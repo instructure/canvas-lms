@@ -61,7 +61,6 @@ module.exports = {
       },
     ],
   ],
-  snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: [
     'jest-localstorage-mock',
     'jest-canvas-mock',

@@ -48,5 +48,4 @@ Run `npm test -- --coverage` for a coverage report.
 * Don't test mocks.
 * Don't test spinners.
 * Don't mock @canvas/i18n, React, ReactDOM
-* Don’t use enzyme.
 * Don’t exceed or increase the default timeout.

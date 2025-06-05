@@ -85,11 +85,10 @@ Usage: node techdebt_stats.js [options]
 Options:
   -h, --help                Show this help message
   -v, --verbose            Show all files instead of just examples
-  -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,enzyme)
+  -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,string-refs)
 
 Available sections:
   skipped         - Skipped tests
-  enzyme          - Enzyme imports
   string-refs     - React string refs
   proptypes       - PropTypes usage
   defaultprops    - DefaultProps usage
@@ -303,56 +302,6 @@ async function showSinonImportStats(verbose = false) {
       })
     } else {
       const examples = await getRandomSinonImportFiles(verbose)
-      examples.forEach(file => {
-        console.log(colorize('gray', `  Example: ${file}`))
-      })
-    }
-  }
-}
-
-async function countEnzymeImports(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]enzyme[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
-  } catch (error) {
-    console.error(colorize('red', `Error counting Enzyme imports: ${error.message}`))
-    return 0
-  }
-}
-
-async function getRandomEnzymeImportFiles(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]enzyme[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
-  } catch (error) {
-    console.error(colorize('red', `Error finding Enzyme import examples: ${error.message}`))
-  }
-  return []
-}
-
-async function showEnzymeImportStats(verbose = false) {
-  const count = await countEnzymeImports(verbose)
-  console.log(colorize('yellow', `- Files with Enzyme imports: ${bold(count)}`))
-
-  if (count > 0) {
-    if (verbose) {
-      const cmd =
-        'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-        'xargs grep -l "from [\'\\"]enzyme[\'\\"]"'
-      const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-      const files = stdout.trim().split('\n').filter(Boolean)
-      files.sort().forEach(file => {
-        console.log(colorize('gray', `  ${file}`))
-      })
-    } else {
-      const examples = await getRandomEnzymeImportFiles(verbose)
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -856,7 +805,6 @@ async function showReactCompilerViolationStats(verbose = false) {
 function getSectionTitle(section) {
   const titles = {
     skipped: ['Skipped Tests', '(fix or remove)'],
-    enzyme: ['Enzyme Imports', '(use testing-library)'],
     'string-refs': ['React String Refs', '(use createRef/useRef/forwardRef/callbackRef)'],
     proptypes: ['PropTypes Usage', '(use TypeScript interfaces/types)'],
     defaultprops: ['DefaultProps Usage', '(use default parameters/TypeScript defaults)'],
@@ -893,12 +841,6 @@ async function printDashboard() {
     if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
       console.log(getSectionTitle('skipped'))
       await countSkippedTests(verbose)
-      console.log()
-    }
-
-    if (selectedSections.length === 0 || selectedSections.includes('enzyme')) {
-      console.log(getSectionTitle('enzyme'))
-      await showEnzymeImportStats(verbose)
       console.log()
     }
 
