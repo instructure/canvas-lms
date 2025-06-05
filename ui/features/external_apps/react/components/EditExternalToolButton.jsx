@@ -41,6 +41,8 @@ export default class EditExternalToolButton extends React.Component {
   }
 
   editButton = React.createRef()
+  configurationForm = React.createRef()
+  lti2Edit = React.createRef()
 
   setContextExternalToolState = data => {
     const tool = Object.assign(data, this.props.tool)
@@ -123,7 +125,7 @@ export default class EditExternalToolButton extends React.Component {
     if (this.state.tool.app_type === 'ContextExternalTool') {
       return (
         <ConfigurationForm
-          ref="configurationForm"
+          ref={this.configurationForm}
           tool={this.state.tool}
           configurationType="manual"
           handleSubmit={this.saveChanges}
@@ -139,7 +141,7 @@ export default class EditExternalToolButton extends React.Component {
       // Lti::ToolProxy
       return (
         <Lti2Edit
-          ref="lti2Edit"
+          ref={this.lti2Edit}
           tool={this.state.tool}
           handleActivateLti2={this.handleActivateLti2}
           handleDeactivateLti2={this.handleDeactivateLti2}
