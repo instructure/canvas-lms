@@ -31,7 +31,7 @@ import type {FormMessage} from '@instructure/ui-form-field'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import type {AssigneeOption} from './Item/types'
 import type {ItemType} from './types'
-import {Spinner} from '@instructure/ui-spinner'
+import AlertManager from '@canvas/alerts/react/AlertManager'
 
 const {Option: CanvasMultiSelectOption} = CanvasMultiSelect as any
 
@@ -207,7 +207,7 @@ const AssigneeSelector = ({
   }, [itemType])
 
   return (
-    <>
+    <AlertManager breakpoints={{}}>
       <CanvasMultiSelect
         disabled={disabledWithGradingPeriod || shouldDisableSelector}
         data-testid="assignee_selector"
@@ -290,7 +290,7 @@ const AssigneeSelector = ({
           </Link>
         </View>
       )}
-    </>
+    </AlertManager>
   )
 }
 
