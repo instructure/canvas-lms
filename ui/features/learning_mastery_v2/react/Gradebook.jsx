@@ -30,7 +30,7 @@ import {
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   CELL_HEIGHT,
-} from './constants'
+} from './utils/constants'
 
 const Gradebook = ({
   courseId,
