@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2018 - present Instructure, Inc.
  *
@@ -18,15 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
-
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
 describe('Gradebook FinalGradeOverrideApi', () => {
-  let server
+  let server: any
 
   beforeEach(() => {
     server = new FakeServer()
@@ -39,7 +39,7 @@ describe('Gradebook FinalGradeOverrideApi', () => {
   describe('.getFinalGradeOverrides()', () => {
     const url = '/courses/1201/gradebook/final_grade_overrides'
 
-    let responseData
+    let responseData: any
 
     beforeEach(() => {
       responseData = {
@@ -100,31 +100,28 @@ describe('Gradebook FinalGradeOverrideApi', () => {
       expect(Object.keys(finalGradeOverrides[1101])).toEqual(['courseGrade'])
     })
 
-    // FOO-4218 - remove or rewrite to remove spies on imports
-    describe.skip('when the request fails', () => {
+    describe('when the request fails', () => {
       beforeEach(() => {
         server.unsetResponses(url)
         server.for(url).respond({status: 500, body: {error: 'Server Error'}})
-
-        sinon.stub(FlashAlert, 'showFlashAlert')
       })
 
       afterEach(() => {
-        // @ts-expect-error
-        FlashAlert.showFlashAlert.restore()
+        jest.clearAllMocks()
       })
 
       it('shows a flash alert', async () => {
         await getFinalGradeOverrides()
-        // @ts-expect-error
-        expect(FlashAlert.showFlashAlert.callCount).toBe(1)
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledTimes(1)
       })
 
       it('flashes an error', async () => {
         await getFinalGradeOverrides()
-        // @ts-expect-error
-        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
-        expect(type).toBe('error')
+        expect(FlashAlert.showFlashAlert).toHaveBeenCalledWith({
+          message: 'There was a problem loading final grade overrides.',
+          type: 'error',
+          err: null,
+        })
       })
     })
   })
