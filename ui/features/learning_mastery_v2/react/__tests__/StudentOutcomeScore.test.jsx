@@ -19,9 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import StudentOutcomeScore from '../StudentOutcomeScore'
-import {svgUrl} from '../icons'
+import {svgUrl} from '../utils/icons'
 
-jest.mock('../icons', () => ({
+jest.mock('../utils/icons', () => ({
   svgUrl: jest.fn(() => 'http://test.com'),
 }))
 

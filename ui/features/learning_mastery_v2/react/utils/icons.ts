@@ -16,7 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const svgUrl = (points, masteryAt) => {
+export type OutcomeIconType =
+  | 'unassessed'
+  | 'exceeds_mastery'
+  | 'mastery'
+  | 'near_mastery'
+  | 'remediation'
+  | 'no_evidence'
+
+/**
+ * Generates a URL to the appropriate SVG icon based on points and mastery level
+ * @param points - The points earned for this outcome, or null if unassessed
+ * @param masteryAt - The points threshold for mastery
+ * @returns The URL path to the corresponding outcome icon
+ */
+export const svgUrl = (points: number | null, masteryAt: number): string => {
   return `/images/outcomes/${getTagIcon(points, masteryAt)}.svg`
 }
 
@@ -26,7 +40,7 @@ export const svgUrl = (points, masteryAt) => {
  *  After OUT-5226 (https://instructure.atlassian.net/browse/OUT-5226), support
  *  for custom outcome scales will be included
  */
-const getTagIcon = (points, masteryAt) => {
+const getTagIcon = (points: number | null, masteryAt: number): OutcomeIconType => {
   if (points == null) {
     return 'unassessed'
   }

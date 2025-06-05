@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {svgUrl} from './icons'
+import {svgUrl} from './utils/icons'
 import {proficiencyRatingShape} from './shapes'
 
 const componentOverrides = {
