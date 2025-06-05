@@ -21,9 +21,6 @@ import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision'
 import WikiPageRevisionsCollection from '../../collections/WikiPageRevisionsCollection'
 import WikiPageRevisionView from '../WikiPageRevisionView'
 import {waitFor} from '@testing-library/react'
-import sinon from 'sinon'
-
-const sandbox = sinon.createSandbox()
 
 describe('WikiPageRevisionView', () => {
   ENV.context_asset_string = 'course_1'
@@ -31,24 +28,28 @@ describe('WikiPageRevisionView', () => {
   test('binds to model change triggers', () => {
     const revision = new WikiPageRevision()
     const view = new WikiPageRevisionView({model: revision})
-    sandbox.mock(view).expects('render').atLeast(1)
+    const renderSpy = jest.spyOn(view, 'render')
     revision.set('body', 'A New Body')
+    expect(renderSpy).toHaveBeenCalled()
   })
 
   test('restore delegates to model.restore', async () => {
     const revision = new WikiPageRevision()
     const view = new WikiPageRevisionView({model: revision})
-    sandbox.spy(view.model, 'restore')
-    sandbox.stub(view, 'windowLocation').returns({
-      href: '',
-      reload() {
-        return true
+    const restoreSpy = jest.spyOn(view.model, 'restore').mockImplementation(() => ({
+      done: callback => {
+        callback({url: 'test-url'})
+        return {fail: () => {}}
       },
+    }))
+    jest.spyOn(view, 'windowLocation').mockReturnValue({
+      href: '',
+      reload: jest.fn(),
     })
     view.restore()
     $('button[data-testid="confirm-button"]').trigger('click')
-    await waitFor(() => view.model.restore.called)
-    expect(view.model.restore.callCount).toBe(1)
+    await waitFor(() => restoreSpy.mock.calls.length > 0)
+    expect(restoreSpy).toHaveBeenCalledTimes(1)
   })
 
   test('toJSON serializes expected values', () => {
