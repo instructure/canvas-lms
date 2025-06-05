@@ -922,6 +922,18 @@ module Lti
         expect(expand!("$Canvas.root_account.global_id")).to eq 10_054_321
       end
 
+      it "has substitution for $Canvas.root_account.decimal_separator" do
+        settings = { decimal_separator: { value: "comma" } }
+        allow(root_account).to receive(:settings).and_return(settings)
+        expect(expand!("$Canvas.root_account.decimal_separator")).to eq "comma"
+      end
+
+      it "has substitution for $Canvas.root_account.thousand_separator" do
+        settings = { thousand_separator: { value: "period" } }
+        allow(root_account).to receive(:settings).and_return(settings)
+        expect(expand!("$Canvas.root_account.thousand_separator")).to eq "period"
+      end
+
       it "has substitution for $Canvas.shard.id" do
         expect(expand!("$Canvas.shard.id")).to eq Shard.current.id
       end
