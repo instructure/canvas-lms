@@ -514,6 +514,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   ): LtiAssetProcessorConnection
   moderatedGrading: ModeratedGrading
   moderatedGradingEnabled: Boolean
+  moduleItems: [ModuleItem!]
   modules: [Module!]
   muted: Boolean
   mySubAssignmentSubmissionsConnection(

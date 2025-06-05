@@ -708,5 +708,22 @@ module Types
     def is_new_quiz
       assignment.quiz_lti?
     end
+
+    field :module_items, [Types::ModuleItemType], null: true
+    def module_items
+      case object.submission_types
+      when "online_quiz"
+        load_association(:quiz).then do |quiz|
+          Loaders::AssociationLoader.for(QuizType, :context_module_tags).load(quiz)
+        end
+
+      when "discussion_topic"
+        load_association(:discussion_topic).then do |discussion|
+          Loaders::AssociationLoader.for(DiscussionType, :context_module_tags).load(discussion)
+        end
+      else
+        load_association(:context_module_tags)
+      end
+    end
   end
 end
