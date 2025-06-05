@@ -199,6 +199,10 @@ body:not(.course-menu-expanded) {
     margin-#{direction(right)}: $ic-sp;
     @include fontSize($ic-font-size--xsmall);
 
+    &:focus {
+      @include ic-focus-variant-inst;
+    }
+
     @include mobile-only {
       display: inline-block;
       width: 100%;
