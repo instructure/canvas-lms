@@ -557,21 +557,17 @@ describe Types::AssignmentType do
       end
 
       it "returns submissions only for the given section" do
-        section1_submission_ids = assignment_type.resolve(<<~GQL, current_user: teacher)
-          submissionsConnection(filter: {sectionIds: [#{section1.id}]}) {
+        gql = "submissionsConnection(filter: {sectionIds: [#{section1.id}]}) {
             edges { node { _id } }
-          }
-        GQL
+          }"
+        section1_submission_ids = assignment_type.resolve(gql, current_user: teacher)
         expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
       end
 
       it "respects visibility for limited teachers" do
         teacher.enrollments.first.update! course_section: section2,
                                           limit_privileges_to_course_section: true
-
-        submissions = assignment_type.resolve(<<~GQL, current_user: teacher)
-          submissionsConnection { nodes { _id } }
-        GQL
+        submissions = assignment_type.resolve("submissionsConnection { nodes { _id } }", current_user: teacher)
 
         expect(submissions).not_to include @section1_student_submission.id.to_s
         expect(submissions).to include @section2_student_submission.id.to_s
@@ -1443,6 +1439,90 @@ describe Types::AssignmentType do
 
     it "returns nil as assignment visiblity for non-authorized users" do
       expect(assignment_type.resolve("assignmentVisibility")).to be_nil
+    end
+  end
+
+  describe "module_items" do
+    let_once(:module_1) { course.context_modules.create!(name: "module 1") }
+    let_once(:module_2) { course.context_modules.create!(name: "module 2") }
+
+    let(:regular_assignment) do
+      assignment = course.assignments.create!(
+        title: "regular assignment",
+        submission_types: "online_text_entry"
+      )
+      module_1.add_item(type: "assignment", id: assignment.id)
+      assignment
+    end
+
+    let(:multi_module_assignment) do
+      assignment = course.assignments.create!(
+        title: "multi module assignment",
+        submission_types: "online_text_entry,online_upload"
+      )
+      module_1.add_item(type: "assignment", id: assignment.id)
+      module_2.add_item(type: "assignment", id: assignment.id)
+      assignment
+    end
+
+    let(:quiz_assignment) do
+      quiz = course.quizzes.create!(title: "test quiz")
+      quiz.publish!
+      module_1.add_item(type: "quiz", id: quiz.id)
+      quiz.assignment
+    end
+
+    let(:discussion_assignment) do
+      discussion = course.discussion_topics.create!(
+        title: "test discussion",
+        assignment: course.assignments.create!
+      )
+      module_1.add_item(type: "discussion_topic", id: discussion.id)
+      discussion.assignment
+    end
+
+    let(:orphaned_assignment) do
+      course.assignments.create!(title: "orphaned assignment")
+    end
+
+    it "returns module items for regular assignment" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(regular_assignment.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(regular_assignment.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Assignment"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns module items for quiz assignment" do
+      resolver = GraphQLTypeTester.new(quiz_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(quiz_assignment.quiz.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(quiz_assignment.quiz.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Quizzes::Quiz"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns module items for discussion assignment" do
+      resolver = GraphQLTypeTester.new(discussion_assignment, current_user: teacher)
+      expect(resolver.resolve("moduleItems { _id }")).to eq(discussion_assignment.discussion_topic.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(discussion_assignment.discussion_topic.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["DiscussionTopic"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s]
+    end
+
+    it "returns empty array when assignment is not in any module" do
+      resolver = GraphQLTypeTester.new(orphaned_assignment, current_user: teacher)
+      module_items = resolver.resolve("moduleItems { id }")
+
+      expect(module_items).to eq []
+    end
+
+    it "returns multiple module items for an assignment in multiple modules" do
+      resolver = GraphQLTypeTester.new(multi_module_assignment, current_user: teacher)
+
+      expect(resolver.resolve("moduleItems { _id }")).to eq(multi_module_assignment.context_module_tags.map { |tag| tag.id.to_s })
+      expect(resolver.resolve("moduleItems { position }")).to eq(multi_module_assignment.context_module_tags.map(&:position))
+      expect(resolver.resolve("moduleItems { content { type } }")).to eq ["Assignment", "Assignment"]
+      expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s, module_2.id.to_s]
     end
   end
 end
