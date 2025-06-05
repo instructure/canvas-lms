@@ -73,7 +73,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 medium">
+      <Flex.Item margin="0 small">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item>
@@ -93,7 +93,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 medium">
+      <Flex.Item margin="0 small">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item align="end" margin="0 x-small x-small 0">
@@ -101,7 +101,7 @@ export default function JobsHeader({
           <strong>{I18n.t('Scope:')}</strong>
         </PresentationContent>
       </Flex.Item>
-      <Flex.Item align="end" shouldGrow={true}>
+      <Flex.Item align="end" shouldGrow={true} shouldShrink={true}>
         <SimpleSelect
           renderLabel={<ScreenReaderContent>{I18n.t('Scope')}</ScreenReaderContent>}
           onChange={onChangeScope}
