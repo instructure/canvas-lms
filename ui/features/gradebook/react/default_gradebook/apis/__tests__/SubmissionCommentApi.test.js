@@ -18,10 +18,16 @@
 
 import SubmissionCommentApi from '../SubmissionCommentApi'
 import {underscoreProperties} from '@canvas/convert-case'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('SubmissionCommentApi.updateSubmissionComment', () => {
-  let server
   const commentId = '12'
   const url = `/submission_comments/${commentId}`
   const updatedComment = 'an updated comment!'
@@ -32,30 +38,33 @@ describe('SubmissionCommentApi.updateSubmissionComment', () => {
     comment: updatedComment,
     edited_at: editedAt,
   }
-  const responseBody = JSON.stringify({submission_comment: underscoreProperties(submissionComment)})
-
-  beforeEach(() => {
-    server = sinon.fakeServer.create({respondImmediately: true})
-  })
-
-  afterEach(() => {
-    server.restore()
-  })
 
   it('on success, returns the submission comment with the updated comment', async () => {
-    server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
+    server.use(
+      http.put(url, () => {
+        return HttpResponse.json({submission_comment: underscoreProperties(submissionComment)})
+      }),
+    )
     const response = await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
     expect(response.data.comment).toBe(updatedComment)
   })
 
   it('on success, returns the submission comment with an updated editedAt', async () => {
-    server.respondWith('PUT', url, [200, {'Content-Type': 'application/json'}, responseBody])
+    server.use(
+      http.put(url, () => {
+        return HttpResponse.json({submission_comment: underscoreProperties(submissionComment)})
+      }),
+    )
     const response = await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
     expect(response.data.editedAt.getTime()).toBe(new Date(editedAt).getTime())
   })
 
   it('on failure, returns a rejected promise with the error', async () => {
-    server.respondWith('PUT', url, [500, {'Content-Type': 'application/json'}, JSON.stringify({})])
+    server.use(
+      http.put(url, () => {
+        return HttpResponse.json({}, {status: 500})
+      }),
+    )
     try {
       await SubmissionCommentApi.updateSubmissionComment(commentId, updatedComment)
     } catch (error) {
@@ -68,7 +77,6 @@ describe('SubmissionCommentApi.createSubmissionComment', () => {
   let assignmentId
   let commentData
   let courseId
-  let server
   let studentId
   let url
 
@@ -77,28 +85,23 @@ describe('SubmissionCommentApi.createSubmissionComment', () => {
     commentData = {group_comment: 0, text_comment: 'comment!'}
     courseId = '1201'
     studentId = '1101'
-    server = sinon.fakeServer.create({respondImmediately: true})
     url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   })
 
-  afterEach(() => {
-    server.restore()
-  })
-
   it('builds data from comment data', async () => {
-    const response = [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({submission_comments: []}),
-    ]
-    server.respondWith('PUT', url, response)
+    let capturedRequestBody
+    server.use(
+      http.put(url, async ({request}) => {
+        capturedRequestBody = await request.json()
+        return HttpResponse.json({submission_comments: []})
+      }),
+    )
     await SubmissionCommentApi.createSubmissionComment(
       courseId,
       assignmentId,
       studentId,
       commentData,
     )
-    const {requestBody} = server.requests[0]
-    expect(JSON.parse(requestBody)).toEqual({comment: {group_comment: 0, text_comment: 'comment!'}})
+    expect(capturedRequestBody).toEqual({comment: {group_comment: 0, text_comment: 'comment!'}})
   })
 })
