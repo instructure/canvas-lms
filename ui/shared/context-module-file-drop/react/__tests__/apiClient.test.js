@@ -16,36 +16,61 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../msw/mswServer'
 import {getCourseRootFolder, getFolderFiles} from '../apiClient'
 
+const server = mswServer([])
+
+beforeAll(() => {
+  server.listen()
+})
+
 beforeEach(() => {
-  moxios.install()
+  // Reset handlers for each test
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   jest.clearAllMocks()
 })
 
+afterAll(() => {
+  server.close()
+})
+
 it('fetches course root folder', async () => {
-  moxios.stubRequest('/api/v1/courses/1/folders/root', {
-    response: {files: []},
-  })
+  server.use(
+    http.get('*/api/v1/courses/1/folders/root', () => {
+      return new HttpResponse(JSON.stringify({files: []}), {
+        status: 200,
+        headers: {'Content-Type': 'application/json'},
+      })
+    }),
+  )
   const rootFolder = await getCourseRootFolder('1')
   expect(rootFolder).toEqual({files: []})
 })
 
 it('fetches folder files across pages', async () => {
-  moxios.stubRequest('/api/v1/folders/1/files?only[]=names', {
-    response: [{display_name: 'a.txt'}],
-    headers: {
-      link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"',
-    },
-  })
-  moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2', {
-    response: [{display_name: 'b.txt'}],
-  })
+  server.use(
+    http.get('*/api/v1/folders/1/files', ({request}) => {
+      const url = new URL(request.url)
+      if (url.searchParams.get('page') === '2') {
+        return new HttpResponse(JSON.stringify([{display_name: 'b.txt'}]), {
+          status: 200,
+          headers: {'Content-Type': 'application/json'},
+        })
+      }
+      return new HttpResponse(JSON.stringify([{display_name: 'a.txt'}]), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"',
+        },
+      })
+    }),
+  )
   const files = await getFolderFiles('1')
   expect(files.map(f => f.get('display_name'))).toEqual(['a.txt', 'b.txt'])
 })

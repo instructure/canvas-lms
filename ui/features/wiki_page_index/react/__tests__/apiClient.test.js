@@ -16,22 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../../shared/msw/mswServer'
 import {deletePages} from '../apiClient'
 
+const server = mswServer([])
+
+beforeAll(() => {
+  server.listen()
+})
+
 beforeEach(() => {
-  moxios.install()
+  // Reset handlers for each test
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   jest.clearAllMocks()
 })
 
+afterAll(() => {
+  server.close()
+})
+
 it('deletes pages', async () => {
-  moxios.stubRequest('/api/v1/courses/1/pages/my_page', {
-    response: {},
-  })
+  server.use(
+    http.delete('*/api/v1/courses/1/pages/my_page', () => {
+      return new HttpResponse(JSON.stringify({}), {
+        status: 200,
+        headers: {'Content-Type': 'application/json'},
+      })
+    }),
+  )
   const response = await deletePages('courses', '1', ['my_page'])
   expect(response.failures).toEqual([])
   expect(response.successes[0].data).toEqual('my_page')
