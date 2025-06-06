@@ -115,6 +115,26 @@ describe Attachment do
         expect(get(attachment.public_url)).to be_routable
       end
     end
+
+    context "with the :disable_file_verifier_access flag off" do
+      before(:once) { @course.root_account.disable_feature!(:file_association_access) }
+
+      it "returns a URL with a uuid verifier" do
+        attachment = attachment_with_context(@course)
+        expect(attachment.public_url).to end_with("/files/#{attachment.id}/download?verifier=#{attachment.uuid}")
+      end
+    end
+
+    context "with the :disable_file_verifier_access flag on" do
+      before(:once) { @course.root_account.enable_feature!(:file_association_access) }
+
+      it "returns a URL with with a jwt verifier" do
+        attachment = attachment_with_context(@course)
+        md = attachment.public_url(user: @teacher).match(%r{/files/#{attachment.id}/download\?verifier=(.+)$})
+
+        expect(CanvasSecurity.decode_jwt(md[1])).to_not be_nil
+      end
+    end
   end
 
   context "public_url InstFS storage" do
@@ -1871,7 +1891,8 @@ describe Attachment do
           id: 1,
           context: content_export,
           display_name: "attachment",
-          uuid: SecureRandom.uuid
+          uuid: SecureRandom.uuid,
+          root_account: @course.root_account
         )
       end
 
@@ -1884,7 +1905,8 @@ describe Attachment do
           id: 1,
           context: @course,
           display_name: "attachment",
-          uuid: SecureRandom.uuid
+          uuid: SecureRandom.uuid,
+          root_account: @course.root_account
         )
       end
 

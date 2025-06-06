@@ -515,7 +515,7 @@ class FilesController < ApplicationController
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
     if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download, check_submissions: false)
-      render json: { public_url: @attachment.public_url(secure: request.ssl?) }
+      render json: { public_url: @attachment.public_url(secure: request.ssl?, user: @current_user) }
     end
   end
 
