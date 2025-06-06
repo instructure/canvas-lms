@@ -399,6 +399,8 @@
   path: '/api/v1/accounts/:account_id/unconfirmed_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/unconfirmed_communication_channels/confirm'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/users'
 - verb: GET
   path: '/api/v1/accounts/:account_id/users'
 - verb: POST
@@ -413,6 +415,8 @@
   path: '/api/v1/accounts/:account_id/users/:user_id/account_notifications/:id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/users/:user_id/restore'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/users/bulk_update'
 - verb: GET
   path: '/api/v1/accounts/:account_id/visible_calendars_count'
 - verb: GET
