@@ -28,6 +28,8 @@ export default class SearchGradingPeriodsField extends React.Component {
     changeSearchText: PropTypes.func.isRequired,
   }
 
+  inputRef = React.createRef()
+
   onChange = event => {
     const trimmedText = event.target.value.trim()
     this.search(trimmedText)
@@ -42,7 +44,7 @@ export default class SearchGradingPeriodsField extends React.Component {
       <div className="GradingPeriodSearchField ic-Form-control">
         <input
           type="text"
-          ref="input"
+          ref={this.inputRef}
           className="ic-Input"
           placeholder={I18n.t('Search grading periods...')}
           onChange={this.onChange}

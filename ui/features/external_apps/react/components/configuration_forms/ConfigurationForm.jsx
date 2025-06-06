@@ -49,6 +49,7 @@ export default class ConfigurationForm extends React.Component {
     this.configurationFormUrlRef = React.createRef()
     this.configurationFormXmlRef = React.createRef()
     this.configurationFormLti2Ref = React.createRef()
+    this.configurationFormLti13Ref = React.createRef()
     this.configurationTypeSelectorRef = React.createRef()
     this.submitLti2Ref = React.createRef()
     this.submitRef = React.createRef()
@@ -128,7 +129,7 @@ export default class ConfigurationForm extends React.Component {
         form = this.configurationFormXmlRef.current
         break
       case 'byClientId':
-        form = this.lti13Form
+        form = this.configurationFormLti13Ref.current
         break
       case 'lti2':
         form = this.configurationFormLti2Ref.current
@@ -228,9 +229,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'byClientId') {
       return (
         <ConfigurationFormLti13
-          ref={el => {
-            this.lti13Form = el
-          }}
+          ref={this.configurationFormLti13Ref}
           data-testid="configuration-form-lti13"
         />
       )
