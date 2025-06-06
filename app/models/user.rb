@@ -2624,8 +2624,8 @@ class User < ActiveRecord::Base
 
     sorted_events = events.sort_by do |e|
       due_date = e.start_at
-      if e.respond_to? :formatted_dates_hash_visible_to
-        e.formatted_dates_hash_visible_to(self).any? do |due_hash|
+      if e.respond_to? :dates_hash_visible_to
+        e.dates_hash_visible_to(self).any? do |due_hash|
           due_date = due_hash[:due_at] if due_hash[:due_at]
         end
       end
@@ -2657,7 +2657,7 @@ class User < ActiveRecord::Base
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
       if a.context.grants_any_right?(self, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-        a.formatted_dates_hash_visible_to(self).any? do |due_hash|
+        a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end
       else
