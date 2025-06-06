@@ -486,7 +486,7 @@ shared_examples_for "context modules for teachers" do
     wait_for_ajaximations
 
     tooltip = fj(".vdd_tooltip_content:visible")
-    expect(tooltip).to include_text "New Section"
+    expect(tooltip).to include_text "1 Section"
     expect(tooltip).to include_text "Everyone else"
   end
 

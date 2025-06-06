@@ -2727,33 +2727,33 @@ describe User do
     end
 
     it "returns assignments that have an override between now and end_at opt" do
-      user = course_with_teacher(active_all: true).user
-      assignment1 = @course.assignments.create!(title: "Assignment1")
-      assignment2 = @course.assignments.create!(title: "Assignment2")
-      assignment3 = @course.assignments.create!(title: "Assignment3")
-      assignment4 = @course.assignments.create!(title: "Assignment4")
-
+      assignments = [double, double, double, double]
+      context = double
       Timecop.freeze(Time.utc(2013, 3, 13, 0, 0)) do
+        user = User.new
+        allow(context).to receive(:grants_any_right?).with(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).and_return true
         due_date1 = { due_at: 1.day.from_now }
         due_date2 = { due_at: 1.week.from_now }
         due_date3 = { due_at: 2.weeks.from_now }
         due_date4 = { due_at: nil }
-
-        expect(assignment1).to receive(:formatted_dates_hash_visible_to).with(user)
-                                                                        .and_return [due_date1]
-        expect(assignment2).to receive(:formatted_dates_hash_visible_to).with(user)
-                                                                        .and_return [due_date2]
-        expect(assignment3).to receive(:formatted_dates_hash_visible_to).with(user)
-                                                                        .and_return [due_date3]
-        expect(assignment4).to receive(:formatted_dates_hash_visible_to).with(user)
-                                                                        .and_return [due_date4]
-        upcoming_assignments = user.select_upcoming_assignments(@course.assignments, {
+        assignments.each do |assignment|
+          allow(assignment).to receive(:context).and_return(context)
+        end
+        expect(assignments.first).to receive(:dates_hash_visible_to).with(user)
+                                                                    .and_return [due_date1]
+        expect(assignments.second).to receive(:dates_hash_visible_to).with(user)
+                                                                     .and_return [due_date2]
+        expect(assignments.third).to receive(:dates_hash_visible_to).with(user)
+                                                                    .and_return [due_date3]
+        expect(assignments[3]).to receive(:dates_hash_visible_to).with(user)
+                                                                 .and_return [due_date4]
+        upcoming_assignments = user.select_upcoming_assignments(assignments, {
                                                                   end_at: 1.week.from_now
                                                                 })
-        expect(upcoming_assignments).to include assignment1
-        expect(upcoming_assignments).to include assignment2
-        expect(upcoming_assignments).not_to include assignment3
-        expect(upcoming_assignments).not_to include assignment4
+        expect(upcoming_assignments).to include assignments.first
+        expect(upcoming_assignments).to include assignments.second
+        expect(upcoming_assignments).not_to include assignments.third
+        expect(upcoming_assignments).not_to include assignments[3]
       end
     end
   end
