@@ -20,6 +20,7 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import axios from '@canvas/axios'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {windowAlert, reloadWindow} from '@canvas/util/globalUtils'
 import template from '../../jst/ExternalContentHomeworkFileSubmissionView.handlebars'
 import ExternalContentHomeworkSubmissionView from './ExternalContentHomeworkSubmissionView'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
@@ -41,23 +42,25 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
 
   render() {
     super.render()
-    const mountPoints = document.querySelectorAll('.turnitin_pledge_container_external_homework_file')
+    const mountPoints = document.querySelectorAll(
+      '.turnitin_pledge_container_external_homework_file',
+    )
     if (mountPoints.length > 0) {
       const pledgeMount = mountPoints[mountPoints.length - 1]
       if (pledgeMount) {
         const pledgeRoot = this.pledgeRoot ?? createRoot(pledgeMount)
         const eulaUrl = pledgeMount.dataset.eulaurl
         const pledgeText = pledgeMount.dataset.pledge
-        const setShouldShowPledgeError = (shouldShow) => this.shouldShowPledgeError = shouldShow
+        const setShouldShowPledgeError = shouldShow => (this.shouldShowPledgeError = shouldShow)
         const getShouldShowFileRequiredError = () => this.shouldShowPledgeError
         pledgeRoot.render(
           <SimilarityPledge
-            inputId='turnitin_pledge_external_content'
+            inputId="turnitin_pledge_external_content"
             setShouldShowPledgeError={setShouldShowPledgeError}
             getShouldShowPledgeError={getShouldShowFileRequiredError}
             eulaUrl={eulaUrl}
             pledgeText={pledgeText}
-          />
+          />,
         )
       }
     }
@@ -70,13 +73,13 @@ class ExternalContentFileSubmissionView extends ExternalContentHomeworkSubmissio
   reloadSuccessfulAssignment(_responseData) {
     $(window).off('beforeunload') // remove alert message from being triggered
 
-    window.alert(
+    windowAlert(
       I18n.t(
         'processing_submission',
         'Canvas is currently processing your submission. You can safely navigate away from this page and we will email you if the submission fails to process.',
       ),
     )
-    window.location.reload()
+    reloadWindow()
     this.loaderPromise.resolve()
   }
 

@@ -24,6 +24,11 @@ import '@canvas/rails-flash-notifications'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import axios from '@canvas/axios'
 
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+  reloadWindow: jest.fn(),
+}))
+
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
