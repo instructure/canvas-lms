@@ -33,8 +33,12 @@ module ObserverEnrollmentsHelper
 
     users = Rails.cache.fetch_with_batched_keys(["observed_users2", course_id].cache_key, batch_object: user, batched_keys: :enrollments, expires_in: 1.day) do
       GuardRail.activate(:secondary) do
-        scope = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards)
-        scope = scope.where(course_id:) if course_id
+        scope = user.enrollments.active_or_pending_by_date
+        scope = if course_id
+                  scope.shard(Shard.shard_for(course_id)).where(course_id:)
+                else
+                  scope.shard(user.in_region_associated_shards)
+                end
         has_own_enrollments = scope.not_of_observer_type.exists? || scope.of_observer_type.where(associated_user_id: nil).exists?
         users = User.where(
           id: scope.of_observer_type.where.not(associated_user_id: nil).distinct.limit(MAX_OBSERVED_USERS).pluck(:associated_user_id)
