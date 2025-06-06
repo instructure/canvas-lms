@@ -296,7 +296,6 @@
     "fast-glob": "^3.2.4",
     "fetch-mock": "9.11.0",
     "file-loader": "^4",
-    "find-up": "^5.0.0",
     "gglobby": "0.0.3",
     "glob": "^7",
     "globals": "^15.13.0",
