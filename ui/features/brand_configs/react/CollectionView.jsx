@@ -24,6 +24,7 @@ import customTypes from '@canvas/theme-editor/react/PropTypes'
 import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 import ThemeCard from './ThemeCard'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {reloadWindow} from '@canvas/util/globalUtils'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Link} from '@instructure/ui-link'
@@ -120,7 +121,7 @@ export default function CollectionView(props) {
       path: `/api/v1/shared_brand_configs/${id}`,
       method: 'DELETE',
     })
-    window.location.reload()
+    reloadWindow()
   }
 
   function isActiveBrandConfig(config) {
