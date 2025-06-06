@@ -55,12 +55,17 @@ const allTermsGroup = (
 )
 
 export default function CoursesToolbar({
-  can_create_courses,
-  terms,
+  can_create_courses = window.ENV &&
+    window.ENV.PERMISSIONS &&
+    window.ENV.PERMISSIONS.can_create_courses,
+  terms = {
+    data: [],
+    loading: false,
+  },
   filteredTerms,
   onApplyFilters,
   onUpdateFilters,
-  isLoading,
+  isLoading = false,
   errors,
   draftFilters,
   toggleSRMessage,
@@ -219,7 +224,7 @@ CoursesToolbar.propTypes = {
   can_create_courses: bool,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
-  isLoading: bool.isRequired,
+  isLoading: bool,
   draftFilters: shape({
     enrollment_type: arrayOf(
       oneOf(['teacher', 'student', 'ta', 'observer', 'designer']).isRequired,
@@ -231,14 +236,4 @@ CoursesToolbar.propTypes = {
   errors: shape({search_term: string}).isRequired,
   terms: termsPropType,
   filteredTerms: arrayOf(termType).isRequired,
-}
-
-CoursesToolbar.defaultProps = {
-  can_create_courses:
-    window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_courses,
-  terms: {
-    data: [],
-    loading: false,
-  },
-  isLoading: false,
 }
