@@ -55,6 +55,13 @@ export default class Toolbar extends React.Component {
     userCanRestrictFilesForContext: PropTypes.bool,
   }
 
+  constructor(props) {
+    super(props)
+    this.usageRightsBtnRef = React.createRef()
+    this.previewLinkRef = React.createRef()
+    this.searchTermRef = React.createRef()
+  }
+
   UNSAFE_componentWillMount() {
     this.downloadTitle = I18n.t('Download as Zip')
     this.tabIndex = null
@@ -141,17 +148,19 @@ export default class Toolbar extends React.Component {
       />
     )
 
-    return this.props.modalOptions.openModal(contents, () => this.refs.usageRightsBtn.focus())
+    return this.props.modalOptions.openModal(contents, () =>
+      this.usageRightsBtnRef.current?.focus(),
+    )
   }
 
   openPreview() {
-    FocusStore.setItemToFocus(this.refs.previewLink)
+    FocusStore.setItemToFocus(this.previewLinkRef.current)
     const queryString = $.param(this.props.getPreviewQuery())
     page(`${this.props.getPreviewRoute()}?${queryString}`)
   }
 
   onSubmitSearch() {
-    const searchTerm = this.refs.searchTerm.value
+    const searchTerm = this.searchTermRef.current?.value || ''
     page(`/search?search_term=${searchTerm}`)
   }
 
@@ -297,7 +306,7 @@ export default class Toolbar extends React.Component {
     if (canManage) {
       return (
         <button
-          ref="usageRightsBtn"
+          ref={this.usageRightsBtnRef}
           type="button"
           disabled={!this.showingButtons}
           className="Toolbar__ManageUsageRights ui-button btn-rights"
@@ -450,7 +459,7 @@ export default class Toolbar extends React.Component {
             placeholder={I18n.t('Search for files')}
             aria-label={I18n.t('Search for files')}
             type="search"
-            ref="searchTerm"
+            ref={this.searchTermRef}
             className="ic-Input"
             defaultValue={this.props.query.search_term}
           />
@@ -465,7 +474,7 @@ export default class Toolbar extends React.Component {
             {/* TODO: use InstUI button */}
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
-              ref="previewLink"
+              ref={this.previewLinkRef}
               href="#"
               onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : () => {}}
               className={viewBtnClasses}
