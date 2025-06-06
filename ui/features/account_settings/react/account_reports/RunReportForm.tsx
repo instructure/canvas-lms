@@ -38,7 +38,6 @@ interface Props {
   reportName: string
   closeModal: () => void
   onSuccess: (reportName: string) => void
-  onRender: () => void
 }
 
 const getParameterName = (name: string) => {
@@ -95,7 +94,6 @@ export default function ConfigureReportForm(props: Props) {
 
   useEffect(() => {
     if (formRef.current) {
-      props.onRender()
       const $form = $(formRef.current)
       const record = dateRefs
 
