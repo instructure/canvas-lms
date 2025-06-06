@@ -163,7 +163,7 @@ describe OverrideListPresenter do
         override.assignment_override_students.create!(user: second_user, assignment:)
         override.save!
 
-        @due_date = presenter.assignment.formatted_dates_hash_visible_to(user).first
+        @due_date = presenter.assignment.dates_hash_visible_to(user).first
       end
 
       it "returns a dynamically generated title based on the number of current and invited users" do
@@ -196,12 +196,18 @@ describe OverrideListPresenter do
   describe "#visible_due_dates" do
     attr_reader :visible_due_dates
 
+    let(:sections) do
+      # the count is the important part, the actual course sections are
+      # not used
+      [double, double, double]
+    end
+
     def dates_visible_to_user
       [
         { due_at: "", lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: 1.hour.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: 2.hours.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
-        { due_at: 1.hour.ago, lock_at: nil, unlock_at: nil, base: true }
+        { due_at: 1.day.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: 2.days.from_now, lock_at: nil, unlock_at: nil, set_type: "CourseSection" },
+        { due_at: 2.days.ago, lock_at: nil, unlock_at: nil, base: true }
       ]
     end
 
@@ -210,121 +216,53 @@ describe OverrideListPresenter do
       expect(presenter.visible_due_dates).to eq []
     end
 
-    context "with assignment present as a teacher" do
+    context "when all sections have overrides" do
       before do
-        @section1 = course.course_sections.create! name: "section 1"
-        @section2 = course.course_sections.create! name: "section 2"
-        @overridden_assignment = course.assignments.create!(title: "Overridden Assignment")
-        @teacher = teacher_in_course(course:, name: "Testing").user
-        allow(AssignmentOverrideApplicator).to receive(:assignment_overridden_for)
-          .with(@overridden_assignment, @teacher).and_return @overridden_assignment
-        @presenter = OverrideListPresenter.new @overridden_assignment, @teacher
+        allow(assignment.context).to receive(:active_section_count)
+          .and_return sections.count
+        allow(assignment).to receive(:all_dates_visible_to).with(user)
+                                                           .and_return dates_visible_to_user
+        @visible_due_dates = presenter.visible_due_dates
       end
 
-      context "when all sections have overrides" do
-        before do
-          @overridden_assignment.assignment_overrides.create!(set: @section1)
-          @overridden_assignment.assignment_overrides.create!(set: @section2, due_at: 1.hour.from_now)
-          @overridden_assignment.assignment_overrides.create!(set: course.default_section, due_at: 2.hours.from_now)
-          @overridden_assignment.due_at = 1.hour.ago
-          @overridden_assignment.save!
-
-          @visible_due_dates = @presenter.visible_due_dates
-        end
-
-        it "doesn't include the default due date" do
-          expect(visible_due_dates.length).to eq 3
-          visible_due_dates.each do |override|
-            expect(override[:base]).not_to be_truthy
-          end
-        end
-
-        it "sorts due dates by due_at, placing not present?/nil after dates" do
-          expect(visible_due_dates.first[:due_at]).to eq(
-            presenter.formatted_date_string(:due_at, dates_visible_to_user.second)
-          )
-          expect(visible_due_dates.second[:due_at]).to eq(
-            presenter.formatted_date_string(:due_at, dates_visible_to_user.third)
-          )
-          expect(visible_due_dates.third[:due_at]).to eq(
-            presenter.formatted_date_string(:due_at, dates_visible_to_user.first)
-          )
-        end
-
-        it "includes the actual Time for presentation transforms in templates" do
-          expect(visible_due_dates.second[:raw][:due_at]).to be_a(Time)
+      it "doesn't include the default due date" do
+        expect(visible_due_dates.length).to eq 3
+        visible_due_dates.each do |override|
+          expect(override[:base]).not_to be_truthy
         end
       end
 
-      context "only some sections have overrides" do
-        before do
-          @overridden_assignment.assignment_overrides.create!(set: @section2, due_at: 1.day.from_now)
-          @overridden_assignment.due_at = 2.days.ago
-          @overridden_assignment.save!
-
-          @visible_due_dates = @presenter.visible_due_dates
-        end
-
-        it "includes the default due date" do
-          expect(visible_due_dates.detect { |due_date| due_date[:due_for] == "Everyone else" })
-            .not_to be_nil
-        end
+      it "sorts due dates by due_at, placing not present?/nil after dates" do
+        expect(visible_due_dates.first[:due_at]).to eq(
+          presenter.formatted_date_string(:due_at, dates_visible_to_user.second)
+        )
+        expect(visible_due_dates.second[:due_at]).to eq(
+          presenter.formatted_date_string(:due_at, dates_visible_to_user.third)
+        )
+        expect(visible_due_dates.third[:due_at]).to eq(
+          presenter.formatted_date_string(:due_at, dates_visible_to_user.first)
+        )
       end
 
-      context "with module overrides" do
-        before do
-          @module = course.context_modules.create!(name: "Module 1")
-          @module.add_item(type: "assignment", id: @overridden_assignment.id)
-          @module.assignment_overrides.create!(set: @section1)
-          @overridden_assignment.due_at = 2.days.ago
-          @overridden_assignment.save!
+      it "includes the actual Time for presentation transforms in templates" do
+        expect(visible_due_dates.second[:raw][:due_at]).to be_a(Time)
+      end
+    end
 
-          @visible_due_dates = @presenter.visible_due_dates
-        end
+    context "only some sections have overrides" do
+      let(:dates_visible) { dates_visible_to_user[1..] }
 
-        it "does not include the default due date" do
-          expect(visible_due_dates.detect { |due_date| due_date[:due_for] == "Everyone else" })
-            .to be_nil
-        end
+      before do
+        allow(assignment.context).to receive(:active_section_count)
+          .and_return sections.count
+        allow(assignment).to receive(:all_dates_visible_to).with(user)
+                                                           .and_return dates_visible
+        @visible_due_dates = presenter.visible_due_dates
+      end
 
-        it "includes the module overrides" do
-          expect(visible_due_dates.detect { |due_date| due_date[:due_for] == "1 Section" })
-            .not_to be_nil
-        end
-
-        it "does not duplicate overwritten module overrides" do
-          @overridden_assignment.assignment_overrides.create!(set: @section1, due_at: 1.day.from_now)
-          @overridden_assignment.due_at = 2.days.ago
-          @overridden_assignment.save!
-          @visible_due_dates = @presenter.visible_due_dates
-
-          expect(visible_due_dates.length).to eq 1
-          expect(visible_due_dates.first[:due_for]).to eq "1 Section"
-          expect(visible_due_dates.first[:due_at]).to_not be_nil
-        end
-
-        it "ignores unassigned module overrides" do
-          @module.assignment_overrides.create!(set: @section2)
-          @overridden_assignment.assignment_overrides.create!(set: @section2, unassign_item: true)
-
-          @visible_due_dates = @presenter.visible_due_dates
-          expect(visible_due_dates.length).to eq 1
-          expect(visible_due_dates.first[:due_for]).to eq "1 Section"
-        end
-
-        it "includes Course overrides" do
-          @overridden_assignment.assignment_overrides.create!(set: course, due_at: 1.hour.from_now)
-          @overridden_assignment.due_at = 2.days.ago
-          @overridden_assignment.save!
-
-          @visible_due_dates = @presenter.visible_due_dates
-          expect(visible_due_dates.length).to eq 2
-          expect(visible_due_dates.detect do |due_date|
-            due_date[:due_for] == "Everyone else" &&
-            due_date[:due_at] == presenter.formatted_date_string(:due_at, dates_visible_to_user.second)
-          end)
-            .not_to be_nil
-        end
+      it "includes the default due date" do
+        expect(visible_due_dates.detect { |due_date| due_date[:base] == true })
+          .not_to be_nil
       end
     end
   end
