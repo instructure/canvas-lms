@@ -74,7 +74,6 @@ describe('Gradebook', () => {
         },
       ],
       courseId: '100',
-      visibleRatings: [true, true, true, true, true, true],
       gradebookFilters: [],
       gradebookFilterHandler: jest.fn(),
       ...props,

@@ -114,14 +114,6 @@ describe('LearningMastery', () => {
     window.ENV = oldEnv
   })
 
-  it('renders each proficiency rating description specified in window.ENV', async () => {
-    const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    ratings.forEach(rating => {
-      expect(getByText(rating.description)).toBeInTheDocument()
-    })
-  })
-
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
     useRollups.mockReturnValue({isLoading: true})
     const {getByText} = render(<LearningMastery {...defaultProps()} />)

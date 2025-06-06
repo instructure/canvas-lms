@@ -66,7 +66,6 @@ describe('ScoresGrid', () => {
           ],
         },
       ],
-      visibleRatings: [true, true, true, true, true, true],
       ...props,
     }
   }

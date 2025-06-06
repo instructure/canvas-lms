@@ -18,13 +18,6 @@
 
 import PropTypes from 'prop-types'
 
-export const proficiencyRatingShape = {
-  points: PropTypes.number,
-  color: PropTypes.string,
-  description: PropTypes.string.isRequired,
-  masteryAt: PropTypes.number.isRequired,
-}
-
 export const studentShape = {
   id: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
