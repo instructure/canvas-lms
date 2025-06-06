@@ -17,22 +17,31 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessibilityController < ApplicationController
-  before_action :require_context
-  before_action :require_user
-  before_action :validate_allowed
+module Accessibility
+  class Issue
+    module ContentChecker
+      module PdfChecker
+        def check_pdf_accessibility(pdf)
+          issues = []
 
-  def index
-    js_bundle :accessibility_checker
+          begin
+            pdf_reader = PDF::Reader.new(pdf.open)
 
-    render html: '<div id="accessibility-checker-container"></div>'.html_safe, layout: true
-  end
+            pdf_rules.each do |rule_class|
+              next if rule_class.test(pdf_reader)
 
-  private
+              issues << build_issue(rule_class, element: "PDF Document")
+            rescue => e
+              log_rule_error(rule_class, "PDF Document", e)
+            end
 
-  def validate_allowed
-    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
-
-    authorized_action(@context, @current_user, [:read, :update])
+            process_issues(issues)
+          rescue => e
+            log_general_error(e)
+            NO_ACCESSIBILITY_ISSUES.dup
+          end
+        end
+      end
+    end
   end
 end

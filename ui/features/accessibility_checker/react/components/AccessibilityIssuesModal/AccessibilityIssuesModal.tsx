@@ -80,8 +80,8 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
     newState.set(issue.id, true)
     setApplying(newState)
     doFetchApi({
-      path: window.location.href + '/update',
-      method: 'POST',
+      path: window.location.href + '/issues',
+      method: 'PUT',
       body: JSON.stringify({
         content_type: item.type,
         content_id: item.id,

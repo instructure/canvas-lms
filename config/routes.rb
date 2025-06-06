@@ -537,10 +537,14 @@ CanvasRails::Application.routes.draw do
     get "canvas_career_validation" => "horizon#validate_course"
     post "canvas_career_conversion" => "horizon#convert_course"
     post "canvas_career_reversion" => "horizon#revert_course"
-    get "accessibility", controller: :accessibility, action: :show
-    get "accessibility/issues", controller: :accessibility, action: :issues
-    post "accessibility/update", controller: :accessibility, action: :update
+
+    resources :accessibility, only: [:index] do
+      collection do
+        resource :issues, only: [:create, :update], module: "accessibility"
+      end
+    end
   end
+
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
   resources :page_views, only: :update

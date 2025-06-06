@@ -17,22 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessibilityController < ApplicationController
-  before_action :require_context
-  before_action :require_user
-  before_action :validate_allowed
+module Accessibility
+  class Issue
+    module AssignmentIssues
+      def generate_assignment_issues
+        context.assignments.active.order(updated_at: :desc).each_with_object({}) do |assignment, issues|
+          result = check_content_accessibility(assignment.description)
 
-  def index
-    js_bundle :accessibility_checker
-
-    render html: '<div id="accessibility-checker-container"></div>'.html_safe, layout: true
-  end
-
-  private
-
-  def validate_allowed
-    return render_unauthorized_action unless tab_enabled?(Course::TAB_ACCESSIBILITY)
-
-    authorized_action(@context, @current_user, [:read, :update])
+          issues[assignment.id] = result.merge(
+            title: assignment.title,
+            published: assignment.published?,
+            updated_at: assignment.updated_at&.iso8601 || "",
+            url: polymorphic_path([context, assignment]),
+            edit_url: "#{polymorphic_path([context, assignment])}/edit"
+          )
+        end
+      end
+    end
   end
 end
