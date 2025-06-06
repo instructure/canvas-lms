@@ -137,6 +137,27 @@ describe "course sections" do
     expect(@section.end_at).not_to be_nil
   end
 
+  it "edits the section with both start and end dates using a 24 hrs language pack" do
+    Account.default.update!(default_locale: "en-GB")
+    edit_name = "edited section name"
+    get "/courses/#{@course.id}/sections/#{@section.id}"
+
+    f(".edit_section_link").click
+    edit_form = f("#edit_section_form")
+    replace_content(edit_form.find_element(:id, "course_section_name"), edit_name)
+    replace_and_proceed(edit_form.find_element(:id, "Selectable___0"), "4 March 2015")
+    replace_and_proceed(edit_form.find_element(:id, "Select___0"), "01:00")
+    replace_and_proceed(edit_form.find_element(:id, "Selectable___2"), "4 March 2015")
+    replace_and_proceed(edit_form.find_element(:id, "Select___1"), "23:00")
+    submit_form(edit_form)
+    wait_for_ajaximations
+    expect(f("#section_name")).to include_text(edit_name)
+    @section.reload
+
+    expect(@section.start_at).to eq("2015-03-04 01:00:00 UTC")
+    expect(@section.end_at).to eq("2015-03-04 23:00:00 UTC")
+  end
+
   it "parses dates" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 

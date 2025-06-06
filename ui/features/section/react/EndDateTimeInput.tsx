@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState, useCallback, useMemo} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -24,12 +24,10 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   validateDateTime,
   generateMessages,
-  parseDateTimeToISO,
   validateStartDateAfterEnd,
-  START_AT_DATE,
-  START_AT_TIME,
   END_AT_DATE,
   END_AT_TIME,
+  SHORT_DATE_FORMAT,
 } from '../utils'
 import type {FormMessage} from '@instructure/ui-form-field'
 
@@ -37,52 +35,56 @@ const I18n = createI18nScope('edit_section_end_date')
 
 interface EndDateTimeInputProps {
   initialValue?: string
+  handleDateTimeChange: (isoDate: string | undefined) => void
 }
 
-const EndDateTimeInput = ({initialValue}: EndDateTimeInputProps) => {
+const EndDateTimeInput = ({initialValue, handleDateTimeChange}: EndDateTimeInputProps) => {
   const [messages, setMessages] = useState<FormMessage[]>(generateMessages(initialValue))
+  const [value, setValue] = useState<string | undefined>(initialValue)
 
   const dateInputRef = useRef<HTMLInputElement | null>(null)
   const timeInputRef = useRef<HTMLInputElement | null>(null)
 
-  const validateInputs = useCallback(() => {
+  const validateInputs = (isoDate: string | undefined) => {
     if (dateInputRef.current && timeInputRef.current) {
       const dateValue = dateInputRef.current.value
-      const timeValue = timeInputRef.current.value
-
-      let errors = validateDateTime(dateValue, timeValue, END_AT_DATE)
+      let errors = validateDateTime(dateValue, END_AT_DATE)
       if (errors.length > 0) {
         setMessages(generateMessages(null, true, errors[0].message))
       } else {
-        const startDate = (document.querySelector(`[name="${START_AT_DATE}"]`) as HTMLInputElement)
-          .value
-        const startTime = (document.querySelector(`[name="${START_AT_TIME}"]`) as HTMLInputElement)
-          .value
-        errors = validateStartDateAfterEnd(startDate, startTime, dateValue, timeValue)
+        const startDateInput = document.getElementById(
+          'start_datetime_value',
+        ) as HTMLInputElement | null
+        let startDateTimeValue
+        if (startDateInput) {
+          startDateTimeValue = startDateInput.value
+        }
+        handleDateTimeChange(isoDate)
+        errors = validateStartDateAfterEnd(startDateTimeValue, isoDate)
         if (errors.length > 0) {
           setMessages(generateMessages(null, true, errors[0].message))
         } else {
-          const endDateTime = parseDateTimeToISO(dateValue, timeValue)
-          setMessages(generateMessages(endDateTime))
+          setMessages(generateMessages(isoDate))
         }
       }
     }
-  }, [])
+  }
 
   useEffect(() => {
-    const handleValidate = () => validateInputs()
+    const handleValidate = () => validateInputs(value)
 
     document.addEventListener('validateDateInputs', handleValidate)
 
     return () => document.removeEventListener('validateDateInputs', handleValidate)
   }, [validateInputs])
 
-  const handleChange = () => {
-    validateInputs()
+  const handleChange = (_: React.SyntheticEvent, isoDate: string | undefined) => {
+    setValue(isoDate)
+    validateInputs(isoDate)
   }
 
   const handleBlur = () => {
-    validateInputs()
+    validateInputs(value)
   }
 
   const handleDateRef = (el: HTMLInputElement | null) => {
@@ -120,9 +122,10 @@ const EndDateTimeInput = ({initialValue}: EndDateTimeInputProps) => {
         messages={messages}
         onChange={handleChange}
         onBlur={handleBlur}
-        value={initialValue}
+        defaultValue={initialValue}
         dateInputRef={handleDateRef}
         timeInputRef={handleTimeRef}
+        dateFormat={SHORT_DATE_FORMAT}
       />
     </View>
   )
