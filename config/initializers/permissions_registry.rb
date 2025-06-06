@@ -1739,6 +1739,12 @@ Rails.application.config.to_prepare do
         available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin]
       },
+      manage_users_in_bulk: {
+        label: -> { I18n.t("Bulk actions - people page") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:horizon_bulk_api_permission) },
+      }
     }
   )
 end
