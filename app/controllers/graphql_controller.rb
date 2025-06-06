@@ -30,7 +30,7 @@ class GraphQLController < ApplicationController
     prep_page_view_for_submit
     prep_page_view_for_create_discussion_entry
 
-    graphql_errors = result.to_h["data"]&.values&.any? { |res| res && res["errors"].present? }
+    graphql_errors = result.to_h["data"]&.values&.any? { |res| res.is_a?(Hash) && res["errors"].present? }
     RequestContext::Generator.add_meta_header("ge", graphql_errors ? "f" : "t")
 
     if graphql_errors
