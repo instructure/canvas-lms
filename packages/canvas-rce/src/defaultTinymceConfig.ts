@@ -72,6 +72,42 @@ const defaultTinymceConfig = {
   // any toolbar data here will be merged into the standard toolbars
   toolbar: undefined,
 
+  color_map: [
+    // First row
+    '#03893D', // InstUI Green45
+    'Green',
+    '#CF4A00', // InstUI Orange45
+    'Orange',
+    '#E62429', // InstUI Red45
+    'Red',
+    '#9E58BD', // InstUI Violet45
+    'Purple',
+    '#2B7ABC', // InstUI Blue45
+    'Blue',
+
+    // Second row
+    '#027634', // InstUI Green57
+    'Dark Green',
+    '#B34000', // InstUI Orange57
+    'Dark Orange',
+    '#C71F23', // InstUI Red57
+    'Dark Red',
+    '#9242B4', // InstUI Violet57
+    'Dark Purple',
+    '#0E68B3', // InstUI Blue57
+    'Dark Blue',
+
+    // Third row
+    '#6A7883', // InstUI Grey45
+    'Light Gray',
+    '#3F515E', // InstUI Grey82
+    'Gray',
+    '#273540', // InstUI Grey125
+    'Dark Gray',
+    '#000000',
+    'Black',
+  ],
+
   // plugins included here will be added to the standard set
   plugins: undefined,
 
