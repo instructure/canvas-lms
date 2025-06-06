@@ -28,6 +28,10 @@ jest.mock('@canvas/theme-editor/submitHtmlForm', () => ({
   submitHtmlForm: jest.fn(),
 }))
 
+jest.mock('@canvas/util/globalUtils', () => ({
+  reloadWindow: jest.fn(),
+}))
+
 const OUR_ACCOUNT_ID = '123'
 const ACTIVE_BASIS = {
   name: 'Account-shared Theme',
@@ -110,18 +114,13 @@ const props = {
 
 describe('CollectionView', () => {
   const deleteURL = new RegExp('/api/v1/shared_brand_configs/(.+)')
-  const {location: savedLocation} = window
 
   beforeEach(() => {
     fetchMock.delete(deleteURL, {})
-    // JS DOM doesn't implement location.reload
-    delete window.location
-    window.location = {reload: jest.fn()}
   })
 
   afterEach(() => {
     fetchMock.restore()
-    window.location = savedLocation
     jest.clearAllMocks()
   })
 
