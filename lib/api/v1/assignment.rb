@@ -378,10 +378,10 @@ module Api::V1::Assignment
           hash["all_dates"] = []
 
           assignment.sub_assignments.each do |sub_assignment|
-            hash["all_dates"].concat(sub_assignment.formatted_dates_hash_visible_to(user))
+            hash["all_dates"].concat(sub_assignment.dates_hash_visible_to(user))
           end
         elsif override_count < ALL_DATES_LIMIT
-          hash["all_dates"] = assignment.formatted_dates_hash_visible_to(user)
+          hash["all_dates"] = assignment.dates_hash_visible_to(user)
         else
           hash["all_dates_count"] = override_count
         end

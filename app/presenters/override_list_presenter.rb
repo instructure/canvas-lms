@@ -123,21 +123,40 @@ class OverrideListPresenter
   #   if it isn't needed (e.g. if all sections have overrides).
   #
   # Returns an array of due date hashes.
-  def visible_due_dates(group_by_date: true)
+  def visible_due_dates
     return [] unless assignment
 
-    overrides = assignment.formatted_dates_hash_visible_to(user)
-    overrides = assignment.merge_overrides_by_date(overrides) if group_by_date
-    other_due_dates_exist = overrides.length > 1
+    assignment.dates_hash_visible_to(user).each do |due_date|
+      due_date[:raw] = due_date.dup
+      due_date[:lock_at] = lock_at due_date
+      due_date[:unlock_at] = unlock_at due_date
+      due_date[:due_at] = due_at due_date
+      due_date[:due_for] = due_for due_date
+    end
+  end
 
-    overrides.map do |due_date|
-      result = {}
-      result[:raw] = due_date.dup
-      result[:lock_at] = lock_at(due_date)
-      result[:unlock_at] = unlock_at(due_date)
-      result[:due_at] = due_at(due_date)
-      result[:due_for] = group_by_date ? formatted_due_for(due_date, other_due_dates_exist:) : due_for(due_date)
-      result
+  def grouped_and_sorted_by_visible_due_dates
+    return [] unless assignment
+
+    # Only supports classic quizzes and normal assignments
+    type_is_allowed = assignment.is_a?(Assignment) ? assignment.submission_types != "discussion_topic" : assignment.is_a?(Quizzes::Quiz)
+    if type_is_allowed
+      overrides = assignment.formatted_dates_hash_visible_to(user, assignment.context)
+      overrides = assignment.merge_overrides_by_date(overrides)
+      other_due_dates_exist = overrides.length > 1
+      overrides.sort_by! { |card| [card[:due_at].nil? ? 1 : 0, card[:due_at]] }
+
+      overrides.map do |due_date|
+        result = {}
+        result[:raw] = due_date.dup
+        result[:lock_at] = lock_at due_date
+        result[:unlock_at] = unlock_at due_date
+        result[:due_at] = due_at due_date
+        result[:due_for] = formatted_due_for(due_date, other_due_dates_exist:)
+        result
+      end
+    else
+      visible_due_dates
     end
   end
 end

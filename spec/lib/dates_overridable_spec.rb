@@ -58,7 +58,7 @@ shared_examples_for "learning object with due dates" do
         override.title = nil
         override.save!
 
-        dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
+        dates_hash = overridable.dates_hash_visible_to(@teacher)
         expect(dates_hash.size).to eq 3
         expect(dates_hash.pluck(:title)).to eq [nil, "Summer session", "2 students"]
       end
@@ -177,7 +177,7 @@ shared_examples_for "learning object with due dates" do
     end
   end
 
-  describe "#formatted_dates_hash_visible_to" do
+  describe "#dates_hash_visible_to" do
     before do
       override.set = course.default_section
       override.override_due_at(7.days.from_now)
@@ -187,11 +187,11 @@ shared_examples_for "learning object with due dates" do
     end
 
     it "only returns active overrides" do
-      expect(overridable.formatted_dates_hash_visible_to(@teacher).size).to eq 2
+      expect(overridable.dates_hash_visible_to(@teacher).size).to eq 2
     end
 
     it "includes the original date as a hash" do
-      dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
       expect(dates_hash.size).to eq 2
 
       dates_hash.sort_by! { |d| d[:title].to_s }
@@ -205,75 +205,12 @@ shared_examples_for "learning object with due dates" do
       override2.override_due_at(8.days.from_now)
       override2.save!
 
-      dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
+      dates_hash = overridable.dates_hash_visible_to(@teacher)
       expect(dates_hash.size).to eq 2
 
       dates_hash.sort_by! { |d| d[:title] }
       expect(dates_hash[0][:title]).to eq "Summer session"
       expect(dates_hash[1][:title]).to eq "value for name"
-    end
-
-    context "with module overrides" do
-      before do
-        student_in_course(course:)
-        @module1 = course.context_modules.create!(name: "Module 1")
-        overridable.context_module_tags.create! context_module: @module1, context: course, tag_type: "context_module"
-
-        @module_adhoc_override = @module1.assignment_overrides.create!
-        override_student = @module_adhoc_override.assignment_override_students.build
-        override_student.user = @student
-        override_student.save!
-      end
-
-      it "returns the module overrides" do
-        dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 2
-        expect(dates_hash[0][:set_type]).to eq "CourseSection"
-        expect(dates_hash[1][:set_type]).to eq "ADHOC"
-        expect(dates_hash[1][:id]).to eq @module_adhoc_override.id
-      end
-
-      it "does not repeat overridden module overrides" do
-        # Create module override for default section
-        @module1.assignment_overrides.create!(set: course.default_section)
-        adhoc_override = overridable.assignment_overrides.create!(due_at: 7.days.from_now)
-        # Create ADHOC override on the overridable
-        override_student = adhoc_override.assignment_override_students.build
-        override_student.user = @student
-        override_student.save!
-
-        # both module overrides should be overridden by the object's overrides
-        dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 2
-        expect(dates_hash[0][:set_type]).to eq "CourseSection"
-        expect(dates_hash[0][:id]).to eq override.id
-        expect(dates_hash[1][:set_type]).to eq "ADHOC"
-        expect(dates_hash[1][:id]).to eq adhoc_override.id
-      end
-
-      it "includes course overrides" do
-        course_override = overridable.assignment_overrides.create!(set: course, due_at: 7.days.from_now)
-
-        dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 3
-        expect(dates_hash[0][:set_type]).to eq "CourseSection"
-        expect(dates_hash[0][:id]).to eq override.id
-        expect(dates_hash[1][:set_type]).to eq "Course"
-        expect(dates_hash[1][:id]).to eq course_override.id
-        expect(dates_hash[2][:set_type]).to eq "ADHOC"
-        expect(dates_hash[2][:id]).to eq @module_adhoc_override.id
-      end
-
-      it "does not include unassigned module overrides" do
-        unassigned_override = overridable.assignment_overrides.create!(unassign_item: true)
-        override_student = unassigned_override.assignment_override_students.build
-        override_student.user = @student
-        override_student.save!
-        dates_hash = overridable.formatted_dates_hash_visible_to(@teacher)
-        expect(dates_hash.size).to eq 1
-        expect(dates_hash[0][:set_type]).to eq "CourseSection"
-        expect(dates_hash[0][:id]).to eq override.id
-      end
     end
   end
 
