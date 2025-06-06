@@ -16,13 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func, number, string, shape, object} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, MutableRefObject} from 'react'
 
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {Button} from '@instructure/ui-buttons'
-import {ExternalTool as ExternalToolModel} from '@canvas/assignments/graphql/student/ExternalTool'
+// Removed unused import for ExternalToolModel
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -32,9 +31,13 @@ import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunch
 const I18n = createI18nScope('assignments_2_external_tool')
 export const EXTERNAL_TOOL_ERROR_MESSAGE = I18n.t('Please launch the tool and select a resource')
 
+interface ContentLaunchViewProps {
+  launchURL: string
+}
+
 // A generic component that shows an iframe for a given URL, used for both
 // launching the LTI to select content and showing selected content
-const ContentLaunchView = ({launchURL}) => (
+const ContentLaunchView = ({launchURL}: ContentLaunchViewProps) => (
   <ToolLaunchIframe
     allow={iframeAllowances()}
     data-testid="lti-launch-frame"
@@ -43,9 +46,14 @@ const ContentLaunchView = ({launchURL}) => (
   />
 )
 
+interface SelectedContentViewProps {
+  url: string
+  resourceLinkLookupUuid?: string | null
+}
+
 // A wrapper component for the above component, showing a specific URL
 // (and possibly resource ID) via a course's retrieval endpoint
-function SelectedContentView({url, resourceLinkLookupUuid}) {
+function SelectedContentView({url, resourceLinkLookupUuid}: SelectedContentViewProps) {
   let launchURL = `/courses/${ENV.COURSE_ID}/external_tools/retrieve?assignment_id=${ENV.ASSIGNMENT_ID}&display=borderless`
   if (resourceLinkLookupUuid != null) {
     launchURL += `&resource_link_lookup_uuid=${resourceLinkLookupUuid}`
@@ -56,13 +64,68 @@ function SelectedContentView({url, resourceLinkLookupUuid}) {
   return <ContentLaunchView launchURL={launchURL} />
 }
 
+interface ExternalToolShape {
+  _id: string
+  description?: string
+  name?: string
+  settings?: {
+    iconUrl?: string
+  }
+}
+
+interface SubmissionDraft {
+  externalTool?: ExternalToolShape
+  ltiLaunchUrl?: string | null
+  resourceLinkLookupUuid?: string | null
+  meetsBasicLtiLaunchCriteria?: boolean
+}
+
+interface Submission {
+  attempt: number
+  id: string
+  url?: string
+  submissionDraft?: SubmissionDraft
+  resourceLinkLookupUuid?: string | null
+  state: string
+}
+
+interface CreateSubmissionDraftVariables {
+  activeSubmissionType: string
+  attempt: number
+  externalToolId: string
+  id: string
+  ltiLaunchUrl: string
+  resourceLinkLookupUuid?: string
+}
+
+interface CreateSubmissionDraftFunction {
+  (params: {variables: CreateSubmissionDraftVariables}): Promise<any>
+}
+
+interface FileUploadRequest {
+  files: Array<{
+    '@type'?: string
+    type?: string
+    mediaType: string
+    [key: string]: any
+  }>
+}
+
+interface ExternalToolDraftViewProps {
+  createSubmissionDraft: CreateSubmissionDraftFunction
+  onFileUploadRequested: (request: FileUploadRequest) => void
+  submission: Submission
+  tool: ExternalToolShape
+  submitButtonRef?: MutableRefObject<HTMLElement | null>
+}
+
 function ExternalToolDraftView({
   createSubmissionDraft,
   onFileUploadRequested,
   submission,
   tool,
   submitButtonRef,
-}) {
+}: ExternalToolDraftViewProps) {
   const {submissionDraft} = submission
   const draftExistsForThisTool =
     submissionDraft?.externalTool?._id === tool._id && submissionDraft?.ltiLaunchUrl != null
@@ -71,7 +134,7 @@ function ExternalToolDraftView({
   const [showErrorMessage, setShowErrorMessage] = useState(false)
 
   useEffect(() => {
-    async function handleDeepLinking(e) {
+    async function handleDeepLinking(e: MessageEvent) {
       if (!['A2ExternalContentReady', 'LtiDeepLinkingResponse'].includes(e.data.subject)) {
         return
       }
@@ -127,12 +190,13 @@ function ExternalToolDraftView({
       }
     }
 
-    submitButtonRef.current?.addEventListener('click', handleClick)
+    const buttonElement = submitButtonRef?.current
+    buttonElement?.addEventListener('click', handleClick)
 
     return () => {
-      submitButtonRef.current?.removeEventListener('click', handleClick)
+      buttonElement?.removeEventListener('click', handleClick)
     }
-  }, [])
+  }, [submissionDraft?.meetsBasicLtiLaunchCriteria, submitButtonRef])
 
   const clearErrors = () => {
     const container = document.getElementById('external_tool_submission_container')
@@ -153,7 +217,7 @@ function ExternalToolDraftView({
             <Button onClick={() => setSelectingItem(true)}>{I18n.t('Change')}</Button>
 
             <SelectedContentView
-              url={submissionDraft.ltiLaunchUrl}
+              url={submissionDraft.ltiLaunchUrl!}
               resourceLinkLookupUuid={submissionDraft.resourceLinkLookupUuid}
             />
           </View>
@@ -170,16 +234,24 @@ function ExternalToolDraftView({
   )
 }
 
+interface ExternalToolSubmissionProps {
+  createSubmissionDraft?: CreateSubmissionDraftFunction
+  onFileUploadRequested?: (request: FileUploadRequest) => void
+  submission: Submission
+  tool?: ExternalToolShape
+  submitButtonRef?: MutableRefObject<HTMLElement | null>
+}
+
 const ExternalToolSubmission = ({
-  createSubmissionDraft,
-  onFileUploadRequested,
+  createSubmissionDraft = () => Promise.resolve(),
+  onFileUploadRequested = () => {},
   submission,
   tool,
   submitButtonRef,
-}) =>
+}: ExternalToolSubmissionProps) =>
   isSubmitted(submission) ? (
     <SelectedContentView
-      url={submission.url}
+      url={submission.url!}
       resourceLinkLookupUuid={submission.resourceLinkLookupUuid}
     />
   ) : (
@@ -187,26 +259,9 @@ const ExternalToolSubmission = ({
       createSubmissionDraft={createSubmissionDraft}
       onFileUploadRequested={onFileUploadRequested}
       submission={submission}
-      tool={tool}
+      tool={tool!}
       submitButtonRef={submitButtonRef}
     />
   )
 
 export default ExternalToolSubmission
-
-ExternalToolSubmission.propTypes = {
-  createSubmissionDraft: func,
-  onFileUploadRequested: func,
-  submission: shape({
-    attempt: number,
-    id: string,
-    url: string,
-  }).isRequired,
-  tool: ExternalToolModel.shape,
-  submitButtonRef: object,
-}
-
-ExternalToolSubmission.defaultProps = {
-  createSubmissionDraft: () => {},
-  onFileUploadRequested: () => {},
-}
