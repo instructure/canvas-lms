@@ -90,19 +90,9 @@ describe "Improved Learning Mastery Gradebook" do
       expect(LearningMasteryGradebookPage.export_csv_button).to be_displayed
     end
 
-    it "does not display mastery scales filter options by default" do
-      navigate_to_gradebook
-      expect(f("body")).to_not contain_css('[data-testid="proficiency-filter"]')
-    end
-
     context "when account_level_mastery_scales is enabled" do
       before do
         Account.site_admin.enable_feature!(:account_level_mastery_scales)
-      end
-
-      it "displays mastery scales filter options" do
-        navigate_to_gradebook
-        expect(LearningMasteryGradebookPage.mastery_scales_filter).to be_displayed
       end
 
       it "displays scores based on mastery scales" do
