@@ -33,30 +33,38 @@ import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('DefaultToolForm')
 
-const DefaultToolForm = props => {
+const DefaultToolForm = ({
+  toolUrl,
+  courseId,
+  toolName,
+  previouslySelected,
+  toolButtonText = I18n.t('Add Content'),
+  toolInfoMessage = I18n.t('Click the button above to add content'),
+  hideErrors = () => {},
+}) => {
   const [launchDefinitions, setLaunchDefinitions] = useState([])
   const toolMessageData = usePostMessage('defaultToolContentReady')
 
   const defaultToolData = launchDefinitions.find(definition =>
-    Object.values(definition.placements).find(placement => placement.url === props.toolUrl),
+    Object.values(definition.placements).find(placement => placement.url === toolUrl),
   )
 
   const contentTitle = () => {
     if (toolMessageData) {
       return toolMessageData.content && toolMessageData.content.title
     }
-    return props.toolName
+    return toolName
   }
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await axios.get(
-        `/api/v1/courses/${props.courseId}/lti_apps/launch_definitions?per_page=100&placements%5B%5D=assignment_selection&placements%5B%5D=resource_selection`,
+        `/api/v1/courses/${courseId}/lti_apps/launch_definitions?per_page=100&placements%5B%5D=assignment_selection&placements%5B%5D=resource_selection`,
       )
       setLaunchDefinitions(result.data)
     }
     fetchData()
-  }, [props.courseId])
+  }, [courseId])
 
   useEffect(() => {
     $('#default-tool').data('tool', defaultToolData)
@@ -64,8 +72,8 @@ const DefaultToolForm = props => {
 
   const handleLaunchButton = event => {
     // clear any errors
-    document.getElementById("default-tool-launch-button")?.classList.remove('error-outline')
-    props.hideErrors("default-tool-launch-button_errors")
+    document.getElementById('default-tool-launch-button')?.classList.remove('error-outline')
+    hideErrors('default-tool-launch-button_errors')
     SelectContentDialogEvents.onContextExternalToolSelect(event, $('#default-tool'))
   }
 
@@ -94,11 +102,11 @@ const DefaultToolForm = props => {
         width="100%"
         textAlign="start"
       >
-        {props.toolButtonText}
+        {toolButtonText}
       </Button>
-      <div id='default-tool-launch-button_errors'></div>
+      <div id="default-tool-launch-button_errors"></div>
 
-      {toolMessageData || props.previouslySelected ? (
+      {toolMessageData || previouslySelected ? (
         <Alert variant="success" margin="small small 0 0">
           <Text weight="bold">{contentTitle()}</Text>
           <br />
@@ -106,7 +114,7 @@ const DefaultToolForm = props => {
         </Alert>
       ) : (
         <Alert variant="info" margin="small small 0 0">
-          {props.toolInfoMessage}
+          {toolInfoMessage}
         </Alert>
       )}
 
@@ -135,12 +143,7 @@ DefaultToolForm.propTypes = {
   previouslySelected: PropTypes.bool.isRequired,
   toolButtonText: PropTypes.string,
   toolInfoMessage: PropTypes.string,
-  hideErrors: PropTypes.func
-}
-
-DefaultToolForm.defaultProps = {
-  toolButtonText: I18n.t('Add Content'),
-  toolInfoMessage: I18n.t('Click the button above to add content'),
+  hideErrors: PropTypes.func,
 }
 
 export default DefaultToolForm
