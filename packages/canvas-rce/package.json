@@ -1,10 +1,10 @@
 {
   "name": "@instructure/canvas-rce",
-  "version": "7.0.0",
+  "version": "7.1.0",
   "description": "A component wrapping Canvas's usage of Tinymce",
   "main": "es/index.js",
   "types": "es/index.d.ts",
-  "owner": "LF",
+  "owner": "RCX",
   "scripts": {
     "i18n:extract": "format-message extract \"es/**/*.js\" -g underscored_crc32 -o locales/en.json",
     "integration-test": "nightwatch --env integration",
