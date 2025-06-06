@@ -3435,7 +3435,7 @@ class Course < ActiveRecord::Base
                             id: TAB_ACCESSIBILITY,
                             label: t("#tabs.accessibility", "Accessibility"),
                             css_class: "accessibility",
-                            href: :course_accessibility_path,
+                            href: :course_accessibility_index_path,
                             visibility: "admins"
                           })
     end

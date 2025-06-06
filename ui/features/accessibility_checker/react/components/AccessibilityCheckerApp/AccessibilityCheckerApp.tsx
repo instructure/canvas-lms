@@ -57,7 +57,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
       }
       return input !== null && input !== undefined ? input : {}
     }
-    doFetchApi({path: window.location.href + '/issues', method: 'GET'})
+    doFetchApi({path: window.location.href + '/issues', method: 'POST'})
       .then(data => {
         setAccessibilityIssues(convertKeysToCamelCase(data.json) as AccessibilityData)
       })
