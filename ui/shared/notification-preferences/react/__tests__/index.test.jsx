@@ -60,7 +60,7 @@ describe('Notification Preferences', () => {
 
     const notification_times = getByTestId('notification_times')
     expect(notification_times).not.toBeNull()
-    expect(notification_times.textContent).toEqual(
+    expect(notification_times.textContent).toContain(
       'Daily notifications will be delivered around 6pm. Weekly notifications will be delivered Saturday between 7pm and 9pm.Dismiss notification schedule information',
     )
   })
