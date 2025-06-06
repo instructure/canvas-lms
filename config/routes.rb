@@ -1815,7 +1815,9 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/permissions", action: :permissions
       get "accounts/:account_id/settings", action: :show_settings
       get "manually_created_courses_account", action: :manually_created_courses_account
+      delete "accounts/:account_id/users", action: :remove_users
       delete "accounts/:account_id/users/:user_id", action: :remove_user
+      put "accounts/:account_id/users/bulk_update", action: :update_users
       put "accounts/:account_id/users/:user_id/restore", action: :restore_user
       get "accounts/:account_id/quiz_ip_filters", action: :quiz_ip_filters, as: "quiz_ip_filters"
       get "acceptable_use_policy", action: :acceptable_use_policy
