@@ -238,38 +238,9 @@ $(document).ready(function () {
               nextRow.find('button.open_report_description_link').focus()
             }
 
-            const setupJQuery = () => {
-              const modalBody = document.getElementById('configure_modal_body')
-              const provisioning_container = modalBody.querySelector('form#provisioning_csv_form')
-              const sis_export_container = modalBody.querySelector('form#sis_export_csv_form')
-
-              const setupCheckboxBehavior = container => {
-                const checkboxes = container.querySelectorAll(
-                  'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
-                )
-
-                container.onclick = () => {
-                  const reportIsChecked = [...checkboxes].some(cb => cb.checked)
-                  const createdBySis = container.querySelector('#parameters_created_by_sis')
-                  const includeDeleted = container.querySelector('#parameters_include_deleted')
-
-                  createdBySis.disabled = !reportIsChecked
-                  includeDeleted.disabled = !reportIsChecked
-
-                  if (!reportIsChecked) {
-                    createdBySis.checked = false
-                    includeDeleted.checked = false
-                  }
-                }
-              }
-
-              if (provisioning_container) setupCheckboxBehavior(provisioning_container)
-              if (sis_export_container) setupCheckboxBehavior(sis_export_container)
-            }
             reportRoot.render(
               <RunReportForm
                 formHTML={html}
-                onRender={setupJQuery}
                 closeModal={closeModal}
                 onSuccess={onSuccess}
                 path={path}
