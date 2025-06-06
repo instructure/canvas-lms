@@ -17,89 +17,76 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import React, {useState, useEffect, useCallback} from 'react'
-import {func, string, object, number, bool, node, shape, instanceOf, arrayOf} from 'prop-types'
+import React, {useState, useEffect, useCallback, ReactNode} from 'react'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
 
+interface SearchItem {
+  id: string
+  name: string
+  [key: string]: any
+}
+
+interface SearchItemSelectorProps {
+  onItemSelected?: (item: SearchItem | null) => void
+  itemSearchFunction?: (params: {
+    success: (items: SearchItem[]) => void
+    error: (error: Error) => void
+    loading: (isLoading: boolean) => void
+    params: Record<string, any>
+  }) => void
+  renderLabel?: ReactNode
+  contextId?: string
+  renderOption?: (item: SearchItem) => ReactNode
+  additionalParams?: Record<string, any>
+  minimumSearchLength?: number
+  isSearchableTerm?: (term: string) => boolean
+  placeholder?: string | null
+  manualSelection?: string | null
+  mountNodeRef?: React.RefObject<Element> | null
+  onInputChanged?: (event: React.ChangeEvent<HTMLInputElement>) => void
+  inputRef?: ((element: HTMLInputElement | null) => void) | null
+  messages?: Array<{
+    text: string
+    type: string
+  }>
+  isRequired?: boolean
+  id?: string | null
+}
+
 const I18n = createI18nScope('managed_course_selector')
 const MINIMUM_SEARCH_LENGTH = 2
 
-SearchItemSelector.propTypes = {
-  onItemSelected: func, // expects each item to have the 'name' property
-  itemSearchFunction: func,
-  renderLabel: node,
-  contextId: string,
-  renderOption: func,
-  additionalParams: object,
-  minimumSearchLength: number,
-  isSearchableTerm: func,
-  placeholder: string,
-  manualSelection: string,
-  mountNodeRef: shape({
-    current: instanceOf(Element),
-  }),
-  onInputChanged: func,
-  inputRef: func,
-  messages: arrayOf(
-    shape({
-      text: string,
-      type: string,
-    }),
-  ),
-  isRequired: bool,
-  id: string,
-}
-
-SearchItemSelector.defaultProps = {
-  onItemSelected: () => {},
-  itemSearchFunction: () => {},
-  renderLabel: '',
-  contextId: '',
-  renderOption: null,
-  additionalParams: {},
-  minimumSearchLength: MINIMUM_SEARCH_LENGTH,
-  isSearchableTerm: term => (term?.length || 0) >= MINIMUM_SEARCH_LENGTH,
-  placeholder: null,
-  manualSelection: null,
-  mountNodeRef: null,
-  onInputChanged: () => {},
-  inputRef: null,
-  messages: [],
-  isRequired: false,
-  id: null,
-}
-
 export default function SearchItemSelector({
-  onItemSelected,
-  renderLabel,
-  itemSearchFunction,
-  contextId,
-  renderOption,
-  additionalParams,
-  mountNodeRef,
-  minimumSearchLength,
-  isSearchableTerm,
-  placeholder,
-  manualSelection,
-  onInputChanged,
-  inputRef,
-  messages,
-  isRequired,
-  id,
-}) {
-  const [items, setItems] = useState(null)
-  const [error, setError] = useState(null)
+  onItemSelected = () => {},
+  renderLabel = '',
+  itemSearchFunction = () => {},
+  contextId = '',
+  renderOption = undefined,
+  additionalParams = {},
+  mountNodeRef = null,
+  minimumSearchLength = MINIMUM_SEARCH_LENGTH,
+  isSearchableTerm = (term: string) => (term?.length || 0) >= MINIMUM_SEARCH_LENGTH,
+  placeholder = null,
+  manualSelection = null,
+  onInputChanged = () => {},
+  inputRef = null,
+  messages = [],
+  isRequired = false,
+  id = null,
+}: SearchItemSelectorProps) {
+  const [items, setItems] = useState<SearchItem[] | null>(null)
+  const [error, setError] = useState<Error | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [inputValue, setInputValue] = useState('')
-  const [selectedItem, setSelectedItem] = useState(null)
+  const [selectedItem, setSelectedItem] = useState<SearchItem | null>(null)
   const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
     isSearchableTerm,
   })
 
   useEffect(() => {
-    handleInputChanged({target: {value: ''}})
+    handleInputChanged({target: {value: ''}} as React.ChangeEvent<HTMLInputElement>)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contextId])
 
@@ -107,7 +94,7 @@ export default function SearchItemSelector({
   useEffect(() => {
     if (typeof manualSelection === 'string') {
       setInputValue(manualSelection)
-      setSelectedItem({name: manualSelection})
+      setSelectedItem({id: '', name: manualSelection})
     }
   }, [manualSelection])
 
@@ -116,7 +103,8 @@ export default function SearchItemSelector({
     if (searchTerm !== inputValue) setSearchTerm(inputValue)
   }, [inputValue, searchTerm, setSearchTerm])
 
-  const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm, search_term: searchTerm}
+  const searchParams: Record<string, any> =
+    searchTerm.length === 0 ? {} : {term: searchTerm, search_term: searchTerm}
   if (contextId) searchParams.contextId = contextId
   itemSearchFunction({
     success: setItems,
@@ -125,7 +113,7 @@ export default function SearchItemSelector({
     params: {...searchParams, ...additionalParams},
   })
 
-  const handleItemSelected = (ev, id) => {
+  const handleItemSelected = (_ev: React.SyntheticEvent, id: string) => {
     if (items === null) return
     const item = items.find(i => i.id === id)
     if (!item) return
@@ -135,7 +123,7 @@ export default function SearchItemSelector({
     onItemSelected(item)
   }
 
-  const handleInputChanged = ev => {
+  const handleInputChanged = (ev: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(ev.target.value)
     setSearchTerm(ev.target.value)
     if (selectedItem !== null && !manualSelection) onItemSelected(null)
@@ -152,19 +140,19 @@ export default function SearchItemSelector({
     : I18n.t('Enter at least %{count} characters', {count: minimumSearchLength})
   const itemOptions =
     items === null
-      ? null
-      : items.map(item => (
+      ? undefined
+      : (items.map(item => (
           <CanvasAsyncSelect.Option key={item.id} id={item.id}>
             {renderOption ? renderOption(item) : item.name}
           </CanvasAsyncSelect.Option>
-        ))
+        )) as React.ReactElement[])
 
   const selectProps = {
     isRequired,
     options: itemOptions,
     isLoading: isLoading || searchTermIsPending,
     inputValue,
-    selectedOptionId: selectedItem ? selectedItem.id : null,
+    selectedOptionId: selectedItem ? selectedItem.id : undefined,
     assistiveText: I18n.t('Enter at least %{count} characters', {count: minimumSearchLength}),
     renderLabel,
     placeholder: placeholder || I18n.t('Begin typing to search'),
@@ -172,10 +160,10 @@ export default function SearchItemSelector({
     onInputChange: handleInputChanged,
     onOptionSelected: handleItemSelected,
     mountNode: mountNodeRef?.current,
-    inputRef,
+    inputRef: inputRef || undefined,
     messages,
     onFocus,
-    id,
+    id: id || undefined,
   }
   return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>
 }

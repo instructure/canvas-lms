@@ -17,10 +17,9 @@
  */
 
 import React from 'react'
-import {bool, func} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {TeacherAssignmentShape} from '../assignmentData'
+// import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentDescription from './AssignmentDescription'
 import Overrides from './Overrides/Overrides'
 import AddHorizontalRuleButton from './AddHorizontalRuleButton'
@@ -29,41 +28,44 @@ import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('asignments_2')
 
-Details.propTypes = {
-  assignment: TeacherAssignmentShape.isRequired,
-  onChangeAssignment: func.isRequired,
-  onValidate: func.isRequired,
-  invalidMessage: func.isRequired,
-  readOnly: bool,
-}
-Details.defaultProps = {
-  readOnly: false,
+interface DetailsProps {
+  assignment: any // TeacherAssignmentShape type
+  onChangeAssignment: (field: string, value: any) => void
+  onValidate: (...args: any[]) => void
+  invalidMessage: (...args: any[]) => any
+  readOnly?: boolean
 }
 
-export default function Details(props) {
+export default function Details({
+  assignment,
+  onChangeAssignment,
+  onValidate,
+  invalidMessage,
+  readOnly = false,
+}: DetailsProps) {
   // html is sanitized on the server side
   return (
     <View as="div" margin="0">
       <AssignmentDescription
-        text={props.assignment.description}
+        text={assignment.description}
         onChange={handleDescriptionChange}
-        readOnly={props.readOnly}
+        readOnly={readOnly}
       />
       <Overrides
-        assignment={props.assignment}
-        onChangeAssignment={props.onChangeAssignment}
-        onValidate={props.onValidate}
-        invalidMessage={props.invalidMessage}
-        readOnly={props.readOnly}
+        assignment={assignment}
+        onChangeAssignment={onChangeAssignment}
+        onValidate={onValidate}
+        invalidMessage={invalidMessage}
+        readOnly={readOnly}
       />
-      {props.readOnly ? null : (
+      {readOnly ? null : (
         <AddHorizontalRuleButton onClick={addOverride} label={I18n.t('Add Override')} />
       )}
     </View>
   )
 
-  function handleDescriptionChange(desc) {
-    props.onChangeAssignment('description', desc)
+  function handleDescriptionChange(desc: string) {
+    onChangeAssignment('description', desc)
   }
 }
 
