@@ -194,14 +194,16 @@ module SectionTabHelper
     def a_attributes
       {
         href: @tab.path,
-        title: a_title,
         id: "#{@tab.label.downcase.tr(" ", "-")}-link",
         "aria-label": a_aria_label,
         "aria-current": a_aria_current_page,
         class: a_classes
       }.tap do |h|
         h[:target] = @tab.target if @tab.target?
-        h["data-tooltip"] = "" if @tab.hide? || @tab.unused?
+        if @tab.hide? || @tab.unused?
+          h["data-tooltip"] = ""
+          h["data-html-tooltip-title"] = a_title
+        end
       end
     end
 
