@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import PropTypes from 'prop-types'
+import type {ReactNode} from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -25,18 +25,47 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {assessmentShape} from './types'
-
 const I18n = createI18nScope('edit_rubricComments')
 
 const ellipsis = () => I18n.t('…')
 
-const truncate = comment => (comment.length > 100 ? comment.slice(0, 99) + ellipsis() : comment)
+const truncate = (comment: string) =>
+  comment.length > 100 ? comment.slice(0, 99) + ellipsis() : comment
 
-const slug = str => str.replace(/\W/g, '')
+const slug = (str: string) => str.replace(/\W/g, '')
 
-const FreeFormComments = props => {
-  const {allowSaving, savedComments, comments, large, saveLater, setComments, setSaveLater} = props
+interface Assessment {
+  criterion_id: string
+  comments?: string
+  comments_html?: string
+  points: {
+    text?: string
+    value?: number
+    valid?: boolean
+  }
+  focusPoints?: number
+  saveCommentsForLater?: boolean
+}
+
+interface FreeFormCommentsProps {
+  allowSaving: boolean
+  savedComments: string[]
+  comments?: string
+  large: boolean
+  saveLater?: boolean
+  setComments: (comments: string) => void
+  setSaveLater: (saveLater: boolean) => void
+}
+
+const FreeFormComments = ({
+  allowSaving,
+  savedComments,
+  comments = '',
+  large,
+  saveLater = false,
+  setComments,
+  setSaveLater,
+}: FreeFormCommentsProps) => {
   const first = (
     <SimpleSelect.Option key="first" id="first" value="first">
       {I18n.t('[ Select ]')}
@@ -57,7 +86,7 @@ const FreeFormComments = props => {
     <SimpleSelect
       renderLabel={I18n.t('Saved Comments')}
       assistiveText={I18n.t('Select from saved comments')}
-      onChange={(_unused, el) => {
+      onChange={(_unused: any, el: any) => {
         setComments(savedComments[el.value])
       }}
       key="simple-select"
@@ -74,14 +103,16 @@ const FreeFormComments = props => {
           checked={saveLater}
           label={I18n.t('Save this comment for reuse')}
           size="small"
-          onChange={event => setSaveLater(event.target.checked)}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+            setSaveLater(event.target.checked)
+          }
         />
       )
     }
   }
 
   const label = I18n.t('Comments')
-  const toScreenReader = el => <ScreenReaderContent>{el}</ScreenReaderContent>
+  const toScreenReader = (el: string) => <ScreenReaderContent>{el}</ScreenReaderContent>
 
   const commentClass = `rubric-comment edit-freeform-comments-${large ? 'large' : 'small'}`
   return (
@@ -92,7 +123,7 @@ const FreeFormComments = props => {
         label={large ? label : toScreenReader(label)}
         placeholder={large ? undefined : label}
         maxHeight="50rem"
-        onChange={e => setComments(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setComments(e.target.value)}
         resize="vertical"
         size="small"
         value={comments}
@@ -102,21 +133,8 @@ const FreeFormComments = props => {
     </div>
   )
 }
-FreeFormComments.propTypes = {
-  allowSaving: PropTypes.bool.isRequired,
-  savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
-  comments: PropTypes.string,
-  large: PropTypes.bool.isRequired,
-  saveLater: PropTypes.bool,
-  setComments: PropTypes.func.isRequired,
-  setSaveLater: PropTypes.func.isRequired,
-}
-FreeFormComments.defaultProps = {
-  comments: '',
-  saveLater: false,
-}
 
-const commentElement = assessment => {
+const commentElement = (assessment: Assessment) => {
   if (assessment.comments_html || assessment.comments) {
     return (
       <div>
@@ -135,25 +153,41 @@ const commentElement = assessment => {
   }
 }
 
-export const CommentText = ({assessment, placeholder, weight}) => (
+interface CommentTextProps {
+  assessment?: Assessment | null
+  placeholder?: string
+  weight: 'normal' | 'light' | 'bold'
+}
+
+export const CommentText = ({assessment = null, placeholder = '', weight}: CommentTextProps) => (
   <span className="react-rubric-break-words">
     <Text size="x-small" weight={weight}>
       {assessment !== null ? commentElement(assessment) : placeholder}
     </Text>
   </span>
 )
-CommentText.propTypes = {
-  assessment: PropTypes.shape(assessmentShape),
-  placeholder: PropTypes.string,
-  weight: PropTypes.string.isRequired,
-}
-CommentText.defaultProps = {
-  assessment: null,
-  placeholder: '',
+
+interface CommentsProps {
+  allowSaving?: boolean
+  editing: boolean
+  assessment?: Assessment | null
+  footer?: ReactNode
+  large?: boolean
+  savedComments: string[]
+  setComments: (comments: string) => void
+  setSaveLater: (saveLater: boolean) => void
 }
 
-const Comments = props => {
-  const {editing, assessment, footer, ...commentProps} = props
+const Comments = ({
+  allowSaving = true,
+  editing,
+  assessment,
+  footer = null,
+  large = true,
+  savedComments,
+  setComments,
+  setSaveLater,
+}: CommentsProps) => {
   if (!editing || assessment === null) {
     return (
       <div className="rubric-freeform">
@@ -170,27 +204,16 @@ const Comments = props => {
   } else {
     return (
       <FreeFormComments
-        comments={assessment.comments}
-        saveLater={assessment.saveCommentsForLater}
-        {...commentProps}
+        comments={assessment?.comments}
+        saveLater={assessment?.saveCommentsForLater}
+        allowSaving={allowSaving}
+        savedComments={savedComments}
+        large={large}
+        setComments={setComments}
+        setSaveLater={setSaveLater}
       />
     )
   }
-}
-Comments.propTypes = {
-  allowSaving: PropTypes.bool,
-  editing: PropTypes.bool.isRequired,
-  assessment: PropTypes.shape(assessmentShape),
-  footer: PropTypes.node,
-  large: PropTypes.bool,
-  savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
-  setComments: PropTypes.func.isRequired,
-  setSaveLater: PropTypes.func.isRequired,
-}
-Comments.defaultProps = {
-  allowSaving: true,
-  footer: null,
-  large: true,
 }
 
 export default Comments
