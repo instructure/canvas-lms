@@ -16,20 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconAddSolid} from '@instructure/ui-icons'
 
-export const useSetEditMode = (ref: React.RefObject<Element>, setter: (value: boolean) => void) => {
-  useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent | TouchEvent) => {
-      if (!ref.current) return
-      setter(ref.current.contains(event.target as Node))
-    }
+const I18n = createI18nScope('page_editor')
 
-    document.addEventListener('click', handleDocumentClick)
-    document.addEventListener('touchstart', handleDocumentClick)
-    return () => {
-      document.removeEventListener('click', handleDocumentClick)
-      document.removeEventListener('touchstart', handleDocumentClick)
-    }
-  }, [ref, setter])
+export const AddButton = (props: {
+  onAddBlockClicked: () => void
+}) => {
+  return (
+    <IconButton
+      data-testid="add-block-button"
+      data-addbutton
+      shape="circle"
+      color="primary"
+      screenReaderLabel={I18n.t('Add a block')}
+      onClick={e => {
+        e.stopPropagation()
+        props.onAddBlockClicked()
+      }}
+    >
+      <IconAddSolid />
+    </IconButton>
+  )
 }

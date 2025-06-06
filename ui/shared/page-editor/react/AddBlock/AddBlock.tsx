@@ -17,15 +17,14 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconAddSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {AddBlockModal} from './AddBlockModal'
 import {ReactElement, useState} from 'react'
 import {useAddNode} from '../hooks/useAddNode'
+import {AddButton} from './AddButton'
 
 const I18n = createI18nScope('page_editor')
 
@@ -48,15 +47,7 @@ const AddBlockContent = (props: {
             )}
           </Text>
         </Flex>
-        <IconButton
-          data-testid="add-block-button"
-          shape="circle"
-          color="primary"
-          screenReaderLabel={I18n.t('Add a block')}
-          onClick={props.onAddBlockClicked}
-        >
-          <IconAddSolid />
-        </IconButton>
+        <AddButton onAddBlockClicked={props.onAddBlockClicked} />
       </Flex>
     </View>
   )
