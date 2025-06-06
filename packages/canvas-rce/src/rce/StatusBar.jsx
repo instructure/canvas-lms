@@ -93,11 +93,9 @@ function renderPathString({path}) {
 
 function emptyTagIcon() {
   return (
-    <SVGIcon viewBox="0 0 24 24" fontSize="24px">
-      <g role="presentation">
-        <text textAnchor="middle" x="12px" y="18px" fontSize="16">
-          &lt;/&gt;
-        </text>
+    <SVGIcon viewBox="0 0 1920 1920" width="1em" height="1em">
+      <g role="presentation" transform="scale(28.7) translate(0, 8)">
+        <path d="M0 29.61L0 25.51L23.71 15.50L23.71 19.87L4.91 27.59L23.71 35.38L23.71 39.75L0 29.61ZM26.46 45.87L36.84 8.86L40.36 8.86L30.00 45.87L26.46 45.87ZM66.80 29.61L43.09 39.75L43.09 35.38L61.87 27.59L43.09 19.87L43.09 15.50L66.80 25.51L66.80 29.61Z"></path>
       </g>
     </SVGIcon>
   )
@@ -436,7 +434,9 @@ export default function StatusBar(props) {
         withBackground={false}
         withBorder={false}
       >
-        {props.rceIsFullscreen ? <IconExitFullScreenLine /> : <IconFullScreenLine />}
+        <div style={{fontSize: '0.9rem'}}>
+          {props.rceIsFullscreen ? <IconExitFullScreenLine /> : <IconFullScreenLine />}
+        </div>
       </IconButton>
     )
   }
