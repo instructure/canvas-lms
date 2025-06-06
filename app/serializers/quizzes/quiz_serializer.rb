@@ -224,7 +224,7 @@ module Quizzes
     end
 
     def all_dates
-      quiz.formatted_dates_hash_visible_to(user, include_all_dates: true)
+      quiz.formatted_dates_hash(quiz.all_due_dates)
     end
 
     def section_count
@@ -388,7 +388,7 @@ module Quizzes
     end
 
     def due_dates
-      @due_dates ||= quiz.formatted_dates_hash_visible_to(current_user)
+      @due_dates ||= quiz.dates_hash_visible_to(current_user)
     end
 
     # If the current user is a student and is in a course section which has
