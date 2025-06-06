@@ -208,14 +208,14 @@ module Types
 
     field :last_activity_at, DateTimeType, null: true
     def last_activity_at
-      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+      return nil unless enrollment.user_id == current_user.id || enrollment.course.grants_right?(current_user, session, :read_reports)
 
       object.last_activity_at
     end
 
     field :total_activity_time, Integer, null: true
     def total_activity_time
-      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+      return nil unless enrollment.user_id == current_user.id || enrollment.course.grants_right?(current_user, session, :read_reports)
 
       object.total_activity_time
     end
@@ -228,8 +228,8 @@ module Types
 
       GraphQLHelpers::UrlHelpers.course_user_url(
         course_id: context[:course].id,
-        id: enrollment.user.id,
-        host: context[:request].host_with_port
+        id: enrollment.user_id,
+        host: request.host_with_port
       )
     end
 
