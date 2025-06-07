@@ -17,7 +17,6 @@
  */
 
 import React, {useContext} from 'react'
-import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -33,7 +32,27 @@ import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('conversations_2')
 
-export const MessageDetailHeader = ({...props}) => {
+interface MessageDetailHeaderProps {
+  text?: string | null
+  onReply?: () => void
+  onReplyAll?: () => void
+  onArchive?: () => void
+  onUnarchive?: () => void
+  onStar?: () => void
+  onUnstar?: () => void
+  onDelete?: () => void
+  focusRef?: (ref: any) => void
+  onForward?: () => void
+  submissionCommentURL?: string
+  scope?: string
+  onBack?: () => void
+}
+
+export const MessageDetailHeader: React.FC<MessageDetailHeaderProps> = ({
+  text = null,
+  focusRef = () => {},
+  ...props
+}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
 
   const showArchive = props.scope !== 'sent' && props.onArchive
@@ -42,7 +61,7 @@ export const MessageDetailHeader = ({...props}) => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({mobile: true, desktop: true}) as any}
       props={{
         mobile: {
           datatestId: 'message-detail-header-mobile',
@@ -55,16 +74,16 @@ export const MessageDetailHeader = ({...props}) => {
         <Flex padding="small">
           <Flex.Item shouldGrow={true} shouldShrink={true}>
             <Heading level="h2">
-              <Text weight="bold" size="large" data-testid={responsiveProps.datatestId}>
+              <Text weight="bold" size="large" data-testid={responsiveProps?.datatestId}>
                 {isSubmissionCommentsType && props.submissionCommentURL ? (
                   <Link
                     href={props.submissionCommentURL}
                     data-testid="submission-comment-header-line"
                   >
-                    {props.text}
+                    {text}
                   </Link>
                 ) : (
-                  props.text
+                  text
                 )}
               </Text>
             </Heading>
@@ -72,12 +91,12 @@ export const MessageDetailHeader = ({...props}) => {
           <Flex.Item>
             <Tooltip renderTip={I18n.t('Return to Conversation List')} on={['hover', 'focus']}>
               <IconButton
-                ref={ref => props.focusRef(ref)}
+                ref={ref => focusRef(ref)}
                 margin="0 x-small 0 0"
                 screenReaderLabel={I18n.t('Return to %{subject} in Conversation List', {
-                  subject: props.text,
+                  subject: text,
                 })}
-                onClick={() => props.onBack()}
+                onClick={() => props.onBack?.()}
                 withBackground={false}
                 withBorder={false}
               >
@@ -91,8 +110,8 @@ export const MessageDetailHeader = ({...props}) => {
                 <IconButton
                   data-testid="message-detail-header-reply-btn"
                   margin="0 x-small 0 0"
-                  screenReaderLabel={I18n.t('Reply for %{subject}', {subject: props.text})}
-                  onClick={() => props.onReply()}
+                  screenReaderLabel={I18n.t('Reply for %{subject}', {subject: text})}
+                  onClick={() => props.onReply?.()}
                   withBackground={false}
                   withBorder={false}
                 >
@@ -110,7 +129,7 @@ export const MessageDetailHeader = ({...props}) => {
                     <IconButton
                       margin="0 x-small 0 0"
                       screenReaderLabel={I18n.t('More options for %{subject}', {
-                        subject: props.text,
+                        subject: text,
                       })}
                       withBackground={false}
                       withBorder={false}
@@ -122,12 +141,12 @@ export const MessageDetailHeader = ({...props}) => {
                 }
               >
                 {props.onReplyAll && (
-                  <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
+                  <Menu.Item value="reply-all" onSelect={() => props.onReplyAll?.()}>
                     {I18n.t('Reply All')}
                   </Menu.Item>
                 )}
                 {props.onForward && (
-                  <Menu.Item value="forward" onSelect={() => props.onForward()}>
+                  <Menu.Item value="forward" onSelect={() => props.onForward?.()}>
                     {I18n.t('Forward')}
                   </Menu.Item>
                 )}
@@ -162,25 +181,4 @@ export const MessageDetailHeader = ({...props}) => {
       )}
     />
   )
-}
-
-MessageDetailHeader.propTypes = {
-  text: PropTypes.string,
-  onReply: PropTypes.func,
-  onReplyAll: PropTypes.func,
-  onArchive: PropTypes.func,
-  onUnarchive: PropTypes.func,
-  onStar: PropTypes.func,
-  onUnstar: PropTypes.func,
-  onDelete: PropTypes.func,
-  focusRef: PropTypes.any,
-  onForward: PropTypes.func,
-  submissionCommentURL: PropTypes.string,
-  scope: PropTypes.string,
-  onBack: PropTypes.func,
-}
-
-MessageDetailHeader.defaultProps = {
-  text: null,
-  focusRef: () => {},
 }
