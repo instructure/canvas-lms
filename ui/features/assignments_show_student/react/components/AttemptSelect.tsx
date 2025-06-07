@@ -19,21 +19,66 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useContext, useEffect} from 'react'
-import PropTypes from 'prop-types'
 import uniqBy from 'lodash/uniqBy'
 import orderBy from 'lodash/orderBy'
-import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('assignments_2')
 
-export const getCurrentAttempt = submission => {
-  return submission && submission.attempt !== 0 ? submission.attempt : 1
+interface Submission {
+  _id: string
+  id: string
+  attempt: number | null
+  attachment?: any
+  attachments?: any[]
+  body?: string | null
+  customGradeStatus?: string | null
+  deductedPoints?: string | number | null
+  enteredGrade?: string | null
+  extraAttempts?: number | null
+  grade?: string | null
+  gradeHidden: boolean
+  gradingStatus?: 'needs_grading' | 'excused' | 'needs_review' | 'graded' | null | string
+  gradedAnonymously?: boolean | null
+  hideGradeFromStudent?: boolean
+  latePolicyStatus?: string | null
+  mediaObject?: any
+  originalityData?: any
+  resourceLinkLookupUuid?: string | null
+  state: string
+  sticker?: string | null
+  submissionDraft?: any
+  submissionStatus?: string | null
+  submissionType?: string | null
+  submittedAt?: string | null
+  turnitinData?: any[] | null
+  feedbackForCurrentAttempt: boolean
+  unreadCommentCount: number
+  url?: string | null
+  assignedAssessments?: any[] | number | null
+  proxySubmitter?: string | null
+  score?: number | null
 }
 
-export default function AttemptSelect({submission, allSubmissions, onChangeSubmission}) {
+interface AttemptSelectProps {
+  submission: Submission
+  allSubmissions: Submission[]
+  onChangeSubmission: (attempt: number) => void
+}
+
+export const getCurrentAttempt = (submission: Submission | null): number => {
+  return submission && submission.attempt !== 0 && submission.attempt !== null
+    ? submission.attempt
+    : 1
+}
+
+export default function AttemptSelect({
+  submission,
+  allSubmissions,
+  onChangeSubmission,
+}: AttemptSelectProps) {
   const current_attempt = getCurrentAttempt(submission)
   const {setOnSuccess} = useContext(AlertManagerContext)
 
@@ -46,10 +91,14 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
     allSubmissions.length > 1 ? allSubmissions.filter(s => s.attempt !== 0) : allSubmissions
 
   const attemptList = orderBy(uniqBy(filteredSubmissions, 'attempt'), 'attempt').map(sub => {
-    return [I18n.t('Attempt %{attempt}', {attempt: sub.attempt || 1}), sub.attempt]
+    const attemptNumber = sub.attempt || 1
+    return [I18n.t('Attempt %{attempt}', {attempt: attemptNumber}), attemptNumber]
   })
 
-  function handleSubmissionChange(e, selectedOption) {
+  function handleSubmissionChange(
+    e: React.SyntheticEvent,
+    selectedOption: {value?: string | number; id?: string},
+  ) {
     const attempt = Number(selectedOption.value)
     onChangeSubmission(attempt)
   }
@@ -59,7 +108,7 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
       <SimpleSelect
         renderLabel={<ScreenReaderContent>{I18n.t('Attempt')}</ScreenReaderContent>}
         width="15rem"
-        value={`${submission.attempt}`}
+        value={`${submission.attempt || 1}`}
         onChange={handleSubmissionChange}
         data-testid="attemptSelect"
       >
@@ -71,10 +120,4 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
       </SimpleSelect>
     </View>
   )
-}
-
-AttemptSelect.propTypes = {
-  allSubmissions: PropTypes.arrayOf(Submission.shape).isRequired,
-  onChangeSubmission: PropTypes.func.isRequired,
-  submission: Submission.shape.isRequired,
 }
