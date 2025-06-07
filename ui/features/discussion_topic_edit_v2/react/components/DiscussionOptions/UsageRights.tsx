@@ -18,7 +18,6 @@
 
 import React, {useEffect, useState, useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
@@ -38,30 +37,57 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = createI18nScope('discussion_create')
 
+interface UsageRightsState {
+  legalCopyright?: string
+  license?: string
+  useJustification?: string
+}
+
+interface UsageRightsOption {
+  display: string
+  value: string
+}
+
+interface CreativeCommonsOption {
+  id: string
+  name: string
+}
+
+interface UsageRightsProps {
+  onSaveUsageRights?: (usageRights: UsageRightsState) => void
+  isOpen?: boolean
+  initialUsageRights?: UsageRightsState
+  errorState?: boolean
+  usageRightsOptions: UsageRightsOption[]
+  creativeCommonsOptions: CreativeCommonsOption[]
+}
+
 export const UsageRights = ({
-  onSaveUsageRights,
-  isOpen,
+  onSaveUsageRights = () => {},
+  isOpen = false,
   initialUsageRights,
-  errorState,
+  errorState = false,
   usageRightsOptions,
   creativeCommonsOptions,
-}) => {
+}: UsageRightsProps) => {
   const [open, setOpen] = useState(isOpen)
   // These are the realtime values used in the modal.
   // If the save button is not pressed, these values are lost
   const [copyrightHolder, setCopyrightHolder] = useState('')
-  const [selectedUsageRightsOption, setSelectedUsageRightsOption] = useState()
-  const [selectedCreativeLicense, setSelectedCreativeLicense] = useState()
+  const [selectedUsageRightsOption, setSelectedUsageRightsOption] =
+    useState<UsageRightsOption | null>(null)
+  const [selectedCreativeLicense, setSelectedCreativeLicense] =
+    useState<CreativeCommonsOption | null>(null)
 
   const findUsageRightsOption = useCallback(
-    useJustification => {
+    (useJustification: string | undefined) => {
       return usageRightsOptions.find(opt => opt.value === useJustification) || null
     },
     [usageRightsOptions],
   )
 
   const findCreativeLicenseOption = useCallback(
-    license => {
+    (license: string | undefined) => {
       return creativeCommonsOptions.find(opt => opt.id === license) || null
     },
     [creativeCommonsOptions],
@@ -84,17 +110,24 @@ export const UsageRights = ({
     )
   }
 
-  const handleSelect = (e, {value}) => {
-    const newSelectedOption = findUsageRightsOption(value)
-    if (newSelectedOption) {
-      setSelectedUsageRightsOption(newSelectedOption)
+  const handleSelect = (_e: React.SyntheticEvent, data: {value?: string | number; id?: string}) => {
+    if (data.value !== undefined) {
+      const newSelectedOption = findUsageRightsOption(String(data.value))
+      if (newSelectedOption) {
+        setSelectedUsageRightsOption(newSelectedOption)
+      }
     }
   }
 
-  const handleCreativeSelect = (e, {value}) => {
-    const newSelectedOption = findCreativeLicenseOption(value)
-    if (newSelectedOption) {
-      setSelectedCreativeLicense(newSelectedOption)
+  const handleCreativeSelect = (
+    _e: React.SyntheticEvent,
+    data: {value?: string | number; id?: string},
+  ) => {
+    if (data.value !== undefined) {
+      const newSelectedOption = findCreativeLicenseOption(String(data.value))
+      if (newSelectedOption) {
+        setSelectedCreativeLicense(newSelectedOption)
+      }
     }
   }
 
@@ -105,12 +138,10 @@ export const UsageRights = ({
     setOpen(!open)
   }
 
-  const handleSaveClick = e => {
-    e.preventDefault()
-
-    const newUsageRightsState = {
+  const handleSaveClick = () => {
+    const newUsageRightsState: UsageRightsState = {
       legalCopyright: copyrightHolder,
-      useJustification: selectedUsageRightsOption.value,
+      useJustification: selectedUsageRightsOption?.value,
     }
     // We only send the license information if the selected usage right is creative commons
     if (selectedUsageRightsOption?.value === 'creative_commons') {
@@ -122,8 +153,7 @@ export const UsageRights = ({
     setOpen(false)
   }
 
-  const handleCancelClick = e => {
-    e.preventDefault()
+  const handleCancelClick = () => {
     revertToInitialValues()
     setOpen(false)
   }
@@ -249,33 +279,4 @@ export const UsageRights = ({
       </Modal>
     </div>
   )
-}
-
-UsageRights.propTypes = {
-  onSaveUsageRights: PropTypes.func, // When the user clicks save, this function is called with the new usage rights object
-  initialUsageRights: PropTypes.shape({
-    legalCopyright: PropTypes.string,
-    license: PropTypes.string,
-    useJustification: PropTypes.string,
-  }),
-  isOpen: PropTypes.bool, // can be used to open the modal
-  errorState: PropTypes.bool, // can be used to show an error state
-  creativeCommonsOptions: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    }),
-  ), // Array of objects with id and name for creative commons options
-  usageRightsOptions: PropTypes.arrayOf(
-    PropTypes.shape({
-      display: PropTypes.string.isRequired,
-      value: PropTypes.string.isRequired,
-    }),
-  ),
-}
-
-UsageRights.defaultProps = {
-  onSaveUsageRights: () => {},
-  isOpen: false,
-  errorState: false,
 }
