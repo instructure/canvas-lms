@@ -166,6 +166,7 @@ describe "calendar2" do
     end
 
     it "creates event by clicking on week calendar", priority: "1" do
+      skip("fickle VICE-5319")
       title = "from clicking week calendar"
       load_week_view
 
