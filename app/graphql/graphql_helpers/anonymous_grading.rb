@@ -20,16 +20,38 @@
 
 module GraphQLHelpers::AnonymousGrading
   def anonymous_grading_scoped_context(submission)
+    # Only set the permission if it hasn't been calculated yet for this submission
+    # This prevents redundant permission checks and loader calls
     if context[:hide_the_user_for_anonymous_grading].nil?
-      context.scoped_set!(:hide_the_user_for_anonymous_grading,
-                          !submission.can_read_submission_user_name?(current_user, session))
+
+      # Use graphql-batch to load the assignment for this submission
+      # This batches multiple assignment loads together to prevent N+1 queries
+      hide_user_value_promise = load_association(:assignment).then do
+        # Calculate whether the user should be hidden for anonymous grading
+        # Returns true if the user SHOULD be hidden (negation of can_read_submission_user_name?)
+        !submission.can_read_submission_user_name?(
+          context[:current_user],
+          context[:session]
+        )
+      end
+
+      # Store the promise in scoped context for this specific submission
+      # The promise will be automatically resolved by graphql-batch before field resolution
+      # Other parts of the subgraph can access this value via context[:hide_the_user_for_anonymous_grading]
+      context.scoped_set!(:hide_the_user_for_anonymous_grading, hide_user_value_promise)
     end
   end
 
   def unless_hiding_user_for_anonymous_grading
-    if !Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading) ||
-       !context[:hide_the_user_for_anonymous_grading]
-      yield
+    return yield unless Account.site_admin.feature_enabled?(:graphql_honor_anonymous_grading)
+
+    permission_value = context[:hide_the_user_for_anonymous_grading]
+
+    # If it's a promise, wait for it to resolve, otherwise use the value directly
+    if permission_value.respond_to?(:then)
+      permission_value.then { |hide_user_value| yield unless hide_user_value }
+    else
+      yield unless permission_value
     end
   end
 end
