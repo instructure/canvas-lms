@@ -18,21 +18,30 @@
 
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import LoadingWrapper from './LoadingWrapper'
 import LoadingSkeleton from './LoadingSkeleton'
 
-import ImportantInfo, {ImportantInfoShape, ImportantInfoEditHeader} from './ImportantInfo'
+import ImportantInfo, {ImportantInfoData, ImportantInfoEditHeader} from './ImportantInfo'
 
 const I18n = createI18nScope('important_info_announcement')
 
-const ImportantInfoLayout = ({isLoading, importantInfos, courseId}) => {
+interface ImportantInfoLayoutProps {
+  isLoading: boolean
+  importantInfos: ImportantInfoData[]
+  courseId?: string
+}
+
+const ImportantInfoLayout: React.FC<ImportantInfoLayoutProps> = ({
+  isLoading,
+  importantInfos,
+  courseId,
+}) => {
   const sectionHeading = <Heading level="h2">{I18n.t('Important Info')}</Heading>
 
-  const renderImportantInfoLoadingContainer = skeletons => (
+  const renderImportantInfoLoadingContainer = (skeletons: React.ReactNode[]) => (
     <div>
       {skeletons.length > 0 && (
         <LoadingSkeleton
@@ -77,12 +86,6 @@ const ImportantInfoLayout = ({isLoading, importantInfos, courseId}) => {
       ))}
     </LoadingWrapper>
   )
-}
-
-ImportantInfoLayout.propTypes = {
-  isLoading: PropTypes.bool.isRequired,
-  importantInfos: PropTypes.arrayOf(PropTypes.shape(ImportantInfoShape)).isRequired,
-  courseId: PropTypes.string,
 }
 
 export default ImportantInfoLayout
