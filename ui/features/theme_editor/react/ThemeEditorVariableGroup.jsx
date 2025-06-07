@@ -21,21 +21,27 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {bool, func, node, number} from 'prop-types'
 import {IconArrowOpenUpSolid} from '@instructure/ui-icons'
 
-export default function ThemeEditorVariableGroup(props) {
+export default function ThemeEditorVariableGroup({
+  summary,
+  expanded = false,
+  children,
+  onToggle,
+  index,
+}) {
   function handleToggle(event, expanded) {
-    props.onToggle(event, expanded, props.index)
+    onToggle(event, expanded, index)
   }
 
   return (
     <ToggleDetails
-      summary={props.summary}
-      expanded={props.expanded}
+      summary={summary}
+      expanded={expanded}
       onToggle={handleToggle}
       icon={IconArrowOpenUpSolid}
       iconPosition="end"
       fluidWidth={true}
     >
-      {props.children}
+      {children}
     </ToggleDetails>
   )
 }
@@ -46,8 +52,4 @@ ThemeEditorVariableGroup.propTypes = {
   children: node.isRequired,
   onToggle: func.isRequired,
   index: number.isRequired,
-}
-
-ThemeEditorVariableGroup.defaultProps = {
-  expanded: false,
 }
