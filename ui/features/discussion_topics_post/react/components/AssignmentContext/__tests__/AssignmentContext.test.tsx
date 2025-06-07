@@ -25,6 +25,10 @@ import {render} from '@testing-library/react'
 
 jest.mock('../../../utils')
 
+const mockResponsiveQuerySizes = responsiveQuerySizes as jest.MockedFunction<
+  typeof responsiveQuerySizes
+>
+
 beforeAll(() => {
   window.matchMedia = jest.fn().mockImplementation(() => {
     return {
@@ -38,23 +42,29 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'},
-  }))
+  mockResponsiveQuerySizes.mockImplementation(
+    () =>
+      ({
+        desktop: {maxWidth: '1000px'},
+      }) as any,
+  )
 })
 
 const mockProps = ({group = 'group 1'} = {}) => ({group})
 
-const setup = props => {
+const setup = (props: any) => {
   return render(<AssignmentContext {...props} />)
 }
 
 describe('AssignmentContext', () => {
   describe('Desktop', () => {
     beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'},
-      }))
+      mockResponsiveQuerySizes.mockImplementation(
+        () =>
+          ({
+            desktop: {maxWidth: '1000px'},
+          }) as any,
+      )
     })
 
     it('should render context', () => {
@@ -70,9 +80,12 @@ describe('AssignmentContext', () => {
 
   describe('Tablet', () => {
     beforeEach(() => {
-      responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'},
-      }))
+      mockResponsiveQuerySizes.mockImplementation(
+        () =>
+          ({
+            tablet: {maxWidth: '1000px'},
+          }) as any,
+      )
     })
 
     it('should render not render context', () => {

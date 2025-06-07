@@ -39,7 +39,7 @@ describe('Overview Content', () => {
       const {getByRole} = render(<OverviewPage {...getProps()} />)
       const button = getByRole('link', {name: 'Edit home page'})
       expect(button).toBeInTheDocument()
-      expect(button.href).toContain('/courses/12/pages/thehomepage/edit')
+      expect((button as HTMLAnchorElement).href).toContain('/courses/12/pages/thehomepage/edit')
     })
 
     it('does not render when canEdit is false', () => {

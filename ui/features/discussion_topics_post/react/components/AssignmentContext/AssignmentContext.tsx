@@ -22,23 +22,34 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
 
 import {Responsive} from '@instructure/ui-responsive'
-import PropTypes from 'prop-types'
 import {DueDatesForParticipantList} from '../DueDatesForParticipantList/DueDatesForParticipantList'
 
 const I18n = createI18nScope('discussion_posts')
 
-export function AssignmentContext({...props}) {
+interface AssignmentOverride {
+  set?: {
+    __typename?: string
+  }
+  [key: string]: any
+}
+
+interface AssignmentContextProps {
+  group?: string
+  assignmentOverride?: AssignmentOverride | null
+}
+
+export function AssignmentContext({group = '', assignmentOverride = null}: AssignmentContextProps) {
   let groupDisplayText = null
-  if (props.group) {
-    groupDisplayText = props.group
-  } else if (props.assignmentOverride?.set?.__typename !== 'AdhocStudents') {
+  if (group) {
+    groupDisplayText = group
+  } else if (assignmentOverride?.set?.__typename !== 'AdhocStudents') {
     groupDisplayText = I18n.t('Everyone')
   }
 
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true}) as any}
       props={{
         tablet: {
           textSize: 'x-small',
@@ -49,25 +60,15 @@ export function AssignmentContext({...props}) {
           displayText: groupDisplayText,
         },
       }}
-      render={responsiveProps => {
-        return responsiveProps.displayText ? (
+      render={(responsiveProps: any) => {
+        return responsiveProps?.displayText ? (
           <DueDatesForParticipantList
             textSize={responsiveProps.textSize}
-            assignmentOverride={props.assignmentOverride}
+            assignmentOverride={assignmentOverride}
             overrideTitle={responsiveProps.displayText}
           />
         ) : null
       }}
     />
   )
-}
-
-AssignmentContext.propTypes = {
-  group: PropTypes.string,
-  assignmentOverride: PropTypes.object,
-}
-
-AssignmentContext.defaultProps = {
-  group: '',
-  assignmentOverride: null,
 }
