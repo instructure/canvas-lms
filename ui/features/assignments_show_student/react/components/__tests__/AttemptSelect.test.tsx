@@ -22,14 +22,17 @@ import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 
-let mockedSetOnSuccess = null
-let mockedOnChangeSubmission = null
+type Submission = any // Using any since mockSubmission returns an unknown shape
 
-function mockContext(children) {
+let mockedSetOnSuccess: jest.Mock
+let mockedOnChangeSubmission: jest.Mock
+
+function mockContext(children: React.ReactNode) {
   return (
     <AlertManagerContext.Provider
       value={{
         setOnSuccess: mockedSetOnSuccess,
+        setOnFailure: jest.fn(),
       }}
     >
       {children}
@@ -37,9 +40,9 @@ function mockContext(children) {
   )
 }
 
-async function createProps({attempt}) {
-  const submission = await mockSubmission({Submission: {attempt}})
-  const submission2 = await mockSubmission({Submission: {attempt: attempt + 1}})
+async function createProps({attempt}: {attempt: number}) {
+  const submission = (await mockSubmission([{Submission: {attempt}}])) as Submission
+  const submission2 = (await mockSubmission([{Submission: {attempt: attempt + 1}}])) as Submission
   return {
     submission,
     allSubmissions: [submission, submission2],
@@ -60,7 +63,7 @@ describe('Attempt', () => {
   })
 
   it('renders attempt 0 as attempt 1', async () => {
-    const submission = await mockSubmission({Submission: {attempt: 0}})
+    const submission = (await mockSubmission([{Submission: {attempt: 0}}])) as Submission
     const props = {
       submission,
       allSubmissions: [submission],
@@ -71,8 +74,8 @@ describe('Attempt', () => {
   })
 
   it('only renders a single "Attempt 1" option when there is attempt 0 and attempt 1', async () => {
-    const submission = await mockSubmission({Submission: {attempt: 0}})
-    const submission2 = await mockSubmission({Submission: {attempt: 1}})
+    const submission = (await mockSubmission([{Submission: {attempt: 0}}])) as Submission
+    const submission2 = (await mockSubmission([{Submission: {attempt: 1}}])) as Submission
     const props = {
       submission: submission2,
       allSubmissions: [submission, submission2],

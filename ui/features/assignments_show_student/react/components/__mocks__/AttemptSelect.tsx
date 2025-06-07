@@ -19,8 +19,15 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-export const getCurrentAttempt = submission => {
-  return submission && submission.attempt !== 0 ? submission.attempt : 1
+interface Submission {
+  attempt: number | null
+  [key: string]: any
+}
+
+export const getCurrentAttempt = (submission: Submission | null): number => {
+  return submission && submission.attempt !== 0 && submission.attempt !== null
+    ? submission.attempt
+    : 1
 }
 
 export default function AttemptSelect() {
