@@ -183,12 +183,19 @@ const ColorPicker = createReactClass({
   },
 
   hexInputRef: null,
+  courseNicknameEditRef: React.createRef(),
+  colorSwatchRefs: [],
+  pickerBodyRef: React.createRef(),
+  reactModalRef: React.createRef(),
 
   // ===============
   //    LIFECYCLE
   // ===============
 
   getInitialState() {
+    // Initialize colorSwatchRefs array with refs for each color
+    this.colorSwatchRefs = this.props.colors.map(() => React.createRef())
+
     return {
       isOpen: this.props.isOpen,
       currentColor: this.props.currentColor,
@@ -255,10 +262,10 @@ const ColorPicker = createReactClass({
   setFocus() {
     // focus course nickname input first if it's there, otherwise the first
     // color swatch
-    if (this.refs.courseNicknameEdit) {
-      this.refs.courseNicknameEdit.focus()
-    } else if (this.refs.colorSwatch0) {
-      ReactDOM.findDOMNode(this.refs.colorSwatch0).focus()
+    if (this.courseNicknameEditRef.current) {
+      this.courseNicknameEditRef.current.focus()
+    } else if (this.colorSwatchRefs[0] && this.colorSwatchRefs[0].current) {
+      this.colorSwatchRefs[0].current.focus()
     }
   },
 
@@ -335,8 +342,8 @@ const ColorPicker = createReactClass({
   },
 
   setCourseNickname() {
-    if (this.refs.courseNicknameEdit) {
-      return this.refs.courseNicknameEdit.setCourseNickname()
+    if (this.courseNicknameEditRef.current) {
+      return this.courseNicknameEditRef.current.setCourseNickname()
     }
   },
 
@@ -421,7 +428,6 @@ const ColorPicker = createReactClass({
         colorSwatchStyle.borderWidth = '2px'
       }
       const title = color.name + ' (' + color.hexcode + ')'
-      const ref = 'colorSwatch' + idx
       const colorBlockStyles = classnames({
         ColorPicker__ColorBlock: true,
         'with-dark-check': this.props.withDarkCheck,
@@ -431,7 +437,7 @@ const ColorPicker = createReactClass({
         <button
           type="button"
           className={colorBlockStyles}
-          ref={ref}
+          ref={this.colorSwatchRefs[idx]}
           role="radio"
           aria-checked={this.state.currentColor === color.hexcode}
           style={colorSwatchStyle}
@@ -455,7 +461,7 @@ const ColorPicker = createReactClass({
     if (this.props.nicknameInfo) {
       return (
         <CourseNicknameEdit
-          ref="courseNicknameEdit"
+          ref={this.courseNicknameEditRef}
           nicknameInfo={this.props.nicknameInfo}
           onEnter={this.onApply.bind(null, this.state.currentColor)}
         />
@@ -516,7 +522,7 @@ const ColorPicker = createReactClass({
     const inputId = 'ColorPickerCustomInput-' + this.props.assetString
 
     return (
-      <div className={containerClasses} ref="pickerBody">
+      <div className={containerClasses} ref={this.pickerBodyRef}>
         {this.prompt()}
         {this.nicknameEdit()}
         <div
@@ -602,7 +608,7 @@ const ColorPicker = createReactClass({
 
     return (
       <ReactModal
-        ref="reactModal"
+        ref={this.reactModalRef}
         style={styleObj}
         isOpen={this.state.isOpen}
         onRequestClose={this.closeModal}
