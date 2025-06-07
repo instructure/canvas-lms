@@ -19,9 +19,39 @@
 import React from 'react'
 import {List} from '@instructure/ui-list'
 import RosterCard from '../../components/RosterCard/RosterCard'
-import {arrayOf, object, shape} from 'prop-types'
 
-const RosterCardView = ({data}) => {
+interface CourseUserNode {
+  _id: string
+  name: string
+  sisId?: string
+  enrollments: Array<{
+    id: string
+    type: string
+    totalActivityTime?: number
+    htmlUrl: string
+    state: string
+    canBeRemoved: boolean
+    section?: any
+    associatedUser?: any
+    [key: string]: any
+  }>
+  loginId?: string
+  avatarUrl?: string
+  pronouns?: string
+  [key: string]: any
+}
+
+interface RosterCardViewProps {
+  data: {
+    course: {
+      usersConnection: {
+        nodes: CourseUserNode[]
+      }
+    }
+  }
+}
+
+const RosterCardView: React.FC<RosterCardViewProps> = ({data}) => {
   const RosterCards = data.course.usersConnection.nodes.map(node => (
     <List.Item key={node._id}>
       <RosterCard courseUsersConnectionNode={node} />
@@ -34,17 +64,5 @@ const RosterCardView = ({data}) => {
     </List>
   )
 }
-
-RosterCardView.propTypes = {
-  data: shape({
-    course: shape({
-      usersConnection: shape({
-        nodes: arrayOf(object).isRequired,
-      }).isRequired,
-    }).isRequired,
-  }).isRequired,
-}
-
-RosterCardView.defaultProps = {}
 
 export default RosterCardView
