@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {any, arrayOf, bool, shape, string} from 'prop-types'
 
 import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -29,6 +28,31 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import FormContent from './FormContent'
 
 const I18n = createI18nScope('post_assignment_grades_tray')
+
+interface Section {
+  id: string
+  name: string
+}
+
+interface LayoutProps {
+  assignment: {
+    anonymousGrading: boolean
+    gradesPublished: boolean
+  }
+  containerName?: string
+  sections: Section[]
+  dismiss: () => void
+  onPostClick: () => void
+  postBySections: boolean
+  postBySectionsChanged: (value: boolean) => void
+  postType: string
+  postTypeChanged: (value: string) => void
+  postingGrades: boolean
+  sectionSelectionChanged: (selected: boolean, sectionId: string) => void
+  selectedSectionIds: string[]
+  unpostedCount: number
+  showSectionValidation?: boolean
+}
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},
@@ -45,7 +69,7 @@ export default function Layout({
   selectedSectionIds,
   unpostedCount,
   showSectionValidation,
-}) {
+}: LayoutProps) {
   return (
     <>
       {!gradesPublished && (
@@ -99,14 +123,4 @@ export default function Layout({
       </FormFieldGroup>
     </>
   )
-}
-
-Layout.propTypes = {
-  assignment: shape({
-    anonymousGrading: bool.isRequired,
-    gradesPublished: bool.isRequired,
-  }).isRequired,
-  containerName: string,
-  sections: arrayOf(any).isRequired,
-  ...FormContent.propTypes,
 }

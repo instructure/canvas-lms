@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -34,6 +33,30 @@ import SpecificSections from '@canvas/grading/react/SpecificSections'
 
 const I18n = createI18nScope('post_assignment_grades_tray')
 
+interface Section {
+  id: string
+  name: string
+}
+
+interface FormContentProps {
+  assignment: {
+    anonymousGrading: boolean
+    gradesPublished: boolean
+  }
+  dismiss: () => void
+  postBySections: boolean
+  postBySectionsChanged: (value: boolean) => void
+  postingGrades: boolean
+  postType: string
+  postTypeChanged: (value: string) => void
+  onPostClick: () => void
+  sections: Section[]
+  sectionSelectionChanged: (selected: boolean, sectionId: string) => void
+  selectedSectionIds: string[]
+  unpostedCount: number
+  showSectionValidation?: boolean
+}
+
 export default function FormContent({
   assignment: {anonymousGrading, gradesPublished},
   dismiss,
@@ -48,7 +71,7 @@ export default function FormContent({
   selectedSectionIds,
   unpostedCount,
   showSectionValidation,
-}) {
+}: FormContentProps) {
   if (postingGrades) {
     return (
       <View as="div" textAlign="center" padding="large">
@@ -124,27 +147,4 @@ export default function FormContent({
       </View>
     </>
   )
-}
-
-FormContent.propTypes = {
-  assignment: shape({
-    anonymousGrading: bool.isRequired,
-    gradesPublished: bool.isRequired,
-  }).isRequired,
-  dismiss: func.isRequired,
-  postBySections: bool.isRequired,
-  postBySectionsChanged: func.isRequired,
-  postingGrades: bool.isRequired,
-  postType: string.isRequired,
-  postTypeChanged: func.isRequired,
-  onPostClick: func.isRequired,
-  sections: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired,
-    }),
-  ).isRequired,
-  sectionSelectionChanged: func.isRequired,
-  selectedSectionIds: arrayOf(string).isRequired,
-  unpostedCount: number.isRequired,
 }
