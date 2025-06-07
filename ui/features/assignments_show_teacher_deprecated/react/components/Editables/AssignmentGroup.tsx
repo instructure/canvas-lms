@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {arrayOf, bool, func, oneOf, string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import produce from 'immer'
 import get from 'lodash/get'
@@ -25,48 +24,51 @@ import {Query} from '@apollo/client/react/components'
 import {Text} from '@instructure/ui-text'
 import SelectableText from './SelectableText'
 import {
-  AssignmentGroupShape,
   COURSE_ASSIGNMENT_GROUPS_QUERY,
   COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
 } from '../../assignmentData'
 
 const I18n = createI18nScope('assignments_2')
 
-const AssignmentGroupPropTypes = {
-  mode: oneOf(['edit', 'view']).isRequired,
-  onChange: func.isRequired,
-  onChangeMode: func.isRequired,
-  onAddAssignmentGroup: func, // .isRequired  TODO: when support + New Assignment Group
-  assignmentGroupList: arrayOf(AssignmentGroupShape),
-  selectedAssignmentGroup: AssignmentGroupShape,
-  readOnly: bool,
+interface AssignmentGroupUIProps {
+  mode: 'edit' | 'view'
+  onChange: (group: any) => void
+  onChangeMode: (mode: string) => void
+  onAddAssignmentGroup?: (group: any, selected: any) => void
+  assignmentGroupList?: any[]
+  selectedAssignmentGroup?: any
+  readOnly?: boolean
+  isLoading?: boolean
+  courseId?: string
+  onAddModule?: any
 }
-// eslint doesn't deal with the prop types being defined this way
 
-const AssignmentGroupDefaultProps = {
-  assignmentGroupList: [],
-  readOnly: false,
+interface AssignmentGroupProps {
+  mode: 'edit' | 'view'
+  onChange: (group: any) => void
+  onChangeMode: (mode: string) => void
+  onAddAssignmentGroup?: (group: any, selected: any) => void
+  assignmentGroupList?: any[]
+  selectedAssignmentGroup?: any
+  readOnly?: boolean
+  courseId?: string
 }
 
 const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')
 
-class AssignmentGroupUI extends React.Component {
-  static propTypes = {
-    ...AssignmentGroupPropTypes,
-    isLoading: bool,
-  }
-
+class AssignmentGroupUI extends React.Component<AssignmentGroupUIProps> {
   static defaultProps = {
-    ...AssignmentGroupDefaultProps,
+    assignmentGroupList: [],
+    readOnly: false,
     isLoading: false,
   }
 
-  handleGroupChange = selection => {
-    const group = this.props.assignmentGroupList.find(g => g.lid === selection.value)
+  handleGroupChange = (selection: any) => {
+    const group = this.props.assignmentGroupList?.find(g => g.lid === selection.value)
     this.props.onChange(group)
   }
 
-  handleGroupChangeMode = mode => {
+  handleGroupChangeMode = (mode: string) => {
     if (!this.props.readOnly) {
       this.props.onChangeMode(mode)
     }
@@ -86,7 +88,7 @@ class AssignmentGroupUI extends React.Component {
   //   }
   // }
   getAssignmentGroupOptions() {
-    let opts = [] // TODO: support adding [{label: I18n.t('+ Assignment Group'), value: 'add'}]
+    let opts: Array<{label: string; value: string}> = [] // TODO: support adding [{label: I18n.t('+ Assignment Group'), value: 'add'}]
     if (this.props.assignmentGroupList && this.props.assignmentGroupList.length) {
       opts = opts.concat(this.props.assignmentGroupList.map(g => ({label: g.name, value: g.lid})))
     } else if (this.props.selectedAssignmentGroup) {
@@ -98,7 +100,7 @@ class AssignmentGroupUI extends React.Component {
     return opts
   }
 
-  renderGroupView = groupOption => {
+  renderGroupView = (groupOption: any) => {
     if (!groupOption) {
       return <Text weight="light">{assignmentGroupPlaceholder}</Text>
     } else {
@@ -121,7 +123,7 @@ class AssignmentGroupUI extends React.Component {
           value={group}
           onChange={this.handleGroupChange}
           onChangeMode={this.handleGroupChangeMode}
-          onChangeSelection={this.handleChangeSelection}
+          onChangeSelection={undefined}
           renderView={this.renderGroupView}
           size="medium"
           readOnly={this.props.readOnly}
@@ -132,14 +134,14 @@ class AssignmentGroupUI extends React.Component {
     )
   }
 }
-const AssignmentGroup = function (props) {
+const AssignmentGroup = function (props: AssignmentGroupProps) {
   const q =
     props.mode === 'edit' ? COURSE_ASSIGNMENT_GROUPS_QUERY : COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
   let groups = []
   let isLoading = false
   return (
     <Query query={q} variables={{courseId: props.courseId}}>
-      {({data, loading, fetchMore}) => {
+      {({data, loading, fetchMore}: any) => {
         if (loading) {
           isLoading = true
         } else if (props.mode === 'edit') {
@@ -157,7 +159,7 @@ const AssignmentGroup = function (props) {
             assignmentGroupList={isLoading ? null : groups}
             onChange={props.onChange}
             onChangeMode={props.onChangeMode}
-            onAddModule={props.onAddModule}
+            onAddModule={(props as any).onAddModule}
             readOnly={props.readOnly}
             isLoading={isLoading}
           />
@@ -166,14 +168,14 @@ const AssignmentGroup = function (props) {
     </Query>
   )
 }
-AssignmentGroup.propTypes = {
-  ...AssignmentGroupPropTypes,
-  courseId: string,
+
+AssignmentGroup.defaultProps = {
+  assignmentGroupList: [],
+  readOnly: false,
 }
-AssignmentGroup.defaultProps = AssignmentGroupDefaultProps
 
 // As long's as there's another page of data, go get it
-function depaginate(fetchMore, data) {
+function depaginate(fetchMore: any, data: any) {
   let isLoading = false
   // We no longer have a request in-flight, see if we need to get another page
   if (data.course.assignmentGroupsConnection.pageInfo.hasNextPage) {
@@ -187,12 +189,12 @@ function depaginate(fetchMore, data) {
 }
 
 // merge the new result into the existing data
-function mergeThePage(previousResult, {fetchMoreResult}) {
+function mergeThePage(previousResult: any, {fetchMoreResult}: any) {
   const newGroups = fetchMoreResult.course.assignmentGroupsConnection.nodes
   const pageInfo = fetchMoreResult.course.assignmentGroupsConnection.pageInfo
   // using immer.produce let's me base the merge result on
   // fetchMoreResult w/o having to do a deep copy first
-  const result = produce(fetchMoreResult, draft => {
+  const result = produce(fetchMoreResult, (draft: any) => {
     let r = set(draft, 'course.pageInfo', pageInfo)
     r = set(
       r,
