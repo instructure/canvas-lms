@@ -24,7 +24,15 @@ import React from 'react'
 import {string, func} from 'prop-types'
 import preventDefault from '@canvas/util/preventDefault'
 
-export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
+export default function CourseListHeader({
+  sort = 'sis_course_id',
+  order = 'asc',
+  onChangeSort,
+  id,
+  label,
+  tipDesc,
+  tipAsc,
+}) {
   const SortIcon = order === 'asc' ? IconMiniArrowUpSolid : IconMiniArrowDownSolid
   return (
     <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
@@ -49,9 +57,4 @@ CourseListHeader.propTypes = {
   label: string.isRequired,
   tipDesc: string.isRequired,
   tipAsc: string.isRequired,
-}
-
-CourseListHeader.defaultProps = {
-  sort: 'sis_course_id',
-  order: 'asc',
 }
