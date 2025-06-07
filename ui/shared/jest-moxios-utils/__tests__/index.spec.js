@@ -17,7 +17,8 @@
  */
 
 import axios from 'axios'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {moxiosWait, moxiosRespond} from '../index'
 
 describe('moxiosWait', () => {
@@ -34,28 +35,35 @@ describe('moxiosWait', () => {
 })
 
 describe('moxiosRespond', () => {
-  beforeEach(() => {
-    moxios.install()
-  })
+  const server = setupServer()
 
-  afterEach(() => {
-    moxios.uninstall()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('throws if the request promise parameter is missing', () => {
     expect(() => moxiosRespond('blah')).toThrow()
   })
 
-  it('merges options into the response', () => {
-    const requestPromise = axios.get('http://example.com')
-    const responsePromise = moxiosRespond({some: 'data'}, requestPromise, {
-      status: 418,
-      headers: {key: 'value'},
-    })
-    return responsePromise.catch(err => {
+  it('merges options into the response', async () => {
+    server.use(
+      http.get('http://example.com', () =>
+        HttpResponse.json(
+          {some: 'data'},
+          {
+            status: 418,
+            headers: {key: 'value'},
+          },
+        ),
+      ),
+    )
+
+    try {
+      await axios.get('http://example.com')
+    } catch (err) {
       expect(err.response.data).toMatchObject({some: 'data'})
       expect(err.response.headers).toMatchObject({key: 'value'})
       expect(err.response.status).toBe(418)
-    })
+    }
   })
 })

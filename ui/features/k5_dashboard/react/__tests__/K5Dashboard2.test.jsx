@@ -26,7 +26,8 @@ import {
 import {resetPlanner} from '@canvas/planner'
 import {act, screen, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import moxios from 'moxios'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import React from 'react'
 import {
   MOCK_TODOS,
@@ -48,6 +49,8 @@ jest.mock('@canvas/util/globalUtils', () => ({
 
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+
+const server = setupServer()
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
@@ -145,9 +148,13 @@ const staff = [
   },
 ]
 
+beforeAll(() => {
+  server.listen()
+})
+
 beforeEach(() => {
-  moxios.install()
-  createPlannerMocks()
+  const handlers = createPlannerMocks()
+  server.use(...handlers)
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, gradeCourses)
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), syllabus)
@@ -166,7 +173,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
@@ -174,6 +181,10 @@ afterEach(() => {
   sessionStorage.clear()
   window.location.hash = ''
   destroyContainer()
+})
+
+afterAll(() => {
+  server.close()
 })
 
 describe('K-5 Dashboard', () => {
@@ -272,11 +283,11 @@ describe('K-5 Dashboard', () => {
     })
 
     it('filters important dates to those selected', async () => {
-      moxios.stubs.reset()
-      moxios.stubRequest(window.location.origin + '/api/v1/dashboard/dashboard_cards', {
-        status: 200,
-        response: MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'})),
-      })
+      server.use(
+        http.get('/api/v1/dashboard/dashboard_cards', () =>
+          HttpResponse.json(MOCK_CARDS.map(c => ({...c, enrollmentState: 'active'}))),
+        ),
+      )
       // Only return assignments associated with course_1 on next call
       fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
       const {getByLabelText, getByTestId, getByText, queryByText} = render(

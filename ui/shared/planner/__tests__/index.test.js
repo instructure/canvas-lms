@@ -20,7 +20,8 @@ import {configure} from '@testing-library/react'
 
 // Configure testing-library to support act
 configure({asyncUtilTimeout: 4000})
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import '@testing-library/jest-dom/extend-expect'
 // React is needed for JSX in the components we're testing
 import {createRoot} from 'react-dom/client'
@@ -95,9 +96,14 @@ const defaultState = {
   today: new Date(),
 }
 
+const server = setupServer()
+
+beforeAll(() => server.listen())
 afterEach(() => {
+  server.resetHandlers()
   resetPlanner()
 })
+afterAll(() => server.close())
 
 describe('with mock api', () => {
   beforeEach(async () => {
@@ -116,16 +122,11 @@ describe('with mock api', () => {
       removeListener: jest.fn(),
     }))
 
-    moxios.install()
     alertInitialize({
       visualSuccessCallback: jest.fn(),
       visualErrorCallback: jest.fn(),
       srAlertCallback: jest.fn(),
     })
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
   })
 
   describe('initializePlanner', () => {

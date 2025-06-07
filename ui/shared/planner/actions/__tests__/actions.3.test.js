@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
-import {isPromise, moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
+import {isPromise} from '@canvas/jest-moxios-utils'
 import * as SidebarActions from '../sidebar-actions'
 import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
@@ -73,20 +74,23 @@ const getBasicState = () => ({
   },
 })
 
+const server = setupServer()
+
 describe('api actions', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    SidebarActions.maybeUpdateTodoSidebar.reset()
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    moxios.install()
     expect.hasAssertions()
     alertInitialize({
       visualSuccessCallback() {},
       visualErrorCallback() {},
       srAlertCallback() {},
     })
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
 
   describe('togglePlannerItemCompletion', () => {
@@ -108,71 +112,107 @@ describe('api actions', () => {
       expect(SidebarActions.maybeUpdateTodoSidebar.args()).toEqual([savePromise])
     })
 
-    it('updates marked_complete and sends override data in the request', () => {
+    it('updates marked_complete and sends override data in the request', async () => {
+      let capturedRequest
+      server.use(
+        http.post('/api/v1/planner/overrides', async ({request}) => {
+          capturedRequest = await request.json()
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem({marked_complete: null})
-      Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
-      return moxiosWait(request => {
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          marked_complete: true,
-          transformedToApiOverride: true,
-        })
+      await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
+      expect(capturedRequest).toMatchObject({
+        marked_complete: true,
+        transformedToApiOverride: true,
       })
     })
 
-    it('does a post if the planner override is new (no id)', () => {
+    it('does a post if the planner override is new (no id)', async () => {
+      let capturedRequest
+      server.use(
+        http.post('/api/v1/planner/overrides', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem({id: '42'})
-      Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('post')
-        expect(request.url).toBe('/api/v1/planner/overrides')
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          marked_complete: true,
-          transformedToApiOverride: true,
-        })
+      await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
+      expect(capturedRequest.method).toBe('POST')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner/overrides')
+      expect(capturedRequest.body).toMatchObject({
+        marked_complete: true,
+        transformedToApiOverride: true,
       })
     })
 
-    it('does a put if the planner override exists (has id)', () => {
+    it('does a put if the planner override exists (has id)', async () => {
+      let capturedRequest
+      server.use(
+        http.put('/api/v1/planner/overrides/5', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem({id: '42', planner_override: {id: '5', marked_complete: true}})
-      Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('put')
-        expect(request.url).toBe('/api/v1/planner/overrides/5')
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          id: '5',
-          marked_complete: true,
-          transformedToApiOverride: true,
-        })
+      await Actions.togglePlannerItemCompletion(plannerItem)(mockDispatch, getBasicState)
+      expect(capturedRequest.method).toBe('PUT')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner/overrides/5')
+      expect(capturedRequest.body).toMatchObject({
+        id: '5',
+        marked_complete: true,
+        transformedToApiOverride: true,
       })
     })
 
-    it('resolves the promise with override response data in the item', () => {
+    it('resolves the promise with override response data in the item', async () => {
+      server.use(
+        http.put('/api/v1/planner/overrides/override_id', () => {
+          return HttpResponse.json(
+            {some: 'response data', id: 'override_id', marked_complete: false},
+            {status: 200},
+          )
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem({planner_override: {id: 'override_id', marked_complete: true}})
-      const togglePromise = Actions.togglePlannerItemCompletion(plannerItem)(
+      const result = await Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
         getBasicState,
       )
-      return moxiosRespond(
-        {some: 'response data', id: 'override_id', marked_complete: false},
-        togglePromise,
-      ).then(result => {
-        expect(result).toMatchObject({
-          wasToggled: true,
-          item: {
-            ...plannerItem,
-            completed: false,
-            overrideId: 'override_id',
-            show: true,
-          },
-        })
+      expect(result).toMatchObject({
+        wasToggled: true,
+        item: {
+          ...plannerItem,
+          completed: false,
+          overrideId: 'override_id',
+          show: true,
+        },
       })
     })
 
-    it('calls the alert function and resends previous override when a failure occurs', () => {
+    it('calls the alert function and resends previous override when a failure occurs', async () => {
+      server.use(
+        http.put('/api/v1/planner/overrides/override_id', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
+
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
@@ -183,16 +223,14 @@ describe('api actions', () => {
         some: 'data',
         planner_override: {id: 'override_id', marked_complete: false},
       }
-      const togglePromise = Actions.togglePlannerItemCompletion(plannerItem)(
+      const result = await Actions.togglePlannerItemCompletion(plannerItem)(
         mockDispatch,
         getBasicState,
       )
-      return moxiosRespond({some: 'response data'}, togglePromise, {status: 500}).then(result => {
-        expect(fakeAlert).toHaveBeenCalled()
-        expect(result).toMatchObject({
-          item: {...plannerItem},
-          wasToggled: true,
-        })
+      expect(fakeAlert).toHaveBeenCalled()
+      expect(result).toMatchObject({
+        item: {...plannerItem},
+        wasToggled: true,
       })
     })
   })

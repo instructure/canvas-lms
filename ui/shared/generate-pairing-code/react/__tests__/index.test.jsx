@@ -20,20 +20,19 @@
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GeneratePairingCode from '../index'
 
 const defaultProps = {
   userId: '1',
 }
 
-beforeEach(() => {
-  moxios.install()
-})
+const server = setupServer()
 
-afterEach(() => {
-  moxios.uninstall()
-})
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('renders the button and modal', () => {
   render(<GeneratePairingCode {...defaultProps} />)
@@ -44,12 +43,10 @@ it('renders the button and modal', () => {
 
 it('Shows the pairing code in the modal after clicking the button', async () => {
   const user = userEvent.setup()
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 200,
-    response: {
-      code: '1234',
-    },
-  })
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
 
   render(<GeneratePairingCode {...defaultProps} />)
 
@@ -67,9 +64,13 @@ it('Shows the pairing code in the modal after clicking the button', async () => 
 
 it('Show an error in the modal if the pairing code fails to generate', async () => {
   const user = userEvent.setup()
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 401,
-  })
+
+  server.use(
+    http.post(
+      '/api/v1/users/1/observer_pairing_codes',
+      () => new HttpResponse(null, {status: 401}),
+    ),
+  )
 
   render(<GeneratePairingCode {...defaultProps} />)
 
@@ -93,12 +94,10 @@ it('Shows the loading spinner while the pairing code is being generated', async 
 
 it('clicking the close button will close the modal', async () => {
   const user = userEvent.setup()
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 200,
-    response: {
-      code: '1234',
-    },
-  })
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
 
   render(<GeneratePairingCode {...defaultProps} />)
 
@@ -117,12 +116,10 @@ it('clicking the close button will close the modal', async () => {
 
 it('clicking the ok button will close the modal', async () => {
   const user = userEvent.setup()
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 200,
-    response: {
-      code: '1234',
-    },
-  })
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
 
   render(<GeneratePairingCode {...defaultProps} />)
 
@@ -141,12 +138,10 @@ it('clicking the ok button will close the modal', async () => {
 
 it('should use the name in the text when it is provided', async () => {
   const user = userEvent.setup()
-  moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 200,
-    response: {
-      code: '1234',
-    },
-  })
+
+  server.use(
+    http.post('/api/v1/users/1/observer_pairing_codes', () => HttpResponse.json({code: '1234'})),
+  )
 
   render(<GeneratePairingCode {...defaultProps} name="George" />)
 

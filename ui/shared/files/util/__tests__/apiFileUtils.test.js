@@ -16,96 +16,94 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {uploadFile} from '../apiFileUtils'
 
 describe('apiFileUtils', () => {
-  beforeEach(() => {
-    moxios.install()
-  })
+  const server = setupServer()
 
-  afterEach(() => {
-    moxios.uninstall()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   describe('uploadFile', () => {
-    it('runs the onSuccess method after upload', async () => {
-      const onSuccess = jest.fn()
+    it('runs the onSuccess method after upload', done => {
+      const onSuccess = jest.fn(data => {
+        expect(data).toBe('yo')
+        expect(onFail).not.toHaveBeenCalled()
+        done()
+      })
       const onFail = jest.fn()
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 200,
-        response: {
-          upload_url: 'http://new_url',
-          upload_params: {
-            Filename: 'file',
-            key: 'folder/filename',
-            'content-type': 'image/png',
-          },
-          file_param: 'attachment[uploaded_data]',
-        },
-      })
-      moxios.stubRequest('http://new_url', {
-        status: 200,
-        response: 'yo',
-      })
+
+      server.use(
+        http.post('/api/v1/folders/1/files', () =>
+          HttpResponse.json({
+            upload_url: 'http://new_url',
+            upload_params: {
+              Filename: 'file',
+              key: 'folder/filename',
+              'content-type': 'image/png',
+            },
+            file_param: 'attachment[uploaded_data]',
+          }),
+        ),
+        http.post(
+          'http://new_url',
+          () =>
+            new HttpResponse('yo', {
+              headers: {'content-type': 'text/plain'},
+            }),
+        ),
+      )
+
       const file = {name: 'file1', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-
-      await moxios.wait(() => {
-        return moxios.wait(() => {
-          expect(onSuccess).toHaveBeenCalledTimes(1)
-          expect(onSuccess).toHaveBeenCalledWith('yo')
-          expect(onFail).not.toHaveBeenCalled()
-        })
-      })
     })
 
-    it('runs the onFailure method on upload failure', async () => {
+    it('runs the onFailure method on upload failure', done => {
       const onSuccess = jest.fn()
-      const onFail = jest.fn()
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 200,
-        response: {
-          upload_url: 'http://new_url',
-          upload_params: {
-            Filename: 'file',
-            key: 'folder/filename',
-            'content-type': 'image/png',
-          },
-          file_param: 'attachment[uploaded_data]',
-        },
+      const onFail = jest.fn(() => {
+        expect(onSuccess).not.toHaveBeenCalled()
+        done()
       })
-      moxios.stubRequest('http://new_url', {
-        status: 400,
-        response: 'yo',
-      })
+
+      server.use(
+        http.post('/api/v1/folders/1/files', () =>
+          HttpResponse.json({
+            upload_url: 'http://new_url',
+            upload_params: {
+              Filename: 'file',
+              key: 'folder/filename',
+              'content-type': 'image/png',
+            },
+            file_param: 'attachment[uploaded_data]',
+          }),
+        ),
+        http.post('http://new_url', () => new HttpResponse('yo', {status: 400})),
+      )
+
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-
-      await moxios.wait(() => {
-        return moxios.wait(() => {
-          expect(onFail).toHaveBeenCalledTimes(1)
-          expect(onSuccess).not.toHaveBeenCalled()
-        })
-      })
     })
   })
 
   describe('onFileUploadInfoReceived', () => {
-    it('runs the onFailure on file prep failure', async () => {
+    it('runs the onFailure on file prep failure', done => {
       const onSuccess = jest.fn()
-      const onFail = jest.fn()
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 400,
-        response: {data: {formData: 'form', uploadUrl: 'new_url'}},
+      const onFail = jest.fn(() => {
+        expect(onSuccess).not.toHaveBeenCalled()
+        done()
       })
+
+      server.use(
+        http.post('/api/v1/folders/1/files', () =>
+          HttpResponse.json({data: {formData: 'form', uploadUrl: 'new_url'}}, {status: 400}),
+        ),
+      )
+
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
-
-      await moxios.wait(() => {
-        expect(onFail).toHaveBeenCalledTimes(1)
-        expect(onSuccess).not.toHaveBeenCalled()
-      })
     })
   })
 })

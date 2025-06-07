@@ -22,7 +22,8 @@ import $ from 'jquery'
 import {createGradebook} from './GradebookSpecHelper'
 import GradebookApi from '../apis/GradebookApi'
 import ReactDOM from 'react-dom'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {calculateCheckpointStates} from '../components/SubmissionTray.tsx'
 
 // Mock global $ for flashError usage
@@ -36,14 +37,18 @@ const defaultGradingScheme = [
   ['F', 0],
 ]
 
+const server = setupServer()
+
 describe('Gradebook#renderSubmissionTray', () => {
   let gradebook
   let submissionStateMapStub
 
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     jest.clearAllMocks()
-
-    moxios.install()
 
     global.ENV = {
       GRADEBOOK_OPTIONS: {
@@ -138,7 +143,6 @@ describe('Gradebook#renderSubmissionTray', () => {
   })
 
   afterEach(() => {
-    moxios.uninstall()
     delete global.ENV
     delete global.$
   })
@@ -801,11 +805,7 @@ describe('Gradebook#renderSubmissionTray', () => {
       mountPointId = 'StudentTray__Container'
       document.body.innerHTML = `<div id="${mountPointId}"></div>`
 
-      moxios.install()
-      moxios.stubRequest(/.*/, {
-        status: 200,
-        response: {submission_comments: []},
-      })
+      server.use(http.get('*', () => HttpResponse.json({submission_comments: []})))
 
       gradebook = createGradebook()
 
@@ -886,7 +886,6 @@ describe('Gradebook#renderSubmissionTray', () => {
         ReactDOM.unmountComponentAtNode(node)
         node.remove()
       }
-      moxios.uninstall()
       jest.restoreAllMocks()
     })
 
@@ -970,11 +969,9 @@ describe('Gradebook#renderSubmissionTray', () => {
       mountPointId = 'StudentTray__Container'
       document.body.innerHTML = `<div id="${mountPointId}"></div>`
 
-      moxios.install()
-      moxios.stubRequest(/.*\/api\/v1\/courses\/.*/, {
-        status: 200,
-        response: {submission_comments: []},
-      })
+      server.use(
+        http.get(/\/api\/v1\/courses\/.*/, () => HttpResponse.json({submission_comments: []})),
+      )
 
       gradebook = createGradebook()
 
@@ -1071,7 +1068,6 @@ describe('Gradebook#renderSubmissionTray', () => {
         ReactDOM.unmountComponentAtNode(node)
         node.remove()
       }
-      moxios.uninstall()
       jest.restoreAllMocks()
     })
 
@@ -1241,16 +1237,16 @@ describe('calculateCheckpointStates', () => {
         subAssignmentSubmissions: [
           {
             seconds_late: SECONDS_IN_HOUR * 5 + 1,
-            late: true
-          }
-        ]
+            late: true,
+          },
+        ],
       },
       {
         lateSubmissionInterval: 'hour',
-      }
+      },
     )
 
-    expect(result[0].timeLate).toEqual("6")
+    expect(result[0].timeLate).toEqual('6')
   })
 
   it('rounds up late days', () => {
@@ -1260,15 +1256,15 @@ describe('calculateCheckpointStates', () => {
         subAssignmentSubmissions: [
           {
             seconds_late: SECONDS_IN_DAY * 5 + 1,
-            late: true
-          }
-        ]
+            late: true,
+          },
+        ],
       },
       {
         lateSubmissionInterval: 'day',
-      }
+      },
     )
 
-    expect(result[0].timeLate).toEqual("6")
+    expect(result[0].timeLate).toEqual('6')
   })
 })
