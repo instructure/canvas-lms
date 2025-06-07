@@ -21,14 +21,50 @@ import 'jquery-migrate'
 import Backbone from '@canvas/backbone'
 import PaginatedCollection from '../PaginatedCollection'
 import getFakePage from '@canvas/test-utils/getFakePage'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('PaginatedCollection', () => {
-  let server
   let collection
+  let server
+
+  const sendPage = (page, url) => {
+    const pathname = new URL(url, 'http://localhost').pathname
+    server.use(
+      http.get(
+        pathname,
+        ({request}) => {
+          const requestUrl = new URL(request.url)
+          if (requestUrl.href === new URL(url, 'http://localhost').href) {
+            return new HttpResponse(JSON.stringify(page.data), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                Link: page.header,
+              },
+            })
+          }
+          return undefined
+        },
+        {once: true},
+      ),
+    )
+  }
+
+  beforeAll(() => {
+    server = setupServer()
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
-    server = sinon.fakeServer.create()
     collection = new PaginatedCollection(null, {
       params: {
         multi: ['foos', 'bars'],
@@ -40,24 +76,11 @@ describe('PaginatedCollection', () => {
       return this.url + '?' + $.param(this.options.params)
     }
     collection.model = Backbone.Model.extend()
-    server.sendPage = function (page, url) {
-      return this.respond('GET', url, [
-        200,
-        {
-          'Content-Type': 'application/json',
-          Link: page.header,
-        },
-        JSON.stringify(page.data),
-      ])
-    }
-  })
-
-  afterEach(() => {
-    server.restore()
   })
 
   test('fetch maintains parent API', () => {
     const page = getFakePage()
+    sendPage(page, collection.urlWithParams())
     const dfd = collection.fetch({
       success: (self, response) => {
         expect(self).toBe(collection)
@@ -70,36 +93,53 @@ describe('PaginatedCollection', () => {
       expect(status).toBe('success')
       expect(typeof xhr.abort).toBe('function')
     })
-    server.sendPage(page, collection.urlWithParams())
   })
 
   test('fetch maintains error handler API', () => {
+    const url = collection.urlWithParams()
+    const pathname = new URL(url, 'http://localhost').pathname
+    server.use(
+      http.get(
+        pathname,
+        ({request}) => {
+          const requestUrl = new URL(request.url)
+          if (requestUrl.href === new URL(url, 'http://localhost').href) {
+            return new HttpResponse('wah wah', {
+              status: 400,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+          }
+          return undefined
+        },
+        {once: true},
+      ),
+    )
+
     collection.fetch({
       error: (self, xhr) => {
         expect(self).toBe(collection)
         expect(xhr.responseText).toBe('wah wah')
       },
     })
-    server.respond('GET', collection.urlWithParams(), [
-      400,
-      {'Content-Type': 'application/json'},
-      'wah wah',
-    ])
   })
 
   test('fetch fires fetch event', () => {
     const page = getFakePage()
+    sendPage(page, collection.urlWithParams())
+
     collection.on('fetch', (self, modelData) => {
       expect(true).toBe(true) // triggers fetch
       expect(modelData).toEqual(page.data)
       expect(self).toBe(collection)
     })
     collection.fetch()
-    server.sendPage(page, collection.urlWithParams())
   })
 
   test('fetches current page', () => {
     const page1 = getFakePage(1)
+    sendPage(page1, collection.urlWithParams())
 
     collection.fetch({
       success: () => {
@@ -109,11 +149,13 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.current).toBe(page1.urls.current)
       },
     })
-    server.sendPage(page1, collection.urlWithParams())
+
     collection.on('fetch:current', (_self, modelData) => {
       expect(true).toBe(true) // triggers fetch:current
       expect(modelData).toEqual(page1.data)
     })
+
+    sendPage(page1, collection.urls.current)
     collection.fetch({
       page: 'current',
       success: () => {
@@ -123,12 +165,12 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.current).toBe(page1.urls.current)
       },
     })
-    server.sendPage(page1, collection.urls.current)
   })
 
   test('fetches next page', () => {
     const page1 = getFakePage(1)
     const page2 = getFakePage(2)
+    sendPage(page1, collection.urlWithParams())
 
     collection.fetch({
       success: () => {
@@ -137,11 +179,13 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.next).toBe(page1.urls.next)
       },
     })
-    server.sendPage(page1, collection.urlWithParams())
+
     collection.on('fetch:next', (_self, modelData) => {
       expect(true).toBe(true) // triggers fetch:next
       expect(modelData).toEqual(page2.data)
     })
+
+    sendPage(page2, collection.urls.next)
     collection.fetch({
       page: 'next',
       success: () => {
@@ -150,12 +194,12 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.next).toBe(page2.urls.next)
       },
     })
-    server.sendPage(page2, collection.urls.next)
   })
 
   test('fetches previous page', () => {
     const page1 = getFakePage(1)
     const page2 = getFakePage(2)
+    sendPage(page2, collection.urlWithParams())
 
     collection.fetch({
       success: () => {
@@ -165,12 +209,12 @@ describe('PaginatedCollection', () => {
       },
     })
 
-    server.sendPage(page2, collection.urlWithParams())
     collection.on('fetch:prev', (_self, modelData) => {
       expect(true).toBe(true) // triggers fetch:prev
       expect(modelData).toEqual(page1.data)
     })
 
+    sendPage(page1, collection.urls.prev)
     collection.fetch({
       page: 'prev',
       success: () => {
@@ -179,7 +223,6 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.prev).toBeUndefined()
       },
     })
-    server.sendPage(page1, collection.urls.prev)
   })
 
   test('fetches current, prev, next, top and bottom pages', () => {
@@ -187,6 +230,7 @@ describe('PaginatedCollection', () => {
     const page2 = getFakePage(2)
     const page3 = getFakePage(3)
     const page4 = getFakePage(4)
+    sendPage(page3, collection.urlWithParams())
 
     collection.fetch({
       success: () => {
@@ -197,8 +241,8 @@ describe('PaginatedCollection', () => {
         expect(collection.urls).toEqual(expectedUrls)
       },
     })
-    server.sendPage(page3, collection.urlWithParams())
 
+    sendPage(page3, collection.urlWithParams())
     collection.fetch({
       page: 'current',
       success: () => {
@@ -208,8 +252,8 @@ describe('PaginatedCollection', () => {
         expect(collection.urls).toEqual(expectedUrls)
       },
     })
-    server.sendPage(page3, collection.urlWithParams())
 
+    sendPage(page2, collection.urls.prev)
     collection.fetch({
       page: 'prev',
       success: () => {
@@ -220,8 +264,8 @@ describe('PaginatedCollection', () => {
         expect(collection.urls).toEqual(expectedUrls)
       },
     })
-    server.sendPage(page2, collection.urls.prev)
 
+    sendPage(page1, collection.urls.top)
     collection.fetch({
       page: 'top',
       success: () => {
@@ -231,8 +275,8 @@ describe('PaginatedCollection', () => {
         expect(collection.urls).toEqual(expectedUrls)
       },
     })
-    server.sendPage(page1, collection.urls.top)
 
+    sendPage(page4, collection.urls.bottom)
     collection.fetch({
       page: 'bottom',
       success: () => {
@@ -240,6 +284,5 @@ describe('PaginatedCollection', () => {
         expect(collection.urls.bottom).toBe(page4.urls.next)
       },
     })
-    server.sendPage(page4, collection.urls.bottom)
   })
 })
