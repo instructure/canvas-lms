@@ -18,11 +18,14 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('react_files')
 
-export default function NoResults({search_term}) {
+interface NoResultsProps {
+  search_term?: string
+}
+
+export default function NoResults({search_term}: NoResultsProps) {
   return (
     <div>
       <p>
@@ -42,8 +45,4 @@ export default function NoResults({search_term}) {
       </ul>
     </div>
   )
-}
-
-NoResults.propTypes = {
-  search_term: PropTypes.string,
 }

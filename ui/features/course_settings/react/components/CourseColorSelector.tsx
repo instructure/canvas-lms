@@ -17,7 +17,6 @@
  */
 
 import React, {useState} from 'react'
-import {string} from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {darken} from '@instructure/ui-color-utils'
@@ -48,7 +47,11 @@ export const COLOR_OPTIONS = [
 ]
 const PREVIEW_SIZE = 16
 
-function ColorPreview({color = '#FFF'}) {
+interface ColorPreviewProps {
+  color?: string
+}
+
+function ColorPreview({color = '#FFF'}: ColorPreviewProps) {
   return (
     <span
       style={{
@@ -68,24 +71,31 @@ function ColorPreview({color = '#FFF'}) {
 
 // Correctly implements modulo for negative numbers instead of remainder.
 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Remainder
-const mod = (n, m) => ((n % m) + m) % m
+const mod = (n: number, m: number) => ((n % m) + m) % m
 
 const handleOptionNavigation =
-  (focusedColorIndex = 0, onChangeFocus) =>
-  e => {
+  (focusedColorIndex = 0, onChangeFocus: (index: number) => void) =>
+  (e: React.KeyboardEvent) => {
     if (e.keyCode !== 37 && e.keyCode !== 39) return
     const offset = e.keyCode - 38
     const newIndex = mod(focusedColorIndex + offset, COLOR_OPTIONS.length)
     onChangeFocus(newIndex)
-    document.getElementById(`color-${COLOR_OPTIONS[newIndex]}`).focus()
+    document.getElementById(`color-${COLOR_OPTIONS[newIndex]}`)?.focus()
   }
 
-const getSelectedColorIndex = color => {
+const getSelectedColorIndex = (color: string) => {
   const selectedColorIndex = COLOR_OPTIONS.indexOf(color)
   return selectedColorIndex >= 0 ? selectedColorIndex : 0
 }
 
-function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
+interface ColorOptionsProps {
+  color: string
+  focusedColorIndex: number
+  onChange: (color: string) => void
+  onChangeFocus: (index: number) => void
+}
+
+function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}: ColorOptionsProps) {
   return (
     <View as="section" onKeyDown={handleOptionNavigation(focusedColorIndex, onChangeFocus)}>
       <ScreenReaderContent>
@@ -119,7 +129,7 @@ function ColorOptions({color, focusedColorIndex, onChange, onChangeFocus}) {
   )
 }
 
-const validateColorString = (oldColor, color) => {
+const validateColorString = (oldColor: string, color: string) => {
   // Allow the auto-populated pound sign to be deleted
   if (oldColor.length === 1 && !color) {
     return ''
@@ -131,7 +141,11 @@ const validateColorString = (oldColor, color) => {
   return `#${newColor}`
 }
 
-export default function CourseColorSelector({courseColor}) {
+interface CourseColorSelectorProps {
+  courseColor?: string
+}
+
+export default function CourseColorSelector({courseColor}: CourseColorSelectorProps) {
   const [color, setColor] = useState(courseColor || '')
   const [focusedColorIndex, setFocusedColorIndex] = useState(() => getSelectedColorIndex(color))
   return (
@@ -158,8 +172,4 @@ export default function CourseColorSelector({courseColor}) {
       />
     </View>
   )
-}
-
-CourseColorSelector.propTypes = {
-  courseColor: string,
 }

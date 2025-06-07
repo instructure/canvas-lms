@@ -21,13 +21,24 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('external_tools')
 
-const ConfirmationForm = props => {
-  const {cancelLabel, confirmLabel, onCancel, onConfirm, message} = props
+interface ConfirmationFormProps {
+  onCancel: () => void
+  onConfirm: () => void
+  message: string
+  confirmLabel?: string
+  cancelLabel?: string
+}
 
+const ConfirmationForm: React.FC<ConfirmationFormProps> = ({
+  cancelLabel = I18n.t('Cancel'),
+  confirmLabel = I18n.t('Submit'),
+  onCancel,
+  onConfirm,
+  message,
+}) => {
   return (
     <View display="block">
       <View display="block">
@@ -45,19 +56,6 @@ const ConfirmationForm = props => {
       </View>
     </View>
   )
-}
-
-ConfirmationForm.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  message: PropTypes.string.isRequired,
-  confirmLabel: PropTypes.string,
-  cancelLabel: PropTypes.string,
-}
-
-ConfirmationForm.defaultProps = {
-  confirmLabel: I18n.t('Submit'),
-  cancelLabel: I18n.t('Cancel'),
 }
 
 export default ConfirmationForm
