@@ -17,7 +17,6 @@
  */
 
 import React, {useState, useEffect, useRef, useContext} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -26,21 +25,61 @@ import {DiscussionDueDatesContext} from '../../util/constants'
 
 const I18n = createI18nScope('discussion_create')
 
-export const AssignmentDueDate = ({
-  initialAssignedInformation,
-  availableAssignToOptions,
-  onAssignedInfoChange,
+interface AssignOption {
+  assetCode: string
+  label: string
+}
+
+interface AssignedInformation {
+  dueDateId: string
+  assignedList: string[]
+  dueDate: string
+  availableFrom: string
+  availableUntil: string
+}
+
+interface AssignmentDueDateProps {
+  availableAssignToOptions?: {
+    [key: string]: AssignOption[]
+  }
+  initialAssignedInformation?: AssignedInformation
+  onAssignedInfoChange?: (info: AssignedInformation) => void
+}
+
+interface FormMessage {
+  text: string
+  type: 'error' | 'hint' | 'success' | 'screenreader-only'
+}
+
+export const AssignmentDueDate: React.FC<AssignmentDueDateProps> = ({
+  initialAssignedInformation = {
+    dueDateId: '',
+    assignedList: [],
+    dueDate: '',
+    availableFrom: '',
+    availableUntil: '',
+  },
+  availableAssignToOptions = {},
+  onAssignedInfoChange = () => {},
 }) => {
-  const dueAtRef = useRef()
-  const unlockAtRef = useRef()
+  const dueAtRef = useRef<any>()
+  const unlockAtRef = useRef<any>()
 
   const [assignedInformation, setAssignedInformation] = useState(initialAssignedInformation)
-  const [dueDateErrorMessage, setDueDateErrorMessage] = useState([])
-  const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState([])
+  const [dueDateErrorMessage, setDueDateErrorMessage] = useState<FormMessage[]>([])
+  const [availableFromAndUntilErrorMessage, setAvailableFromAndUntilErrorMessage] = useState<
+    FormMessage[]
+  >([])
 
-  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(DiscussionDueDatesContext)
+  const {gradedDiscussionRefMap, setGradedDiscussionRefMap} = useContext(
+    DiscussionDueDatesContext,
+  ) as any
 
-  const validateDueDate = (dueDate, availableFrom, availableUntil) => {
+  const validateDueDate = (
+    dueDate: string,
+    availableFrom: string,
+    availableUntil: string,
+  ): string | null => {
     const due = new Date(dueDate)
     const from = availableFrom ? new Date(availableFrom) : null
     const until = availableUntil ? new Date(availableUntil) : null
@@ -54,7 +93,10 @@ export const AssignmentDueDate = ({
     return null
   }
 
-  const validateAvailableFromAndUntil = (availableFrom, availableUntil) => {
+  const validateAvailableFromAndUntil = (
+    availableFrom: string,
+    availableUntil: string,
+  ): string | null => {
     const from = availableFrom ? new Date(availableFrom) : null
     const until = availableUntil ? new Date(availableUntil) : null
 
@@ -64,10 +106,12 @@ export const AssignmentDueDate = ({
     return null
   }
 
-  const setRefMap = (field, ref) => {
-    const refMap = gradedDiscussionRefMap.get(initialAssignedInformation.dueDateId)
+  const setRefMap = (field: string, ref: any) => {
+    const refMap = gradedDiscussionRefMap.get(initialAssignedInformation.dueDateId) || {}
     refMap[field] = ref
-    setGradedDiscussionRefMap(new Map(gradedDiscussionRefMap))
+    const newMap = new Map(gradedDiscussionRefMap)
+    newMap.set(initialAssignedInformation.dueDateId, refMap)
+    setGradedDiscussionRefMap(newMap)
   }
 
   useEffect(() => {
@@ -117,7 +161,7 @@ export const AssignmentDueDate = ({
           dueDateId={initialAssignedInformation.dueDateId}
           availableAssignToOptions={availableAssignToOptions}
           initialAssignedToInformation={initialAssignedInformation.assignedList}
-          onOptionSelect={selectedOption => {
+          onOptionSelect={(selectedOption: string) => {
             const newInfo = {
               ...assignedInformation,
               assignedList: [...assignedInformation.assignedList, selectedOption],
@@ -125,7 +169,7 @@ export const AssignmentDueDate = ({
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
-          onOptionDismiss={dismissedOption => {
+          onOptionDismiss={(dismissedOption: string) => {
             const newInfo = {
               ...assignedInformation,
               assignedList: assignedInformation.assignedList.filter(
@@ -141,8 +185,8 @@ export const AssignmentDueDate = ({
           description={I18n.t('Due')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}
-          onChange={(_event, newDate) => {
-            const newInfo = {...assignedInformation, dueDate: newDate}
+          onChange={(_event: any, newDate?: string) => {
+            const newInfo = {...assignedInformation, dueDate: newDate || ''}
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
@@ -153,7 +197,7 @@ export const AssignmentDueDate = ({
           dateRenderLabel={I18n.t('Date')}
           timeRenderLabel={I18n.t('Time')}
           messages={dueDateErrorMessage}
-          dateInputRef={ref => {
+          dateInputRef={(ref: any) => {
             dueAtRef.current = ref
           }}
         />
@@ -162,8 +206,8 @@ export const AssignmentDueDate = ({
           description={I18n.t('Available from')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}
-          onChange={(_event, newDate) => {
-            const newInfo = {...assignedInformation, availableFrom: newDate}
+          onChange={(_event: any, newDate?: string) => {
+            const newInfo = {...assignedInformation, availableFrom: newDate || ''}
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
@@ -174,7 +218,7 @@ export const AssignmentDueDate = ({
           dateRenderLabel={I18n.t('Date')}
           timeRenderLabel={I18n.t('Time')}
           messages={availableFromAndUntilErrorMessage}
-          dateInputRef={ref => {
+          dateInputRef={(ref: any) => {
             unlockAtRef.current = ref
           }}
         />
@@ -183,8 +227,8 @@ export const AssignmentDueDate = ({
           description={I18n.t('Until')}
           prevMonthLabel={I18n.t('previous')}
           nextMonthLabel={I18n.t('next')}
-          onChange={(_event, newDate) => {
-            const newInfo = {...assignedInformation, availableUntil: newDate}
+          onChange={(_event: any, newDate?: string) => {
+            const newInfo = {...assignedInformation, availableUntil: newDate || ''}
             setAssignedInformation(newInfo)
             onAssignedInfoChange(newInfo)
           }}
@@ -199,35 +243,4 @@ export const AssignmentDueDate = ({
       </FormFieldGroup>
     </>
   )
-}
-
-AssignmentDueDate.propTypes = {
-  availableAssignToOptions: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        assetCode: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired,
-      }),
-    ),
-  ).isRequired,
-  initialAssignedInformation: PropTypes.shape({
-    dueDateId: PropTypes.string,
-    assignedList: PropTypes.arrayOf(PropTypes.string),
-    dueDate: PropTypes.string,
-    availableFrom: PropTypes.string,
-    availableUntil: PropTypes.string,
-  }),
-  onAssignedInfoChange: PropTypes.func,
-}
-
-AssignmentDueDate.defaultProps = {
-  availableAssignToOptions: {},
-  initialAssignedInformation: {
-    dueDateId: '',
-    assignedList: [],
-    dueDate: '',
-    availableFrom: '',
-    availableUntil: '',
-  },
-  onAssignedInfoChange: () => {},
 }
