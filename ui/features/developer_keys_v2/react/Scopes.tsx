@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Billboard} from '@instructure/ui-billboard'
@@ -35,23 +34,62 @@ import ScopesList from './ScopesList'
 
 const I18n = createI18nScope('react_developer_keys')
 
-export default class Scopes extends React.Component {
+interface Scope {
+  controller?: string
+  action?: string
+  verb?: string
+  path?: string
+  scope: string
+  resource: string
+  resource_name?: string
+}
+
+interface DeveloperKey {
+  notes?: string | null
+  icon_url?: string | null
+  vendor_code?: string | null
+  redirect_uris?: string | null
+  email?: string | null
+  name?: string | null
+  scopes?: string[]
+  allow_includes?: boolean
+  require_scopes?: boolean | null
+}
+
+interface ScopesProps {
+  availableScopes: Record<string, Scope | Scope[]>
+  availableScopesPending: boolean
+  dispatch: Function
+  listDeveloperKeyScopesSet: Function
+  developerKey?: DeveloperKey
+  requireScopes?: boolean | null
+  onRequireScopesChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  updateDeveloperKey: Function
+}
+
+interface ScopesState {
+  filter: string
+}
+
+export default class Scopes extends React.Component<ScopesProps, ScopesState> {
   state = {filter: ''}
 
-  handleFilterChange = e => {
+  handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
       filter: e.currentTarget.value,
     })
   }
 
   enforceScopesSrText() {
-    return this.props.requireScopes
+    const requireScopes = this.props.requireScopes ?? false
+    return requireScopes
       ? I18n.t('Clicking the checkbox will cause scopes table to disappear below')
       : I18n.t('Clicking the checkbox will cause scopes table to appear below')
   }
 
   body() {
     const {developerKey} = this.props
+    const requireScopes = this.props.requireScopes ?? false
     if (this.props.availableScopesPending) {
       return (
         <Grid.Row hAlign="space-around">
@@ -68,7 +106,7 @@ export default class Scopes extends React.Component {
       <Grid.Row>
         <Grid.Col>
           <View>
-            {this.props.requireScopes ? (
+            {requireScopes ? (
               <ScopesList
                 availableScopes={this.props.availableScopes}
                 selectedScopes={developerKey ? developerKey.scopes : []}
@@ -98,8 +136,9 @@ export default class Scopes extends React.Component {
   render() {
     const searchEndpoints = I18n.t('Search endpoints')
     const {developerKey, updateDeveloperKey} = this.props
+    const requireScopes = this.props.requireScopes ?? false
     const includeTooltip = I18n.t(
-      'Permit usage of all “includes” parameters for this developer key. "Includes"' +
+      'Permit usage of all "includes" parameters for this developer key. "Includes"' +
         ' parameters may grant access to additional data not included in the scopes selected below.',
     )
 
@@ -115,11 +154,11 @@ export default class Scopes extends React.Component {
                   <ScreenReaderContent>{this.enforceScopesSrText()}</ScreenReaderContent>
                 </span>
               }
-              checked={this.props.requireScopes}
+              checked={requireScopes}
               onChange={this.props.onRequireScopesChange}
             />
           </Grid.Col>
-          {this.props.requireScopes ? (
+          {requireScopes ? (
             <Grid.Col width="auto">
               <TextInput
                 renderLabel={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
@@ -131,13 +170,13 @@ export default class Scopes extends React.Component {
             </Grid.Col>
           ) : null}
         </Grid.Row>
-        {this.props.requireScopes && (
+        {requireScopes && (
           <Grid.Row>
             <Grid.Col>
               <Checkbox
                 inline={true}
                 label={<Text>{I18n.t('Allow Include Parameters ')}</Text>}
-                checked={developerKey.allow_includes}
+                checked={developerKey?.allow_includes}
                 onChange={e => {
                   updateDeveloperKey('allow_includes', e.currentTarget.checked)
                 }}
@@ -146,7 +185,7 @@ export default class Scopes extends React.Component {
               &nbsp;
               <Tooltip renderTip={includeTooltip} on={['hover', 'focus']} color="primary">
                 {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                <span tabIndex="0">
+                <span tabIndex={0}>
                   <IconInfoLine />
                   <ScreenReaderContent>{includeTooltip}</ScreenReaderContent>
                 </span>
@@ -158,36 +197,4 @@ export default class Scopes extends React.Component {
       </Grid>
     )
   }
-}
-
-Scopes.propTypes = {
-  availableScopes: PropTypes.objectOf(
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        resource: PropTypes.string,
-        scope: PropTypes.string,
-      }),
-    ),
-  ).isRequired,
-  availableScopesPending: PropTypes.bool.isRequired,
-  dispatch: PropTypes.func.isRequired,
-  listDeveloperKeyScopesSet: PropTypes.func.isRequired,
-  developerKey: PropTypes.shape({
-    notes: PropTypes.string,
-    icon_url: PropTypes.string,
-    vendor_code: PropTypes.string,
-    redirect_uris: PropTypes.string,
-    email: PropTypes.string,
-    name: PropTypes.string,
-    scopes: PropTypes.arrayOf(PropTypes.string),
-    allow_includes: PropTypes.bool,
-  }),
-  requireScopes: PropTypes.bool,
-  onRequireScopesChange: PropTypes.func.isRequired,
-  updateDeveloperKey: PropTypes.func.isRequired,
-}
-
-Scopes.defaultProps = {
-  developerKey: undefined,
-  requireScopes: false,
 }

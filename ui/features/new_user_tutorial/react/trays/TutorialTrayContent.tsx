@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
@@ -28,24 +27,49 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-const TutorialTrayContent = props => (
-  <div className={`NewUserTutorialTray__Content ${props.name}`}>
+interface TutorialLink {
+  href: string
+  label: string
+}
+
+interface TutorialTrayContentProps {
+  name?: string
+  heading: string
+  subheading: string
+  children?: React.ReactNode
+  image?: string | null
+  imageWidth?: string
+  links?: TutorialLink[]
+  seeAllLink?: TutorialLink
+}
+
+const TutorialTrayContent: React.FC<TutorialTrayContentProps> = ({
+  name = '',
+  heading,
+  subheading,
+  children = [],
+  image = null,
+  imageWidth = '7.5rem',
+  links,
+  seeAllLink,
+}) => (
+  <div className={`NewUserTutorialTray__Content ${name}`}>
     <div>
       <Heading level="h3" margin="none none medium">
-        <TruncateText>{props.heading}</TruncateText>
+        <TruncateText>{heading}</TruncateText>
       </Heading>
-      <Text size="large">{props.subheading}</Text>
+      <Text size="large">{subheading}</Text>
       <View as="p" margin="small none none">
-        {props.children}
+        {children}
       </View>
-      {props.links && (
+      {links && (
         <View
           as="div"
           borderWidth="small none none"
           padding="medium x-small"
           margin="medium none none"
         >
-          {props.links.map((link, index) => {
+          {links.map((link, index) => {
             return (
               <Flex
                 key={link.href}
@@ -65,41 +89,22 @@ const TutorialTrayContent = props => (
           })}
         </View>
       )}
-      {props.seeAllLink && (
+      {seeAllLink && (
         <View as="div" padding="medium x-small" borderWidth="small none none">
-          <Link href={props.seeAllLink.href} isWithinText={false} target="_blank">
-            {props.seeAllLink.label}
+          <Link href={seeAllLink.href} isWithinText={false} target="_blank">
+            {seeAllLink.label}
           </Link>
         </View>
       )}
     </div>
-    {props.image && (
+    {image && (
       <Flex aria-hidden="true" height="100%" padding="none none x-small" justifyItems="center">
         <Flex.Item>
-          <Img src={props.image} width={props.imageWidth} alt="" />
+          <Img src={image} width={imageWidth} alt="" />
         </Flex.Item>
       </Flex>
     )}
   </div>
 )
-
-TutorialTrayContent.propTypes = {
-  name: PropTypes.string.isRequired,
-  heading: PropTypes.string.isRequired,
-  subheading: PropTypes.string.isRequired,
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-  image: PropTypes.string,
-  imageWidth: PropTypes.string,
-  links: PropTypes.array,
-  seeAllLink: PropTypes.object,
-}
-TutorialTrayContent.defaultProps = {
-  children: [],
-  image: null,
-  imageWidth: '7.5rem',
-  name: '',
-  links: undefined,
-  seeAllLink: undefined,
-}
 
 export default TutorialTrayContent
