@@ -272,6 +272,19 @@ async function countSinonImports(verbose = false) {
   }
 }
 
+async function countMoxiosImports(verbose = false) {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]moxios[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
+  } catch (error) {
+    console.error(colorize('red', `Error counting moxios imports: ${error.message}`))
+    return 0
+  }
+}
+
 async function getRandomSinonImportFiles(verbose = false) {
   try {
     const cmd =
@@ -282,6 +295,20 @@ async function getRandomSinonImportFiles(verbose = false) {
     return getRandomExamples(files, 3)
   } catch (error) {
     console.error(colorize('red', `Error finding Sinon import examples: ${error.message}`))
+  }
+  return []
+}
+
+async function getRandomMoxiosImportFiles(verbose = false) {
+  try {
+    const cmd =
+      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
+      'xargs grep -l "from [\'\\"]moxios[\'\\"]"'
+    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
+    const files = stdout.trim().split('\n').filter(Boolean)
+    return getRandomExamples(files, 3)
+  } catch (error) {
+    console.error(colorize('red', `Error finding moxios import examples: ${error.message}`))
   }
   return []
 }
@@ -302,6 +329,29 @@ async function showSinonImportStats(verbose = false) {
       })
     } else {
       const examples = await getRandomSinonImportFiles(verbose)
+      examples.forEach(file => {
+        console.log(colorize('gray', `  Example: ${file}`))
+      })
+    }
+  }
+}
+
+async function showMoxiosImportStats(verbose = false) {
+  const count = await countMoxiosImports(verbose)
+  console.log(colorize('yellow', `- Files with moxios imports: ${bold(count)}`))
+
+  if (count > 0) {
+    const files = await getGrepMatchingFiles(
+      '__tests__.*\\.(js|jsx|ts|tsx)$',
+      '\\bmoxios\\b',
+      verbose,
+    )
+    if (verbose) {
+      files.sort().forEach(file => {
+        console.log(colorize('gray', `  ${file}`))
+      })
+    } else {
+      const examples = await getRandomMoxiosImportFiles(verbose)
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -804,19 +854,20 @@ async function showReactCompilerViolationStats(verbose = false) {
 
 function getSectionTitle(section) {
   const titles = {
-    skipped: ['Skipped Tests', '(fix or remove)'],
     'string-refs': ['React String Refs', '(use createRef/useRef/forwardRef/callbackRef)'],
-    proptypes: ['PropTypes Usage', '(use TypeScript interfaces/types)'],
+    class: ['React Class Component Files', '(convert to function components)'],
     defaultprops: ['DefaultProps Usage', '(use default parameters/TypeScript defaults)'],
     handlebars: ['Handlebars Files', '(convert to React)'],
-    jquery: ['JQuery Imports', '(use native DOM)'],
-    sinon: ['Sinon Imports', '(use Jest)'],
-    reactdom: ['ReactDOM.render Files', '(convert to createRoot)'],
-    class: ['React Class Component Files', '(convert to function components)'],
     javascript: ['JavaScript Files', '(convert to TypeScript)'],
-    typescript: ['TypeScript Suppressions', ''],
+    jquery: ['JQuery Imports', '(use native DOM)'],
+    moxios: ['Moxios Imports', '(use Jest)'],
     outdated: ['Outdated Packages', ''],
+    proptypes: ['PropTypes Usage', '(use TypeScript interfaces/types)'],
     reactCompiler: ['React Compiler Rule Violations', ''],
+    reactdom: ['ReactDOM.render Files', '(convert to createRoot)'],
+    sinon: ['Sinon Imports', '(use Jest)'],
+    skipped: ['Skipped Tests', '(fix or remove)'],
+    typescript: ['TypeScript Suppressions', ''],
   }
 
   const [title, note] = titles[section] || [section, '']
@@ -838,21 +889,33 @@ async function printDashboard() {
     const selectedSections = options.sections
     const verbose = options.verbose
 
-    if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
-      console.log(getSectionTitle('skipped'))
-      await countSkippedTests(verbose)
-      console.log()
-    }
-
     if (selectedSections.length === 0 || selectedSections.includes('string-refs')) {
       console.log(getSectionTitle('string-refs'))
       await showReactStringRefStats(verbose)
       console.log()
     }
 
-    if (selectedSections.length === 0 || selectedSections.includes('proptypes')) {
-      console.log(getSectionTitle('proptypes'))
-      await showPropTypesStats(verbose)
+    if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
+      console.log(getSectionTitle('sinon'))
+      await showSinonImportStats(verbose)
+      console.log()
+    }
+
+    if (selectedSections.length === 0 || selectedSections.includes('moxios')) {
+      console.log(getSectionTitle('moxios'))
+      await showMoxiosImportStats(verbose)
+      console.log()
+    }
+
+    if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
+      console.log(getSectionTitle('skipped'))
+      await countSkippedTests(verbose)
+      console.log()
+    }
+
+    if (selectedSections.length === 0 || selectedSections.includes('reactdom')) {
+      console.log(getSectionTitle('reactdom'))
+      await countReactDomRenderFiles(verbose)
       console.log()
     }
 
@@ -868,27 +931,21 @@ async function printDashboard() {
       console.log()
     }
 
-    if (selectedSections.length === 0 || selectedSections.includes('jquery')) {
-      console.log(getSectionTitle('jquery'))
-      await showJqueryImportStats(verbose)
-      console.log()
-    }
-
-    if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
-      console.log(getSectionTitle('sinon'))
-      await showSinonImportStats(verbose)
-      console.log()
-    }
-
-    if (selectedSections.length === 0 || selectedSections.includes('reactdom')) {
-      console.log(getSectionTitle('reactdom'))
-      await countReactDomRenderFiles(verbose)
-      console.log()
-    }
-
     if (selectedSections.length === 0 || selectedSections.includes('class')) {
       console.log(getSectionTitle('class'))
       await countReactClassComponentFiles(verbose)
+      console.log()
+    }
+
+    if (selectedSections.length === 0 || selectedSections.includes('proptypes')) {
+      console.log(getSectionTitle('proptypes'))
+      await showPropTypesStats(verbose)
+      console.log()
+    }
+
+    if (selectedSections.length === 0 || selectedSections.includes('jquery')) {
+      console.log(getSectionTitle('jquery'))
+      await showJqueryImportStats(verbose)
       console.log()
     }
 
