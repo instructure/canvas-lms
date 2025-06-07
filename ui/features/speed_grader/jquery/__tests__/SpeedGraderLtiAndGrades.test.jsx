@@ -109,6 +109,11 @@ describe('SpeedGrader', () => {
       $div = $(fixtures).find('#iframe_holder')
 
       server.use(
+        http.get('/api/v1/courses/:courseId/grading_periods', () => {
+          return HttpResponse.json({
+            grading_periods: [],
+          })
+        }),
         http.get('*', () => {
           return HttpResponse.json({})
         }),
@@ -217,6 +222,24 @@ describe('SpeedGrader', () => {
     beforeEach(() => {
       fakeENV.setup()
       fixtures.innerHTML = requiredDOMFixtures
+
+      server.use(
+        http.get('/api/v1/courses/:courseId/grading_periods', () => {
+          return HttpResponse.json({
+            grading_periods: [],
+          })
+        }),
+        http.get('*', () => {
+          return HttpResponse.json({})
+        }),
+        http.post('*', () => {
+          return HttpResponse.json({})
+        }),
+        http.put('*', () => {
+          return HttpResponse.json({})
+        }),
+      )
+
       SpeedGrader.setup()
     })
 
