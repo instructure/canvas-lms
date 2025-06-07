@@ -39,9 +39,9 @@ const I18n = createI18nScope('attachment')
 const Attachment = ({
   index,
   setBlob,
-  validFileTypes,
-  getShouldShowFileRequiredError,
-  setShouldShowFileRequiredError,
+  validFileTypes = [],
+  getShouldShowFileRequiredError = () => {},
+  setShouldShowFileRequiredError = () => {},
 }) => {
   const [openWebcamModal, setOpenWebcamModal] = useState(false)
   const [dataURL, setDataURL] = useState(null)
@@ -320,12 +320,6 @@ Attachment.propTypes = {
   validFileTypes: arrayOf(PropTypes.string),
   getShouldShowFileRequiredError: PropTypes.func,
   setShouldShowFileRequiredError: PropTypes.func,
-}
-
-Attachment.defaultProps = {
-  validFileTypes: [],
-  getShouldShowFileRequiredError: () => {},
-  setShouldShowFileRequiredError: () => {},
 }
 
 export default Attachment
