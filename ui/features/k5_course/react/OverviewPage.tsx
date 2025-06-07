@@ -17,7 +17,6 @@
  */
 
 import React, {useMemo} from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -29,7 +28,19 @@ import {ImmersiveReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
 const I18n = createI18nScope('overview_page')
 
-export default function OverviewPage({content, url, canEdit, showImmersiveReader}) {
+interface OverviewPageProps {
+  content: string
+  url: string
+  canEdit: boolean
+  showImmersiveReader: boolean
+}
+
+export default function OverviewPage({
+  content,
+  url,
+  canEdit,
+  showImmersiveReader,
+}: OverviewPageProps) {
   const html = useMemo(() => apiUserContent.convert(content), [content])
   return (
     <>
@@ -49,6 +60,8 @@ export default function OverviewPage({content, url, canEdit, showImmersiveReader
           <Flex.Item margin="0 0 0 small">
             <ImmersiveReaderButton
               content={{content: () => html, title: I18n.t('Subject Home Page')}}
+              readerSDK={undefined}
+              breakpoints={undefined}
             />
           </Flex.Item>
         )}
@@ -60,11 +73,4 @@ export default function OverviewPage({content, url, canEdit, showImmersiveReader
       />
     </>
   )
-}
-
-OverviewPage.propTypes = {
-  content: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  canEdit: PropTypes.bool.isRequired,
-  showImmersiveReader: PropTypes.bool.isRequired,
 }

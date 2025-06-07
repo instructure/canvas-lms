@@ -30,7 +30,7 @@ test('should open modal on key press', async () => {
           description: 'this is a test keyboard shortcut',
         },
       ]}
-    />
+    />,
   )
 
   expect(document.querySelector('.keyboard_navigation')).not.toBeInTheDocument()

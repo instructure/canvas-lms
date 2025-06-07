@@ -17,12 +17,20 @@
  */
 
 import React, {useEffect, useState, useCallback} from 'react'
-import {shape, string, arrayOf} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const KeyboardShortcutModal = ({shortcuts = []}) => {
+interface Shortcut {
+  keycode: string
+  description: string
+}
+
+interface KeyboardShortcutModalProps {
+  shortcuts?: Shortcut[]
+}
+
+const KeyboardShortcutModal: React.FC<KeyboardShortcutModalProps> = ({shortcuts = []}) => {
   const I18n = useI18nScope('keyboardShortcutModal')
   const [isOpen, setIsOpen] = useState(false)
 
@@ -31,15 +39,16 @@ const KeyboardShortcutModal = ({shortcuts = []}) => {
   }
 
   const handleKeydown = useCallback(
-    e => {
+    (e: KeyboardEvent) => {
       if (e.repeat) return
       const keyComboPressed = e.key === '?' && e.shiftKey
-      if (keyComboPressed && e.target.nodeName !== 'INPUT' && e.target.nodeName !== 'TEXTAREA') {
+      const target = e.target as HTMLElement
+      if (keyComboPressed && target.nodeName !== 'INPUT' && target.nodeName !== 'TEXTAREA') {
         e.preventDefault()
         setIsOpen(!isOpen)
       }
     },
-    [isOpen]
+    [isOpen],
   )
 
   useEffect(() => {
@@ -60,7 +69,7 @@ const KeyboardShortcutModal = ({shortcuts = []}) => {
         <div className="keyboard_navigation">
           <ScreenReaderContent>
             {I18n.t(
-              'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts'
+              'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts',
             )}
           </ScreenReaderContent>
           <ul className="navigation_list">
@@ -76,19 +85,6 @@ const KeyboardShortcutModal = ({shortcuts = []}) => {
       </Modal.Body>
     </Modal>
   )
-}
-
-KeyboardShortcutModal.propTypes = {
-  shortcuts: arrayOf(
-    shape({
-      keycode: string.isRequired,
-      description: string.isRequired,
-    })
-  ),
-}
-
-KeyboardShortcutModal.defaultProps = {
-  shortcuts: [],
 }
 
 export default KeyboardShortcutModal
