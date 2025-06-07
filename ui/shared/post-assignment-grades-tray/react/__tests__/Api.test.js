@@ -18,7 +18,8 @@
 
 import MockCanvasClient from '@canvas/test-utils/MockCanvasClient'
 import * as Api from '../Api'
-import sinon from 'sinon'
+import {http} from 'msw'
+import {setupServer} from 'msw/node'
 
 const deepEqual = (x, y) => expect(x).toEqual(y)
 const strictEqual = (x, y) => expect(x).toBe(y)
@@ -177,16 +178,11 @@ describe('PostAssignmentGradesTray Api', () => {
   })
 
   describe('.resolvePostAssignmentGradesStatus', () => {
-    let server
+    const server = setupServer()
 
-    beforeEach(() => {
-      server = sinon.createFakeServer()
-      server.respondImmediately = true
-    })
-
-    afterEach(() => {
-      server.restore()
-    })
+    beforeAll(() => server.listen())
+    afterEach(() => server.resetHandlers())
+    afterAll(() => server.close())
 
     test('returns ids of submissions posted when job finishes', async () => {
       const responseData = {
@@ -194,11 +190,13 @@ describe('PostAssignmentGradesTray Api', () => {
         url: `/api/v1/progress/${PROGRESS_ID}`,
         workflow_state: 'completed',
       }
-      server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
-        200,
-        {},
-        JSON.stringify(responseData),
-      ])
+      server.use(
+        http.get(`/api/v1/progress/${PROGRESS_ID}`, () => {
+          return new Response(JSON.stringify(responseData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
       const results = await Api.resolvePostAssignmentGradesStatus({
         id: PROGRESS_ID,
         workflowState: 'queued',
@@ -212,11 +210,13 @@ describe('PostAssignmentGradesTray Api', () => {
         url: `/api/v1/progress/${PROGRESS_ID}`,
         workflow_state: 'failed',
       }
-      server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
-        200,
-        {},
-        JSON.stringify(responseData),
-      ])
+      server.use(
+        http.get(`/api/v1/progress/${PROGRESS_ID}`, () => {
+          return new Response(JSON.stringify(responseData), {
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
 
       try {
         await Api.resolvePostAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'})
