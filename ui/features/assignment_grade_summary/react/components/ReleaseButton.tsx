@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {bool, func, oneOf} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconCheckMarkSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y-content'
@@ -25,9 +24,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {
-  FAILURE,
-  GRADES_ALREADY_RELEASED,
-  NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   STARTED,
   SUCCESS,
@@ -35,7 +31,7 @@ import {
 
 const I18n = createI18nScope('assignment_grade_summary')
 
-function readyButton(props) {
+function readyButton(props: any) {
   return (
     <Button {...props} color="primary">
       {I18n.t('Release Grades')}
@@ -43,7 +39,7 @@ function readyButton(props) {
   )
 }
 
-function startedButton(props) {
+function startedButton(props: any) {
   const title = I18n.t('Releasing Grades')
 
   return (
@@ -54,7 +50,7 @@ function startedButton(props) {
   )
 }
 
-function successButton(props) {
+function successButton(props: any) {
   return (
     <Button {...props} renderIcon={IconCheckMarkSolid} color="primary-inverse">
       {I18n.t('Grades Released')}
@@ -62,11 +58,19 @@ function successButton(props) {
   )
 }
 
-export default function ReleaseButton(props) {
-  const {gradesReleased, onClick, releaseGradesStatus, ...otherProps} = props
+interface ReleaseButtonProps {
+  gradesReleased: boolean
+  onClick: () => void
+  releaseGradesStatus?: string | null
+  [key: string]: any
+}
+
+export default function ReleaseButton(props: ReleaseButtonProps) {
+  const {gradesReleased, onClick, releaseGradesStatus = null, ...otherProps} = props
   const isValidSelection = releaseGradesStatus !== SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS
   const canClick =
-    !(gradesReleased || [STARTED, SUCCESS].includes(releaseGradesStatus)) && isValidSelection
+    !(gradesReleased || [STARTED, SUCCESS].includes(releaseGradesStatus as string)) &&
+    isValidSelection
   const buttonProps = {
     ...otherProps,
     disabled: !isValidSelection || null,
@@ -83,21 +87,4 @@ export default function ReleaseButton(props) {
   }
 
   return readyButton(buttonProps)
-}
-
-ReleaseButton.propTypes = {
-  gradesReleased: bool.isRequired,
-  onClick: func.isRequired,
-  releaseGradesStatus: oneOf([
-    FAILURE,
-    GRADES_ALREADY_RELEASED,
-    NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
-    SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
-    STARTED,
-    SUCCESS,
-  ]),
-}
-
-ReleaseButton.defaultProps = {
-  releaseGradesStatus: null,
 }
