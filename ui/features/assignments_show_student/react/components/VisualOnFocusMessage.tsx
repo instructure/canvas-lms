@@ -17,16 +17,19 @@
  */
 
 import React, {useState} from 'react'
-import PropTypes from 'prop-types'
 
-export default function VisualOnFocusMessage({message}) {
+interface VisualOnFocusMessageProps {
+  message?: string
+}
+
+export default function VisualOnFocusMessage({message}: VisualOnFocusMessageProps) {
   const [focused, setFocused] = useState(false)
 
   return (
     <div className="accessibility_warning">
       <span
         className={focused ? '' : 'screenreader-only'}
-        tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+        tabIndex={0} // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         data-testid="visual-onfocus-message"
@@ -35,8 +38,4 @@ export default function VisualOnFocusMessage({message}) {
       </span>
     </div>
   )
-}
-
-VisualOnFocusMessage.propTypes = {
-  message: PropTypes.string,
 }
