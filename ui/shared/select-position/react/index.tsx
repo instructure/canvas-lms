@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useId} from 'react'
-import {string, func, bool, arrayOf, node, oneOfType, shape} from 'prop-types'
+import React, {useId, ReactNode} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ConnectorIcon from './ConnectorIcon'
 import {Heading} from '@instructure/ui-heading'
@@ -28,33 +27,35 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text as InstText} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {positions} from '@canvas/positions'
-import {siblingPropType} from '@canvas/move-item-tray/react/propTypes'
 
-export const itemShape = shape({
-  id: string.isRequired,
-  title: string.isRequired,
-  groupId: string,
-})
+// Assuming this type is defined in the move-item-tray package
+type SiblingType = Array<ItemType> | Error | null
+
+export interface ItemType {
+  id: string
+  title: string
+  groupId?: string
+}
 
 const I18n = createI18nScope('selectPosition')
 
-RenderSelect.propTypes = {
-  label: oneOfType([string, node]).isRequired,
-  onChange: func.isRequired,
-  options: arrayOf(node),
-  className: string,
-  selectOneDefault: bool,
-  testId: string,
+interface RenderSelectProps {
+  label: string | ReactNode
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
+  options?: ReactNode[]
+  className?: string
+  selectOneDefault?: boolean
+  testId?: string | null
 }
 
-RenderSelect.defaultProps = {
-  options: [],
-  className: '',
-  selectOneDefault: false,
-  testId: null,
-}
-
-export function RenderSelect({label, onChange, options, className, selectOneDefault, testId}) {
+export function RenderSelect({
+  label,
+  onChange,
+  options = [],
+  className = '',
+  selectOneDefault = false,
+  testId = null,
+}: RenderSelectProps) {
   const id = useId()
 
   return (
@@ -78,30 +79,28 @@ export function RenderSelect({label, onChange, options, className, selectOneDefa
   )
 }
 
-SelectPosition.propTypes = {
-  items: arrayOf(itemShape).isRequired,
-  siblings: siblingPropType,
-  selectedPosition: shape({type: string}),
-  selectPosition: func,
-  selectSibling: func,
+interface SelectedPositionType {
+  type: string
 }
 
-SelectPosition.defaultProps = {
-  selectedPosition: {type: 'absolute'},
-  selectPosition: () => {},
-  selectSibling: () => {},
+interface SelectPositionProps {
+  items: ItemType[]
+  siblings?: SiblingType
+  selectedPosition?: SelectedPositionType
+  selectPosition?: (event: React.ChangeEvent<HTMLSelectElement>) => void
+  selectSibling?: (event: React.ChangeEvent<HTMLSelectElement>) => void
 }
 
 export default function SelectPosition({
   items,
   siblings,
-  selectedPosition,
-  selectPosition,
-  selectSibling,
-}) {
+  selectedPosition = {type: 'absolute'},
+  selectPosition = () => {},
+  selectSibling = () => {},
+}: SelectPositionProps) {
   const positionSelected = !!(selectedPosition && selectedPosition.type === 'relative')
 
-  function renderMessage(string, color) {
+  function renderMessage(string: string, color: 'primary' | 'danger'): ReactNode {
     return (
       <View
         as="div"
@@ -115,7 +114,7 @@ export default function SelectPosition({
     )
   }
 
-  function renderSelectSibling() {
+  function renderSelectSibling(): ReactNode {
     if (siblings instanceof Error) {
       return renderMessage(I18n.t('Failed loading items'), 'danger')
     }
@@ -150,7 +149,7 @@ export default function SelectPosition({
     )
   }
 
-  function renderPlaceTitle() {
+  function renderPlaceTitle(): ReactNode {
     const title =
       items.length === 1 ? I18n.t('Place "%{title}"', {title: items[0].title}) : I18n.t('Place')
     return <Heading level="h4">{title}</Heading>
@@ -164,7 +163,7 @@ export default function SelectPosition({
         onChange={selectPosition}
         options={Object.keys(positions).map(pos => (
           <option key={pos} value={pos}>
-            {positions[pos].label}
+            {(positions as any)[pos].label}
           </option>
         ))}
         selectOneDefault={false}
