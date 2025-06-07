@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
-import {isPromise, moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
+import {isPromise} from '@canvas/jest-moxios-utils'
 import * as SidebarActions from '../sidebar-actions'
 import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
@@ -73,20 +74,23 @@ const getBasicState = () => ({
   },
 })
 
+const server = setupServer()
+
 describe('api actions', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    SidebarActions.maybeUpdateTodoSidebar.reset()
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    moxios.install()
     expect.hasAssertions()
     alertInitialize({
       visualSuccessCallback() {},
       visualErrorCallback() {},
       srAlertCallback() {},
     })
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
   })
 
   describe('savePlannerItem', () => {
@@ -116,68 +120,104 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'SAVED_PLANNER_ITEM', payload: savePromise})
     })
 
-    it('sends transformed data in the request', () => {
+    it('sends transformed data in the request', async () => {
+      let capturedRequest
+      server.use(
+        http.post('/api/v1/planner_notes', async ({request}) => {
+          capturedRequest = await request.json()
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem()
-      Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosWait(request => {
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          some: 'data',
-          transformedToApi: true,
-        })
+      await Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(capturedRequest).toMatchObject({
+        some: 'data',
+        transformedToApi: true,
       })
     })
 
-    it('resolves the promise with transformed response data', () => {
+    it('resolves the promise with transformed response data', async () => {
+      server.use(
+        http.post('/api/v1/planner_notes', () => {
+          return HttpResponse.json({some: 'response data'}, {status: 201})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerItem = simpleItem()
-      const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, savePromise).then(result => {
-        expect(result).toMatchObject({
-          item: {some: 'response data', transformedToInternal: true},
-          isNewItem: true,
-        })
+      const result = await Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(result).toMatchObject({
+        item: {some: 'response data', transformedToInternal: true},
+        isNewItem: true,
       })
     })
 
-    it('does a post if the planner item is new (no id)', () => {
+    it('does a post if the planner item is new (no id)', async () => {
+      let capturedRequest
+      server.use(
+        http.post('/api/v1/planner_notes', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json({}, {status: 201})
+        }),
+      )
+
       const plannerItem = simpleItem()
-      Actions.savePlannerItem(plannerItem)(
+      await Actions.savePlannerItem(plannerItem)(
         () => {},
         () => {
           return {timeZone: 'America/Halifax'}
         },
       )
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('post')
-        expect(request.url).toBe('/api/v1/planner_notes')
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          some: 'data',
-          transformedToApi: true,
-        })
+      expect(capturedRequest.method).toBe('POST')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner_notes')
+      expect(capturedRequest.body).toMatchObject({
+        some: 'data',
+        transformedToApi: true,
       })
     })
 
-    it('does a put if the planner item exists (has id)', () => {
+    it('does a put if the planner item exists (has id)', async () => {
+      let capturedRequest
+      server.use(
+        http.put('/api/v1/planner_notes/42', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
+
       const plannerItem = simpleItem({id: '42'})
-      Actions.savePlannerItem(plannerItem)(
+      await Actions.savePlannerItem(plannerItem)(
         () => {},
         () => {
           return {timeZone: 'America/Halifax'}
         },
       )
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('put')
-        expect(request.url).toBe('/api/v1/planner_notes/42')
-        expect(JSON.parse(request.config.data)).toMatchObject({
-          id: '42',
-          some: 'data',
-          transformedToApi: true,
-        })
+      expect(capturedRequest.method).toBe('PUT')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner_notes/42')
+      expect(capturedRequest.body).toMatchObject({
+        id: '42',
+        some: 'data',
+        transformedToApi: true,
       })
     })
 
-    it('calls the alert function when a failure occurs', () => {
+    it('calls the alert function when a failure occurs', async () => {
+      server.use(
+        http.post('/api/v1/planner_notes', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
+
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
@@ -185,34 +225,32 @@ describe('api actions', () => {
       })
 
       const plannerItem = simpleItem()
-      const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, savePromise, {status: 500}).then(_result => {
-        expect(fakeAlert).toHaveBeenCalled()
-      })
+      await Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(fakeAlert).toHaveBeenCalled()
     })
 
-    it('saves and restores the override data', () => {
+    it('saves and restores the override data', async () => {
+      server.use(
+        http.put('/api/v1/planner_notes/42', () => {
+          return HttpResponse.json({some: 'data', id: '42'}, {status: 200})
+        }),
+      )
+
       const mockDispatch = jest.fn()
       // a planner item with override data
       const plannerItem = simpleItem({id: '42', overrideId: '17', completed: true})
-      const savePromise = Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond(
-        {some: 'data', id: '42'}, // notice the response has no override data
-        savePromise,
-        {status: 200},
-      ).then(result => {
-        expect(result).toMatchObject({
-          // yet the resolved item does have override data
-          item: {
-            some: 'data',
-            id: '42',
-            overrideId: '17',
-            completed: true,
-            show: true,
-            transformedToInternal: true,
-          },
-          isNewItem: false,
-        })
+      const result = await Actions.savePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(result).toMatchObject({
+        // yet the resolved item does have override data
+        item: {
+          some: 'data',
+          id: '42',
+          overrideId: '17',
+          completed: true,
+          show: true,
+          transformedToInternal: true,
+        },
+        isNewItem: false,
       })
     })
   })
@@ -235,38 +273,53 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith(SidebarActions.maybeUpdateTodoSidebar)
     })
 
-    it('sends a delete request for the item id', () => {
+    it('sends a delete request for the item id', async () => {
+      let capturedRequest
+      server.use(
+        http.delete('/api/v1/planner_notes/42', ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+          }
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
+
       const plannerItem = simpleItem({id: '42'})
-      Actions.deletePlannerItem(plannerItem)(() => {})
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('delete')
-        expect(request.url).toBe('/api/v1/planner_notes/42')
-      })
+      await Actions.deletePlannerItem(plannerItem)(() => {})
+      expect(capturedRequest.method).toBe('DELETE')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner_notes/42')
     })
 
-    it('resolves the promise with transformed response data', () => {
+    it('resolves the promise with transformed response data', async () => {
+      server.use(
+        http.delete('*/planner_notes/*', () => {
+          return HttpResponse.json({some: 'response data'}, {status: 200})
+        }),
+      )
+
       const mockDispatch = jest.fn()
-      const plannerItem = simpleItem()
-      const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, deletePromise).then(result => {
-        expect(result).toMatchObject({some: 'response data', transformedToInternal: true})
-      })
+      const plannerItem = simpleItem({id: '1'})
+      const result = await Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(result).toMatchObject({some: 'response data', transformedToInternal: true})
     })
 
-    it('calls the alert function when a failure occurs', () => {
+    it('calls the alert function when a failure occurs', async () => {
+      server.use(
+        http.delete('*/planner_notes/*', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
+
       const fakeAlert = jest.fn()
       const mockDispatch = jest.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
 
-      const plannerItem = simpleItem()
-      const deletePromise = Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, deletePromise, {status: 500}).then(
-        __staticRouterHydrationDataresult => {
-          expect(fakeAlert).toHaveBeenCalled()
-        },
-      )
+      const plannerItem = simpleItem({id: '1'})
+      await Actions.deletePlannerItem(plannerItem)(mockDispatch, getBasicState)
+      expect(fakeAlert).toHaveBeenCalled()
     })
   })
 })

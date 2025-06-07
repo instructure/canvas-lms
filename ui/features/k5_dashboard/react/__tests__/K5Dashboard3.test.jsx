@@ -25,7 +25,7 @@ import {
 import {resetPlanner} from '@canvas/planner'
 import {act, screen, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import moxios from 'moxios'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import {
   MOCK_TODOS,
@@ -48,6 +48,8 @@ jest.mock('@canvas/util/globalUtils', () => ({
 
 const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
+
+const server = setupServer()
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
@@ -145,9 +147,13 @@ const staff = [
   },
 ]
 
+beforeAll(() => {
+  server.listen()
+})
+
 beforeEach(() => {
-  moxios.install()
-  createPlannerMocks()
+  const handlers = createPlannerMocks()
+  server.use(...handlers)
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, gradeCourses)
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), syllabus)
@@ -166,7 +172,7 @@ beforeEach(() => {
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   fetchMock.restore()
   fakeENV.teardown()
   resetPlanner()
@@ -174,6 +180,10 @@ afterEach(() => {
   sessionStorage.clear()
   window.location.hash = ''
   destroyContainer()
+})
+
+afterAll(() => {
+  server.close()
 })
 
 // These are the tests that needed to be modified when

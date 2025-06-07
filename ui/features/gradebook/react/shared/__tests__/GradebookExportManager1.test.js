@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GradebookExportManager from '../GradebookExportManager'
 
 const currentUserId = 42
-const exportingUrl = 'http://exportingUrl'
+const exportingUrl = '/api/v1/gradebook_exports'
 const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
 const attachmentBase = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 const workingExport = {
@@ -29,15 +30,15 @@ const workingExport = {
   workflowState: 'queued',
 }
 
+const server = setupServer()
+
+beforeAll(() => server.listen())
+
+afterEach(() => server.resetHandlers())
+
+afterAll(() => server.close())
+
 describe('GradebookExportManager - constructor', () => {
-  beforeEach(() => {
-    moxios.install()
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
-  })
-
   test('sets the polling interval with a sensible default', () => {
     const manager = new GradebookExportManager(exportingUrl, currentUserId, undefined, 5000)
     expect(manager.pollingInterval).toBe(5000)
@@ -74,14 +75,12 @@ describe('GradebookExportManager - monitoringUrl', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject = undefined
   })
 
@@ -104,14 +103,12 @@ describe('GradebookExportManager - attachmentUrl', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId, {...workingExport})
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject = undefined
   })
 
@@ -134,74 +131,117 @@ describe('GradebookExportManager - startExport', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId)
-
-    // Initial request to start the export
-    moxios.stubRequest(exportingUrl, {
-      status: 200,
-      response: {
-        progress_id: 'newProgressId',
-        attachment_id: 'newAttachmentId',
-        filename: 'newfile',
-      },
-    })
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject.clearMonitor()
     subject = undefined
   })
 
   test('sets show_student_first_last_name setting if requested', async () => {
+    let capturedRequest
+    server.use(
+      http.post('*', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        })
+      }),
+    )
+
     subject.monitorExport = (resolve, _reject) => resolve('success')
 
     const getAssignmentOrder = () => []
     const getStudentOrder = () => []
     await subject.startExport(undefined, getAssignmentOrder, true, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.show_student_first_last_name).toBe(true)
+    expect(capturedRequest.show_student_first_last_name).toBe(true)
   })
 
   test('does not set show_student_first_last_name setting by default', async () => {
+    let capturedRequest
+    server.use(
+      http.post('*', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        })
+      }),
+    )
+
     subject.monitorExport = (resolve, _reject) => resolve('success')
 
     const getAssignmentOrder = () => []
     const getStudentOrder = () => []
     await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.show_student_first_last_name).toBe(false)
+    expect(capturedRequest.show_student_first_last_name).toBe(false)
   })
 
   test('includes assignment_order if getAssignmentOrder returns some assignments', async () => {
+    let capturedRequest
+    server.use(
+      http.post('*', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        })
+      }),
+    )
+
     subject.monitorExport = (resolve, _reject) => resolve('success')
 
     const getAssignmentOrder = () => ['1', '2', '3']
     const getStudentOrder = () => []
     await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.assignment_order).toEqual(['1', '2', '3'])
+    expect(capturedRequest.assignment_order).toEqual(['1', '2', '3'])
   })
 
   test('does not include assignment_order if getAssignmentOrder returns no assignments', async () => {
+    let capturedRequest
+    server.use(
+      http.post('*', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        })
+      }),
+    )
+
     subject.monitorExport = (resolve, _reject) => resolve('success')
 
     const getAssignmentOrder = () => []
     const getStudentOrder = () => []
     await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.assignment_order).toBeUndefined()
+    expect(capturedRequest.assignment_order).toBeUndefined()
   })
 
   test('includes stringified student IDs if getStudentOrder returns some students', async () => {
+    let capturedRequest
+    server.use(
+      http.post('*', async ({request}) => {
+        capturedRequest = await request.json()
+        return HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        })
+      }),
+    )
+
     subject.monitorExport = (resolve, _reject) => resolve('success')
 
     const getAssignmentOrder = () => []
     const getStudentOrder = () => ['4', '10610000001840127', '12']
     await subject.startExport(undefined, getAssignmentOrder, false, getStudentOrder)
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    expect(postData.student_order).toEqual(['4', '10610000001840127', '12'])
+    expect(capturedRequest.student_order).toEqual(['4', '10610000001840127', '12'])
   })
 
   test('returns a rejected promise if the manager has no exportingUrl set', async () => {

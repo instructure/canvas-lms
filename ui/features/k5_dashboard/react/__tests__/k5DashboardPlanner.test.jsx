@@ -19,7 +19,8 @@
 import React from 'react'
 import {act, render as testingLibraryRender, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {cloneDeep} from 'lodash'
 import {resetPlanner} from '@canvas/planner'
 import {MOCK_CARDS, MOCK_CARDS_2, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
@@ -42,16 +43,19 @@ const render = children =>
   testingLibraryRender(<MockedQueryProvider>{children}</MockedQueryProvider>)
 
 const currentUserId = defaultProps.currentUser.id
-const moxiosWait = () => new Promise(resolve => moxios.wait(resolve))
+
+const server = setupServer(...createPlannerMocks())
 
 describe('K5Dashboard Schedule Section', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fetchMock.get(/\/api\/v1\/announcements/, [])
     fetchMock.get(/\/api\/v1\/calendar_events/, [])
     fetchMock.put(/.*\/api\/v1\/users\/\d+\/colors/, {})
     fetchMock.spy()
-    moxios.install()
-    createPlannerMocks()
     global.ENV = defaultEnv
     fetchShowK5Dashboard.mockImplementation(() =>
       Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
@@ -59,7 +63,6 @@ describe('K5Dashboard Schedule Section', () => {
   })
 
   afterEach(() => {
-    moxios.uninstall()
     global.ENV = {}
     resetPlanner()
     fetchMock.reset()
@@ -140,6 +143,24 @@ describe('K5Dashboard Schedule Section', () => {
   })
 
   it('preloads surrounding weeks only once schedule tab is visible', async () => {
+    let requestCount = 0
+    server.use(
+      http.get('/api/v1/planner/items', ({request}) => {
+        const url = new URL(request.url)
+        const perPage = url.searchParams.get('per_page')
+
+        requestCount++
+
+        if (perPage === '1') {
+          // These are the preload requests for prev/next week
+          return HttpResponse.json([])
+        } else {
+          // Return the main planner item for the current week
+          return HttpResponse.json(MOCK_PLANNER_ITEM, {headers: {link: 'url; rel="current"'}})
+        }
+      }),
+    )
+
     const {findByText, getByText} = render(
       <K5Dashboard
         {...defaultProps}
@@ -148,18 +169,13 @@ describe('K5Dashboard Schedule Section', () => {
       />,
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
-    expect(moxios.requests.count()).toBe(6)
+    const countBefore = requestCount
     act(() => getByText('Schedule').click())
-    await moxiosWait()
-    expect(moxios.requests.count()).toBe(8) // 2 more requests for prev and next week preloads
+    await waitFor(() => expect(requestCount).toBe(countBefore + 2)) // 2 more requests for prev and next week preloads
   })
 
   // FOO-3831
   it.skip('reloads the planner with correct data when the selected observee is updated (flaky)', async () => {
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
-      status: 200,
-      response: MOCK_CARDS,
-    })
     const observerPlannerItem = cloneDeep(MOCK_PLANNER_ITEM)
     observerPlannerItem[0].plannable.title = 'Assignment for Observee'
     const observedUsersList = [
@@ -172,6 +188,38 @@ describe('K5Dashboard Schedule Section', () => {
         name: 'Student 2',
       },
     ]
+
+    let lastRequestUrl = null
+    server.use(
+      http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
+        const url = request.url
+        if (url.includes('observed_user_id=1')) {
+          return HttpResponse.json(MOCK_CARDS)
+        } else if (url.includes('observed_user_id=2')) {
+          return HttpResponse.json(MOCK_CARDS_2)
+        }
+      }),
+      http.get('/api/v1/planner/items', ({request}) => {
+        lastRequestUrl = request.url
+        if (request.url.includes('observed_user_id=2')) {
+          return HttpResponse.json(observerPlannerItem, {
+            headers: {link: 'url; rel="current"'},
+          })
+        }
+        return HttpResponse.json([])
+      }),
+      http.get('/api/v1/users/self/missing_submissions', ({request}) => {
+        if (request.url.includes('observed_user_id=2')) {
+          return HttpResponse.json([opportunities[0]], {
+            headers: {link: 'url; rel="current"'},
+          })
+        }
+        return HttpResponse.json(opportunities, {
+          headers: {link: 'url; rel="current"'},
+        })
+      }),
+    )
+
     const {findByText, findByTestId, getByTestId, getByText} = render(
       <K5Dashboard
         {...defaultProps}
@@ -184,28 +232,12 @@ describe('K5Dashboard Schedule Section', () => {
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
     expect(await findByTestId('missing-item-info')).toHaveTextContent('Show 2 missing items')
-    moxios.stubs.reset()
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-      status: 200,
-      response: MOCK_CARDS_2,
-    })
-    moxios.stubRequest(/api\/v1\/planner\/items\?.*observed_user_id=2.*/, {
-      status: 200,
-      headers: {link: 'url; rel="current"'},
-      response: observerPlannerItem,
-    })
-    moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
-      status: 200,
-      headers: {link: 'url; rel="current"'},
-      response: [opportunities[0]],
-    })
+
     const observerSelect = getByTestId('observed-student-dropdown')
     act(() => observerSelect.click())
     act(() => getByText('Student 2').click())
     expect(await findByText('Assignment for Observee')).toBeInTheDocument()
     expect(await findByTestId('missing-item-info')).toHaveTextContent('Show 1 missing item')
-    await moxiosWait()
-    const request = moxios.requests.mostRecent()
-    expect(request.url).toContain('observed_user_id=2')
+    await waitFor(() => expect(lastRequestUrl).toContain('observed_user_id=2'))
   })
 })

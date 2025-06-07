@@ -20,7 +20,8 @@ import '@instructure/canvas-theme'
 import React from 'react'
 import {render} from '@testing-library/react'
 import {Provider} from 'react-redux'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import configureStore from '../../store'
 import ExternalFeedsTray from '../ExternalFeedsTray'
 
@@ -42,14 +43,14 @@ const renderWithRedux = ui => {
   return result
 }
 
-beforeAll(() => {
-  moxios.install()
-  moxios.stubRequest('/api/v1/courses/1/external_feeds')
-})
+const server = setupServer(
+  http.get('/api/v1/courses/1/external_feeds', () => HttpResponse.json([])),
+  http.get('/api/v1/*/external_feeds', () => HttpResponse.json([])),
+)
 
-afterAll(() => {
-  moxios.uninstall()
-})
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 it('renders the ExternalFeedsTray component', () => {
   const ref = React.createRef()

@@ -21,7 +21,6 @@ import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObserve
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import moxios from 'moxios'
 import React from 'react'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
@@ -209,7 +208,6 @@ afterAll(() => {
 })
 
 beforeEach(() => {
-  moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, MOCK_COURSE_SYLLABUS)
   fetchMock.get(FETCH_APPS_URL, MOCK_COURSE_APPS)
   fetchMock.get(FETCH_TABS_URL, MOCK_COURSE_TABS)
@@ -239,7 +237,6 @@ afterEach(() => {
   modulesContainer?.remove()
 
   localStorage.clear()
-  moxios.uninstall()
   fetchMock.restore()
   server.resetHandlers()
   window.location.hash = ''

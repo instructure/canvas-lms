@@ -17,14 +17,21 @@
  */
 
 import React from 'react'
-import moxios from 'moxios'
 import {screen, render, fireEvent, waitFor} from '@testing-library/react'
 import storeCreator from '../store/store'
 import actions from '../actions/developerKeysActions'
 import InheritanceStateControl from '../InheritanceStateControl'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import $ from 'jquery'
 
 jest.mock('@canvas/instui-bindings/react/Confirm')
+
+// Mock jQuery flash notification functions
+beforeEach(() => {
+  $.flashError = jest.fn()
+  $.flashMessage = jest.fn()
+  $.flashWarning = jest.fn()
+})
 
 const sampleDeveloperKey = (defaults = {}) => {
   return {
@@ -63,14 +70,10 @@ describe('InheritanceStateControl', () => {
   beforeEach(() => {
     window.ENV.FEATURES ||= {}
     oldFeatures = window.ENV.FEATURES
-
-    moxios.install()
   })
 
   afterEach(() => {
     window.ENV.FEATURES = oldFeatures
-
-    moxios.uninstall()
   })
 
   it('uses the "off" state from the store for a siteadmin key', () => {

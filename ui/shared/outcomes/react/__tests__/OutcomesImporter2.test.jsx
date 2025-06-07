@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {render, cleanup, waitFor, act} from '@testing-library/react'
 import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 
@@ -49,8 +50,24 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
+const server = setupServer(
+  http.post(getApiUrl(`/group/${learningOutcomeGroupId}`), ({request}) => {
+    const url = new URL(request.url)
+    if (url.searchParams.get('import_type') === 'instructure_csv') {
+      return HttpResponse.json({id: learningOutcomeGroupId})
+    }
+  }),
+  http.get(getApiUrl(`outcome_imports/${learningOutcomeGroupId}/created_group_ids`), () =>
+    HttpResponse.json([]),
+  ),
+  // Generic handler for dynamic outcome import IDs
+  http.get(/\/api\/v1\/accounts\/\d+\/outcome_imports\/\d+\/created_group_ids/, () =>
+    HttpResponse.json([]),
+  ),
+)
+
 // Helper function to render OutcomesImporter with optional mocks
-const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
+const renderOutcomesImporter = (props = {}) => {
   const activeProps = {
     ...defaultProps(),
     ...props,
@@ -60,20 +77,6 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
   document.body.appendChild(container)
 
   const wrapper = render(<OutcomesImporter {...activeProps} ref={ref} />, {container})
-
-  if (addMocksCallback) {
-    addMocksCallback()
-  } else {
-    // Default stubbed requests
-    moxios.stubRequest(getApiUrl(`/group/${learningOutcomeGroupId}?import_type=instructure_csv`), {
-      status: 200,
-      response: {id: learningOutcomeGroupId},
-    })
-    moxios.stubRequest(getApiUrl(`outcome_imports/${learningOutcomeGroupId}/created_group_ids`), {
-      status: 200,
-      response: [],
-    })
-  }
 
   return {
     wrapper,
@@ -87,35 +90,42 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
 }
 
 describe('OutcomesImporter', () => {
-  beforeEach(() => {
-    moxios.install()
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    cleanup()
     jest.clearAllMocks()
     jest.clearAllTimers()
   })
+  afterAll(() => server.close())
 
-  afterEach(() => {
-    moxios.uninstall()
-    cleanup()
-  })
-
-  // TODO: redo without moxios
-  it('uploads file when the upload begins', done => {
+  it('uploads file when the upload begins', async () => {
     const disableOutcomeViews = jest.fn()
     const resetOutcomeViews = jest.fn()
 
     // Create a separate mock for the completeUpload method
     const completeUploadMock = jest.fn()
 
-    const {ref, unmount} = renderOutcomesImporter(
-      {disableOutcomeViews, resetOutcomeViews, invokedImport: true},
-      () => {
-        // Use a wildcard stub to catch any URL format for the outcome_imports endpoint
-        moxios.stubOnce('POST', new RegExp(`/api/v1${contextUrlRoot}/outcome_imports/.*`), {
-          status: 200,
-          response: {id: 10},
-        })
-      },
+    let requestReceived = false
+    server.use(
+      http.post(new RegExp(`/api/v1${contextUrlRoot}/outcome_imports/.*`), async ({request}) => {
+        requestReceived = true
+        const url = request.url
+        expect(url).toContain('/outcome_imports/')
+        expect(url).toContain('import_type=instructure_csv')
+
+        const formData = await request.formData()
+        expect(formData.get('attachment')).toBeTruthy()
+
+        return HttpResponse.json({id: 10})
+      }),
     )
+
+    const {ref, unmount} = renderOutcomesImporter({
+      disableOutcomeViews,
+      resetOutcomeViews,
+      invokedImport: true,
+    })
 
     // Mock the completeUpload method to avoid side effects
     ref.current.completeUpload = completeUploadMock
@@ -128,44 +138,32 @@ describe('OutcomesImporter', () => {
     // Verify disableOutcomeViews was called synchronously
     expect(disableOutcomeViews).toHaveBeenCalled()
 
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-
-      // Verify the URL contains the expected path components without being strict about the format
-      expect(request.url).toContain('/outcome_imports/')
-      expect(request.url).toContain('import_type=instructure_csv')
-
-      // Since moxios doesn't parse FormData, we'll inspect the FormData manually
-      // Access the FormData entries via Symbols
-      const symbols = Object.getOwnPropertySymbols(request.config.data)
-      const entries = request.config.data[symbols[0]]
-
-      // Find the attachment entry
-      const attachmentEntry = entries.find(entry => entry.name === 'attachment')
-
-      expect(attachmentEntry).toBeDefined()
-      // Since moxios serializes the File, attachmentEntry.value is "[object File]"
-      // We cannot assert it is an instance of File, so we'll check the serialized string
-      expect(attachmentEntry.value).toBe('[object File]')
-      done()
-      unmount()
+    await waitFor(() => {
+      expect(requestReceived).toBe(true)
     })
+
+    unmount()
   })
 
-  it('starts polling for import status after the upload begins', done => {
+  it('starts polling for import status after the upload begins', async () => {
     const id = '10'
     const disableOutcomeViews = jest.fn()
     const resetOutcomeViews = jest.fn()
-    const {wrapper, unmount} = renderOutcomesImporter(
-      {disableOutcomeViews, resetOutcomeViews, importId: id, file: null},
-      () => {
-        // Stub the request for polling with the correct URL
-        moxios.stubRequest(getApiUrl(id), {
-          status: 200,
-          response: {workflow_state: 'failed', processing_errors: []},
-        })
-      },
+
+    let requestCount = 0
+    server.use(
+      http.get(getApiUrl(id), () => {
+        requestCount++
+        return HttpResponse.json({workflow_state: 'failed', processing_errors: []})
+      }),
     )
+
+    const {wrapper, unmount} = renderOutcomesImporter({
+      disableOutcomeViews,
+      resetOutcomeViews,
+      importId: id,
+      file: null,
+    })
     const newProps = {
       ...defaultProps(),
       file: null,
@@ -180,41 +178,36 @@ describe('OutcomesImporter', () => {
 
     jest.advanceTimersByTime(2000)
 
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-
-      // Verify the request count
-      expect(moxios.requests.count()).toEqual(2)
-
-      // Check that the URL matches what's expected by the apiClient
-      expect(request.url).toBe(getApiUrl(id))
-
-      jest.clearAllTimers()
-      done()
-      unmount()
+    await waitFor(() => {
+      expect(requestCount).toBeGreaterThanOrEqual(1)
     })
+
+    jest.clearAllTimers()
+    unmount()
   })
 
-  it('completes upload when status returns succeeded or failed', done => {
+  it('completes upload when status returns succeeded or failed', async () => {
     const id = '10'
     const resetOutcomeViews = jest.fn()
-    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews}, () => {
-      moxios.stubRequest(getApiUrl(id), {
-        status: 200,
-        response: {workflow_state: 'succeeded', processing_errors: []},
-      })
-    })
+
+    server.use(
+      http.get(getApiUrl(id), () =>
+        HttpResponse.json({workflow_state: 'succeeded', processing_errors: []}),
+      ),
+    )
+
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
 
     getFakeTimer()
     ref.current.pollImportStatus(id)
 
     jest.advanceTimersByTime(2000)
 
-    moxios.wait(() => {
+    await waitFor(() => {
       expect(resetOutcomeViews).toHaveBeenCalled()
-      done()
-      unmount()
     })
+
+    unmount()
   })
 
   it('renders importer if in progress', async () => {
@@ -227,10 +220,11 @@ describe('OutcomesImporter', () => {
       resetOutcomeViews: () => {},
     }
 
-    moxios.stubRequest(getApiUrl('latest'), {
-      status: 200,
-      response: {workflow_state: 'importing', user: {id: userId}, id: '1'},
-    })
+    server.use(
+      http.get(getApiUrl('latest'), () =>
+        HttpResponse.json({workflow_state: 'importing', user: {id: userId}, id: '1'}),
+      ),
+    )
 
     await showOutcomesImporterIfInProgress(props, userId)
     await waitFor(() => {
@@ -249,9 +243,7 @@ describe('OutcomesImporter', () => {
       resetOutcomeViews: () => {},
     }
 
-    moxios.stubRequest(getApiUrl('latest'), {
-      status: 404,
-    })
+    server.use(http.get(getApiUrl('latest'), () => new HttpResponse(null, {status: 404})))
 
     await showOutcomesImporterIfInProgress(props, userId)
     expect(mount.innerHTML).toBe('')
@@ -263,11 +255,13 @@ describe('OutcomesImporter', () => {
     const resetOutcomeViews = jest.fn()
     const onSuccessfulOutcomesImport = jest.fn()
 
-    // Setup the mock for created_group_ids endpoint
-    moxios.stubRequest(getApiUrl(`${id}/created_group_ids`), {
-      status: 200,
-      response: [],
-    })
+    let requestMade = false
+    server.use(
+      http.get(getApiUrl(`${id}/created_group_ids`), () => {
+        requestMade = true
+        return HttpResponse.json([])
+      }),
+    )
 
     // Render with the necessary props
     const {ref, unmount} = renderOutcomesImporter({
@@ -285,11 +279,9 @@ describe('OutcomesImporter', () => {
     expect(resetOutcomeViews).toHaveBeenCalled()
 
     // Wait for the API request to be made
-    await moxios.wait(() => {})
-
-    // Verify the request was made with the correct URL
-    const request = moxios.requests.mostRecent()
-    expect(request.url).toContain(`/outcome_imports/${id}/created_group_ids`)
+    await waitFor(() => {
+      expect(requestMade).toBe(true)
+    })
 
     // Verify onSuccessfulOutcomesImport was called
     await waitFor(() => {

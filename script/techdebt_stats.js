@@ -272,19 +272,6 @@ async function countSinonImports(verbose = false) {
   }
 }
 
-async function countMoxiosImports(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]moxios[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
-  } catch (error) {
-    console.error(colorize('red', `Error counting moxios imports: ${error.message}`))
-    return 0
-  }
-}
-
 async function getRandomSinonImportFiles(verbose = false) {
   try {
     const cmd =
@@ -295,20 +282,6 @@ async function getRandomSinonImportFiles(verbose = false) {
     return getRandomExamples(files, 3)
   } catch (error) {
     console.error(colorize('red', `Error finding Sinon import examples: ${error.message}`))
-  }
-  return []
-}
-
-async function getRandomMoxiosImportFiles(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]moxios[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
-  } catch (error) {
-    console.error(colorize('red', `Error finding moxios import examples: ${error.message}`))
   }
   return []
 }
@@ -329,29 +302,6 @@ async function showSinonImportStats(verbose = false) {
       })
     } else {
       const examples = await getRandomSinonImportFiles(verbose)
-      examples.forEach(file => {
-        console.log(colorize('gray', `  Example: ${file}`))
-      })
-    }
-  }
-}
-
-async function showMoxiosImportStats(verbose = false) {
-  const count = await countMoxiosImports(verbose)
-  console.log(colorize('yellow', `- Files with moxios imports: ${bold(count)}`))
-
-  if (count > 0) {
-    const files = await getGrepMatchingFiles(
-      '__tests__.*\\.(js|jsx|ts|tsx)$',
-      '\\bmoxios\\b',
-      verbose,
-    )
-    if (verbose) {
-      files.sort().forEach(file => {
-        console.log(colorize('gray', `  ${file}`))
-      })
-    } else {
-      const examples = await getRandomMoxiosImportFiles(verbose)
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -860,7 +810,6 @@ function getSectionTitle(section) {
     handlebars: ['Handlebars Files', '(convert to React)'],
     javascript: ['JavaScript Files', '(convert to TypeScript)'],
     jquery: ['JQuery Imports', '(use native DOM)'],
-    moxios: ['Moxios Imports', '(use Jest)'],
     outdated: ['Outdated Packages', ''],
     proptypes: ['PropTypes Usage', '(use TypeScript interfaces/types)'],
     reactCompiler: ['React Compiler Rule Violations', ''],
@@ -898,12 +847,6 @@ async function printDashboard() {
     if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
       console.log(getSectionTitle('sinon'))
       await showSinonImportStats(verbose)
-      console.log()
-    }
-
-    if (selectedSections.length === 0 || selectedSections.includes('moxios')) {
-      console.log(getSectionTitle('moxios'))
-      await showMoxiosImportStats(verbose)
       console.log()
     }
 
