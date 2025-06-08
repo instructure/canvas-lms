@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
@@ -29,7 +28,15 @@ const I18n = createI18nScope('discussion_posts')
 
 const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
 
-export function RolePillContainer({...props}) {
+interface RolePillContainerProps {
+  /**
+   * String Array of user roles
+   */
+  discussionRoles?: string[]
+  'data-testid'?: string
+}
+
+export function RolePillContainer({...props}: RolePillContainerProps) {
   // Filter out roles that aren't found in the role hierarchy
   const filteredRoles = props.discussionRoles
     ? props.discussionRoles.filter(role => ROLE_HIERARCHY.includes(role))
@@ -39,7 +46,7 @@ export function RolePillContainer({...props}) {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true})}
+      query={responsiveQuerySizes({tablet: true, desktop: true}) as any}
       props={{
         tablet: {
           display: 'inline',
@@ -58,12 +65,12 @@ export function RolePillContainer({...props}) {
         <>
           {baseRolesToDisplay.length > 0 && (
             <InlineList
-              delimiter={hasMultipleRoles ? 'pipe' : responsiveProps.delimiter}
+              delimiter={hasMultipleRoles ? 'pipe' : responsiveProps?.delimiter || 'none'}
               data-testid="pill-container"
             >
               {baseRolesToDisplay.map(baseRole => (
                 <InlineList.Item key={baseRole}>
-                  {matches.includes('desktop') && !hasMultipleRoles ? (
+                  {matches?.includes('desktop') && !hasMultipleRoles ? (
                     <Pill data-testid={`pill-${baseRole}`}>{baseRole}</Pill>
                   ) : (
                     <Text size="x-small" transform="uppercase" data-testid={`mobile-${baseRole}`}>
@@ -80,8 +87,8 @@ export function RolePillContainer({...props}) {
   )
 }
 
-function roleName(baseRole) {
-  const types = {
+function roleName(baseRole: string): string {
+  const types: Record<string, string> = {
     get TeacherEnrollment() {
       return I18n.t('Teacher')
     },
@@ -99,7 +106,7 @@ function roleName(baseRole) {
   return types[baseRole]
 }
 
-function sortDiscussionRoles(roleNameArray) {
+function sortDiscussionRoles(roleNameArray: string[]): string[] {
   roleNameArray = Array.isArray(roleNameArray) ? roleNameArray : []
 
   roleNameArray.sort((roleNameA, roleNameB) => {
@@ -112,13 +119,6 @@ function sortDiscussionRoles(roleNameArray) {
     return roleName(rawName)
   })
   return roleNames
-}
-
-RolePillContainer.propTypes = {
-  /**
-   * String Array of user roles
-   */
-  discussionRoles: PropTypes.array,
 }
 
 export default RolePillContainer

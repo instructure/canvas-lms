@@ -19,7 +19,6 @@
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
 import {
   getDisplayName,
@@ -49,13 +48,103 @@ import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = createI18nScope('discussion_posts')
 
-const AuthorInfoBase = ({breakpoints, ...props}) => {
+interface UserType {
+  id?: string
+  _id?: string
+  avatarUrl?: string
+  displayName?: string
+  htmlUrl?: string
+  courseRoles?: string[]
+  pronouns?: string
+  shortName?: string
+}
+
+interface AnonymousUserType {
+  id?: string
+  avatarUrl?: string
+  shortName?: string
+}
+
+interface AuthorInfoProps {
+  /**
+   * Object containing author information
+   */
+  author?: UserType
+  /**
+   * Object containing anonymous author information
+   */
+  anonymousAuthor?: AnonymousUserType
+  /**
+   * Object containing editor information
+   */
+  editor?: UserType
+  /**
+   * Determines if the unread badge should be displayed
+   */
+  isUnread?: boolean
+  /**
+   * Marks whether an unread message has a forcedReadState
+   */
+  isForcedRead?: boolean
+  /**
+   * Boolean to determine if we are in the split view
+   */
+  createdAt?: string
+  /**
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
+   */
+  timingDisplay?: string
+  /**
+   * Denotes time of last edit.
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
+   */
+  editedTimingDisplay?: string
+  /**
+   * Last Reply Date if there are discussion replies
+   */
+  lastReplyAtDisplay?: string
+  /**
+   * Whether or not we render the created at date in a tooltip
+   */
+  showCreatedAsTooltip?: boolean
+  /**
+   * Boolean to determine if the author is the topic author
+   */
+  isTopicAuthor?: boolean
+  discussionEntryVersions?: any[]
+  reportTypeCounts?: {
+    total?: number
+  }
+  threadMode?: boolean
+  threadParent?: boolean
+  toggleUnread?: () => void
+  breakpoints?: {
+    miniTablet?: boolean
+    tablet?: boolean
+    desktop?: boolean
+    desktopNavOpen?: boolean
+    desktopOnly?: boolean
+    mobileOnly?: boolean
+    ICEDesktop?: boolean
+  }
+  delayedPostAt?: string
+  isTopic?: boolean
+  published?: boolean
+  isAnnouncement?: boolean
+  isSplitView?: boolean
+}
+
+const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
   const {searchTerm} = useContext(SearchContext)
 
   const hasAuthor = Boolean(props.author || props.anonymousAuthor)
   const avatarUrl = isAnonymous(props) ? null : props.author?.avatarUrl
 
-  const getUnreadBadgeOffset = avatarSize => {
+  const getUnreadBadgeOffset = (avatarSize: string) => {
     if (avatarSize === 'x-small') return '-8px'
     if (avatarSize === 'small') return '-6px'
     return '-5px'
@@ -67,11 +156,11 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
   const timestampTextSize = 'small'
   const authorNameTextSize = 'medium'
   const authorInfoPadding = '0 0 0 small'
-  let avatarSize = 'small'
+  let avatarSize: 'x-small' | 'small' | 'medium' = 'small'
 
-  if (breakpoints.desktopNavOpen) {
+  if (breakpoints?.desktopNavOpen) {
     avatarSize = props.threadMode && !props.threadParent ? 'small' : 'medium'
-  } else if (breakpoints.mobileOnly) {
+  } else if (breakpoints?.mobileOnly) {
     avatarSize = 'small'
   } else {
     // tablet
@@ -113,16 +202,16 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
               <Avatar
                 size={avatarSize}
                 name={getDisplayName(props)}
-                src={avatarUrl}
+                src={avatarUrl || undefined}
                 margin="0"
                 data-testid="author_avatar"
               />
             )}
             {hasAuthor && !isAnonymous(props) && hideStudentNames && (
-              <AnonymousAvatar seedString={props.author._id} size={avatarSize} />
+              <AnonymousAvatar seedString={props.author?._id} size={avatarSize} />
             )}
             {hasAuthor && isAnonymous(props) && (
-              <AnonymousAvatar seedString={props.anonymousAuthor.shortName} size={avatarSize} />
+              <AnonymousAvatar seedString={props.anonymousAuthor?.shortName} size={avatarSize} />
             )}
           </div>
         )}
@@ -131,10 +220,14 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
         <Flex direction="column" margin={authorInfoPadding}>
           {hasAuthor && (
             <Flex.Item overflowY="visible">
-              <Flex wrap="wrap" gap="0 small" direction={breakpoints.mobileOnly ? 'column' : 'row'}>
+              <Flex
+                wrap="wrap"
+                gap="0 small"
+                direction={breakpoints?.mobileOnly ? 'column' : 'row'}
+              >
                 <Text
                   weight="bold"
-                  size={authorNameTextSize}
+                  size={authorNameTextSize as any}
                   lineHeight="condensed"
                   data-testid="author_name"
                   wrap="break-word"
@@ -148,13 +241,11 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
                       authorNameTextSize={authorNameTextSize}
                       searchTerm={searchTerm}
                       discussionEntryProps={props}
-                      mobileOnly={breakpoints.mobileOnly}
+                      mobileOnly={breakpoints?.mobileOnly}
                     />
                   )}
                 </Text>
-                <Flex.Item
-                  padding={breakpoints.mobileOnly ? '0 0 0 xx-small' : '0'}
-                >
+                <Flex.Item padding={breakpoints?.mobileOnly ? '0 0 0 xx-small' : '0'}>
                   <RolePillContainer
                     discussionRoles={resolveAuthorRoles(
                       props.isTopicAuthor,
@@ -181,17 +272,19 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
               lastReplyAtDisplay={props.lastReplyAtDisplay}
               showCreatedAsTooltip={props.showCreatedAsTooltip}
               timestampTextSize={timestampTextSize}
-              mobileOnly={breakpoints.mobileOnly}
+              mobileOnly={breakpoints?.mobileOnly}
               isTopic={props.isTopic}
               published={props.published}
               isAnnouncement={props.isAnnouncement}
             />
-            {ENV.discussion_entry_version_history && props.discussionEntryVersions.length > 1 && (
-              <DiscussionEntryVersionHistory
-                textSize={timestampTextSize}
-                discussionEntryVersions={props.discussionEntryVersions}
-              />
-            )}
+            {(ENV as any).discussion_entry_version_history &&
+              props.discussionEntryVersions &&
+              props.discussionEntryVersions.length > 1 && (
+                <DiscussionEntryVersionHistory
+                  textSize={timestampTextSize}
+                  discussionEntryVersions={props.discussionEntryVersions}
+                />
+              )}
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -199,69 +292,22 @@ const AuthorInfoBase = ({breakpoints, ...props}) => {
   )
 }
 
-AuthorInfoBase.propTypes = {
-  /**
-   * Object containing author information
-   */
-  author: User.shape,
-  /**
-   * Object containing anonymous author information
-   */
-  anonymousAuthor: AnonymousUser.shape,
-  /**
-   * Object containing editor information
-   */
-  editor: User.shape,
-  /**
-   * Determines if the unread badge should be displayed
-   */
-  isUnread: PropTypes.bool,
-  /**
-   * Marks whether an unread message has a forcedReadState
-   */
-  isForcedRead: PropTypes.bool,
-  /**
-   * Boolean to determine if we are in the split view
-   */
-  createdAt: PropTypes.string,
-  /**
-   * Display text for the relative time information. This prop is expected
-   * to be provided as a string of the exact text to be displayed, not a
-   * timestamp to be formatted.
-   */
-  timingDisplay: PropTypes.string,
-  /**
-   * Denotes time of last edit.
-   * Display text for the relative time information. This prop is expected
-   * to be provided as a string of the exact text to be displayed, not a
-   * timestamp to be formatted.
-   */
-  editedTimingDisplay: PropTypes.string,
-  /**
-   * Last Reply Date if there are discussion replies
-   */
-  lastReplyAtDisplay: PropTypes.string,
-  /**
-   * Whether or not we render the created at date in a tooltip
-   */
-  showCreatedAsTooltip: PropTypes.bool,
-  /**
-   * Boolean to determine if the author is the topic author
-   */
-  isTopicAuthor: PropTypes.bool,
-  discussionEntryVersions: PropTypes.arrayOf(DiscussionEntryVersion.shape),
-  reportTypeCounts: PropTypes.object,
-  threadMode: PropTypes.bool,
-  threadParent: PropTypes.bool,
-  toggleUnread: PropTypes.func,
-  breakpoints: breakpointsShape,
-  delayedPostAt: PropTypes.string,
-  isTopic: PropTypes.bool,
-  published: PropTypes.bool,
-  isAnnouncement: PropTypes.bool,
+interface TimestampsProps {
+  author?: UserType
+  editor?: UserType
+  createdAt?: string
+  delayedPostAt?: string
+  editedTimingDisplay?: string
+  lastReplyAtDisplay?: string
+  timestampTextSize: string
+  mobileOnly?: boolean
+  isTopic?: boolean
+  published?: boolean
+  isAnnouncement?: boolean
+  showCreatedAsTooltip?: boolean
 }
 
-const Timestamps = props => {
+const Timestamps = (props: TimestampsProps) => {
   const isTeacher =
     ENV?.current_user_roles &&
     ENV?.current_user_roles.includes('teacher') &&
@@ -353,12 +399,12 @@ const Timestamps = props => {
     <Flex wrap="wrap">
       {createdAtText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize}>{createdAtText}</Text>
+          <Text size={props.timestampTextSize as any}>{createdAtText}</Text>
         </Flex.Item>
       )}
       {delayedPostText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize}>
+          <Text size={props.timestampTextSize as any}>
             {createdAtText && ' | '}
             {delayedPostText}
           </Text>
@@ -366,7 +412,7 @@ const Timestamps = props => {
       )}
       {editText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize}>
+          <Text size={props.timestampTextSize as any}>
             {' | '}
             {editText}
           </Text>
@@ -375,7 +421,7 @@ const Timestamps = props => {
       {props.lastReplyAtDisplay && (
         <Flex.Item overflowX="hidden" padding="0 xx-small 0 0">
           {' | '}
-          <Text size={props.timestampTextSize}>
+          <Text size={props.timestampTextSize as any}>
             {I18n.t('Last reply %{lastReplyAtDisplay}', {
               lastReplyAtDisplay: props.lastReplyAtDisplay,
             })}
@@ -386,21 +432,16 @@ const Timestamps = props => {
   )
 }
 
-Timestamps.propTypes = {
-  author: User.shape,
-  editor: User.shape,
-  createdAt: PropTypes.string,
-  delayedPostAt: PropTypes.string,
-  editedTimingDisplay: PropTypes.string,
-  lastReplyAtDisplay: PropTypes.string,
-  timestampTextSize: PropTypes.string,
-  mobileOnly: PropTypes.bool,
-  isTopic: PropTypes.bool,
-  published: PropTypes.bool,
-  isAnnouncement: PropTypes.bool,
+interface NameLinkProps {
+  userType: string
+  user?: UserType
+  searchTerm?: string
+  mobileOnly?: boolean
+  authorNameTextSize?: string
+  discussionEntryProps?: AuthorInfoProps
 }
 
-const NameLink = props => {
+const NameLink = (props: NameLinkProps) => {
   let classnames = ''
   if (props.user?.courseRoles?.includes('StudentEnrollment'))
     classnames = 'student_context_card_trigger'
@@ -434,7 +475,7 @@ const NameLink = props => {
             {props.user?.pronouns && (
               <Text
                 lineHeight="condensed"
-                size={props.authorNameTextSize}
+                size={props.authorNameTextSize as any}
                 fontStyle="italic"
                 data-testid="author-pronouns"
               >
@@ -448,15 +489,6 @@ const NameLink = props => {
       </Link>
     </div>
   )
-}
-
-NameLink.propTypes = {
-  userType: PropTypes.string,
-  user: User.shape,
-  searchTerm: PropTypes.string,
-  mobileOnly: PropTypes.bool,
-  authorNameTextSize: PropTypes.string,
-  discussionEntryProps: PropTypes.object,
 }
 
 export const AuthorInfo = WithBreakpoints(AuthorInfoBase)
