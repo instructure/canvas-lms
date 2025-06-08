@@ -18,12 +18,11 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {string} from 'prop-types'
 
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 
-import propTypes from '../propTypes'
+import {Permissions} from '../types'
 
 import pinnedUrl from '../../images/pinned.svg'
 import unpinnedUrl from '../../images/unpinned.svg'
@@ -33,42 +32,56 @@ import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('discussions_v2')
 
-const BackgroundSVG = props => (
+interface BackgroundSVGProps {
+  url: string
+}
+
+const BackgroundSVG: React.FC<BackgroundSVGProps> = props => (
   <View margin="small auto" maxWidth="16rem" display="block">
     <img alt="" src={props.url} />
   </View>
 )
 
-BackgroundSVG.propTypes = {
-  url: string.isRequired,
+interface PinnedDiscussionBackgroundProps {
+  permissions: Permissions
 }
 
-export const pinnedDiscussionBackground = props => (
+export const pinnedDiscussionBackground: React.FC<PinnedDiscussionBackgroundProps> = props => (
   <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={pinnedUrl} />
-    <Text as="div" margin="x-small auto" weight="bold">
-      {I18n.t('You currently have no pinned discussions')}
-    </Text>
-    {props.permissions.manage_content && (
-      <Text as="div" margin="x-small auto">
-        {I18n.t(
-          'To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.',
-        )}
+    <View margin="x-small auto">
+      <Text as="div" weight="bold">
+        {I18n.t('You currently have no pinned discussions')}
       </Text>
+    </View>
+    {props.permissions.manage_content && (
+      <View margin="x-small auto">
+        <Text as="div">
+          {I18n.t(
+            'To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu.',
+          )}
+        </Text>
+      </View>
     )}
   </View>
 )
 
-pinnedDiscussionBackground.propTypes = {
-  permissions: propTypes.permissions.isRequired,
+interface UnpinnedDiscussionsBackgroundProps {
+  contextType: string
+  contextID: string
+  permissions: Permissions
 }
 
-export const unpinnedDiscussionsBackground = props => (
+export const unpinnedDiscussionsBackground: React.FC<
+  UnpinnedDiscussionsBackgroundProps
+> = props => (
   <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={unpinnedUrl} />
-    <Text as="div" margin="x-small auto" weight="bold">
-      {I18n.t('There are no discussions to show in this section')}
-    </Text>
+    <View margin="x-small auto">
+      <Text as="div" weight="bold">
+        {I18n.t('There are no discussions to show in this section')}
+      </Text>
+    </View>
     {props.permissions.create && (
       <Link
         href={`/${props.contextType}s/${props.contextID}/discussion_topics/new`}
@@ -80,28 +93,26 @@ export const unpinnedDiscussionsBackground = props => (
   </View>
 )
 
-unpinnedDiscussionsBackground.propTypes = {
-  contextType: string.isRequired,
-  contextID: string.isRequired,
-  permissions: propTypes.permissions.isRequired,
+interface ClosedDiscussionBackgroundProps {
+  permissions: Permissions
 }
 
-export const closedDiscussionBackground = props => (
+export const closedDiscussionBackground: React.FC<ClosedDiscussionBackgroundProps> = props => (
   <View margin="large" textAlign="center" display="block">
     <BackgroundSVG url={closedForCommentsUrl} />
-    <Text as="div" margin="x-small auto" weight="bold">
-      {I18n.t('You currently have no discussions with closed comments')}
-    </Text>
-    {props.permissions.manage_content && (
-      <Text as="div" margin="x-small auto">
-        {I18n.t(
-          'To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.',
-        )}
+    <View margin="x-small auto">
+      <Text as="div" weight="bold">
+        {I18n.t('You currently have no discussions with closed comments')}
       </Text>
+    </View>
+    {props.permissions.manage_content && (
+      <View margin="x-small auto">
+        <Text as="div">
+          {I18n.t(
+            'To close comments on a discussion, drag a discussion here, or select Close for Comments from the discussion settings menu.',
+          )}
+        </Text>
+      </View>
     )}
   </View>
 )
-
-closedDiscussionBackground.propTypes = {
-  permissions: propTypes.permissions.isRequired,
-}

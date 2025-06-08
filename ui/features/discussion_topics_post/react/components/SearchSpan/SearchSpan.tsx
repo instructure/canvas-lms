@@ -17,20 +17,43 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+
+interface SearchSpanProps {
+  /**
+   * String containing the term to highlight
+   */
+  searchTerm?: string
+  /**
+   * String containing displayable message
+   */
+  text?: string
+  isSplitView?: boolean
+  isAnnouncement?: boolean
+  isTopic?: boolean
+  resourceId?: string
+  testId?: string
+  /**
+   * Language code if the span has been translated
+   */
+  lang?: string
+}
 
 // Highlights plaintext while not modifying any existing HTML or styling.
-const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
+const addSearchHighlighting = (
+  searchTerm?: string,
+  searchArea?: string,
+  isSplitView?: boolean,
+): string => {
   // Check for conditions where highlighting should not be applied
   if (!searchArea || !searchTerm || isSplitView) {
-    return searchArea
+    return searchArea || ''
   }
 
   // If no HTML tags, bypass parsing for performance
   if (!searchArea.includes('<')) return highlightText(searchArea, searchTerm)
 
-  const textAndTags = [] // Stores HTML tags and plaintext as separate elements
-  const textAndTagsMatches = [] // Stores indexes of matched elements
+  const textAndTags: string[] = [] // Stores HTML tags and plaintext as separate elements
+  const textAndTagsMatches: number[] = [] // Stores indexes of matched elements
   let tempString = ''
 
   // Parse the input to split HTML tags from plaintext elements
@@ -61,7 +84,7 @@ const addSearchHighlighting = (searchTerm, searchArea, isSplitView) => {
 }
 
 // Highlight the search term and remove HTML
-const highlightText = (text, searchTerm) => {
+const highlightText = (text: string, searchTerm: string): string => {
   const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const searchExpression = new RegExp(`(${escapedSearchTerm})`, 'gi')
 
@@ -73,7 +96,7 @@ const highlightText = (text, searchTerm) => {
     )
 }
 
-export function SearchSpan({...props}) {
+export function SearchSpan({...props}: SearchSpanProps) {
   const resourceType = () => {
     if (props.isAnnouncement == null || props.isTopic == null) {
       return undefined
@@ -96,24 +119,4 @@ export function SearchSpan({...props}) {
       }}
     />
   )
-}
-
-SearchSpan.propTypes = {
-  /**
-   * String containing the term to highlight
-   */
-  searchTerm: PropTypes.string,
-  /**
-   * String containing displayable message
-   */
-  text: PropTypes.string,
-  isSplitView: PropTypes.bool,
-  isAnnouncement: PropTypes.bool,
-  isTopic: PropTypes.bool,
-  resourceId: PropTypes.string,
-  testId: PropTypes.string,
-  /**
-   * Language code if the span has been translated
-   */
-  lang: PropTypes.string,
 }

@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import DateHelper from '@canvas/datetime/dateHelper'
@@ -26,15 +25,29 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {IconPeerGradedLine, IconPeerReviewLine} from '@instructure/ui-icons'
-import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = createI18nScope('discussion_posts')
 
-export const PeerReview = props => {
+interface PeerReviewProps {
+  dueAtDisplayText?: string
+  revieweeName: string
+  reviewLinkUrl?: string
+  workflowState: string
+  disabled?: boolean
+}
+
+interface ResponsiveProps {
+  textCompleted: string
+  textNotCompleted: string
+  textSize: 'x-small' | 'medium'
+}
+
+export const PeerReview: React.FC<PeerReviewProps> = props => {
   const reviewLinkUrl = props.reviewLinkUrl
   const interaction = props.disabled ? 'disabled' : 'enabled'
 
-  const renderNotCompletedMobileView = responsiveProps => {
+  const renderNotCompletedMobileView = (responsiveProps: ResponsiveProps) => {
     const mobileIcon = <IconPeerReviewLine />
     const mobileMmessage = (
       <Text weight="bold" size="x-small">
@@ -62,7 +75,7 @@ export const PeerReview = props => {
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({mobile: true, desktop: true})}
+      query={responsiveQuerySizes({mobile: true, desktop: true}) as any}
       props={{
         mobile: {
           textCompleted: I18n.t('Completed'),
@@ -76,7 +89,7 @@ export const PeerReview = props => {
                 ),
               })
             : I18n.t('Peer review due', {name: props.revieweeName}),
-          textSize: 'x-small',
+          textSize: 'x-small' as const,
         },
         desktop: {
           textCompleted: I18n.t('You have completed a peer review for %{name}', {
@@ -88,15 +101,15 @@ export const PeerReview = props => {
                 dueAtText: DateHelper.formatDatetimeForDiscussions(props.dueAtDisplayText),
               })
             : I18n.t('Peer review for %{name}', {name: props.revieweeName}),
-          textSize: 'medium',
+          textSize: 'medium' as const,
         },
       }}
-      render={(responsiveProps, matches) => {
+      render={(responsiveProps: any, matches?: any) => {
         let icon, message
         if (props.workflowState === 'completed') {
           icon = <IconPeerGradedLine />
           message = <Text size={responsiveProps.textSize}>{responsiveProps.textCompleted}</Text>
-        } else if (matches.includes('mobile')) {
+        } else if (matches?.includes('mobile')) {
           // Early return the mobile view when it is not completed
           return renderNotCompletedMobileView(responsiveProps)
         } else {
@@ -129,12 +142,4 @@ export const PeerReview = props => {
       }}
     />
   )
-}
-
-PeerReview.propTypes = {
-  dueAtDisplayText: PropTypes.string,
-  revieweeName: PropTypes.string.isRequired,
-  reviewLinkUrl: PropTypes.string,
-  workflowState: PropTypes.string.isRequired,
-  disabled: PropTypes.bool,
 }
