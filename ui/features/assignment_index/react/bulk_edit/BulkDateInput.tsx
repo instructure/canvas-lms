@@ -17,35 +17,32 @@
  */
 
 import React, {useCallback} from 'react'
-import {bool, func, oneOf, string, arrayOf, shape} from 'prop-types'
 import moment from 'moment-timezone'
 import {View} from '@instructure/ui-view'
 import {DateTime} from '@instructure/ui-i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import type {FormMessage} from '@instructure/ui-form-field'
 import CanvasDateInput2 from '@canvas/datetime/react/components/DateInput2'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
-BulkDateInput.propTypes = {
-  label: string.isRequired,
-  selectedDateString: string,
-  dateKey: oneOf(['due_at', 'unlock_at', 'lock_at']),
-  assignmentId: string.isRequired,
-  overrideId: string, // may be null
-  updateAssignmentDate: func.isRequired,
-  timezone: string,
-  fancyMidnight: bool,
-  defaultTime: string,
-  interaction: string,
-  messages: arrayOf(shape({type: string, text: string})),
-  width: string,
-}
-
-BulkDateInput.defaultProps = {
-  timezone: null,
-  fancyMidnight: false,
-  defaultTime: null,
-  interaction: 'enabled',
-  width: '100%',
+interface BulkDateInputProps {
+  label: string
+  selectedDateString?: string
+  dateKey: 'due_at' | 'unlock_at' | 'lock_at'
+  assignmentId: string
+  overrideId?: string
+  updateAssignmentDate: (params: {
+    newDate: Date | null
+    dateKey: string
+    assignmentId: string
+    overrideId?: string
+  }) => void
+  timezone?: string | null
+  fancyMidnight?: boolean
+  defaultTime?: string | null
+  interaction?: 'disabled' | 'enabled' | 'readonly'
+  messages?: FormMessage[]
+  width?: string
 }
 
 function BulkDateInput({
@@ -56,24 +53,24 @@ function BulkDateInput({
   assignmentId,
   overrideId,
   updateAssignmentDate,
-  timezone,
-  fancyMidnight,
-  defaultTime,
-  interaction,
-  width,
-}) {
+  timezone = null,
+  fancyMidnight = false,
+  defaultTime = null,
+  interaction = 'enabled',
+  width = '100%',
+}: BulkDateInputProps) {
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
   const formatDate = useDateTimeFormat('date.formats.full_with_weekday', timezone)
 
   const setDate = useCallback(
-    newDate => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
+    (newDate: Date | null) => updateAssignmentDate({newDate, dateKey, assignmentId, overrideId}),
     [updateAssignmentDate, dateKey, assignmentId, overrideId],
   )
 
   const handleSelectedDateChange = useCallback(
-    (newDate, dateInputType) => {
+    (newDate: Date | null, dateInputType?: string) => {
       if (!newDate) {
         setDate(null)
       } else if (dateInputType === 'pick' && selectedDateString) {
@@ -113,7 +110,10 @@ function BulkDateInput({
     [fancyMidnight, defaultTime, selectedDateString, setDate, timezone],
   )
 
-  const renderLabel = useCallback(() => <ScreenReaderContent>{label}</ScreenReaderContent>, [label])
+  const renderLabel = useCallback(
+    () => <ScreenReaderContent>{label}</ScreenReaderContent>,
+    [label],
+  ) as any
 
   return (
     <View as="div" minWidth={width} margin="x-small 0">
