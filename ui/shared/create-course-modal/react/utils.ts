@@ -18,13 +18,27 @@
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
+interface Course {
+  id: string
+  name: string
+}
+
+interface Account {
+  id: string
+  name: string
+}
+
+interface Enrollment {
+  account?: Account
+}
+
 /* Creates a new course with name in provided account, and enrolls the user as a teacher */
 export const createNewCourse = (
-  accountId,
-  courseName,
-  syncHomeroomEnrollments = null,
-  homeroomCourseId = null,
-) =>
+  accountId: string,
+  courseName: string,
+  syncHomeroomEnrollments: boolean | null = null,
+  homeroomCourseId: string | null = null,
+): Promise<any> =>
   doFetchApi({
     path: `/api/v1/accounts/${accountId}/courses`,
     method: 'POST',
@@ -38,14 +52,14 @@ export const createNewCourse = (
 
 /* Return array of objects containing id and name of accounts associated with each
    enrollment. */
-export const getAccountsFromEnrollments = enrollments =>
+export const getAccountsFromEnrollments = (enrollments: Enrollment[]): Account[] =>
   enrollments
     .filter(e => e.account)
-    .reduce((acc, e) => {
-      if (!acc.find(({id}) => id === e.account.id)) {
+    .reduce((acc: Account[], e) => {
+      if (!acc.find(({id}) => id === e.account!.id)) {
         acc.push({
-          id: e.account.id,
-          name: e.account.name,
+          id: e.account!.id,
+          name: e.account!.name,
         })
       }
       return acc

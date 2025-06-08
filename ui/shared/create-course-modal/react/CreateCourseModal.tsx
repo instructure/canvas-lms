@@ -17,7 +17,6 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import PropTypes from 'prop-types'
 import React, {useState, useCallback} from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -37,7 +36,32 @@ import {createNewCourse, getAccountsFromEnrollments} from './utils'
 
 const I18n = createI18nScope('create_course_modal')
 
-export const CreateCourseModal = ({
+interface Account {
+  id: string
+  name: string
+  adminable?: boolean
+}
+
+interface Course {
+  id: string
+  name: string
+  homeroom_course: boolean
+  account_id: string
+}
+
+interface Enrollment {
+  account?: Account
+}
+
+interface CreateCourseModalProps {
+  isModalOpen: boolean
+  setModalOpen: (isOpen: boolean) => void
+  permissions: 'admin' | 'teacher' | 'student' | 'no_enrollments'
+  restrictToMCCAccount: boolean
+  isK5User: boolean
+}
+
+export const CreateCourseModal: React.FC<CreateCourseModalProps> = ({
   isModalOpen,
   setModalOpen,
   permissions,
@@ -45,11 +69,11 @@ export const CreateCourseModal = ({
   isK5User,
 }) => {
   const [loading, setLoading] = useState(true)
-  const [allAccounts, setAllAccounts] = useState([])
-  const [allHomerooms, setAllHomerooms] = useState([])
+  const [allAccounts, setAllAccounts] = useState<Account[]>([])
+  const [allHomerooms, setAllHomerooms] = useState<Course[]>([])
   const [syncHomeroomEnrollments, setSyncHomeroomEnrollments] = useState(false)
-  const [selectedHomeroom, setSelectedHomeroom] = useState(null)
-  const [selectedAccount, setSelectedAccount] = useState(null)
+  const [selectedHomeroom, setSelectedHomeroom] = useState<Course | null>(null)
+  const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
   const [accountSearchTerm, setAccountSearchTerm] = useState('')
   const [courseName, setCourseName] = useState('')
 
@@ -76,8 +100,13 @@ export const CreateCourseModal = ({
 
   const createCourse = () => {
     setLoading(true)
-    createNewCourse(selectedAccount.id, courseName, syncHomeroomEnrollments, selectedHomeroom?.id)
-      .then(course => (window.location.href = `/courses/${course.id}/settings`))
+    createNewCourse(
+      selectedAccount!.id,
+      courseName,
+      syncHomeroomEnrollments,
+      selectedHomeroom?.id || null,
+    )
+      .then((course: any) => (window.location.href = `/courses/${course.id}/settings`))
       .catch(err => {
         setLoading(false)
         showFlashError(errorMessage)(err)
@@ -86,7 +115,7 @@ export const CreateCourseModal = ({
 
   const teacherStudentFetchOpts = {
     path: '/api/v1/users/self/courses',
-    success: useCallback(enrollments => {
+    success: useCallback((enrollments: Enrollment[]) => {
       const accounts = getAccountsFromEnrollments(enrollments)
       setAllAccounts(accounts)
       if (accounts.length === 1) {
@@ -104,7 +133,7 @@ export const CreateCourseModal = ({
 
   const adminFetchOpts = {
     path: '/api/v1/manageable_accounts',
-    success: useCallback(accounts => {
+    success: useCallback((accounts: Account[]) => {
       // Filter out any undefined/null accounts and ensure they have names before sorting
       const validAccounts = accounts.filter(account => account && account.name)
       setAllAccounts(
@@ -120,7 +149,7 @@ export const CreateCourseModal = ({
 
   const noEnrollmentsFetchOpts = {
     path: '/api/v1/manually_created_courses_account',
-    success: useCallback(account => {
+    success: useCallback((account: Account[]) => {
       setAllAccounts(account)
       setSelectedAccount(account[0])
       setAccountSearchTerm(account[0].name)
@@ -134,7 +163,7 @@ export const CreateCourseModal = ({
       path: '/api/v1/course_creation_accounts',
 
       // eslint-disable-next-line react-hooks/rules-of-hooks
-      success: useCallback(accounts => {
+      success: useCallback((accounts: Account[]) => {
         setAllAccounts(
           accounts.sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'})),
         )
@@ -157,21 +186,23 @@ export const CreateCourseModal = ({
 
   useFetchApi({
     loading: setLoading,
-    error: useCallback(err => showFlashError(I18n.t('Unable to get accounts'))(err), []),
+    error: useCallback((err: Error) => showFlashError(I18n.t('Unable to get accounts'))(err), []),
     fetchAllPages: true,
-    ...fetchOpts,
+    ...(fetchOpts as any),
   })
 
-  const handleAccountSelected = id => {
+  const handleAccountSelected = (id: string) => {
     if (allAccounts != null) {
       const account = allAccounts.find(a => a.id === id)
-      setSelectedAccount(account)
-      setAccountSearchTerm(account.name)
-      setSyncHomeroomEnrollments(false)
+      if (account) {
+        setSelectedAccount(account)
+        setAccountSearchTerm(account.name)
+        setSyncHomeroomEnrollments(false)
+      }
     }
   }
 
-  let accountOptions = []
+  let accountOptions: JSX.Element[] = []
   if (allAccounts) {
     accountOptions = allAccounts
       .filter(a => a.name.toLowerCase().includes(accountSearchTerm.toLowerCase()))
@@ -183,8 +214,8 @@ export const CreateCourseModal = ({
   }
 
   let homeOptionPath = '/api/v1/users/self/courses'
-  if(window.ENV.FEATURES?.enhanced_course_creation_account_fetching) {
-    if(selectedAccount && selectedAccount.adminable){
+  if (window.ENV.FEATURES?.enhanced_course_creation_account_fetching) {
+    if (selectedAccount && selectedAccount.adminable) {
       homeOptionPath = `/api/v1/accounts/${selectedAccount.id}/courses`
     }
   } else if (permissions === 'admin' && selectedAccount) {
@@ -193,7 +224,7 @@ export const CreateCourseModal = ({
 
   useFetchApi({
     loading: setLoading,
-    success: useCallback(courses => {
+    success: useCallback((courses: Course[]) => {
       const homerooms = courses ? courses.filter(homeroom => homeroom.homeroom_course) : []
       setAllHomerooms(homerooms)
       if (homerooms.length > 0) {
@@ -206,28 +237,30 @@ export const CreateCourseModal = ({
       homeroom: true,
       per_page: 100,
     },
-    error: useCallback(err => showFlashError(I18n.t('Unable to get homerooms'))(err), []),
+    error: useCallback((err: Error) => showFlashError(I18n.t('Unable to get homerooms'))(err), []),
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
     forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,
     path: homeOptionPath,
   })
 
-  const handleHomeroomSelected = id => {
+  const handleHomeroomSelected = (id: string) => {
     if (allHomerooms != null) {
       const homeroom = allHomerooms.find(a => a.id === id)
-      setSelectedHomeroom(homeroom)
+      if (homeroom) {
+        setSelectedHomeroom(homeroom)
+      }
     }
   }
 
-  const handleSyncEnrollmentsChanged = e => {
+  const handleSyncEnrollmentsChanged = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSyncHomeroomEnrollments(e.target.checked)
     if (e.target.checked && homeroomOptions[0]) {
       handleHomeroomSelected(homeroomOptions[0].props?.id)
     }
   }
 
-  let homeroomOptions = []
+  let homeroomOptions: JSX.Element[] = []
   if (selectedAccount) {
     homeroomOptions = allHomerooms
       .filter(homeroom => homeroom.account_id === selectedAccount.id)
@@ -265,7 +298,8 @@ export const CreateCourseModal = ({
                 placeholder={I18n.t('Begin typing to search')}
                 noOptionsLabel={I18n.t('No Results')}
                 onInputChange={e => setAccountSearchTerm(e.target.value)}
-                onOptionSelected={(_e, id) => handleAccountSelected(id)}
+                onOptionSelected={(_e: any, id: string) => handleAccountSelected(id)}
+                isLoading={loading}
               >
                 {accountOptions}
               </CanvasAsyncSelect>
@@ -283,7 +317,7 @@ export const CreateCourseModal = ({
                 data-testid="homeroom-select"
                 renderLabel={I18n.t('Select a homeroom')}
                 assistiveText={I18n.t('Use arrow keys to navigate options.')}
-                onChange={(_e, data) => handleHomeroomSelected(data.id)}
+                onChange={(_e: any, data: any) => handleHomeroomSelected(data.id as string)}
               >
                 {homeroomOptions}
               </SimpleSelect>
@@ -320,12 +354,4 @@ export const CreateCourseModal = ({
       </Modal.Footer>
     </Modal>
   )
-}
-
-CreateCourseModal.propTypes = {
-  isModalOpen: PropTypes.bool.isRequired,
-  setModalOpen: PropTypes.func.isRequired,
-  permissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']).isRequired,
-  restrictToMCCAccount: PropTypes.bool.isRequired,
-  isK5User: PropTypes.bool.isRequired,
 }
