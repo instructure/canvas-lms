@@ -17,7 +17,6 @@
  */
 
 import React, {useState, useRef} from 'react'
-import PropTypes from 'prop-types'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {Heading} from '@instructure/ui-heading'
@@ -35,8 +34,29 @@ import {useScope as usei18NScope} from '@canvas/i18n'
 
 const I18N = usei18NScope('discussion_create')
 
-export default function GroupCategoryModal({show, setShow, onSubmit}) {
-  const defaultFocusElementRef = useRef(null)
+interface GroupCategoryFormData {
+  groupName: string
+  groupStructure: string
+  allowSelfSignup: boolean
+  requireSameSection: boolean
+  autoAssignGroupLeader: boolean
+  numberOfGroups: number
+  numberOfStudentsPerGroup: number
+  groupLeaderAssignmentMethod: string | null
+}
+
+interface GroupCategoryModalProps {
+  show?: boolean
+  setShow?: (show: boolean) => void
+  onSubmit?: (data: GroupCategoryFormData) => void
+}
+
+export default function GroupCategoryModal({
+  show = false,
+  setShow = () => {},
+  onSubmit = () => {},
+}: GroupCategoryModalProps) {
+  const defaultFocusElementRef = useRef<any>(null)
 
   // Form properties
   const [groupName, setGroupName] = useState('')
@@ -46,12 +66,14 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
   const [autoAssignGroupLeader, setAutoAssignGroupLeader] = useState(false)
   const [numberOfGroups, setNumberOfGroups] = useState(0)
   const [numberOfStudentsPerGroup, setNumberOfStudentsPerGroup] = useState(0)
-  const [groupLeaderAssignmentMethod, setGroupLeaderAssignmentMethod] = useState(null)
+  const [groupLeaderAssignmentMethod, setGroupLeaderAssignmentMethod] = useState<string | null>(
+    null,
+  )
 
   const handleNumberChange = (
-    value,
-    callback,
-    newValue,
+    value: number,
+    callback: (value: number) => void,
+    newValue: number,
     max = Number.MAX_SAFE_INTEGER,
     min = 0,
   ) => {
@@ -173,7 +195,7 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
                 setNumberOfStudentsPerGroup(
                   value !== 'number-of-students-per-group' ? 0 : numberOfStudentsPerGroup,
                 )
-                setGroupStructure(value)
+                setGroupStructure(value as string)
               }}
             >
               <SimpleSelect.Option id="create-later" value="create-later">
@@ -259,7 +281,7 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
                   name="auto-assign-group-leader-settings"
                   description=""
                   disabled={!autoAssignGroupLeader}
-                  value={groupLeaderAssignmentMethod}
+                  value={groupLeaderAssignmentMethod || ''}
                   onChange={event => setGroupLeaderAssignmentMethod(event.target.value)}
                 >
                   <RadioInput
@@ -288,16 +310,4 @@ export default function GroupCategoryModal({show, setShow, onSubmit}) {
       </Modal>
     </>
   )
-}
-
-GroupCategoryModal.propTypes = {
-  show: PropTypes.bool,
-  setShow: PropTypes.func,
-  onSubmit: PropTypes.func,
-}
-
-GroupCategoryModal.defaultProps = {
-  show: false,
-  setShow: () => {},
-  onSubmit: () => {},
 }
