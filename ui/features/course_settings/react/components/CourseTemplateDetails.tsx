@@ -19,7 +19,6 @@
 import React, {useState, useRef} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -35,7 +34,17 @@ const I18n = createI18nScope('course_template_details')
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
-const AssociatedText = ({count, onClick}) => (
+interface Account {
+  id: string
+  name: string
+}
+
+interface AssociatedTextProps {
+  count: number
+  onClick: () => void
+}
+
+const AssociatedText: React.FC<AssociatedTextProps> = ({count, onClick}) => (
   <Link data-testid="result-n-assoc" onClick={count > 0 ? onClick : undefined}>
     <Text size="small">
       {count > 10
@@ -57,14 +66,13 @@ const AssociatedText = ({count, onClick}) => (
   </Link>
 )
 
-AssociatedText.propTypes = {
-  count: number.isRequired,
-  onClick: func.isRequired,
+interface AssociatedAccountsProps {
+  accounts: Account[]
 }
 
 // Return a list of the names of the given accounts.
 // Truncate the list at 10
-const AssociatedAccounts = ({accounts}) => (
+const AssociatedAccounts: React.FC<AssociatedAccountsProps> = ({accounts}) => (
   <List margin="none none small none">
     {accounts.slice(0, 10).map(a => (
       <List.Item key={a.name}>{a.name}</List.Item>
@@ -72,32 +80,28 @@ const AssociatedAccounts = ({accounts}) => (
   </List>
 )
 
-AssociatedAccounts.propTypes = {
-  accounts: arrayOf(
-    shape({
-      id: string,
-      name: string,
-    }).isRequired,
-  ),
+interface CourseTemplateDetailsProps {
+  isEditable?: boolean
 }
 
-const CourseTemplateDetails = ({isEditable}) => {
+const CourseTemplateDetails: React.FC<CourseTemplateDetailsProps> = ({isEditable = false}) => {
   const [checked, setChecked] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<Error | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
   const dataRequested = useRef(false)
-  const [templatedAccounts, setTemplatedAccounts] = useState(undefined)
+  const [templatedAccounts, setTemplatedAccounts] = useState<Account[] | undefined>(undefined)
 
   async function getCourseSettings() {
     try {
       const {json} = await doFetchApi({
-        path: `/api/v1${ENV.CONTEXT_BASE_URL}?include[]=templated_accounts`,
+        path: `/api/v1${(ENV as any).CONTEXT_BASE_URL}?include[]=templated_accounts`,
       })
-      setChecked(json.template)
-      setTemplatedAccounts(json.templated_accounts)
+      const data = json as {template: boolean; templated_accounts: Account[]}
+      setChecked(data.template)
+      setTemplatedAccounts(data.templated_accounts)
     } catch (err) {
-      setError(err)
+      setError(err as Error)
     } finally {
       setLoading(false)
     }
@@ -125,7 +129,7 @@ const CourseTemplateDetails = ({isEditable}) => {
 
   if (loading)
     return <Spinner data-testid="loading-spinner" size="x-small" renderTitle={I18n.t('Loading')} />
-  if (error) throw new Error(error)
+  if (error) throw new Error(error.message)
 
   const modalLabel = I18n.t('Associated Accounts')
 
@@ -165,20 +169,14 @@ const CourseTemplateDetails = ({isEditable}) => {
           </Heading>
         </Modal.Header>
         <Modal.Body>
-          <AssociatedAccounts accounts={templatedAccounts} />
-          {templatedAccounts?.length > 10 && <Text size="small">(more not shown)</Text>}
+          <AssociatedAccounts accounts={templatedAccounts || []} />
+          {templatedAccounts && templatedAccounts.length > 10 && (
+            <Text size="small">(more not shown)</Text>
+          )}
         </Modal.Body>
       </Modal>
     </div>
   )
-}
-
-CourseTemplateDetails.propTypes = {
-  isEditable: bool,
-}
-
-CourseTemplateDetails.defaultProps = {
-  isEditable: false,
 }
 
 export default CourseTemplateDetails

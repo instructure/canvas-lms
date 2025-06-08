@@ -20,7 +20,6 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {AssignmentSingleAvailabilityWindow} from '../AssignmentSingleAvailabilityWindow/AssignmentSingleAvailabilityWindow'
 import {AssignmentMultipleAvailabilityWindows} from '../AssignmentMultipleAvailabilityWindows/AssignmentMultipleAvailabilityWindows'
-import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
@@ -29,7 +28,43 @@ import {CheckpointsTray} from '../CheckpointsTray/CheckpointsTray'
 
 const I18n = createI18nScope('discussion_posts')
 
-export function AssignmentAvailabilityContainer({...props}) {
+interface AssignmentOverride {
+  id: string
+  dueAt?: string | null
+  unlockAt?: string | null
+  lockAt?: string | null
+  title?: string
+}
+
+interface Checkpoint {
+  tag: string
+  points: number
+  dueAt?: string | null
+  closedAt?: string | null
+}
+
+interface Assignment {
+  id: string
+  dueAt?: string | null
+  lockAt?: string | null
+  unlockAt?: string | null
+  assignmentOverrides?: {
+    nodes: AssignmentOverride[]
+  }
+  checkpoints?: Checkpoint[]
+}
+
+interface AssignmentAvailabilityContainerProps {
+  assignment?: Assignment
+  isAdmin?: boolean
+  inPacedCourse?: boolean
+  courseId?: string
+  replyToEntryRequiredCount?: number
+  replyToTopicSubmission?: any
+  replyToEntrySubmission?: any
+}
+
+export function AssignmentAvailabilityContainer({...props}: AssignmentAvailabilityContainerProps) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)
 
   let assignmentOverrides = props.assignment?.assignmentOverrides?.nodes || []
@@ -46,7 +81,7 @@ export function AssignmentAvailabilityContainer({...props}) {
           unlockAt: props.assignment?.unlockAt,
           lockAt: props.assignment?.lockAt,
           title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-          id: props.assignment?.id,
+          id: props.assignment?.id || '',
         })
       : [
           {
@@ -54,16 +89,16 @@ export function AssignmentAvailabilityContainer({...props}) {
             unlockAt: props.assignment?.unlockAt,
             lockAt: props.assignment?.lockAt,
             title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-            id: props.assignment?.id,
+            id: props.assignment?.id || '',
           },
         ]
   }
 
-  const useCheckpointsTray = props.assignment?.checkpoints?.length > 0
+  const useCheckpointsTray = (props.assignment?.checkpoints?.length || 0) > 0
   const trayComponent = () => {
     if (props.inPacedCourse) {
       return <CoursePacingNotice courseId={props.courseId} />
-    } else if (useCheckpointsTray) {
+    } else if (useCheckpointsTray && props.assignment?.checkpoints) {
       return (
         <CheckpointsTray
           checkpoints={props.assignment.checkpoints}
@@ -104,14 +139,4 @@ export function AssignmentAvailabilityContainer({...props}) {
       />
     </>
   )
-}
-
-AssignmentAvailabilityContainer.propTypes = {
-  assignment: PropTypes.object,
-  isAdmin: PropTypes.bool,
-  inPacedCourse: PropTypes.bool,
-  courseId: PropTypes.string,
-  replyToEntryRequiredCount: PropTypes.number,
-  replyToTopicSubmission: PropTypes.object,
-  replyToEntrySubmission: PropTypes.object,
 }

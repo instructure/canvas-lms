@@ -18,7 +18,6 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -29,18 +28,35 @@ import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {outcomeShape} from './shapes'
 import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('OutcomeManagement')
 
-const OutcomeRemoveModal = ({
+interface Outcome {
+  _id: string
+  linkId: string
+  title: string
+  canUnlink: boolean
+  parentGroupId: string
+  parentGroupTitle: string
+}
+
+interface OutcomeRemoveModalProps {
+  outcomes: Record<string, Outcome>
+  isOpen: boolean
+  onCloseHandler: () => void
+  onCleanupHandler: () => void
+  removeOutcomes: (outcomes: Record<string, Outcome>) => Promise<void>
+  onRemoveLearningOutcomesHandler?: (linkIds: string[]) => void
+}
+
+const OutcomeRemoveModal: React.FC<OutcomeRemoveModalProps> = ({
   outcomes,
   isOpen,
   onCloseHandler,
   onCleanupHandler,
   removeOutcomes,
-  onRemoveLearningOutcomesHandler,
+  onRemoveLearningOutcomesHandler = () => {},
 }) => {
   const {isCourse} = useCanvasContext()
   const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
@@ -57,9 +73,16 @@ const OutcomeRemoveModal = ({
     onCleanupHandler()
   }
 
-  const generateOutcomesList = outcomeLinkIds => {
+  const generateOutcomesList = (outcomeLinkIds: string[]) => {
     // Groups outcomes by parent group
-    const groups = {}
+    const groups: Record<
+      string,
+      {
+        groupId: string
+        groupTitle: string
+        groupOutcomes: string[]
+      }
+    > = {}
     for (const linkId of outcomeLinkIds) {
       const groupId = outcomes[linkId].parentGroupId
       groups[groupId] = groups[groupId]
@@ -230,7 +253,7 @@ const OutcomeRemoveModal = ({
         <View as="div">
           <Text size="medium">{modalMessage}</Text>
         </View>
-        <View as="div" maxHeight="16rem" tabIndex={removableCount > 10 ? '0' : '-1'}>
+        <View as="div" maxHeight="16rem" tabIndex={removableCount > 10 ? 0 : -1}>
           {nonRemovableCount > 0 && removableCount > 0 ? (
             <>
               <View as="div" padding="small 0 xx-small">
@@ -252,19 +275,6 @@ const OutcomeRemoveModal = ({
       <Modal.Footer>{modalButtons}</Modal.Footer>
     </Modal>
   )
-}
-
-OutcomeRemoveModal.propTypes = {
-  outcomes: PropTypes.objectOf(outcomeShape).isRequired,
-  isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired,
-  onCleanupHandler: PropTypes.func.isRequired,
-  removeOutcomes: PropTypes.func.isRequired,
-  onRemoveLearningOutcomesHandler: PropTypes.func,
-}
-
-OutcomeRemoveModal.defaultProps = {
-  onRemoveLearningOutcomesHandler: () => {},
 }
 
 export default OutcomeRemoveModal
