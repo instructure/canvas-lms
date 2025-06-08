@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {bool, func} from 'prop-types'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {View} from '@instructure/ui-view'
@@ -31,25 +30,87 @@ import AnnouncementModel from '@canvas/discussions/backbone/models/Announcement'
 import SectionsTooltip from '@canvas/sections-tooltip'
 import CourseItemRow from './CourseItemRow'
 import UnreadBadge from '@canvas/unread-badge'
-import announcementShape from '../proptypes/announcement'
-import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 import {makeTimestamp} from '@canvas/datetime/react/date-utils'
 
 const I18n = createI18nScope('shared_components')
 
+interface Author {
+  id: string
+  name: string
+  display_name?: string
+  avatar_image_url?: string | null
+  html_url: string
+}
+
+interface Section {
+  id: string
+  name: string
+}
+
+interface Announcement {
+  id: string
+  position: number
+  published: boolean
+  title: string
+  message: string
+  posted_at?: string
+  delayed_post_at?: string
+  author: Author
+  read_state?: 'read' | 'unread'
+  discussion_subentry_count: number
+  unread_count: number
+  locked: boolean
+  html_url: string
+  permissions?: {
+    reply?: boolean
+  }
+  user_count?: number
+  sections?: Section[]
+}
+
+interface MasterCourseData {
+  canManageCourse?: boolean
+  canAutoPublishCourses?: boolean
+  isChildCourse?: boolean
+  isMasterCourse?: boolean
+  accountId?: string | number
+  masterCourse?: {
+    id: string | number
+  }
+}
+
+interface AnnouncementRowProps {
+  announcement: Announcement
+  canManage?: boolean
+  canDelete?: boolean
+  masterCourseData?: MasterCourseData | null
+  rowRef?: (ref: any) => void
+  onSelectedChanged?: (selected: boolean, id: string) => void
+  onManageMenuSelect?: (event: any, value: any) => void
+  canHaveSections?: boolean
+  announcementsLocked?: boolean
+}
+
 export default function AnnouncementRow({
   announcement,
-  canManage,
-  canDelete,
-  masterCourseData,
-  rowRef,
-  onSelectedChanged,
-  onManageMenuSelect,
-  canHaveSections,
-  announcementsLocked,
-}) {
+  canManage = false,
+  canDelete = false,
+  masterCourseData = null,
+  rowRef = () => {},
+  onSelectedChanged = () => {},
+  onManageMenuSelect = () => {},
+  canHaveSections = false,
+  announcementsLocked = false,
+}: AnnouncementRowProps) {
   const dateFormatter = useDateTimeFormat('time.formats.medium')
-  const timestamp = makeTimestamp(announcement, I18n.t('Delayed until:'), I18n.t('Posted on:'))
+  const timestamp = makeTimestamp(
+    {
+      delayed_post_at: announcement.delayed_post_at,
+      posted_at: announcement.posted_at,
+    },
+    I18n.t('Delayed until:'),
+    I18n.t('Posted on:'),
+  )
   const readCount =
     announcement.discussion_subentry_count > 0 ? (
       <UnreadBadge
@@ -78,7 +139,7 @@ export default function AnnouncementRow({
       menuList.push(
         <Menu.Item
           key="delete"
-          value={{action: 'delete', id: announcement.id}}
+          value={{action: 'delete', id: announcement.id} as any}
           id="delete-announcement-menu-option"
         >
           <span aria-hidden="true">
@@ -95,7 +156,7 @@ export default function AnnouncementRow({
       menuList.push(
         <Menu.Item
           key="lock"
-          value={{action: 'lock', id: announcement.id, lock: !announcement.locked}}
+          value={{action: 'lock', id: announcement.id, lock: !announcement.locked} as any}
           id="lock-announcement-menu-option"
           data-action-state={announcement.locked ? 'allowCommentsButton' : 'disallowCommentsButton'}
         >
@@ -124,7 +185,7 @@ export default function AnnouncementRow({
   // necessary because announcements return html from RCE
   const contentWrapper = document.createElement('span')
   contentWrapper.innerHTML = announcement.message
-  const textContent = contentWrapper.textContent.trim()
+  const textContent = contentWrapper.textContent?.trim() || ''
 
   return (
     <CourseItemRow
@@ -151,7 +212,7 @@ export default function AnnouncementRow({
           model: new AnnouncementModel(announcement),
           unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {title: announcement.title}),
           lockedText: I18n.t('%{title} is locked. Click to unlock', {title: announcement.title}),
-          course_id: masterCourseData.masterCourse.id,
+          course_id: masterCourseData?.masterCourse?.id,
           content_id: announcement.id,
           content_type: 'discussion_topic',
         }),
@@ -177,27 +238,4 @@ export default function AnnouncementRow({
       hasReadBadge={true}
     />
   )
-}
-
-AnnouncementRow.propTypes = {
-  announcement: announcementShape.isRequired,
-  canManage: bool,
-  canDelete: bool,
-  canHaveSections: bool,
-  masterCourseData: masterCourseDataShape,
-  rowRef: func,
-  onSelectedChanged: func,
-  onManageMenuSelect: func,
-  announcementsLocked: bool,
-}
-
-AnnouncementRow.defaultProps = {
-  canManage: false,
-  canDelete: false,
-  canHaveSections: false,
-  masterCourseData: null,
-  rowRef() {},
-  onSelectedChanged() {},
-  onManageMenuSelect() {},
-  announcementsLocked: false,
 }
