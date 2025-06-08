@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
 import React, {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
@@ -34,10 +33,29 @@ const I18n = createI18nScope('conversations_2')
 
 const MAX_LABEL_LENGTH = 25
 
-export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) => {
+interface InternalLabel {
+  name: string
+  new: boolean
+}
+
+interface ManageUserLabelsProps {
+  open: boolean
+  labels: string[]
+  onCreate: (labels: string[]) => void
+  onDelete: (labels: string[]) => void
+  onClose?: () => void
+}
+
+export const ManageUserLabels: React.FC<ManageUserLabelsProps> = ({
+  open,
+  labels,
+  onCreate,
+  onDelete,
+  onClose,
+}) => {
   const [newLabel, setNewLabel] = useState('')
-  const [internalLabels, setInternalLabels] = useState([])
-  const [deletedLabels, setDeletedLabels] = useState([])
+  const [internalLabels, setInternalLabels] = useState<InternalLabel[]>([])
+  const [deletedLabels, setDeletedLabels] = useState<string[]>([])
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -74,7 +92,7 @@ export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) =>
     setInternalLabels(newInternalLabels)
   }
 
-  const deleteLabel = labelName => {
+  const deleteLabel = (labelName: string) => {
     const newInternalLabels = [...internalLabels].filter(label => label.name !== labelName)
     const labelIsNew = internalLabels.find(label => label.name === labelName)?.new || false
 
@@ -222,12 +240,4 @@ export const ManageUserLabels = ({open, labels, onCreate, onDelete, onClose}) =>
       </Modal.Footer>
     </Modal>
   )
-}
-
-ManageUserLabels.propTypes = {
-  open: PropTypes.bool,
-  labels: PropTypes.arrayOf(PropTypes.string),
-  onCreate: PropTypes.func,
-  onDelete: PropTypes.func,
-  onClose: PropTypes.func,
 }

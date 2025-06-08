@@ -24,11 +24,20 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from './constants'
-import PropTypes from 'prop-types'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-const StudentHeader = ({gradebookFilters, gradebookFilterHandler}) => {
+type GradebookFilter = 'missing_user_rollups' | 'inactive_enrollments' | 'concluded_enrollments'
+
+interface StudentHeaderProps {
+  gradebookFilters: string[]
+  gradebookFilterHandler: (filter: GradebookFilter) => void
+}
+
+const StudentHeader: React.FC<StudentHeaderProps> = ({
+  gradebookFilters,
+  gradebookFilterHandler,
+}) => {
   const toggleStudentsWithoutAssessments = () => gradebookFilterHandler('missing_user_rollups')
   const toggleInactiveEnrollments = () => gradebookFilterHandler('inactive_enrollments')
   const toggleConcludedEnrollments = () => gradebookFilterHandler('concluded_enrollments')
@@ -81,11 +90,6 @@ const StudentHeader = ({gradebookFilters, gradebookFilterHandler}) => {
       </Flex>
     </View>
   )
-}
-
-StudentHeader.propTypes = {
-  gradebookFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
-  gradebookFilterHandler: PropTypes.func.isRequired,
 }
 
 export default StudentHeader
