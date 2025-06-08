@@ -18,7 +18,6 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -32,17 +31,42 @@ import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('video_conference')
 
+type Attendee = {
+  displayName: string
+  id: string
+  assetCode: string
+}
+
+type VideoConferenceModalProps = {
+  open: boolean
+  onDismiss: () => void
+  onSubmit: (e: React.FormEvent, data: any) => Promise<boolean>
+  isEditing?: boolean
+  hasBegun?: boolean
+  name?: string
+  duration?: number
+  options?: string[]
+  description?: string
+  invitationOptions?: string[]
+  attendeesOptions?: string[]
+  type?: string
+  availableAttendeesList?: Attendee[]
+  selectedAttendees?: Attendee[]
+  startCalendarDate?: string
+  endCalendarDate?: string
+}
+
 export const VideoConferenceModal = ({
   availableAttendeesList,
-  isEditing,
+  isEditing = false,
   open,
   onDismiss,
   onSubmit,
   ...props
-}) => {
-  const OPTIONS_DEFAULT = []
+}: VideoConferenceModalProps) => {
+  const OPTIONS_DEFAULT: string[] = []
 
-  if (ENV.bbb_recording_enabled) {
+  if ((ENV as any).bbb_recording_enabled) {
     OPTIONS_DEFAULT.push('recording_enabled')
   }
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
@@ -55,10 +79,12 @@ export const VideoConferenceModal = ({
   ]
 
   const [tab, setTab] = useState(SETTINGS_TAB)
-  const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
+  const defaultName = (ENV as any).context_name
+    ? `${(ENV as any).context_name} Conference`
+    : 'Conference'
   const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
-    isEditing ? props.type : window.ENV.conference_type_details[0].type,
+    isEditing ? props.type : (window.ENV as any).conference_type_details[0].type,
   )
   const [duration, setDuration] = useState(isEditing ? props.duration : 60)
   const [options, setOptions] = useState(isEditing ? props.options : OPTIONS_DEFAULT)
@@ -71,7 +97,7 @@ export const VideoConferenceModal = ({
     isEditing ? props.attendeesOptions : ATTENDEES_OPTIONS_DEFAULT,
   )
   const [showAddressBook, setShowAddressBook] = useState(false)
-  const [selectedAttendees, setSelectedAttendees] = useState(
+  const [selectedAttendees, setSelectedAttendees] = useState<Attendee[]>(
     props.selectedAttendees ? props.selectedAttendees : [],
   )
   const [startCalendarDate, setStartCalendarDate] = useState(
@@ -84,21 +110,29 @@ export const VideoConferenceModal = ({
   const [showCalendarOptions, setShowCalendarOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const [nameValidationMessages, setNameValidationMessages] = useState([])
-  const [durationValidationMessages, setDurationValidationMessages] = useState([])
-  const [descriptionValidationMessages, setDescriptionValidationMessages] = useState([])
-  const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
-  const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
+  const [nameValidationMessages, setNameValidationMessages] = useState<
+    Array<{text: any; type: string}>
+  >([])
+  const [durationValidationMessages, setDurationValidationMessages] = useState<
+    Array<{text: any; type: string}>
+  >([])
+  const [descriptionValidationMessages, setDescriptionValidationMessages] = useState<
+    Array<{text: any; type: string}>
+  >([])
+  const [calendarValidationMessages, setCalendarValidationMessages] = useState<
+    Array<Array<{text: any; type: string}>>
+  >([])
+  const [addToCalendar, setAddToCalendar] = useState((options || []).includes('add_to_calendar'))
 
-  const onStartDateChange = newValue => {
+  const onStartDateChange = (newValue: string) => {
     setStartCalendarDate(newValue)
   }
 
-  const onEndDateChange = newValue => {
+  const onEndDateChange = (newValue: string) => {
     setEndCalendarDate(newValue)
   }
 
-  const retrieveErrorMessage = error => (
+  const retrieveErrorMessage = (error: string) => (
     <span>
       <View as="span" display="inline-block" margin="0 xxx-small xx-small 0">
         <IconWarningSolid />
@@ -108,14 +142,13 @@ export const VideoConferenceModal = ({
     </span>
   )
 
-  const setAndValidateName = nameToBeValidated => {
+  const setAndValidateName = (nameToBeValidated: string) => {
     if (nameToBeValidated.length > 255) {
       setNameValidationMessages([
         {text: retrieveErrorMessage(I18n.t('Name must not exceed 255 characters')), type: 'error'},
       ])
-    }
-    else if (nameToBeValidated.length === 0) {
-      setName("")
+    } else if (nameToBeValidated.length === 0) {
+      setName('')
       setNameValidationMessages([
         {text: retrieveErrorMessage(I18n.t('Please fill this field')), type: 'error'},
       ])
@@ -125,29 +158,44 @@ export const VideoConferenceModal = ({
     }
   }
 
-  const setAndValidateDuration = durationToBeValidated => {
+  const setAndValidateDuration = (durationToBeValidated: number | string) => {
+    const numValue =
+      typeof durationToBeValidated === 'string'
+        ? parseInt(durationToBeValidated, 10)
+        : durationToBeValidated
     if (durationToBeValidated.toString().length > 8) {
       setDurationValidationMessages([
-        {text: retrieveErrorMessage(I18n.t('Duration must be less than or equal to 99,999,999 minutes')), type: 'error'},
+        {
+          text: retrieveErrorMessage(
+            I18n.t('Duration must be less than or equal to 99,999,999 minutes'),
+          ),
+          type: 'error',
+        },
       ])
       if (durationValidationMessages.length === 0) {
-        setDuration(durationToBeValidated)
+        setDuration(numValue)
       }
     } else if (Number(durationToBeValidated) === 0) {
       setDurationValidationMessages([
-        {text: retrieveErrorMessage(I18n.t('Duration must be greater than 0 minute')), type: 'error'},
+        {
+          text: retrieveErrorMessage(I18n.t('Duration must be greater than 0 minute')),
+          type: 'error',
+        },
       ])
-      setDuration(durationToBeValidated)
+      setDuration(numValue)
     } else {
       setDurationValidationMessages([])
-      setDuration(durationToBeValidated)
+      setDuration(numValue)
     }
   }
 
-  const setAndValidateDescription = descriptionToBeValidated => {
+  const setAndValidateDescription = (descriptionToBeValidated: string) => {
     if (descriptionToBeValidated.length > 2500) {
       setDescriptionValidationMessages([
-        {text: retrieveErrorMessage(I18n.t('Description must not exceed 2500 characters')), type: 'error'},
+        {
+          text: retrieveErrorMessage(I18n.t('Description must not exceed 2500 characters')),
+          type: 'error',
+        },
       ])
     } else {
       setDescriptionValidationMessages([])
@@ -157,16 +205,16 @@ export const VideoConferenceModal = ({
 
   // Detect initial state for address book display
   useEffect(() => {
-    const inviteAll = invitationOptions.includes('invite_all')
-    inviteAll ? setShowAddressBook(false) : setShowAddressBook(true)
+    const inviteAll = (invitationOptions || []).includes('invite_all')
+    setShowAddressBook(!inviteAll)
   }, [invitationOptions])
 
   // Detect initial state for calender picker display
   useEffect(() => {
-    addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
+    setShowCalendarOptions(addToCalendar)
   }, [addToCalendar])
 
-  const normalizeDate = calendarString => {
+  const normalizeDate = (calendarString: string | null) => {
     if (!calendarString) {
       return null
     }
@@ -183,7 +231,10 @@ export const VideoConferenceModal = ({
     const endDate = normalizeDate(endCalendarDate)
     const startDate = normalizeDate(startCalendarDate)
 
-    if ((addToCalendar && !(endDate > startDate)) || !endDate || !startDate) {
+    if (
+      (addToCalendar && endDate && startDate && !(endDate > startDate)) ||
+      (addToCalendar && (!endDate || !startDate))
+    ) {
       setCalendarValidationMessages([
         [{text: I18n.t('Start Date/Time must be before the End Date/Time'), type: 'error'}],
         [{text: I18n.t('End Date/Time must be later than Start Date/Time'), type: 'error'}],
@@ -224,9 +275,9 @@ export const VideoConferenceModal = ({
           attendeesOptions={attendeesOptions}
           onSetAttendeesOptions={setAttendeesOptions}
           showAddressBook={showAddressBook}
-          onAttendeesChange={setSelectedAttendees}
+          onAttendeesChange={setSelectedAttendees as any}
           availableAttendeesList={availableAttendeesList}
-          selectedAttendees={selectedAttendees}
+          selectedAttendees={selectedAttendees as any}
           showCalendar={showCalendarOptions}
           setAddToCalendar={setAddToCalendar}
           addToCalendar={addToCalendar}
@@ -259,9 +310,9 @@ export const VideoConferenceModal = ({
         invitationOptions={invitationOptions}
         onSetInvitationOptions={setInvitationOptions}
         showAddressBook={showAddressBook}
-        onAttendeesChange={setSelectedAttendees}
+        onAttendeesChange={setSelectedAttendees as any}
         availableAttendeesList={availableAttendeesList}
-        selectedAttendees={selectedAttendees}
+        selectedAttendees={selectedAttendees as any}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
         hasBegun={props.hasBegun}
@@ -280,7 +331,7 @@ export const VideoConferenceModal = ({
         if (tab === ATTENDEES_TAB) {
           setTab(SETTINGS_TAB)
           setTimeout(() => {
-            document.querySelector('button[type=submit]').click()
+            ;(document.querySelector('button[type=submit]') as HTMLButtonElement)?.click()
           }, 200)
           return
         }
@@ -313,9 +364,10 @@ export const VideoConferenceModal = ({
         <Heading>{header}</Heading>
       </Modal.Header>
       <Modal.Body padding="none" overflow="fit">
+        {/* @ts-expect-error VideoConferenceTypeSelect is JSX component */}
         <VideoConferenceTypeSelect
-          conferenceTypes={window.ENV.conference_type_details}
-          onSetConferenceType={type => setConferenceType(type)}
+          conferenceTypes={(window.ENV as any).conference_type_details}
+          onSetConferenceType={(type: string) => setConferenceType(type)}
           isEditing={isEditing}
         />
         {renderModalOptions()}
@@ -357,29 +409,6 @@ export const VideoConferenceModal = ({
       </Modal.Footer>
     </Modal>
   )
-}
-
-VideoConferenceModal.propTypes = {
-  open: PropTypes.bool,
-  onDismiss: PropTypes.func,
-  onSubmit: PropTypes.func,
-  isEditing: PropTypes.bool,
-  hasBegun: PropTypes.bool,
-  name: PropTypes.string,
-  duration: PropTypes.number,
-  options: PropTypes.arrayOf(PropTypes.string),
-  description: PropTypes.string,
-  invitationOptions: PropTypes.arrayOf(PropTypes.string),
-  attendeesOptions: PropTypes.arrayOf(PropTypes.string),
-  type: PropTypes.string,
-  availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.object),
-  startCalendarDate: PropTypes.string,
-  endCalendarDate: PropTypes.string,
-}
-
-VideoConferenceModal.defaultProps = {
-  isEditing: false,
 }
 
 export default VideoConferenceModal
