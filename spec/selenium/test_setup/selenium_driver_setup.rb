@@ -384,7 +384,6 @@ module SeleniumDriverSetup
     def base_rack_app
       Rack::Builder.new do
         use Rails::Rack::Debugger unless Rails.env.test?
-        use Rack::Deflater
         run CanvasRails::Application
       end.to_app
     end
