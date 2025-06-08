@@ -18,57 +18,54 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {useRef, useState, useEffect} from 'react'
-import {bool, func, number} from 'prop-types'
 import shortid from '@canvas/shortid'
 import {FormField} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
+import type {FormMessage} from '@instructure/ui-form-field'
 import {View} from '@instructure/ui-view'
 import $ from 'jquery'
 
 const I18n = createI18nScope('allowed_attempts')
 
-AllowedAttempts.propTypes = {
-  limited: bool.isRequired,
-  attempts: number, // not required, may be null to specify a blank value
-  locked: bool,
-  onLimitedChange: func.isRequired,
-  onAttemptsChange: func.isRequired,
-  onHideErrors: func.isRequired,
-}
-
-AllowedAttempts.defaultProps = {
-  attempts: -1,
-  locked: false,
+interface AllowedAttemptsProps {
+  limited: boolean
+  attempts?: number | null
+  locked?: boolean
+  onLimitedChange: (limited: boolean) => void
+  onAttemptsChange: (attempts: number | null) => void
+  onHideErrors: () => void
 }
 
 export default function AllowedAttempts({
   limited,
-  attempts,
-  locked,
+  attempts = -1,
+  locked = false,
   onLimitedChange,
   onAttemptsChange,
   onHideErrors,
-}) {
+}: AllowedAttemptsProps) {
   const selectIdRef = useRef(shortid())
   const limitedValue = limited ? 'limited' : 'unlimited'
   const attemptsValue = limited ? attempts || '' : -1
   const [validationError, setValidationError] = useState(false)
-  const attemptsMessages = validationError
-    ? [{text: '', type: 'error'}]
-    : []
+  const attemptsMessages: FormMessage[] = validationError ? [{text: '', type: 'error'}] : []
 
   useEffect(() => {
-    $(document).on('validateAllowedAttempts', (_e, data) => setValidationError(!!data.error))
+    $(document).on('validateAllowedAttempts', (_e: any, data: {error: boolean}) =>
+      setValidationError(!!data.error),
+    )
 
-    return () => $(document).off('validateAllowedAttempts')
+    return () => {
+      $(document).off('validateAllowedAttempts')
+    }
   }, [setValidationError])
 
-  function handleLimitedChange(e) {
+  function handleLimitedChange(e: React.ChangeEvent<HTMLSelectElement>) {
     onLimitedChange(e.target.value === 'limited')
     onHideErrors()
   }
 
-  function handleAttemptsChange(e) {
+  function handleAttemptsChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newValue = parseInt(e.target.value, 10)
     if (e.target.value === '') {
       onAttemptsChange(null)
@@ -78,7 +75,7 @@ export default function AllowedAttempts({
     onHideErrors()
   }
 
-  function handleIncrementOrDecrement(step) {
+  function handleIncrementOrDecrement(step: number) {
     let updatedAttempts
     if (attempts === null) {
       updatedAttempts = 1
