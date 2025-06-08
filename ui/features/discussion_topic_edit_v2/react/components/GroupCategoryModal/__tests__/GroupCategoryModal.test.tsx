@@ -36,9 +36,9 @@ describe('GroupCategoryModal', () => {
   it('opens Leadership section when it clicks allows checkbox', async () => {
     const user = userEvent.setup(USER_EVENT_OPTIONS)
     const {queryByText, getAllByText, getByText} = setup()
-    expect(queryByText('Leadership', {hidden: false})).not.toBeInTheDocument()
+    expect(queryByText('Leadership')).not.toBeInTheDocument()
     await user.click(getByText('Allow'))
-    expect(getAllByText('Leadership', {hidden: false})[0]).toBeInTheDocument()
+    expect(getAllByText('Leadership')[0]).toBeInTheDocument()
   })
 
   it('unchecks suboordinate options when it unchecks allow checkbox', async () => {
@@ -76,7 +76,7 @@ describe('GroupCategoryModal', () => {
     const {getByText, getByLabelText} = setup()
     await user.click(getByText('Group Structure'))
     await user.click(getByText('Split students by number of groups'))
-    const numberInput = getByLabelText('Number of Groups')
+    const numberInput = getByLabelText('Number of Groups') as HTMLInputElement
     await user.type(numberInput, '{arrowdown}')
     expect(numberInput.value).toBe('0')
     // userEvent's {arrowup} does not work with number inputs
