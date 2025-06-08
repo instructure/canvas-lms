@@ -16,19 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import {bool} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
-import LoginActionPrompt from './LoginActionPrompt'
 import React from 'react'
+import LoginActionPrompt from './LoginActionPrompt'
 import RubricTab from './RubricTab'
+import type {Assignment} from '../../assignments_show_student'
 
-LoggedOutTabs.propTypes = {
-  assignment: Assignment.shape.isRequired,
-  nonAcceptedEnrollment: bool,
+interface LoggedOutTabsProps {
+  assignment: Assignment & {
+    rubric?: any
+    env: {
+      enrollmentState: string | null
+    }
+  }
+  nonAcceptedEnrollment?: boolean
 }
 
-export default function LoggedOutTabs(props) {
+export default function LoggedOutTabs(props: LoggedOutTabsProps) {
   return (
     <div>
       {props.assignment.rubric && (

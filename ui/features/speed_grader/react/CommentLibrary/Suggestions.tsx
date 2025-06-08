@@ -17,7 +17,6 @@
  */
 
 import React, {memo, useEffect, useCallback, useState} from 'react'
-import PropTypes from 'prop-types'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -41,24 +40,38 @@ const componentOverrides = {
   },
 }
 
+interface SearchResult {
+  comment: string
+  _id: string
+}
+
+interface SuggestionsProps {
+  searchResults: SearchResult[]
+  showResults: boolean
+  setComment: (comment: string) => void
+  closeSuggestions: () => void
+  suggestionsRef: HTMLElement | null
+}
+
 const Suggestions = ({
   searchResults,
   showResults,
   setComment,
   closeSuggestions,
   suggestionsRef,
-}) => {
-  const [mountRef, setMountRef] = useState(null)
+}: SuggestionsProps) => {
+  const [mountRef, setMountRef] = useState<HTMLDivElement | null>(null)
   useEffect(() => {
     // Hide/show suggestions div when showResults changes
     // There is an arrow that appears from the popover that needs to be hidden
     // when not showing results.
     if (suggestionsRef) {
-      suggestionsRef.style.visibility = showResults ? 'visible' : 'hidden'
+      const ref = suggestionsRef
+      ref.style.visibility = showResults ? 'visible' : 'hidden'
     }
   }, [showResults, suggestionsRef])
 
-  const onSetMountRef = useCallback(node => {
+  const onSetMountRef = useCallback((node: HTMLDivElement | null) => {
     setMountRef(node)
   }, [])
 
@@ -81,7 +94,7 @@ const Suggestions = ({
         placement="top center"
         shouldRenderOffscreen={true}
         isShowingContent={true}
-        offsetY={suggestionsPosition?.y - inlinePosition?.y || 0}
+        offsetY={(suggestionsPosition?.y ?? 0) - (inlinePosition?.y ?? 0)}
         mountNode={() => suggestionsRef}
         onHideContent={() => showResults && closeSuggestions()}
       >
@@ -97,9 +110,7 @@ const Suggestions = ({
                     onSelect={_e => setComment(result.comment)}
                     data-testid="comment-suggestion"
                   >
-                    <TruncateText as="span" maxLines={3}>
-                      {result.comment}
-                    </TruncateText>
+                    <TruncateText maxLines={3}>{result.comment}</TruncateText>
                   </Menu.Item>
                 ))}
               </Menu.Group>
@@ -110,19 +121,6 @@ const Suggestions = ({
       <div ref={onSetMountRef} />
     </>
   )
-}
-
-Suggestions.propTypes = {
-  searchResults: PropTypes.arrayOf(
-    PropTypes.shape({
-      comment: PropTypes.string.isRequired,
-      _id: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
-  showResults: PropTypes.bool.isRequired,
-  setComment: PropTypes.func.isRequired,
-  closeSuggestions: PropTypes.func.isRequired,
-  suggestionsRef: PropTypes.object,
 }
 
 export default memo(Suggestions)

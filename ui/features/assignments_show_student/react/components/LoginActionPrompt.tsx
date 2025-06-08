@@ -22,7 +22,6 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {bool, string} from 'prop-types'
 import React from 'react'
 import lockedSVG from '../../images/Locked1.svg'
 
@@ -32,7 +31,12 @@ const navigateToLogin = () => {
   assignLocation('/login')
 }
 
-function LoginActionText(props) {
+interface LoginActionTextProps {
+  enrollmentState: string | null
+  nonAcceptedEnrollment?: boolean
+}
+
+function LoginActionText(props: LoginActionTextProps) {
   let text
 
   if (props.enrollmentState === 'accepted') {
@@ -44,13 +48,20 @@ function LoginActionText(props) {
   }
 
   return (
-    <Text margin="small" size="medium" data-testid="login-action-text">
-      {text}
-    </Text>
+    <View margin="small">
+      <Text size="medium" data-testid="login-action-text">
+        {text}
+      </Text>
+    </View>
   )
 }
 
-function LoginActionButton(props) {
+interface LoginActionButtonProps {
+  enrollmentState: string | null
+  nonAcceptedEnrollment?: boolean
+}
+
+function LoginActionButton(props: LoginActionButtonProps) {
   if (props.enrollmentState === 'accepted') {
     return null
   }
@@ -76,7 +87,12 @@ function LoginActionButton(props) {
   )
 }
 
-function LoginActionPrompt(props) {
+interface LoginActionPromptProps {
+  nonAcceptedEnrollment?: boolean
+  enrollmentState: string | null
+}
+
+function LoginActionPrompt(props: LoginActionPromptProps) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
       <Flex.Item>
@@ -85,9 +101,9 @@ function LoginActionPrompt(props) {
         </View>
       </Flex.Item>
       <Flex.Item>
-        <Text margin="small" size="x-large">
-          {I18n.t('Submission Locked')}
-        </Text>
+        <View margin="small">
+          <Text size="x-large">{I18n.t('Submission Locked')}</Text>
+        </View>
       </Flex.Item>
       <Flex.Item>
         <LoginActionText {...props} />
@@ -99,15 +115,6 @@ function LoginActionPrompt(props) {
       </Flex.Item>
     </Flex>
   )
-}
-
-LoginActionPrompt.propTypes = {
-  nonAcceptedEnrollment: bool,
-  enrollmentState: string,
-}
-
-LoginActionPrompt.defaultProps = {
-  enrollmentState: null,
 }
 
 export default LoginActionPrompt
