@@ -28,10 +28,6 @@ import './ContentShareUserSearchSelector.css'
 
 const I18n = createI18nScope('user_search_selector')
 
-ContentShareUserSearchSelector.defaultProps = {
-  selectedUsers: [],
-}
-
 const MINIMUM_SEARCH_LENGTH = 3
 
 const isSearchableTerm = (term: string) => term.length >= MINIMUM_SEARCH_LENGTH
@@ -54,7 +50,7 @@ type Props = {
 export default function ContentShareUserSearchSelector({
   courseId,
   onUserSelected,
-  selectedUsers,
+  selectedUsers = [],
   selectedUsersError = false,
   userSelectInputRef,
   ...restOfSelectProps
