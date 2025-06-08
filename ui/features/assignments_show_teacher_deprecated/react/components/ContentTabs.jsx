@@ -36,12 +36,15 @@ ContentTabs.propTypes = {
   readOnly: bool,
 }
 
-ContentTabs.defaultProps = {
-  readOnly: false,
-}
-
 export default function ContentTabs(props) {
-  const {assignment} = props
+  const {
+    assignment,
+    onMessageStudentsClick,
+    onChangeAssignment,
+    onValidate,
+    invalidMessage,
+    readOnly = false,
+  } = props
   const [tab, setTab] = useState('tab-panel-details')
 
   function changeTab(_ev, {id}) {
@@ -57,10 +60,10 @@ export default function ContentTabs(props) {
       >
         <Details
           assignment={assignment}
-          onChangeAssignment={props.onChangeAssignment}
-          onValidate={props.onValidate}
-          invalidMessage={props.invalidMessage}
-          readOnly={props.readOnly}
+          onChangeAssignment={onChangeAssignment}
+          onValidate={onValidate}
+          invalidMessage={invalidMessage}
+          readOnly={readOnly}
         />
       </Tabs.Panel>
       <Tabs.Panel
@@ -86,10 +89,7 @@ export default function ContentTabs(props) {
         id="tab-panel-students"
         isSelected={tab === 'tab-panel-students'}
       >
-        <StudentsSearcher
-          onMessageStudentsClick={props.onMessageStudentsClick}
-          assignment={assignment}
-        />
+        <StudentsSearcher onMessageStudentsClick={onMessageStudentsClick} assignment={assignment} />
       </Tabs.Panel>
     </Tabs>
   )
