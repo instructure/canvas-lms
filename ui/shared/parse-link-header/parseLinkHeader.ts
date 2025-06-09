@@ -18,7 +18,7 @@
 
 // based on https://github.com/thlorenz/parse-link-header/blob/master/index.js (MIT)
 
-type LinkInfo = {
+export type LinkInfo = {
   [key: string]: string
   url: string
   rel: string

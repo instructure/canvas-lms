@@ -16,20 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as z from 'zod'
-import {ZLtiRegistrationId} from './LtiRegistrationId'
-import {ZLtiDeploymentId} from './LtiDeploymentId'
-import {ZLtiContextControl} from './LtiContextControl'
+import {z} from 'zod'
 
-export const ZLtiDeployment = z.object({
-  id: ZLtiDeploymentId,
-  registration_id: ZLtiRegistrationId,
-  deployment_id: z.string(),
-  context_id: z.string(),
-  context_type: z.enum(['Course', 'Account']),
-  context_name: z.string(),
-  workflow_state: z.enum(['active', 'deleted']),
-  context_controls: z.array(ZLtiContextControl),
-})
-
-export type LtiDeployment = z.infer<typeof ZLtiDeployment>
+export const ZCourseId = z.string().brand('CourseId')
+export type CourseId = z.infer<typeof ZCourseId>
