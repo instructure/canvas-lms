@@ -952,6 +952,26 @@ describe ContentMigration do
         expect(a2_to.only_visible_to_overrides).to be false
       end
 
+      it "preserves assignment_overrides for page assignments" do
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
+        a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page")
+        a1.build_wiki_page(title: a1.title, context: a1.context).save!
+        a2 = assignment_model(context: @copy_from, title: "a2", submission_types: "wiki_page")
+        a2.build_wiki_page(title: a2.title, context: a2.context).save!
+        assignment_override_model(assignment: a1, set_type: "Noop", title: "A1")
+        assignment_override_model(assignment: a2, set_type: "Noop", title: "A2")
+        run_course_copy
+
+        a1_to = @copy_to.assignments.find_by(migration_id: mig_id(a1))
+        expect(a1_to.assignment_overrides.length).to eq 1
+        expect(a1_to.assignment_overrides.first.title).to eq "A1"
+        a2_to = @copy_to.assignments.find_by(migration_id: mig_id(a2))
+        expect(a2_to.assignment_overrides.length).to eq 1
+        expect(a2_to.assignment_overrides.first.title).to eq "A2"
+      end
+
       it "ignores page assignments if mastery paths is not enabled in destination" do
         a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page", only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
