@@ -389,3 +389,8 @@ pkce:
   applies_to: SiteAdmin
   display_name: PKCE in OAuth2 Authorization Code Flow
   description: Enable PKCE in OAuth2 Authorization Code Flow
+restrict_student_access:
+  state: hidden
+  display_name: Restricted Inbox, Files and Calendar Functionality
+  description: Enable restricted functionalities for students so that inbox communications, file movements and calendar events can be restricted.
+  applies_to: RootAccount
