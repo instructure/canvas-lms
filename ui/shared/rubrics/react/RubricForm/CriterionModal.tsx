@@ -487,7 +487,11 @@ const RatingRow = ({
   onRemove,
   onPointsBlur,
 }: RatingRowProps) => {
-  const [pointsInputText, setPointsInputText] = useState<string | number>(rating.points)
+  const [pointsInputText, setPointsInputText] = useState<string | number>(0)
+
+  useEffect(() => {
+    setPointsInputText(rating.points)
+  }, [rating.points])
 
   function setRatingForm<K extends keyof RubricRating>(key: K, value: RubricRating[K]) {
     onChange({...rating, [key]: value})
