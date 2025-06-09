@@ -256,6 +256,7 @@ module Types
           Boolean,
           "internal use",
           null: false
+
     field :post_to_sis,
           Boolean,
           "present if Sync Grades to SIS feature is enabled",
@@ -590,7 +591,9 @@ module Types
       SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
-    field :my_sub_assignment_submissions_connection, SubmissionType.connection_type, null: true
+    field :my_sub_assignment_submissions_connection, SubmissionType.connection_type, null: true do
+      description "submissions for sub-assignments belonging to the current user"
+    end
     def my_sub_assignment_submissions_connection
       return nil if current_user.nil?
 
@@ -662,9 +665,9 @@ module Types
       end
     end
 
-    field :has_sub_assignments, Boolean, null: false
+    field :has_sub_assignments, Boolean, "Boolean: returns true if the assignment is checkpointed. A checkpointed assignment has checkpoints ( also known as sub_assignments)", null: false
 
-    field :checkpoints, [CheckpointType], null: true
+    field :checkpoints, [CheckpointType], "A list of checkpoints (also known as sub_assignments) that are associated with this assignment", null: true
     def checkpoints
       load_association(:context).then do |course|
         if course.discussion_checkpoints_enabled?

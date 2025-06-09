@@ -747,7 +747,7 @@ describe Mutations::CreateDiscussionTopic do
             ]
           GQL
           result = execute_with_input_with_assignment(query)
-          expect_error(result, "If RQD is enabled, checkpoints cannot be created")
+          expect_error(result, "If Restrict Quantitative Data is enabled, checkpoints cannot be created")
         end
       end
 
