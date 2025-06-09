@@ -193,6 +193,26 @@ describe "quiz edit page assign to" do
         wait_for_ajaximations
         expect(f(assignee_selected_option_selector).text).to include(@student1.name)
       end
+
+      it "clicking convert overrides button converts overrides and refreshes the cards" do
+        student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+        @diff_tag2.add_user(student2)
+        @classic_quiz.update!(only_visible_to_overrides: true)
+        @course.account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+          a.save!
+        end
+        get "/courses/#{@course.id}/quizzes/#{@classic_quiz.id}/edit"
+        wait_for_ajaximations
+        overrides = ff(assignee_selected_option_selector)
+        expect(overrides[0].text).to include(@diff_tag1.name)
+        expect(overrides[1].text).to include(@diff_tag2.name)
+        f(convert_override_button_selector).click
+        wait_for_ajaximations
+        converted_overrides = ff(assignee_selected_option_selector)
+        expect(converted_overrides[0].text).to include(student2.name)
+        expect(converted_overrides[1].text).to include(@student1.name)
+      end
     end
   end
 

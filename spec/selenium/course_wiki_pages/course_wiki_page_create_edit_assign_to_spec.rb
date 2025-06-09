@@ -208,5 +208,26 @@ describe "wiki pages edit page assign to" do
       wait_for_ajaximations
       expect(f(assignee_selected_option_selector).text).to include(@student1.name)
     end
+
+    it "clicking convert overrides button converts overrides and refreshes the cards" do
+      dtc = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+      diff_tag2 = @course.groups.create!(name: "Differentiation Tag 1", group_category: dtc, non_collaborative: true)
+      diff_tag2.add_user(@student2)
+      @page.assignment_overrides.create!(set_type: "Group", set_id: diff_tag2.id, title: diff_tag2.name)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      visit_wiki_edit_page(@course.id, @page.title)
+      wait_for_ajaximations
+      overrides = ff(assignee_selected_option_selector)
+      expect(overrides[0].text).to include(@diff_tag1.name)
+      expect(overrides[1].text).to include(diff_tag2.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      converted_overrides = ff(assignee_selected_option_selector)
+      expect(converted_overrides[0].text).to include(@student2.name)
+      expect(converted_overrides[1].text).to include(@student1.name)
+    end
   end
 end

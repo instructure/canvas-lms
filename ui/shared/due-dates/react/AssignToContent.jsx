@@ -49,6 +49,7 @@ const AssignToContent = ({
   getGroupCategoryId,
   type,
   overrides,
+  setOverrides,
   defaultSectionId,
   importantDates,
   supportDueDates = true,
@@ -533,7 +534,7 @@ const AssignToContent = ({
         isCheckpointed={isCheckpointed}
         postToSIS={postToSIS}
         isTray={false}
-        setStagedOverrides={setStagedOverrides}
+        setOverrides={setOverrides}
       />
     </View>
   )

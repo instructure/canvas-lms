@@ -125,6 +125,7 @@ describe "discussions overrides" do
         a.save!
       end
       @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+      @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
       @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
       @group_category.create_groups(1)
       @differentiation_tag_group_1 = @group_category.groups.first_or_create
@@ -159,6 +160,28 @@ describe "discussions overrides" do
       f(convert_override_button_selector).click
       wait_for_ajaximations
       expect(f(assignee_selected_option_selector).text).to include(@student1.name)
+    end
+
+    it "clicking convert overrides button converts overrides and refreshes the cards" do
+      gc = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      gc.create_groups(1)
+      differentiation_tag_group_2 = gc.groups.first_or_create
+      differentiation_tag_group_2.add_user(@student2)
+      @assignment.assignment_overrides.create!(set: differentiation_tag_group_2)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      overrides = ff(assignee_selected_option_selector)
+      expect(overrides[0].text).to include(@differentiation_tag_group_1.name)
+      expect(overrides[1].text).to include(differentiation_tag_group_2.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      converted_overrides = ff(assignee_selected_option_selector)
+      expect(converted_overrides[0].text).to include(@student2.name)
+      expect(converted_overrides[1].text).to include(@student1.name)
     end
   end
 end
