@@ -361,7 +361,7 @@ export const CriterionModal = ({
               </Flex.Item>
               {!hidePoints && (
                 <Flex.Item>
-                  <View as="div" width={criterionUseRange ? '12.375rem' : '8.875rem'}>
+                  <View as="div" width={criterionUseRange ? '14.375rem' : '9.875rem'}>
                     {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
                   </View>
                 </Flex.Item>
@@ -519,10 +519,10 @@ const RatingRow = ({
           </Flex.Item>
           {!hidePoints && (
             <Flex.Item align="start">
-              <View as="div" width={criterionUseRange ? '9.375rem' : '5.938rem'}>
+              <View as="div" width={criterionUseRange ? '11.375rem' : '6.938rem'}>
                 <Flex alignItems="end" height="2.375rem">
                   {criterionUseRange && (
-                    <Flex.Item width="3.438rem" textAlign="end" margin="0 0 x-small 0">
+                    <Flex.Item width="4.5rem" textAlign="end" margin="0 0 x-small 0">
                       <View as="span" margin="0 small 0 0">
                         {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
@@ -556,7 +556,7 @@ const RatingRow = ({
                           setPointsInputText(value.toString())
                         }}
                         data-testid="rating-points"
-                        width="4.938rem"
+                        width="6.25rem"
                         onBlur={() => {
                           onPointsBlur()
                         }}
@@ -717,7 +717,7 @@ const DragVerticalLineBreak = ({criterionUseRange}: DragVerticalLineBreakProps) 
         width: '1px',
         height: 'auto',
         backgroundColor: '#E8EAEC',
-        left: criterionUseRange ? '13.75rem' : '10.313rem',
+        left: criterionUseRange ? '15.75rem' : '11.313rem',
         top: '1.688rem',
         bottom: '1.688rem',
       }}
