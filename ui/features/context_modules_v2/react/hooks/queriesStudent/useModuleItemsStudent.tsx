@@ -96,6 +96,13 @@ export const MODULE_ITEMS_STUDENT_QUERY = gql`
               type: __typename
               pointsPossible
               published
+              submissionsConnection(filter: {includeUnsubmitted: true}) {
+                nodes {
+                  _id
+                  cachedDueDate
+                  missing
+                }
+              }
             }
             ... on ExternalUrl {
               title
