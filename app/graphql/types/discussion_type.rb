@@ -169,7 +169,7 @@ module Types
       SubmissionSearch.new(object.assignment, current_user, session, filter).search
     end
 
-    field :checkpoints, [CheckpointType], null: true
+    field :checkpoints, [CheckpointType], "a list of checkpoints(also known as sub_assignments) that belong to this discussion", null: true
     def checkpoints
       load_association(:assignment).then do |assignment|
         if assignment&.context&.discussion_checkpoints_enabled?
