@@ -178,7 +178,7 @@ export interface ItemAssignToTrayProps {
   onInitialStateSet?: (cards: ItemAssignToCardSpec[]) => void
   postToSIS?: boolean
   isTray?: boolean
-  setStagedOverrides?: (overrides: exportedOverride[] | null) => void
+  setOverrides?: (overrides: exportedOverride[] | null) => void
 }
 
 export default function ItemAssignToTray({
@@ -211,7 +211,7 @@ export default function ItemAssignToTray({
   onInitialStateSet,
   postToSIS = false,
   isTray = true,
-  setStagedOverrides,
+  setOverrides,
 }: ItemAssignToTrayProps) {
   const isPacedCourse = ENV.IN_PACED_COURSE
   const isMasteryPathCourse =
@@ -664,7 +664,7 @@ export default function ItemAssignToTray({
           assignToCardsRef={assignToCardsRef}
           disabledOptionIdsRef={disabledOptionIdsRef}
           isTray={isTray}
-          setStagedOverrides={setStagedOverrides}
+          setOverrides={setOverrides}
         />
       )}
     </View>

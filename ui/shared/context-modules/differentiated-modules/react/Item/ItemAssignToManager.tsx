@@ -51,7 +51,7 @@ export default function ItemAssignToManager({
   onInitialStateSet,
   postToSIS,
   isTray,
-  setStagedOverrides,
+  setOverrides,
 }: ItemAssignToTrayProps) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -85,7 +85,7 @@ export default function ItemAssignToManager({
         onInitialStateSet={onInitialStateSet}
         postToSIS={postToSIS}
         isTray={isTray}
-        setStagedOverrides={setStagedOverrides}
+        setOverrides={setOverrides}
       />
     </QueryClientProvider>
   )

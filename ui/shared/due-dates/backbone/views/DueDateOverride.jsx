@@ -51,6 +51,7 @@ function DueDateOverrideView() {
   this.containsDiffTagOverrides = this.containsDiffTagOverrides.bind(this)
   this.getDefaultDueDate = this.getDefaultDueDate.bind(this)
   this.setNewOverridesCollection = this.setNewOverridesCollection.bind(this)
+  this.resetOverrides = this.resetOverrides.bind(this)
   this.showError = this.showError.bind(this)
   this.validateGroupOverrides = this.validateGroupOverrides.bind(this)
   this.validateTokenInput = this.validateTokenInput.bind(this)
@@ -87,6 +88,7 @@ DueDateOverrideView.prototype.render = function () {
     onSync: this.setNewOverridesCollection,
     defaultSectionId: this.model.defaultDueDateSectionId,
     overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
+    setOverrides: this.resetOverrides,
     assignmentId: this.model.assignment.get('id'),
     getAssignmentName: () => {
       const element =
@@ -373,12 +375,16 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  if (newOverrides !== undefined) {
-    this.model.overrides.reset(newOverrides)
+  this.resetOverrides(newOverrides)
+  return this.model.assignment.importantDates(importantDates)
+}
+
+DueDateOverrideView.prototype.resetOverrides = function (overrides) {
+  if (overrides !== undefined) {
+    this.model.overrides.reset(overrides)
     const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
     this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
   }
-  return this.model.assignment.importantDates(importantDates)
 }
 
 // =================

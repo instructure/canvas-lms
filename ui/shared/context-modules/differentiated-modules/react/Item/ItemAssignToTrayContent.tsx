@@ -85,7 +85,7 @@ export interface ItemAssignToTrayContentProps
   assignToCardsRef: React.MutableRefObject<ItemAssignToCardSpec[]>
   disabledOptionIdsRef: React.MutableRefObject<string[]>
   isTray: boolean
-  setStagedOverrides?: (overrides: exportedOverride[] | null) => void
+  setOverrides?: (overrides: exportedOverride[] | null) => void
 }
 
 const MAX_PAGES = 10
@@ -170,7 +170,7 @@ const ItemAssignToTrayContent = ({
   assignToCardsRef,
   disabledOptionIdsRef,
   isTray,
-  setStagedOverrides = () => {},
+  setOverrides = () => {},
 }: ItemAssignToTrayContentProps) => {
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
@@ -530,8 +530,7 @@ const ItemAssignToTrayContent = ({
         onInitialStateSet?.(cards)
         setAssignToCards(cards)
         if (refetchPages) {
-          // we refetched so update the staged overrides for assignment save
-          setStagedOverrides(overrides)
+          setOverrides(overrides)
         }
       } catch {
         showFlashError()()
