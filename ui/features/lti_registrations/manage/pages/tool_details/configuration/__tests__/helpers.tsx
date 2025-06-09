@@ -38,6 +38,7 @@ import {z} from 'zod'
 import {ZUser} from '../../../../model/User'
 import {ZUserId} from '../../../../model/UserId'
 import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 export const mockConfiguration = (
   config: Partial<InternalLtiConfiguration>,
@@ -82,6 +83,7 @@ export const mockOverlay = (
 export const renderAppWithRegistration =
   (registration: LtiRegistrationWithAllInformation, refreshRegistration: () => void = jest.fn()) =>
   (element: React.ReactNode) => {
+    const queryClient = new QueryClient()
     const router = createMemoryRouter([
       {
         path: '*',
@@ -104,7 +106,11 @@ export const renderAppWithRegistration =
         ),
       },
     ])
-    return render(<RouterProvider router={router} />)
+    return render(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    )
   }
 
 export const renderApp = (...p: Parameters<typeof mockRegistrationWithAllInformation>) =>
