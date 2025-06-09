@@ -18,7 +18,7 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
-import {IconSearchLine, IconXLine} from '@instructure/ui-icons'
+import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {Select} from '@instructure/ui-select'
 import React, {ReactNode, useEffect, useRef, useState} from 'react'
 
@@ -171,7 +171,7 @@ export default function AutocompleteSearch(props: Props) {
           <IconButton
             withBorder={false}
             withBackground={false}
-            renderIcon={<IconXLine />}
+            renderIcon={<IconTroubleLine />}
             onClick={() => handleInputChange('')}
             screenReaderLabel={I18n.t('Clear search')}
           />
