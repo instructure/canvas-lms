@@ -38,6 +38,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {assignLocation} from '@canvas/util/globalUtils'
+import {clearAssetProcessorReports} from '../helpers/AssetProcessorHelper'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
@@ -535,6 +536,10 @@ const SubmissionManager = ({
   const handleSubmitConfirmation = () => {
     submitAssignment()
     setDraftStatus(null)
+    // We clear the asset processor reports from ENV when a new attempt is submitted
+    // to ensure that the reports are not shown for the new attempt.
+    // User needs to reload the page to see the new reports.
+    clearAssetProcessorReports()
   }
 
   const handleSubmitButton = async () => {

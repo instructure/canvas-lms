@@ -19,7 +19,7 @@
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {ASSET_REPORT_MODAL_EVENT} from '../../submissions_show_preview_asset_report_status/react/AssetReportStatusLink'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
-import StudentAssetReportModal from '../../submissions_show_preview_asset_report_status/react/StudentAssetReportModal'
+import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
 import {useEffect, useState} from 'react'
 
 export default function StudentAssetReportModalWrapper() {

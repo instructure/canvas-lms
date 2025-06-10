@@ -22,12 +22,14 @@ import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
 import groupBy from 'lodash/groupBy'
-import {LtiAssetReports} from '../../../shared/lti/react/LtiAssetReports'
+import {LtiAssetReports} from './LtiAssetReports'
 import {type LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import AssetReportStatus from '../../../shared/lti/react/AssetReportStatus'
+import TruncateWithTooltip from '../../lti-apps/components/common/TruncateWithTooltip'
+import AssetReportStatus from './AssetReportStatus'
+import {View} from '@instructure/ui-view'
 
 interface Props {
   assetProcessors: ExistingAttachedAssetProcessor[]
@@ -49,6 +51,9 @@ export default function StudentAssetReportModal({
 }: Props) {
   const attachmentId = reports?.[0]?.asset.attachment_id
   const attachmentName = reports?.[0]?.asset.attachment_name
+  const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
+    reports.some(report => report.asset_processor_id === assetProcessor.id),
+  )
 
   if (!attachmentId) {
     return null
@@ -84,18 +89,26 @@ export default function StudentAssetReportModal({
         />
       </Modal.Header>
       <Modal.Body>
-        <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0">
+        <Flex justifyItems="space-between" alignItems="center" margin="0 0 medium 0" gap="medium">
           <FlexItem>
-            <Text size="descriptionPage" weight="weightImportant">
-              {attachmentName}
-            </Text>
+            <View maxWidth="30em" as="div">
+              <Text size="descriptionPage" weight="weightImportant">
+                <TruncateWithTooltip
+                  linesAllowed={1}
+                  horizontalOffset={0}
+                  backgroundColor="primary-inverse"
+                >
+                  {attachmentName}
+                </TruncateWithTooltip>
+              </Text>
+            </View>
           </FlexItem>
           <FlexItem>
             <AssetReportStatus reports={reports} />
           </FlexItem>
         </Flex>
         <LtiAssetReports
-          assetProcessors={assetProcessors}
+          assetProcessors={assetProcessorsWithReports}
           attempt={null}
           reportsByAttachment={reportsByAttachment}
           studentId={undefined}
