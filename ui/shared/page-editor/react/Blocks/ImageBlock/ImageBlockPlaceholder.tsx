@@ -16,24 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
-import {AddBlock} from './AddBlock'
-import {DummyBlock} from './Blocks/DummyBlock'
-import {TextBlock} from './Blocks/TextBlock'
-import {PageEditorContext} from './PageEditorContext'
-import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
-import {ImageBlock} from './Blocks/ImageBlock'
+import {IconAddSolid} from '@instructure/ui-icons'
 
-export const PageEditor = (props: {
-  data: SerializedNodes | null
-}) => {
+export const ImageBlockPlaceholder = () => {
   return (
-    <PageEditorContext>
-      <Editor resolver={{DummyBlock, TextBlock, ImageBlock}}>
-        <AddBlockModalRenderer />
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
-    </PageEditorContext>
+    <div className="image-block-placeholder">
+      <IconAddSolid size="medium" />
+    </div>
   )
 }

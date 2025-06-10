@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextBlock} from '../TextBlock'
+import {ImageBlock} from '../ImageBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 
 jest.mock('../../../PageEditorContext', () => ({
@@ -24,9 +24,9 @@ jest.mock('../../../PageEditorContext', () => ({
   usePageEditorContext: jest.fn(() => ({})),
 }))
 
-describe('TextBlock', () => {
+describe('ImageBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(TextBlock)
+    renderBlock(ImageBlock)
     expect(true).toBe(true)
   })
 })

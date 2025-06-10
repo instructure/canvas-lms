@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {DummyBlock} from '../Blocks/DummyBlock'
 import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
+import {ImageBlock} from '../Blocks/ImageBlock'
 
 const I18n = createI18nScope('page_editor')
 
@@ -29,7 +30,7 @@ export const blockFactory = {
   dummyBlock: () => <DummyBlock dummyValue="" />,
   simpleText: () => <TextBlock />,
   imageText: () => <p>image_text</p>,
-  image: () => <p>image</p>,
+  image: () => <ImageBlock />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
