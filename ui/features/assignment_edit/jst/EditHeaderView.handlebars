@@ -3,7 +3,7 @@
 {{else}}
   {{!-- EVAL-3711 Remove ICE feature flag --}}
   {{#if instui_nav}}
-    <h1 class="screenreader-only">{{#t}}{{renderHeaderTitle}}{{/t}}</h1>
+    <h1 class="screenreader-only">{{renderHeaderTitle}}</h1>
   {{else}}
     <h1 class="screenreader-only">{{#t}}New Assignment{{/t}}</h1>
   {{/if}}
@@ -13,7 +13,7 @@
     {{!-- EVAL-3711 Remove ICE feature flag --}}
     {{#if instui_nav}}
       <div class="header-bar-left">
-          <h1 class='assignment-edit-header-title'>{{#t}}{{renderHeaderTitle}}{{/t}}</h1>
+          <h1 class='assignment-edit-header-title'>{{renderHeaderTitle}}</h1>
           <div class="published-assignment-container" style="margin-top:0.75rem"></div>
       </div>
     {{/if}}
