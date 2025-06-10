@@ -16,17 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextBlock} from '../TextBlock'
-import {renderBlock} from '../../__tests__/render-helper'
-
-jest.mock('../../../PageEditorContext', () => ({
-  __esModule: true,
-  usePageEditorContext: jest.fn(() => ({})),
-}))
-
-describe('TextBlock', () => {
-  it('should render without crashing', () => {
-    renderBlock(TextBlock)
-    expect(true).toBe(true)
-  })
-})
+export * from './ImageBlock'
