@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '@canvas/discussions/react/utils'
 import {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {useManageThreadedRepliesStore} from '../../hooks/useManageThreadedRepliesStore'
 
 const I18n = createI18nScope('discussions_v2')
 
@@ -33,8 +34,13 @@ declare const ENV: GlobalEnv & {
   AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS?: string
 }
 
-const ManageThreadedRepliesAlert = () => {
+interface ManageThreadedRepliesAlertProps {
+  onOpen: () => void
+}
+
+const ManageThreadedRepliesAlert: React.FC<ManageThreadedRepliesAlertProps> = ({onOpen}) => {
   const count = ENV?.AMOUNT_OF_SIDE_COMMENT_DISCUSSIONS || 0
+  const showAlert = useManageThreadedRepliesStore(state => state.showAlert)
 
   if (!count) {
     return null
@@ -61,7 +67,7 @@ const ManageThreadedRepliesAlert = () => {
   )
 
   return (
-    <Alert variant="warning" margin="mediumSmall 0" open={true}>
+    <Alert variant="warning" margin="mediumSmall 0" open={showAlert}>
       <Flex gap="x-small" direction="column">
         <Text dangerouslySetInnerHTML={{__html: alertTitle}} />
         <Text dangerouslySetInnerHTML={{__html: alertText}} />
@@ -76,10 +82,10 @@ const ManageThreadedRepliesAlert = () => {
             <Flex justifyItems="end">
               <Button
                 id="manage-threaded-discussions"
-                test-id="manage-threaded-discussions"
+                data-testid="manage-threaded-discussions"
                 color="primary"
-                as="a"
                 display={matchProps?.display}
+                onClick={onOpen}
               >
                 {I18n.t('Manage Discussions')}
               </Button>
