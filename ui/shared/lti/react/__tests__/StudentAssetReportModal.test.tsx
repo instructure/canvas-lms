@@ -52,6 +52,18 @@ describe('StudentAssetReportModal', () => {
       tool_name: 'Test Processor',
       title: 'Test Processor Title',
     },
+    {
+      id: 2,
+      tool_id: 101,
+      tool_name: 'Another Processor',
+      title: 'Another Processor Title',
+    },
+    {
+      id: 3,
+      tool_id: 103,
+      tool_name: 'Unused Processor',
+      title: 'Unused Processor Title',
+    },
   ]
   const assignmentName = 'Test Assignment'
 
@@ -82,7 +94,6 @@ describe('StudentAssetReportModal', () => {
       />,
     )
 
-    // Check that the modal title is rendered
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
   })
 
@@ -98,7 +109,6 @@ describe('StudentAssetReportModal', () => {
       />,
     )
 
-    // Check that the modal title is not rendered
     expect(screen.queryByText(`Document Processors for ${assignmentName}`)).not.toBeInTheDocument()
   })
 
@@ -118,7 +128,7 @@ describe('StudentAssetReportModal', () => {
     expect(screen.getByText(attachmentName)).toBeInTheDocument()
   })
 
-  it('renders AssetReportStatus with proper reports', () => {
+  it('filters asset processors to only include those with reports', () => {
     const reports = [
       createReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
       createReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
@@ -133,12 +143,12 @@ describe('StudentAssetReportModal', () => {
       />,
     )
 
-    // Since we have a high priority report, the status should show "Needs attention"
-    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
+    expect(screen.getByText('Another Processor · Another Processor Title')).toBeInTheDocument()
+    expect(screen.queryByText('Unused Processor · Unused Processor Title')).not.toBeInTheDocument()
   })
 
   it('properly renders with reports from multiple processors', () => {
-    // Create reports with different processor IDs
     const reports = [
       createReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
       createReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
@@ -153,9 +163,8 @@ describe('StudentAssetReportModal', () => {
       />,
     )
 
-    // Since we're using real components, we can verify that UI elements are rendered correctly
     expect(screen.getByText('test.pdf')).toBeInTheDocument()
-    expect(screen.getByText('Needs attention')).toBeInTheDocument() // From the high priority report
+    expect(screen.getByText('Needs attention')).toBeInTheDocument()
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
   })
 })
