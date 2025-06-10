@@ -19,13 +19,13 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import React, {PropsWithChildren} from 'react'
-import {AddButton} from '../../AddBlock/AddButton'
+import React, {PropsWithChildren, ReactNode} from 'react'
 
 export const BaseBlockLayout = React.forwardRef<
   HTMLDivElement,
   PropsWithChildren<{
     title: string
+    addButton: ReactNode
   }>
 >((props, ref) => {
   return (
@@ -41,7 +41,7 @@ export const BaseBlockLayout = React.forwardRef<
         </Flex>
         <Flex>{props.children}</Flex>
       </Flex>
-      <AddButton onAddBlockClicked={() => {}} />
+      {props.addButton}
     </div>
   )
 })

@@ -16,28 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import {TextBlock} from '../TextBlock'
-import {Editor, Frame} from '@craftjs/core'
-
-jest.mock('../../../PageEditorContext', () => ({
-  __esModule: true,
-  usePageEditorContext: jest.fn(() => ({})),
-}))
-
-const renderBlock = () => {
-  return render(
-    <Editor resolver={{TextBlock}}>
-      <Frame>
-        <TextBlock />
-      </Frame>
-    </Editor>,
-  )
-}
-
-describe('TextBlock', () => {
-  it('should render without crashing', () => {
-    renderBlock()
-    expect(true).toBe(true)
-  })
-})
+export type Prettify<T> = {
+  [K in keyof T]: T[K]
+} & {}

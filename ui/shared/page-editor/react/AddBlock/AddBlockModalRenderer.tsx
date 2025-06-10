@@ -16,28 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import {TextBlock} from '../TextBlock'
-import {Editor, Frame} from '@craftjs/core'
+import {ReactElement} from 'react'
+import {usePageEditorContext} from '../PageEditorContext'
+import {AddBlockModal} from './AddBlockModal'
+import {useAddNode} from '../hooks/useAddNode'
 
-jest.mock('../../../PageEditorContext', () => ({
-  __esModule: true,
-  usePageEditorContext: jest.fn(() => ({})),
-}))
+export const AddBlockModalRenderer = (props: {}) => {
+  const {addBlockModal} = usePageEditorContext()
+  const addNode = useAddNode()
+  const onAddBlock = (block: ReactElement) => {
+    addNode(block, addBlockModal.insertAfterNodeId)
+  }
 
-const renderBlock = () => {
-  return render(
-    <Editor resolver={{TextBlock}}>
-      <Frame>
-        <TextBlock />
-      </Frame>
-    </Editor>,
+  return (
+    <AddBlockModal
+      open={addBlockModal.isOpen}
+      onDismiss={addBlockModal.close}
+      onAddBlock={onAddBlock}
+    />
   )
 }
-
-describe('TextBlock', () => {
-  it('should render without crashing', () => {
-    renderBlock()
-    expect(true).toBe(true)
-  })
-})
