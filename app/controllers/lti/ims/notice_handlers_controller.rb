@@ -20,17 +20,21 @@
 
 module Lti::IMS
   # @API Notice Handlers
-  # @internal
   #
   # API for the LTI Platform Notification Service.
   #
   # Requires LTI Advantage (JWT OAuth2) tokens with the
   # `https://purl.imsglobal.org/spec/lti/scope/noticehandlers` scope.
   #
+  # See the Canvas
+  # <a href="/doc/api/file.pns.html">Platform Notification Service</a>
+  # intro guide for an overview of these endpoints and information on specific
+  # notice types.
+  #
   # @model NoticeCatalog
   #     {
   #       "id": "NoticeCatalog",
-  #       "description": "",
+  #       "description": "Set of notice handlers (one per notice type) for an LTI tool deployment.",
   #       "properties": {
   #          "client_id": {
   #            "description": "The LTI tool's client ID (global developer key ID)",
@@ -59,7 +63,7 @@ module Lti::IMS
   # @model NoticeHandler
   #     {
   #       "id": "NoticeHandler",
-  #       "description": "",
+  #       "description": "A notice handler for a particular tool deployment and notice type.",
   #       "properties": {
   #         "handler": {
   #           "description": "URL to receive the notice",
@@ -72,9 +76,9 @@ module Lti::IMS
   #           "type": "string"
   #         },
   #         "max_batch_size": {
-  #           "description": "The maximum number of notices to include in a single batch",
+  #           "description": "The maximum number of notices to include in a single batch, or 'null' if not set.",
   #           "example": 100,
-  #           "type": ["integer", "null"]
+  #           "type": "integer"
   #         }
   #       }
   #     }

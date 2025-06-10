@@ -239,6 +239,7 @@ object for placement-specific target_link_uri's.</p>
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/score"</code>,
           <code class="enum">"https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"</code>,
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"</code>,
+          <code class="enum">"https://purl.imsglobal.org/spec/lti/scope/noticehandlers"</code>,
           <code class="enum">"https://canvas.instructure.com/lti/public_jwk/scope/update"</code>
      </p>
 </p>
