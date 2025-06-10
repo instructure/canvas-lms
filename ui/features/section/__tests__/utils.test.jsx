@@ -63,16 +63,16 @@ describe('generateMessages', () => {
 
 describe('validateDatetime', () => {
   it('returns empty array when date is empty', () => {
-    expect(validateDateTime('', '', '')).toEqual([])
+    expect(validateDateTime('', '')).toEqual([])
   })
 
   it('returns empty array for valid date', () => {
-    const result = validateDateTime('May 15, 2023', '12:00 PM', START_AT_DATE)
+    const result = validateDateTime('May 15, 2023', START_AT_DATE)
     expect(result).toEqual([])
   })
 
   it('returns error for invalid date', () => {
-    const result = validateDateTime('Invalid', '12:00 PM', 'field')
+    const result = validateDateTime('Invalid', 'field')
     expect(result).toEqual([
       {
         containerName: 'field',
@@ -95,7 +95,7 @@ describe('validateStartDateAfterEnd', () => {
   })
 
   it('returns error when end date is before start date', () => {
-    const result = validateStartDateAfterEnd('May 16, 2023', '11:00 AM', 'May 15, 2023', '10:00 AM')
+    const result = validateStartDateAfterEnd('2025-06-09T05:31:00.000Z', '2025-06-08T05:31:00.000Z')
     expect(result).toEqual([
       {
         containerName: END_AT_DATE,

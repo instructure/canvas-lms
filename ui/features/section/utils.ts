@@ -25,6 +25,8 @@ export const START_AT_TIME = 'start_at_time'
 export const END_AT_DATE = 'end_at_date'
 export const END_AT_TIME = 'end_at_time'
 
+export const SHORT_DATE_FORMAT = 'll' // e.g., 'Jan 1, 2025'
+
 const I18n = createI18nScope('edit_section_dates')
 
 interface Error {
@@ -70,10 +72,15 @@ export function generateMessages(
   return []
 }
 
-export function validateDateTime(dateValue: string, timeValue: string, field: string): Error[] {
+export function validateDateTime(
+  dateValue: string,
+  field: string,
+  format: string = SHORT_DATE_FORMAT,
+): Error[] {
   const errors: Error[] = []
   if (!dateValue) return errors
-  if (!isValidDate(`${dateValue} ${timeValue}`, 'MMM D, YYYY hh:mm A')) {
+
+  if (!isValidDate(dateValue, format)) {
     errors.push({
       containerName: field,
       instUIControlled: true,
@@ -85,26 +92,19 @@ export function validateDateTime(dateValue: string, timeValue: string, field: st
   return errors
 }
 
-export function parseDateTimeToISO(dateValue: string, timeValue: string) {
-  return moment.tz(`${dateValue} ${timeValue}`, 'MMMM D, YYYY h:mm A', ENV.TIMEZONE).toISOString()
-}
-
 export function validateStartDateAfterEnd(
-  startDate: string,
-  startTime: string,
-  endDate: string,
-  endTime: string,
+  isoStartDateTime: string | undefined,
+  isoEndDateTime: string | undefined,
 ): Error[] {
   const errors: Error[] = []
-  const start = `${startDate} ${startTime}`
-  const end = `${endDate} ${endTime}`
-  if (!isValidDate(start, 'MMMM D, YYYY hh:mm A') || !isValidDate(end, 'MMM D, YYYY hh:mm A')) {
+  if (!isValidDate(isoStartDateTime) || !isValidDate(isoStartDateTime)) {
     return errors
   }
-  const startDateTime = moment(parseDateTimeToISO(startDate, startTime))
-  const endDateTime = moment(parseDateTimeToISO(endDate, endTime))
 
-  if (startDateTime.isAfter(endDateTime)) {
+  const startDateTimeMoment = moment(isoStartDateTime)
+  const endDateTimeMoment = moment(isoEndDateTime)
+
+  if (startDateTimeMoment.isAfter(endDateTimeMoment)) {
     errors.push({
       containerName: END_AT_DATE,
       instUIControlled: true,
@@ -114,6 +114,9 @@ export function validateStartDateAfterEnd(
   return errors
 }
 
-function isValidDate(dateString: string | null, format: string) {
-  return moment(dateString, format).isValid()
+function isValidDate(
+  dateString: string | undefined,
+  format: string | moment.MomentBuiltinFormat = moment.ISO_8601,
+): boolean {
+  return moment(dateString, format, ENV.LOCALE).isValid()
 }
