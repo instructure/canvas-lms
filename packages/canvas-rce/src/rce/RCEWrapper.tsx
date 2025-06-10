@@ -180,7 +180,6 @@ interface RCEWrapperProps {
   autosave?: {
     enabled?: boolean
     maxAge?: number
-    interval?: number
   }
   canvasOrigin: string
   defaultContent?: string

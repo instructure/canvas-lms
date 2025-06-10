@@ -106,6 +106,26 @@ describe('CanvasRce', () => {
     }
   })
 
+  it('sets maxAge for autosave to 60 minutes by default', async () => {
+    const rceRef = createRef(null)
+    window.ENV = {
+      rce_auto_save_max_age_ms: undefined,
+    }
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+    expect(rceRef.current.props.autosave.maxAge).toEqual(60 * 60 * 1000) // 60 minutes in milliseconds
+  })
+
+  it('sets maxAge for autosave to the environment variable value', async () => {
+    const rceRef = createRef(null)
+    window.ENV = {
+      rce_auto_save_max_age_ms: 30 * 60 * 1000, // 30 minutes in milliseconds
+    }
+    render(<CanvasRce ref={rceRef} textareaId="textarea3" autosave={{enabled: false}} />, target)
+    await waitFor(() => expect(rceRef.current).not.toBeNull())
+    expect(rceRef.current.props.autosave.maxAge).toEqual(30 * 60 * 1000) // 30 minutes in milliseconds
+  })
+
   describe('merging UI elements', () => {
     // the only way I can think of to test these functions
     // is to look at the props passed to the mock Editor component
