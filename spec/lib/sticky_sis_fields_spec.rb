@@ -383,13 +383,13 @@ describe StickySisFields do
       ac.stuck_sis_fields = [:short_name]
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [:short_name].to_set
       expect(ac.instance_variable_get(:@sis_fields_to_unstick)).to eq [:name].to_set
-      expect(ac.send(:load_stuck_sis_fields_cache)).to eq [:name].to_set
+      expect(ac.send(:stuck_sis_fields_cache)).to eq [:name].to_set
       AbstractCourse.process_as_sis clear_sis_stickiness: true do
         ac.save!
       end
       expect(ac.instance_variable_get(:@sis_fields_to_stick)).to eq [].to_set
       expect(ac.instance_variable_get(:@sis_fields_to_unstick)).to eq [].to_set
-      expect(ac.send(:load_stuck_sis_fields_cache)).to eq [].to_set
+      expect(ac.send(:stuck_sis_fields_cache)).to eq [].to_set
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
   end
