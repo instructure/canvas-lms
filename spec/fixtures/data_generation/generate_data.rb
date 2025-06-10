@@ -453,6 +453,71 @@ def generate_course_pace_course
   puts "Module ID is #{module1.id}"
 end
 
+def generate_mega_course
+  puts "Generate Mega Course with #{@mega_course} learning objects"
+  course_with_teacher_enrolled
+  course_with_students_enrolled
+
+  items_per_course_module = 20
+  course_modules = []
+
+  number_of_course_modules = @mega_course / items_per_course_module
+  last_module_number_of_items = @mega_course % items_per_course_module
+  if last_module_number_of_items >> 0
+    number_of_course_modules += 1
+  end
+
+  number_of_course_modules.times do
+    course_modules << create_module(@course)
+  end
+
+  course_modules.each_with_index do |course_module, module_number|
+    items_per_course_module = if module_number == number_of_course_modules - 1 && last_module_number_of_items > 0
+                                last_module_number_of_items
+                              else
+                                20
+                              end
+
+    item_types = %w[assignment discussion_topic quiz wiki_page]
+
+    item_types.cycle.take(items_per_course_module).each do |item_type|
+      learning_object = case item_type
+                        when "assignment"
+                          create_assignment(@course, "Mega Assignment")
+                        when "discussion_topic"
+                          create_discussion(@course, @teacher)
+                        when "quiz"
+                          create_quiz(@course)
+                        when "wiki_page"
+                          create_wiki_page(@course)
+                        end
+
+      course_module.add_item(id: learning_object.id, type: item_type)
+    end
+  end
+
+  assignment_list = @course.assignments
+  wiki_page_list = @course.wiki_pages
+
+  assignment_list.each do |assignment|
+    Assignment.suspend_due_date_caching do
+      @student_list.each do |student|
+        ao = assignment.assignment_overrides.create!
+        ao.assignment_override_students.create!(user: student)
+      end
+    end
+  end
+
+  wiki_page_list.each do |wiki_page|
+    @student_list.each do |student|
+      ao = wiki_page.assignment_overrides.create!
+      ao.assignment_override_students.create!(user: student)
+    end
+  end
+
+  print_standard_course_info
+end
+
 def create_all_the_available_data
   save_course_name = @course_name
   @course_name = save_course_name + " (course with students)"
@@ -477,6 +542,8 @@ def create_all_the_available_data
   generate_course_assignment_groups
   @course_name = save_course_name + " (course pace course)"
   generate_course_pace_course
+  @course_name = save_course_name + " (mega course)"
+  generate_mega_course
 end
 # rubocop:enable Specs/ScopeHelperModules
 
@@ -499,6 +566,7 @@ option_parser = OptionParser.new do |opts|
   opts.on("-r", "--rubric", "Course with Outcome Rubric Assignment")
   opts.on("-s", "--submissions", "Course and Assignments and Submissions")
   opts.on("-t", "--sections", "Course with Students in Sections")
+  opts.on("-o", "--mega_course=MEGACOURSE", Integer, "Mega Course with Learning Objects and Overrides (default: 200)")
   opts.on_tail("-h", "--help", "Help") do
     puts opts
     exit
@@ -515,12 +583,15 @@ end
 @course_name = options.key?(:course_name) ? options[:course_name] : "Play Course"
 @number_of_students = options.key?(:num_students) ? options[:num_students] : 3
 root_account_id = options.key?(:account_id) ? options[:account_id] : 2
-
+puts "Root Account Id is #{root_account_id}"
 if (@root_account = Account.find_by(id: root_account_id)).nil?
   puts "Invalid Root Account Id: #{root_account_id}"
   puts option_parser.help
   exit 1
 end
+
+# mega course takes the number of learning objects to create
+@mega_course = options.key?(:mega_course) ? options[:mega_course] : 200
 
 options.except!(:course_name, :num_students, :account_id)
 
@@ -557,6 +628,8 @@ options.each_key do |key|
     generate_sections
   when :course_pace
     generate_course_pace_course
+  when :mega_course
+    generate_mega_course
   else raise "should never get here -- BIG FAIL"
   end
 end
