@@ -33,6 +33,26 @@ const uploadFile = async (user: UserEvent, fileDrop: HTMLElement) => {
   return file
 }
 
+const mockPost = (expected: {batchMode: boolean; overrideSis: boolean; termId?: string}) => {
+  const {batchMode, overrideSis, termId} = expected
+  fetchMock.post(SIS_IMPORT_URI, (_url, opts) => {
+    const body = opts?.body
+
+    if (!(body instanceof FormData)) {
+      throw new Error('Expected FormData')
+    }
+
+    // validate body (FormData)
+    expect(body.get('attachment')).not.toBeNull() // file should be present
+    expect(body.get('batch_mode')).toEqual(batchMode.toString())
+    expect(body.get('override_sis_stickiness')).toEqual(overrideSis.toString())
+    if (termId) {
+      expect(body.get('batch_mode_term_id')).toEqual(termId.toString())
+    }
+    return 200
+  })
+}
+
 const enrollmentTerms = {enrollment_terms: [{id: '1', name: 'Term 1'}]}
 
 describe('SisImportForm', () => {
@@ -49,7 +69,7 @@ describe('SisImportForm', () => {
     fakeENV.setup({ACCOUNT_ID})
 
     // Mock the terms API endpoint
-    fetchMock.get(`${TERMS_API_URI}?per_page=100&page=1`, {
+    fetchMock.get(`${TERMS_API_URI}?per_page=100&page=1&term_name=`, {
       body: enrollmentTerms,
       headers: {
         Link: '<>; rel="current"',
@@ -77,7 +97,7 @@ describe('SisImportForm', () => {
     expect(getByTestId('batch_mode')).toBeInTheDocument()
 
     // term select
-    expect(queryByTestId('term_select')).toBeNull()
+    expect(queryByTestId('full-batch-dropdown')).toBeNull()
 
     // override sis
     expect(getByTestId('override_sis_stickiness')).toBeInTheDocument()
@@ -104,7 +124,7 @@ describe('SisImportForm', () => {
     const warningText = await findByText(/this will delete everything for this term/)
     expect(warningText).toBeInTheDocument()
 
-    const termSelect = await findByTestId('term_select')
+    const termSelect = await findByTestId('full-batch-dropdown')
     expect(termSelect).toBeInTheDocument()
   })
 
@@ -144,22 +164,15 @@ describe('SisImportForm', () => {
   it('calls onSuccess with data on submit', async () => {
     const onSuccess = jest.fn()
     const user = userEvent.setup()
-    fetchMock.post(SIS_IMPORT_URI, 200)
+    mockPost({batchMode: false, overrideSis: false})
+
     const {getByText, getByTestId} = renderWithClient(<SisImportForm onSuccess={onSuccess} />)
 
-    const file = await uploadFile(user, getByTestId('file_drop'))
+    await uploadFile(user, getByTestId('file_drop'))
 
     getByText('Process Data').click()
     await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
     expect(onSuccess).toHaveBeenCalled()
-
-    // validate body is accurate
-    const fetchOptions = fetchMock.lastCall()?.[1] || {}
-    const formData = fetchOptions.body as FormData
-    // file.toString() is just [object File], but it confirms a file is sent
-    expect(formData.get('attachment')).toBe(file.toString())
-    expect(formData.get('batch_mode')).toBe('false')
-    expect(formData.get('override_sis_stickiness')).toBe('false')
   })
 
   describe('opens confirmation modal', () => {
@@ -172,7 +185,7 @@ describe('SisImportForm', () => {
       await user.click(getByTestId('batch_mode'))
 
       // Wait for the term select to appear
-      await findByTestId('term_select')
+      await findByTestId('full-batch-dropdown')
 
       getByText('Process Data').click()
       expect(getByText('Confirm Changes')).toBeInTheDocument()
@@ -181,7 +194,7 @@ describe('SisImportForm', () => {
     it('calls onSuccess if confirmed', async () => {
       const onSuccess = jest.fn()
       const user = userEvent.setup()
-      fetchMock.post(SIS_IMPORT_URI, 200)
+      mockPost({batchMode: true, overrideSis: false, termId: '1'})
       const {getByText, getByTestId, findByTestId} = renderWithClient(
         <SisImportForm onSuccess={onSuccess} />,
       )
@@ -189,18 +202,12 @@ describe('SisImportForm', () => {
       await user.click(getByTestId('batch_mode'))
 
       // Wait for the term select to appear
-      await findByTestId('term_select')
+      await findByTestId('full-batch-dropdown')
 
       getByText('Process Data').click()
       getByText('Confirm').click()
       await waitFor(() => expect(fetchMock.called(SIS_IMPORT_URI, 'POST')).toBe(true))
       expect(onSuccess).toHaveBeenCalled()
-
-      // validate body is accurate
-      const fetchOptions = fetchMock.lastCall()?.[1] || {}
-      const formData = fetchOptions.body as FormData
-      expect(formData.get('batch_mode')).toBe('true')
-      expect(formData.get('batch_mode_term_id')).toBe('1')
     })
 
     it('does not call onSuccess if cancelled', async () => {
@@ -213,7 +220,7 @@ describe('SisImportForm', () => {
       await user.click(getByTestId('batch_mode'))
 
       // Wait for the term select to appear
-      await findByTestId('term_select')
+      await findByTestId('full-batch-dropdown')
 
       getByText('Process Data').click()
       getByText('Cancel').click()
