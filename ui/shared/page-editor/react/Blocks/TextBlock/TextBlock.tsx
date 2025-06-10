@@ -16,17 +16,53 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {TextBlockLayout} from './TextBlockLayout'
-import {TextBlockContent} from './TextBlockContent'
-import {BaseBlock} from '../BaseBlock'
+import {TextBlockEdit} from './TextBlockEdit'
+import {TextBlockPreview} from './TextBlockPreview'
+import {BaseBlock, useIsEditMode} from '../BaseBlock'
+import {useSave} from '../BaseBlock/useSave'
+
+export const TextBlockContent = (props: {
+  title: string
+  content: string
+}) => {
+  const isEditMode = useIsEditMode()
+  const save = useSave<typeof TextBlock>()
+
+  const [title, setTitle] = useState(props.title)
+  const [content, setContent] = useState(props.content)
+
+  useEffect(() => {
+    if (!isEditMode) {
+      save({
+        title,
+        content,
+      })
+    }
+  }, [isEditMode, title, content, save])
+
+  return isEditMode ? (
+    <TextBlockEdit
+      title={title}
+      content={content}
+      onTitleChange={(newTitle: string) => setTitle(newTitle)}
+      onContentChange={(newContent: string) => setContent(newContent)}
+    />
+  ) : (
+    <TextBlockPreview />
+  )
+}
 
 const I18n = createI18nScope('page_editor')
 
-export const TextBlock = () => {
+export const TextBlock = (props: {
+  title: string
+  content: string
+}) => {
   return (
     <BaseBlock title={I18n.t('Text Block')}>
-      <TextBlockLayout content={<TextBlockContent />} />
+      <TextBlockContent {...props} />
     </BaseBlock>
   )
 }

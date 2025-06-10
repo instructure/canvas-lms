@@ -16,13 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Flex} from '@instructure/ui-flex'
-import {ReactNode} from 'react'
-
-export const TextBlockLayout = (props: {content: ReactNode}) => {
-  return (
-    <Flex direction="column" gap="small" width={'100%'}>
-      {props.content}
-    </Flex>
-  )
-}
+@import 'base/environment';

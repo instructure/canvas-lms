@@ -28,7 +28,7 @@ type BlockFactory = {[key: string]: () => ReactElement}
 
 export const blockFactory = {
   dummyBlock: () => <DummyBlock dummyValue="" />,
-  simpleText: () => <TextBlock />,
+  simpleText: () => <TextBlock title="" content="" />,
   imageText: () => <p>image_text</p>,
   image: () => <ImageBlock />,
 } as const satisfies BlockFactory
