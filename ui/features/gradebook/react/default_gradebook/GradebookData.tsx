@@ -151,7 +151,7 @@ export default function GradebookData(props: Props) {
       fetchSisOverrides()
     }
     fetchCustomColumns()
-    loadStudentData(props.gradebookEnv.use_graphql_for_gradebook)
+    loadStudentData(props.gradebookEnv.performance_improvements_for_gradebook)
   }, [
     fetchCustomColumns,
     fetchFilters,
@@ -166,21 +166,21 @@ export default function GradebookData(props: Props) {
     props.gradebookEnv.post_grades_feature,
     props.gradebookEnv.settings.filter_columns_by,
     props.gradebookEnv.settings.filter_rows_by,
-    props.gradebookEnv.use_graphql_for_gradebook,
+    props.gradebookEnv.performance_improvements_for_gradebook,
   ])
 
   useEffect(() => {
     if (gradingPeriodSet) {
       fetchGradingPeriodAssignments().then(() => {
         loadAssignmentGroups({
-          useGraphQL: props.gradebookEnv.use_graphql_for_gradebook,
+          useGraphQL: props.gradebookEnv.performance_improvements_for_gradebook,
           hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
           currentGradingPeriodId,
         })
       })
     } else {
       loadAssignmentGroups({
-        useGraphQL: props.gradebookEnv.use_graphql_for_gradebook,
+        useGraphQL: props.gradebookEnv.performance_improvements_for_gradebook,
         hideZeroPointQuizzes: props.gradebookEnv.hide_zero_point_quizzes,
       })
     }
@@ -190,12 +190,12 @@ export default function GradebookData(props: Props) {
     fetchGradingPeriodAssignments,
     loadAssignmentGroups,
     props.gradebookEnv.hide_zero_point_quizzes,
-    props.gradebookEnv.use_graphql_for_gradebook,
+    props.gradebookEnv.performance_improvements_for_gradebook,
   ])
 
   const reloadStudentData = useCallback(() => {
-    loadStudentData(props.gradebookEnv.use_graphql_for_gradebook)
-  }, [loadStudentData, props.gradebookEnv.use_graphql_for_gradebook])
+    loadStudentData(props.gradebookEnv.performance_improvements_for_gradebook)
+  }, [loadStudentData, props.gradebookEnv.performance_improvements_for_gradebook])
 
   return (
     <Gradebook
