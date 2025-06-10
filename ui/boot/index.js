@@ -31,7 +31,6 @@ import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as installNodeDecorations} from './initializers/installNodeDecorations'
 import {up as activateCourseMenuToggler} from '@canvas/common/activateCourseMenuToggler'
-import {loadReactRouter} from './initializers/router'
 
 // Import is required, workaround for ARC-8398
 // eslint-disable-next-line import/no-nodejs-modules
@@ -55,7 +54,6 @@ moment().locale(ENV.MOMENT_LOCALE)
 let runOnceAfterLocaleFiles = () => {
   configureDateTimeMomentParser()
   configureDateTime()
-  loadReactRouter()
   renderRailsFlashNotifications()
   activateCourseMenuToggler()
   import('@canvas/enhanced-user-content')
