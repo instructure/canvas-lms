@@ -25,15 +25,11 @@ import {submitHtmlForm} from '@canvas/theme-editor/submitHtmlForm'
 import ThemeCard from './ThemeCard'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {reloadWindow} from '@canvas/util/globalUtils'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
-import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Menu} from '@instructure/ui-menu'
 import {IconAddSolid, IconQuestionLine} from '@instructure/ui-icons'
-import {Popover} from '@instructure/ui-popover'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('theme_collection_view')
 
@@ -243,18 +239,20 @@ export default function CollectionView(props) {
       {cards.globalThemes && (
         <div className="ic-ThemeCard-container" data-testid="container-templates-section">
           <h2 className="ic-ThemeCard-container__Heading">
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-            <span className="ic-ThemeCard-container__Heading-text" tabIndex={0}>
+            <span className="ic-ThemeCard-container__Heading-text">
               {I18n.t('Templates')}
               <Tooltip
+                style={{color: 'black'}}
                 placement="top"
-                margin="small 0 0 0"
                 renderTip={explainerText}
-                color="primary"
+                on={['click', 'hover', 'focus']}
               >
-                <Link size="small" renderIcon={IconQuestionLine}>
-                  <ScreenReaderContent>{explainerText}</ScreenReaderContent>
-                </Link>
+                <IconButton
+                  renderIcon={IconQuestionLine}
+                  withBackground={false}
+                  withBorder={false}
+                  screenReaderLabel={explainerText}
+                />
               </Tooltip>
             </span>
           </h2>
