@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import React from 'react'
 import {Editor, Frame} from '@craftjs/core'
 import {render} from '@testing-library/react'
 
-export const renderBlock = (Block: () => JSX.Element) => {
+export function renderBlock<T>(Block: React.FC<T>, props: T & React.Attributes) {
   return render(
     <Editor resolver={{[Block.name]: Block}}>
       <Frame>
-        <Block />
+        <Block {...props} />
       </Frame>
     </Editor>,
   )

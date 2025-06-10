@@ -39,7 +39,9 @@ export const BaseBlockLayout = React.forwardRef<
           </Flex>
           <Flex>{/*Menu items*/}</Flex>
         </Flex>
-        <Flex>{props.children}</Flex>
+        <Flex direction="column" gap="small" width={'100%'}>
+          {props.children}
+        </Flex>
       </Flex>
       {props.addButton}
     </div>

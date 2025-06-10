@@ -26,7 +26,7 @@ jest.mock('../../../PageEditorContext', () => ({
 
 describe('TextBlock', () => {
   it('should render without crashing', () => {
-    renderBlock(TextBlock)
+    renderBlock(TextBlock, {title: 'Test Title', content: 'Test Content'})
     expect(true).toBe(true)
   })
 })
