@@ -39,15 +39,7 @@ import {createRoot} from 'react-dom/client'
 import FormattedErrorMessage from '@canvas/assignments/react/FormattedErrorMessage'
 import StartDateTimeInput from '../react/StartDateTimeInput'
 import EndDateTimeInput from '../react/EndDateTimeInput'
-import {
-  validateDateTime,
-  parseDateTimeToISO,
-  validateStartDateAfterEnd,
-  START_AT_DATE,
-  START_AT_TIME,
-  END_AT_DATE,
-  END_AT_TIME,
-} from '../utils'
+import {validateDateTime, validateStartDateAfterEnd, START_AT_DATE, END_AT_DATE} from '../utils'
 
 const I18n = createI18nScope('section')
 
@@ -75,8 +67,16 @@ $(document).ready(function () {
       if (startDateTimeValue) {
         value = startDateTimeValue.value
       }
+      const onChange = isoDate => {
+        startDateTimeValue.value = isoDate ?? ''
+      }
       const root = createRoot(startDateTimeInput)
-      root.render(<StartDateTimeInput initialValue={value}></StartDateTimeInput>)
+      root.render(
+        <StartDateTimeInput
+          initialValue={value}
+          handleDateTimeChange={onChange}
+        ></StartDateTimeInput>,
+      )
     }
   }
 
@@ -88,8 +88,13 @@ $(document).ready(function () {
       if (endDateTimeValue) {
         value = endDateTimeValue.value
       }
+      const onChange = isoDate => {
+        endDateTimeValue.value = isoDate ?? ''
+      }
       const root = createRoot(endDateTimeInput)
-      root.render(<EndDateTimeInput initialValue={value}></EndDateTimeInput>)
+      root.render(
+        <EndDateTimeInput initialValue={value} handleDateTimeChange={onChange}></EndDateTimeInput>,
+      )
     }
   }
 
@@ -158,23 +163,21 @@ $(document).ready(function () {
 
   const validateSectionStart = () => {
     const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
-    const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
-    return validateDateTime(startDate, startTime, START_AT_DATE)
+    return validateDateTime(startDate, START_AT_DATE)
   }
 
   const validateSectionEnd = () => {
     let errors = []
     const endDate = document.querySelector(`[name="${END_AT_DATE}"]`).value
-    const endTime = document.querySelector(`[name="${END_AT_TIME}"]`).value
 
-    errors = validateDateTime(endDate, endTime, END_AT_DATE)
+    errors = validateDateTime(endDate, END_AT_DATE)
     if (errors.length > 0) {
       return errors
     }
 
-    const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
-    const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
-    errors = validateStartDateAfterEnd(startDate, startTime, endDate, endTime)
+    const startDateTime = document.getElementById('start_datetime_value').value
+    const endDateTime = document.getElementById('end_datetime_value').value
+    errors = validateStartDateAfterEnd(startDateTime, endDateTime)
     return errors
   }
 
@@ -266,13 +269,8 @@ $(document).ready(function () {
           renderFormErrors(validateFormErrors, true)
           return false
         } else {
-          const startDate = document.querySelector(`[name="${START_AT_DATE}"]`).value
-          const startTime = document.querySelector(`[name="${START_AT_TIME}"]`).value
-          data['course_section[start_at]'] = parseDateTimeToISO(startDate, startTime)
-
-          const endDate = document.querySelector(`[name="${END_AT_DATE}"]`).value
-          const endTime = document.querySelector(`[name="${END_AT_TIME}"]`).value
-          data['course_section[end_at]'] = parseDateTimeToISO(endDate, endTime)
+          data['course_section[start_at]'] = document.getElementById('start_datetime_value').value
+          data['course_section[end_at]'] = document.getElementById('end_datetime_value').value
 
           $edit_section_form.hide()
           $edit_section_form.find('.name').text(data['course_section[name]']).show()
