@@ -52,7 +52,7 @@ class DiscussionTopicInsight < ActiveRecord::Base
     # TODO: chunking should probably be sliced based on total tokens
 
     unprocessed_entries_list = unprocessed_entries(should_preload: true)
-    InstStatsd::Statsd.gauge("discussion_topic.insight.entry_batch", unprocessed_entries_list.size)
+    InstStatsd::Statsd.distribution("discussion_topic.insight.entry_batch_count", unprocessed_entries_list.size)
 
     unprocessed_entries_list.each_slice(BATCH_SIZE) do |batch|
       content = prompt_presenter.content_for_insight(entries: batch.map(&:first))

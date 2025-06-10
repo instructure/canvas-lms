@@ -25,7 +25,7 @@ describe DiscussionTopicInsight do
     @teacher = user_model
     @course.enroll_student(@student, enrollment_state: "active")
     @course.enroll_teacher(@teacher, enrollment_state: "active")
-    allow(InstStatsd::Statsd).to receive(:gauge)
+    allow(InstStatsd::Statsd).to receive(:distribution)
   end
 
   describe "associations" do
@@ -227,7 +227,7 @@ describe DiscussionTopicInsight do
       )
 
       @insight.generate
-      expect(InstStatsd::Statsd).to have_received(:gauge).with("discussion_topic.insight.entry_batch", valid_llm_response.size).at_least(:once)
+      expect(InstStatsd::Statsd).to have_received(:distribution).with("discussion_topic.insight.entry_batch_count", valid_llm_response.size).at_least(:once)
 
       expect(@insight.entries.count).to eq(6)
       expect(@insight.entries).to include(insight_entry)
