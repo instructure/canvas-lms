@@ -1717,10 +1717,13 @@ class Attachment < ActiveRecord::Base
     reload
   end
 
-  def self.batch_destroy(attachments)
+  def self.not_deleted_content_tags_for_attachments(attachments)
     ContentTag.not_deleted.where(content_type: "Attachment", content_id: attachments)
               .union(ContentTag.not_deleted.where(context_type: "Attachment", context_id: attachments))
-              .find_each(&:destroy)
+  end
+
+  def self.batch_destroy(attachments)
+    not_deleted_content_tags_for_attachments(attachments).find_each(&:destroy)
     while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     Lti::Asset.where(attachment_id: attachments).in_batches(of: 1000).destroy_all
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
