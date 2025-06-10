@@ -74,7 +74,10 @@ const CanvasRce = forwardRef(function CanvasRce(
   })
   const [autosave_] = useState<RCEPropTypes['autosave']>({
     enabled: autosave,
-    interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
+    maxAge:
+      Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
+        ? 3600000
+        : ENV.rce_auto_save_max_age_ms,
   })
   const [refCreated, setRefCreated] = useState<Element | null>(null)
 

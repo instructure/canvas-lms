@@ -144,7 +144,6 @@ export interface RCEPropTypes {
   autosave?: {
     enabled?: boolean
     maxAge?: number
-    interval?: number
   }
 
   /**
