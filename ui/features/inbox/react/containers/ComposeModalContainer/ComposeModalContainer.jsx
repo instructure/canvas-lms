@@ -39,7 +39,7 @@ import {
 import {ConversationContext} from '../../../util/constants'
 import {useLazyQuery, useQuery} from '@apollo/client'
 import {RECIPIENTS_OBSERVERS_QUERY, INBOX_SETTINGS_QUERY} from '../../../graphql/Queries'
-import { TranslationContext, useTranslationContextState } from '../../hooks/useTranslationContext'
+import {TranslationContext, useTranslationContextState} from '../../hooks/useTranslationContext'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -70,7 +70,7 @@ const ComposeModalContainer = props => {
     activeSignature,
     setModalError: props.setModalError,
     body,
-    setBody
+    setBody,
   })
 
   const {loading: inboxSettingsLoading} = useQuery(INBOX_SETTINGS_QUERY, {
@@ -372,10 +372,15 @@ const ComposeModalContainer = props => {
         },
       })
     } else {
+      const hideIndividualMessageCheckbox =
+        ENV?.FEATURES?.restrict_student_access &&
+        ENV?.current_user_has_teacher_enrollment &&
+        !(ENV?.current_user_roles || []).includes('student')
+
       await props.createConversation({
         variables: {
           attachmentIds: attachments.map(a => a.id),
-          bulkMessage: sendIndividualMessages,
+          bulkMessage: hideIndividualMessageCheckbox ? true : sendIndividualMessages,
           body,
           contextCode: selectedContext?.contextID || ENV?.CONVERSATIONS?.ACCOUNT_CONTEXT_CODE,
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
