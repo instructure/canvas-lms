@@ -102,7 +102,7 @@ module Context
           context_codes << context.asset_string if context
         end
       end
-      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
+      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).joins(:rubric).where(rubrics: { workflow_state: "active" }).preload(rubric: :context).to_a
     end
 
     associations = associations.select(&:rubric).uniq { |a| [a.rubric_id, a.context.asset_string] }
