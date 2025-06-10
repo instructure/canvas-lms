@@ -23,7 +23,7 @@ import {IconAddSolid} from '@instructure/ui-icons'
 const I18n = createI18nScope('page_editor')
 
 export const AddButton = (props: {
-  onAddBlockClicked: () => void
+  onClicked: () => void
 }) => {
   return (
     <IconButton
@@ -34,7 +34,7 @@ export const AddButton = (props: {
       screenReaderLabel={I18n.t('Add a block')}
       onClick={e => {
         e.stopPropagation()
-        props.onAddBlockClicked()
+        props.onClicked()
       }}
     >
       <IconAddSolid />

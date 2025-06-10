@@ -20,6 +20,15 @@ import {PropsWithChildren, useRef, useState} from 'react'
 import {BaseBlockLayout} from './BaseBlockLayout'
 import {BlockContext} from './BaseBlockContext'
 import {useSetEditMode} from './useSetEditMode'
+import {AddButton} from '../../AddBlock/AddButton'
+import {useNode} from '@craftjs/core'
+import {usePageEditorContext} from '../../PageEditorContext'
+
+const InsertButton = () => {
+  const {addBlockModal} = usePageEditorContext()
+  const {id} = useNode()
+  return <AddButton onClicked={() => addBlockModal.open(id)} />
+}
 
 export const BaseBlock = (
   props: PropsWithChildren<{
@@ -32,7 +41,7 @@ export const BaseBlock = (
 
   return (
     <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockLayout ref={ref} title={props.title}>
+      <BaseBlockLayout ref={ref} title={props.title} addButton={<InsertButton />}>
         {props.children}
       </BaseBlockLayout>
     </BlockContext.Provider>
