@@ -57,7 +57,6 @@ import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
-import ManageThreadedRepliesAlert from './ManageThreadedRepliesAlert'
 
 const I18n = createI18nScope('discussions_v2')
 
@@ -357,7 +356,6 @@ export default class DiscussionsIndex extends Component {
           <ConnectedIndexHeader breakpoints={this.props.breakpoints} />
           {ENV?.FEATURES?.disallow_threaded_replies_fix_alert &&
             !ENV?.FEATURES?.disallow_threaded_replies_manage && <DisallowThreadedFixAlert />}
-          {ENV?.FEATURES?.disallow_threaded_replies_manage && <ManageThreadedRepliesAlert />}
           {this.props.isLoadingDiscussions
             ? this.renderSpinner(I18n.t('Loading Discussions'))
             : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
