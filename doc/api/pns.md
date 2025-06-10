@@ -3,7 +3,7 @@ Platform Notification Service
 
 Platform Notification Service (PNS) enables server-to-server communication by allowing the Platform to send messages, known as Notices, to Tools outside the scope of an active user session. Tools can register a "webhook" or handler endpoint using PNS to receive specific types of Notices, facilitating seamless integration and automation.
 
-<a href="https://www.imsglobal.org/spec/lti-pns/v1p0/main" target="_blank">Official (1EdTech) documentation.</a>
+See also <a href="/doc/api/notice_handlers.html">endpoint-level documentation</a> and <a href="https://www.imsglobal.org/spec/lti-pns/v1p0/main" target="_blank">Official (1EdTech) documentation</a>.
 
 ## Tool Configuration
 

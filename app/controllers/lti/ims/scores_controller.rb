@@ -20,7 +20,7 @@
 module Lti::IMS
   # @API Score
   #
-  # Score API for IMS Assignment and Grade Services
+  # Score API for 1EdTech (IMS) <a href="/doc/api/file.assignment_tools.html">Assignment and Grade Services</a>.
   #
   # @model Score
   #     {

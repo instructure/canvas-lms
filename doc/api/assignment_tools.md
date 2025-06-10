@@ -7,7 +7,7 @@ LTI services to return submissions and/or scores back to the Canvas gradebook.
 The specifics for how grading is achieved depend on the LTI version being used:
 
 - [LTI Advantage: Assignment and Grading Services](#lti_advantage)
-- [LTI 1.1 Grade Passback Tools](#outcomes_service)
+- [LTI 1.1 Grade Passback Tools (deprecated)](#outcomes_service)
 
 Tools become associated with Canvas assignments either through the UI during
 <a href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-assignment-using-an-external-app/ta-p/656"
@@ -190,7 +190,11 @@ then exposed in the Submission Details and SpeedGrader Views so that both
 students and teachers can see what was submitted to the external tool without
 leaving Canvas. Support for basic urls, text, and LTI links are supported.
 
-# LTI 1.1 Grade Passback Tools <a name="outcomes_service"></a>
+# LTI 1.1 Grade Passback Tools (deprecated) <a name="outcomes_service"></a>
+
+NOTE: LTI 1.1 (including Grade Passback) is an old version of the LTI standard.
+New tools should be written for the LTI 1.3 spec (and
+[Assignment and Grading Services](#lti_advantage))
 
 Tools can know that they have been launched in a graded context because
 additional parameters are sent across when a student accesses the external
