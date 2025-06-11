@@ -59,16 +59,11 @@ class ActiveRecord::Base
       ].map do |method|
         next unless method
 
-        search_name = if RUBY_VERSION >= "3.4.0"
-                        owner_str = method.owner.to_s
-
-                        if owner_str =~ /\A#<Class:(.+)>\z/
-                          "'#{Regexp.last_match(1)}.#{method.name}'"
-                        else
-                          "'#{owner_str}##{method.name}'"
-                        end
+        owner_str = method.owner.to_s
+        search_name = if owner_str =~ /\A#<Class:(.+)>\z/
+                        "'#{Regexp.last_match(1)}.#{method.name}'"
                       else
-                        "`#{method.name}'"
+                        "'#{owner_str}##{method.name}'"
                       end
 
         regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in #{Regexp.escape(search_name)}\z/

@@ -1009,13 +1009,7 @@ RSpec.configure do |config|
   end
 
   def skip_if_prepended_class_method_stubs_broken
-    versions = [
-      "2.4.6",
-      "2.4.9",
-      "2.5.1",
-      "2.5.3"
-    ]
-    skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
+    skip("stubbing prepended class methods is broken in new versions of ruby")
   end
 end
 

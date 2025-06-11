@@ -299,11 +299,7 @@ describe OutcomesService::MigrationService do
         it "raises error on failed and adds a content_import warning" do
           failure_desc = "Content Import for Outcomes Service failed"
           stub_get_content_import.to_return(status: 200, body: '{"state":"failed"}')
-          expected_error = if RUBY_VERSION >= "3.4.0"
-                             "#{failure_desc}: {\"state\" => \"failed\"}"
-                           else
-                             "#{failure_desc}: {\"state\"=>\"failed\"}"
-                           end
+          expected_error = "#{failure_desc}: {\"state\" => \"failed\"}"
           expect { described_class.import_completed?(import_data) }.to raise_error(RuntimeError, expected_error)
           expect(content_migration.warnings).to include("Content Import for Outcomes Service failed")
         end
