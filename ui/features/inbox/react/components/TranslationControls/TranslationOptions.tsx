@@ -25,8 +25,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Language} from './TranslationControls'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {IconAiLine} from '@instructure/ui-icons'
+import {IconAiLine, IconAiSolid} from '@instructure/ui-icons'
 import {useTranslationContext} from '../../hooks/useTranslationContext'
+import {canvas} from '@instructure/ui-themes'
 
 const I18n = createI18nScope('conversations_2')
 
@@ -137,8 +138,8 @@ const TranslationOptions: React.FC<Props> = ({asPrimary, onSetPrimary}) => {
             </Flex.Item>
             <Flex.Item>
               <Button
-                renderIcon={() => <IconAiLine />}
-                color="secondary"
+                color="ai-primary"
+                renderIcon={<IconAiSolid />}
                 disabled={translationLoading}
                 onClick={handleSubmit}
               >

@@ -225,7 +225,7 @@ describe('DiscussionPostToolbar', () => {
         const {getByText} = setup({isAnnouncement: true}, null, {
           translationLanguages: {current: ['en', 'es']},
         })
-        expect(getByText('Translate Announcement')).toBeTruthy()
+        expect(getByText('Open Translate')).toBeTruthy()
       })
     })
 
@@ -243,7 +243,7 @@ describe('DiscussionPostToolbar', () => {
           translationLanguages: {current: ['en', 'es']},
         })
 
-        expect(getByText('Translate Discussion')).toBeTruthy()
+        expect(getByText('Open Translate')).toBeTruthy()
       })
 
       it('does render the translate button with improved text when the translation controls are on', () => {
@@ -252,7 +252,7 @@ describe('DiscussionPostToolbar', () => {
           showTranslationControl: true,
         })
 
-        expect(getByText('Turn off Translation')).toBeTruthy()
+        expect(getByText('Close Translate')).toBeTruthy()
         expect(getByTestId('translate-button')).toHaveAttribute(
           'data-action-state',
           'disableTranslation',

@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {SurveyLinkBox} from '@canvas/discussions/react/components/SurveyLinkBox/SurveyLinkBox'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IconRefreshLine, IconEndLine, IconAiLine} from '@instructure/ui-icons'
+import {IconRefreshLine, IconEndLine, IconAiLine, IconAiSolid} from '@instructure/ui-icons'
 import {DiscussionManagerUtilityContext} from '../../utils/constants'
 import {TranslationTriggerModal} from '../../components/TranslationTriggerModal/TranslationTriggerModal'
 
@@ -147,8 +147,8 @@ export const DiscussionTranslationModuleContainer = ({isAnnouncement}) => {
             onClick={translateDiscussion}
             disabled={entryTranslatingSet.size > 0}
             margin="0 small 0 0"
-            renderIcon={<IconAiLine />}
-            color="primary"
+            color="ai-primary"
+            renderIcon={IconAiSolid}
           >
             {I18n.t('Translate')}
           </Button>

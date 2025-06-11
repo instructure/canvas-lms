@@ -29,6 +29,8 @@ import {
   IconPermissionsLine,
   IconSearchLine,
   IconTroubleLine,
+  IconAiColoredSolid,
+  IconXSolid,
 } from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -130,18 +132,17 @@ export const DiscussionPostToolbar = props => {
   const renderTranslate = () => {
     const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
 
-    const translationText = props.isAnnouncement
-      ? I18n.t('Translate Announcement')
-      : I18n.t('Translate Discussion')
+    const translationText = I18n.t('Open Translate')
 
-    const improvedText = showTranslationControl ? I18n.t('Turn off Translation') : translationText
+    const improvedText = showTranslationControl ? I18n.t('Close Translate') : translationText
 
     return (
       <Button
         onClick={toggleTranslateText}
         data-testid="translate-button"
         data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
-        renderIcon={<IconAiLine />}
+        renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
+        color={showTranslationControl ? 'secondary' : 'ai-secondary'}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
       </Button>
