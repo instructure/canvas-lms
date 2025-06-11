@@ -46,6 +46,40 @@ describe "Submissions API", type: :request do
     sub
   end
 
+  context "with sharding" do
+    specs_require_sharding
+
+    it "creates correct cross-shard preview URLs" do
+      student1 = user_factory(active_all: true)
+      course_with_teacher(active_all: true)
+      @course.enroll_student(student1).accept!
+
+      a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15)
+      submit_homework(a1, student1)
+
+      @shard1.activate do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.global_id}/assignments/#{a1.global_id}/submissions/#{student1.global_id}.json",
+                        { controller: "submissions_api",
+                          action: "show",
+                          format: "json",
+                          course_id: @course.global_id.to_s,
+                          assignment_id: a1.global_id.to_s,
+                          user_id: student1.global_id.to_s })
+        expect(json["preview_url"]).to eql("http://www.example.com/courses/#{Shard.short_id_for(@course.id)}/assignments/#{Shard.short_id_for(a1.id)}/submissions/#{student1.global_id}?preview=1&version=1")
+
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.global_id}/assignments/#{a1.global_id}/submissions.json",
+                        { controller: "submissions_api",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.global_id.to_s,
+                          assignment_id: a1.global_id.to_s })
+        expect(json[0]["preview_url"]).to eql("http://www.example.com/courses/#{Shard.short_id_for(@course.id)}/assignments/#{Shard.short_id_for(a1.id)}/submissions/#{student1.global_id}?preview=1&version=1")
+      end
+    end
+  end
+
   describe "using section ids" do
     before :once do
       @student1 = user_factory(active_all: true)
