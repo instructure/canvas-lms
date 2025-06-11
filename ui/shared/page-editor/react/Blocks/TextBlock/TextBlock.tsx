@@ -19,14 +19,16 @@
 import {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockEdit} from './TextBlockEdit'
-import {TextBlockPreview} from './TextBlockPreview'
+import {TextBlockEditPreview} from './TextBlockEditPreview'
 import {BaseBlock, useIsEditMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 
-export const TextBlockContent = (props: {
+export type TextBlockProps = {
   title: string
   content: string
-}) => {
+}
+
+export const TextBlockContent = (props: TextBlockProps) => {
   const isEditMode = useIsEditMode()
   const save = useSave<typeof TextBlock>()
 
@@ -50,16 +52,13 @@ export const TextBlockContent = (props: {
       onContentChange={(newContent: string) => setContent(newContent)}
     />
   ) : (
-    <TextBlockPreview />
+    <TextBlockEditPreview title={title} content={content} />
   )
 }
 
 const I18n = createI18nScope('page_editor')
 
-export const TextBlock = (props: {
-  title: string
-  content: string
-}) => {
+export const TextBlock = (props: TextBlockProps) => {
   return (
     <BaseBlock title={I18n.t('Text Block')}>
       <TextBlockContent {...props} />
