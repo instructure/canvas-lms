@@ -40,7 +40,7 @@ interface RollupParams {
  * @returns A promise that resolves to the API response
  */
 export const loadRollups = (
-  courseId: string,
+  courseId: string | number,
   gradebookFilters: string[],
   needDefaults: boolean = false,
   page: number = 1,
@@ -73,7 +73,10 @@ interface ExportCSVParams {
  * @param gradebookFilters - Filters to exclude from the results
  * @returns A promise that resolves to the API response
  */
-export const exportCSV = (courseId: string, gradebookFilters: string[]): Promise<AxiosResponse> => {
+export const exportCSV = (
+  courseId: string | number,
+  gradebookFilters: string[],
+): Promise<AxiosResponse> => {
   const params: {params: ExportCSVParams} = {
     params: {
       exclude: gradebookFilters,

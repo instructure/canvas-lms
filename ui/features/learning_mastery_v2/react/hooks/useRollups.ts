@@ -21,12 +21,35 @@ import {groupBy} from 'lodash'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {loadRollups} from '../apiClient'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {
+  StudentRollup,
+  Outcome,
+  Rating,
+  Student,
+  OutcomeRollup,
+  RollupsResponse,
+  StudentRollupData,
+} from '../types/rollup'
 
 const I18n = createI18nScope('OutcomeManagement')
 
-const getRow = (studentRollups, outcomes) =>
+interface UseRollupsProps {
+  courseId: string | number
+  accountMasteryScalesEnabled: boolean
+}
+
+interface UseRollupsReturn {
+  isLoading: boolean
+  students: Student[]
+  outcomes: Outcome[]
+  rollups: StudentRollupData[]
+  gradebookFilters: string[]
+  setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
+}
+
+const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRollup[] =>
   studentRollups[0].scores.map(score => {
-    const outcome = outcomes.find(o => o.id === score.links.outcome)
+    const outcome = outcomes.find(o => o.id === score.links.outcome)!
     const rating = findRating(outcome.ratings, score.score)
     return {
       outcomeId: outcome.id,
@@ -37,7 +60,7 @@ const getRow = (studentRollups, outcomes) =>
     }
   })
 
-const findRating = (ratings, score) => {
+const findRating = (ratings: Rating[], score: number): Rating => {
   const rating = ratings.find(
     (r, i) =>
       r.points === score ||
@@ -47,9 +70,9 @@ const findRating = (ratings, score) => {
   return rating || ratings[ratings.length - 1]
 }
 
-const getStudents = (rollups, users) => {
+const getStudents = (rollups: StudentRollup[], users: Student[]): Student[] => {
   const students = users.map(user => {
-    const rollup = rollups.find(r => r.links.user === user.id)
+    const rollup = rollups.find(r => r.links.user === user.id)!
     const status = rollup.links.status === 'completed' ? 'concluded' : rollup.links.status
     return {
       ...user,
@@ -60,7 +83,7 @@ const getStudents = (rollups, users) => {
   return students
 }
 
-const rollupsByUser = (rollups, outcomes) => {
+const rollupsByUser = (rollups: StudentRollup[], outcomes: Outcome[]): StudentRollupData[] => {
   const rollupsByUserId = groupBy(rollups, rollup => rollup.links.user)
   return Object.entries(rollupsByUserId).map(([studentId, studentRollups]) => ({
     studentId,
@@ -68,12 +91,15 @@ const rollupsByUser = (rollups, outcomes) => {
   }))
 }
 
-export default function useRollups({courseId, accountMasteryScalesEnabled}) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [gradebookFilters, setGradebookFilters] = useState([])
-  const [students, setStudents] = useState([])
-  const [outcomes, setOutcomes] = useState([])
-  const [rollups, setRollups] = useState([])
+export default function useRollups({
+  courseId,
+  accountMasteryScalesEnabled,
+}: UseRollupsProps): UseRollupsReturn {
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [gradebookFilters, setGradebookFilters] = useState<string[]>([])
+  const [students, setStudents] = useState<Student[]>([])
+  const [outcomes, setOutcomes] = useState<Outcome[]>([])
+  const [rollups, setRollups] = useState<StudentRollupData[]>([])
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -81,7 +107,11 @@ export default function useRollups({courseId, accountMasteryScalesEnabled}) {
     ;(async () => {
       try {
         setIsLoading(true)
-        const {data} = await loadRollups(courseId, gradebookFilters, needMasteryAndColorDefaults)
+        const {data} = (await loadRollups(
+          courseId,
+          gradebookFilters,
+          needMasteryAndColorDefaults,
+        )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         setStudents(getStudents(data.rollups, fetchedUsers))
         setRollups(rollupsByUser(data.rollups, fetchedOutcomes))

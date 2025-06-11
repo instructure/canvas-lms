@@ -56,7 +56,12 @@ describe('useRollups', () => {
     },
   ]
 
-  const mockedRatings = [
+  const mockedRatings: Array<{
+    color: string
+    description: string
+    mastery: boolean
+    points: number
+  }> = [
     {
       color: 'green',
       description: 'mastery!',
@@ -135,12 +140,14 @@ describe('useRollups', () => {
         rollups: mockedRollups,
       },
     })
-    axios.get.mockResolvedValue(promise)
+    ;(axios.get as jest.Mock).mockResolvedValue(promise)
   })
 
   describe('useRollups hook', () => {
     it('returns defaults until the request finishes loading', async () => {
-      const {result} = renderHook(() => useRollups({courseId: '1'}))
+      const {result} = renderHook(() =>
+        useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
+      )
       const {isLoading, students, outcomes, rollups, gradebookFilters} = result.current
       expect(isLoading).toEqual(true)
       expect(students).toEqual([])
@@ -152,7 +159,9 @@ describe('useRollups', () => {
     })
 
     it('returns the response after the request finishes', async () => {
-      const {result} = renderHook(() => useRollups({courseId: '1'}))
+      const {result} = renderHook(() =>
+        useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
+      )
       await act(async () => jest.runAllTimers())
       const {students, outcomes, rollups, gradebookFilters} = result.current
       expect(axios.get).toHaveBeenCalled()
@@ -182,7 +191,9 @@ describe('useRollups', () => {
     })
 
     it("correctly translates student status from 'completed' to 'concluded' when loading rollups", async () => {
-      const {result} = renderHook(() => useRollups({courseId: '1'}))
+      const {result} = renderHook(() =>
+        useRollups({courseId: '1', accountMasteryScalesEnabled: false}),
+      )
       await act(async () => jest.runAllTimers())
       const {students} = result.current
       expect(axios.get).toHaveBeenCalled()
@@ -196,7 +207,7 @@ describe('useRollups', () => {
     })
 
     it('calls the /rollups URL with the right parameters', async () => {
-      renderHook(() => useRollups({courseId: '1'}))
+      renderHook(() => useRollups({courseId: '1', accountMasteryScalesEnabled: false}))
       await act(async () => jest.runAllTimers())
       const params = {
         params: {
@@ -213,8 +224,8 @@ describe('useRollups', () => {
     })
 
     it('renders a flashAlert if the request fails', async () => {
-      axios.get.mockRejectedValue({})
-      renderHook(() => useRollups({courseId: '1'}))
+      ;(axios.get as jest.Mock).mockRejectedValue({})
+      renderHook(() => useRollups({courseId: '1', accountMasteryScalesEnabled: false}))
       await act(async () => jest.runAllTimers())
       expect(axios.get).toHaveBeenCalled()
       expect(showFlashAlert).toHaveBeenCalledWith({
