@@ -16,16 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Modal} from '@instructure/ui-modal'
+import getRCSProps from '@canvas/rce/getRCSProps'
+import {UploadFile} from '@instructure/canvas-rce'
+import {useState} from 'react'
+import {handleImageSubmit, panels, StoreProp, UploadData, UploadFilePanelIds} from './handle-image'
 
 export const ImageBlockUploadModal = (props: {
   open: boolean
+  onSelected: (url: string, alt: string) => void
+  onDismiss: () => void
 }) => {
-  return (
-    <Modal open={props.open} label="" size="small">
-      <Modal.Header></Modal.Header>
-      <Modal.Body></Modal.Body>
-      <Modal.Footer></Modal.Footer>
-    </Modal>
-  )
+  const [isUploading, setIsUploading] = useState(false)
+
+  const handleSubmit = async (
+    _editor: unknown,
+    _accept: unknown,
+    selectedPanel: UploadFilePanelIds,
+    uploadData: UploadData,
+    storeProps: StoreProp,
+  ) => {
+    setIsUploading(true)
+    const {url, altText} = await handleImageSubmit(selectedPanel, uploadData, storeProps)
+    setIsUploading(false)
+    props.onSelected(url, altText)
+  }
+
+  return props.open ? (
+    <UploadFile
+      accept={'image/*'}
+      trayProps={getRCSProps()!}
+      label={'Upload Image'}
+      panels={panels as any}
+      onDismiss={props.onDismiss}
+      onSubmit={handleSubmit}
+      canvasOrigin={window.location?.origin}
+      uploading={isUploading}
+    />
+  ) : null
 }

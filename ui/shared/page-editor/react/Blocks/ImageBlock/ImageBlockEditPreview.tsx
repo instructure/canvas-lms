@@ -16,17 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ImageBlock} from '../ImageBlock'
-import {renderBlock} from '../../__tests__/render-helper'
+import {ImageBlockProps} from './ImageBlock'
+import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 
-jest.mock('../../../PageEditorContext', () => ({
-  __esModule: true,
-  usePageEditorContext: jest.fn(() => ({})),
-}))
-
-describe('ImageBlock', () => {
-  it('should render without crashing', () => {
-    renderBlock(ImageBlock, {url: '', altText: ''})
-    expect(true).toBe(true)
-  })
-})
+export const ImageBlockEditPreview = (props: ImageBlockProps) => {
+  return props.url ? (
+    <img src={props.url} alt="" className="image-block-preview" />
+  ) : (
+    <ImageBlockDefaultPreviewImage />
+  )
+}
