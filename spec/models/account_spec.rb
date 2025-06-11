@@ -3190,4 +3190,36 @@ describe Account do
       expect(@account.allow_assign_to_differentiation_tags?).to be false
     end
   end
+
+  context "number separator validation" do
+    let(:account) { Account.new(name: "test account") }
+
+    it "is valid when separators are not set" do
+      expect(account).to be_valid
+    end
+
+    it "is valid when both separators are different" do
+      account.settings[:decimal_separator] = { value: "." }
+      account.settings[:thousand_separator] = { value: "," }
+      expect(account).to be_valid
+    end
+
+    it "is invalid when both separators are the same" do
+      account.settings[:decimal_separator] = { value: "," }
+      account.settings[:thousand_separator] = { value: "," }
+      expect(account).not_to be_valid
+    end
+
+    it "is invalid if decimal_separator is present but thousand_separator is blank" do
+      account.settings[:decimal_separator] = { value: "." }
+      account.settings[:thousand_separator] = { value: "" }
+      expect(account).not_to be_valid
+    end
+
+    it "is invalid if thousand_separator is present but decimal_separator is blank" do
+      account.settings[:thousand_separator] = { value: "," }
+      account.settings[:decimal_separator] = { value: "" }
+      expect(account).not_to be_valid
+    end
+  end
 end
