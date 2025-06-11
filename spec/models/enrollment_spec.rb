@@ -1658,13 +1658,7 @@ describe Enrollment do
       expect(Enrollment).to receive(:delay_if_production)
         .with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"))
         .and_call_original
-      # The delegation works correctly in both cases, just the introspection of the method
-      # kwargs by rspec is different between ruby versions
-      if RUBY_VERSION >= "2.7.0"
-        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id)
-      else
-        expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
-      end
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id)
 
       Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
     end

@@ -88,8 +88,6 @@ describe "safe_yaml" do
   end
 
   it "supports a unique case of key / value pairs" do
-    skip("newer ruby versions only") unless RUBY_VERSION >= "3.0.0"
-
     os = OpenStruct.new # rubocop:disable Style/OpenStructUse
     os.table = { a: "b" }
     os.modifiable = true
