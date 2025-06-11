@@ -289,7 +289,11 @@ module SIS
           pseudo.account = @root_account
           unless pseudo.stuck_sis_fields.include?(:workflow_state)
             pseudo.workflow_state = status
-            pseudo.deleted_at = Time.now.utc if status == "deleted"
+            pseudo.deleted_at = if status == "deleted"
+                                  Time.now.utc
+                                else
+                                  nil
+                                end
           end
           if pseudo.new_record? && status != "deleted"
             should_add_account_associations = true
