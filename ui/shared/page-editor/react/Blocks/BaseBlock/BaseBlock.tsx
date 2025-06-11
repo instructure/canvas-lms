@@ -20,7 +20,9 @@ import {PropsWithChildren, useRef, useState} from 'react'
 import {BaseBlockLayout} from './BaseBlockLayout'
 import {BlockContext} from './BaseBlockContext'
 import {useSetEditMode} from './useSetEditMode'
+import {RemoveButton} from './RemoveButton'
 import {AddButton} from '../../AddBlock/AddButton'
+import {useDeleteNode} from '../../hooks/useDeleteNode'
 import {useNode} from '@craftjs/core'
 import {usePageEditorContext} from '../../PageEditorContext'
 
@@ -28,6 +30,12 @@ const InsertButton = () => {
   const {addBlockModal} = usePageEditorContext()
   const {id} = useNode()
   return <AddButton onClicked={() => addBlockModal.open(id)} />
+}
+
+const DeleteButton = () => {
+  const deleteNode = useDeleteNode()
+
+  return <RemoveButton onClicked={deleteNode} />
 }
 
 export const BaseBlock = (
@@ -41,7 +49,12 @@ export const BaseBlock = (
 
   return (
     <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockLayout ref={ref} title={props.title} addButton={<InsertButton />}>
+      <BaseBlockLayout
+        ref={ref}
+        title={props.title}
+        addButton={<InsertButton />}
+        menu={[<DeleteButton key="menu-delete-btn" />]}
+      >
         {props.children}
       </BaseBlockLayout>
     </BlockContext.Provider>

@@ -25,6 +25,7 @@ export const BaseBlockLayout = React.forwardRef<
   HTMLDivElement,
   PropsWithChildren<{
     title: string
+    menu: ReactNode
     addButton: ReactNode
   }>
 >((props, ref) => {
@@ -37,7 +38,7 @@ export const BaseBlockLayout = React.forwardRef<
               {props.title}
             </Text>
           </Flex>
-          <Flex>{/*Menu items*/}</Flex>
+          <Flex>{props.menu}</Flex>
         </Flex>
         <Flex direction="column" gap="small" width={'100%'}>
           {props.children}
