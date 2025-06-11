@@ -211,7 +211,7 @@ class Account < ActiveRecord::Base
   validate :validate_help_links, if: ->(a) { a.settings_changed? }
   validate :validate_course_template, if: ->(a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
   validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
-
+  validate :validate_number_separators, if: ->(a) { a.settings_changed? && (a.settings.dig(:decimal_separator, :value) != a.settings_was.dig(:decimal_separator, :value) || a.settings.dig(:thousand_separator, :value) != a.settings_was.dig(:thousand_separator, :value)) }
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
 
@@ -1811,6 +1811,21 @@ class Account < ActiveRecord::Base
     end
     unless course_template.template?
       errors.add(:course_template_id, t("Course template must be marked as a template"))
+    end
+  end
+
+  def validate_number_separators
+    decimal_sep = settings.dig(:decimal_separator, :value)
+    thousand_sep = settings.dig(:thousand_separator, :value)
+
+    if decimal_sep.present? && thousand_sep.blank?
+      errors.add(:thousand_separator_blank, t("Thousand separator cannot be blank if decimal separator is present."))
+    elsif thousand_sep.present? && decimal_sep.blank?
+      errors.add(:decimal_separator_blank, t("Decimal separator cannot be blank if thousand separator is present."))
+    end
+
+    if decimal_sep.present? && thousand_sep.present? && decimal_sep == thousand_sep
+      errors.add(:separators_cannot_be_the_same, t("Decimal and thousand separators cannot be the same."))
     end
   end
 
