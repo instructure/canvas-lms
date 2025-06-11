@@ -541,6 +541,8 @@ CanvasRails::Application.routes.draw do
     resources :accessibility, only: [:index] do
       collection do
         resource :issues, only: [:create, :update], module: "accessibility"
+        post "preview" => "accessibility/preview#create"
+        get "preview" => "accessibility/preview#show"
       end
     end
   end

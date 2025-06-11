@@ -26,13 +26,14 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
-import React, {useState} from 'react'
-import {AccessibilityIssue, ContentItem, FormType, IssueForm} from '../../types'
+import React, {useEffect, useState} from 'react'
+import {AccessibilityIssue, ContentItem, FormType, PreviewResponse} from '../../types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {IconPublishSolid} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
 
 interface AccessibilityIssuesTrayProps {
   onClose: (shallClose: boolean) => void
@@ -45,6 +46,42 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
   onClose,
   item,
 }) => {
+  const [originalContentLoading, setOriginalContentLoading] = useState(true)
+  const [originalContent, setOriginalContent] = useState(I18n.t('Loading content...'))
+  useEffect(() => {
+    const params = new URLSearchParams({
+      content_type: item.type,
+      content_id: String(item.id),
+    })
+
+    doFetchApi({
+      path: `${window.location.href}/preview?${params.toString()}`,
+      method: 'GET',
+    })
+      .then(result => {
+        return result.json
+      })
+      .then(resultJson => {
+        setOriginalContent((resultJson as PreviewResponse).content)
+      })
+      .catch(err => {
+        console.error('Error loading preview for content. Error is:' + err.message)
+      })
+      .finally(() => {
+        setOriginalContentLoading(false)
+      })
+  }, [item.id, item.type])
+
+  useEffect(() => {
+    setIssuesPreview(
+      new Map<string, PreviewResponse>(
+        item.issues?.map(issue => {
+          return [issue.id, {content: originalContent, path: issue.path}]
+        }) || [],
+      ),
+    )
+  }, [originalContent, item.issues])
+
   const [shallReload, setShallReload] = useState(false)
 
   const [solvedIssue, setSolvedIssue] = useState(
@@ -68,18 +105,35 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
       }) || [],
     ),
   )
+  const [previewLoading, setPreviewLoading] = useState(
+    new Map(
+      item.issues?.map(issue => {
+        return [issue.id, false]
+      }) || [],
+    ),
+  )
+  const [issuesPreview, setIssuesPreview] = useState(
+    new Map<string, PreviewResponse>(
+      item.issues?.map(issue => {
+        return [issue.id, {content: originalContent, path: issue.path}]
+      }) || [],
+    ),
+  )
 
   const getIssueId = (issue: AccessibilityIssue, index: number): string => {
     return issue.id || `${item.type}-${item.id}-issue-${index}`
   }
 
-  const handleApplyClick = (item: ContentItem, issue: AccessibilityIssue) => {
+  const handleApplyClick = (issue: AccessibilityIssue) => {
     const newState = new Map(applying)
     newState.set(issue.id, true)
     setApplying(newState)
     doFetchApi({
       path: window.location.href + '/issues',
       method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         content_type: item.type,
         content_id: item.id,
@@ -104,24 +158,59 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
       })
   }
 
-  const createForm = (issueId: string, form: IssueForm): React.ReactNode => {
-    if (!form) return <></>
+  const handleFormChange = (issue: AccessibilityIssue, formValue: string) => {
+    const newState = new Map(previewLoading)
+    newState.set(issue.id, true)
+    setPreviewLoading(newState)
+    doFetchApi({
+      path: window.location.href + '/preview',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content_type: item.type,
+        content_id: item.id,
+        rule: issue.ruleId,
+        path: issue.path,
+        value: formValue,
+      }),
+    })
+      .then(result => result.json)
+      .then(resultJson => {
+        const newState = new Map(issuesPreview)
+        newState.set(issue.id, resultJson as PreviewResponse)
+        setIssuesPreview(newState)
+      })
+      .catch(err => {
+        console.error('Error loading preview for accessibility issue. Error is:' + err.message)
+      })
+      .finally(() => {
+        const newState = new Map(previewLoading)
+        newState.set(issue.id, false)
+        setPreviewLoading(newState)
+      })
+  }
 
-    switch (form.type) {
+  const createForm = (issue: AccessibilityIssue): React.ReactNode => {
+    if (!issue || !issue.form) return <></>
+
+    switch (issue.form.type) {
       case FormType.Checkbox:
         return (
           <View as="div" margin="small 0">
             <Checkbox
-              label={form.label}
-              checked={issueFormState.get(issueId) === 'true'}
+              label={issue.form.label}
+              checked={issueFormState.get(issue.id) === 'true'}
               onChange={() => {
                 const newState = new Map(issueFormState)
-                if (newState.get(issueId) === 'true') {
-                  newState.set(issueId, 'false')
+                if (newState.get(issue.id) === 'true') {
+                  newState.set(issue.id, 'false')
                 } else {
-                  newState.set(issueId, 'true')
+                  newState.set(issue.id, 'true')
                 }
                 setIssueFormState(newState)
+                handleFormChange(issue, newState.get(issue.id) || 'false')
               }}
             />
           </View>
@@ -130,23 +219,24 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
       case FormType.ColorPicker:
         return (
           <View as="div" margin="small 0">
-            <Text weight="bold">{form.label}</Text>
+            <Text weight="bold">{issue.form.label}</Text>
           </View>
         )
 
       case FormType.TextInput:
         return (
           <View as="div" margin="small 0">
-            <Text weight="bold">{form.label}</Text>
+            <Text weight="bold">{issue.form.label}</Text>
             <View as="div" margin="x-small 0 0 0">
               <TextInput
                 display="inline-block"
                 width="15rem"
-                value={issueFormState.get(issueId) || ''}
+                value={issueFormState.get(issue.id) || ''}
                 onChange={(_, value) => {
                   const newState = new Map(issueFormState)
-                  newState.set(issueId, value)
+                  newState.set(issue.id, value)
                   setIssueFormState(newState)
+                  handleFormChange(issue, value)
                 }}
               />
             </View>
@@ -156,23 +246,24 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
       case FormType.DropDown:
         return (
           <SimpleSelect
-            renderLabel={form.label}
-            value={issueFormState.get(issueId) || ''}
+            renderLabel={issue.form.label}
+            value={issueFormState.get(issue.id) || ''}
             onChange={(_, {id, value}) => {
               const newState = new Map(issueFormState)
               if (value && typeof value === 'string') {
-                newState.set(issueId, value)
+                newState.set(issue.id, value)
               }
               setIssueFormState(newState)
+              handleFormChange(issue, value as string)
             }}
           >
-            {form.options?.map((option, index) => (
+            {issue.form.options?.map((option, index) => (
               <SimpleSelect.Option
                 id={option}
                 key={index}
                 value={option}
-                selected={form.value === option}
-                disabled={form.value !== option}
+                selected={issue.form.value === option}
+                disabled={issue.form.value !== option}
               >
                 {option}
               </SimpleSelect.Option>
@@ -182,6 +273,46 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
 
       default:
         return <></>
+    }
+  }
+
+  const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
+  const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
+
+  const applyHighlight = (issue: AccessibilityIssue) => {
+    const issuePreview = issuesPreview.get(issue.id) || {content: originalContent, path: issue.path}
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(issuePreview.content, 'text/html')
+    const target = doc.evaluate(
+      issuePreview.path || '',
+      doc.body,
+      null,
+      XPathResult.FIRST_ORDERED_NODE_TYPE,
+      null,
+    ).singleNodeValue
+
+    if (target instanceof Element) {
+      const newStyle = `${target.getAttribute('style') || ''}; ${SELECTOR_STYLE}`
+      target.setAttribute('style', newStyle)
+      target.setAttribute(A11Y_ISSUE_ATTR_NAME, encodeURIComponent(issue.path))
+    }
+
+    return doc.body.innerHTML
+  }
+
+  const scrollIssueIntoView = (selector: string) => {
+    return (_: React.MouseEvent, expanded: boolean) => {
+      if (expanded) {
+        setTimeout(() => {
+          document
+            .querySelector(`[${A11Y_ISSUE_ATTR_NAME}="${encodeURIComponent(selector)}"]`)
+            ?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest',
+            })
+        }, 0)
+      }
     }
   }
 
@@ -241,13 +372,36 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
                     </Flex.Item>
                   </Flex>
                 ) : (
-                  createForm(issue.id, issue.form)
+                  createForm(issue)
                 )}
                 {issue.issueUrl !== '' ? (
                   <Link href={issue.issueUrl}>More information on this</Link>
                 ) : (
                   <></>
                 )}
+
+                <Flex.Item padding="x-small 0 x-small x-small">
+                  {solvedIssue.get(issue.id) ? (
+                    <></>
+                  ) : (
+                    <ToggleDetails summary="Preview fix" onToggle={scrollIssueIntoView(issue.path)}>
+                      {originalContentLoading && previewLoading.get(issue.id) ? (
+                        <Spinner renderTitle="Loading..." size="small" />
+                      ) : (
+                        <View
+                          as="div"
+                          padding="0 x-small 0 x-small"
+                          id={`a11y-issue-preview-${index}`}
+                          borderColor="neutral"
+                          maxHeight="300px"
+                          overflowY="auto"
+                          dangerouslySetInnerHTML={{__html: applyHighlight(issue)}}
+                        />
+                      )}
+                    </ToggleDetails>
+                  )}
+                </Flex.Item>
+
                 <Flex direction="row" justifyItems="end">
                   {applying.get(issue.id) === true ? (
                     <Flex.Item>
@@ -260,9 +414,7 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
                     {solvedIssue.get(issue.id) ? (
                       <></>
                     ) : (
-                      <Button onClick={() => handleApplyClick(item, issue)}>
-                        {I18n.t('Apply Fix')}
-                      </Button>
+                      <Button onClick={() => handleApplyClick(issue)}>{I18n.t('Apply Fix')}</Button>
                     )}
                   </Flex.Item>
                 </Flex>
@@ -273,7 +425,6 @@ export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = (
           <Text as="p">{I18n.t('No issues found')}</Text>
         )}
       </View>
-
       <View margin="0 medium">
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">

@@ -21,6 +21,7 @@ module Accessibility
   class Issue
     class HtmlFixer
       include ActiveModel::Model
+      include ::Accessibility::NokogiriMethods
 
       CONTENT_ATTRIBUTE_MAP = {
         "Page" => "body",
@@ -47,9 +48,16 @@ module Accessibility
 
       def apply_fix!
         body = record.send(target_attribute)
-        record.send("#{target_attribute}=", fix_content(body, rule, path, value))
+        fixed_content, = fix_content(body, rule, path, value)
+        record.send("#{target_attribute}=", fixed_content)
         record.save!
         { json: { success: true }, status: :ok }
+      end
+
+      def fix_preview
+        body = record.send(target_attribute)
+        fixed_content, fixed_path = fix_content(body, rule, path, value)
+        { json: { content: fixed_content, path: fixed_path }, status: :ok }
       end
 
       private
@@ -66,11 +74,11 @@ module Accessibility
             raise "Element not found for path: #{target_element}"
           end
 
-          doc.to_html
+          [doc.to_html, element_path(element)]
         rescue => e
           Rails.logger.error "Accessibility Rule content fix problem encountered: #{e.message}"
           Rails.logger.error e.backtrace.join("\n")
-          html_content
+          [html_content, nil]
         end
       end
 

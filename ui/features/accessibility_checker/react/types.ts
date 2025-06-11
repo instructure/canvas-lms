@@ -65,3 +65,8 @@ export interface ContentItem {
   editUrl?: string
   issues?: AccessibilityIssue[]
 }
+
+export interface PreviewResponse {
+  content: string
+  path?: string
+}
