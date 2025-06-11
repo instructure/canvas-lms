@@ -1210,8 +1210,8 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_id == ANALYTICS_2
       context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
     elsif tool_id == ADMIN_ANALYTICS
-      if context.is_a?(Course) && context.feature_enabled?(:analytics_2_lti_13_enabled)
-        true
+      if context.is_a?(Course)
+        context.feature_enabled?(:analytics_2_lti_13_enabled) && context.feature_enabled?(:analytics_2)
       else
         context.feature_enabled?(:admin_analytics)
       end
