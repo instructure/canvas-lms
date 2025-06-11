@@ -13,7 +13,7 @@ Follow the prerequisites listed [here](https://instructure.atlassian.net/wiki/sp
 Then in your terminal:
 
 ```bash
-gem install inst inst-private
+gem install inst
 inst config-file
 ```
 
