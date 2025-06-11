@@ -47,6 +47,8 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     if input[:message] != discussion_topic.message && discussion_topic.editing_restricted?(:content)
       # editing is impossible frontwise, so we're just gonna ignore auto formatting
       input[:message] = discussion_topic.message
+    elsif !input[:message].nil?
+      input[:message] = Api::Html::Content.process_incoming(input[:message], host: context[:request].host, port: context[:request].port)
     end
 
     if input[:anonymous_state].present? && discussion_topic.discussion_subentry_count > 0
