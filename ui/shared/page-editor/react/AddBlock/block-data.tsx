@@ -30,7 +30,7 @@ export const blockFactory = {
   dummyBlock: () => <DummyBlock dummyValue="" />,
   simpleText: () => <TextBlock title="" content="" />,
   imageText: () => <p>image_text</p>,
-  image: () => <ImageBlock />,
+  image: () => <ImageBlock url="" altText="" />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory

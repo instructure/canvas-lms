@@ -19,36 +19,25 @@
 import './image-block.css'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock, useIsEditMode} from '../BaseBlock'
-import {ImageBlockAddButton} from './ImageBlockAddButton'
-import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
-import {useState} from 'react'
-import {ImageBlockUploadModal} from './ImageBlockUploadModal'
+import {ImageBlockEdit} from './ImageBlockEdit'
+import {ImageBlockEditPreview} from './ImageBlockEditPreview'
 
 const I18n = createI18nScope('page_editor')
 
-const ImageBlockEdit = () => {
-  const [isOpen, setIsOpen] = useState(false)
-  return (
-    <>
-      <ImageBlockUploadModal open={isOpen} />
-      <ImageBlockAddButton onClick={() => setIsOpen(true)} />
-    </>
-  )
-}
-
-const ImageBlockEditPreview = () => {
-  return <ImageBlockDefaultPreviewImage />
-}
-
-const ImageBlockContent = () => {
+const ImageBlockContent = (props: ImageBlockProps) => {
   const isEditMode = useIsEditMode()
-  return isEditMode ? <ImageBlockEdit /> : <ImageBlockEditPreview />
+  return isEditMode ? <ImageBlockEdit {...props} /> : <ImageBlockEditPreview {...props} />
 }
 
-export const ImageBlock = () => {
+export type ImageBlockProps = {
+  url: string | undefined
+  altText: string | undefined
+}
+
+export const ImageBlock = (props: ImageBlockProps) => {
   return (
     <BaseBlock title={I18n.t('Image Block')}>
-      <ImageBlockContent />
+      <ImageBlockContent {...props} />
     </BaseBlock>
   )
 }
