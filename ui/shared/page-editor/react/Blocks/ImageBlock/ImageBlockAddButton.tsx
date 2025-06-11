@@ -18,9 +18,23 @@
 
 import {IconAddSolid} from '@instructure/ui-icons'
 
-export const ImageBlockPlaceholder = () => {
+export const ImageBlockAddButton = (props: {
+  onClick: () => void
+}) => {
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      props.onClick()
+    }
+  }
   return (
-    <div className="image-block-placeholder">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={props.onClick}
+      onKeyDown={handleKeyDown}
+      className="image-block-container image-block-add-button"
+    >
       <IconAddSolid size="medium" />
     </div>
   )
