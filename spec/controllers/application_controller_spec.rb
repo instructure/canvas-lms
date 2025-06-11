@@ -2537,6 +2537,12 @@ RSpec.describe ApplicationController do
         expect(controller.send(:show_student_view_button?)).to be_truthy
       end
 
+      it "returns true on files_v2 page" do
+        controller.params[:controller] = "files"
+        controller.params[:action] = "react_files"
+        expect(controller.send(:show_student_view_button?)).to be_truthy
+      end
+
       it "returns false if context is not set" do
         controller.instance_variable_set(:@context, nil)
         controller.params[:controller] = "courses"
