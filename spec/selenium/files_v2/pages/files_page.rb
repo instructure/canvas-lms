@@ -223,6 +223,16 @@ module FilesPage
     f("[data-testid='unpublished-button-icon']")
   end
 
+  def all_item_published?
+    expect(published_status_button).to be_present
+    expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']")
+  end
+
+  def all_item_unpublished?
+    expect(unpublished_status_button).to be_present
+    expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']")
+  end
+
   def link_only_status_button
     f("[data-testid='link-only-button-icon']")
   end
