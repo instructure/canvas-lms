@@ -98,7 +98,7 @@ describe Lti::ContextControlService do
     let_once(:registration) do
       lti_tool_configuration_model(account: root_account).lti_registration
     end
-    let_once(:root_account) { account_model }
+    let_once(:root_account) { account_model(name: "root") }
     let_once(:account) { root_account }
     let_once(:deployment) do
       registration.new_external_tool(root_account)
@@ -113,7 +113,7 @@ describe Lti::ContextControlService do
     end
 
     context "with course-level control" do
-      let(:course) { course_model }
+      let(:course) { course_model(account: root_account) }
       let(:control) { Lti::ContextControl.create!(registration:, deployment:, course:) }
       let(:controls) { [control] }
 
@@ -129,8 +129,12 @@ describe Lti::ContextControlService do
         expect(subject.dig(control.id, :child_control_count)).to eq 0
       end
 
-      it "has a depth of 0" do
-        expect(subject.dig(control.id, :depth)).to eq 0
+      it "has the correct depth" do
+        expect(subject.dig(control.id, :depth)).to eq 1
+      end
+
+      it "has the correct display path" do
+        expect(subject.dig(control.id, :display_path)).to eq []
       end
     end
 
@@ -220,6 +224,12 @@ describe Lti::ContextControlService do
         expect(subject.dig(control2.id, :depth)).to eq 1
         expect(subject.dig(control3.id, :depth)).to eq 0
       end
+
+      it "finds the display path for all controls" do
+        expect(subject.dig(control1.id, :display_path)).to eq []
+        expect(subject.dig(control2.id, :display_path)).to eq []
+        expect(subject.dig(control3.id, :display_path)).to eq []
+      end
     end
 
     context "with nested subaccounts that lack controls" do
@@ -230,7 +240,7 @@ describe Lti::ContextControlService do
       let!(:subaccount_2) { account_model(name: "Subaccount 2", parent_account: subaccount) }
       # subaccount_3, inside of subaccount_2, *has* a CC
       let!(:subaccount_3) do
-        account_model(name: "Subaccount 2", parent_account: subaccount_2)
+        account_model(name: "Subaccount 3", parent_account: subaccount_2)
       end
       let!(:subaccount_3_control) do
         Lti::ContextControl.create!(registration:, deployment:, account: subaccount_3)
@@ -247,6 +257,12 @@ describe Lti::ContextControlService do
         expect(subject.dig(control.id, :depth)).to eq 0
         expect(subject.dig(subaccount_3_control.id, :depth)).to eq 1
         expect(subject.dig(subaccount_3_course_control.id, :depth)).to eq 2
+      end
+
+      it "finds the correct display paths" do
+        expect(subject.dig(control.id, :display_path)).to eq []
+        expect(subject.dig(subaccount_3_control.id, :display_path)).to eq [subaccount.name, subaccount_2.name]
+        expect(subject.dig(subaccount_3_course_control.id, :display_path)).to eq [subaccount.name, subaccount_2.name, subaccount_3.name]
       end
     end
   end

@@ -180,11 +180,10 @@ class Lti::ContextControl < ActiveRecord::Base
     account&.name || course.name
   end
 
-  # A human-readable version of this control's path,
-  # meant for UI display.
-  # TODO: Fully implement as part of INTEROP-8992
-  def path_names
-    [context_name]
+  # Array of names of all parents in this control's account chain,
+  # not including the control's context itself. Meant for UI display.
+  def display_path
+    calculated_attrs[:display_path]
   end
 
   # Includes all nested subaccounts that belong to the control's account.

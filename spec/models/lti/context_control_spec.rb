@@ -732,6 +732,37 @@ describe Lti::ContextControl do
     end
   end
 
+  describe "#display_path" do
+    let(:control) { create! }
+
+    it "is empty for root account controls" do
+      expect(control.display_path).to eq([])
+    end
+
+    context "with nested accounts" do
+      let(:root_account) { account_model(name: "root") }
+      let(:subaccount) { account_model(parent_account: root_account, name: "sub") }
+      let(:account) { account_model(parent_account: subaccount, name: "account") }
+      let(:control) { create! }
+
+      it "only includes parent account names" do
+        expect(control.display_path).to eq([subaccount.name])
+      end
+    end
+
+    context "with course-level control" do
+      let(:root_account) { account_model(name: "root") }
+      let(:subaccount) { account_model(parent_account: root_account, name: "sub") }
+      let(:course) { course_model(account: subaccount, name: "course") }
+      let(:account) { nil }
+      let(:control) { create! }
+
+      it "does not include course name" do
+        expect(control.display_path).to eq([subaccount.name])
+      end
+    end
+  end
+
   describe "#subaccount_count" do
     let(:control) { create! }
 

@@ -174,11 +174,6 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               }
             })
 
-          /**
-           * Contains the name of each context that should be displayed under the control
-           * TODO: We will delete this when we have the display_path from the backend.
-           */
-          const actualDisplayPath = controlPath.map(cc => cc.control.context_name).slice(0, -1)
           const closestParent = controlPath[controlPath.length - 2]
           return (
             <List.Item key={control.id} as="div">
@@ -188,7 +183,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                 account_id={control.account_id ?? undefined}
                 context_name={control.context_name}
                 available={control.available}
-                path_segments={actualDisplayPath}
+                path_segments={control.display_path}
                 depth={control.depth - 1}
                 exception_counts={{
                   child_control_count: control.child_control_count,

@@ -220,7 +220,7 @@ RSpec.describe Lti::DeploymentsController do
           created_by: nil,
           deployment_id: deployment.id,
           depth: 0,
-          display_path: control.path_names,
+          display_path: control.display_path,
           id: control.id,
           path: control.path,
           registration_id: registration.id,
