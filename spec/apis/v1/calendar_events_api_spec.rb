@@ -5921,4 +5921,45 @@ describe CalendarEventsApiController, type: :request do
       expect(events.map { |e| { start_at: e.start_at, end_at: e.end_at } }).to match_array(@events)
     end
   end
+
+  context "check_restricted_file_access_for_students" do
+    before :once do
+      @student = user_factory(active_all: true, active_state: "active")
+      @course.enroll_student(@student, enrollment_state: "active")
+    end
+
+    it "restricts students from creating calendar events with file attachments in description" do
+      attachment = attachment_model(context: @course, display_name: "restricted_file.pdf")
+      description_with_file = "<p>Event with file: <a href=\"/courses/#{@course.id}/files/#{attachment.id}/preview\">restricted_file.pdf</a></p>"
+
+      api_call_as_user(@student,
+                       :post,
+                       "/api/v1/calendar_events",
+                       { controller: "calendar_events_api", action: "create", format: "json" },
+                       { calendar_event: {
+                         context_code: @course.asset_string,
+                         title: "Event with file",
+                         description: description_with_file
+                       } },
+                       {},
+                       { expected_status: 403 })
+    end
+
+    it "allows teachers to create calendar events with file attachments in description" do
+      attachment = attachment_model(context: @course, display_name: "teacher_file.pdf")
+      description_with_file = "<p>Event with file: <a href=\"/courses/#{@course.id}/files/#{attachment.id}/preview\">teacher_file.pdf</a></p>"
+
+      json = api_call_as_user(@teacher,
+                              :post,
+                              "/api/v1/calendar_events",
+                              { controller: "calendar_events_api", action: "create", format: "json" },
+                              { calendar_event: {
+                                context_code: @course.asset_string,
+                                title: "Teacher Event with file",
+                                description: description_with_file
+                              } })
+      expect(response).to be_successful
+      expect(json["title"]).to eq "Teacher Event with file"
+    end
+  end
 end
