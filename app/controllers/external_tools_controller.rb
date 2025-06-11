@@ -131,10 +131,17 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      @tools = if params[:include_parents]
+      @tools = if Canvas::Plugin.value_to_boolean(params[:include_parents])
                  Lti::ContextToolFinder.all_tools_for(@context, current_user: (params[:include_personal] ? @current_user : nil))
                else
-                 Lti::ContextToolFinder.only_for(@context).active
+                 base_scope = Lti::ContextToolFinder.only_for(@context).active
+
+                 if @context.root_account.feature_enabled?(:lti_registrations_next)
+                   available_deployment_ids = Lti::ContextControl.deployment_ids_for_context(@context)
+                   base_scope.where(id: available_deployment_ids).or(base_scope.lti_1_1)
+                 else
+                   base_scope
+                 end
                end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
