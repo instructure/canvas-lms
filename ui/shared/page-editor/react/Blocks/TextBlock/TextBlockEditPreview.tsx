@@ -16,12 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Heading} from '@instructure/ui-heading'
 
-export const TextBlockPreview = () => {
+const I18n = createI18nScope('page_editor')
+
+export const TextBlockEditPreview = (props: {
+  title: string
+  content: string
+}) => {
+  const isTitleDefined = props.title.trim().length > 0
+  const isContentDefined = props.content.trim().length > 0
+
+  const content = isContentDefined
+    ? props.content
+    : `<p style="color: '#9EA6AD'">${I18n.t('Type to add body')}</p>`
+
   return (
     <>
-      <View as="p">Text Block Preview</View>
+      <Heading variant="titleSection" color={isTitleDefined ? 'primary' : 'secondary'}>
+        {isTitleDefined ? props.title : I18n.t('Type to add block title')}
+      </Heading>
+      <div dangerouslySetInnerHTML={{__html: content}}></div>
     </>
   )
 }
