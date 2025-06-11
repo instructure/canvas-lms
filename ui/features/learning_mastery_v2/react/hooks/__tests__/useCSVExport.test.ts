@@ -32,13 +32,20 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('useCSVExport', () => {
-  let exportMock
-  const mockedExport =
+  let exportMock: jest.Mock
+
+  const mockedExport: string =
     'Student name, Student ID, Student SIS ID, Outcome 1 result, Outcome 1 mastery points\n' +
     'test student, 1, student_1, 2.5, 3\n' +
     'other student, 2, student_2, 3.3, 3'
 
-  const defaultProps = (props = {}) => {
+  interface ExportProps {
+    courseId: string | number
+    gradebookFilters: string[]
+    [key: string]: any
+  }
+
+  const defaultProps = (props: Partial<ExportProps> = {}): ExportProps => {
     return {
       courseId: '1',
       gradebookFilters: [],
@@ -46,8 +53,8 @@ describe('useCSVExport', () => {
     }
   }
 
-  const forceURLFail = () => {
-    exportMock = axios.get.mockRejectedValue({})
+  const forceURLFail = (): void => {
+    exportMock = (axios.get as jest.Mock).mockRejectedValue({})
   }
 
   beforeEach(() => {
@@ -57,7 +64,7 @@ describe('useCSVExport', () => {
         mockedExport,
       },
     })
-    exportMock = axios.get.mockResolvedValue(promise)
+    exportMock = (axios.get as jest.Mock).mockResolvedValue(promise)
   })
 
   describe('useCSVExport hook', () => {
@@ -65,15 +72,12 @@ describe('useCSVExport', () => {
       const {result} = renderHook(() => useCSVExport(defaultProps()))
       const {exportGradebook, exportState, exportData} = result.current
 
-      // Validate initial state of hook
       expect(exportState).toEqual(EXPORT_NOT_STARTED)
       expect(exportData).toStrictEqual([])
 
-      // Request the Export
       act(() => exportGradebook())
       await act(async () => jest.runAllTimers())
 
-      // Validate end state of hook
       expect(result.current.exportState).toEqual(EXPORT_COMPLETE)
       expect(result.current.exportData).toStrictEqual({
         mockedExport,

@@ -28,11 +28,28 @@ export const EXPORT_PENDING = 'EXPORT_PENDING'
 export const EXPORT_COMPLETE = 'EXPORT_COMPLETE'
 export const EXPORT_FAILED = 'EXPORT_FAILED'
 
-export default function useCSVExport({courseId, gradebookFilters}) {
-  const [exportState, setExportState] = useState(EXPORT_NOT_STARTED)
-  const [exportData, setExportData] = useState([])
+export type ExportState =
+  | typeof EXPORT_NOT_STARTED
+  | typeof EXPORT_PENDING
+  | typeof EXPORT_COMPLETE
+  | typeof EXPORT_FAILED
 
-  const exportGradebook = () => {
+interface CSVExportProps {
+  courseId: string | number
+  gradebookFilters: string[]
+}
+
+interface CSVExportHook {
+  exportGradebook: () => void
+  exportState: ExportState
+  exportData: any[]
+}
+
+export default function useCSVExport({courseId, gradebookFilters}: CSVExportProps): CSVExportHook {
+  const [exportState, setExportState] = useState<ExportState>(EXPORT_NOT_STARTED)
+  const [exportData, setExportData] = useState<any[]>([])
+
+  const exportGradebook = (): void => {
     ;(async () => {
       try {
         setExportState(EXPORT_PENDING)
