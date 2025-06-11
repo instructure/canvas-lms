@@ -41,6 +41,7 @@ class Lti::ContextControl < ActiveRecord::Base
   validates :account_id, on: :update, if: -> { account_id.present? }, comparison: { equal_to: :account_id_was, message: t("cannot be changed") }
 
   before_create :set_path
+  after_destroy :soft_delete_child_controls
 
   scope :active, -> { where.not(workflow_state: :deleted) }
 
@@ -212,6 +213,17 @@ class Lti::ContextControl < ActiveRecord::Base
   end
 
   private
+
+  def soft_delete_child_controls
+    Lti::ContextControl
+      .active
+      .where("path LIKE ?", "#{path}%")
+      .where(deployment_id:, registration_id:)
+      .where.not(id:)
+      .in_batches do |batch|
+      batch.update_all(workflow_state: "deleted", updated_at: Time.current, updated_by_id:)
+    end
+  end
 
   def calculated_attrs
     @calculated_attrs ||= Lti::ContextControlService.preload_calculated_attrs([self])[id]

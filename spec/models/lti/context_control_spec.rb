@@ -31,7 +31,6 @@ describe Lti::ContextControl do
       available:,
     }
   end
-  let(:account) { account_model }
   let(:course) { nil }
   let(:deployment) { external_tool_1_3_model(context: account) }
   let(:registration) do
@@ -41,6 +40,8 @@ describe Lti::ContextControl do
     reg
   end
   let(:available) { true }
+
+  let_once(:account) { account_model }
 
   describe "validations" do
     context "when both account and course are present" do
@@ -132,6 +133,82 @@ describe Lti::ContextControl do
       it "is invalid" do
         control.path = new_path
         expect { control.save! }.to raise_error(ActiveRecord::RecordInvalid, /cannot be changed/)
+      end
+    end
+  end
+
+  describe "#destroy" do
+    subject { control.destroy }
+
+    let_once(:registration) do
+      lti_registration_with_tool(account:)
+    end
+    let_once(:deployment) do
+      registration.deployments.first
+    end
+    let_once(:control) do
+      Lti::ContextControl.find_by(account:, registration:, deployment:)
+    end
+
+    it "soft-deletes the control" do
+      expect { subject }.to change { control.reload.workflow_state }.from("active").to("deleted")
+    end
+
+    it "doesn't delete controls associated with other registrations" do
+      other_registration = lti_registration_with_tool(account:)
+
+      subject
+      expect(other_registration.reload.context_controls.where(workflow_state: "deleted").count).to eq(0)
+    end
+
+    it "doesn't delete controls associated with the same registration but different deployment" do
+      other_deployment = registration.new_external_tool(account)
+
+      subject
+
+      expect(other_deployment.context_controls.where(workflow_state: "deleted").count).to eq(0)
+    end
+
+    context "with child controls" do
+      let_once(:subaccount1) { account_model(parent_account: account) }
+      let_once(:subaccount2) { account_model(parent_account: account) }
+      let_once(:subsubaccount) { account_model(parent_account: subaccount1) }
+      let_once(:course1) { course_model(account: subaccount1) }
+      let_once(:course2) { course_model(account: subaccount2) }
+      let_once(:subcourse) { course_model(account: subsubaccount) }
+      let_once(:contexts) do
+        [subaccount1, subaccount2, subsubaccount, course1, course2, subcourse]
+      end
+      let_once(:controls) do
+        contexts.map do |context|
+          Lti::ContextControl.create!(
+            account: context.is_a?(Account) ? context : nil,
+            course: context.is_a?(Course) ? context : nil,
+            registration:,
+            deployment:
+          )
+        end
+      end
+
+      it "soft-deletes the children as well" do
+        subject
+
+        expect(deployment.reload.context_controls.pluck(:workflow_state)).to all(eq("deleted"))
+      end
+
+      context "one of the child controls is already deleted" do
+        before do
+          controls.first.update!(workflow_state: "deleted")
+        end
+
+        it "still soft-deletes the other children" do
+          subject
+          expect(deployment.reload.context_controls.pluck(:workflow_state)).to all(eq("deleted"))
+        end
+
+        it "doesn't try to update the already deleted control" do
+          expect { subject }.not_to change { controls.first.reload.updated_at }
+        end
       end
     end
   end
