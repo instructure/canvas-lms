@@ -478,9 +478,9 @@ project_lhotse:
   display_name: Grading Assistance
   description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
-use_graphql_for_gradebook:
-  state: on
+performance_improvements_for_gradebook:
+  state: hidden
   applies_to: Course
-  display_name: Use GraphQL for Gradebook
-  description: This feature prioritizes GraphQL API over other APIs to reduce load time and improve performance.
+  display_name: Performance Improvements for Gradebook Data Loading
+  description: Reduce Gradebook load time by improving back end performance and reducing unnecessary background data
   shadow: true
