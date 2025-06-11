@@ -3306,6 +3306,7 @@ class ApplicationController < ActionController::Base
     "wiki_pages#index" => Course::TAB_PAGES,
     "wiki_pages#show" => nil,
     "files#index" => Course::TAB_FILES,
+    "files#react_files" => Course::TAB_FILES,
     "files#show" => nil,
     "assignments#syllabus" => Course::TAB_SYLLABUS,
     "outcomes#index" => Course::TAB_OUTCOMES,
