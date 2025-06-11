@@ -479,7 +479,8 @@ project_lhotse:
   description: Enables the new AI-assisted grading tool inside of the Modernized Speedgrader for assignments in this course.
   hidden: true
 performance_improvements_for_gradebook:
-  state: allowed
+  state: hidden
   applies_to: Course
   display_name: Performance Improvements for Gradebook Data Loading
   description: Reduce Gradebook load time by improving back end performance and reducing unnecessary background data
+  shadow: true
