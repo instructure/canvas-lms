@@ -59,7 +59,7 @@ import {
   isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts,
-  activeTypeMeetsCriteria
+  activeTypeMeetsCriteria,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
@@ -475,7 +475,9 @@ const SubmissionManager = ({
       allowChangesToSubmission &&
       !assignment.lockInfo.isLocked &&
       !shouldRenderNewAttempt() &&
-      lastSubmittedSubmission?.gradingStatus !== 'excused'
+      submission.gradingStatus !== 'excused' &&
+      (assignment.allowedAttempts == null || assignment.allowedAttempts >= submission.attempt) &&
+      submission.state === 'unsubmitted'
     )
   }
 
@@ -843,7 +845,7 @@ const SubmissionManager = ({
               data-testid="new-attempt-button"
               color="primary"
               onClick={startNewAttemptAction}
-              elementRef={(element) => newAttemptButtonRef.current = element}
+              elementRef={element => (newAttemptButtonRef.current = element)}
             >
               {I18n.t('New Attempt')}
             </Button>
@@ -894,7 +896,7 @@ const SubmissionManager = ({
         disabled={draftStatus === 'saving' || isSubmitting}
         color="primary"
         onClick={() => handleSubmitButton()}
-        elementRef={(element) => submitButtonRef.current = element}
+        elementRef={element => (submitButtonRef.current = element)}
       >
         {I18n.t('Submit Assignment')}
       </Button>
