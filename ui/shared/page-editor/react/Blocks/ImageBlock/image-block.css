@@ -1,14 +1,25 @@
-.image-block-placeholder {
+.image-block-container {
   display: flex;
   width: 100%;
   height: 670px;
   align-items: center;
   justify-content: center;
-  background-color: #2b7abc1a;
-  cursor: pointer;
   border: solid 1px #d7dade;
 }
 
-.image-block-placeholder svg {
+.image-block-add-button {
+  background-color: #2b7abc1a;
+  cursor: pointer;
+}
+
+.image-block-add-button svg {
   color: #2b7abc;
+}
+
+.image-block-default-preview {
+  background-color: #f2f4f4;
+}
+
+.image-block-default-preview svg {
+  color: #d7dade;
 }
