@@ -49,6 +49,13 @@ module Accessibility
       html_fixer.apply_fix!
     end
 
+    def update_preview(raw_data)
+      html_fixer = HtmlFixer.new(raw_data, self)
+      return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
+
+      html_fixer.fix_preview
+    end
+
     private
 
     def error_response(message, status)
