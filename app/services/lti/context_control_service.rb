@@ -118,11 +118,28 @@ module Lti
         end
       end
 
+      course_account_ids = Course.where(id: course_controls.pluck(:course_id).compact).pluck(:account_id)
+      account_ids = (course_account_ids + account_controls.pluck(:account_id).compact).uniq
+      all_account_ids = Account.multi_account_chain_ids(account_ids)
+      all_account_names = Account.where(id: all_account_ids).pluck(:id, :name).to_h
+
+      display_paths = controls.each_with_object({}) do |control, paths|
+        # exclude control's own context, only include parents
+        # exclude root account as well
+        account_names = control.path.split(".")[1...-1].filter_map do |segment|
+          account_id = segment[1..].to_i
+          all_account_names[account_id]
+        end
+
+        paths[control.id] = account_names
+      end
+
       account_controls.each do |control|
         attrs[control.id] = {
           subaccount_count: subaccount_ids[control.account_id].size,
           course_count: course_counts[control.account_id],
           child_control_count: child_control_counts[control.id],
+          display_path: display_paths[control.id],
           depth: control_depths[control.id]
         }
       end
@@ -132,6 +149,7 @@ module Lti
           subaccount_count: 0,
           course_count: 0,
           child_control_count: 0,
+          display_path: display_paths[control.id],
           depth: control_depths[control.id]
         }
       end

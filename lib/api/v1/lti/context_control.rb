@@ -34,7 +34,7 @@ module Api::V1::Lti::ContextControl
   # @param context [Context] the context in which the request is made
   # @param calculated_attrs [Hash] additional data to include in the JSON, can contain:
   #   depth [Integer] the depth of the context control in the hierarchy. used for the UI
-  #   display_path [String] the names of the accounts in the path. used for the UI
+  #   display_path [String[]] the names of the accounts in the path. used for the UI
   #   subaccount_count [Integer] the number of subaccounts affected by this control.
   #   course_count [Integer] the number of courses affected by this control.
   #   child_control_count [Integer] the number of child context controls for this control.
@@ -47,7 +47,7 @@ module Api::V1::Lti::ContextControl
       json["child_control_count"] = calculated_attrs[:child_control_count] || context_control.child_control_count
       json["subaccount_count"] = calculated_attrs[:subaccount_count] || context_control.subaccount_count
       json["course_count"] = calculated_attrs[:course_count] || context_control.course_count
-      json["display_path"] = calculated_attrs[:display_path] || context_control.path_names
+      json["display_path"] = calculated_attrs[:display_path] || context_control.display_path
       json["depth"] = calculated_attrs[:depth] || 0
 
       json["created_by"] = nil
