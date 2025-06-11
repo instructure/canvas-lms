@@ -137,12 +137,17 @@ class Lti::ContextControl < ActiveRecord::Base
     # Get the path for a context (account or course) and the paths of all of
     # its parent accounts.
     #
+    # Note: this does not return paths for context controls that necessarily
+    # exist; it does not query to see if there is a control at each path.
+    # It returns a list of paths that *could* exist as parent paths of the
+    # provided context's level.
+    #
     # E.g. with a root account 1, subaccount 3, and course 1, for
     # context = course 1 this will return:
     # [ "a1", "a1.a3", "a1.a3.c1" ]
     #
     # This method should be used when searching for context controls by path, to
-    # get all context controls for any account that the
+    # get all context controls that could affect the provided context.
     #
     # @returns An array of strings, with each string being a path like what is
     #          returned from calculate_path.
