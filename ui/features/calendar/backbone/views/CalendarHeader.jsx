@@ -64,6 +64,14 @@ CalendarHeader.prototype.initialize = function () {
   return this.render()
 }
 
+CalendarHeader.prototype._isUserStudent = function () {
+  return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+}
+
+CalendarHeader.prototype._shouldShowCreateEventLink = function () {
+  return !(ENV?.FEATURES?.restrict_student_access && this._isUserStudent())
+}
+
 CalendarHeader.prototype.connectEvents = function () {
   const _this = this
   this.navigator.on('navigatePrev', function () {
@@ -104,7 +112,14 @@ CalendarHeader.prototype.moveToCalendarViewButton = function (direction) {
 
 CalendarHeader.prototype.showNavigator = function () {
   this.$navigator.show()
-  return this.$createNewEventLink.show()
+
+  if (this.$createNewEventLink) {
+    if (this._shouldShowCreateEventLink()) {
+      this.$createNewEventLink.show()
+    } else {
+      this.$createNewEventLink.hide()
+    }
+  }
 }
 
 CalendarHeader.prototype._showVisualAgendaRecommendation = function () {
@@ -183,6 +198,9 @@ CalendarHeader.prototype._triggerAgenda = function (_event) {
 
 CalendarHeader.prototype._triggerCreateNewEvent = function (event) {
   event.preventDefault()
+  if (!this._shouldShowCreateEventLink()) {
+    return false
+  }
   this.trigger('createNewEvent')
   return publish('CalendarHeader/createNewEvent')
 }
@@ -231,7 +249,9 @@ CalendarHeader.prototype.afterRender = function () {
           this.$calendarViewButtons = this.$el.find('.calendar_view_buttons')
           this.$recommendAgenda = this.$el.find('.recommend_agenda')
           this.$navigator = this.$el.find('.calendar_navigator')
-          this.$createNewEventLink = this.$el.find('#create_new_event_link')
+          if (this._shouldShowCreateEventLink()) {
+            this.$createNewEventLink = this.$el.find('#create_new_event_link')
+          }
           this.$refreshCalendarLink = this.$el.find('#refresh_calendar_link')
 
           this._loadObjects(options)

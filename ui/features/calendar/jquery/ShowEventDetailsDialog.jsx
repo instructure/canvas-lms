@@ -57,7 +57,20 @@ export default class ShowEventDetailsDialog {
     this.contexts = event.contexts
   }
 
+  isUserStudent = () => {
+    return ENV.current_user_roles && ENV.current_user_roles.includes('student')
+  }
+
+  canCreateEvent = () => {
+    return !(ENV?.FEATURES?.restrict_student_access && this.isUserStudent())
+  }
+
   showEditDialog = () => {
+    if (!this.canCreateEvent()) {
+      console.warn('User does not have permission to create events')
+      return
+    }
+
     this.popover.hide()
     new EditEventDetailsDialog(this.event).show()
   }
