@@ -36,6 +36,7 @@ describe('CriterionModal tests', () => {
         onDismiss={() => {}}
         onSave={() => {}}
         hidePoints={false}
+        freeFormCriterionComments={false}
         {...props}
       />,
     )
@@ -489,6 +490,63 @@ describe('CriterionModal tests', () => {
 
       fireEvent.click(exitWarningModalButton)
       expect(onDismiss).toHaveBeenCalled()
+    })
+  })
+
+  describe('Free Form Criterion Comments Tests', () => {
+    it('should not render ratings if freeFormCriterionComments is true', () => {
+      const {queryAllByTestId, getByTestId} = renderComponent({freeFormCriterionComments: true})
+
+      expect(queryAllByTestId('rating-name')).toHaveLength(0)
+      expect(queryAllByTestId('rating-points')).toHaveLength(0)
+      expect(queryAllByTestId('rating-scale')).toHaveLength(0)
+      expect(getByTestId('free-form-criterion-comments-label')).toHaveTextContent(
+        'Written Feedback',
+      )
+    })
+  })
+
+  describe('Auto Generate Points Tests', () => {
+    it('should auto-generate points for ratings when max points input is changed', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+
+      const maxPointsInput = queryAllByTestId('max-points-input')[0] as HTMLInputElement
+      fireEvent.change(maxPointsInput, {target: {value: '20'}})
+      fireEvent.blur(maxPointsInput)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('20')
+      expect(totalRatingPoints[1].value).toEqual('16')
+      expect(totalRatingPoints[2].value).toEqual('12')
+      expect(totalRatingPoints[3].value).toEqual('8')
+    })
+
+    it('should auto-generate points when the max points is changed to be lower than the current max', () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId} = renderComponent({criterion})
+
+      const maxPointsInput = queryAllByTestId('max-points-input')[0] as HTMLInputElement
+      fireEvent.change(maxPointsInput, {target: {value: '8'}})
+      fireEvent.blur(maxPointsInput)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('8')
+      expect(totalRatingPoints[1].value).toEqual('6.4')
+      expect(totalRatingPoints[2].value).toEqual('4.8')
+      expect(totalRatingPoints[3].value).toEqual('3.2')
     })
   })
 })
