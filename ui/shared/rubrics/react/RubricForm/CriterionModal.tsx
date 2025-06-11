@@ -25,7 +25,12 @@ import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconDragHandleLine, IconPlusLine, IconTrashLine} from '@instructure/ui-icons'
+import {
+  IconCommentLine,
+  IconDragHandleLine,
+  IconPlusLine,
+  IconTrashLine,
+} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
 import {TextInput} from '@instructure/ui-text-input'
@@ -36,6 +41,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {DragDropContext as DragAndDrop, Droppable, Draggable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
 import {WarningModal} from './WarningModal'
+import {autoGeneratePoints} from './utils'
 
 const I18n = createI18nScope('rubrics-criterion-modal')
 
@@ -98,6 +104,7 @@ export type CriterionModalProps = {
   hidePoints: boolean
   isOpen: boolean
   unassessed: boolean
+  freeFormCriterionComments: boolean
   onSave: (criterion: RubricCriterion) => void
   onDismiss: () => void
 }
@@ -107,6 +114,7 @@ export const CriterionModal = ({
   hidePoints,
   isOpen,
   unassessed,
+  freeFormCriterionComments,
   onDismiss,
   onSave,
 }: CriterionModalProps) => {
@@ -118,6 +126,13 @@ export const CriterionModal = ({
   const [dragging, setDragging] = useState(false)
   const [checkValidation, setCheckValidation] = useState(false)
   const [showWarningModal, setShowWarningModal] = useState(false)
+
+  const [maxPoints, setMaxPoints] = useState<string | number>(0)
+
+  useEffect(() => {
+    const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : 0
+    setMaxPoints(maxRatingPoints)
+  }, [ratings])
 
   const addRating = (index: number) => {
     const isFirstIndex = index === 0
@@ -213,7 +228,11 @@ export const CriterionModal = ({
       hasLongDescriptionChanged ||
       hasCriterionUseRangeChanged
 
-    hasDataChanged ? setShowWarningModal(true) : onDismiss()
+    if (hasDataChanged) {
+      setShowWarningModal(true)
+    } else {
+      onDismiss()
+    }
   }
 
   const handleDragStart = () => {
@@ -269,8 +288,6 @@ export const CriterionModal = ({
       ? [{text: 'Criteria Name Required', type: 'error'}]
       : []
 
-  const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : '--'
-
   return (
     <>
       <WarningModal
@@ -308,7 +325,7 @@ export const CriterionModal = ({
                   width="20.75rem"
                   value={criterionDescription ?? ''}
                   messages={criterionDescriptionErrorMessage}
-                  onChange={(e, value) => setCriterionDescription(value)}
+                  onChange={(_e, value) => setCriterionDescription(value)}
                   data-testid="rubric-criterion-name-input"
                 />
               </View>
@@ -319,7 +336,7 @@ export const CriterionModal = ({
                   display="inline-block"
                   width="41.75rem"
                   value={criterionLongDescription ?? ''}
-                  onChange={(e, value) => setCriterionLongDescription(value)}
+                  onChange={(_e, value) => setCriterionLongDescription(value)}
                   data-testid="rubric-criterion-description-input"
                 />
               </View>
@@ -329,103 +346,153 @@ export const CriterionModal = ({
           <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
             <Flex>
               <Flex.Item shouldGrow={true}>
-                {unassessed && criterionUseRangeEnabled && !hidePoints && (
-                  <Checkbox
-                    label={I18n.t('Enable Range')}
-                    checked={criterionUseRange}
-                    onChange={e => setCriterionUseRange(e.target.checked)}
-                    data-testid="enable-range-checkbox"
-                  />
+                {unassessed &&
+                  criterionUseRangeEnabled &&
+                  !hidePoints &&
+                  !freeFormCriterionComments && (
+                    <Checkbox
+                      label={I18n.t('Enable Range')}
+                      checked={criterionUseRange}
+                      onChange={e => setCriterionUseRange(e.target.checked)}
+                      data-testid="enable-range-checkbox"
+                    />
+                  )}
+                {freeFormCriterionComments && (
+                  <View
+                    as="span"
+                    margin="0 small 0 0"
+                    data-testid="free-form-criterion-comments-label"
+                  >
+                    <IconCommentLine size="x-small" themeOverride={{sizeXSmall: '1.5rem'}} />{' '}
+                    <Text weight="bold">{I18n.t('Written Feedback')}</Text>
+                  </View>
                 )}
               </Flex.Item>
               <Flex.Item>
                 {!hidePoints && (
-                  <Heading
-                    level="h2"
-                    as="h2"
-                    themeOverride={{h2FontWeight: 700, h2FontSize: '22px', lineHeight: '1.75rem'}}
-                  >
-                    {maxRatingPoints} {I18n.t('Points Possible')}
-                  </Heading>
+                  <>
+                    <Flex gap="small">
+                      <Flex.Item>
+                        <TextInput
+                          data-testid="max-points-input"
+                          renderLabel={
+                            <ScreenReaderContent>{I18n.t('Maximum Points')}</ScreenReaderContent>
+                          }
+                          display="inline-block"
+                          width="4rem"
+                          value={maxPoints.toString()}
+                          onChange={(_e, value) => {
+                            setMaxPoints(value)
+                          }}
+                          onBlur={e => {
+                            let newMaxPoints = Number(e.target.value)
+                            if (Number.isNaN(newMaxPoints) || newMaxPoints < 0) {
+                              newMaxPoints = 5
+                            }
+                            setMaxPoints(newMaxPoints)
+                            const updatedRatings = autoGeneratePoints(ratings, newMaxPoints)
+                            setRatings(updatedRatings)
+                          }}
+                        />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <Heading
+                          level="h2"
+                          as="h2"
+                          themeOverride={{
+                            h2FontWeight: 700,
+                            h2FontSize: '22px',
+                            lineHeight: '1.75rem',
+                          }}
+                        >
+                          {I18n.t(' Points Possible')}
+                        </Heading>
+                      </Flex.Item>
+                    </Flex>
+                  </>
                 )}
               </Flex.Item>
             </Flex>
           </View>
 
-          <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
-            <Flex>
-              <Flex.Item>
-                <View as="div" width="4.125rem">
-                  {I18n.t('Display')}
-                </View>
-              </Flex.Item>
-              {!hidePoints && (
-                <Flex.Item>
-                  <View as="div" width={criterionUseRange ? '14.375rem' : '9.875rem'}>
-                    {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
-                  </View>
-                </Flex.Item>
-              )}
-              <Flex.Item>
-                <View as="div" width="8.875rem" margin={hidePoints ? '0 0 0 x-large' : '0'}>
-                  {I18n.t('Rating Name')}
-                </View>
-              </Flex.Item>
-              <Flex.Item>
-                <View as="div" margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
-                  {I18n.t('Rating Description')}
-                </View>
-              </Flex.Item>
-            </Flex>
-          </View>
+          {!freeFormCriterionComments && (
+            <>
+              <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
+                <Flex>
+                  <Flex.Item>
+                    <View as="div" width="4.125rem">
+                      {I18n.t('Display')}
+                    </View>
+                  </Flex.Item>
+                  {!hidePoints && (
+                    <Flex.Item>
+                      <View as="div" width={criterionUseRange ? '14.375rem' : '9.875rem'}>
+                        {criterionUseRange ? I18n.t('Point Range') : I18n.t('Points')}
+                      </View>
+                    </Flex.Item>
+                  )}
+                  <Flex.Item>
+                    <View as="div" width="8.875rem" margin={hidePoints ? '0 0 0 x-large' : '0'}>
+                      {I18n.t('Rating Name')}
+                    </View>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <View as="div" margin="0 0 0 small" themeOverride={{marginSmall: '1rem'}}>
+                      {I18n.t('Rating Description')}
+                    </View>
+                  </Flex.Item>
+                </Flex>
+              </View>
 
-          <View as="div" position="relative">
-            {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
-            <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <Droppable droppableId="droppable-id">
-                {provided => {
-                  return (
-                    <div ref={provided.innerRef} {...provided.droppableProps}>
-                      {ratings.map((rating, index) => {
-                        const scale = ratings.length - (index + 1)
-                        const rangeStart = rangingFrom(ratings, index)
+              <View as="div" position="relative">
+                {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
+                <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="droppable-id">
+                    {provided => {
+                      return (
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                          {ratings.map((rating, index) => {
+                            const scale = ratings.length - (index + 1)
+                            const rangeStart = rangingFrom(ratings, index)
 
-                        return (
-                          <View as="div" key={`rating-row-${rating.id}-${index}`}>
-                            <AddRatingRow
-                              onClick={() => addRating(index)}
-                              unassessed={unassessed}
-                              isDragging={dragging}
-                            />
-                            <RatingRow
-                              index={index}
-                              checkValidation={checkValidation}
-                              hidePoints={hidePoints}
-                              rating={rating}
-                              scale={scale}
-                              showRemoveButton={ratings.length > 1}
-                              criterionUseRange={criterionUseRange}
-                              rangeStart={rangeStart}
-                              unassessed={unassessed}
-                              onRemove={() => removeRating(index)}
-                              onChange={updatedRating => updateRating(index, updatedRating)}
-                              onPointsBlur={reorderRatings}
-                            />
-                          </View>
-                        )
-                      })}
-                      <AddRatingRow
-                        onClick={() => addRating(ratings.length)}
-                        unassessed={unassessed}
-                        isDragging={dragging}
-                      />
-                      {provided.placeholder}
-                    </div>
-                  )
-                }}
-              </Droppable>
-            </DragAndDrop>
-          </View>
+                            return (
+                              <View as="div" key={`rating-row-${rating.id}-${index}`}>
+                                <AddRatingRow
+                                  onClick={() => addRating(index)}
+                                  unassessed={unassessed}
+                                  isDragging={dragging}
+                                />
+                                <RatingRow
+                                  index={index}
+                                  checkValidation={checkValidation}
+                                  hidePoints={hidePoints}
+                                  rating={rating}
+                                  scale={scale}
+                                  showRemoveButton={ratings.length > 1}
+                                  criterionUseRange={criterionUseRange}
+                                  rangeStart={rangeStart}
+                                  unassessed={unassessed}
+                                  onRemove={() => removeRating(index)}
+                                  onChange={updatedRating => updateRating(index, updatedRating)}
+                                  onPointsBlur={reorderRatings}
+                                />
+                              </View>
+                            )
+                          })}
+                          <AddRatingRow
+                            onClick={() => addRating(ratings.length)}
+                            unassessed={unassessed}
+                            isDragging={dragging}
+                          />
+                          {provided.placeholder}
+                        </div>
+                      )
+                    }}
+                  </Droppable>
+                </DragAndDrop>
+              </View>
+            </>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Flex width="100%">
@@ -552,7 +619,7 @@ const RatingRow = ({
                           setPointsInputText(newNumber)
                           setRatingForm('points', newNumber)
                         }}
-                        onChange={(e, value) => {
+                        onChange={(_e, value) => {
                           if (!/^\d*[.,]?\d{0,2}$/.test(value)) return
 
                           const newNumber = setNumber(Number(value.replace(',', '.')))
@@ -607,7 +674,7 @@ const RatingRow = ({
                         }
                         display="inline-block"
                         value={rating.description ?? ''}
-                        onChange={(e, value) => setRatingForm('description', value)}
+                        onChange={(_e, value) => setRatingForm('description', value)}
                         data-testid="rating-name"
                         messages={errorMessage}
                       />
