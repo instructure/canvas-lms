@@ -3313,7 +3313,7 @@ describe ContextExternalTool do
       end
     end
 
-    context "when the tool is already existing" do
+    context "when the tool already exists" do
       before do
         subject.save
         run_jobs
@@ -3364,6 +3364,49 @@ describe ContextExternalTool do
         tool.unified_tool_id_needs_update = true
         expect(tool.save).to be true
         expect(tool.reload.unified_tool_id_needs_update).to be true
+      end
+    end
+  end
+
+  describe "#destroy" do
+    subject { deployment.destroy }
+
+    let_once(:registration) { lti_registration_with_tool(account:) }
+    let_once(:account) { account_model }
+    let_once(:deployment) do
+      registration.deployments.first
+    end
+
+    it "soft-deletes the tool and it's context controls" do
+      expect { subject }.to change { deployment.reload.workflow_state }.to("deleted")
+      expect(deployment.context_controls.reload.pluck(:workflow_state))
+        .to all(eq("deleted"))
+    end
+
+    context "when the tool has lots of controls" do
+      let_once(:subaccount1) { account_model(parent_account: account) }
+      let_once(:subaccount2) { account_model(parent_account: account) }
+      let_once(:subcourse) { course_model(account: subaccount1) }
+
+      before(:once) do
+        Lti::ContextControl.create!(account: subaccount1,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+        Lti::ContextControl.create!(account: subaccount2,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+        Lti::ContextControl.create!(course: subcourse,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+      end
+
+      it "soft-deletes all controls" do
+        subject
+        expect(deployment.context_controls.reload.pluck(:workflow_state))
+          .to all(eq("deleted"))
       end
     end
   end

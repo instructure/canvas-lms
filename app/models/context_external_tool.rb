@@ -30,7 +30,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
   has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
-  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment, dependent: :destroy
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
   has_one :estimated_duration, dependent: :destroy, inverse_of: :external_tool
 
@@ -82,6 +82,7 @@ class ContextExternalTool < ActiveRecord::Base
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
   before_save :infer_defaults, :add_identity_hash
+  after_destroy :soft_delete_associated_context_controls
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
@@ -1447,5 +1448,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     fields_for_utid = %w[tool_id name domain url settings]
     !!saved_changes.keys.intersect?(fields_for_utid)
+  end
+
+  def soft_delete_associated_context_controls
+    context_controls.active.in_batches.update_all(workflow_state: "deleted", updated_at: Time.current)
   end
 end
