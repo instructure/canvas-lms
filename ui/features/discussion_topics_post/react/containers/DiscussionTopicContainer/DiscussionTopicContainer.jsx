@@ -584,30 +584,6 @@ export const DiscussionTopicContainer = ({
                                       </Button>
                                     </span>
                                   </Flex.Item>
-                                  {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
-                                    <Flex.Item
-                                      shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
-                                      shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
-                                      overflowY="visible"
-                                    >
-                                      <SummarizeButton
-                                        onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
-                                        isEnabled={isSummaryEnabled}
-                                        isLoading={isFeedbackLoading}
-                                        isMobile={matches.includes('mobile')}
-                                      />
-                                    </Flex.Item>
-                                  )}
-                                  {ENV.user_can_access_insights && (
-                                    <Flex.Item overflowY="visible">
-                                      <DiscussionInsightsButton
-                                        isMobile={matches.includes('mobile')}
-                                        onClick={() => {
-                                          assignLocation(ENV.INSIGHTS_URL)
-                                        }}
-                                      />
-                                    </Flex.Item>
-                                  )}
                                   {podcast_url?.href && (
                                     <Flex.Item overflowY="visible">
                                       <PodcastFeed
@@ -616,6 +592,41 @@ export const DiscussionTopicContainer = ({
                                       />
                                     </Flex.Item>
                                   )}
+                                  <Flex.Item shouldGrow>
+                                    <Flex
+                                      direction="row"
+                                      wrap="wrap"
+                                      gap="small"
+                                      justifyItems="end"
+                                    >
+                                      {ENV.user_can_access_insights && (
+                                        <Flex.Item overflowY="visible">
+                                          <DiscussionInsightsButton
+                                            isMobile={matches.includes('mobile')}
+                                            onClick={() => {
+                                              assignLocation(ENV.INSIGHTS_URL)
+                                            }}
+                                          />
+                                        </Flex.Item>
+                                      )}
+                                      {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
+                                        <Flex.Item
+                                          shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
+                                          shouldShrink={
+                                            responsiveProps?.summaryButton?.shouldShrink
+                                          }
+                                          overflowY="visible"
+                                        >
+                                          <SummarizeButton
+                                            onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
+                                            isEnabled={isSummaryEnabled}
+                                            isLoading={isFeedbackLoading}
+                                            isMobile={matches.includes('mobile')}
+                                          />
+                                        </Flex.Item>
+                                      )}
+                                    </Flex>
+                                  </Flex.Item>
                                 </Flex>
                               </>
                             )}

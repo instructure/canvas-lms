@@ -681,27 +681,27 @@ describe('DiscussionTopicContainer', () => {
       ENV.user_can_summarize = true
       ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
       expect(queryByTestId('summarize-button')).toBeTruthy()
     })
 
-    it('should render discussion summary button with Turn Off Summary if summary is enabled', () => {
+    it('should render discussion summary button with Close Summary if summary is enabled', () => {
       ENV.user_can_summarize = true
       ENV.discussion_summary_enabled = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
-      expect(queryByTestId('summarize-button').textContent).toBe('Turn Off Summary')
+      expect(queryByTestId('summarize-button').textContent).toBe('Close Summary')
     })
 
     it('should not render the discussion summary button if user can not summarize', () => {
       ENV.user_can_summarize = false
       ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
       expect(queryByTestId('summarize-button')).toBeNull()
@@ -711,7 +711,7 @@ describe('DiscussionTopicContainer', () => {
       ENV.discussion_summary_enabled = true
       ENV.user_can_summarize = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
       expect(queryByTestId('summary-loading')).toBeTruthy()
     })
@@ -720,7 +720,7 @@ describe('DiscussionTopicContainer', () => {
       ENV.discussion_summary_enabled = false
       ENV.user_can_summarize = true
       const {queryAllByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
       expect(queryAllByTestId(/summary-.*/)).toEqual([])
     })

@@ -19,7 +19,7 @@
 import React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
-import {IconSyllabusLine, IconXSolid} from '@instructure/ui-icons'
+import {IconAiColoredSolid, IconXSolid} from '@instructure/ui-icons'
 
 interface SummarizeButtonProps {
   onClick: () => Promise<void>
@@ -45,12 +45,12 @@ export const SummarizeButton: React.FC<SummarizeButtonProps> = ({
   return (
     <Button
       onClick={handleClick}
-      // TODO: choose a more appropriate AI icon as soon as it's available
-      renderIcon={isEnabled ? <IconXSolid /> : <IconSyllabusLine />}
+      color={isEnabled ? 'secondary' : 'ai-secondary'}
+      renderIcon={isEnabled ? <IconXSolid /> : <IconAiColoredSolid />}
       data-testid="summarize-button"
       display={isMobile ? 'block' : 'inline-block'}
     >
-      {isEnabled ? I18n.t('Turn Off Summary') : I18n.t('Summarize Discussion')}
+      {isEnabled ? I18n.t('Close Summary') : I18n.t('Open Summary')}
     </Button>
   )
 }
