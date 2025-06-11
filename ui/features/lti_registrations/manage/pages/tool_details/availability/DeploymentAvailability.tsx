@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import * as React from 'react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
@@ -38,6 +38,7 @@ import {ContextCard} from './ContextCard'
 import {LtiContextControl} from '../../../model/LtiContextControl'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {List} from '@instructure/ui-list'
+import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -79,6 +80,11 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
 
   const rootControl = deployment.context_controls.find(contextIsForDeployment(deployment))
 
+  const [exceptionModalOpenState, setExceptionModalOpenState] =
+    React.useState<ExceptionModalOpenState>({
+      open: false,
+    })
+
   return (
     <View
       borderRadius="medium"
@@ -103,6 +109,23 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               </Flex>
             </Flex>
           </Flex.Item>
+          <Flex.Item as="div">
+            <Button
+              onClick={() => {
+                setExceptionModalOpenState({
+                  open: true,
+                  deployment,
+                })
+              }}
+              color="primary"
+            >
+              {I18n.t('Add Exception')}
+            </Button>
+          </Flex.Item>
+          <ExceptionModal
+            openState={exceptionModalOpenState}
+            onClose={() => setExceptionModalOpenState({open: false})}
+          />
         </Flex>
       </Heading>
       <div>
