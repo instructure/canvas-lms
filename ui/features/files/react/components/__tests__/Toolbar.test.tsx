@@ -258,6 +258,7 @@ describe('Toolbar', () => {
   test('renders switch to new files button when feature flags are on', () => {
     ENV.FEATURES.files_a11y_rewrite_toggle = true
     ENV.FEATURES.files_a11y_rewrite = true
+    ENV.current_user_id = '1'
     const toolbar = render(
       <Toolbar
         params="foo"
@@ -288,6 +289,38 @@ describe('Toolbar', () => {
   test('does not render switch to new files button when only toggle flag is on', () => {
     ENV.FEATURES.files_a11y_rewrite_toggle = true
     ENV.FEATURES.files_a11y_rewrite = false
+    ENV.current_user_id = '1'
+    const toolbar = render(
+      <Toolbar
+        params="foo"
+        query=""
+        selectedItems={[file]}
+        currentFolder={courseFolder}
+        contextId="1"
+        contextType="courses"
+        userCanAddFilesForContext={true}
+        userCanEditFilesForContext={true}
+        userCanDeleteFilesForContext={true}
+        userCanRestrictFilesForContext={true}
+      />,
+    )
+    const config = {
+      '.btn-view': true,
+      '.btn-download': true,
+      '.btn-move': true,
+      '.btn-restrict': true,
+      '.btn-delete': true,
+      '.btn-add-folder': true,
+      '.btn-upload': true,
+      '.btn-switch-to-new-files-page': false,
+    }
+    expect(buttonsEnabled(toolbar, config)).toBeTruthy()
+  })
+
+  test('does not render switch to new files button when user is anonymous', () => {
+    ENV.FEATURES.files_a11y_rewrite_toggle = true
+    ENV.FEATURES.files_a11y_rewrite = true
+    ENV.current_user_id = null
     const toolbar = render(
       <Toolbar
         params="foo"
