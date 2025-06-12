@@ -22,6 +22,7 @@ describe "Accessibility Checker App UI", type: :selenium do
   include_context "in-process server selenium tests"
 
   before do
+    Account.site_admin.enable_feature!(:accessibility_dashboard_feature)
     course_with_teacher_logged_in
     @course.enable_feature!(:accessibility_tab_enable)
   end
