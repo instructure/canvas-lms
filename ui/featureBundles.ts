@@ -134,7 +134,6 @@ const featureBundles: {
   k5_dashboard: () => import('./features/k5_dashboard/index'),
   k5_theme: () => import('./features/k5_theme/index'),
   ldap_cert_upload: () => import('./features/ldap_cert_upload/index'),
-  ldap_settings_test: () => import('./features/ldap_settings_test/index'),
   learning_mastery_v2: () => import('./features/learning_mastery_v2/index'),
   learning_mastery: () => import('./features/learning_mastery/index'),
   learning_outcomes: () => import('./features/learning_outcomes/index'),
