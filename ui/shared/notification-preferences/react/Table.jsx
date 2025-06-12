@@ -26,7 +26,6 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
@@ -166,53 +165,28 @@ const renderNotificationCategory = (
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          {Object.keys(notificationPreferences.channels[0].categories[notificationCategory])
-            .filter(
-              category =>
-                notificationPreferences.channels[0].categories[notificationCategory][category]
-                  .notification,
-            )
-            .map(category => (
+          {Object.entries(notificationPreferences.channels[0].categories[notificationCategory])
+            .filter(([_, categoryValue]) => categoryValue.notification)
+            .map(([category, categoryValue]) => (
               <Table.Row key={category} data-testid={formatCategoryKey(category)}>
                 <Table.RowHeader>
-                  <Tooltip
-                    renderTip={
-                      <div
-                        dangerouslySetInnerHTML={{
-                          __html:
-                            notificationPreferences.channels[0].categories[notificationCategory][
-                              category
-                            ].notification.categoryDescription,
-                        }}
-                        data-testid={`${formatCategoryKey(category)}_description`}
-                      />
-                    }
-                    placement="end"
+                  <Text
+                    tabIndex="0"
+                    variant="contentImportant"
+                    data-testid={`${formatCategoryKey(category)}_header`}
                   >
-                    <span
-                      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-                      tabIndex="0"
-                      style={{padding: theme.spacing.xxSmall}}
-                      data-testid={`${formatCategoryKey(category)}_header`}
-                    >
-                      {
-                        notificationPreferences.channels[0].categories[notificationCategory][
-                          category
-                        ].notification.categoryDisplayName
-                      }
-                    </span>
-                  </Tooltip>
-                  <ScreenReaderContent>
-                    <div
+                    {categoryValue.notification.categoryDisplayName}
+                  </Text>
+                  <View as="div" data-testid={`${formatCategoryKey(category)}_description`}>
+                    <Text
+                      variant="legend"
                       dangerouslySetInnerHTML={{
-                        __html:
-                          notificationPreferences.channels[0].categories[notificationCategory][
-                            category
-                          ].notification.categoryDescription,
+                        __html: categoryValue.notification.categoryDescription
+                          .replace(/<p>/g, '<span style="display: block;">')
+                          .replace(/<\/p>/g, '</span>'),
                       }}
-                      data-testid={`${formatCategoryKey(category)}_screenReader`}
                     />
-                  </ScreenReaderContent>
+                  </View>
                   {category === 'Grading' &&
                     renderSendScoresInEmailsToggle(
                       sendScoresInEmails,

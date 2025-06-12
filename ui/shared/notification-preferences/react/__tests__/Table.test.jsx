@@ -160,26 +160,49 @@ describe('Notification Preferences Table', () => {
       />,
     )
 
-    const dueDateTooltip = getByTestId('due_date_description')
-    const {getByText} = within(dueDateTooltip)
+    const dueDateDescription = getByTestId('due_date_description')
+    const {getByText} = within(dueDateDescription)
 
-    expect(dueDateTooltip).not.toBeNull()
-    expect(dueDateTooltip).toContainElement(getByText('Due date description'))
+    expect(dueDateDescription).not.toBeNull()
+    expect(dueDateDescription).toContainElement(getByText('Due date description'))
   })
 
-  it('renders the category description in screen reader', () => {
+  it('removes <p> tags from descriptions', () => {
     const {getByTestId} = render(
       <NotificationPreferencesTable
-        preferences={mockedNotificationPreferences()}
+        preferences={{
+          sendScoresInEmails: true,
+          channels: [
+            {
+              _id: '1',
+              path: 'test@test.com',
+              pathType: 'email',
+              notificationPolicies: [
+                {
+                  communicationChannelId: '1',
+                  frequency: 'daily',
+                  notification: {
+                    category: 'Due Date',
+                    categoryDisplayName: 'Due Date',
+                    categoryDescription: '<p>Due date description</p>',
+                    name: 'Assignment Due Date Override Changed',
+                    _id: '3',
+                  },
+                },
+              ],
+            },
+          ],
+        }}
         updatePreference={jest.fn()}
       />,
     )
 
-    const dueDateScreenReader = getByTestId('due_date_screenReader')
-    const {getByText} = within(dueDateScreenReader)
+    const dueDateDescription = getByTestId('due_date_description')
+    const {queryByText} = within(dueDateDescription)
 
-    expect(dueDateScreenReader).not.toBeNull()
-    expect(dueDateScreenReader).toContainElement(getByText('Due date description'))
+    expect(dueDateDescription).not.toBeNull()
+    expect(dueDateDescription).toContainElement(queryByText('Due date description'))
+    expect(dueDateDescription).not.toContainElement(queryByText('<p>Due date description</p>'))
   })
 
   it('renders the send scores in emails toggle as enabled when the setting is set', () => {
