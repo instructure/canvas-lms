@@ -38,7 +38,7 @@ import preventDefault from '@canvas/util/preventDefault'
 import unflatten from 'obj-unflatten'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
-const I18n = createI18nScope('account_course_user_search')
+const I18n = createI18nScope('dsr')
 
 const initialState = {
   open: false,
@@ -133,8 +133,10 @@ export default class CreateDSRModal extends React.Component {
         data: unflatten({[field]: {$set: value}}),
         errors: {$set: {}},
       })
-      if (value === "" || value === undefined) {
-        newState = update(newState, {errors: {[field]: {$set: [I18n.t('Request name is required')]}}})
+      if (value === '' || value === undefined) {
+        newState = update(newState, {
+          errors: {[field]: {$set: [I18n.t('Request name is required')]}},
+        })
       }
       return newState
     })
