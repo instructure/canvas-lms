@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,4 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './jquery/index'
+export interface EnvAuthentication {
+  LDAP_SETTINGS_TEST: {
+    ldap_ips?: string
+  }
+}

@@ -26,11 +26,8 @@
   <div id="auth-config-right-side">
 
     <% if @presenter.ldap_config? %>
-      <a href="#"
-         class="test_ldap_link btn button-sidebar-wide"
-         <%= image_tag "pending_review.png", :alt => '' %>
-         <%= t(:test_ldap_link, "Test LDAP Authentication")%>
-      </a>
+      <% js_env({LDAP_SETTINGS_TEST: { ldap_ips: @presenter.ldap_ips}}) %>
+      <div id="ldap_settings_test_mount_point"></div>
     <% end %>
 
     <div id="add-authentication-provider"
@@ -93,11 +90,6 @@
                presenter: @presenter,
                aac: @presenter.new_config(auth_type.sti_name)
              } %>
-<% end %>
-
-<% if @presenter.ldap_configs.size > 0 %>
-  <%= render partial: 'ldap_settings_test',
-             locals: { account: @account, presenter: @presenter } %>
 <% end %>
 
 <% js_bundle :authentication_providers %>

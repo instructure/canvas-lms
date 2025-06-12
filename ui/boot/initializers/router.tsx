@@ -97,6 +97,12 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/page_views/react/PageViewsRoute')}
       />
       <Route
+        path="/accounts/:accountId/authentication_providers"
+        lazy={() =>
+          import('../../features/authentication_providers/react/AuthenticationProviderRoute')
+        }
+      />
+      <Route
         path="/accounts"
         lazy={() => import('../../features/account_manage/react/AccountListRoute')}
       />
