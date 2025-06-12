@@ -23,6 +23,8 @@ import DifferentiatedModulesTray from '@canvas/context-modules/differentiated-mo
 import {queryClient} from '@canvas/query'
 import {InfiniteData} from '@tanstack/react-query'
 import type {ModuleItem, ModulesResponse} from '../utils/types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
@@ -246,5 +248,28 @@ export const handleAddItem = (
     setSelectedModuleId(moduleId)
     setSelectedModuleName(module.name)
     setIsAddItemModalOpen(true)
+  }
+}
+
+export const handleModuleViewChange = async (
+  role: 'teacher' | 'student',
+  setValue: React.Dispatch<React.SetStateAction<string>>,
+  courseId: string,
+  data: {id?: string},
+) => {
+  const {id} = data
+  const moduleId = id ?? 'all'
+  setValue(moduleId)
+
+  try {
+    await doFetchApi({
+      path: `/api/v1/courses/${courseId}/settings`,
+      method: 'PUT',
+      body: {
+        [`show_${role}_only_module_id`]: moduleId,
+      },
+    })
+  } catch (err: any) {
+    showFlashError(`Cannot set the ${role} view module: ${err.message}`)
   }
 }

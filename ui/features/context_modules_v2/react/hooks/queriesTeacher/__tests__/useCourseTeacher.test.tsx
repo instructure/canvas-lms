@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCourseStudent} from '../useCourseStudent'
+import {useCourseTeacher} from '../useCourseTeacher'
 import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
@@ -24,22 +24,18 @@ import {waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {graphql, HttpResponse} from 'msw'
 
-const mockCourseStudentData = {
+const mockCourseTeacherData = {
   name: 'Test Course',
-  submissionStatistics: {
-    missingSubmissionsCount: 5,
-    submissionsDueThisWeekCount: 10,
-  },
   settings: {
     showStudentOnlyModuleId: 'mod_1',
+    showTeacherOnlyModuleId: 'mod_2',
   },
 }
 
 const mockGqlResponse = {
   legacyNode: {
-    name: mockCourseStudentData.name,
-    submissionStatistics: mockCourseStudentData.submissionStatistics,
-    settings: mockCourseStudentData.settings,
+    name: mockCourseTeacherData.name,
+    settings: mockCourseTeacherData.settings,
   },
 }
 
@@ -47,8 +43,8 @@ const courseId = '123'
 const errorMsg = 'Test error'
 const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
 
-const renderUseCourseStudentHook = (courseId: string) =>
-  renderHook(() => useCourseStudent(courseId), {
+const renderUseCourseTeacherHook = (courseId: string) =>
+  renderHook(() => useCourseTeacher(courseId), {
     wrapper: ({children}: {children: React.ReactNode}) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
@@ -56,7 +52,7 @@ const renderUseCourseStudentHook = (courseId: string) =>
 
 const server = setupServer()
 
-describe('useCourseStudent', () => {
+describe('useCourseTeacher', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
@@ -66,14 +62,14 @@ describe('useCourseStudent', () => {
 
   it('should be in error state if gql query throws exception', async () => {
     server.use(
-      graphql.query('GetCourseStudentQuery', () => {
+      graphql.query('GetCourseTeacherQuery', () => {
         return HttpResponse.json({
           errors: [{message: errorMsg}],
         })
       }),
     )
 
-    const {result} = renderUseCourseStudentHook(courseId)
+    const {result} = renderUseCourseTeacherHook(courseId)
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
@@ -83,14 +79,14 @@ describe('useCourseStudent', () => {
 
   it('should be in error state if the result contains error', async () => {
     server.use(
-      graphql.query('GetCourseStudentQuery', () => {
+      graphql.query('GetCourseTeacherQuery', () => {
         return HttpResponse.json({
           data: {errors: [{message: errorMsg}]},
         })
       }),
     )
 
-    const {result} = renderUseCourseStudentHook(courseId)
+    const {result} = renderUseCourseTeacherHook(courseId)
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
@@ -100,7 +96,7 @@ describe('useCourseStudent', () => {
 
   it('should map the data correctly for successful response', async () => {
     server.use(
-      graphql.query('GetCourseStudentQuery', ({variables}) => {
+      graphql.query('GetCourseTeacherQuery', ({variables}) => {
         expect(variables.courseId).toBe(courseId)
         return HttpResponse.json({
           data: {legacyNode: mockGqlResponse.legacyNode},
@@ -108,29 +104,28 @@ describe('useCourseStudent', () => {
       }),
     )
 
-    const {result} = renderUseCourseStudentHook(courseId)
+    const {result} = renderUseCourseTeacherHook(courseId)
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
-      expect(result.current.data).toEqual(mockCourseStudentData)
+      expect(result.current.data).toEqual(mockCourseTeacherData)
     })
   })
 
   it('should handle undefined data in the response', async () => {
     server.use(
-      graphql.query('GetCourseStudentQuery', () => {
+      graphql.query('GetCourseTeacherQuery', () => {
         return HttpResponse.json({
           data: {legacyNode: null},
         })
       }),
     )
 
-    const {result} = renderUseCourseStudentHook(courseId)
+    const {result} = renderUseCourseTeacherHook(courseId)
 
     await waitFor(() => {
       expect(result.current.data).toEqual({
         name: undefined,
-        submissionStatistics: undefined,
       })
     })
   })
@@ -138,7 +133,7 @@ describe('useCourseStudent', () => {
   it('should pass the courseId to the query', async () => {
     let capturedVariables: any = null
     server.use(
-      graphql.query('GetCourseStudentQuery', ({variables}) => {
+      graphql.query('GetCourseTeacherQuery', ({variables}) => {
         capturedVariables = variables
         return HttpResponse.json({
           data: {legacyNode: mockGqlResponse.legacyNode},
@@ -146,7 +141,7 @@ describe('useCourseStudent', () => {
       }),
     )
 
-    renderUseCourseStudentHook(courseId)
+    renderUseCourseTeacherHook(courseId)
 
     await waitFor(() => {
       expect(capturedVariables).toEqual({courseId})

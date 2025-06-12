@@ -19,27 +19,24 @@
 import {useQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
-import {CourseStudentResponse, CourseStudentGraphQLResult} from '../../utils/types.d'
+import {CourseTeacherResponse, CourseTeacherGraphQLResult} from '../../utils/types'
 
-const COURSE_STUDENT_QUERY = gql`
-  query GetCourseStudentQuery($courseId: ID!) {
+const COURSE_TEACHER_QUERY = gql`
+  query GetCourseTeacherQuery($courseId: ID!) {
     legacyNode(_id: $courseId, type: Course) {
       ... on Course {
         name
-        submissionStatistics {
-          missingSubmissionsCount
-          submissionsDueThisWeekCount
-        }
         settings {
           showStudentOnlyModuleId
+          showTeacherOnlyModuleId
         }
       }
     }
   }
 `
 
-async function getCourseStudent(courseId: string): Promise<CourseStudentResponse> {
-  const result = await executeQuery<CourseStudentGraphQLResult>(COURSE_STUDENT_QUERY, {
+async function getCourseTeacher(courseId: string): Promise<CourseTeacherResponse> {
+  const result = await executeQuery<CourseTeacherGraphQLResult>(COURSE_TEACHER_QUERY, {
     courseId,
   })
 
@@ -49,14 +46,13 @@ async function getCourseStudent(courseId: string): Promise<CourseStudentResponse
 
   return {
     name: result.legacyNode?.name,
-    submissionStatistics: result.legacyNode?.submissionStatistics,
     settings: result.legacyNode?.settings,
   }
 }
 
-export function useCourseStudent(courseId: string) {
-  return useQuery<CourseStudentResponse, Error>({
-    queryKey: ['courseStudent', courseId],
-    queryFn: () => getCourseStudent(courseId),
+export function useCourseTeacher(courseId: string) {
+  return useQuery<CourseTeacherResponse, Error>({
+    queryKey: ['courseTeacher', courseId],
+    queryFn: () => getCourseTeacher(courseId),
   })
 }

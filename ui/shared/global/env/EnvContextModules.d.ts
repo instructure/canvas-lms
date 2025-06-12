@@ -68,4 +68,8 @@ export interface EnvContextModules {
   DEFAULT_DUE_TIME?: string
   FEATURE_MODULES_PERF?: boolean
   IS_STUDENT?: boolean
+  MODULE_FEATURES?: {
+    STUDENT_MODULE_SELECTION: boolean
+    TEACHER_MODULE_SELECTION: boolean
+  }
 }

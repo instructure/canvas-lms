@@ -195,4 +195,103 @@ describe "context modules", :ignore_js_errors do
       expect(f('[data-testid="modules-rewrite-container"]')).to be_displayed
     end
   end
+
+  context "module select dropdown for teacher and student views" do
+    before do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:modules_teacher_module_selection)
+      @course.root_account.enable_feature!(:modules_student_module_selection)
+    end
+
+    it "shows teacher and student dropdown with All Modules default" do
+      go_to_modules
+      student_dropdown_input = f("input[role='combobox'][title='All Modules']")
+      expect(student_dropdown_input[:value]).to eq("All Modules")
+
+      teacher_select = ff("label")[0]
+      expect(teacher_select.text).to include("Teachers View")
+
+      student_select = ff("label")[1]
+      expect(student_select.text).to include("Students View")
+    end
+
+    it "updates visible modules when selecting a specific module for teachers" do
+      go_to_modules
+
+      teacher_dropdown_input = ff("input[role='combobox'][title='All Modules']")[0]
+      teacher_dropdown_input.click
+
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      expect(first_module.text).to eq("module1")
+
+      first_module.click
+      wait_for_ajaximations
+
+      visible_modules = ff("div[class*='context_module'] h3")
+      expect(visible_modules.length).to eq(1)
+      expect(visible_modules.first.text).to include("module1")
+    end
+
+    it "does not update visible module when selecting a specific module for students" do
+      go_to_modules
+
+      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
+      student_dropdown_input.click
+
+      wait_for_ajaximations
+
+      second_module = ff("[role='option']")[2]
+      expect(second_module.text).to eq("module2")
+
+      second_module.click
+      wait_for_ajaximations
+
+      visible_modules = ff("div[class*='context_module'] h3")
+      expect(visible_modules.length).to eq(2)
+      expect(visible_modules.first.text).to include("module1")
+    end
+
+    it "displays selected module in students view when acting as student" do
+      go_to_modules
+      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
+      student_dropdown_input.click
+
+      wait_for_ajaximations
+
+      second_module = ff("[role='option']")[2]
+      expect(second_module.text).to eq("module2")
+
+      second_module.click
+      wait_for_ajaximations
+
+      student_view_toggle = f("a#easy_student_view")
+      student_view_toggle.click
+
+      visible_modules = f("span[class*='ig-header-title'] span")
+      expect(visible_modules.text).to include("module2")
+    end
+
+    it "persists selected module filter after reload" do
+      go_to_modules
+
+      teacher_dropdown_input = f("input[role='combobox'][title='All Modules']")
+      teacher_dropdown_input.click
+
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      first_module.click
+      wait_for_ajaximations
+
+      refresh_page
+      wait_for_ajaximations
+
+      # Ensure the same module is still selected and shown
+      visible_modules = ff("div[class*='context_module'] h3")
+      expect(visible_modules.length).to eq(1)
+      expect(visible_modules.first.text).to include("module1")
+    end
+  end
 end
