@@ -30,12 +30,20 @@ class GraphQLController < ApplicationController
     prep_page_view_for_submit
     prep_page_view_for_create_discussion_entry
 
-    graphql_errors = result.to_h["data"]&.values&.any? { |res| res.is_a?(Hash) && res["errors"].present? }
-    RequestContext::Generator.add_meta_header("ge", graphql_errors ? "f" : "t")
+    # generic errors like exceed complexity are on root level of result
+    graphql_errors = result["errors"]
+    # query specific business logic errors (e.g. permission required) are nested in the data hash
+    query_errors = result.to_h["data"]&.values&.map { |res| (res.is_a?(Hash) && res["errors"].present?) ? res["errors"] : "" }&.reject(&:blank?)
 
-    if graphql_errors
+    any_error_occured = graphql_errors.present? || query_errors.present?
+    RequestContext::Generator.add_meta_header("ge", any_error_occured ? "f" : "t")
+    if any_error_occured
       disable_page_views
-      Rails.logger.info "There are GraphQL errors: #{result["errors"].to_json}"
+      Rails.logger.info "There are GraphQL errors: #{safe_to_json({ graphql_errors:, query_errors: }.compact)}"
+      if graphql_errors.present? && graphql_errors.is_a?(Array)
+        max_complexity_error = graphql_errors.find { |e| e.is_a?(Hash) && e["message"].to_s.include?("exceeds max complexity") }
+        log_exceed_complexity_error(max_complexity_error["message"].to_s) if max_complexity_error.present?
+      end
     end
 
     render json: result
@@ -129,5 +137,24 @@ class GraphQLController < ApplicationController
       id = params[:variables][:discussionTopicId]
       ::DiscussionTopic.where(id:)
     end
+  end
+
+  def safe_to_json(obj)
+    obj.to_json
+  rescue
+    obj
+  end
+
+  def log_exceed_complexity_error(err_msg)
+    tags = { operation_name: }
+    InstStatsd::Statsd.distributed_increment("graphql.errors.exceeds_max_complexity.count", tags:)
+    InstStatsd::Statsd.gauge("graphql.errors.exceeds_max_complexity.compexity", err_msg[/complexity of (\d+),/, 1]&.to_i, tags:)
+  end
+
+  def operation_name
+    document = GraphQL.parse(params[:query])
+    document&.definitions&.find { |d| d.is_a?(GraphQL::Language::Nodes::OperationDefinition) }&.name
+  rescue GraphQL::ParseError
+    "unknown"
   end
 end
