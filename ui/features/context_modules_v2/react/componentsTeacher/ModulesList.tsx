@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback, memo} from 'react'
+import React, {useState, useEffect, useCallback, memo, useMemo} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -27,6 +27,7 @@ import {
   handleCollapseAll,
   handleExpandAll,
   handleToggleExpand,
+  handleModuleViewChange,
 } from '../handlers/modulePageActionHandlers'
 import ManageModuleContentTray from './ManageModuleContent/ManageModuleContentTray'
 import {useModules} from '../hooks/queries/useModules'
@@ -38,6 +39,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleAction} from '../utils/types'
 import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
+import ModuleFilterHeader from './ModuleFilterHeader'
+import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -51,11 +54,12 @@ const MemoizedModule = memo(Module, (prevProps, nextProps) => {
   )
 })
 
+const ALL_MODULES = 'all'
 const ModulesList: React.FC = () => {
-  const {courseId} = useContextModule()
+  const {teacherViewEnabled, studentViewEnabled, courseId} = useContextModule()
   const reorderItemsMutation = useReorderModuleItems()
   const reorderModulesMutation = useReorderModules()
-  const {data, isLoading, error} = useModules(courseId || '')
+  const {data, isLoading, isFetching, error} = useModules(courseId || '')
 
   // Initialize with an empty Map - all modules will be collapsed by default
   const [expandedModules, setExpandedModules] = useState<Map<string, boolean>>(new Map())
@@ -67,6 +71,59 @@ const ModulesList: React.FC = () => {
     null,
   )
   const [sourceModule, setSourceModule] = useState<{id: string; title: string} | null>(null)
+  const [teacherViewValue, setTeacherViewValue] = useState(ALL_MODULES)
+  const [studentViewValue, setStudentViewValue] = useState(ALL_MODULES)
+  const {data: courseStudentData} = useCourseTeacher(courseId || '')
+  const [isDisabled, setIsDisabled] = useState(true)
+
+  useEffect(() => {
+    setIsDisabled(isFetching)
+  }, [isFetching])
+
+  useEffect(() => {
+    if ((!teacherViewEnabled && !studentViewEnabled) || !courseStudentData) return
+
+    const studentId = courseStudentData.settings?.showStudentOnlyModuleId ?? ALL_MODULES
+    const teacherId = courseStudentData.settings?.showTeacherOnlyModuleId ?? ALL_MODULES
+
+    setStudentViewValue(studentId)
+    setTeacherViewValue(teacherId)
+  }, [courseId, teacherViewEnabled, studentViewEnabled, courseStudentData])
+
+  const filteredModules = useMemo(() => {
+    const allModules = data?.pages?.flatMap(page => page.modules) ?? []
+
+    if (!teacherViewEnabled || teacherViewValue === ALL_MODULES) return allModules
+
+    return allModules.filter(module => module._id === teacherViewValue)
+  }, [data, teacherViewValue, teacherViewEnabled])
+
+  const moduleOptions = useMemo(() => {
+    if (!data) return {teacherView: [], studentView: []}
+
+    const allModules = data.pages.flatMap(page =>
+      page.modules.map(m => ({
+        id: m._id,
+        name: m.name,
+        published: m.published,
+      })),
+    )
+
+    return {
+      teacherView: allModules,
+      studentView: allModules.filter(m => m.published),
+    }
+  }, [data])
+
+  const handleTeacherChange = (
+    _e: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number; id?: string},
+  ) => handleModuleViewChange('teacher', setTeacherViewValue, courseId, data)
+
+  const handleStudentChange = (
+    _e: React.SyntheticEvent<Element, Event>,
+    data: {value?: string | number; id?: string},
+  ) => handleModuleViewChange('student', setStudentViewValue, courseId, data)
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -236,47 +293,57 @@ const ModulesList: React.FC = () => {
                 {...provided.droppableProps}
                 style={{minHeight: '100px'}}
               >
+                {(studentViewEnabled || teacherViewEnabled) && filteredModules.length ? (
+                  <ModuleFilterHeader
+                    moduleOptions={moduleOptions}
+                    handleTeacherChange={handleTeacherChange}
+                    teacherViewValue={teacherViewValue}
+                    teacherViewEnabled={teacherViewEnabled}
+                    handleStudentChange={handleStudentChange}
+                    studentViewValue={studentViewValue}
+                    studentViewEnabled={studentViewEnabled}
+                    disabled={isDisabled}
+                  />
+                ) : null}
                 <Flex direction="column" gap="small">
                   {data?.pages[0]?.modules.length === 0 ? (
                     <View as="div" textAlign="center" padding="large">
                       <Text>{I18n.t('No modules found')}</Text>
                     </View>
                   ) : (
-                    data?.pages
-                      .flatMap(page => page.modules)
-                      .map((module, index) => (
-                        <Draggable key={module._id} draggableId={module._id} index={index}>
-                          {(dragProvided, snapshot) => (
-                            <div
-                              ref={dragProvided.innerRef}
-                              {...dragProvided.draggableProps}
-                              style={{
-                                ...dragProvided.draggableProps.style,
-                                margin: '0 0 8px 0',
-                                background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
-                                borderRadius: '4px',
-                              }}
-                            >
-                              <MemoizedModule
-                                id={module._id}
-                                name={module.name}
-                                published={module.published}
-                                prerequisites={module.prerequisites}
-                                completionRequirements={module.completionRequirements}
-                                requirementCount={module.requirementCount}
-                                expanded={!!expandedModules.get(module._id)}
-                                hasActiveOverrides={module.hasActiveOverrides}
-                                onToggleExpand={onToggleExpandRef}
-                                dragHandleProps={dragProvided.dragHandleProps}
-                                setModuleAction={setModuleAction}
-                                setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-                                setSelectedModuleItem={setSelectedModuleItem}
-                                setSourceModule={setSourceModule}
-                              />
-                            </div>
-                          )}
-                        </Draggable>
-                      ))
+                    filteredModules.map((module, index) => (
+                      <Draggable key={module._id} draggableId={module._id} index={index}>
+                        {(dragProvided, snapshot) => (
+                          <div
+                            ref={dragProvided.innerRef}
+                            {...dragProvided.draggableProps}
+                            style={{
+                              ...dragProvided.draggableProps.style,
+                              margin: '0 0 8px 0',
+                              background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
+                              borderRadius: '4px',
+                            }}
+                          >
+                            <MemoizedModule
+                              id={module._id}
+                              name={module.name}
+                              published={module.published}
+                              prerequisites={module.prerequisites}
+                              completionRequirements={module.completionRequirements}
+                              requirementCount={module.requirementCount}
+                              expanded={!!expandedModules.get(module._id)}
+                              hasActiveOverrides={module.hasActiveOverrides}
+                              onToggleExpand={onToggleExpandRef}
+                              dragHandleProps={dragProvided.dragHandleProps}
+                              setModuleAction={setModuleAction}
+                              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                              setSelectedModuleItem={setSelectedModuleItem}
+                              setSourceModule={setSourceModule}
+                            />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))
                   )}
                 </Flex>
                 {provided.placeholder}
