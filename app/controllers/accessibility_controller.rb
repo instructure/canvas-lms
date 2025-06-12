@@ -117,7 +117,7 @@ class AccessibilityController < ApplicationController
   private
 
   def allowed?
-    return false unless tab_enabled?(Course::TAB_ACCESSIBILITY) && authorized_action(@context, @current_user, :read)
+    return false unless tab_enabled?(Course::TAB_ACCESSIBILITY) && authorized_action(@context, @current_user, [:read, :update])
 
     true
   end
