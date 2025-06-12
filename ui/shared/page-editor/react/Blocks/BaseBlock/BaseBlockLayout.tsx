@@ -26,6 +26,7 @@ export const BaseBlockLayout = React.forwardRef<
   PropsWithChildren<{
     title: string
     menu: ReactNode
+    actionButtons: ReactNode
     addButton: ReactNode
   }>
 >((props, ref) => {
@@ -42,6 +43,9 @@ export const BaseBlockLayout = React.forwardRef<
         </Flex>
         <Flex direction="column" gap="small" width={'100%'}>
           {props.children}
+        </Flex>
+        <Flex direction="row-reverse" width={'100%'} justifyItems="space-between">
+          <Flex.Item>{props.actionButtons}</Flex.Item>
         </Flex>
       </Flex>
       {props.addButton}
