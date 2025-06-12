@@ -20,8 +20,8 @@
 
 require_relative "../../../spec_helper"
 
-describe AuthenticationProvider::SAML::InCommon do
-  let(:subject) { AuthenticationProvider::SAML::InCommon }
+describe AuthenticationProvider::SAML::UKFederation do
+  subject { AuthenticationProvider::SAML::UKFederation }
 
   describe ".refresh_providers" do
     before do
@@ -31,10 +31,10 @@ describe AuthenticationProvider::SAML::InCommon do
     let!(:saml) do
       Account.default.authentication_providers.create!(auth_type: "saml",
                                                        metadata_uri: subject::URN,
-                                                       idp_entity_id: "urn:mace:incommon:myschool.edu")
+                                                       idp_entity_id: "urn:mace:ukfederation:myschool.edu")
     end
 
-    it "does nothing if there aren't any InCommon providers" do
+    it "does nothing if there aren't any UKFederation providers" do
       saml.destroy
       expect(subject).not_to receive(:refresh_if_necessary)
       subject.refresh_providers
@@ -59,11 +59,11 @@ describe AuthenticationProvider::SAML::InCommon do
     it "continues after a failure" do
       saml2 = Account.default.authentication_providers.create!(auth_type: "saml",
                                                                metadata_uri: subject::URN,
-                                                               idp_entity_id: "urn:mace:incommon:myschool2.edu")
+                                                               idp_entity_id: "urn:mace:ukfederation:myschool2.edu")
       expect(subject).to receive(:refresh_if_necessary).and_return("xml")
       expect(subject).to receive(:validate_and_parse_metadata).and_return({
-                                                                            "urn:mace:incommon:myschool.edu" => "metadata1",
-                                                                            "urn:mace:incommon:myschool2.edu" => "metadata2",
+                                                                            "urn:mace:ukfederation:myschool.edu" => "metadata1",
+                                                                            "urn:mace:ukfederation:myschool2.edu" => "metadata2",
                                                                           })
 
       expect(Canvas::Errors).to receive(:capture_exception).once
@@ -77,7 +77,7 @@ describe AuthenticationProvider::SAML::InCommon do
     it "populates and saves" do
       expect(subject).to receive(:refresh_if_necessary).and_return("xml")
       expect(subject).to receive(:validate_and_parse_metadata).and_return({
-                                                                            "urn:mace:incommon:myschool.edu" => "metadata1"
+                                                                            "urn:mace:ukfederation:myschool.edu" => "metadata1"
                                                                           })
 
       expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with("metadata1")

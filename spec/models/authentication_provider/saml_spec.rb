@@ -93,6 +93,14 @@ describe AuthenticationProvider::SAML do
       expect(saml.metadata_uri).to eq AuthenticationProvider::SAML::InCommon::URN
     end
 
+    it "populates InCommon metadata from MDQ-constructed URI" do
+      saml = Account.default.authentication_providers.new(auth_type: "saml",
+                                                          metadata_uri: AuthenticationProvider::SAML::InCommon::URN,
+                                                          idp_entity_id: "urn:mace:incommon:myschool.edu")
+      expect(saml).to receive(:populate_from_metadata_url).with("https://mdq.incommon.org/entities/urn%3Amace%3Aincommon%3Amyschool.edu")
+      saml.save!
+    end
+
     it "overwrite sig_alg field as appropriate" do
       # defaults to RSA-SHA256
       saml = AuthenticationProvider::SAML.new

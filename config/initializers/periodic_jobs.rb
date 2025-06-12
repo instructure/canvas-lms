@@ -273,6 +273,8 @@ Rails.configuration.after_initialize do
     end
 
     AuthenticationProvider::SAML::Federation.descendants.each do |federation|
+      next if federation::MDQ
+
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", "45 0 * * *" do
         DatabaseServer.send_in_each_region(federation,
                                            :refresh_providers,

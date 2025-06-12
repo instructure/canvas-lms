@@ -21,7 +21,17 @@
 require "saml2"
 
 class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::MetadataRefresher
+  MDQ = false
+
   class << self
+    def metadata_uri(entity_id)
+      raise "can't use metadata_uri for a federation that doesn't use MDQ" unless self::MDQ
+
+      e = endpoint
+      e += "/" unless e.end_with?("/")
+      "#{e}entities/#{CGI.escape(entity_id)}"
+    end
+
     def metadata
       Shard.default.activate do
         if Canvas.redis_enabled?
