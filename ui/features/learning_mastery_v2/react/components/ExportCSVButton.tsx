@@ -17,23 +17,30 @@
  */
 
 import React, {useRef, useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {CSVLink} from 'react-csv'
 import {IconExportLine} from '@instructure/ui-icons'
-import useCSVExport, {EXPORT_COMPLETE, EXPORT_FAILED, EXPORT_PENDING} from './hooks/useCSVExport'
+import useCSVExport, {EXPORT_COMPLETE, EXPORT_FAILED, EXPORT_PENDING} from '../hooks/useCSVExport'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-const ExportCSVButton = ({courseId, gradebookFilters}) => {
-  const csvElementRef = useRef(null)
-  const exportCSV = () => csvElementRef.current?.click()
+export interface ExportCSVButtonProps {
+  courseId: string
+  gradebookFilters?: string[]
+}
+
+export const ExportCSVButton: React.FC<ExportCSVButtonProps> = ({
+  courseId,
+  gradebookFilters = [],
+}) => {
+  const csvElementRef = useRef<HTMLSpanElement>(null)
+  const exportCSV = (): void => csvElementRef.current?.click()
 
   const {exportGradebook, exportState, exportData} = useCSVExport({courseId, gradebookFilters})
-  const [interaction, setInteraction] = useState('enabled')
+  const [interaction, setInteraction] = useState<'enabled' | 'disabled'>('enabled')
 
-  const onButtonClick = () => {
+  const onButtonClick = (): void => {
     setInteraction('disabled')
     exportGradebook()
   }
@@ -50,7 +57,7 @@ const ExportCSVButton = ({courseId, gradebookFilters}) => {
   return (
     <>
       <Button
-        renderIcon={IconExportLine}
+        renderIcon={<IconExportLine />}
         onClick={onButtonClick}
         interaction={interaction}
         data-testid="export-button"
@@ -67,10 +74,3 @@ const ExportCSVButton = ({courseId, gradebookFilters}) => {
     </>
   )
 }
-
-ExportCSVButton.propTypes = {
-  courseId: PropTypes.string.isRequired,
-  gradebookFilters: PropTypes.arrayOf(PropTypes.string),
-}
-
-export default ExportCSVButton
