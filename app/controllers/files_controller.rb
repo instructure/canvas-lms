@@ -411,7 +411,7 @@ class FilesController < ApplicationController
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
-      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
+      files_version_2 = files_version_2?
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
 
       root_folders_by_context = {}
@@ -1702,6 +1702,18 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def files_version_2?
+    unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+      return false
+    end
+
+    unless @current_user
+      return true
+    end
+
+    !Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1"
+  end
 
   def quota_exempt?
     @attachment.verify_quota_exemption_key(params[:quota_exemption]) ||
