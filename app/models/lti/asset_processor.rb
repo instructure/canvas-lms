@@ -103,6 +103,6 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   def report_custom_variables
-    (custom || {}).merge!(report&.dig("custom") || {})
+    (custom || {}).merge(report&.dig("custom") || {})
   end
 end

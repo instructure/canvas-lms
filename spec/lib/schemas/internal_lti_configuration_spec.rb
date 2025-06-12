@@ -363,6 +363,40 @@ describe Schemas::InternalLtiConfiguration do
       end
     end
 
+    describe "eula subsettings" do
+      let(:eula_settings) do
+        {
+          target_link_uri: "https://example.com/eula",
+          custom_fields: { "foo" => "$Canvas.user.id" }
+        }
+      end
+
+      context "in ActivityAssetProcessor" do
+        let(:json) do
+          super().merge(
+            {
+              placements: [
+                { placement: "ActivityAssetProcessor", eula: eula_settings }
+              ]
+            }
+          )
+        end
+
+        it "returns no errors" do
+          expect(subject).to be_empty
+        end
+
+        context "with invalid eula settings" do
+          let(:eula_settings) { { custom_fields: { "abc" => false } } }
+
+          it "returns errors" do
+            expect(subject).not_to be_empty
+            expect(error_message).to include "eula"
+          end
+        end
+      end
+    end
+
     context "root_account_only" do
       context "in launch_settings" do
         let(:json) do

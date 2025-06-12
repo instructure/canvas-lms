@@ -120,6 +120,7 @@ class ContextExternalTool < ActiveRecord::Base
   CUSTOM_EXTENSION_KEYS = {
     file_menu: [:accept_media_types].freeze,
     editor_button: [:use_tray].freeze,
+    ActivityAssetProcessor: [:eula].freeze,
     submission_type_selection: [:description, :require_resource_selection].freeze,
   }.freeze
 
@@ -347,6 +348,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def extension_setting(type, property = nil)
     val = calculate_extension_setting(type, property)
+
     if property == :icon_url
       # make sure it's a valid url
       begin
@@ -1393,8 +1395,16 @@ class ContextExternalTool < ActiveRecord::Base
     ).delete_suffix("/deployment")
   end
 
+  def eula_settings
+    extension_setting(:ActivityAssetProcessor, :eula)
+  end
+
   def eula_launch_url
-    extension_setting(:ActivityAssetProcessor, :eula)&.dig("target_link_uri") || launch_url
+    eula_settings&.dig("target_link_uri")&.to_s || launch_url
+  end
+
+  def eula_custom_fields
+    eula_settings&.dig("custom_fields")&.transform_values(&:to_s) || {}
   end
 
   private

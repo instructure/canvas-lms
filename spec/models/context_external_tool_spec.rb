@@ -3459,7 +3459,7 @@ describe ContextExternalTool do
     end
   end
 
-  describe "#eula_launch_url" do
+  describe "eula fields" do
     let(:tool) do
       ContextExternalTool.create!(
         context: @root_account,
@@ -3472,13 +3472,29 @@ describe ContextExternalTool do
     end
     let(:settings) { {} }
 
-    it "returns the extension eula_launch_url if present" do
-      settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
-      expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
+    describe "#eula_launch_url" do
+      it "returns the extension eula_launch_url if present" do
+        settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
+        expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
+      end
+
+      it "returns the launch_url if extension eula_launch_url is not present" do
+        expect(tool.eula_launch_url).to eq tool.launch_url
+      end
     end
 
-    it "returns the launch_url if extension eula_launch_url is not present" do
-      expect(tool.eula_launch_url).to eq tool.launch_url
+    describe "#eula_custom_fields" do
+      it "returns the fields if custom_fields is a hash" do
+        custom_fields = { "field1" => "value1", "field2" => "value2" }
+        settings[:ActivityAssetProcessor] = { eula: { custom_fields: } }
+
+        expected = { "field1" => "value1", "field2" => "value2" }
+        expect(tool.eula_custom_fields).to eq(expected)
+      end
+
+      it "returns {} if custom_fields is not given" do
+        expect(tool.eula_custom_fields).to eq({})
+      end
     end
   end
 end

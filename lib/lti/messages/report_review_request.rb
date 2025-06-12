@@ -73,7 +73,7 @@ module Lti::Messages
     end
 
     def unexpanded_custom_parameters
-      super.merge!(@asset_report.asset_processor.report_custom_variables)
+      super.merge(@asset_report.asset_processor.report_custom_variables)
     end
   end
 end

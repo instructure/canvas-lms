@@ -50,7 +50,7 @@ module Lti::Messages
 
     def unexpanded_custom_parameters
       # Add message-specific custom params (e.g. specified by Asset Processor deep linking response)
-      super.merge!(@opts[:custom_params] || {})
+      super.merge(@opts[:custom_params] || {})
     end
   end
 end
