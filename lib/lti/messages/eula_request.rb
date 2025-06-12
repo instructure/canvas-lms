@@ -37,5 +37,9 @@ module Lti::Messages
     def generate_post_payload_message
       super(validate_launch: true)
     end
+
+    def unexpanded_custom_parameters
+      super.merge(@tool.eula_custom_fields)
+    end
   end
 end

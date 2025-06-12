@@ -88,7 +88,7 @@ module Lti::Messages
 
     def unexpanded_custom_parameters
       # Add in link-specific custom params (e.g. created by deep linking)
-      super.merge!(resource_link&.custom || {})
+      super.merge(resource_link&.custom || {})
     end
 
     def resource_link
