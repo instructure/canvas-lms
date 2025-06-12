@@ -159,6 +159,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     return if metadata_uri.blank?
     return unless metadata_uri_changed? || idp_entity_id_changed?
 
+    effective_metadata_uri = metadata_uri
+
     Federation.descendants.each do |federation|
       # someone's trying to cheat; switch to our more efficient implementation
       self.metadata_uri = federation::URN if metadata_uri == federation.endpoint
@@ -168,6 +170,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       if idp_entity_id.blank?
         errors.add(:idp_entity_id, :blank)
         return
+      end
+
+      if federation::MDQ
+        effective_metadata_uri = federation.metadata_uri(idp_entity_id)
+        break
       end
 
       begin
@@ -187,7 +194,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
 
     begin
-      populate_from_metadata_url(metadata_uri)
+      populate_from_metadata_url(effective_metadata_uri)
     rescue => e
       ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
       errors.add(:metadata_uri, e.message)

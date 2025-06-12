@@ -71,6 +71,15 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
       subject.refresh_providers
     end
+
+    it "uses MDQ-constructed metadata URIs" do
+      expect(subject).to receive(:refresh_if_necessary)
+        .with(saml1.global_id, "https://mdq.incommon.org/entities/urn%3Amace%3Aincommon%3Amyschool.edu")
+        .and_return(false)
+
+      saml1.update!(metadata_uri: AuthenticationProvider::SAML::InCommon::URN, idp_entity_id: "urn:mace:incommon:myschool.edu")
+      subject.refresh_providers
+    end
   end
 
   describe ".refresh_if_necessary" do

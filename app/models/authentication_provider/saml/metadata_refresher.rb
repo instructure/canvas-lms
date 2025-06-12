@@ -23,11 +23,24 @@ require "saml2"
 class AuthenticationProvider::SAML::MetadataRefresher < AuthenticationProvider::ProviderRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
-      federations = AuthenticationProvider::SAML::Federation.descendants.map { |federation| federation::URN }
+      federations = AuthenticationProvider::SAML::Federation.descendants
+                                                            .reject { |federation| federation::MDQ }
+                                                            .map { |federation| federation::URN }
       providers ||= AuthenticationProvider::SAML.active
                                                 .where.not(metadata_uri: [nil, ""] + federations)
                                                 .shard(shard_scope)
       super
+    end
+
+    private
+
+    def uri_for(provider)
+      effective_metadata_uri = AuthenticationProvider::SAML::Federation
+                               .descendants
+                               .find { |federation| federation::MDQ && provider.metadata_uri == federation::URN }
+                               &.metadata_uri(provider.idp_entity_id)
+
+      effective_metadata_uri || super
     end
   end
 end
