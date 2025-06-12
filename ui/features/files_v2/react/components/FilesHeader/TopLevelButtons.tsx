@@ -91,6 +91,7 @@ const TopLevelButtons = ({
 
   const switchUIButton = () => {
     if (!ENV.FEATURES?.files_a11y_rewrite_toggle) return null
+    if (!ENV.current_user_id) return null
     return (
       <Button color="secondary" display={buttonDisplay} onClick={handleSwitchToOldFiles}>
         {I18n.t('Switch to Old Files Page')}
