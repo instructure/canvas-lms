@@ -896,10 +896,101 @@
 #       }
 #     }
 #
+# @model ContextSearchResponse
+#     {
+#       "id": "ContextSearchResponse",
+#       "description": "The response for the Search Accounts and Courses API endpoint",
+#       "properties": {
+#         "accounts": {
+#           "description": "Accounts that match the search query. Limited to 100.",
+#           "example": [{ "$ref": "Account" }],
+#           "type": "array",
+#           "items": {
+#             "$ref": "SearchableAccount"
+#           }
+#         },
+#         "courses": {
+#           "description": "Courses that match the search query. Limited to 100.",
+#           "example": [{ "$ref": "Course" }],
+#           "type": "array",
+#           "items": {
+#             "$ref": "SearchableCourse"
+#           }
+#         }
+#       }
+#     }
+#
+# @model SearchableAccount
+#     {
+#       "id": "SearchableAccount",
+#       "description": "A minimal representation of an Account for Canvas Apps search purposes",
+#       "properties": {
+#         "id": {
+#           "description": "The Canvas DB ID",
+#           "example": "1",
+#           "type": "string"
+#         },
+#         "name": {
+#           "description": "The account name",
+#           "example": "An Account",
+#           "type": "string"
+#         },
+#         "sis_id": {
+#           "description": "The SIS ID of the account, if any. Only present if user can read or manage SIS.",
+#           "example": "sis-account-1",
+#           "type": "string"
+#         },
+#         "display_path": {
+#           "description": "Names of the accounts in this account's hierarchy, excluding the root and this account.",
+#           "example": ["Sub Account"],
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
+#         }
+#       }
+#     }
+#
+# @model SearchableCourse
+#     {
+#       "id": "SearchableCourse",
+#       "description": "A minimal representation of a Course for Canvas Apps search purposes",
+#       "properties": {
+#         "id": {
+#           "description": "The Canvas DB ID",
+#           "example": "1",
+#           "type": "string"
+#         },
+#         "name": {
+#           "description": "The course name",
+#           "example": "A Course",
+#           "type": "string"
+#         },
+#         "sis_id": {
+#           "description": "The SIS ID of the course, if any. Only present if user can read or manage SIS.",
+#           "example": "sis-course-1",
+#           "type": "string"
+#         },
+#         "display_path": {
+#           "description": "Names of the accounts in this course's account hierarchy, excluding the root.",
+#           "example": ["Sub Account"],
+#           "type": "array",
+#           "items": {
+#             "type": "string"
+#           }
+#         },
+#         "course_code": {
+#           "description": "The course code",
+#           "example": "COURSE-101",
+#           "type": "string"
+#         }
+#       }
+#     }
+#
 class Lti::RegistrationsController < ApplicationController
   before_action :require_account_context_instrumented
   before_action :require_feature_flag
-  before_action :require_lti_registrations_next_feature_flag, only: %i[reset]
+  before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search]
   before_action :require_manage_lti_registrations
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1366,6 +1457,86 @@ class Lti::RegistrationsController < ApplicationController
     ) => {lti_registration_account_binding:}
 
     render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
+  end
+
+  # @API Search for Accounts and Courses
+  # This is a utility endpoint used by the Canvas Apps UI and may not serve general use cases.
+  #
+  # Search for accounts and courses that match the search term on name, SIS id, or course code.
+  # Returns bare-bones data about each account and course. Used to populate the search dropdowns
+  # when managing LTI registration availability.
+  #
+  # @argument by_account_id [Optional, String] If provided, only searches within this account.
+  # @argument search_term [Optional, String] String to search for in account names, SIS ids, or course codes.
+  #
+  # @returns ContextSearchResponse
+  #
+  # @example_request
+  #
+  #   This would search for accounts and courses matching the search term "example"
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/context_search?search_term=example' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  def context_search
+    account_id = params[:by_account_id]
+    search_term = params[:search_term].to_s.strip
+    can_read_sis = @context.root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+
+    account_scope = Account.active.where(root_account_id: @domain_root_account.id).or(Account.where(id: @domain_root_account.id))
+    if account_id.present?
+      subaccount_ids = Account.sub_account_ids_recursive(account_id)
+      account_scope = account_scope.where(id: subaccount_ids + [account_id])
+    end
+
+    course_scope = Course.active.where(account: account_scope)
+
+    if search_term.present?
+      account_scope = account_scope.where("name ILIKE :s OR sis_source_id ILIKE :s", s: "%#{search_term}%")
+      course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
+    end
+
+    accounts = account_scope.limit(100)
+    courses = course_scope.limit(100)
+
+    all_account_ids = (accounts.pluck(:id) + courses.pluck(:account_id)).uniq
+    if all_account_ids.empty?
+      return render json: { accounts: [], courses: [] }
+    end
+
+    account_chains = Account.account_chain_ids_for_multiple_accounts(all_account_ids)
+                            # put highest-level account first and
+                            # remove first (root) account from chain
+                            .transform_values { |ids| ids.tap(&:pop).reverse }
+    all_account_chain_ids = account_chains.values.flatten.uniq
+    account_names = Account.where(id: all_account_chain_ids).pluck(:id, :name).to_h
+
+    accounts_json = accounts.map do |account|
+      display_path = account_chains[account.id].filter_map do |id|
+        account_names[id] unless id == account.id # don't include the account itself in the display path
+      end
+      {
+        id: account.id.to_s,
+        name: account.name,
+        sis_id: can_read_sis ? account.sis_source_id : nil,
+        display_path:
+      }
+    end
+
+    courses_json = courses.map do |course|
+      display_path = account_chains[course.account_id].map { |id| account_names[id] }
+      {
+        id: course.id.to_s,
+        name: course.name,
+        sis_id: can_read_sis ? course.sis_source_id : nil,
+        course_code: course.course_code,
+        display_path:
+      }
+    end
+
+    render json: {
+      accounts: accounts_json,
+      courses: courses_json
+    }
   end
 
   private
