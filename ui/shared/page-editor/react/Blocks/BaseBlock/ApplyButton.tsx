@@ -16,22 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect} from 'react'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {Button} from '@instructure/ui-buttons'
 
-export const useSetEditMode = (ref: React.RefObject<Element>, setter: (value: boolean) => void) => {
-  useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent | TouchEvent) => {
-      if (!ref.current) return
-      if (ref.current.contains(event.target as Node)) {
-        setter(true)
-      }
-    }
+const I18n = createI18nScope('page_editor')
 
-    document.addEventListener('click', handleDocumentClick)
-    document.addEventListener('touchstart', handleDocumentClick)
-    return () => {
-      document.removeEventListener('click', handleDocumentClick)
-      document.removeEventListener('touchstart', handleDocumentClick)
-    }
-  }, [ref, setter])
+export const ApplyButton = (props: {
+  onClick: () => void
+}) => {
+  return (
+    <Button color="primary" onClick={props.onClick}>
+      {I18n.t('Apply')}
+    </Button>
+  )
 }

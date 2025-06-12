@@ -25,6 +25,7 @@ import {AddButton} from '../../AddBlock/AddButton'
 import {useDeleteNode} from '../../hooks/useDeleteNode'
 import {useNode} from '@craftjs/core'
 import {usePageEditorContext} from '../../PageEditorContext'
+import {ApplyButton} from './ApplyButton'
 
 const InsertButton = () => {
   const {addBlockModal} = usePageEditorContext()
@@ -36,6 +37,12 @@ const DeleteButton = () => {
   const deleteNode = useDeleteNode()
 
   return <RemoveButton onClicked={deleteNode} />
+}
+
+const SaveButton = (props: {
+  onClick: () => void
+}) => {
+  return <ApplyButton onClick={props.onClick} />
 }
 
 export const BaseBlock = (
@@ -53,6 +60,11 @@ export const BaseBlock = (
         ref={ref}
         title={props.title}
         addButton={<InsertButton />}
+        actionButtons={
+          isEditMode
+            ? [<SaveButton key="action-save-btn" onClick={() => setIsEditMode(false)} />]
+            : []
+        }
         menu={[<DeleteButton key="menu-delete-btn" />]}
       >
         {props.children}
