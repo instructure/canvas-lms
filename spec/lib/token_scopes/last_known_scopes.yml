@@ -236,6 +236,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/context_search'
+- verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_groups'
