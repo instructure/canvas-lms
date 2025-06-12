@@ -3429,7 +3429,7 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if Account.site_admin.feature_enabled?(:accessibility_dashboard_feature) && feature_enabled?(:accessibility_tab_enable)
+    if feature_enabled?(:accessibility_tab_enable)
       default_tabs.insert(1,
                           {
                             id: TAB_ACCESSIBILITY,

@@ -8,10 +8,4 @@ accessibility_tab_enable:
     provided the feature "Accessibility Dashboard" is also enabled. Clicking 
     on the tab will open a new page with accessibility issues found
     among available course resources. 
-accessibility_dashboard_feature:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Accessibility Dashboard
-  description: |-
-    Enables displaying accessibility dashboards for courses. Need to be turned
-    on to enable course-level accessibility tabs.
+
