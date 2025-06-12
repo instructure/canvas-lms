@@ -499,6 +499,32 @@ describe AuthenticationProvider do
       expect(@pseudonym.integration_id).to eq "testfrd"
     end
 
+    it "ignores conflicting sis_user_id value" do
+      @pseudonym.update sis_user_id: "A"
+      new_ps = user_with_pseudonym(active_all: true).pseudonym
+      aac.apply_federated_attributes(new_ps,
+                                     { "sis_id" => "A" },
+                                     purpose: :provisioning)
+      expect(new_ps.sis_user_id).to be_nil
+    end
+
+    it "ignores conflicting integration_id value" do
+      @pseudonym.update integration_id: "A"
+      new_ps = user_with_pseudonym(active_all: true).pseudonym
+      aac.apply_federated_attributes(new_ps,
+                                     { "internal_id" => "A" },
+                                     purpose: :provisioning)
+      expect(new_ps.integration_id).to be_nil
+    end
+
+    it "updates the integration_id to match the sis_user_id if requested" do
+      @pseudonym.update sis_user_id: "A"
+      aac.apply_federated_attributes(@pseudonym,
+                                     { "internal_id" => "A" },
+                                     purpose: :provisioning)
+      expect(@pseudonym.integration_id).to eq "A"
+    end
+
     it "supports multiple emails" do
       aac.apply_federated_attributes(@pseudonym, { "email" => %w[cody@school.edu student@school.edu] })
       @user.reload
