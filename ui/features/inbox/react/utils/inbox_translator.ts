@@ -67,6 +67,7 @@ export async function translateText(args: TranslateArgs, text: string): Promise<
         inputs: {
           tgt_lang: args.tgtLang,
           text,
+          feature_slug: 'inbox',
         },
       },
     })

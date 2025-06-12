@@ -16,3 +16,10 @@ ai_translation_improvements:
   display_name: AI Translation Improvements
   description: Improve the ui and ux around AI translation features.
   shadow: true
+
+cedar_translation:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Cedar Translation
+  description: |-
+    Uses Cedar for translations

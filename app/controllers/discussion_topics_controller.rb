@@ -879,6 +879,7 @@ class DiscussionTopicsController < ApplicationController
 
       assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
       participant = @topic.participant(@current_user)
+      translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                context_type: @topic.context_type,
@@ -895,9 +896,9 @@ class DiscussionTopicsController < ApplicationController
                discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_entry_version_history: Account.site_admin.feature_enabled?(:discussion_entry_version_history),
-               discussion_translation_available: Translation.available?(@context, :translation, @domain_root_account.feature_enabled?(:ai_translation_improvements)), # Is translation enabled on the course.
+               discussion_translation_available: Translation.available?(translation_flags), # Is translation enabled on the course.
                ai_translation_improvements: @domain_root_account.feature_enabled?(:ai_translation_improvements),
-               discussion_translation_languages: Translation.available?(@context, :translation, @domain_root_account.feature_enabled?(:ai_translation_improvements)) ? Translation.languages(@domain_root_account.feature_enabled?(:ai_translation_improvements)) : [],
+               discussion_translation_languages: Translation.available?(translation_flags) ? Translation.languages(translation_flags) : [],
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                user_can_summarize: @topic.user_can_summarize?(@current_user),
                user_can_access_insights: @topic.user_can_access_insights?(@current_user),
