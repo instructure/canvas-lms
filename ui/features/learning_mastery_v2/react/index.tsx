@@ -32,7 +32,7 @@ import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
-import ExportCSVButton from './ExportCSVButton'
+import {ExportCSVButton} from './components/ExportCSVButton'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
