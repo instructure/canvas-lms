@@ -30,6 +30,7 @@ import DiscussionThreadedSelect from './DiscussionThreadedSelect'
 import {useManageThreadedRepliesStore} from '../../hooks/useManageThreadedRepliesStore'
 import {DTRDiscussion} from './ManageThreadedReplies'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import LoadingIndicator from '@canvas/loading-indicator/react'
 
 const I18n = createI18nScope('discussions_v2')
 
@@ -107,6 +108,7 @@ const DiscussionEntry: React.FC<DiscussionEntryProps> = ({
 const DiscussionTable: React.FC<DiscussionTableProps> = ({mobileOnly, discussions}) => {
   const selectedDiscussions = useManageThreadedRepliesStore(state => state.selectedDiscussions)
   const setDiscussionState = useManageThreadedRepliesStore(state => state.setDiscussionState)
+  const isLoading = useManageThreadedRepliesStore(state => state.loading)
   const toggleSelectedDiscussions = useManageThreadedRepliesStore(
     state => state.toggleSelectedDiscussions,
   )
@@ -177,10 +179,18 @@ const DiscussionTable: React.FC<DiscussionTableProps> = ({mobileOnly, discussion
           </Flex.Item>
         </Flex>
       </View>
-      {discussions.map(discussion => (
-        <DiscussionEntry key={discussion.id} {...discussion} mobileOnly={mobileOnly} />
-      ))}
-      {mobileOnly && <View as="div" width="100%" borderWidth="small 0 0 0" borderColor="primary" />}
+      {isLoading && (
+        <View as="div" borderWidth="small 0 0 0" borderColor="primary" padding="large">
+          <LoadingIndicator />
+        </View>
+      )}
+      {!isLoading &&
+        discussions.map(discussion => (
+          <DiscussionEntry key={discussion.id} {...discussion} mobileOnly={mobileOnly} />
+        ))}
+      {!isLoading && mobileOnly && (
+        <View as="div" width="100%" borderWidth="small 0 0 0" borderColor="primary" />
+      )}
     </View>
   )
 }

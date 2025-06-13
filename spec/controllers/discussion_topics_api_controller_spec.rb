@@ -974,4 +974,56 @@ describe DiscussionTopicsApiController do
       expect(announcement.reload.discussion_type).to eq("side_comment")
     end
   end
+
+  context "update_discussion_types" do
+    before do
+      course_with_teacher(active_all: true)
+    end
+
+    it "should update the discussions types to 'threaded' and 'not_threaded' according to the parameters" do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_return(true)
+      user_session(@teacher)
+      topic1 = @course.discussion_topics.create!(title: "discussion1", discussion_type: "side_comment")
+      topic2 = @course.discussion_topics.create!(title: "discussion2", discussion_type: "side_comment")
+
+      put "update_discussion_types", params: { course_id: @course.id, threaded: [topic1.id], not_threaded: [topic2.id] }, format: "json"
+
+      expect(response).to be_successful
+      expect(topic1.reload.discussion_type).to eq("threaded")
+      expect(topic2.reload.discussion_type).to eq("not_threaded")
+    end
+
+    it "should return an error if the discussion type is not side_comment" do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_return(true)
+      user_session(@teacher)
+      topic1 = @course.discussion_topics.create!(title: "discussion1", discussion_type: "threaded")
+      topic2 = @course.discussion_topics.create!(title: "discussion2", discussion_type: "side_comment")
+
+      put "update_discussion_types", params: { course_id: @course.id, threaded: [topic1.id], not_threaded: [topic2.id] }, format: "json"
+
+      expect(response).to have_http_status(:bad_request)
+      expect(topic1.reload.discussion_type).to eq("threaded")
+      expect(topic2.reload.discussion_type).to eq("side_comment")
+    end
+
+    it "should throw an error if the user doesn't have the right to modify it" do
+      allow(Account.site_admin).to receive(:feature_enabled?).and_return(true)
+      student_in_course(active_all: true, course: @course)
+      user_session(@student)
+      topic1 = @course.discussion_topics.create!(title: "discussion1", discussion_type: "side_comment")
+      put "update_discussion_types", params: { course_id: @course.id, threaded: [topic1.id], not_threaded: [] }, format: "json"
+
+      expect(response).to have_http_status(:forbidden)
+      expect(topic1.reload.discussion_type).to eq("side_comment")
+    end
+
+    it "should throw a 404 if the feature is not enabled" do
+      user_session(@teacher)
+      topic1 = @course.discussion_topics.create!(title: "discussion1", discussion_type: "side_comment")
+      put "update_discussion_types", params: { course_id: @course.id, threaded: [topic1.id], not_threaded: [] }, format: "json"
+
+      expect(response).to be_not_found
+      expect(topic1.reload.discussion_type).to eq("side_comment")
+    end
+  end
 end

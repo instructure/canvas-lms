@@ -54,6 +54,7 @@ const DiscussionThreadedSelect: React.FC<DiscussionThreadedSelectProps> = ({id})
   const [isOpen, setIsOpen] = useState(false)
 
   const discussionState = useManageThreadedRepliesStore(state => state.discussionStates)[id]
+  const isDirty = useManageThreadedRepliesStore(state => state.isDirty)
   const setDiscussionState = useManageThreadedRepliesStore(state => state.setDiscussionState)
 
   const handleSelectOption: SelectProps['onRequestSelectOption'] = (_e, {id: optionId}) => {
@@ -84,6 +85,7 @@ const DiscussionThreadedSelect: React.FC<DiscussionThreadedSelectProps> = ({id})
       inputValue={
         OPTIONS.find(option => option.value === discussionState)?.label || OPTIONS[0].label
       }
+      messages={isDirty && discussionState === 'not_set' ? [{type: 'error', text: ''}] : undefined}
       isShowingOptions={isOpen}
       onRequestShowOptions={() => setIsOpen(true)}
       onRequestHideOptions={() => setIsOpen(false)}
