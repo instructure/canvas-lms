@@ -20,4 +20,4 @@ To enable use of Consul with Docker there are three things that you need to do.
 
 1. Add `docker-compose/consul.override.yml` to your `COMPOSE_FILE` env var.
 2. Un-comment the development consul configuration in `config/consul.yml`
-3. Run the rake task to pre-populate the config values in consul: `docker-compose run --rm web bin/rake canvas:seed_consul`
+3. Run the rake task to pre-populate the config values in consul: `docker compose run --rm web bin/rake canvas:seed_consul`

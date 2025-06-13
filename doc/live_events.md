@@ -16,7 +16,7 @@ There are two components to local development:
 
 If using the docker-compose dev setup, there is a "fake kinesis" available in
 docker-compose/kinesis.override.yml available for use. To start this kinesis
-container run `docker-compose up -d kinesis`. Once it's up, make sure you have
+container run `docker compose up -d kinesis`. Once it's up, make sure you have
 the `aws` cli installed, and run the following command to create a stream (with
 canvas running). Keep in mind that we are running this locally so actual AWS
 credentials are not needed, run the following command as you see it here:
@@ -47,7 +47,7 @@ Restart Canvas, and events should start flowing to your kinesis stream.
 You can view the stream with the `tail_kinesis` tool:
 
 ```bash
-docker-compose run --rm web script/tail_kinesis http://kinesis:4567 live-events
+docker compose run --rm web script/tail_kinesis http://kinesis:4567 live-events
 ```
 
 #### Stubbing Kinesis
@@ -60,7 +60,7 @@ them to a kinesis stream.
 An easy way of accessing stdout when using dockerized Canvas is this:
 
 ```
-docker-compose logs -f --tail=100 <jobs|web> # whichever container you need
+docker compose logs -f --tail=100 <jobs|web> # whichever container you need
 ```
 
 #### Connecting to local Publisher Lambda
@@ -94,7 +94,7 @@ block, check the example file or copy this block:
 
 Restart Canvas, and events should start flowing to the kinesis stream, and to
 the publisher lambda itself. You can view the stream and publisher lambda
-activity by looking at the output of `docker-compose up` in the `live-events-publish`
+activity by looking at the output of `docker compose up` in the `live-events-publish`
 repo.
 
 ### Subscription Management

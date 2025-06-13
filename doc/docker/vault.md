@@ -15,4 +15,4 @@ To enable use of Vault with Docker there are three things that you need to do.
 
 1. Add `docker-compose/vault.override.yml` to your `COMPOSE_FILE` env var.
 2. Un-comment the development vault configuration in `config/vault.yml`
-3. Run the rake task to pre-populate the config values in vault: `docker-compose run --rm web bin/rake canvas:seed_vault`
+3. Run the rake task to pre-populate the config values in vault: `docker compose run --rm web bin/rake canvas:seed_vault`
