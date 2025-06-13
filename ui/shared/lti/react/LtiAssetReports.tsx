@@ -119,7 +119,8 @@ function shouldShowResubmitButton({
   if (submissionType === 'online_text_entry') {
     const reportForAttempt = reports.by_attempt?.[attempt]?.[processorId]
     return hasResubmittableReports(reportForAttempt)
-  } else if (submissionType === 'online_upload') {
+  }
+  if (submissionType === 'online_upload') {
     return versionedAttachments.some(({attachment}) => {
       const reportsForAttachment = reports.by_attachment?.[attachment.id]?.[processorId]
       return hasResubmittableReports(reportsForAttachment)

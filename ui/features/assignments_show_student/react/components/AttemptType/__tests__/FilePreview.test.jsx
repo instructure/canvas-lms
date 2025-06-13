@@ -81,8 +81,18 @@ const resolvers = () => ({
 })
 
 const mockSubmissionWithResolvers = overrides => mockSubmission(overrides, resolvers)
+let originalEnv
 
 describe('FilePreview', () => {
+  beforeEach(() => {
+    originalEnv = global.ENV
+    global.ENV = {...originalEnv}
+  })
+
+  afterEach(() => {
+    global.ENV = originalEnv
+  })
+
   it('renders a message if there are no files to display', async () => {
     const props = {
       submission: await mockSubmissionWithResolvers({
@@ -181,7 +191,7 @@ describe('FilePreview', () => {
     global.ENV.ASSIGNMENT_NAME = 'Test Assignment'
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files},
+        Submission: {attachments: files, submissionType: 'online_upload'},
       }),
     }
 
@@ -205,7 +215,7 @@ describe('FilePreview', () => {
     global.ENV.ASSET_PROCESSORS = []
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files},
+        Submission: {attachments: files, submissionType: 'online_upload'},
       }),
     }
     render(<FilePreview {...props} />)
@@ -218,7 +228,7 @@ describe('FilePreview', () => {
     global.ENV.ASSET_REPORTS = null
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files},
+        Submission: {attachments: files, submissionType: 'online_upload'},
       }),
     }
     render(<FilePreview {...props} />)
@@ -229,7 +239,7 @@ describe('FilePreview', () => {
   it('renders the size of each file being uploaded', async () => {
     const props = {
       submission: await mockSubmissionWithResolvers({
-        Submission: {attachments: files},
+        Submission: {attachments: files, submissionType: 'online_upload'},
       }),
     }
     render(<FilePreview {...props} />)

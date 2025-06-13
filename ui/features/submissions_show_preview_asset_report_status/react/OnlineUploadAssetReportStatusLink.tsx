@@ -16,36 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useMemo} from 'react'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ViewOwnProps} from '@instructure/ui-view'
-import AssetReportStatus from '../../../shared/lti/react/AssetReportStatus'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {filterReports} from '@canvas/lti/react/AssetProcessorHelper'
+import {ViewOwnProps} from '@instructure/ui-view'
+import {useMemo} from 'react'
+import AssetReportStatus from '../../../shared/lti/react/AssetReportStatus'
 
 export const ASSET_REPORT_MODAL_EVENT = 'openAssetReportModal'
 
 interface Props {
-  attachmentId?: string
+  attachmentId: string
   assetProcessors: ExistingAttachedAssetProcessor[]
   assetReports: LtiAssetReportWithAsset[]
   assignmentName: string
 }
 
-export default function AssetReportStatusLink({
+/*
+ * This component is used inside an iframe in case of online_upload in old student submission view,
+ * but we want the Report modal to open in the main window.
+ * To do this, we post a message to the main window which will then open the modal.
+ * The message is handled by the StudentAssetReportModalWrapper component.
+ * (ui/features/submissions/react/StudentAssetReportModalWrapper.tsx)
+ */
+export default function OnlineUploadAssetReportStatusLink({
   assetProcessors,
   assetReports,
   attachmentId,
   assignmentName,
 }: Props) {
-  /*
-   * This file list is rendered into an iframe, but we want the Report modal
-   * to open in the main window. To do this, we post a message to the main window
-   * which will then open the modal.
-   * The message is handled by the StudentAssetReportModalWrapper component.
-   * (ui/features/submissions/react/StudentAssetReportModalWrapper.tsx)
-   */
   const reports = useMemo(
-    () => assetReports.filter(report => report.asset.attachment_id === attachmentId),
+    () => filterReports(assetReports, attachmentId),
     [assetReports, attachmentId],
   )
 
@@ -56,6 +57,7 @@ export default function AssetReportStatusLink({
       assetReports: reports,
       assetProcessors,
       assignmentName,
+      submissionType: 'online_upload',
     })
   }
 

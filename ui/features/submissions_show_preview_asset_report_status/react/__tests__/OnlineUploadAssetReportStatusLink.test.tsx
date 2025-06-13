@@ -16,11 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssetReportStatusLink, {ASSET_REPORT_MODAL_EVENT} from '../AssetReportStatusLink'
+import OnlineUploadAssetReportStatusLink, {
+  ASSET_REPORT_MODAL_EVENT,
+} from '../OnlineUploadAssetReportStatusLink'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
 import {render, screen} from '@testing-library/react'
 
-describe('AssetReportStatusLink', () => {
+describe('OnlineUploadAssetReportStatusLink', () => {
   const createReport = (
     priority: 0 | 1 | 2 | 3 | 4 | 5 = 0,
     assetAttachmentId: string | null = '10',
@@ -76,7 +78,7 @@ describe('AssetReportStatusLink', () => {
     ]
 
     render(
-      <AssetReportStatusLink
+      <OnlineUploadAssetReportStatusLink
         assetProcessors={mockAssetProcessors}
         assetReports={reports}
         attachmentId={attachmentId}
@@ -98,7 +100,7 @@ describe('AssetReportStatusLink', () => {
 
     // Get the openModal function that was passed to AssetReportStatus
     render(
-      <AssetReportStatusLink
+      <OnlineUploadAssetReportStatusLink
         assetProcessors={mockAssetProcessors}
         assetReports={reports}
         attachmentId={attachmentId}
@@ -115,6 +117,7 @@ describe('AssetReportStatusLink', () => {
       assetReports: filteredReports,
       assetProcessors: mockAssetProcessors,
       assignmentName,
+      submissionType: 'online_upload',
     })
   })
 })

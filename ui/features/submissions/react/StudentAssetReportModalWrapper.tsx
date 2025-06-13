@@ -17,23 +17,37 @@
  */
 
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {ASSET_REPORT_MODAL_EVENT} from '../../submissions_show_preview_asset_report_status/react/AssetReportStatusLink'
+import {ASSET_REPORT_MODAL_EVENT} from '../../submissions_show_preview_asset_report_status/react/OnlineUploadAssetReportStatusLink'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
 import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
 import {useEffect, useState} from 'react'
 
+/**
+ * The AssetReportStatusLink which, when clicked, triggers opening the
+ * StudentAssetReportModal, is in an iframe so cannot launch the modal
+ * directly in the main content window. This wrapper is rendered in the
+ * main content window and provides a postMessage listener to listen to
+ * the message sent by AssetReportStatusLink to open the modal.
+ */
 export default function StudentAssetReportModalWrapper() {
   const [open, setOpen] = useState(false)
   const [reports, setReports] = useState<LtiAssetReportWithAsset[]>([])
   const [assetProcessors, setAssetProcessors] = useState<ExistingAttachedAssetProcessor[]>([])
   const [assignmentName, setAssignmentName] = useState<string>('')
+  const [submissionType, setSubmissionType] = useState<'online_text_entry' | 'online_upload'>()
 
   useEffect(() => {
     function handleOpenAssetReportModal(event: MessageEvent) {
+      if (event.origin !== window.location.origin) {
+        console.warn('Rejected message from different origin:', event.origin)
+        return
+      }
+
       if (event.data.type === ASSET_REPORT_MODAL_EVENT) {
         setReports(event.data.assetReports)
         setAssetProcessors(event.data.assetProcessors)
         setAssignmentName(event.data.assignmentName)
+        setSubmissionType(event.data.submissionType)
         setOpen(true)
       }
     }
@@ -51,6 +65,11 @@ export default function StudentAssetReportModalWrapper() {
     return null
   }
 
+  if (!assignmentName || !submissionType) {
+    console.error('Missing required data for StudentAssetReportModal')
+    return null
+  }
+
   return (
     <StudentAssetReportModal
       assetProcessors={assetProcessors}
@@ -58,6 +77,7 @@ export default function StudentAssetReportModalWrapper() {
       onClose={onClose}
       open={open}
       reports={reports}
+      submissionType={submissionType}
     />
   )
 }

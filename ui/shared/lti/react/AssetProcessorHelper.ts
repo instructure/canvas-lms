@@ -25,19 +25,35 @@ declare const ENV: {
   ASSIGNMENT_NAME?: string
 }
 
-export function filterReports(attachmentId: string) {
-  if (!ENV.ASSET_REPORTS || !attachmentId) {
+export function filterReports(
+  reports: LtiAssetReportWithAsset[] | undefined,
+  attachmentId?: string,
+) {
+  if (!reports || !attachmentId) {
+    return []
+  }
+  return reports.filter(report => report.asset && report.asset.attachment_id === attachmentId) ?? []
+}
+
+export function filterReportsByAttempt(
+  reports: LtiAssetReportWithAsset[] | undefined,
+  attemptId?: string,
+) {
+  if (!reports || !attemptId) {
     return []
   }
   return (
-    ENV.ASSET_REPORTS?.filter(
-      report => report.asset && report.asset.attachment_id === attachmentId,
+    reports.filter(
+      report => report.asset && report.asset.submission_attempt?.toString() === attemptId,
     ) ?? []
   )
 }
 
-export function shouldRenderAssetProcessorData() {
-  return ENV.ASSET_PROCESSORS && ENV.ASSET_PROCESSORS.length > 0 && ENV.ASSET_REPORTS != null
+export function shouldRenderAssetProcessorData(): boolean {
+  if (ENV.ASSET_PROCESSORS && ENV.ASSET_PROCESSORS.length > 0 && ENV.ASSET_REPORTS != null) {
+    return true
+  }
+  return false
 }
 
 export function clearAssetProcessorReports() {

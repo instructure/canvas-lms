@@ -44,9 +44,7 @@ import {Flex} from '@instructure/ui-flex'
 import {arrayOf, func, bool} from 'prop-types'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
-import AssetReportStatus from '../../../../shared/lti/react/AssetReportStatus'
-import StudentAssetReportModal from '../../../../shared/lti/react/StudentAssetReportModal'
-import {filterReports, shouldRenderAssetProcessorData} from '../helpers/AssetProcessorHelper'
+import DocumentProcessorsSection from './DocumentProcessorsSection'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -140,8 +138,6 @@ function renderContentBaseOnAvailability(
   {assignment, submission, reviewerSubmission, rubricExpanded, toggleRubricExpanded},
   alertContext,
   onSuccessfulPeerReview,
-  apModalAttachmentId,
-  setApModalAttachmentId,
 ) {
   if (assignment.env.modulePrereq) {
     return <MissingPrereqs moduleUrl={assignment.env.moduleUrl} />
@@ -188,30 +184,7 @@ function renderContentBaseOnAvailability(
                 )}
               />
             )}
-            {/* Document Processor status rendering for single file submissions.
-             * If there are multiple attachments, the Document Processor status
-             * is displayed in the files table (FilePreview).
-             */}
-            {shouldRenderAssetProcessorData() && submission.attachments.length === 1 && (
-              <Flex alignItems="end" margin="medium 0" gap="x-small">
-                <Text weight="bold" margin="0 small 0 0">
-                  {I18n.t('Document processors')}
-                </Text>
-                <AssetReportStatus
-                  reports={filterReports(submission.attachments[0]._id)}
-                  openModal={() => setApModalAttachmentId(submission.attachments[0]._id)}
-                />
-              </Flex>
-            )}
-            {shouldRenderAssetProcessorData() && apModalAttachmentId && (
-              <StudentAssetReportModal
-                assetProcessors={ENV.ASSET_PROCESSORS}
-                assignmentName={assignment.name}
-                open={apModalAttachmentId !== null}
-                reports={filterReports(apModalAttachmentId)}
-                onClose={() => setApModalAttachmentId(null)}
-              />
-            )}
+            <DocumentProcessorsSection submission={submission} />
             <AssignmentToggleDetails description={assignment.description} />
             {assignment.rubric && (
               <Suspense fallback={<LoadingIndicator />}>
@@ -265,7 +238,6 @@ function StudentContent(props) {
       props.assignment.env.peerReviewAvailable &&
       !props.assignment.rubric)
   const [commentTrayStatus, setCommentTrayStatus] = useState(initialCommentTrayState)
-  const [apModalAttachmentId, setApModalAttachmentId] = useState(null)
 
   const {description, name} = props.assignment
   useEffect(() => {
@@ -329,13 +301,7 @@ function StudentContent(props) {
         commentTrayStatus={commentTrayStatus}
         onSuccessfulPeerReview={onSuccessfulPeerReview}
       />
-      {renderContentBaseOnAvailability(
-        props,
-        alertContext,
-        onSuccessfulPeerReview,
-        apModalAttachmentId,
-        setApModalAttachmentId,
-      )}
+      {renderContentBaseOnAvailability(props, alertContext, onSuccessfulPeerReview)}
     </div>
   )
 }
