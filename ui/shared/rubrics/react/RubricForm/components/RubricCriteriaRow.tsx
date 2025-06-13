@@ -39,7 +39,7 @@ import {
   IconLockLine,
 } from '@instructure/ui-icons'
 import {Draggable} from 'react-beautiful-dnd'
-import './drag-and-drop/styles.css'
+import '../drag-and-drop/styles.css'
 
 const I18n = createI18nScope('rubrics-criteria-row')
 
