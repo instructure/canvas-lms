@@ -189,7 +189,7 @@ describe MasterCourses::MasterMigration do
       @copy_from = @course
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
-      tool = external_tool_model(context: Account.default, opts: { use_1_3: true, developer_key: DeveloperKey.create!(account: Account.default) })
+      tool = lti_registration_with_tool(account: Account.default).deployments.first
       @original_assignment = @copy_from.assignments.create!(title: "some assignment", submission_types: "external_tool", points_possible: 10)
       tag = ContentTag.new(content: tool, url: "http://example.com/original", context: @original_assignment)
       @original_assignment.update!(external_tool_tag: tag)
