@@ -1486,8 +1486,6 @@
 - verb: PUT
   path: '/api/v1/files/:id'
 - verb: GET
-  path: '/api/v1/files/:id/:uuid/status'
-- verb: GET
   path: '/api/v1/files/:id/create_success'
 - verb: OPTIONS
   path: '/api/v1/files/:id/create_success'

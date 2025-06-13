@@ -1277,18 +1277,6 @@ class FilesController < ApplicationController
     render json: json.merge!(doc_preview_json(@attachment))
   end
 
-  def api_file_status
-    @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first!
-    case @attachment.file_state
-    when "available"
-      render json: { upload_status: "ready", attachment: attachment_json(@attachment, @current_user) }
-    when "deleted"
-      render json: { upload_status: "pending" }
-    else
-      render json: { upload_status: "errored", message: @attachment.upload_error_message }
-    end
-  end
-
   def update
     @attachment = @context.attachments.find(params[:id])
     if (folder_id = params.dig(:attachment, :folder_id))
