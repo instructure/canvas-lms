@@ -76,3 +76,10 @@ export function reorderPinnedDiscussions({contextType, contextId}, order) {
 export function migrateDiscussionDisallowThreadedReplies({contextId}) {
   return axios.put(`/api/v1/courses/${contextId}/discussion_topics/migrate_disallow`)
 }
+
+export function updateDiscussionTopicTypes({contextId, threaded, notThreaded}) {
+  return axios.put(`/api/v1/courses/${contextId}/discussion_topics/update_discussion_types`, {
+    threaded,
+    not_threaded: notThreaded,
+  })
+}

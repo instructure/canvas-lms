@@ -28,14 +28,15 @@ class DiscussionTopicsApiController < ApplicationController
   include LocaleSelection
 
   before_action :require_context_and_read_access
-  before_action :require_topic, except: %i[mark_all_topic_read migrate_disallow]
+  before_action :require_topic, except: %i[mark_all_topic_read migrate_disallow update_discussion_types]
   before_action :require_initial_post, except: %i[add_entry
                                                   mark_topic_read
                                                   mark_topic_unread
                                                   mark_all_topic_read
                                                   migrate_disallow
                                                   show
-                                                  unsubscribe_topic]
+                                                  unsubscribe_topic
+                                                  update_discussion_types]
   before_action only: %i[replies
                          entries
                          add_entry
@@ -1064,6 +1065,34 @@ class DiscussionTopicsApiController < ApplicationController
     InstStatsd::Statsd.gauge("discussion_topic.migrate_disallow.discussions_updated", update_count, tags:)
 
     render json: { update_count: }
+  end
+
+  # TODO: remove it after the alert is no longer needed
+  # same as migrate_disallow
+  def update_discussion_types
+    raise ActiveRecord::RecordNotFound unless Account.site_admin.feature_enabled?(:disallow_threaded_replies_manage)
+    return render_unauthorized_action unless @context.grants_right?(@current_user, session, :moderate_forum)
+
+    threaded = params[DiscussionTopic::DiscussionTypes::THREADED]
+    not_threaded = params[DiscussionTopic::DiscussionTypes::NOT_THREADED]
+    unless (threaded.is_a?(Array) && threaded.present?) ||
+           (not_threaded.is_a?(Array) && not_threaded.present?)
+      return render(json: { error: "Missing data" }, status: :bad_request)
+    end
+
+    side_comment_count = @context.active_discussion_topics.only_discussion_topics.where(discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT).size
+
+    to_threaded = @context.active_discussion_topics.only_discussion_topics.where(id: threaded, discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+    to_not_threaded = @context.active_discussion_topics.only_discussion_topics.where(id: not_threaded, discussion_type: DiscussionTopic::DiscussionTypes::SIDE_COMMENT)
+
+    if to_threaded.size != threaded.size || to_not_threaded.size != not_threaded.size || to_threaded.size + to_not_threaded.size != side_comment_count
+      return render(json: { error: "Invalid data", count: side_comment_count }, status: :bad_request)
+    end
+
+    to_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::THREADED, updated_at: Time.now.utc)
+    to_not_threaded.in_batches.update_all(discussion_type: DiscussionTopic::DiscussionTypes::NOT_THREADED, updated_at: Time.now.utc)
+
+    render json: { success: "true" }
   end
 
   protected

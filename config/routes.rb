@@ -1508,6 +1508,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :discussion_topics_api) do
       put "courses/:course_id/discussion_topics/migrate_disallow", action: :migrate_disallow
+      put "courses/:course_id/discussion_topics/update_discussion_types", action: :update_discussion_types
 
       %w[course group].each do |context|
         put "#{context.pluralize}/:#{context}_id/discussion_topics/read_all", action: :mark_all_topic_read, as: "#{context}_discussion_mark_all_read"

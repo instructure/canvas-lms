@@ -373,13 +373,15 @@ export default class DiscussionsIndex extends Component {
           {ENV?.FEATURES?.disallow_threaded_replies_fix_alert &&
             !ENV?.FEATURES?.disallow_threaded_replies_manage && <DisallowThreadedFixAlert />}
 
-          {ENV?.FEATURES?.disallow_threaded_replies_manage && (
-            <ManageThreadedReplies
-              courseId={ENV.COURSE_ID}
-              discussions={sideCommentedDiscussions}
-              mobileOnly={this.props.breakpoints.mobileOnly}
-            />
-          )}
+          {!this.props.isLoadingDiscussions &&
+            ENV?.FEATURES?.disallow_threaded_replies_manage &&
+            ENV?.permissions?.moderate && (
+              <ManageThreadedReplies
+                courseId={ENV.COURSE_ID}
+                discussions={sideCommentedDiscussions}
+                mobileOnly={this.props.breakpoints.mobileOnly}
+              />
+            )}
 
           {this.props.isLoadingDiscussions
             ? this.renderSpinner(I18n.t('Loading Discussions'))

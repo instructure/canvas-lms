@@ -23,7 +23,10 @@ type State = {
   showAlert: boolean
   selectedDiscussions: string[]
   discussionStates: Record<string, 'not_set' | 'threaded' | 'not_threaded'>
+  loading: boolean
   isValid: boolean
+  isDirty: boolean
+  errorCount: number
 }
 
 type Actions = {
@@ -31,8 +34,9 @@ type Actions = {
   setDiscussionState: (discussionId: string, state: 'threaded' | 'not_threaded') => void
   toggleSelectedDiscussion: (discussionId: string) => void
   toggleSelectedDiscussions: (discussionIds: string[]) => void
-  setIsValid: (isValid: boolean) => void
   setShowAlert: (showAlert: boolean) => void
+  setModalClose: (closeAlert?: boolean) => void
+  validate: () => boolean
 }
 
 export const useManageThreadedRepliesStore = create<State & Actions>()(
@@ -42,6 +46,9 @@ export const useManageThreadedRepliesStore = create<State & Actions>()(
       discussionStates: {},
       isValid: false,
       showAlert: true, // defautl to true the component itself hides if there is no discussion, but we want to hide it later
+      loading: false,
+      isDirty: false,
+      errorCount: 0,
 
       initialize: discussions =>
         set(() => ({
@@ -56,12 +63,32 @@ export const useManageThreadedRepliesStore = create<State & Actions>()(
         })),
 
       setDiscussionState: (discussionId, state) => {
-        return set(prevState => ({
-          discussionStates: {
+        if (!['threaded', 'not_threaded'].includes(state)) {
+          return
+        }
+
+        return set(prevState => {
+          let isValid = prevState.isValid
+
+          const discussionStates = {
             ...prevState.discussionStates,
             [discussionId]: state,
-          },
-        }))
+          }
+
+          if (!isValid && Object.values(discussionStates).every(s => s !== 'not_set')) {
+            isValid = true
+          }
+
+          const errorCount = !prevState.isDirty
+            ? 0
+            : Object.values(discussionStates).filter(s => s === 'not_set').length
+
+          return {
+            isValid,
+            discussionStates,
+            errorCount,
+          }
+        })
       },
 
       toggleSelectedDiscussion: discussionId =>
@@ -79,9 +106,44 @@ export const useManageThreadedRepliesStore = create<State & Actions>()(
           selectedDiscussions: discussionIds,
         })),
 
-      setIsValid: isValid => set({isValid}),
-
       setShowAlert: showAlert => set({showAlert}),
+
+      setModalClose: (closeAlert = false) =>
+        set({
+          loading: false,
+          isValid: false,
+          isDirty: false,
+          errorCount: 0,
+          showAlert: !closeAlert,
+          selectedDiscussions: [],
+        }),
+
+      validate: () => {
+        let canContinue = false
+
+        set(prevState => {
+          const isValid = Object.values(prevState.discussionStates).every(
+            state => state !== 'not_set',
+          )
+
+          if (isValid) {
+            canContinue = true
+          }
+
+          const errorCount = isValid
+            ? 0
+            : Object.values(prevState.discussionStates).filter(s => s === 'not_set').length
+
+          return {
+            isValid,
+            isLoading: isValid,
+            isDirty: true,
+            errorCount,
+          }
+        })
+
+        return canContinue
+      },
     }),
     {name: 'ManageThreadedRepliesStore'},
   ),

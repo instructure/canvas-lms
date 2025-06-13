@@ -29,6 +29,8 @@ import DiscussionTable from './DiscussionTable'
 import {useManageThreadedRepliesStore} from '../../hooks/useManageThreadedRepliesStore'
 import {gql, useQuery} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {updateDiscussionTopicTypes} from '../../apiClient'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('discussions_v2')
 
@@ -81,10 +83,13 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const initialize = useManageThreadedRepliesStore(state => state.initialize)
-  const setShowAlert = useManageThreadedRepliesStore(state => state.setShowAlert)
-  const toggleSelectedDiscussions = useManageThreadedRepliesStore(
-    state => state.toggleSelectedDiscussions,
-  )
+  const discussionStates = useManageThreadedRepliesStore(state => state.discussionStates)
+  const setModalClose = useManageThreadedRepliesStore(state => state.setModalClose)
+  const isLoading = useManageThreadedRepliesStore(state => state.loading)
+  const validate = useManageThreadedRepliesStore(state => state.validate)
+  const errorCount = useManageThreadedRepliesStore(state => state.errorCount)
+  const isDirty = useManageThreadedRepliesStore(state => state.isDirty)
+
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
 
   const discussions = useMemo(
@@ -104,15 +109,45 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
 
   const handleClose = () => {
     setIsOpen(false)
-    toggleSelectedDiscussions([])
+    setModalClose()
   }
 
-  const handleSave = () => {
-    setShowAlert(false)
-    setIsOpen(false)
-    toggleSelectedDiscussions([])
-    setOnSuccess(I18n.t('Discussions updated successfully.'), false)
-    // setOnFailure(I18n.t('Failed to update discussions.'), false)
+  const handleSave = async () => {
+    if (!validate()) {
+      return
+    }
+
+    const threaded: string[] = []
+    const notThreaded: string[] = []
+
+    Object.entries(discussionStates).forEach(([d, type]) => {
+      if (type === 'threaded') {
+        threaded.push(d)
+      } else if (type === 'not_threaded') {
+        notThreaded.push(d)
+      }
+    })
+
+    try {
+      const response = await updateDiscussionTopicTypes({
+        contextId: ENV.COURSE_ID,
+        threaded,
+        notThreaded,
+      })
+
+      if (response.data.success === 'true') {
+        setModalClose(true)
+        setOnSuccess(I18n.t('Discussions updated successfully.'), false)
+      } else {
+        setModalClose(false)
+        setOnFailure(I18n.t('Failed to update discussions.'), false)
+      }
+    } catch (_error) {
+      setModalClose(false)
+      setOnFailure(I18n.t('Failed to update discussions.'), false)
+    } finally {
+      setIsOpen(false)
+    }
   }
 
   const bottomButtons = mobileOnly ? BOTTOM_BUTTONS.toReversed() : BOTTOM_BUTTONS
@@ -126,7 +161,7 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
         onDismiss={handleClose}
       >
         <Modal.Header>
-          <View as="div" maxWidth="1022px" margin="0 auto" padding={mobileOnly ? '0' : '0 x-small'}>
+          <View as="div" maxWidth="1006px" margin="0 auto" padding={mobileOnly ? '0' : '0 x-small'}>
             <Flex justifyItems="space-between">
               <Heading>{I18n.t('Manage Discussions')}</Heading>
               <CloseButton
@@ -138,7 +173,7 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
           </View>
         </Modal.Header>
         <Modal.Body padding="0">
-          <View maxWidth="1022px" as="div" margin="0 auto" padding={mobileOnly ? '0' : '0 x-small'}>
+          <View maxWidth="1006px" as="div" margin="0 auto" padding={mobileOnly ? '0' : '0 x-small'}>
             <View
               as="div"
               margin={
@@ -146,15 +181,30 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
                   ? 'mediumSmall mediumSmall medium mediumSmall'
                   : 'mediumSmall 0 x-large 0'
               }
-              dangerouslySetInnerHTML={{
-                __html: I18n.t(
-                  "Please set all Discussions to either *'Threaded'* or *'Not threaded'*. Use the *'Set to Threaded'* and *'Set to Not threaded'* actions to bulk update selected Discussions in the course. Use the dropdown menus to decide on individual Discussions.",
-                  {
-                    wrappers: [`<i>$1</i>`],
-                  },
-                ),
-              }}
-            ></View>
+            >
+              <View
+                as="div"
+                margin="0 0 small 0"
+                dangerouslySetInnerHTML={{
+                  __html: I18n.t(
+                    "Please set all Discussions to either *'Threaded'* or *'Not threaded'*. Use the *'Set to Threaded'* and *'Set to Not threaded'* actions to bulk update multiple selected Discussions. Use the dropdown menus to decide on individual Discussions.",
+                    {
+                      wrappers: [`<i>$1</i>`],
+                    },
+                  ),
+                }}
+              />
+              {!isDirty && (
+                <Alert variant="info">
+                  {I18n.t('A selection is required for every Discussion')}
+                </Alert>
+              )}
+              {isDirty && errorCount > 0 && (
+                <Alert variant="error">
+                  {I18n.t('Please select an option for the indicated Discussions')}
+                </Alert>
+              )}
+            </View>
             <View
               as="div"
               margin={mobileOnly ? '0 mediumSmall medium mediumSmall' : '0 0 medium 0'}
@@ -170,15 +220,26 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
                   </Text>
                 </Flex.Item>
                 <Flex.Item>
-                  <Text size="small" color="secondary">
-                    {I18n.t(
-                      {
-                        one: '1 Discussion',
-                        other: '%{count} Discussions',
-                      },
-                      {count: discussions.length},
+                  <Flex direction={mobileOnly ? 'row-reverse' : 'row'} gap="small">
+                    {isDirty && errorCount > 0 && (
+                      <Flex.Item>
+                        <Text size="small" color="danger">
+                          {I18n.t('%{count} Not decided', {count: errorCount})}
+                        </Text>
+                      </Flex.Item>
                     )}
-                  </Text>
+                    <Flex.Item>
+                      <Text size="small" color="secondary">
+                        {I18n.t(
+                          {
+                            one: '1 Discussion',
+                            other: '%{count} Discussions',
+                          },
+                          {count: discussions.length},
+                        )}
+                      </Text>
+                    </Flex.Item>
+                  </Flex>
                 </Flex.Item>
               </Flex>
             </View>
@@ -188,7 +249,7 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
         <Modal.Footer>
           <View
             as="div"
-            maxWidth="1022px"
+            maxWidth="1006px"
             width="100%"
             margin="0 auto"
             padding={mobileOnly ? '0' : '0 x-small'}
@@ -205,6 +266,7 @@ const ManageThreadedReplies: React.FC<ManageThreadedRepliesProps> = ({
                   key={button.id}
                   id={`manage-threaded-replies-${button.id}`}
                   color={button.color}
+                  disabled={button.id === 'confirm' && isLoading}
                   onClick={button.id === 'cancel' ? handleClose : handleSave}
                 >
                   {button.label}
