@@ -186,6 +186,7 @@ module Lti
         ContextControlsBookmarker,
         Lti::ContextControl
                .eager_load(:deployment)
+               .active
                .where(registration:)
                .where.not(context_external_tools: { workflow_state: ["deleted", "disabled"] })
                .order(:deployment_id, :path)

@@ -19,7 +19,7 @@ import * as React from 'react'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
@@ -27,7 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Link as RouterLink} from 'react-router-dom'
-import {createContextControls} from '../../../api/contextControls'
+import {createContextControls, deleteContextControl} from '../../../api/contextControls'
 import {deleteDeployment} from '../../../api/deployments'
 import {AccountId, ZAccountId} from '../../../model/AccountId'
 import {ZCourseId} from '../../../model/CourseId'
@@ -35,11 +35,17 @@ import {LtiDeployment} from '../../../model/LtiDeployment'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
 import {askForContextControl} from './AskForContextControl'
 import {ContextCard} from './ContextCard'
-import {LtiContextControl} from '../../../model/LtiContextControl'
+import {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {List} from '@instructure/ui-list'
 import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
-import {formatApiResultError} from '../../../../common/lib/apiResult/ApiResult'
+import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
+import {
+  DeleteExceptionModal,
+  DeleteExceptionModalOpenState,
+} from './exception_modal/DeleteExceptionModal'
+import {isUnsuccessful, formatApiResultError} from '../../../../common/lib/apiResult/ApiResult'
+import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -47,11 +53,12 @@ export type DeploymentAvailabilityProps = {
   accountId: AccountId
   deployment: LtiDeployment
   registration: LtiRegistrationWithAllInformation
+  deleteControl: typeof deleteContextControl
   refetchControls: () => void
   debug: boolean
 }
 
-const contextIsForDeployment = (deployment: LtiDeployment) => (cc: LtiContextControl) => {
+const matchesDeploymentsContext = (deployment: LtiDeployment) => (cc: LtiContextControl) => {
   return (
     (deployment.context_type === 'Course' && deployment.context_id === cc.course_id) ||
     (deployment.context_type === 'Account' && deployment.context_id === cc.account_id)
@@ -59,34 +66,55 @@ const contextIsForDeployment = (deployment: LtiDeployment) => (cc: LtiContextCon
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {registration, deployment, debug, refetchControls} = props
+  const {registration, deployment, debug, refetchControls, deleteControl} = props
 
-  const controls_with_ids = deployment.context_controls
-    .filter(cc => {
-      // We don't want to show controls that are for the same context as the deployment
-      return !contextIsForDeployment(deployment)(cc)
-    })
-    .map(cc => {
-      if (cc.course_id) {
-        return {
-          path_id: `c${cc.course_id}`,
-          control: cc,
-        }
-      } else {
-        return {
-          path_id: `a${cc.account_id}`,
-          control: cc,
-        }
+  const controls_with_ids = deployment.context_controls.map(cc => {
+    if (cc.course_id) {
+      return {
+        path_id: `c${cc.course_id}`,
+        control: cc,
       }
-    })
+    } else {
+      return {
+        path_id: `a${cc.account_id}`,
+        control: cc,
+      }
+    }
+  })
 
-  const rootControl = deployment.context_controls.find(contextIsForDeployment(deployment))
+  const rootControl = deployment.context_controls.find(matchesDeploymentsContext(deployment))
+
+  const [deleteExceptionModalOpenProps, setDeleteExceptionModalOpenProps] =
+    React.useState<DeleteExceptionModalOpenState>({
+      open: false,
+    })
 
   const [exceptionModalOpenState, setExceptionModalOpenState] =
     React.useState<ExceptionModalOpenState>({
       open: false,
     })
 
+  const onDelete = React.useCallback(
+    async (registrationId: LtiRegistrationId, controlId: LtiContextControlId) => {
+      const result = await deleteControl(registrationId, controlId)
+
+      if (isUnsuccessful(result)) {
+        showFlashError(
+          I18n.t(
+            'There was an error deleting the exception. If the error persists, please contact support.',
+          ),
+        )()
+      } else {
+        showFlashSuccess(I18n.t('The exception was successfully deleted.'))()
+        setDeleteExceptionModalOpenProps({
+          open: false,
+        })
+        refetchControls()
+      }
+      return result
+    },
+    [deleteControl, refetchControls],
+  )
   return (
     <View
       borderRadius="medium"
@@ -183,49 +211,106 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         </Text>
       </View>
       <List itemSpacing="small" isUnstyled margin="0">
-        {controls_with_ids.map(({control}) => {
-          /**
-           * This is the path of the control, where
-           * each node is a realized control from the
-           * path string id segments.
-           */
-          const controlPath = control.path
-            .split('.')
-            .filter(s => s.length > 0)
-            .flatMap(s => {
-              const matched = controls_with_ids.find(c => c.path_id === s)
-              if (matched) {
-                return [matched]
-              } else {
-                return []
-              }
-            })
-
-          const closestParent = controlPath[controlPath.length - 2]
-          return (
-            <List.Item key={control.id} as="div">
-              <ContextCard
-                key={control.id}
-                course_id={control.course_id ?? undefined}
-                account_id={control.account_id ?? undefined}
-                context_name={control.context_name}
-                available={control.available}
-                path_segments={control.display_path}
-                depth={control.depth - 1}
-                exception_counts={{
-                  child_control_count: control.child_control_count,
-                  course_count: control.course_count,
-                  subaccount_count: control.subaccount_count,
-                }}
-                path={control.path}
-                inherit_note={
-                  closestParent && closestParent.control.available === control.available
+        {controls_with_ids
+          .filter(cc => !matchesDeploymentsContext(deployment)(cc.control))
+          .map(({control}) => {
+            /**
+             * This is a list of all controls that are considered ancestors of the current control,
+             * sorted from the root control down to the current control.
+             */
+            const controlPath = control.path
+              .split('.')
+              .filter(s => s.length > 0)
+              .flatMap(s => {
+                const matched = controls_with_ids.find(c => c.path_id === s)
+                if (matched) {
+                  return [matched]
+                } else {
+                  return []
                 }
-              />
-            </List.Item>
-          )
-        })}
+              })
+
+            const closestParent = controlPath[controlPath.length - 2]
+            return (
+              <List.Item key={control.id} as="div">
+                <Flex direction="row" justifyItems="space-between" as="div">
+                  <Flex.Item shouldGrow shouldShrink>
+                    <ContextCard
+                      key={control.id}
+                      course_id={control.course_id ?? undefined}
+                      account_id={control.account_id ?? undefined}
+                      context_name={control.context_name}
+                      available={control.available}
+                      path_segments={control.display_path}
+                      depth={control.depth - 1}
+                      exception_counts={{
+                        child_control_count: control.child_control_count,
+                        course_count: control.course_count,
+                        subaccount_count: control.subaccount_count,
+                      }}
+                      path={control.path}
+                      inherit_note={
+                        closestParent && closestParent.control.available === control.available
+                      }
+                    />
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Flex gap="small">
+                      <Flex.Item>
+                        <IconButton
+                          size="medium"
+                          renderIcon={IconEditLine}
+                          screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
+                            contextName: control.context_name,
+                          })}
+                          onClick={() => {
+                            // TODO, actually open the edit modal
+                          }}
+                        />
+                      </Flex.Item>
+                      <Flex.Item>
+                        <IconButton
+                          id={`delete-exception-${control.id}`}
+                          size="medium"
+                          screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
+                            contextName: control.context_name,
+                          })}
+                          renderIcon={IconTrashLine}
+                          onClick={() => {
+                            if ('course_id' in control && control.course_id) {
+                              setDeleteExceptionModalOpenProps({
+                                open: true,
+                                availableInParentContext: closestParent?.control?.available,
+                                toolName: registration.name,
+                                courseControl: control,
+                              })
+                            } else {
+                              setDeleteExceptionModalOpenProps({
+                                ...props,
+                                open: true,
+                                availableInParentContext: closestParent?.control?.available,
+                                toolName: registration.name,
+                                accountControl: control,
+                                childControls: deployment.context_controls.filter(
+                                  c => c.path.startsWith(control.path) && c.path !== control.path,
+                                ),
+                              })
+                            }
+                          }}
+                        />
+                      </Flex.Item>
+                    </Flex>
+                  </Flex.Item>
+                </Flex>
+              </List.Item>
+            )
+          })}
       </List>
+      <DeleteExceptionModal
+        {...deleteExceptionModalOpenProps}
+        onClose={() => setDeleteExceptionModalOpenProps({open: false})}
+        onDelete={onDelete}
+      />
       {
         /**
          * These are debug buttons, and will be removed before release

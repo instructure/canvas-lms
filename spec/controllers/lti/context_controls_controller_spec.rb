@@ -246,6 +246,14 @@ describe Lti::ContextControlsController, type: :request do
             }.with_indifferent_access
           )
         end
+
+        it "doesn't include deleted or controls" do
+          other_control.destroy
+
+          subject
+          controls = response_json.find { |d| d["id"] == deployment.id }["context_controls"]
+          expect(controls.map { |cc| cc["id"] }).not_to include(other_control.id)
+        end
       end
     end
 

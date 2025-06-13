@@ -52,7 +52,7 @@ import {RegistrationWizardModal} from './manage/registration_wizard/Registration
 import {route as MonitorRoute} from './monitor/route'
 import {isLtiRegistrationsUsageEnabled} from './monitor/utils'
 import {ToolConfigurationEdit} from './manage/pages/tool_details/configuration/ToolConfigurationEdit'
-import {fetchControlsByDeployment} from './manage/api/contextControls'
+import {deleteContextControl, fetchControlsByDeployment} from './manage/api/contextControls'
 
 const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
@@ -112,6 +112,7 @@ const router = createBrowserRouter(
                 <ToolAvailability
                   fetchControlsByDeployment={fetchControlsByDeployment}
                   accountId={accountId}
+                  deleteContextControl={deleteContextControl}
                 />
               ),
             },
