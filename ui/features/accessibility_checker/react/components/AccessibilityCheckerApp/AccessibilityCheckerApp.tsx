@@ -29,10 +29,11 @@ import React, {useState, useEffect} from 'react'
 
 import {TypeToKeyMap} from '../../constants'
 import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
-import {convertKeysToCamelCase} from '../../utils2'
+import {calculateTotalIssuesCount, convertKeysToCamelCase} from '../../utils'
 import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
+import {IssuesCounter} from './IssuesCounter'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -204,6 +205,23 @@ export const AccessibilityCheckerApp: React.FC = () => {
               </Text>
             </Flex.Item>
           )}
+        </Flex>
+
+        <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
+          <Flex.Item>
+            <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
+              <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
+            </View>
+          </Flex.Item>
+          <Flex.Item shouldGrow shouldShrink>
+            <View
+              as="div"
+              padding="medium"
+              borderWidth="small"
+              borderRadius="medium"
+              height="100%"
+            ></View>
+          </Flex.Item>
         </Flex>
 
         <AccessibilityIssuesTable

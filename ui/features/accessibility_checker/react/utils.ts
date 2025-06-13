@@ -16,8 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// FIXME: This file's content will need to be appended to the original utils.ts file
-// after that file is added in the change of LMA-105
+import {AccessibilityData} from './types'
+
+export function calculateTotalIssuesCount(data: AccessibilityData) {
+  let total = 0
+  ;['pages', 'assignments', 'attachments'].forEach(key => {
+    const items = data[key as keyof AccessibilityData]
+    if (items) {
+      Object.values(items).forEach(item => {
+        if (item.count) {
+          total += item.count
+        }
+      })
+    }
+  })
+
+  return total
+}
 
 export const snakeToCamel = function (str: string): string {
   return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
