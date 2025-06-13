@@ -494,3 +494,4 @@ grading_assistance_file_uploads:
   applies_to: SiteAdmin
   display_name: Grading Assistance File Uploads
   description: Enables support for uploading files as part of the AI-assisted grading tool in the Modernized Speedgrader.
+  shadow: true
