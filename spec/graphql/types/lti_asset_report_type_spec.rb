@@ -30,7 +30,6 @@ describe Types::LtiAssetReportType do
       workflow_state: "deleted"
     )
     rep2 = lti_asset_report_model(
-      submission:,
       asset_processor: ap1,
       title: "def",
       report_type: "t2",
@@ -40,7 +39,11 @@ describe Types::LtiAssetReportType do
       priority: 1,
       indication_color: "#FF0000",
       indication_alt: "indication_alt1",
-      result: "result2result2result2result2result2result2result2result2result2result2result2"
+      result: "result2result2result2result2result2result2result2result2result2result2result2",
+      asset: lti_asset_model(
+        submission:,
+        submission_attempt: 2
+      )
     )
     rep3 = lti_asset_report_model(
       submission:,
@@ -118,8 +121,13 @@ describe Types::LtiAssetReportType do
   end
 
   it "provides attachmendId through asset" do
-    expected_att_ids = [@rep2, @rep3, @rep4].map { _1.asset.attachment_id.to_s }
+    expected_att_ids = [@rep2, @rep3, @rep4].map { _1.asset.attachment_id&.to_s }
     expect(rep_query("asset { attachmentId }")).to match_array(expected_att_ids)
+  end
+
+  it "provides submissionAttempt through asset" do
+    expected_submission_attempts = [@rep2, @rep3, @rep4].map { _1.asset.submission_attempt }
+    expect(rep_query("asset { submissionAttempt }")).to match_array(expected_submission_attempts)
   end
 
   it "provides comment" do

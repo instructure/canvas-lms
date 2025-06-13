@@ -23,5 +23,6 @@ module Types
     implements Interfaces::LegacyIDInterface
 
     field :attachment_id, ID, null: true
+    field :submission_attempt, Int, null: true
   end
 end
