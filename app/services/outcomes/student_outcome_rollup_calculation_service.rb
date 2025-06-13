@@ -21,14 +21,32 @@ module Outcomes
   # Calculates and persists outcome rollups for a single student in a course.
   #
   # Usage:
-  #   Outcomes::StudentOutcomeRollupCalculationService.call(course: course, student: student)
+  #   Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
   class StudentOutcomeRollupCalculationService < ApplicationService
-    # @param course [Course] the course whose outcomes to roll up
-    # @param student [User] the student for whom to calculate rollups
-    def initialize(course:, student:)
+    attr_reader :course, :student
+
+    class << self
+      # Schedule a delayed job to calculate outcome rollups for a student in a course.
+      # This method creates a singleton delayed job that will be scheduled to run after
+      # a short delay. If an existing job exists for the same course/student pair,
+      # it will be replaced with this new job.
+      #
+      # @param course_id [Integer] The ID of the course containing the outcomes
+      # @param student_id [Integer] The ID of the student for whom to calculate outcome rollups
+      def calculate_for_student(course_id:, student_id:)
+        delay(run_at: 1.minute.from_now,
+              on_conflict: :overwrite,
+              singleton: "calculate_for_student:#{course_id}:#{student_id}")
+          .call(course_id:, student_id:)
+      end
+    end
+
+    # @param course_id [Integer] the course_id whose outcomes to roll up
+    # @param student_id [Integer] the student_id for whom to calculate rollups
+    def initialize(course_id:, student_id:)
       super()
-      @course  = course
-      @student = student
+      @course  = Course.find(course_id)
+      @student = User.find(student_id)
     end
 
     # Runs the full calculation and persists the calculation.
