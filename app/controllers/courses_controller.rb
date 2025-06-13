@@ -947,6 +947,7 @@ class CoursesController < ApplicationController
       end
 
       @course ||= (@sub_account || @account).courses.build(params_for_create)
+      @course.saving_user = @current_user
 
       if can_manage_sis
         @course.sis_source_id = sis_course_id
@@ -965,13 +966,6 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         if @course.save
-          UserContent.associate_attachments_to_rce_object(
-            @course.syllabus_body,
-            @course,
-            context_field_name: "syllabus_body",
-            user: @current_user,
-            feature_enabled: @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-          )
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
           @course.require_assignment_group
@@ -3445,6 +3439,7 @@ class CoursesController < ApplicationController
       disable_conditional_release if changes[:conditional_release]&.last == false
 
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes)
+      @course.saving_user = @current_user
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
@@ -3452,13 +3447,6 @@ class CoursesController < ApplicationController
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
-        UserContent.associate_attachments_to_rce_object(
-          @course.syllabus_body,
-          @course,
-          context_field_name: "syllabus_body",
-          user: @current_user,
-          feature_enabled: @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-        )
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
         if @course.can_sync_with_homeroom?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)

@@ -67,6 +67,9 @@ class AttachmentAssociation < ActiveRecord::Base
     to_delete = currently_has - global_ids
     to_create = global_ids - currently_has
 
+    return if (to_create + to_delete).none?
+    raise "User is required to update attachment links" if user.blank? && !blank_user
+
     if to_delete.any?
       context.attachment_associations.where(context_concern:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
     end

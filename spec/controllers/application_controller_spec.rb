@@ -98,6 +98,7 @@ RSpec.describe ApplicationController do
         it "adds location tag to attachment urls" do
           @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
           attachment = @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
+          @course.saving_user = @teacher
           @course.syllabus_body = "<img src='/courses/#{@course.id}/files/#{attachment.id}'/>"
           @course.save!
           expect(controller.send(:user_content, @course.syllabus_body, location: "course_syllabus_#{@course.id}")).to include("location=course_syllabus_#{@course.id}")

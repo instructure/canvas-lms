@@ -2224,6 +2224,7 @@ describe AssignmentsController do
               <p><a class="instructure_file_link auto_open" title="Link" href="/users/#{Shard.short_id_for(@user.id)}/files/#{Shard.short_id_for(@doc1.id)}?wrap=1" target="_blank" rel="noopener" data-canvas-previewable="true">#{@doc1.display_name}</a></p>
             HTML
 
+            @course.saving_user = @user
             @course.update!(syllabus_body:)
 
             get "syllabus", params: { course_id: @course.id }

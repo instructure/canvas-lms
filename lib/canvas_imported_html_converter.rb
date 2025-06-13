@@ -132,6 +132,7 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
   end
 
   def replace_item_placeholders!(item_key, field_links, skip_associations = false)
+    context.saving_user = user
     item_type = item_key[:type]
     item_type = field_links.keys.first if [:block_editor, :block_editor_text].include? field_links.keys.first
 
@@ -141,15 +142,8 @@ class CanvasImportedHtmlConverter < CanvasLinkMigrator::ImportedHtmlConverter
     when :syllabus
       syllabus = context.syllabus_body
       if LinkReplacer.sub_placeholders!(syllabus, field_links.values.flatten)
-        context.class.where(id: context.id).update_all(syllabus_body: syllabus)
+        context.update(syllabus_body: syllabus)
       end
-      UserContent.associate_attachments_to_rce_object(
-        syllabus,
-        context,
-        context_field_name: "syllabus_body",
-        user:,
-        feature_enabled: disable_file_verifiers_in_public_syllabus_enabled?
-      )
     when :assessment_question
       process_assessment_question!(item_key[:item], field_links.values.flatten)
     when :quiz_question
