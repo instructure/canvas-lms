@@ -2662,7 +2662,7 @@ class ApplicationController < ActionController::Base
   # since we neet to process the attachments in the html.
   def user_content(str, context: @context, user: @current_user, is_public: false, location: nil, safe_html: false)
     return nil unless str
-    return str if safe_html
+    return str.html_safe if safe_html
 
     is_course_syllabus = location&.include?("course_syllabus_") && context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
     render_location_tag = if is_course_syllabus || (location && context.root_account.feature_enabled?(:file_association_access))
