@@ -241,7 +241,14 @@ describe Lti::PlatformNotificationService do
     end
 
     context "with tool installed in root account" do
-      let(:tool) { external_tool_1_3_model(context: root_account) }
+      let(:tool) do
+        lti_registration_with_tool(
+          account: root_account,
+          configuration_params: {
+            domain: "https://example.com"
+          }
+        ).deployments.first
+      end
 
       it "sends notice to tool" do
         subject
@@ -253,7 +260,16 @@ describe Lti::PlatformNotificationService do
       let(:course) { course_model(account: subaccount) }
       let(:subaccount) { account_model(parent_account: root_account) }
       let(:root_account) { account_model }
-      let(:tool) { external_tool_1_3_model(context: subaccount) }
+      let(:tool) do
+        reg = lti_registration_with_tool(
+          account: root_account,
+          configuration_params: {
+            domain: "https://example.com"
+          }
+        )
+
+        reg.new_external_tool(subaccount)
+      end
 
       it "sends notice to tool" do
         subject
@@ -262,7 +278,16 @@ describe Lti::PlatformNotificationService do
     end
 
     context "with tool installed in course" do
-      let(:tool) { external_tool_1_3_model(context: course) }
+      let(:tool) do
+        reg = lti_registration_with_tool(
+          account: course.account,
+          configuration_params: {
+            domain: "https://example.com"
+          }
+        )
+
+        reg.new_external_tool(course)
+      end
 
       it "sends notice to tool" do
         subject

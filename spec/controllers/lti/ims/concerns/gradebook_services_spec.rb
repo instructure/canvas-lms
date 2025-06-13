@@ -61,18 +61,10 @@ module Lti
         }
         assignment_model(opts)
       end
-      let_once(:developer_key) { DeveloperKey.create! }
+      let_once(:developer_key) { lti_developer_key_model(account: context.account) }
       let_once(:tool) do
-        ContextExternalTool.create!(
-          context:,
-          consumer_key: "key",
-          shared_secret: "secret",
-          name: "test tool",
-          url: "http://www.tool.com/launch",
-          developer_key:,
-          lti_version: "1.3",
-          workflow_state: "public"
-        )
+        lti_tool_configuration_model(developer_key:)
+        developer_key.lti_registration.new_external_tool(context)
       end
       let_once(:line_item) { assignment.line_items.first }
       let(:parsed_response_body) { response.parsed_body }

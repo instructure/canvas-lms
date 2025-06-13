@@ -3551,8 +3551,6 @@ describe ExternalToolsController do
         shared_secret: "secret1"
       )
       tool.url = "http://www.example.com/basic_lti"
-      tool.use_1_3 = true
-      tool.developer_key = DeveloperKey.create!
       tool.save!
       tool
     end

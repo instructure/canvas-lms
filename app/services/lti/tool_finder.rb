@@ -271,8 +271,6 @@ module Lti
         ContextExternalTool.find_by(id:)
       end
 
-      private
-
       # Filters the given scope of ContextExternalTools by the context controls
       # that are set for the given context.
       #
@@ -289,6 +287,8 @@ module Lti
           scope.where(id: deployment_ids).or(scope.lti_1_1)
         end
       end
+
+      private
 
       # Sorts all tools in the context chain by a variety of criteria in SQL
       # as opposed to in memory, in order to make it easier to find a tool that matches
