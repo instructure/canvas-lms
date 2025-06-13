@@ -26,7 +26,7 @@ import UploadProgress, {Uploader} from './UploadProgress'
 import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {type ResolvedName} from '../FilesHeader/UploadButton/FileOptions'
-import {queueOptionsCollectionUploads} from '../shared/FileUploadDrop'
+import {queueOptionsCollectionUploads} from '../../../utils/uploadUtils'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 
 const hasInProgressUploads = (uploaders: Uploader[], conflicted: Uploader[]) => {

@@ -31,7 +31,6 @@ export const defaultProps: FileFolderTableProps = {
   size: 'large',
   rows: [],
   isLoading: false,
-  contextType: 'course',
   userCanEditFilesForContext: true,
   userCanDeleteFilesForContext: true,
   userCanRestrictFilesForContext: true,

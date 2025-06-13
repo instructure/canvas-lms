@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {screen, fireEvent, waitFor} from '@testing-library/react'
+import {screen, waitFor} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
 import {renderComponent} from './testUtils'
