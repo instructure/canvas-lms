@@ -297,6 +297,7 @@ export type AttachmentData = Readonly<{
 }>
 
 export type Attachment = {
+  _id: string
   canvadoc_url?: string
   comment_id?: string
   content_type: string

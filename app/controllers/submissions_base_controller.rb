@@ -23,6 +23,7 @@ class SubmissionsBaseController < ApplicationController
   include AssignmentsHelper
   include AssessmentRequestHelper
   include SubmissionsHelper
+  include AssetProcessorStudentHelper
 
   include Api::V1::Rubric
   include Api::V1::SubmissionComment
@@ -61,7 +62,8 @@ class SubmissionsBaseController < ApplicationController
                  EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
                  EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list]
                })
-
+        @asset_reports = asset_reports(submission: @submission)
+        @asset_processors = asset_processors(assignment: @assignment)
         js_bundle :submissions
         css_bundle :submission
 

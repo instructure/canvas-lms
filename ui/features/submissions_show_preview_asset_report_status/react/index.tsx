@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
 import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
-import AssetReportStatusLink from './AssetReportStatusLink'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
-
-import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import OnlineUploadAssetReportStatusLink from './OnlineUploadAssetReportStatusLink'
 
 declare const ENV: {
   ASSET_REPORTS?: LtiAssetReportWithAsset[]
@@ -41,12 +40,17 @@ ready(() => {
 
   const containers = document.querySelectorAll<HTMLDivElement>('.asset_report_status_container')
   containers.forEach(container => {
+    const attachmentId = container.dataset['attachmentId']
+    if (!attachmentId) {
+      console.warn('No attachmentId found in asset report status container')
+      return
+    }
     createRoot(container).render(
-      <AssetReportStatusLink
+      <OnlineUploadAssetReportStatusLink
         assignmentName={assignmentName}
         assetProcessors={assetProcessors}
         assetReports={reports}
-        attachmentId={container.dataset['attachmentId']}
+        attachmentId={attachmentId}
       />,
     )
   })
