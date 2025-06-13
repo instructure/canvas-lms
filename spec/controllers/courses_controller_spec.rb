@@ -2697,6 +2697,38 @@ describe CoursesController do
       json = response.parsed_body
       expect(json["errors"].keys).to include "unparsable_content"
     end
+
+    context "with disable_file_verifiers_in_public_syllabus enabled" do
+      before do
+        @account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      end
+
+      it "creates attachment_associations when files are linked in the syllabus" do
+        attachment_model(context: @user)
+        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        course = Course.find(json["id"])
+        expect(course.attachment_associations.pluck(:context_concern, :attachment_id)).to eq([["syllabus_body", @attachment.id]])
+      end
+    end
+
+    context "with disable_file_verifiers_in_public_syllabus disabled" do
+      before do
+        @account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+      end
+
+      it "does not create attachment_associations when files are linked in the syllabus" do
+        attachment_model(context: @user)
+        put "create", params: { account_id: @account.id, course: { syllabus_body: "<p><a href=\"/files/#{@attachment.id}\">#{@attachment.display_name}</a></p>" }, format: :json }
+
+        expect(response).to be_successful
+        json = response.parsed_body
+        course = Course.find(json["id"])
+        expect(course.attachment_associations).to be_empty
+      end
+    end
   end
 
   describe "PUT 'update'" do
@@ -3227,6 +3259,45 @@ describe CoursesController do
         @course.reload
         expect(@course.settings[:image_id]).to be_nil
         expect(@course.settings[:image_url]).to be_nil
+      end
+    end
+
+    context "with disable_file_verifiers_in_public_syllabus enabled" do
+      before do
+        user_session(@teacher)
+        @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+        @image = attachment_model(context: @course, display_name: "100mpx.png", uploaded_data: fixture_file_upload("100mpx.png"), instfs_uuid: "image")
+        @course.saving_user = @teacher
+        @course.update(syllabus_body: "<p><a href=\"/files/#{@image.id}\">#{@image.display_name}</a></p>")
+        @course
+      end
+
+      it "adds attachment_associations when new files are linked in the syllabus" do
+        media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
+        new_body = <<~HTML
+          <p><a href="/files/#{@image.id}">#{@image.display_name}</a></p>
+          <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>
+        HTML
+        put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
+
+        expected_associations = [["syllabus_body", @image.id],
+                                 ["syllabus_body", media.id]]
+        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array(expected_associations)
+      end
+
+      it "removes attachment_associations when files are removed from the syllabus" do
+        media = attachment_model(context: @course, display_name: "292.mp3", uploaded_data: fixture_file_upload("292.mp3"), instfs_uuid: "media")
+        new_body = <<~HTML
+          <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true"></iframe></p>
+        HTML
+        put "update", params: { id: @course.id, course: { syllabus_body: new_body }, format: :json }
+
+        expect(@course.attachment_associations.pluck(:context_concern, :attachment_id)).to match_array([["syllabus_body", media.id]])
+      end
+
+      it "does not call update_associations when the syllabus body doesn't change" do
+        expect(@course).not_to receive(:update_associations)
+        put "update", params: { id: @course.id, course: { image_url: "http://farm3.static.flickr.com/image.jpg" }, format: :json }
       end
     end
 
