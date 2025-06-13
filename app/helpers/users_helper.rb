@@ -33,7 +33,7 @@ module UsersHelper
     last_login = pseudonyms.flat_map do |p2|
       [[p2.current_login_at, p2.current_login_ip],
        [p2.last_login_at, p2.last_login_ip]]
-    end.reject { _1.first.nil? }.sort_by(&:first)[-2]
+    end.reject { it.first.nil? }.sort_by(&:first)[-2]
 
     p.last_login_at = last_login&.first
     p.last_login_ip = last_login&.last

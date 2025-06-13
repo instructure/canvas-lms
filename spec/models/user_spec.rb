@@ -1612,8 +1612,8 @@ describe User do
     # convenience to search and then get the first page. none of these specs
     # should be putting more than a handful of users into the search results...
     # right?
-    def search_messageable_users(viewing_user, *args)
-      viewing_user.address_book.search_users(*args).paginate(page: 1, per_page: 20)
+    def search_messageable_users(viewing_user, *)
+      viewing_user.address_book.search_users(*).paginate(page: 1, per_page: 20)
     end
 
     it "does not include users from other sections if visibility is limited to sections" do

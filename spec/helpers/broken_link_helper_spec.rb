@@ -170,7 +170,7 @@ describe BrokenLinkHelper, type: :controller do
         user_session(@student)
         @request.env["HTTP_REFERER"] = "/courses/#{@course.id}/assignments/#{linked_assignment.id}"
         get :show, params: { course_id: @course.id, id: @assignment.id }
-        expect(response.status).to eq(401)
+        expect(response).to have_http_status(:unauthorized)
         expect(response.body).to include("We&#39;ve let your instructor know to review this link as soon as possible.")
       end
     end

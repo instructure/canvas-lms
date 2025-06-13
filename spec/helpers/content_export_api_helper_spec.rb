@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe ContentExportApiHelper, type: :helper do
+RSpec.describe ContentExportApiHelper do
   let(:context) { double("Context", content_exports:, quizzes:) }
   let(:content_exports) { double("ContentExports", build: export) }
   let(:quizzes) { double("Quizzes", exists?: true) }

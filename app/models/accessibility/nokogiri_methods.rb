@@ -19,12 +19,12 @@
 
 module Accessibility
   module NokogiriMethods
-    def walk_dom_tree(node, &block)
+    def walk_dom_tree(node, &)
       return unless node
 
       if node.is_a?(Nokogiri::XML::Element)
         yield(node)
-        node.children.each { |child| walk_dom_tree(child, &block) }
+        node.children.each { |child| walk_dom_tree(child, &) }
       end
     end
 

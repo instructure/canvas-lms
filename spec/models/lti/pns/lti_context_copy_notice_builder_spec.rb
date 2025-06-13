@@ -20,7 +20,7 @@
 
 require_relative "../../../spec_helper"
 
-RSpec.describe Lti::Pns::LtiContextCopyNoticeBuilder, type: :model do
+RSpec.describe Lti::Pns::LtiContextCopyNoticeBuilder do
   let(:account) { account_model }
   let(:developer_key) do
     dk = DeveloperKey.new(

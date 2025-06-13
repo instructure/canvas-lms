@@ -49,7 +49,7 @@ class PeriodicJobs
     run_at
   end
 
-  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false, connection_class: nil, error_callback: nil)
+  def self.with_each_shard_by_database_in_region(klass, method, *, jitter: nil, local_offset: false, connection_class: nil, error_callback: nil)
     error_callback ||= -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
 
     Shard.with_each_shard(Shard.in_current_region, exception: error_callback) do
@@ -65,7 +65,7 @@ class PeriodicJobs
       dj_params[:run_at] = compute_run_at(jitter:, local_offset:)
 
       current_shard.activate do
-        klass.delay(**dj_params).__send__(method, *args)
+        klass.delay(**dj_params).__send__(method, *)
       end
     end
   end

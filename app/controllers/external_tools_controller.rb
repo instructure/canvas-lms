@@ -740,7 +740,7 @@ class ExternalToolsController < ApplicationController
 
     # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
     if selection_type == "collaboration"
-      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find _1 }
+      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find it }
       collaboration = nil unless collaboration&.update_url == params[:url]
     end
 

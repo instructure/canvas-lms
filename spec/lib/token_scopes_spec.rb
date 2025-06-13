@@ -105,13 +105,13 @@ describe TokenScopes do
     let(:documented_scopes_and_descs) do
       scopes_from_yaml_file
         .reject { |_scope, obj| obj["undocumented"] }
-        .transform_values { _1["description"] }
+        .transform_values { it["description"] }
     end
 
     let(:undocumented_hidden_scopes_and_descs) do
       scopes_from_yaml_file
         .select { |_scope, obj| obj["undocumented"] }
-        .transform_values { _1["description"] }
+        .transform_values { it["description"] }
     end
 
     describe "LTI_SCOPES" do

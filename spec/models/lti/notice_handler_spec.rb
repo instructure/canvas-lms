@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.describe Lti::NoticeHandler, type: :model do
+RSpec.describe Lti::NoticeHandler do
   let(:account) { account_model }
   let(:tool) { external_tool_1_3_model }
   let(:notice_type) { "LtiAssetProcessorSubmissionNotice" }

@@ -480,8 +480,8 @@ describe AdheresToPolicy::InstanceMethods do
             can :read
           end
 
-          def call_permission_cache_key_for(*args)
-            permission_cache_key_for(*args)
+          def call_permission_cache_key_for(*)
+            permission_cache_key_for(*)
           end
         end
 

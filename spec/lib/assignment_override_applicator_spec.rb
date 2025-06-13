@@ -74,10 +74,10 @@ describe AssignmentOverrideApplicator do
     @module_override
   end
 
-  def create_assignment(*args)
+  def create_assignment(*)
     # need to make sure it doesn't invalidate the cache right away
     Timecop.freeze(5.seconds.ago) do
-      assignment_model(*args)
+      assignment_model(*)
     end
   end
 

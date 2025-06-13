@@ -112,7 +112,7 @@ describe Types::LtiAssetReportType do
   end
 
   it "provides processorId" do
-    expected_ap_ids = [@ap1, @ap2, @ap2].map { _1.id.to_s }
+    expected_ap_ids = [@ap1, @ap2, @ap2].map { it.id.to_s }
     expect(rep_query("processorId")).to match_array(expected_ap_ids)
   end
 
@@ -121,12 +121,12 @@ describe Types::LtiAssetReportType do
   end
 
   it "provides attachmendId through asset" do
-    expected_att_ids = [@rep2, @rep3, @rep4].map { _1.asset.attachment_id&.to_s }
+    expected_att_ids = [@rep2, @rep3, @rep4].map { it.asset.attachment_id&.to_s }
     expect(rep_query("asset { attachmentId }")).to match_array(expected_att_ids)
   end
 
   it "provides submissionAttempt through asset" do
-    expected_submission_attempts = [@rep2, @rep3, @rep4].map { _1.asset.submission_attempt }
+    expected_submission_attempts = [@rep2, @rep3, @rep4].map { it.asset.submission_attempt }
     expect(rep_query("asset { submissionAttempt }")).to match_array(expected_submission_attempts)
   end
 
