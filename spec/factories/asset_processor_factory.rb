@@ -93,7 +93,7 @@ module Factories
     props[:submission] ||= submission_model
     if props[:submission].submission_type == "online_text_entry"
       props[:submission_attempt] ||= props[:submission].attempt
-    else
+    elsif props[:submission_attempt].blank?
       props[:attachment] ||= attachment_model
     end
     Lti::Asset.create!(**props)

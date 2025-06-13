@@ -4987,6 +4987,7 @@ type LtiAsset implements LegacyIDInterface {
   """
   _id: ID!
   attachmentId: ID
+  submissionAttempt: Int
 }
 
 type LtiAssetProcessor implements LegacyIDInterface {
