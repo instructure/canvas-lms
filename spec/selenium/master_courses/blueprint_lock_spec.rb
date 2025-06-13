@@ -102,6 +102,8 @@ describe "master courses - locked items" do
 
     # setup some stuff
     @assignment = @master.assignments.create!(title: "Blah", points_possible: 10)
+    @ag1 = @master.assignment_groups.create!(name: "Assignment Group 1")
+    @assignment2 = @master.assignments.create!(title: "Blah2", points_possible: 10, assignment_group: @ag1)
     @page = @master.wiki_pages.create!(title: "Unicorn")
     @quiz = @master.quizzes.create!(title: "TestQuiz")
     @discussion = @master.discussion_topics.create!(title: "My discussion")
@@ -227,6 +229,18 @@ describe "master courses - locked items" do
 
         element = blueprint_index_quizzes_icon
         expect(element).not_to contain_css(@locked_button_css) # verify that the state has changed.
+      end
+
+      it "keeps the assignment that gets locked in its assignments group" do
+        @tag = @template.create_content_tag_for!(@assignment2)
+        lock_index_tag
+
+        run_master_course_migration(@master)
+
+        get "/courses/#{@minion.id}/assignments"
+        assignment_group = AssignmentGroup.where(name: "Assignment Group 1", context: @minion.id).last
+        minion_assignment2 = Assignment.where(title: "Blah2", context: @minion.id).last
+        expect(minion_assignment2.assignment_group_id).to eq(assignment_group.id)
       end
     end
   end
