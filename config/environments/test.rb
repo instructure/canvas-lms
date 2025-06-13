@@ -58,7 +58,7 @@ Rails.application.configure do
   # Print deprecation notices to both stderr and the log
   config.active_support.deprecation = [:stderr, :log]
 
-  config.eager_load = false
+  config.eager_load = ENV["CI"].present?
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) } # rubocop:disable Security/Eval
