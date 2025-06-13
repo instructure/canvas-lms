@@ -29,7 +29,7 @@ import {View} from '@instructure/ui-view'
 import {Link as RouterLink} from 'react-router-dom'
 import {createContextControls} from '../../../api/contextControls'
 import {deleteDeployment} from '../../../api/deployments'
-import {ZAccountId} from '../../../model/AccountId'
+import {AccountId, ZAccountId} from '../../../model/AccountId'
 import {ZCourseId} from '../../../model/CourseId'
 import {LtiDeployment} from '../../../model/LtiDeployment'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
@@ -43,6 +43,7 @@ import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/Excepti
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
+  accountId: AccountId
   deployment: LtiDeployment
   registration: LtiRegistrationWithAllInformation
   refetchControls: () => void
@@ -123,6 +124,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             </Button>
           </Flex.Item>
           <ExceptionModal
+            accountId={props.accountId}
             openState={exceptionModalOpenState}
             onClose={() => setExceptionModalOpenState({open: false})}
           />

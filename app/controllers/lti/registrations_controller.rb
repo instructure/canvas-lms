@@ -1495,8 +1495,8 @@ class Lti::RegistrationsController < ApplicationController
       course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
     end
 
-    accounts = account_scope.limit(100)
-    courses = course_scope.limit(100)
+    accounts = account_scope.limit(20)
+    courses = course_scope.limit(20)
 
     all_account_ids = (accounts.pluck(:id) + courses.pluck(:account_id)).uniq
     if all_account_ids.empty?

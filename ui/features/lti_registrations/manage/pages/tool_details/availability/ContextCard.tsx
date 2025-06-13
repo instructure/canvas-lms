@@ -27,6 +27,7 @@ import {Text} from '@instructure/ui-text'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {CourseId} from '../../../model/CourseId'
 import {AccountId} from '../../../model/AccountId'
+import {ContextPath} from './ContextPath'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -86,16 +87,6 @@ export const ContextCard = ({
   const pathLength = path_segments?.length || 0
   const marginLeft = depth * 20 + 'px'
 
-  let beginningPathSegments: string[] = []
-  let lastPathSegment: string | undefined = undefined
-
-  if (path_segments.length === 1) {
-    beginningPathSegments = path_segments
-    lastPathSegment = undefined
-  } else if (path_segments.length > 1) {
-    beginningPathSegments = path_segments.slice(0, -1)
-    lastPathSegment = path_segments[path_segments.length - 1]
-  }
   return (
     <div style={{marginLeft}}>
       <View
@@ -123,25 +114,8 @@ export const ContextCard = ({
                 </Pill>
               ) : null}
             </Flex>
-            <Flex.Item shouldGrow={true}>
-              <Flex alignItems="center">
-                <div
-                  style={{
-                    flexShrink: 1,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {beginningPathSegments.join(' / ')}
-                </div>
-                {lastPathSegment && (
-                  <Flex.Item margin="0 0 0 xx-small">
-                    {' / '}
-                    {lastPathSegment}
-                  </Flex.Item>
-                )}
-              </Flex>
+            <Flex.Item shouldGrow>
+              <ContextPath path={path_segments} />
             </Flex.Item>
             <View as="div" margin="0">
               {exception_counts && renderExceptionCounts(exception_counts)}
