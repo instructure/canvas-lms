@@ -81,19 +81,23 @@ export const ZLtiLegacyConfiguration = ZInternalLtiConfiguration.omit({
       tool_id: z.string().nullable().optional(),
       domain: z.string().nullable().optional(),
       privacy_level: ZLtiPrivacyLevel.nullable().optional(),
-      platform: z.literal("canvas.instructure.com"),
-      settings: z.object({
-        placements: z.array(ZInternalPlacementConfiguration),
-      }).merge(ZInternalBaseLaunchSettings)
-    })
-  )
+      platform: z.literal('canvas.instructure.com'),
+      settings: z
+        .object({
+          placements: z.array(ZInternalPlacementConfiguration),
+        })
+        .merge(ZInternalBaseLaunchSettings),
+    }),
+  ),
 })
 
 export const ZLtiRegistrationWithLegacyConfiguration = ZLtiRegistration.extend({
-  overlaid_legacy_configuration: ZLtiLegacyConfiguration
+  overlaid_legacy_configuration: ZLtiLegacyConfiguration,
 })
 
-export type LtiRegistrationWithLegacyConfiguration = z.infer<typeof ZLtiRegistrationWithLegacyConfiguration>
+export type LtiRegistrationWithLegacyConfiguration = z.infer<
+  typeof ZLtiRegistrationWithLegacyConfiguration
+>
 
 export const isForcedOn = (reg: LtiRegistration) =>
   reg.inherited &&

@@ -121,6 +121,7 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                 {deployments.map(dep => (
                   <List.Item key={dep.id}>
                     <DeploymentAvailability
+                      accountId={props.accountId}
                       key={dep.id}
                       deployment={dep}
                       registration={registration}
