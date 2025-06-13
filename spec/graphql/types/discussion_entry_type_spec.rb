@@ -84,13 +84,30 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
-  it "has an attachment" do
-    a = attachment_model
-    discussion_entry.attachment = a
-    discussion_entry.save!
+  describe "with attachment" do
+    let(:attachment) { attachment_model }
 
-    expect(discussion_entry_type.resolve("attachment { _id }")).to eq discussion_entry.attachment.id.to_s
-    expect(discussion_entry_type.resolve("attachment { displayName }")).to eq discussion_entry.attachment.display_name
+    it "has an attachment" do
+      discussion_entry.attachment = attachment
+      discussion_entry.save!
+
+      expect(discussion_entry_type.resolve("attachment { _id }")).to eq discussion_entry.attachment.id.to_s
+      expect(discussion_entry_type.resolve("attachment { displayName }")).to eq discussion_entry.attachment.display_name
+    end
+
+    it "adds attachment location tag to url when file_association_access feature flag is enabled" do
+      attachment.root_account.enable_feature!(:file_association_access)
+      discussion_entry.attachment = attachment
+      discussion_entry.save!
+
+      type = GraphQLTypeTester.new(discussion_entry, current_user: @teacher, domain_root_account: @course.root_account)
+      expect(
+        type.resolve("attachment { url }", request: ActionDispatch::TestRequest.create)
+      ).to include "location=#{discussion_entry.asset_string}"
+      expect(
+        type.resolve("attachment { url }", request: ActionDispatch::TestRequest.create)
+      ).not_to include "verifier=#{discussion_entry.attachment.uuid}"
+    end
   end
 
   describe "converts anchor tag to video tag" do

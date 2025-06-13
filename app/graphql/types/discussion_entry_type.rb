@@ -246,6 +246,7 @@ module Types
 
     field :attachment, Types::FileType, null: true
     def attachment
+      context.scoped_set!(:asset_location, object.asset_string)
       load_association(:attachment)
     end
 
