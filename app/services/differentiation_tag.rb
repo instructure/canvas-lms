@@ -21,4 +21,5 @@ module DifferentiationTag
   class DifferentiationTagServiceError < StandardError; end
 
   OVERRIDABLE_LEARNING_OBJECTS = %w[ContextModule Assignment Quizzes::Quiz WikiPage DiscussionTopic].freeze
+  DELAYED_JOB_TAG = "convert_tag_overrides_to_adhoc_overrides"
 end
