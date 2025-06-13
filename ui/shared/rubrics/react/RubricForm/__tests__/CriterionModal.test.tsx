@@ -19,12 +19,9 @@
 import React from 'react'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
 import {fireEvent, render} from '@testing-library/react'
-import {
-  CriterionModal,
-  DEFAULT_RUBRIC_RATINGS,
-  reorder,
-  type CriterionModalProps,
-} from '../CriterionModal'
+import {CriterionModal, type CriterionModalProps} from '../components/CriterionModal/CriterionModal'
+import {DEFAULT_RUBRIC_RATINGS} from '../constants'
+import {reorderRatingsAtIndex} from '../../utils'
 
 describe('CriterionModal tests', () => {
   const renderComponent = (props?: Partial<CriterionModalProps>) => {
@@ -141,7 +138,7 @@ describe('CriterionModal tests', () => {
       const startIndex = 0
       const endIndex = 3
 
-      const reorderedRatings = reorder({list: ratings, startIndex, endIndex})
+      const reorderedRatings = reorderRatingsAtIndex({list: ratings, startIndex, endIndex})
 
       const expectedRatings = [
         {id: '2', points: 4, description: 'Mastery', longDescription: ''},

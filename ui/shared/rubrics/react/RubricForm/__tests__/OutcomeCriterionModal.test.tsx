@@ -18,7 +18,10 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {OutcomeCriterionModal, type OutcomeCriterionModalProps} from '../OutcomeCriterionModal'
+import {
+  OutcomeCriterionModal,
+  type OutcomeCriterionModalProps,
+} from '../components/OutcomeCriterionModal'
 
 describe('OutcomeCriterionModal', () => {
   const onDismissMock = jest.fn()
