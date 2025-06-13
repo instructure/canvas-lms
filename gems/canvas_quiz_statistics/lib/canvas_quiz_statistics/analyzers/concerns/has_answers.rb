@@ -66,10 +66,10 @@ module CanvasQuizStatistics::Analyzers::Concerns
     #     aggregate "Other" and "Missing" answers)
     #
     # @return [NilClass]
-    def calculate_responses(responses, answers, *args)
+    def calculate_responses(responses, answers, *)
       responses.each do |response|
-        answer = locate_answer(response, answers, *args)
-        answer ||= if answer_present_but_unknown?(response, *args)
+        answer = locate_answer(response, answers, *)
+        answer ||= if answer_present_but_unknown?(response, *)
                      generate_unknown_answer(answers)
                    else
                      generate_missing_answer(answers)

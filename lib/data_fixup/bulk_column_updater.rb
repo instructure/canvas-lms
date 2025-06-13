@@ -100,7 +100,7 @@ module DataFixup
             lines = f.each_line.first(batch_size)
             break if lines.empty?
 
-            rows = lines.map { parse_tsv_line(_1) }
+            rows = lines.map { parse_tsv_line(it) }
             add_rows_fn.call(rows)
           end
         end

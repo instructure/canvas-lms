@@ -40,8 +40,8 @@ describe LegacyMultipart::SequencedStream do
         @source.size
       end
 
-      def read(*args)
-        @reader.call(@source, *args)
+      def read(*)
+        @reader.call(@source, *)
       end
     end
   end

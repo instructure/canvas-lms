@@ -50,8 +50,8 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
     @caches.each_value { |c| c.delete_matched(matcher, options) }
   end
 
-  def clear(**options)
-    @caches.each_value { |c| c.clear(**options) }
+  def clear(**)
+    @caches.each_value { |c| c.clear(**) }
   end
 
   def read_multi(*names)
@@ -68,11 +68,11 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
     @zonal_store ||= @caches[Canvas.availability_zone || @caches.keys.first]
   end
 
-  def write_entry(key, entry, raw: false, **options)
-    @caches.each_value { |c| c.send(:write_entry, key, entry, raw:, **options) }
+  def write_entry(key, entry, raw: false, **)
+    @caches.each_value { |c| c.send(:write_entry, key, entry, raw:, **) }
   end
 
-  def delete_entry(key, **options)
-    @caches.each_value { |c| c.send(:delete_entry, key, **options) }
+  def delete_entry(key, **)
+    @caches.each_value { |c| c.send(:delete_entry, key, **) }
   end
 end

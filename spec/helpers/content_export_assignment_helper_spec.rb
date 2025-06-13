@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-RSpec.describe ContentExportAssignmentHelper, type: :helper do
+RSpec.describe ContentExportAssignmentHelper do
   describe "#get_selected_assignments" do
     subject { helper.get_selected_assignments(export, params) }
 

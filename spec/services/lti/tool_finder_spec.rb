@@ -803,8 +803,8 @@ describe Lti::ToolFinder do
       end
 
       context "and there is a difference in LTI version" do
-        def find_tool(url, **opts)
-          Lti::ToolFinder.from_url(url, context, **opts)
+        def find_tool(url, **)
+          Lti::ToolFinder.from_url(url, context, **)
         end
 
         before do

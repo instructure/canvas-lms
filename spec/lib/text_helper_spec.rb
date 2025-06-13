@@ -22,8 +22,8 @@ describe TextHelper do
     Class.new do
       extend TextHelper
 
-      def self.t(*args)
-        I18n.t(*args)
+      def self.t(*)
+        I18n.t(*)
       end
     end
   end
