@@ -1755,6 +1755,11 @@ CanvasRails::Application.routes.draw do
         put "courses/:course_id/pages/:url_or_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
       end
 
+      scope(controller: :course_tag_conversion) do
+        put "courses/:course_id/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
+        get "courses/:course_id/convert_tag_overrides/status", action: :conversion_job_status
+      end
+
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end

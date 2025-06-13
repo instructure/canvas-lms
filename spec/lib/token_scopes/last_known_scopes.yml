@@ -795,6 +795,10 @@
   path: '/api/v1/courses/:course_id/content_migrations/migrators'
 - verb: GET
   path: '/api/v1/courses/:course_id/content_share_users'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/convert_tag_overrides'
+- verb: GET
+  path: '/api/v1/courses/:course_id/convert_tag_overrides/status'
 - verb: POST
   path: '/api/v1/courses/:course_id/course_copy'
 - verb: GET
