@@ -86,6 +86,11 @@ export const DragAndDropWrapper = (
     queueOptionsCollectionUploads(props.contextId, props.contextType, fileOptions, () => {})
   }
 
+  const onModalClose = (fileOptions: FileOptionsResults) => {
+    setFileOptions(fileOptions)
+    hideOverlay()
+  }
+
   if (!props.enabled) {
     return props.children
   }
@@ -127,7 +132,7 @@ export const DragAndDropWrapper = (
       <FileUploadModals
         fileOptions={fileOptions}
         onResolved={onModalResolved}
-        onClose={hideOverlay}
+        onClose={onModalClose}
       />
     </div>
   )
