@@ -126,8 +126,8 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [content, courseId, setIsMenuOpen])
 
   const handleAssignToRef = useCallback(() => {
-    handleAssignTo(content, courseId, setIsMenuOpen)
-  }, [content, courseId, setIsMenuOpen])
+    handleAssignTo(content, courseId, setIsMenuOpen, moduleId)
+  }, [content, courseId, setIsMenuOpen, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
     handleDuplicate(moduleId, itemId, queryClient, courseId, setIsMenuOpen)

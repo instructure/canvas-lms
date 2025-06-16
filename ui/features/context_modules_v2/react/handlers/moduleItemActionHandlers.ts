@@ -93,6 +93,7 @@ export const handleAssignTo = (
   content: ModuleItemContent | null,
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
+  moduleId?: string,
 ) => {
   if (!courseId) {
     showFlashError(I18n.t('Course ID is required for assign to functionality'))
@@ -105,6 +106,7 @@ export const handleAssignTo = (
     moduleItemType: getItemType(content?.type),
     moduleItemContentId: content?._id,
     pointsPossible: content?.pointsPossible,
+    moduleId,
   })
   if (setIsMenuOpen) {
     setIsMenuOpen(false)
