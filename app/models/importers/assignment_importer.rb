@@ -194,7 +194,15 @@ module Importers
         end
       end
 
-      item.assignment_group = assignment_group(hash, context)
+      if Account.site_admin.feature_enabled?(:wiki_page_mastery_path_no_assignment_group)
+        if hash[:submission_types] == "wiki_page" && context.conditional_release?
+          item.assignment_group = nil
+        else
+          associate_assignment_group(hash, context, item)
+        end
+      else
+        associate_assignment_group(hash, context, item)
+      end
 
       if item.points_possible.to_i < 0
         item.points_possible = 0
@@ -665,18 +673,11 @@ module Importers
       item
     end
 
-    def self.assignment_group(hash, context)
-      return context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first if hash[:assignment_group_migration_id]
-
-      if wiki_page_mastery_path_no_assignment_group?(hash, context)
-        return nil
+    def self.associate_assignment_group(hash, context, item)
+      if hash[:assignment_group_migration_id]
+        item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
       end
-
-      context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
-    end
-
-    def self.wiki_page_mastery_path_no_assignment_group?(hash, context)
-      hash[:submission_types] == "wiki_page" && Account.site_admin.feature_enabled?(:wiki_page_mastery_path_no_assignment_group) && context.conditional_release?
+      item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
     end
   end
 end
