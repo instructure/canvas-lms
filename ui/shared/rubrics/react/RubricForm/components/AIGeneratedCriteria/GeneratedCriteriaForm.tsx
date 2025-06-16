@@ -45,6 +45,24 @@ export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
   pointsPerCriterion: '20',
   useRange: false,
   additionalPromptInfo: '',
+  gradeLevel: 'higher-ed',
+}
+
+const gradeLevels = {
+  ['higher-ed']: I18n.t('Higher Education'),
+  twelfth: I18n.t('12th Grade'),
+  eleventh: I18n.t('11th Grade'),
+  tenth: I18n.t('10th Grade'),
+  ninth: I18n.t('9th Grade'),
+  eighth: I18n.t('8th Grade'),
+  seventh: I18n.t('7th Grade'),
+  sixth: I18n.t('6th Grade'),
+  fifth: I18n.t('5th Grade'),
+  fourth: I18n.t('4th Grade'),
+  third: I18n.t('3rd Grade'),
+  second: I18n.t('2nd Grade'),
+  first: I18n.t('1st Grade'),
+  kindergarten: I18n.t('Kindergarten'),
 }
 
 type GeneratedCriteriaFormProps = {
@@ -137,6 +155,29 @@ export const GeneratedCriteriaForm = ({
         </Flex>
       </Heading>
       <Flex alignItems="end" gap="medium" margin="medium 0 0">
+        <Flex.Item shouldShrink={true}>
+          <SimpleSelect
+            data-testid="grade-level-input"
+            renderLabel={I18n.t('Grade Level')}
+            value={generateCriteriaForm.gradeLevel}
+            onChange={(_event, {value}) => {
+              if (value) {
+                setGenerateCriteriaForm({
+                  ...generateCriteriaForm,
+                  gradeLevel: value.toString(),
+                })
+              }
+            }}
+          >
+            {Object.entries(gradeLevels).map(([key, value]) => {
+              return (
+                <SimpleSelectOption key={key} id={`criteria-count-${key}`} value={key}>
+                  {value}
+                </SimpleSelectOption>
+              )
+            })}
+          </SimpleSelect>
+        </Flex.Item>
         <Flex.Item shouldShrink={true}>
           <SimpleSelect
             data-testid="criteria-count-input"

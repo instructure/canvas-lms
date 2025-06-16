@@ -255,6 +255,7 @@ export const generateCriteria = async (
         points_per_criterion: generateCriteriaProps.pointsPerCriterion,
         use_range: generateCriteriaProps.useRange,
         additional_prompt_info: generateCriteriaProps.additionalPromptInfo,
+        grade_level: generateCriteriaProps.gradeLevel,
       },
     }),
   })
