@@ -3622,4 +3622,58 @@ describe EnrollmentsApiController, type: :request do
       expect(json["can_provide"]).to be_truthy
     end
   end
+
+  describe "bulk enrollment" do
+    before :once do
+      Account.default.enable_feature!(:horizon_bulk_api_permission)
+      @course = course_model sis_source_id: "course", workflow_state: "created"
+      @path = "/api/v1/accounts/#{Account.default.id}/bulk_enrollment"
+      @path_options = { controller: "enrollments_api", action: "bulk_enrollment", format: "json", account_id: Account.default.id }
+    end
+
+    it "enrolls multiple users in a course" do
+      user1 = user_with_pseudonym(name: "User One")
+      user2 = user_with_pseudonym(name: "User Two")
+      json = api_call_as_user account_admin_user(active_all: true),
+                              :post,
+                              @path,
+                              @path_options,
+                              {
+                                user_ids: [user1.id, user2.id],
+                                course_ids: [@course.id]
+                              }
+
+      run_jobs
+
+      expect(response).to be_successful
+      enrollments = Enrollment.where(course: @course, user: [user1, user2])
+      expect(enrollments.count).to eq(2)
+      expect(enrollments.map(&:user_id)).to match_array([user1.id, user2.id])
+      expect(Progress.find(json["id"])).to be_completed
+    end
+
+    it "enrolls multiple users in multiple courses" do
+      user1 = user_with_pseudonym(name: "User One")
+      user2 = user_with_pseudonym(name: "User Two")
+      @course2 = @course.root_account.courses.create!(name: "course2", workflow_state: "available")
+
+      json = api_call_as_user account_admin_user(active_all: true),
+                              :post,
+                              @path,
+                              @path_options,
+                              {
+                                user_ids: [user1.id, user2.id],
+                                course_ids: [@course.id, @course2.id]
+                              }
+
+      run_jobs
+
+      expect(response).to be_successful
+      enrollments = Enrollment.where(user: [user1, user2], course: [@course, @course2])
+      expect(enrollments.count).to eq(4)
+      expect(enrollments.all? { |e| e.course_id == @course.id || e.course_id == @course2.id }).to be_truthy
+      expect(enrollments.map(&:user_id)).to match_array([user1.id, user2.id, user1.id, user2.id])
+      expect(Progress.find(json["id"])).to be_completed
+    end
+  end
 end
