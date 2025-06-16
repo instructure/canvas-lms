@@ -20,16 +20,15 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {pick} from 'lodash'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
-import OutcomeHeader from '../OutcomeHeader'
+import {OutcomeHeader, OutcomeHeaderProps} from '../OutcomeHeader'
+import {Outcome} from '../../../types/rollup'
 
 describe('OutcomeHeader', () => {
-  const outcome = {
+  const outcome: Outcome = {
     id: '1',
     title: 'outcome 1',
     description: 'Outcome description',
     display_name: 'Friendly outcome name',
-    context_type: 'Account',
-    context_id: '1',
     calculation_method: 'decaying_average',
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
@@ -38,7 +37,7 @@ describe('OutcomeHeader', () => {
     ),
   }
 
-  const defaultProps = () => {
+  const defaultProps = (): OutcomeHeaderProps => {
     return {
       outcome,
     }
