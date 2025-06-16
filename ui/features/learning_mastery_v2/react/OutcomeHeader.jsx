@@ -28,7 +28,7 @@ import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CELL_HEIGHT, COLUMN_WIDTH} from './utils/constants'
 import {outcomeShape} from './types/shapes'
-import OutcomeDescriptionModal from './OutcomeDescriptionModal'
+import {OutcomeDescriptionModal} from './components/modals/OutcomeDescriptionModal'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 

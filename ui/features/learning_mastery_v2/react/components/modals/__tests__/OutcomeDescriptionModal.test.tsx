@@ -18,28 +18,33 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import OutcomeDescriptionModal from '../OutcomeDescriptionModal'
+import {OutcomeDescriptionModal} from '../OutcomeDescriptionModal'
+import {Outcome} from '../../../types/rollup'
 import LMGBContext from '@canvas/outcomes/react/contexts/LMGBContext'
 import {pick} from 'lodash'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 
 describe('OutcomeDescriptionModal', () => {
-  let onCloseHandlerMock
+  let onCloseHandlerMock: jest.Mock
 
-  const setCalculationMethod = (outcome, method, calculationInt = null) => {
-    outcome.calculation_method = method
-    outcome.calculation_int = calculationInt
-    return outcome
+  const setCalculationMethod = (
+    outcome: Outcome,
+    method: string,
+    calculationInt: number | null = null,
+  ): Outcome => {
+    return {
+      ...outcome,
+      calculation_method: method,
+      calculation_int: calculationInt ?? outcome.calculation_int,
+    }
   }
 
-  const defaultOutcome = {
+  const defaultOutcome: Outcome = {
     id: '1',
     title: 'Outcome',
     description: '<p>Outcome Description</p>',
     display_name: 'Friendly Outcome Name',
     friendly_description: 'Friendly Description',
-    context_type: 'Account',
-    context_id: '1',
     calculation_method: 'decaying_average',
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
@@ -48,14 +53,11 @@ describe('OutcomeDescriptionModal', () => {
     ),
   }
 
-  const outcomeNoFriendlyDescription = {
+  const outcomeNoFriendlyDescription: Outcome = {
     id: '1',
     title: 'Outcome',
     description: '<p>Outcome Description</p>',
     display_name: 'Friendly Outcome Name',
-    friendly_description: null,
-    context_type: 'Account',
-    context_id: '1',
     calculation_method: 'decaying_average',
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
@@ -64,14 +66,11 @@ describe('OutcomeDescriptionModal', () => {
     ),
   }
 
-  const outcomeEmpty = {
+  const outcomeEmpty: Outcome = {
     id: '1',
     title: 'Outcome',
     description: '',
     display_name: '',
-    friendly_description: null,
-    context_type: 'Account',
-    context_id: '1',
     calculation_method: 'decaying_average',
     calculation_int: 65,
     mastery_points: defaultMasteryPoints,
@@ -80,11 +79,23 @@ describe('OutcomeDescriptionModal', () => {
     ),
   }
 
-  const defaultProps = outcome => ({
+  const defaultProps = (outcome: Outcome) => ({
     outcome,
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
   })
+
+  interface RenderWithProviderOptions {
+    outcome?: Outcome
+    overrides?: Record<string, any>
+    env?: {
+      contextType: string
+      contextId: string
+      outcomesFriendlyDescriptionFF: boolean
+      accountLevelMasteryScalesFF: boolean
+      contextURL?: string
+    }
+  }
 
   const renderWithProvider = ({
     outcome = defaultOutcome,
@@ -94,8 +105,9 @@ describe('OutcomeDescriptionModal', () => {
       contextId: '1',
       outcomesFriendlyDescriptionFF: false,
       accountLevelMasteryScalesFF: true,
+      contextURL: '',
     },
-  } = {}) => {
+  }: RenderWithProviderOptions = {}) => {
     return render(
       <LMGBContext.Provider value={{env}}>
         <OutcomeDescriptionModal {...defaultProps(outcome)} {...overrides} />
@@ -193,6 +205,7 @@ describe('OutcomeDescriptionModal', () => {
       contextId: '1',
       outcomesFriendlyDescriptionFF: true,
       accountLevelMasteryScalesFF: true,
+      contextURL: '',
     }
 
     it('does not render friendly description if FF is disabled', () => {
