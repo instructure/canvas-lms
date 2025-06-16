@@ -157,6 +157,9 @@ ContextModules.prototype.initialize = function () {
 
 ContextModules.prototype.onKeyDown = function (e) {
   const $target = $(e.target)
+  if (['SELECT', 'BUTTON'].includes($target[0]?.tagName)) {
+    return
+  }
   const fn = 'on' + this.keyCodes[e.keyCode] + 'Key'
   if (this[fn]) {
     e.preventDefault()
