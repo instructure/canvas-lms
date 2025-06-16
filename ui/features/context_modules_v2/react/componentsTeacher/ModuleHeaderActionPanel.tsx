@@ -81,9 +81,16 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         {prerequisites?.length && (
           <Flex.Item>
             <Text size="small" color="secondary">
-              {I18n.t('Prerequisites: %{prerequisiteModuleName}', {
-                prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '',
-              })}
+              {I18n.t(
+                {
+                  one: 'Prerequisite: %{prerequisiteModuleName}',
+                  other: 'Prerequisites: %{prerequisiteModuleName}',
+                },
+                {
+                  count: prerequisites?.length || 0,
+                  prerequisiteModuleName: prerequisites?.map?.(p => p.name).join(', ') || '',
+                },
+              )}
             </Text>
           </Flex.Item>
         )}

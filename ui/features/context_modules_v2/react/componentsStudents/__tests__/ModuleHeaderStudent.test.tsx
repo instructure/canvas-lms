@@ -86,4 +86,27 @@ describe('ModuleHeaderStudent', () => {
     const {getByTestId} = setUp(buildDefaultProps({progression, completionRequirements: []}))
     expect(getByTestId('module-header-status-icon-lock')).toBeInTheDocument()
   })
+
+  describe('prerequisites', () => {
+    it('renders prerequisites when one exists', () => {
+      const {getByText} = setUp(buildDefaultProps({prerequisites: [{name: 'Test Prerequisite'}]}))
+      expect(getByText('Prerequisite: Test Prerequisite')).toBeInTheDocument()
+    })
+
+    it('renders prerequisites when multiple exist', () => {
+      const {getByText} = setUp(
+        buildDefaultProps({
+          prerequisites: [{name: 'Test Prerequisite 1'}, {name: 'Test Prerequisite 2'}],
+        }),
+      )
+      expect(
+        getByText('Prerequisites: Test Prerequisite 1, Test Prerequisite 2'),
+      ).toBeInTheDocument()
+    })
+
+    it('does not render prerequisites when none exist', () => {
+      const container = setUp(buildDefaultProps({prerequisites: []}))
+      expect(container.queryByTestId('module-header-prerequisites')).toBeNull()
+    })
+  })
 })
