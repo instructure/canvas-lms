@@ -30,7 +30,7 @@ export type OutcomeIconType =
  * @param masteryAt - The points threshold for mastery
  * @returns The URL path to the corresponding outcome icon
  */
-export const svgUrl = (points: number | null, masteryAt: number): string => {
+export const svgUrl = (points: number | null | undefined, masteryAt: number): string => {
   return `/images/outcomes/${getTagIcon(points, masteryAt)}.svg`
 }
 
@@ -40,7 +40,7 @@ export const svgUrl = (points: number | null, masteryAt: number): string => {
  *  After OUT-5226 (https://instructure.atlassian.net/browse/OUT-5226), support
  *  for custom outcome scales will be included
  */
-const getTagIcon = (points: number | null, masteryAt: number): OutcomeIconType => {
+const getTagIcon = (points: number | null | undefined, masteryAt: number): OutcomeIconType => {
   if (points == null) {
     return 'unassessed'
   }

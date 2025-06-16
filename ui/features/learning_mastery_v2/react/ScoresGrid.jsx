@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 import {keyBy} from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import StudentOutcomeScore from './StudentOutcomeScore'
+import {StudentOutcomeScore} from './components/grid/StudentOutcomeScore'
 import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
 import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './utils/constants'
 
