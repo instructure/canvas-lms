@@ -156,4 +156,64 @@ describe('ExceptionModal', () => {
     await userEvent.click(screen.getByRole('button', {name: /close/i}))
     expect(onClose).toHaveBeenCalled()
   })
+
+  it('removes an added exception when the delete button is clicked', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal accountId={accountId} openState={openState} onClose={onClose} />,
+    )
+
+    // Add a context
+    const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
+    input.focus()
+    await userEvent.paste('Subaccount')
+    const subaccount_1 = await waitFor(() => screen.findByText('Subaccount 101'), {timeout: 3000})
+    await userEvent.click(subaccount_1)
+    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+
+    // Find and click the delete/remove button for the added exception
+    // (Assume the button has an accessible label like "Remove Subaccount 101" or a role "button" near the exception name)
+    const removeBtn = screen.getByRole('button', {name: /delete exception.*subaccount 101/i})
+    await userEvent.click(removeBtn)
+
+    // The exception should be removed from the list
+    expect(screen.queryByText('Subaccount 101')).not.toBeInTheDocument()
+  })
+
+  it('updates the availability status when the select option is changed', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal accountId={accountId} openState={openState} onClose={onClose} />,
+    )
+
+    // Add a context
+    const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
+    input.focus()
+    await userEvent.paste('Subaccount')
+    const subaccount_1 = await waitFor(() => screen.findByText('Subaccount 101'), {timeout: 3000})
+    await userEvent.click(subaccount_1)
+    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+
+    // Find the select for availability by its current value
+    const select = screen.getByDisplayValue(/not available/i)
+
+    select.click() // Open the select dropdown
+
+    // Click on the "Available" option
+    const availableOption = screen.getByText('Available')
+    await userEvent.click(availableOption)
+
+    expect(select).toHaveDisplayValue(/available/i)
+
+    // Change back to "Not Available"
+    select.click() // Open the select dropdown
+    // Click on the "Available" option
+    const notAvailableOption = screen.getByText('Not Available')
+    await userEvent.click(notAvailableOption)
+    expect(select).toHaveDisplayValue(/not available/i)
+  })
 })

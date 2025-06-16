@@ -18,12 +18,11 @@
 
 import * as React from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-import {SearchableContexts} from '../../../../model/SearchableContext'
-import {ContextPath} from '../ContextPath'
 import {Spacing} from '@instructure/emotion'
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+import {SearchableContexts} from '../../../../model/SearchableContext'
 const I18n = createI18nScope('lti_registrations')
 
 type ContextOptionProps = {
@@ -40,27 +39,23 @@ export const ContextOption = React.memo(({context, margin}: ContextOptionProps) 
       <Text>{name}</Text>
       <Flex.Item shouldShrink>
         <Text size="small">
-          <Flex alignItems="center" as="div" gap="xx-small">
-            {hasPath ? (
-              <Flex.Item shouldShrink>
-                <ContextPath path={display_path} />
-              </Flex.Item>
-            ) : undefined}
+          <Flex alignItems="center" gap="xx-small">
+            {hasPath ? <EllipsifiedItem>{display_path.join(' / ')}</EllipsifiedItem> : undefined}
             {hasPath && (course_code || sis_id) ? <View>·</View> : undefined}
             {course_code ? (
-              <Flex.Item as="div" shouldGrow>
+              <EllipsifiedItem>
                 <View>
                   {I18n.t('Course ID: %{course_code}', {
                     course_code: course_code,
                   })}
                 </View>
-              </Flex.Item>
+              </EllipsifiedItem>
             ) : undefined}
             {sis_id && course_code ? <View>|</View> : undefined}
             {sis_id ? (
-              <Flex.Item as="div" shouldGrow>
+              <EllipsifiedItem>
                 <View>{I18n.t('SIS ID: %{sis_id}', {sis_id: sis_id})}</View>
-              </Flex.Item>
+              </EllipsifiedItem>
             ) : undefined}
           </Flex>
         </Text>
@@ -68,3 +63,19 @@ export const ContextOption = React.memo(({context, margin}: ContextOptionProps) 
     </Flex>
   )
 })
+
+const EllipsifiedItem = ({
+  children,
+  style,
+}: {children: React.ReactNode; style?: React.CSSProperties}) => (
+  <div
+    style={{
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+      ...style,
+    }}
+  >
+    {children}
+  </div>
+)

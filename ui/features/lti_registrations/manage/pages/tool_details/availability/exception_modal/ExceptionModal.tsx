@@ -17,10 +17,10 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconCoursesLine, IconSubaccountsLine} from '@instructure/ui-icons'
+import {IconCoursesLine, IconSubaccountsLine, IconTrashLine} from '@instructure/ui-icons'
 import {List} from '@instructure/ui-list'
 import {Modal} from '@instructure/ui-modal'
 import {Text} from '@instructure/ui-text'
@@ -31,6 +31,8 @@ import {LtiDeployment} from '../../../../model/LtiDeployment'
 import {ContextOption} from './ContextOption'
 import {ContextSearch} from './ContextSearch'
 import {ContextSearchOption} from './ContextSearchOption'
+import {Select} from '@instructure/ui-select'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -91,7 +93,7 @@ export const ExceptionModal = ({openState, onClose, accountId}: ExceptionModalPr
             <List isUnstyled margin="0" itemSpacing="small">
               {contextControlForm.map((control, index) => (
                 <List.Item key={index}>
-                  <Flex alignItems="center">
+                  <Flex alignItems="center" gap="x-small">
                     <Flex.Item>
                       {control.context.type === 'course' ? (
                         <IconCoursesLine size="x-small" />
@@ -99,8 +101,42 @@ export const ExceptionModal = ({openState, onClose, accountId}: ExceptionModalPr
                         <IconSubaccountsLine size="x-small" />
                       )}
                     </Flex.Item>
-                    <Flex.Item shouldGrow>
-                      <ContextOption context={control.context.context} margin="0 small" />
+                    <Flex.Item shouldGrow shouldShrink>
+                      <ContextOption context={control.context.context} />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <SimpleSelect
+                        renderLabel=""
+                        value={control.available ? 'available' : 'unavailable'}
+                        onChange={(e, {value}) => {
+                          // Update the availability status of the context
+                          setContextControlForm(prev =>
+                            prev.map((c, i) =>
+                              i === index ? {...c, available: value === 'available'} : c,
+                            ),
+                          )
+                        }}
+                      >
+                        <SimpleSelect.Option id={`available`} value={'available'}>
+                          {I18n.t('Available')}
+                        </SimpleSelect.Option>
+                        <SimpleSelect.Option id={`unavailable`} value={'unavailable'}>
+                          {I18n.t('Not Available')}
+                        </SimpleSelect.Option>
+                      </SimpleSelect>
+                    </Flex.Item>
+                    <Flex.Item>
+                      <IconButton
+                        screenReaderLabel={I18n.t('Delete exception for %{context_name}', {
+                          context_name: control.context.context.name,
+                        })}
+                        onClick={() => {
+                          // Remove the context from the context control form
+                          setContextControlForm(prev => prev.filter((_c, i) => i !== index))
+                        }}
+                      >
+                        <IconTrashLine />
+                      </IconButton>
                     </Flex.Item>
                   </Flex>
                 </List.Item>
