@@ -98,6 +98,20 @@ describe CoursesController do
       expect(assigns[:css_bundles].flatten).not_to include :k5_font
     end
 
+    context "when the user prefers the dyslexia friendly font" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        toggle_k5_setting(@course.account)
+        @student.enable_feature!(:use_dyslexic_font)
+      end
+
+      it "does not include k5_font css bundle" do
+        get_index(user: @student)
+        expect(assigns[:css_bundles].flatten).to include :k5_theme
+        expect(assigns[:css_bundles].flatten).not_to include :k5_font
+      end
+    end
+
     describe "homeroom courses" do
       before :once do
         @account = Account.default
