@@ -101,7 +101,7 @@ export const RatingRow = ({
                 <Flex alignItems="end" height="2.375rem">
                   {criterionUseRange && (
                     <Flex.Item width="4.5rem" textAlign="end" margin="0 0 x-small 0">
-                      <View as="span" margin="0 small 0 0">
+                      <View as="span" margin="0 small 0 0" data-testid="range-start">
                         {rangeStart ? I18n.t('%{rangeStart} to ', {rangeStart}) : `--`}
                       </View>
                     </Flex.Item>

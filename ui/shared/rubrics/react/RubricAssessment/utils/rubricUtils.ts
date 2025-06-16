@@ -41,11 +41,20 @@ export const rangingFrom = (ratings: RubricRating[], index: number, ratingOrder?
   const previousPointModifier = getAdjustedDecimalRatingModifier(previousRatingPoints)
   const nextRatingPoints = ratings[index + 1]?.points
   const nextPointModifier = getAdjustedDecimalRatingModifier(nextRatingPoints)
+  const currentRatingPoints = ratings[index]?.points
 
   if (ratingOrder === 'ascending') {
+    if (currentRatingPoints === previousRatingPoints) {
+      return undefined
+    }
+
     return index > 0
       ? roundToTwoDecimalPlaces(previousRatingPoints + previousPointModifier)
       : undefined
+  }
+
+  if (currentRatingPoints === nextRatingPoints) {
+    return undefined
   }
 
   return index < ratings.length - 1
