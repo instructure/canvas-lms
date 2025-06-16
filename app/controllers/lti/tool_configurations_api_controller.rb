@@ -99,7 +99,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       account: @context,
       created_by: @current_user,
       registration_params: {
-        name: tool_configuration_params[:name] || "Unnamed tool",
+        name: configuration_params[:title] || "Unnamed tool",
         admin_nickname: developer_key_params[:name],
       },
       overlay_params: {
