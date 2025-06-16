@@ -605,6 +605,7 @@ describe('RubricForm Tests', () => {
       })
 
       expect(getByTestId('generate-criteria-form')).toBeInTheDocument()
+      expect(getByTestId('grade-level-input')).toHaveValue('Higher Education')
       expect(getByTestId('criteria-count-input')).toHaveValue('5')
       expect(getByTestId('rating-count-input')).toHaveValue('4')
       expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
@@ -706,6 +707,7 @@ describe('RubricForm Tests', () => {
         pointsPerCriterion: '20',
         useRange: false,
         additionalPromptInfo: '',
+        gradeLevel: 'higher-ed',
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
     })

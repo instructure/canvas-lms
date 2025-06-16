@@ -516,6 +516,7 @@ class Rubric < ActiveRecord::Base
     rating_count: 4,
     points_per_criterion: 20,
     use_range: false,
+    grade_level: "higher-ed"
   }.freeze
   def generate_criteria_via_llm(association_object, generate_options = {})
     unless association_object.is_a?(AbstractAssignment)
@@ -543,6 +544,7 @@ class Rubric < ActiveRecord::Base
       CRITERIA_COUNT: generate_options[:criteria_count] || DEFAULT_GENERATE_OPTIONS[:criteria_count],
       RATING_COUNT: generate_options[:rating_count] || DEFAULT_GENERATE_OPTIONS[:rating_count],
       ADDITIONAL_PROMPT_INFO: generate_options[:additional_prompt_info].present? ? "Also consider: #{generate_options[:additional_prompt_info]}" : "",
+      GRADE_LEVEL: generate_options[:grade_level] || DEFAULT_GENERATE_OPTIONS[:grade_level],
     }
 
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)

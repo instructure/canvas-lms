@@ -25,14 +25,6 @@ import {GenerateCriteriaFormProps} from '../types/RubricForm'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 
-export const defaultGenerateCriteriaForm: GenerateCriteriaFormProps = {
-  criteriaCount: 5,
-  ratingCount: 4,
-  pointsPerCriterion: '20',
-  useRange: false,
-  additionalPromptInfo: '',
-}
-
 type UseGenerateCriteriaProps = {
   generateCriteriaMutationFn?: () => Promise<CanvasProgress>
   handleProgressUpdates: (progress: CanvasProgress) => void
