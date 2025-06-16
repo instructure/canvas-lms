@@ -33,6 +33,7 @@ import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
 import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {TypeToKeyMap} from '../../constants'
+import {IssueCell} from '../DataTable/IssueCell'
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
@@ -251,20 +252,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
                       </Flex>
                     </Table.Cell>
                     <Table.Cell textAlign="center">
-                      {item.count > 0 ? (
-                        <Badge
-                          count={item.count}
-                          countUntil={999}
-                          variant="danger"
-                          margin="small 0 small 0"
-                        >
-                          <Button onClick={() => handleRowClick(item)}>
-                            {I18n.t('View Issues')}
-                          </Button>
-                        </Badge>
-                      ) : (
-                        <Text color="secondary">No issues</Text>
-                      )}
+                      <IssueCell item={item} onClick={handleRowClick} />
                     </Table.Cell>
                     <Table.Cell>{item.type}</Table.Cell>
                     <Table.Cell>
