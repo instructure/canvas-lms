@@ -606,10 +606,27 @@ class AccountsController < ApplicationController
                              api_v1_sub_accounts_url,
                              total_entries: recursive ? nil : @accounts.count)
 
-    supported_includes = %w[course_count sub_account_count]
-    includes = (supported_includes.any? { |i| params[:include]&.include?(i) }) ? supported_includes : []
-
     ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
+
+    supported_includes = %w[course_count sub_account_count]
+    includes = Array(params[:include])
+    includes &= supported_includes
+
+    # Preload course and sub_account counts
+    if includes.include?("course_count")
+      course_counts = GuardRail.activate(:secondary) do
+        Course.active.where(account_id: @accounts).group(:account_id).size
+      end
+      @accounts.each { |a| a.instance_variable_set(:@course_count, course_counts.fetch(a.id, 0)) }
+    end
+
+    if includes.include?("sub_account_count")
+      sub_account_counts = GuardRail.activate(:secondary) do
+        Account.active.where(parent_account_id: @accounts).group(:parent_account_id).size
+      end
+      @accounts.each { |a| a.instance_variable_set(:@sub_account_count, sub_account_counts.fetch(a.id, 0)) }
+    end
+
     render json: @accounts.map { |a| account_json(a, @current_user, session, includes) }
   end
 
