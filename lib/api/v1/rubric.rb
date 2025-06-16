@@ -22,6 +22,7 @@ module Api::V1::Rubric
   include Api::V1::Json
   include Api::V1::RubricAssessment
   include Api::V1::RubricAssociation
+  include Api::V1::Outcome
 
   API_ALLOWED_RUBRIC_OUTPUT_FIELDS = {
     only: %w[
@@ -92,6 +93,7 @@ module Api::V1::Rubric
       ACCOUNT_LEVEL_MASTERY_SCALES: @context.root_account.feature_enabled?(:account_level_mastery_scales),
       ASSIGNMENT_ID: assignment.id,
       COURSE_ID: @context.id,
+      ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
       ai_rubrics_enabled: Rubric.ai_rubrics_enabled?(@context),
       assigned_rubric:,
       rubric_association:,
