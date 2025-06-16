@@ -21,9 +21,14 @@ import {render, fireEvent} from '@testing-library/react'
 import StudentHeader from '../StudentHeader'
 
 describe('StudentHeader', () => {
-  let gradebookFilterHandlerMock
+  let gradebookFilterHandlerMock: jest.Mock
 
-  const defaultProps = (props = {}) => ({
+  const defaultProps = (
+    _props = {},
+  ): {
+    gradebookFilters: string[]
+    gradebookFilterHandler: jest.Mock
+  } => ({
     gradebookFilters: [],
     gradebookFilterHandler: gradebookFilterHandlerMock,
   })

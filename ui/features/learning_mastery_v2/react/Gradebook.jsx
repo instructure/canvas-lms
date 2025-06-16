@@ -21,7 +21,7 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import StudentCell from './StudentCell'
 import OutcomeHeader from './OutcomeHeader'
-import StudentHeader from './StudentHeader'
+import StudentHeader from './components/grid/StudentHeader'
 import ScoresGrid from './ScoresGrid'
 import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
 import {

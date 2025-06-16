@@ -23,7 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from './utils/constants'
+import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
