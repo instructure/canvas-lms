@@ -368,53 +368,57 @@ export const RubricForm = ({
 
   useEffect(() => {
     if (outcomeDialogOpen) {
-      const dialog = new FindDialog({
-        title: I18n.t('Find Outcome'),
-        selectedGroup: new OutcomeGroup(rootOutcomeGroup),
-        useForScoring: true,
-        shouldImport: false,
-        disableGroupImport: true,
-        rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
-        url: '/outcomes/find_dialog',
-        zIndex: 10000,
-      })
-      dialog?.show()
-      ;(dialog as any).on('import', (outcomeData: any) => {
-        const newOutcomeCriteria = {
-          id: Date.now().toString(),
-          points: outcomeData.attributes.points_possible,
-          description: outcomeData.outcomeLink.outcome.title,
-          longDescription: stripPTags(outcomeData.attributes.description),
-          outcome: {
-            displayName: outcomeData.attributes.display_name,
-            title: outcomeData.outcomeLink.outcome.title,
-          },
-          ignoreForScoring: !outcomeData.useForScoring,
-          masteryPoints: outcomeData.attributes.mastery_points,
-          criterionUseRange: false,
-          ratings: outcomeData.attributes.ratings,
-          learningOutcomeId: outcomeData.outcomeLink.outcome.id,
-        }
-        const criteria = [...criteriaRef.current]
-        // Check if the outcome has already been added to this rubric
-        const hasDuplicateLearningOutcomeId = criteria.some(
-          criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId,
-        )
+      try {
+        const dialog = new FindDialog({
+          title: I18n.t('Find Outcome'),
+          selectedGroup: new OutcomeGroup(rootOutcomeGroup),
+          useForScoring: true,
+          shouldImport: false,
+          disableGroupImport: true,
+          rootOutcomeGroup: new OutcomeGroup(rootOutcomeGroup),
+          url: '/outcomes/find_dialog',
+          zIndex: 10000,
+        })
+        dialog?.show()
+        ;(dialog as any).on('import', (outcomeData: any) => {
+          const newOutcomeCriteria = {
+            id: Date.now().toString(),
+            points: outcomeData.attributes.points_possible,
+            description: outcomeData.outcomeLink.outcome.title,
+            longDescription: stripPTags(outcomeData.attributes.description),
+            outcome: {
+              displayName: outcomeData.attributes.display_name,
+              title: outcomeData.outcomeLink.outcome.title,
+            },
+            ignoreForScoring: !outcomeData.useForScoring,
+            masteryPoints: outcomeData.attributes.mastery_points,
+            criterionUseRange: false,
+            ratings: outcomeData.attributes.ratings,
+            learningOutcomeId: outcomeData.outcomeLink.outcome.id,
+          }
+          const criteria = [...criteriaRef.current]
+          // Check if the outcome has already been added to this rubric
+          const hasDuplicateLearningOutcomeId = criteria.some(
+            criterion => criterion.learningOutcomeId === newOutcomeCriteria.learningOutcomeId,
+          )
 
-        if (hasDuplicateLearningOutcomeId) {
-          showFlashError(
-            I18n.t('This Outcome has not been added as it already exists in this rubric.'),
-          )()
+          if (hasDuplicateLearningOutcomeId) {
+            showFlashError(
+              I18n.t('This Outcome has not been added as it already exists in this rubric.'),
+            )()
 
-          return
-        }
-        criteria.push(newOutcomeCriteria)
+            return
+          }
+          criteria.push(newOutcomeCriteria)
 
-        setRubricFormField('pointsPossible', calcPointsPossible(criteria))
-        setRubricFormField('criteria', criteria)
-        dialog.cleanup()
-      })
-      setOutcomeDialogOpen(false)
+          setRubricFormField('pointsPossible', calcPointsPossible(criteria))
+          setRubricFormField('criteria', criteria)
+          dialog.cleanup()
+        })
+        setOutcomeDialogOpen(false)
+      } catch (error) {
+        showFlashError(I18n.t('Failed to open the outcome dialog'))()
+      }
     }
   }, [outcomeDialogOpen, rootOutcomeGroup, setRubricFormField])
 

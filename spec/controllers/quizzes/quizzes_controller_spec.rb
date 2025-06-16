@@ -872,6 +872,7 @@ describe Quizzes::QuizzesController do
           expect(assigns[:js_env][:assigned_rubric][:can_update]).to be_truthy
           expect(assigns[:js_env][:assigned_rubric][:association_count]).to eq 1
           expect(assigns[:js_env][:rubric_association][:id]).to eq quiz_assignment.rubric_association.id
+          expect(assigns[:js_env][:ROOT_OUTCOME_GROUP]).to be_present
         end
 
         it "does not set assigned_rubric and rubric_association in the ENV when FF is OFF" do
