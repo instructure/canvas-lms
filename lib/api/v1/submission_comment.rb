@@ -49,13 +49,14 @@ module Api::V1::SubmissionComment
     if submission_comment.media_comment?
       sc_hash["media_comment"] = media_comment_json(
         { media_id: submission_comment.media_comment_id,
-          media_type: submission_comment.media_comment_type }
+          media_type: submission_comment.media_comment_type },
+        location: submission_comment.asset_string
       )
     end
 
     unless submission_comment.attachments.blank?
       sc_hash["attachments"] = submission_comment.attachments.map do |a|
-        attachment_json(a, user)
+        attachment_json(a, user, { location: submission_comment.asset_string })
       end
     end
     if @current_user && submission_comment.grants_right?(@current_user, :read_author)

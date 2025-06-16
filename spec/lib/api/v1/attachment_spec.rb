@@ -45,7 +45,8 @@ describe Api::V1::Attachment do
       expect(json.fetch("url")).not_to include("verifier")
     end
 
-    it "includes the location parameter in the url when the opts contains it" do
+    it "includes the location parameter in the url when the opts contains it and file_association_access feature flag is enabled" do
+      attachment.root_account.enable_feature!(:file_association_access)
       params = {
         include: ["preview_url"],
         skip_permission_checks: true
