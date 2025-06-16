@@ -191,7 +191,7 @@ const FileFolderTable = ({
       <Flex direction="column">
         <DragAndDropWrapper
           enabled={!isEmpty && showDrop && !!currentFolder}
-          minHeight={300}
+          minHeight={420}
           currentFolder={currentFolder!}
           contextId={contextId}
           contextType={pluralizeContextTypeString(contextType)}
