@@ -18,15 +18,21 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import StudentOutcomeScore from '../StudentOutcomeScore'
-import {svgUrl} from '../utils/icons'
+import {StudentOutcomeScore, StudentOutcomeScoreProps} from '../StudentOutcomeScore'
+import {svgUrl} from '../../../utils/icons'
+import {Outcome, OutcomeRollup, Rating} from '../../../types/rollup'
 
-jest.mock('../utils/icons', () => ({
+jest.mock('../../../utils/icons', () => ({
   svgUrl: jest.fn(() => 'http://test.com'),
 }))
 
 describe('StudentOutcomeScore', () => {
-  const defaultProps = (props = {}) => {
+  interface TestProps {
+    outcome?: Partial<Outcome>
+    rollup?: Partial<OutcomeRollup>
+  }
+
+  const defaultProps = (props: TestProps = {}): StudentOutcomeScoreProps => {
     return {
       outcome: {
         id: '1',
@@ -37,7 +43,8 @@ describe('StudentOutcomeScore', () => {
         calculation_int: 65,
         mastery_points: 5,
         ratings: [],
-      },
+        ...props.outcome,
+      } as Outcome,
       rollup: {
         outcomeId: '1',
         rating: {
@@ -46,13 +53,16 @@ describe('StudentOutcomeScore', () => {
           description: 'great!',
           mastery: false,
         },
-      },
-      ...props,
+        ...props.rollup,
+      } as OutcomeRollup,
     }
   }
 
   beforeEach(() => {
-    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
+    window.ENV = window.ENV || {}
+    window.ENV.GRADEBOOK_OPTIONS = {
+      ACCOUNT_LEVEL_MASTERY_SCALES: true,
+    }
   })
 
   it('calls svgUrl with the right arguments', () => {
