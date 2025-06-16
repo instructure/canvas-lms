@@ -64,6 +64,18 @@ describe K5Mode do
         expect(assigns(:js_bundles).flatten).to include(:k5_theme)
       end
 
+      context "when the user prefers the dyslexia friendly font" do
+        before do
+          @teacher.enable_feature!(:use_dyslexic_font)
+        end
+
+        it "does not include k5_font css bundle" do
+          get :index, params: { course_id: @course.id }
+          expect(assigns(:css_bundles).flatten).to include(:k5_theme)
+          expect(assigns(:css_bundles).flatten).not_to include(:k5_font)
+        end
+      end
+
       context "that is also a student" do
         before do
           @course.enroll_user(@teacher, "StudentEnrollment", enrollment_state: "active")

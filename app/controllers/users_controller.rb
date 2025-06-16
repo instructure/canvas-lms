@@ -577,7 +577,7 @@ class UsersController < ApplicationController
              })
 
       css_bundle :k5_common, :k5_dashboard, :dashboard_card
-      css_bundle :k5_font unless use_classic_font?
+      css_bundle :k5_font unless use_classic_font? || @current_user.prefers_dyslexic_font?
       js_bundle :k5_dashboard
     else
       # things needed only for classic dashboard

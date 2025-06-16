@@ -3133,6 +3133,20 @@ describe UsersController do
           expect(assigns[:css_bundles].flatten).not_to include :k5_font
         end
 
+        context "when the user prefers the dyslexia friendly font" do
+          before do
+            course_with_student_logged_in
+            toggle_k5_setting(@course.account)
+            @student.enable_feature!(:use_dyslexic_font)
+          end
+
+          it "does not include k5_font css bundle" do
+            get "user_dashboard"
+            expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+            expect(assigns[:css_bundles].flatten).not_to include :k5_font
+          end
+        end
+
         context "ENV.INITIAL_NUM_K5_CARDS" do
           before :once do
             course_with_student
