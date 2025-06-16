@@ -23,7 +23,11 @@ import {ApiResult, parseFetchResult} from '../../common/lib/apiResult/ApiResult'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {AccountId} from '../model/AccountId'
 import {LtiDeploymentId} from '../model/LtiDeploymentId'
-import {LtiContextControlId, ZLtiContextControl} from '../model/LtiContextControl'
+import {
+  LtiContextControl,
+  LtiContextControlId,
+  ZLtiContextControl,
+} from '../model/LtiContextControl'
 import {CourseId} from '../model/CourseId'
 
 /**
@@ -66,6 +70,24 @@ export const deleteContextControl: DeleteContextControl = (registrationId, contr
     fetch(`/api/v1/lti_registrations/${registrationId}/controls/${controlId}`, {
       ...defaultFetchOptions(),
       method: 'DELETE',
+    }),
+  )
+
+export type UpdateContextControl = (
+  registrationId: LtiRegistrationId,
+  controlId: LtiContextControlId,
+  available: boolean,
+) => Promise<ApiResult<LtiContextControl>>
+export const updateContextControl: UpdateContextControl = (registrationId, controlId, available) =>
+  parseFetchResult(ZLtiContextControl)(
+    fetch(`/api/v1/lti_registrations/${registrationId}/controls/${controlId}`, {
+      ...defaultFetchOptions(),
+      method: 'PUT',
+      body: JSON.stringify({available}),
+      headers: {
+        ...defaultFetchOptions().headers,
+        'Content-Type': 'application/json',
+      },
     }),
   )
 
