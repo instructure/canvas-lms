@@ -140,6 +140,9 @@ ShowFolder.render = function () {
     this.props.currentFolder.folders.loadedAll && this.props.currentFolder.files.loadedAll
   )
 
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+
   // We have to put the "select all" checkbox out here because VO won't read the table properly
   // if it's in the table header, and won't read it at all if it's outside the table but inside
   // the <div role="grid">.
@@ -172,7 +175,7 @@ ShowFolder.render = function () {
         )}
         {hasLoadedAll && (
           <>
-            {this.props.userCanAddFilesForContext && (
+            {this.props.userCanAddFilesForContext && !isAccessRestricted && (
               <FileUpload
                 currentFolder={this.props.currentFolder}
                 filesDirectoryRef={this.props.filesDirectoryRef}

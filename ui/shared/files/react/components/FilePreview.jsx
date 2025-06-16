@@ -296,6 +296,8 @@ export default class FilePreview extends React.PureComponent {
       'ef-file-preview-button': true,
       'ef-file-preview-button--active': this.state.showInfoPanel,
     })
+    const isStudent = (ENV?.current_user_roles || []).includes('student')
+    const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
 
     return (
       <Overlay
@@ -316,16 +318,18 @@ export default class FilePreview extends React.PureComponent {
                 {this.state.initialItem ? this.state.initialItem.displayName() : ''}
               </h1>
               <div className="ef-file-preview-header-buttons">
-                {this.state.displayedItem && !this.state.displayedItem.get('locked_for_user') && (
-                  <a
-                    href={this.state.displayedItem.get('url')}
-                    download={true}
-                    className="ef-file-preview-header-download ef-file-preview-button"
-                  >
-                    <i className="icon-download" />
-                    <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
-                  </a>
-                )}
+                {this.state.displayedItem &&
+                  !this.state.displayedItem.get('locked_for_user') &&
+                  !isAccessRestricted && (
+                    <a
+                      href={this.state.displayedItem.get('url')}
+                      download={true}
+                      className="ef-file-preview-header-download ef-file-preview-button"
+                    >
+                      <i className="icon-download" />
+                      <span className="hidden-phone">{` ${I18n.t('Download')}`}</span>
+                    </a>
+                  )}
                 <button
                   type="button"
                   className={showInfoPanelClasses}

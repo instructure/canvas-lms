@@ -59,6 +59,10 @@ describe('Toolbar', () => {
     userFolder = new Folder({context_type: 'User', context_id: 2})
   })
 
+  afterEach(() => {
+    delete window.ENV.FEATURES?.restrict_student_access
+  })
+
   test('renders multi select action items when there is more than one item selected', () => {
     const toolbar = render(
       <Toolbar params="foo" query="" selectedItems={[file]} contextId="1" contextType="courses" />,
@@ -117,6 +121,35 @@ describe('Toolbar', () => {
       '.btn-delete': true,
       '.btn-add-folder': true,
       '.btn-upload': true,
+    }
+    expect(buttonsEnabled(toolbar, config)).toBeTruthy()
+  })
+
+  test('does not renders upload, move & download buttons for student with restricted permissions', () => {
+    window.ENV.FEATURES.restrict_student_access = true
+    window.ENV.current_user_roles = ['student']
+    const toolbar = render(
+      <Toolbar
+        params="foo"
+        query=""
+        selectedItems={[file]}
+        currentFolder={courseFolder}
+        contextId="1"
+        contextType="courses"
+        userCanAddFilesForContext={true}
+        userCanEditFilesForContext={true}
+        userCanDeleteFilesForContext={true}
+        userCanRestrictFilesForContext={true}
+      />,
+    )
+    const config = {
+      '.btn-view': true,
+      '.btn-download': false,
+      '.btn-move': false,
+      '.btn-restrict': true,
+      '.btn-delete': true,
+      '.btn-add-folder': true,
+      '.btn-upload': false,
     }
     expect(buttonsEnabled(toolbar, config)).toBeTruthy()
   })
