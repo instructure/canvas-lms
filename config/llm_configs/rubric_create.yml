@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-name: "rubric-create-V1"
+name: "rubric-create-V2"
 model_id: "anthropic.claude-3-haiku-20240307-v1:0"
 rate_limit:
   limit: 25
@@ -33,12 +33,15 @@ template: |
 
   1. Analyze the assignment description. Identify the main objectives of the assignment, note specific requirements or criteria mentioned, and determine key skills or knowledge areas being assessed. <ADDITIONAL_PROMPT_INFO_PLACEHOLDER>
 
-  2. Create rubric criteria. Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment. Ensure these criteria align with the assignment's objectives and requirements. Make sure criteria are clear, concise, and mutually exclusive
+  2. Create rubric criteria:
+  - Brainstorm potential criteria based on your analysis, then select the best <CRITERIA_COUNT_PLACEHOLDER> criteria that encompass the essential elements of the assignment.
+  - Ensure these criteria align with the assignment's objectives and requirements.
+  - Make sure criteria are clear, concise, and mutually exclusive.
 
   3. Develop the rating scale for each criterion:
   - For each criterion, create ratings for <RATING_COUNT_PLACEHOLDER> performance levels.
-  - Describe what constitutes each level of performance in clear, specific, and succinct terms
-  - Ensure that each rating is measurable and observable
+  - Describe what constitutes each level of performance in clear, specific, and succinct terms.
+  - Ensure that each rating is measurable and observable.
 
   4. Format the final rubric:
   Present the final rubric in a JSON structure. Here's an example of how the structure should look (do not use this content, it's just to illustrate the format):
@@ -72,6 +75,6 @@ template: |
 
   Ensure that your rubric is comprehensive, covering all major aspects of the assignment, and that it provides clear guidance for evaluating student work at different performance levels. The JSON structure should be consistent and properly formatted for easy parsing.
 
-  Now, please create the rubric based on the assignment description provided earlier. Your final output should only include the JSON structure with no extra explanation.
+  Now, please create the rubric based on the assignment description provided earlier, in the same language as the assignment description, with <CRITERIA_COUNT_PLACEHOLDER> criteria each containing <RATING_COUNT_PLACEHOLDER> ratings. Your final output should only include the JSON structure with no extra explanation.
 options:
   max_tokens: 5000
