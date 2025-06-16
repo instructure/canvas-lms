@@ -279,7 +279,8 @@ module Api::V1::Submission
       hash["media_comment"] =
         media_comment_json(
           { media_id: attempt.media_comment_id,
-            media_type: attempt.media_comment_type }
+            media_type: attempt.media_comment_type },
+          location: attempt.asset_string
         )
     end
 
@@ -324,7 +325,7 @@ module Api::V1::Submission
               submission_id: attempt.id
             }
 
-            attachment_json(attachment, user, {}, options)
+            attachment_json(attachment, user, { location: attempt.asset_string }, options)
           end
       end
     end

@@ -90,9 +90,24 @@ describe Api::V1::Submission do
         fake_controller.instance_variable_set(:@domain_root_account, attachment.root_account)
       end
 
-      it "should add asset location tag to the submission json body" do
+      it "should add asset location tag to all other fields of the json for online_upload" do
         student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
-        submission = assignment.submit_homework(student, submission_type: "online_upload", body: "<img src='/users/#{teacher.id}/files/#{attachment.id}'>", attachments: [attachment])
+        attachment = attachment_model(content_type: "application/pdf", context: student)
+        submission = assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+        submission.versioned_attachments = [attachment]
+        submission.save!
+        submission.media_comment_id = 1
+        submission.media_comment_type = "video/mp4"
+        fake_controller.current_user = student
+        json = fake_controller.submission_json(submission, assignment, teacher, session, context)
+
+        expect(json["attachments"].first["url"]).to include("location=#{submission.asset_string}")
+        expect(json["media_comment"]["url"]).to include("location=#{submission.asset_string}")
+      end
+
+      it "should add asset location tag to all other fields of the json for online_text_entry" do
+        student = course_with_user("StudentEnrollment", course:, active_all: true, name: "Student").user
+        submission = assignment.submit_homework(student, submission_type: "online_text_entry", body: "<img src='/users/#{teacher.id}/files/#{attachment.id}'>", attachments: [attachment])
         json = fake_controller.submission_json(submission, assignment, teacher, session, context)
 
         expect(json["body"]).to include("location=#{submission.asset_string}")
