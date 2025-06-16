@@ -622,6 +622,27 @@ describe('fetchModuleItems utility', () => {
         })
       })
 
+      it('sets the correct aria-label on the pagination element', async () => {
+        const moduleId = '1083'
+        const moduleName = 'Module 1: Basics'
+
+        // The module's aria-label contains the module name
+        const moduleElement = document.getElementById(`context_module_${moduleId}`)
+        moduleElement?.setAttribute('aria-label', moduleName)
+
+        await moduleItemsLazyLoader.fetchModuleItemsHtml(moduleId, 1)
+
+        await waitFor(() => {
+          const pagination = screen.getByTestId(`module-${moduleId}-pagination`)
+          expect(pagination).toBeInTheDocument()
+          expect(pagination).toHaveAttribute('aria-label', `${moduleName} Pagination`)
+
+          // The page button should exist with the correct aria label
+          const page1Button = pagination?.querySelector(`button[aria-label="${moduleName} Page 1"]`)
+          expect(page1Button).toBeInTheDocument()
+        })
+      })
+
       describe('behavior when a page is empty', () => {
         const moduleId = '2000'
 
