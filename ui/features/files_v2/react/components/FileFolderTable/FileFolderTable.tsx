@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState, useRef, useMemo, Ref} from 'react'
+import React, {useCallback, useState, useMemo, Ref} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
@@ -24,7 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {getUniqueId, pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
@@ -39,6 +39,8 @@ import {
   getSelectionScreenReaderText,
   setColumnWidths,
 } from './FileFolderTableUtils'
+import {DragAndDropWrapper} from './DragAndDropWrapper'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,7 +48,6 @@ export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   rows: (File | Folder)[]
   isLoading: boolean
-  contextType: string
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   userCanRestrictFilesForContext: boolean
@@ -64,7 +65,6 @@ const FileFolderTable = ({
   size,
   rows,
   isLoading,
-  contextType,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   userCanRestrictFilesForContext,
@@ -77,7 +77,7 @@ const FileFolderTable = ({
   handleFileDropRef,
   selectAllRef,
 }: FileFolderTableProps) => {
-  const {currentFolder} = useFileManagement()
+  const {currentFolder, contextId, contextType} = useFileManagement()
   const isStacked = size !== 'large'
   const columnHeaders: ColumnHeader[] = useMemo(() => {
     const actionsTitle = isStacked ? '' : I18n.t('Actions')
@@ -183,53 +183,62 @@ const FileFolderTable = ({
   )
 
   const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
+  const isEmpty = rows.length === 0 && !isLoading
 
   return (
     <>
       {renderModals()}
       <Flex direction="column">
-        <Table
-          caption={tableCaption}
-          hover={true}
-          layout={isStacked ? 'stacked' : 'fixed'}
-          data-testid="files-table"
+        <DragAndDropWrapper
+          enabled={!isEmpty && showDrop && !!currentFolder}
+          minHeight={300}
+          currentFolder={currentFolder!}
+          contextId={contextId}
+          contextType={pluralizeContextTypeString(contextType)}
         >
-          <Table.Head
-            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+          <Table
+            caption={tableCaption}
+            hover={true}
+            layout={isStacked ? 'stacked' : 'fixed'}
+            data-testid="files-table"
           >
-            <Table.Row>
-              {renderTableHead(
-                size,
-                allRowsSelected,
-                someRowsSelected,
-                toggleSelectAll,
-                isStacked,
+            <Table.Head
+              renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+            >
+              <Table.Row>
+                {renderTableHead(
+                  size,
+                  allRowsSelected,
+                  someRowsSelected,
+                  toggleSelectAll,
+                  isStacked,
+                  filteredColumns,
+                  sort,
+                  handleColumnHeaderClick,
+                  selectAllRef,
+                )}
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
+              {renderTableBody(
+                rows,
                 filteredColumns,
-                sort,
-                handleColumnHeaderClick,
-                selectAllRef,
+                selectedRows,
+                size,
+                isStacked,
+                toggleRowSelection,
+                userCanEditFilesForContext,
+                userCanDeleteFilesForContext,
+                userCanRestrictFilesForContext,
+                usageRightsRequiredForContext,
+                setModalOrTrayOptions,
               )}
-            </Table.Row>
-          </Table.Head>
-          <Table.Body>
-            {renderTableBody(
-              rows,
-              filteredColumns,
-              selectedRows,
-              size,
-              isStacked,
-              toggleRowSelection,
-              userCanEditFilesForContext,
-              userCanDeleteFilesForContext,
-              userCanRestrictFilesForContext,
-              usageRightsRequiredForContext,
-              setModalOrTrayOptions,
-            )}
-          </Table.Body>
-        </Table>
+            </Table.Body>
+          </Table>
+        </DragAndDropWrapper>
         <SubTableContent
           isLoading={isLoading}
-          isEmpty={rows.length === 0 && !isLoading}
+          isEmpty={isEmpty}
           searchString={searchString}
           showDrop={showDrop}
           handleFileDropRef={handleFileDropRef}

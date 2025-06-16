@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {render, screen, fireEvent} from '@testing-library/react'
-import {FileUploadDrop, queueOptionsCollectionUploads} from '../FileUploadDrop'
-import {BBFolderWrapper, FileFolderWrapper} from '../../../../utils/fileFolderWrappers'
-import {FAKE_COURSE_FOLDER, FAKE_FILES} from '../../../../fixtures/fakeData'
+import {FileUploadDrop} from '../FileUploadDrop'
+import {BBFolderWrapper} from '../../../../utils/fileFolderWrappers'
+import {FAKE_COURSE_FOLDER} from '../../../../fixtures/fakeData'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
+import {queueOptionsCollectionUploads} from '../../../../utils/uploadUtils'
 
 const defaultProps = {
   contextId: '1',

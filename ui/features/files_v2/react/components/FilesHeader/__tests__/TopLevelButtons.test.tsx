@@ -146,6 +146,7 @@ describe('TopLevelButtons', () => {
 
   it('renders switch to Old Files button when toggle flag is on', () => {
     ENV.FEATURES.files_a11y_rewrite_toggle = true
+    ENV.current_user_id = '12345'
     renderComponent()
     const switchButton = screen.getByText(/Switch to Old Files Page/i)
     expect(switchButton).toBeInTheDocument()
@@ -153,6 +154,15 @@ describe('TopLevelButtons', () => {
 
   it('does not render switch to Old Files button when toggle flag is off', () => {
     ENV.FEATURES.files_a11y_rewrite_toggle = false
+    ENV.current_user_id = '12345'
+    renderComponent()
+    const switchButton = screen.queryByText(/Switch to Old Files Page/i)
+    expect(switchButton).not.toBeInTheDocument()
+  })
+
+  it('does not render switch to Old Files button when user is anonymous', () => {
+    ENV.FEATURES.files_a11y_rewrite_toggle = true
+    ENV.current_user_id = null
     renderComponent()
     const switchButton = screen.queryByText(/Switch to Old Files Page/i)
     expect(switchButton).not.toBeInTheDocument()

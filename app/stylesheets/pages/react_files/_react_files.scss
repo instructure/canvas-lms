@@ -390,6 +390,24 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
   padding: 30px
 }
 
+.FileDragOverlayContainer {
+  position: relative;
+}
+
+.FileDragOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 2*36px);
+  height: calc(100% - 2*36px);
+  padding: 36px;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.FileDragOverlay [data-filedropcontent] {
+  background-color: white;
+}
+
 .modified-by-link {
   a {
     text-overflow: ellipsis;

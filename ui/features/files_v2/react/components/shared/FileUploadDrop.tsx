@@ -16,19 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useCallback, useState} from 'react'
+import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Flex} from '@instructure/ui-flex'
 import {Billboard} from '@instructure/ui-billboard'
 import {RocketSVG} from '@instructure/canvas-media'
 import {Text} from '@instructure/ui-text'
-import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import {BBFolderWrapper} from '../../../utils/fileFolderWrappers'
 import {type FileOptionsResults} from '../FilesHeader/UploadButton/FileOptions'
-import ZipFileOptionsForm from '../FilesHeader/UploadButton/ZipFileOptionsForm'
-import FileRenameForm from '../FilesHeader/UploadButton/FileRenameForm'
-import {createPortal} from 'react-dom'
+import {FileUploadModals} from './FileUploadModals'
+import {queueOptionsCollectionUploads, startUpload} from '../../../utils/uploadUtils'
 
 const I18n = createI18nScope('upload_drop_zone')
 
@@ -41,25 +39,6 @@ type FileUploadDropProps = {
   handleFileDropRef?: (el: HTMLInputElement | null) => void
 }
 
-export const queueOptionsCollectionUploads = (
-  contextId: string | number,
-  contextType: string,
-  fileOptions?: FileOptionsResults | null,
-  onClose?: () => void,
-) => {
-  if (!fileOptions) return
-  if (
-    fileOptions.zipOptions.length === 0 &&
-    fileOptions.nameCollisions.length === 0 &&
-    FileOptionsCollection.hasNewOptions()
-  ) {
-    if (fileOptions.resolvedNames.length > 0) {
-      FileOptionsCollection.queueUploads(contextId, contextType)
-    }
-    if (onClose) onClose()
-  }
-}
-
 export const FileUploadDrop = ({
   contextId,
   contextType,
@@ -70,21 +49,6 @@ export const FileUploadDrop = ({
 }: FileUploadDropProps) => {
   const [fileOptions, setFileOptions] = useState<FileOptionsResults | null>(null)
 
-  useEffect(() => {
-    FileOptionsCollection.setFolder(currentFolder)
-    FileOptionsCollection.setUploadOptions({
-      alwaysRename: false,
-      alwaysUploadZips: false,
-      errorOnDuplicate: true,
-    })
-  }, [currentFolder])
-
-  useEffect(() => {
-    queueOptionsCollectionUploads(contextId, contextType, fileOptions, onClose)
-    setFileOptions(fileOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fileOptions])
-
   const handleDrop = (
     accepted: ArrayLike<DataTransferItem | globalThis.File>,
     _rejected: ArrayLike<DataTransferItem | globalThis.File>,
@@ -92,62 +56,19 @@ export const FileUploadDrop = ({
   ) => {
     e?.preventDefault()
     e?.stopPropagation()
-    FileOptionsCollection.setFolder(currentFolder)
-    FileOptionsCollection.setOptionsFromFiles(accepted, true)
-    setFileOptions(FileOptionsCollection.getState())
+    const newFileOptions = startUpload(currentFolder, contextId, contextType, onClose, accepted)
+    setFileOptions(newFileOptions)
   }
 
-  const onZipOptionsResolved = useCallback(
-    (fileNameOptions: any) => {
-      FileOptionsCollection.onZipOptionsResolved(fileNameOptions)
-      setFileOptions(FileOptionsCollection.getState())
-    },
-    [setFileOptions],
-  )
+  const onModalResolved = (fileOptions: FileOptionsResults) => {
+    queueOptionsCollectionUploads(contextId, contextType, fileOptions, onClose)
+    setFileOptions(fileOptions)
+  }
 
-  const onNameConflictResolved = useCallback(
-    (fileNameOptions: any) => {
-      FileOptionsCollection.onNameConflictResolved(fileNameOptions)
-      setFileOptions(FileOptionsCollection.getState())
-    },
-    [setFileOptions],
-  )
-
-  const onCloseResolveModals = useCallback(() => {
-    // user dismissed a zip or name conflict modal
-    FileOptionsCollection.resetState()
-    setFileOptions(FileOptionsCollection.getState())
-    if (onClose) onClose()
-  }, [onClose])
-
-  const renderModal = useCallback(() => {
-    if (!fileOptions) return null
-
-    const zipOptions = fileOptions.zipOptions
-    const nameCollisions = fileOptions.nameCollisions
-
-    if (zipOptions.length)
-      return createPortal(
-        <ZipFileOptionsForm
-          open={!!zipOptions.length}
-          onClose={onCloseResolveModals}
-          fileOptions={zipOptions[0]}
-          onZipOptionsResolved={onZipOptionsResolved}
-        />,
-        document.body,
-      )
-    else if (nameCollisions.length)
-      return createPortal(
-        <FileRenameForm
-          open={!!nameCollisions.length}
-          onClose={onCloseResolveModals}
-          fileOptions={nameCollisions[0]}
-          onNameConflictResolved={onNameConflictResolved}
-        />,
-        document.body,
-      )
-    else return null
-  }, [fileOptions, onCloseResolveModals, onZipOptionsResolved, onNameConflictResolved])
+  const onModalClose = (fileOptions: FileOptionsResults) => {
+    setFileOptions(fileOptions)
+    onClose?.()
+  }
 
   return (
     <>
@@ -173,7 +94,11 @@ export const FileUploadDrop = ({
           </Flex>
         }
       />
-      {renderModal()}
+      <FileUploadModals
+        fileOptions={fileOptions}
+        onResolved={onModalResolved}
+        onClose={onModalClose}
+      />
     </>
   )
 }
