@@ -23,3 +23,19 @@
 .image-block-default-preview svg {
   color: #d7dade;
 }
+
+.image-actions-container {
+  position: relative;
+}
+
+.image-actions-container img {
+  width: 100%;
+}
+
+.image-actions-container .image-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 16px;
+}

@@ -19,14 +19,45 @@
 import './image-block.css'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {BaseBlock, useIsEditMode} from '../BaseBlock'
-import {ImageBlockEdit} from './ImageBlockEdit'
-import {ImageBlockEditPreview} from './ImageBlockEditPreview'
+import {ImageActionsWrapper} from './ImageActionsWrapper'
+import {useState} from 'react'
+import {useSave} from '../BaseBlock/useSave'
+import {ImageBlockUploadModal} from './ImageBlockUploadModal'
+import {ImageBlockAddButton} from './ImageBlockAddButton'
+import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 
 const I18n = createI18nScope('page_editor')
 
 const ImageBlockContent = (props: ImageBlockProps) => {
   const isEditMode = useIsEditMode()
-  return isEditMode ? <ImageBlockEdit {...props} /> : <ImageBlockEditPreview {...props} />
+  const [isOpen, setIsOpen] = useState(false)
+  const save = useSave<typeof ImageBlock>()
+  const closeModal = () => setIsOpen(false)
+  const onSelected = (url: string, altText: string) => {
+    closeModal()
+    save({
+      url,
+      altText,
+    })
+  }
+
+  const image = props.url ? <img src={props.url} alt={props.altText} /> : undefined
+  return (
+    <>
+      {isEditMode && (
+        <ImageBlockUploadModal open={isOpen} onDismiss={closeModal} onSelected={onSelected} />
+      )}
+
+      <ImageActionsWrapper
+        showActions={isEditMode && !!image}
+        onUploadClick={() => setIsOpen(true)}
+      >
+        {isEditMode
+          ? (image ?? <ImageBlockAddButton onClick={() => setIsOpen(true)} />)
+          : (image ?? <ImageBlockDefaultPreviewImage />)}
+      </ImageActionsWrapper>
+    </>
+  )
 }
 
 export type ImageBlockProps = {
