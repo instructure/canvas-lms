@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import StudentCell from '../StudentCell'
+import {StudentCell, StudentCellProps} from '../StudentCell'
+import {Student} from '../../../types/rollup'
 
 describe('StudentCell', () => {
-  const defaultProps = (props = {}) => ({
+  const defaultProps = (props: Partial<StudentCellProps> = {}): StudentCellProps => ({
     student: {
       status: 'active',
       name: 'Student Test',
@@ -29,7 +30,7 @@ describe('StudentCell', () => {
       sortable_name: 'Test, Student',
       avatar_url: '/avatar-url',
       id: '1',
-    },
+    } as Student,
     courseId: '100',
     ...props,
   })
@@ -47,20 +48,21 @@ describe('StudentCell', () => {
   it('renders a link to the student learning mastery gradebook', () => {
     const props = defaultProps()
     const {getByTestId} = render(<StudentCell {...props} />)
-    expect(getByTestId('student-cell-link').href).toMatch(
+    expect((getByTestId('student-cell-link') as HTMLAnchorElement).href).toMatch(
       `/courses/${props.courseId}/grades/${props.student.id}#tab-outcomes`,
     )
   })
 
   describe('student status', () => {
-    const getTestStudent = status => ({
-      status,
-      name: 'Student Test',
-      display_name: 'Student Test',
-      sortable_name: 'Test, Student',
-      avatar_url: '/avatar-url',
-      id: '1',
-    })
+    const getTestStudent = (status: string): Student =>
+      ({
+        status,
+        name: 'Student Test',
+        display_name: 'Student Test',
+        sortable_name: 'Test, Student',
+        avatar_url: '/avatar-url',
+        id: '1',
+      }) as Student
 
     it('does not render student status label when student active', () => {
       const {queryByTestId} = render(
