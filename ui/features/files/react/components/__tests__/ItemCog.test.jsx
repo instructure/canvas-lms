@@ -42,6 +42,14 @@ const manageFilesConfig = {
   deleteLink: true,
 }
 
+const restrictFilesConfig = {
+  download: false,
+  editName: true,
+  usageRights: true,
+  move: false,
+  deleteLink: true,
+}
+
 const buttonsEnabled = config => {
   let valid = true
   for (const prop in config) {
@@ -246,6 +254,12 @@ describe('ItemCog', () => {
     // After deletion, focus should move to the name button
     nameButton.focus()
     expect(document.activeElement).toBe(nameButton)
+  })
+
+  it('restrict download & move buttons for users with restricted permission', () => {
+    window.ENV.FEATURES.restrict_student_access = true
+    render(<ItemCog {...sampleProps(true, true, true)} />, {container: fixtures})
+    expect(buttonsEnabled(restrictFilesConfig)).toBe(true)
   })
 
   describe('Send To menu item', () => {

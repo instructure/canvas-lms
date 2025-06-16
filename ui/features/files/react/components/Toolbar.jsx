@@ -71,6 +71,11 @@ export default class Toolbar extends React.Component {
     return this.props.currentFolder.folders.add({})
   }
 
+  isAccessRestricted() {
+    const isStudent = (ENV?.current_user_roles || []).includes('student')
+    return ENV?.FEATURES?.restrict_student_access && isStudent
+  }
+
   handleSwitchToNewFiles = async () => {
     doFetchApi({
       method: 'PUT',
@@ -276,12 +281,14 @@ export default class Toolbar extends React.Component {
                 &nbsp;
                 <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
               </button>
-              <UploadButton
-                currentFolder={this.props.currentFolder}
-                showingButtons={!!this.showingButtons}
-                contextId={this.props.contextId}
-                contextType={this.props.contextType}
-              />
+              {!this.isAccessRestricted() && (
+                <UploadButton
+                  currentFolder={this.props.currentFolder}
+                  showingButtons={!!this.showingButtons}
+                  contextId={this.props.contextId}
+                  contextType={this.props.contextType}
+                />
+              )}
               {this.renderTrayToolsMenu()}
             </>
           )}
@@ -435,6 +442,8 @@ export default class Toolbar extends React.Component {
       userCanDeleteFilesForContext,
     } = this.props
 
+    const isAccessRestricted = this.isAccessRestricted()
+
     const canManage = permission => {
       return permission && !submissionsFolderSelected && !restrictedByMasterCourse
     }
@@ -498,8 +507,9 @@ export default class Toolbar extends React.Component {
             </a>
 
             {this.renderManageAccessPermissionsButton(canManage(userCanRestrictFilesForContext))}
-            {this.renderDownloadButton()}
-            {this.renderCopyCourseButton(canManage(userCanEditFilesForContext))}
+            {!isAccessRestricted && this.renderDownloadButton()}
+            {!isAccessRestricted &&
+              this.renderCopyCourseButton(canManage(userCanEditFilesForContext))}
             {this.renderManageUsageRightsButton(
               canManage(userCanEditFilesForContext && this.props.usageRightsRequiredForContext),
             )}

@@ -87,6 +87,15 @@ describe('ShowFolder', () => {
     expect(queryByText('Drop files here to upload')).not.toBeInTheDocument()
   })
 
+  it('does not render the FileUpload component if student access is restricted', () => {
+    window.ENV.FEATURES ||= {}
+    window.ENV.FEATURES.restrict_student_access = true
+    window.ENV.current_user_roles = ['student']
+
+    const {queryByText} = render(<ShowFolder {...defaultProps()} />)
+    expect(queryByText('Drop files here to upload')).not.toBeInTheDocument()
+  })
+
   it('renders empty text if the folder is empty', () => {
     const props = defaultProps()
     jest.spyOn(props.currentFolder, 'isEmpty').mockReturnValue(true)
