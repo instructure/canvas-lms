@@ -75,6 +75,8 @@
   path: '/api/v1/accounts/:account_id/bounced_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/bounced_communication_channels/reset'
+- verb: POST
+  path: /api/v1/accounts/:account_id/bulk_enrollment
 - verb: GET
   path: '/api/v1/accounts/:account_id/content_migrations'
 - verb: POST
