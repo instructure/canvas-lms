@@ -2001,11 +2001,15 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    courses.active.size
+    return @course_count if defined?(@course_count)
+
+    GuardRail.activate(:secondary) { courses.active.size }
   end
 
   def sub_account_count
-    sub_accounts.active.size
+    return @sub_account_count if defined?(@sub_account_count)
+
+    GuardRail.activate(:secondary) { sub_accounts.active.size }
   end
 
   def user_count

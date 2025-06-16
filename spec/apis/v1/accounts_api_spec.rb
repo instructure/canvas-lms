@@ -206,27 +206,62 @@ describe "Accounts API", type: :request do
       expect(json.pluck("name")).to eq ["Account 1", "Account 2", "implicit-access", "subby"]
     end
 
-    it "includes course count if requested" do
-      2.times { course_factory(active_all: true, account: @a1.sub_accounts.find_by(name: "subby")) }
+    it "preloads and returns correct course counts" do
+      2.times { course_factory(active_all: true, account: @a2) }
       json = api_call(:get,
                       "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=course_count",
                       { controller: "accounts",
                         action: "sub_accounts",
-                        account_id: @a1.id.to_s,
+                        account_id: @a1.id.to_param,
                         format: "json",
                         include: ["course_count"] })
-      expect(json.pluck("course_count")).to match_array([2, 0, 0, 0])
+
+      expect(json.pluck("course_count")).to match_array([0, 0, 0, 2])
+      expect(json).not_to include("sub_account_count")
     end
 
-    it "includes sub-account count if requested" do
+    it "preloads and returns correct sub-account counts" do
       json = api_call(:get,
                       "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=sub_account_count",
                       { controller: "accounts",
                         action: "sub_accounts",
-                        account_id: @a1.id.to_s,
+                        account_id: @a1.id.to_param,
                         format: "json",
                         include: ["sub_account_count"] })
+
       expect(json.pluck("sub_account_count")).to match_array([0, 0, 3, 3])
+      expect(json).not_to include("course_count")
+    end
+
+    it "accepts both course and sub-account count args simultaneously" do
+      2.times { course_factory(active_all: true, account: @a2) }
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=course_count&include[]=sub_account_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_param,
+                        format: "json",
+                        include: ["course_count", "sub_account_count"] })
+
+      expect(json[0]["course_count"]).to be_present
+      expect(json[0]["sub_account_count"]).to be_present
+    end
+
+    it "handles deleted courses and accounts properly" do
+      2.times { course_factory(active_all: true, account: @a2) }
+      @a2.courses.take.update!(workflow_state: "deleted")
+      @a1_2.update!(workflow_state: "deleted")
+
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@a1.id}/sub_accounts?include[]=course_count&include[]=sub_account_count",
+                      { controller: "accounts",
+                        action: "sub_accounts",
+                        account_id: @a1.id.to_param,
+                        format: "json",
+                        include: ["course_count", "sub_account_count"] })
+
+      expect(json.pluck("course_count")).to match_array([0, 0, 0, 1])
+      expect(json.pluck("sub_account_count")).to match_array([0, 0, 2, 3])
     end
 
     it "adds sub account" do
