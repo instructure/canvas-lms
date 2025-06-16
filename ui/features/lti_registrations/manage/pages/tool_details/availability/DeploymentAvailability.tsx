@@ -15,45 +15,55 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import * as React from 'react'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
 import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import * as React from 'react'
 import {Link as RouterLink} from 'react-router-dom'
-import {createContextControls, deleteContextControl} from '../../../api/contextControls'
+import {
+  isSuccessful,
+  isUnsuccessful,
+  formatApiResultError,
+} from '../../../../common/lib/apiResult/ApiResult'
+import {
+  createContextControls,
+  DeleteContextControl,
+  UpdateContextControl,
+} from '../../../api/contextControls'
 import {deleteDeployment} from '../../../api/deployments'
 import {AccountId, ZAccountId} from '../../../model/AccountId'
 import {ZCourseId} from '../../../model/CourseId'
+import {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
 import {LtiDeployment} from '../../../model/LtiDeployment'
 import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
+import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {askForContextControl} from './AskForContextControl'
 import {ContextCard} from './ContextCard'
-import {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
-import {renderExceptionCounts} from './renderExceptionCounts'
-import {List} from '@instructure/ui-list'
-import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
-import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {
   DeleteExceptionModal,
   DeleteExceptionModalOpenState,
 } from './exception_modal/DeleteExceptionModal'
-import {isUnsuccessful, formatApiResultError} from '../../../../common/lib/apiResult/ApiResult'
-import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 
+import {EditExceptionModal} from './exception_modal/EditExceptionModal'
+import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
+import {renderExceptionCounts} from './renderExceptionCounts'
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
   accountId: AccountId
   deployment: LtiDeployment
   registration: LtiRegistrationWithAllInformation
-  deleteControl: typeof deleteContextControl
+  deleteControl: DeleteContextControl
+  editControl: UpdateContextControl
   refetchControls: () => void
   debug: boolean
 }
@@ -66,7 +76,7 @@ const matchesDeploymentsContext = (deployment: LtiDeployment) => (cc: LtiContext
 }
 
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {registration, deployment, debug, refetchControls, deleteControl} = props
+  const {registration, deployment, debug, refetchControls, deleteControl, editControl} = props
 
   const controls_with_ids = deployment.context_controls.map(cc => {
     if (cc.course_id) {
@@ -82,12 +92,17 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
     }
   })
 
-  const rootControl = deployment.context_controls.find(matchesDeploymentsContext(deployment))
+  const rootControl = deployment.context_controls.find(matchesDeploymentsContext(deployment))!
 
   const [deleteExceptionModalOpenProps, setDeleteExceptionModalOpenProps] =
     React.useState<DeleteExceptionModalOpenState>({
       open: false,
     })
+
+  const [editControlInfo, setEditControlInfo] = React.useState<{
+    control: LtiContextControl
+    availableInParentContext: boolean | null
+  } | null>(null)
 
   const [exceptionModalOpenState, setExceptionModalOpenState] =
     React.useState<ExceptionModalOpenState>({
@@ -125,7 +140,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
     >
       <Heading level="h3">
         <Flex alignItems="center" justifyItems="space-between" as="div">
-          <Flex.Item as="div">
+          <Flex.Item as="div" shouldGrow shouldShrink>
             <Flex alignItems="center" as="div">
               <Flex.Item padding="0 xx-small 0 0" as="div">
                 {I18n.t('Installed in %{context_name}', {
@@ -133,24 +148,43 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                 })}
               </Flex.Item>
               <Flex as="div">
-                <Pill color="primary">
-                  {rootControl?.available ? I18n.t('Available') : I18n.t('Unavailable')}
-                </Pill>
+                <Flex.Item>
+                  <Pill color="primary">
+                    {rootControl?.available ? I18n.t('Available') : I18n.t('Unavailable')}
+                  </Pill>
+                </Flex.Item>
               </Flex>
             </Flex>
           </Flex.Item>
           <Flex.Item as="div">
-            <Button
-              onClick={() => {
-                setExceptionModalOpenState({
-                  open: true,
-                  deployment,
-                })
-              }}
-              color="primary"
-            >
-              {I18n.t('Add Exception')}
-            </Button>
+            <Flex direction="row" gap="small" justifyItems="end" as="div">
+              <Flex.Item>
+                <IconButton
+                  id={`edit-exception-${rootControl?.id}`}
+                  size="medium"
+                  screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
+                    context_name: rootControl?.context_name,
+                  })}
+                  renderIcon={IconEditLine}
+                  onClick={() =>
+                    setEditControlInfo({control: rootControl, availableInParentContext: null})
+                  }
+                />
+              </Flex.Item>
+              <Flex.Item as="div">
+                <Button
+                  onClick={() => {
+                    setExceptionModalOpenState({
+                      open: true,
+                      deployment,
+                    })
+                  }}
+                  color="primary"
+                >
+                  {I18n.t('Add Exception')}
+                </Button>
+              </Flex.Item>
+            </Flex>
           </Flex.Item>
           <ExceptionModal
             accountId={props.accountId}
@@ -258,13 +292,17 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                     <Flex gap="small">
                       <Flex.Item>
                         <IconButton
+                          id={`edit-exception-${control.id}`}
                           size="medium"
                           renderIcon={IconEditLine}
                           screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
                             contextName: control.context_name,
                           })}
                           onClick={() => {
-                            // TODO, actually open the edit modal
+                            setEditControlInfo({
+                              control,
+                              availableInParentContext: closestParent.control.available,
+                            })
                           }}
                         />
                       </Flex.Item>
@@ -306,6 +344,19 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             )
           })}
       </List>
+      {editControlInfo && (
+        <EditExceptionModal
+          {...editControlInfo}
+          onClose={() => setEditControlInfo(null)}
+          onSave={async (...args) => {
+            const result = await editControl(...args)
+            if (isSuccessful(result)) {
+              refetchControls()
+            }
+            return result
+          }}
+        />
+      )}
       <DeleteExceptionModal
         {...deleteExceptionModalOpenProps}
         onClose={() => setDeleteExceptionModalOpenProps({open: false})}
