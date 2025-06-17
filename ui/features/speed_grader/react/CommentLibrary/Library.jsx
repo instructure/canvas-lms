@@ -55,6 +55,19 @@ const Library = ({
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [showResults, setShowResults] = useState(false)
 
+  const setPureTextComment = useCallback(
+    value => {
+      // Must replace new lines with <p> tags
+      const text = value
+        .split(/\n/)
+        .map(it => `<p>${it}</p>`)
+        .join('')
+
+      setComment(text)
+    },
+    [setComment],
+  )
+
   useEffect(() => {
     const parent = suggestionsRef?.parentNode
     const handleBlur = event => {
@@ -89,15 +102,15 @@ const Library = ({
     if (isTrayOpen) {
       setIsTrayOpen(false)
     }
-    setComment(comment)
+    setPureTextComment(comment)
   }
 
   const setCommentFromSuggestion = useCallback(
     comment => {
       setShowResults(false)
-      setComment(comment)
+      setPureTextComment(comment)
     },
-    [setComment],
+    [setPureTextComment],
   )
 
   const closeSuggestions = useCallback(() => {
