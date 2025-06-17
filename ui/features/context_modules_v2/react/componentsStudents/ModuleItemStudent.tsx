@@ -24,7 +24,6 @@ import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../ut
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
 import ModuleItemTitleStudent from './ModuleItemTitleStudent'
-import ModuleDiscussionCheckpointStudent from './ModuleDiscussionCheckpointStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
