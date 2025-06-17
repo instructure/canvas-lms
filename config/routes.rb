@@ -1124,8 +1124,6 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :career) do
-    get "career/learn/:course_id", action: :catch_all, as: :career_learn
-    get "career/learn/:course_id/*path", action: :catch_all, as: :career_learn_path
     get "career/courses/:course_id", action: :catch_all, as: :course_career
     get "career/courses/:course_id/*path", action: :catch_all, as: :course_career_path
     get "career/accounts/:account_id", action: :catch_all, as: :account_career
