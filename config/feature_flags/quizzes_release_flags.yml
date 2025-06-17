@@ -118,3 +118,9 @@ new_quizzes_separators:
   description: If enabled, users can set decimal and thousands separators for New Quizzes
   state: allowed
   applies_to: SiteAdmin
+new_quizzes_ai_quiz_generation:
+  display_name: AI Quiz Generation
+  description: If enabled, the "Generate With AI" button will appear, allowing AI-based quiz creation for institutions in the Early Adopter Program
+  state: hidden
+  shadow: true
+  applies_to: Course

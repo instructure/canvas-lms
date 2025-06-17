@@ -2243,6 +2243,18 @@ module Lti
                        },
                        COURSE_GUARD
 
+    # Returns true if the AI quiz generation feature is enabled for the course.
+    # This is used to determine whether to display the "Generate Quiz" button in the UI.
+    #
+    # @example
+    #   ```
+    #   true
+    #   ```
+    register_expansion "Canvas.course.aiQuizGeneration",
+                       [],
+                       -> { @context.feature_enabled?(:new_quizzes_ai_quiz_generation) },
+                       COURSE_GUARD
+
     private
 
     def unique_submission_dates

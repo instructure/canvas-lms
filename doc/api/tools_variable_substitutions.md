@@ -1720,3 +1720,13 @@ If the account does not have a thousand separator set, it will return "$Canvas.a
 ```
 "period"
 ```
+## Canvas.course.aiQuizGeneration
+Returns true if the AI quiz generation feature is enabled for the course.
+This is used to determine whether to display the "Generate With AI" button in the UI.
+
+**Availability**: *when launched in a course (or a Group within a course)*  
+
+
+```
+true
+```
