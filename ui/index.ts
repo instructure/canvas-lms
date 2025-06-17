@@ -28,6 +28,7 @@ import ready from '@instructure/ready'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {Mathml} from '@instructure/canvas-rce'
 import {Capabilities as C, up} from '@canvas/engine'
+import {loadReactRouter} from './boot/initializers/router'
 import loadLocale from './loadLocale'
 import featureBundles from './featureBundles'
 // @ts-expect-error
@@ -122,6 +123,7 @@ function afterDocumentReady() {
   const helpButton = document.querySelector('.help_dialog_trigger')
   if (helpButton !== null) helpButton.addEventListener('click', openHelpDialog)
 
+  loadReactRouter()
   loadNewUserTutorials()
 
   if (!ENV.FEATURES.explicit_latex_typesetting) {
