@@ -22,8 +22,20 @@ require_relative "../grades/pages/gradebook_page"
 require_relative "../grades/pages/gradebook_cells_page"
 require_relative "pages/student_context_tray_page"
 
-describe "admin avatars" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "admin avatars" do |ff_enabled|
   include_context "in-process server selenium tests"
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   before do
     course_with_admin_logged_in
@@ -141,4 +153,9 @@ describe "admin avatars" do
       expect(student_avatar_link).to be_displayed
     end
   end
+end
+
+describe "admin avatars" do
+  it_behaves_like "admin avatars", true
+  it_behaves_like "admin avatars", false
 end
