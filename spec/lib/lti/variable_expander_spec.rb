@@ -986,6 +986,39 @@ module Lti
         )
       end
 
+      context "Canvas.course.aiQuizGeneration expansion" do
+        let(:subst_name) { "$Canvas.course.aiQuizGeneration" }
+
+        it "returns true when the feature flag is enabled for the course" do
+          course.save!
+          course.enable_feature!(:new_quizzes_ai_quiz_generation)
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to be(true)
+        end
+
+        it "returns false when the feature flag is not enabled for the course" do
+          course.save!
+
+          expander = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expect(expand!(subst_name, expander:)).to be(false)
+        end
+      end
+
       context "modules resources expansion" do
         let(:available_canvas_resources) { [{ "course_id" => course.id, "type" => "module" }] }
 
