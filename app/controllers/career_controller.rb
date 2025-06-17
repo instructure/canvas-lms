@@ -23,21 +23,15 @@ class CareerController < ApplicationController
 
   before_action :require_user
   before_action :require_context
-  before_action :set_app_type
-  before_action :require_enabled_canvas_career
+  before_action :require_enabled_learning_provider_app
 
   def catch_all
     env = {
-      FEATURES: features_env,
+      FEATURES: features_env
     }
     js_env(CANVAS_CAREER: env)
-
-    # Load appropriate app based on user type
-    if @is_provider_app
-      load_provider_app
-    else
-      load_learner_app
-    end
+    remote_env(canvascareer: canvas_career_learning_provider_app_launch_url)
+    deferred_js_bundle :canvas_career
 
     respond_to do |format|
       format.html { render html: "", layout: "bare" }
@@ -46,28 +40,10 @@ class CareerController < ApplicationController
 
   private
 
-  def set_app_type
-    @is_provider_app = should_load_provider_app?
-  end
-
-  def require_enabled_canvas_career
-    if @is_provider_app
-      redirect_to(root_path) and return unless canvas_career_learning_provider_app_enabled?
-    else
-      redirect_to(root_path) and return unless canvas_career_learner_app_enabled_for_students?
+  def require_enabled_learning_provider_app
+    unless canvas_career_learning_provider_app_enabled?
+      redirect_to root_path and return
     end
-  end
-
-  def load_learner_app
-    url = canvas_career_learner_app_launch_url
-    remote_env(canvascareer: url)
-    deferred_js_bundle :canvas_career_learner
-  end
-
-  def load_provider_app
-    url = canvas_career_learning_provider_app_launch_url
-    remote_env(canvascareer: url)
-    deferred_js_bundle :canvas_career_learning_provider
   end
 
   def features_env
@@ -81,7 +57,6 @@ class CareerController < ApplicationController
       horizon_content_library
       horizon_program_management
       horizon_skill_management
-
     ].index_with { |feature| account.feature_enabled?(feature) }
   end
 end
