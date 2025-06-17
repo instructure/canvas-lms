@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as React from 'react'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirm} from '@canvas/instui-bindings/react/Confirm'
 import {Button} from '@instructure/ui-buttons'
@@ -39,6 +39,7 @@ import {LtiContextControl} from '../../../model/LtiContextControl'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {List} from '@instructure/ui-list'
 import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
+import {formatApiResultError} from '../../../../common/lib/apiResult/ApiResult'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -127,6 +128,30 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             accountId={props.accountId}
             openState={exceptionModalOpenState}
             onClose={() => setExceptionModalOpenState({open: false})}
+            onConfirm={contextControls => {
+              const onError = showFlashError(
+                I18n.t('There was an error adding the exceptions. Please try again later.'),
+              )
+              return createContextControls({
+                registrationId: deployment.registration_id,
+                contextControls,
+              })
+                .then(result => {
+                  if (result._type === 'Success') {
+                    showFlashSuccess(
+                      I18n.t('%{count} exception(s) were successfully added.', {
+                        count: contextControls.length,
+                      }),
+                    )()
+                    refetchControls()
+                  } else {
+                    // handle error
+                    console.error(formatApiResultError(result))
+                    onError()
+                  }
+                })
+                .catch(onError)
+            }}
           />
         </Flex>
       </Heading>
