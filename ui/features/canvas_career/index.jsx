@@ -16,14 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import ReactDOM from 'react-dom'
 
-import GenericErrorPage from '@canvas/generic-error-page'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import ready from '@instructure/ready'
-import {Spinner} from '@instructure/ui-spinner'
 import {captureException} from '@sentry/browser'
+import {Spinner} from '@instructure/ui-spinner'
+import ready from '@instructure/ready'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import GenericErrorPage from '@canvas/generic-error-page'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = createI18nScope('canvascareer')
 
@@ -60,23 +61,20 @@ ready(() => {
     mountPoint,
   )
 
-  Promise.all([
-    import('canvascareerlearner/bootstrap'),
-    import('canvascareerlearner/setupEnvContext'),
-  ])
+  Promise.all([import('canvascareer/bootstrap'), import('canvascareer/setupEnvContext')])
     .then(([{mount}, {setupEnvContext}]) => {
       mount(mountPoint, setupEnvContext())
     })
     .catch(error => {
-      console.error('Failed to load CanvasCareer learner app', error)
+      console.error('Failed to load CanvasCareer', error)
       captureException(error)
 
       ReactDOM.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}
           errorMessage={error.message}
-          errorSubject={'CanvasCareer learner app loading error'}
-          errorCategory={'CanvasCareer Error Page'}
+          errorSubject={I18n.t('CanvasCareer loading error')}
+          errorCategory={I18n.t('CanvasCareer Error Page')}
         />,
         mountPoint,
       )
