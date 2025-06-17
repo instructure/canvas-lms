@@ -502,7 +502,6 @@ function DiscussionTopicForm({
     shouldShowPostToSectionOption,
     shouldShowAnonymousOptions,
     shouldShowViewSettings,
-    shouldShowAnnouncementOnlyOptions,
     shouldShowGroupOptions,
     shouldShowGradedDiscussionOptions,
     shouldShowUsageRightsOption,
@@ -515,6 +514,7 @@ function DiscussionTopicForm({
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
     shouldShowSuppressAssignmentOption,
+    groupContextType,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -582,7 +582,7 @@ function DiscussionTopicForm({
       ),
       groupCategoryId: isGroupDiscussion ? groupCategoryId : null,
       specificSections: shouldShowPostToSectionOption ? sectionIdsToPostTo.join() : 'all',
-      locked: shouldShowAnnouncementOnlyOptions ? locked : false,
+      locked: isAnnouncement ? locked : false,
       // we allow requireInitial posts for group discussions created from the course,
       // just not from discussions created from within the group context directly
       requireInitialPost: ENV.context_is_not_group ? requireInitialPost : false,
@@ -935,8 +935,13 @@ function DiscussionTopicForm({
   const renderAllowParticipantsToComment = useCallback(() => {
     if (!isAnnouncement) return
     if (!shouldShowAllowParticipantsToCommentOption) {
+      const tooltipText =
+        groupContextType === 'Account'
+          ? I18n.t('This option is locked in account settings')
+          : I18n.t('This option is locked in course settings')
+
       return (
-        <Tooltip renderTip={I18n.t('This setting is locked in course settings')}>
+        <Tooltip renderTip={tooltipText}>
           <Checkbox
             label={I18n.t('Allow Participants to Comment')}
             value="enable-participants-commenting"

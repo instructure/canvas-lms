@@ -642,6 +642,7 @@ class DiscussionTopicsController < ApplicationController
       ASSIGNMENT_ID: @topic.assignment_id,
       CONTEXT_ACTION_SOURCE: :discussion_topic,
       CONTEXT_ID: @context.id,
+      GROUP_CONTEXT_TYPE: @context.is_a?(Group) ? @context.context.class.name : nil,
       DISCUSSION_TOPIC: hash,
       GROUP_CATEGORIES: categories
               .reject { |c| c.student_organized? || c.non_collaborative? }
