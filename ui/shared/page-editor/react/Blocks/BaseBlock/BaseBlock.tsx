@@ -23,9 +23,11 @@ import {useSetEditMode} from './useSetEditMode'
 import {RemoveButton} from './RemoveButton'
 import {AddButton} from '../../AddBlock/AddButton'
 import {useDeleteNode} from '../../hooks/useDeleteNode'
+import {useDuplicateNode} from '../../hooks/useDuplicateNode'
 import {useNode} from '@craftjs/core'
 import {usePageEditorContext} from '../../PageEditorContext'
 import {ApplyButton} from './ApplyButton'
+import {CopyButton} from './CopyButton'
 
 const InsertButton = () => {
   const {addBlockModal} = usePageEditorContext()
@@ -43,6 +45,12 @@ const SaveButton = (props: {
   onClick: () => void
 }) => {
   return <ApplyButton onClick={props.onClick} />
+}
+
+const DuplicateButton = () => {
+  const duplicateNode = useDuplicateNode()
+
+  return <CopyButton onClicked={duplicateNode} />
 }
 
 export const BaseBlock = (
@@ -65,7 +73,10 @@ export const BaseBlock = (
             ? [<SaveButton key="action-save-btn" onClick={() => setIsEditMode(false)} />]
             : []
         }
-        menu={[<DeleteButton key="menu-delete-btn" />]}
+        menu={[
+          <DuplicateButton key="menu-duplicate-btn" />,
+          <DeleteButton key="menu-delete-btn" />,
+        ]}
       >
         {props.children}
       </BaseBlockLayout>
