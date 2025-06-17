@@ -16,20 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as createI18nScope} from '@canvas/i18n'
-import {Heading} from '@instructure/ui-heading'
-import {MainLayout} from './react/layouts/MainLayout'
-import {ContentBuilderWrapper} from './react/components/ContentBuilderWrapper'
-import {PageTitle} from './react/components/PageTitle'
-import {BodyLayout} from './react/layouts/BodyLayout'
+import './page-editor-layout.css'
+import {ReactNode} from 'react'
 
-const I18n = createI18nScope('pages')
-
-export const App = () => {
+export const PageEditorLayout = (props: {
+  toolbar: ReactNode
+  editor: ReactNode
+}) => {
   return (
-    <MainLayout
-      header={<Heading variant="titlePageDesktop">{I18n.t('Page Editor')}</Heading>}
-      body={<BodyLayout title={<PageTitle />} editor={<ContentBuilderWrapper />} />}
-    />
+    <div className="page-editor-container">
+      <div className="toolbar-area">{props.toolbar}</div>
+      <div className="editor-area">{props.editor}</div>
+    </div>
   )
 }
