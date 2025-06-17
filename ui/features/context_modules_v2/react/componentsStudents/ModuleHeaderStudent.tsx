@@ -86,8 +86,8 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             <Flex.Item>
               <Flex gap="small" alignItems="center" justifyItems="end">
                 <Flex.Item shouldShrink>
-                  <Heading level="h3">
-                    <Text size="large" wrap="break-word">
+                  <Heading level="h2">
+                    <Text size="large" weight="bold" wrap="break-word">
                       {name}
                     </Text>
                   </Heading>
