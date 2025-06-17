@@ -20,19 +20,39 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Pill} from '@instructure/ui-pill'
+import {IconCheckLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('context_modules_v2')
 
 type Props = {
   requirementCount?: number
+  completed?: boolean
 }
 
-export const ModuleHeaderCompletionRequirement = ({requirementCount}: Props) => {
+const getPillText = (requirementCount?: number, completed?: boolean) => {
+  if (completed) {
+    return requirementCount ? I18n.t('Completed One Item') : I18n.t('Completed All Items')
+  }
+
+  return requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')
+}
+
+export const getPillColor = (completed?: boolean) => {
+  if (completed) {
+    return 'success'
+  }
+  return 'info'
+}
+
+export const ModuleHeaderCompletionRequirement = ({requirementCount, completed}: Props) => {
   return (
-    <Pill color="primary">
-      <Text size="x-small">
-        {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
-      </Text>
+    <Pill
+      color={getPillColor(completed)}
+      renderIcon={
+        completed ? <IconCheckLine data-testid="module-header-completion-requirement-icon" /> : null
+      }
+    >
+      <Text size="x-small">{getPillText(requirementCount, completed)}</Text>
     </Pill>
   )
 }
