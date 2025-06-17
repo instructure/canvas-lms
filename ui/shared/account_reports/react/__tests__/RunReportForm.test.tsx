@@ -72,6 +72,14 @@ const innerHtml4 = `<form>
     };
 </script>`
 
+const reportJson = {
+  id: '123',
+  report: 'test_report_csv',
+  status: 'created',
+  created_at: '2025-01-01T00:00:00Z',
+  progress: 0,
+}
+
 const props = {
   formHTML: innerHtml1,
   path: '/api/fake_post',
@@ -106,6 +114,7 @@ describe('RunReportForm', () => {
     const user = userEvent.setup()
     fetchMock.post(props.path, {
       status: 200,
+      body: reportJson,
     })
     const {getByTestId} = render(<RunReportForm {...props} />)
 
@@ -117,7 +126,7 @@ describe('RunReportForm', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(props.onSuccess).toHaveBeenCalled()
+      expect(props.onSuccess).toHaveBeenCalledWith(reportJson)
       expect(fetchMock.called(props.path, 'POST')).toBeTruthy()
       const request = fetchMock.lastOptions()
       const formData = request?.body as FormData
@@ -133,6 +142,7 @@ describe('RunReportForm', () => {
     const user = userEvent.setup()
     fetchMock.post(props.path, {
       status: 200,
+      body: reportJson,
     })
     const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml2} />)
 
@@ -150,7 +160,7 @@ describe('RunReportForm', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(props.onSuccess).toHaveBeenCalled()
+      expect(props.onSuccess).toHaveBeenCalledWith(reportJson)
       expect(fetchMock.called(props.path, 'POST')).toBeTruthy()
       const request = fetchMock.lastOptions()
       const formData = request?.body as FormData
@@ -164,6 +174,7 @@ describe('RunReportForm', () => {
     const user = userEvent.setup()
     fetchMock.post(props.path, {
       status: 200,
+      body: reportJson,
     })
     const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml3} />)
 
@@ -176,7 +187,7 @@ describe('RunReportForm', () => {
     await user.click(submitButton)
 
     await waitFor(() => {
-      expect(props.onSuccess).toHaveBeenCalled()
+      expect(props.onSuccess).toHaveBeenCalledWith(reportJson)
       expect(fetchMock.called(props.path, 'POST')).toBeTruthy()
       const request = fetchMock.lastOptions()
       const formData = request?.body as FormData
