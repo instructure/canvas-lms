@@ -23,17 +23,24 @@ import {TextBlock} from './Blocks/TextBlock'
 import {PageEditorContext} from './PageEditorContext'
 import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {ImageBlock} from './Blocks/ImageBlock'
+import {PageEditorLayout} from './layout/PageEditorLayout'
+import {Toolbar} from './Toolbar'
 
 export const PageEditor = (props: {
   data: SerializedNodes | null
 }) => {
   return (
     <PageEditorContext>
-      <Editor resolver={{DummyBlock, TextBlock, ImageBlock}}>
-        <AddBlockModalRenderer />
-        <AddBlock />
-        <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
-      </Editor>
+      <PageEditorLayout
+        toolbar={<Toolbar />}
+        editor={
+          <Editor resolver={{DummyBlock, TextBlock, ImageBlock}}>
+            <AddBlockModalRenderer />
+            <AddBlock />
+            <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
+          </Editor>
+        }
+      />
     </PageEditorContext>
   )
 }
