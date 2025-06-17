@@ -20,8 +20,20 @@
 require_relative "../../common"
 require_relative "../pages/gradebook_page"
 
-describe "Gradebook frontend/backend calculators" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook frontend/backend calculators" do |ff_enabled|
   include_context "in-process server selenium tests"
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   before :once do
     @unlucky1 = [95.86, 66.62, 76.98, 87.85, 68.32, 94.32, 62.6, 81.59, 92.21, 90.31, 82.26, 70.88, 83.24, 90.83, 65.74, 73.05, 94.16, 65.3, 78.92, 87.11]
@@ -116,4 +128,9 @@ describe "Gradebook frontend/backend calculators" do
       expect(@diff).to be_empty
     end
   end
+end
+
+describe "Gradebook frontend/backend calculators" do
+  it_behaves_like "Gradebook frontend/backend calculators", true
+  it_behaves_like "Gradebook frontend/backend calculators", false
 end
