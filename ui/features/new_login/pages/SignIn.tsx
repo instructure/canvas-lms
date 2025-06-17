@@ -110,9 +110,12 @@ const SignIn = () => {
       if (response.status === 200) {
         if (response.data?.otp_required) {
           setOtpRequired(true)
-        } else if (response.data?.pseudonym) {
+        } else if (response.data?.location) {
           isRedirectingRef.current = true
-          assignLocation(response.data.location || '/dashboard')
+          // location is always present for successful logins, including:
+          // standard logins, cross-account redirects, OAuth flows,
+          // course-based logins, and registration confirmations
+          assignLocation(response.data.location)
         } else {
           handleFailedLogin()
         }

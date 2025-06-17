@@ -108,7 +108,7 @@ describe('SignIn', () => {
       })
       ;(performSignIn as jest.Mock).mockResolvedValueOnce({
         status: 200,
-        data: {pseudonym: true, location: '/dashboard'},
+        data: {location: 'https://test.canvas.com/?login_success=1'},
       })
       setup()
       const usernameInput = screen.getByTestId('username-input')
@@ -118,36 +118,7 @@ describe('SignIn', () => {
       await userEvent.type(passwordInput, 'password123')
       await userEvent.click(loginButton)
       await waitFor(() => {
-        expect(assignLocation).toHaveBeenCalledWith('/dashboard')
-        expect(assignLocation).toHaveBeenCalledTimes(1)
-      })
-    })
-
-    it('calls assignLocation with /dashboard if no location is provided', async () => {
-      const setIsUiActionPending = jest.fn()
-      ;(useNewLogin as jest.Mock).mockReturnValue({
-        isUiActionPending: false,
-        setIsUiActionPending,
-        otpRequired: false,
-        setOtpRequired: jest.fn(),
-        rememberMe: false,
-        setRememberMe: jest.fn(),
-        loginFailed: false,
-        setLoginFailed: jest.fn(),
-      })
-      ;(performSignIn as jest.Mock).mockResolvedValueOnce({
-        status: 200,
-        data: {pseudonym: true},
-      })
-      setup()
-      const usernameInput = screen.getByTestId('username-input')
-      const passwordInput = screen.getByTestId('password-input')
-      const loginButton = screen.getByTestId('login-button')
-      await userEvent.type(usernameInput, 'user@example.com')
-      await userEvent.type(passwordInput, 'password123')
-      await userEvent.click(loginButton)
-      await waitFor(() => {
-        expect(assignLocation).toHaveBeenCalledWith('/dashboard')
+        expect(assignLocation).toHaveBeenCalledWith('https://test.canvas.com/?login_success=1')
         expect(assignLocation).toHaveBeenCalledTimes(1)
       })
     })
