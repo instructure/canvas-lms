@@ -236,39 +236,46 @@ export default class Toolbar extends React.Component {
     const phoneHiddenSet = classnames({
       'hidden-phone': this.showingButtons,
     })
-    if (canManage) {
+
+    const showToggleButton =
+      ENV.FEATURES?.files_a11y_rewrite_toggle &&
+      ENV.FEATURES?.files_a11y_rewrite &&
+      ENV.current_user_id
+
+    if (canManage || showToggleButton) {
       return (
         <div className="ef-actions">
-          {ENV.FEATURES?.files_a11y_rewrite_toggle &&
-            ENV.FEATURES?.files_a11y_rewrite &&
-            ENV.current_user_id && (
+          {showToggleButton && (
+            <button
+              type="button"
+              className="btn btn-switch-to-new-files-page"
+              aria-label={I18n.t('Switch to New Files Page')}
+              onClick={() => this.handleSwitchToNewFiles()}
+            >
+              <span className={phoneHiddenSet}>{I18n.t('Switch to New Files Page')}</span>
+            </button>
+          )}
+          {canManage && (
+            <>
               <button
                 type="button"
-                className="btn btn-switch-to-new-files-page"
-                aria-label={I18n.t('Switch to New Files Page')}
-                onClick={() => this.handleSwitchToNewFiles()}
+                onClick={() => this.addFolder()}
+                className="btn btn-add-folder"
+                aria-label={I18n.t('Add Folder')}
               >
-                <span className={phoneHiddenSet}>{I18n.t('Switch to New Files Page')}</span>
+                <i className="icon-plus" />
+                &nbsp;
+                <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
               </button>
-            )}
-          <button
-            type="button"
-            onClick={() => this.addFolder()}
-            className="btn btn-add-folder"
-            aria-label={I18n.t('Add Folder')}
-          >
-            <i className="icon-plus" />
-            &nbsp;
-            <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
-          </button>
-
-          <UploadButton
-            currentFolder={this.props.currentFolder}
-            showingButtons={!!this.showingButtons}
-            contextId={this.props.contextId}
-            contextType={this.props.contextType}
-          />
-          {this.renderTrayToolsMenu()}
+              <UploadButton
+                currentFolder={this.props.currentFolder}
+                showingButtons={!!this.showingButtons}
+                contextId={this.props.contextId}
+                contextType={this.props.contextType}
+              />
+              {this.renderTrayToolsMenu()}
+            </>
+          )}
         </div>
       )
     }
