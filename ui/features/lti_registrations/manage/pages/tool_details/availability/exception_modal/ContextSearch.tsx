@@ -46,6 +46,7 @@ const mkCourseOptionId = (courseId: CourseId): OptionId => `course-${courseId}`
 
 type ContextSearchProps = {
   accountId: AccountId
+  disabled: boolean
   onSelectContext?: (context: ContextSearchOption) => void
 }
 
@@ -226,6 +227,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
   return (
     <View as="div">
       <Select
+        disabled={props.disabled}
         renderLabel={''}
         assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
         placeholder={I18n.t('Search by sub-accounts or courses')}

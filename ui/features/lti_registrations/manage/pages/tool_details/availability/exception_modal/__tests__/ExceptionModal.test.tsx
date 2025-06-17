@@ -80,6 +80,7 @@ describe('ExceptionModal', () => {
         accountId={ZAccountId.parse('1')}
         openState={{open: false}}
         onClose={jest.fn()}
+        onConfirm={jest.fn()}
       />,
     )
     expect(screen.queryByText('Add Availability and Exceptions')).not.toBeInTheDocument()
@@ -91,6 +92,7 @@ describe('ExceptionModal', () => {
         accountId={ZAccountId.parse('1')}
         openState={{open: true, deployment: mockDeployment({})}}
         onClose={jest.fn()}
+        onConfirm={jest.fn()}
       />,
     )
     expect(screen.getByText('Add Availability and Exceptions')).toBeInTheDocument()
@@ -109,6 +111,7 @@ describe('ExceptionModal', () => {
         accountId={ZAccountId.parse('1')}
         openState={{open: true, deployment: mockDeployment({})}}
         onClose={onClose}
+        onConfirm={jest.fn()}
       />,
     )
     const closeBtn = screen.getByRole('button', {name: /close/i})
@@ -121,7 +124,12 @@ describe('ExceptionModal', () => {
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
     renderWithQueryClient(
-      <ExceptionModal accountId={accountId} openState={openState} onClose={onClose} />,
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={jest.fn()}
+      />,
     )
 
     // Search for "Subaccount"
@@ -162,7 +170,12 @@ describe('ExceptionModal', () => {
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
     renderWithQueryClient(
-      <ExceptionModal accountId={accountId} openState={openState} onClose={onClose} />,
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={jest.fn()}
+      />,
     )
 
     // Add a context
@@ -187,7 +200,12 @@ describe('ExceptionModal', () => {
     const openState = {open: true, deployment: mockDeployment({})}
     const onClose = jest.fn()
     renderWithQueryClient(
-      <ExceptionModal accountId={accountId} openState={openState} onClose={onClose} />,
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={jest.fn()}
+      />,
     )
 
     // Add a context
@@ -215,5 +233,44 @@ describe('ExceptionModal', () => {
     const notAvailableOption = screen.getByText('Not Available')
     await userEvent.click(notAvailableOption)
     expect(select).toHaveDisplayValue(/not available/i)
+  })
+
+  it('calls onConfirm with selected controls when Done is clicked', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    const onConfirm = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />,
+    )
+
+    // Add a context
+    const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
+    input.focus()
+    await userEvent.paste('Subaccount')
+    const subaccount_1 = await waitFor(() => screen.findByText('Subaccount 101'), {timeout: 3000})
+    await userEvent.click(subaccount_1)
+    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+
+    // Click Done
+    const doneBtn = screen.getByRole('button', {name: /done/i})
+    await userEvent.click(doneBtn)
+
+    expect(onConfirm).toHaveBeenCalledTimes(1)
+    // Should be called with an array of controls, containing the selected context
+    expect(onConfirm.mock.calls[0][0]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          available: false,
+          account_id: expect.anything(),
+          deployment_id: openState.deployment.id,
+        }),
+      ]),
+    )
   })
 })
