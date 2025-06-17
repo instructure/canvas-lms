@@ -48,6 +48,7 @@ export default class FindDialog extends DialogBaseView {
           click: e => this.cancel(e),
         },
         {
+          id: 'import_outcome',
           text: I18n.t('#buttons.import', 'Import'),
           class: 'btn-primary',
           click: e => this.import(e),
