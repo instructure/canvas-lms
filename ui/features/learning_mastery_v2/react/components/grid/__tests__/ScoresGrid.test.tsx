@@ -18,10 +18,11 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import ScoresGrid from '../ScoresGrid'
+import {ScoresGrid, ScoresGridProps} from '../ScoresGrid'
+import {Student, Outcome, StudentRollupData} from '../../../types/rollup'
 
 describe('ScoresGrid', () => {
-  const defaultProps = (props = {}) => {
+  const defaultProps = (props: Partial<ScoresGridProps> = {}): ScoresGridProps => {
     return {
       rollups: [
         {
@@ -38,7 +39,7 @@ describe('ScoresGrid', () => {
             },
           ],
         },
-      ],
+      ] as StudentRollupData[],
       students: [
         {
           id: '1',
@@ -46,7 +47,7 @@ describe('ScoresGrid', () => {
           display_name: 'Student Name',
           status: 'active',
         },
-      ],
+      ] as Student[],
       outcomes: [
         {
           id: '1',
@@ -65,13 +66,14 @@ describe('ScoresGrid', () => {
             },
           ],
         },
-      ],
+      ] as Outcome[],
       ...props,
     }
   }
 
   beforeEach(() => {
-    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
+    window.ENV = window.ENV || {}
+    window.ENV.GRADEBOOK_OPTIONS = {ACCOUNT_LEVEL_MASTERY_SCALES: true}
   })
 
   it('renders each outcome rollup', () => {

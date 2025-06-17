@@ -16,22 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useMemo} from 'react'
-import PropTypes from 'prop-types'
 import {keyBy} from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {StudentOutcomeScore} from './components/grid/StudentOutcomeScore'
-import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
-import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './utils/constants'
+import {StudentOutcomeScore} from './StudentOutcomeScore'
+import {Student, Outcome, StudentRollupData, OutcomeRollup} from '../../types/rollup'
+import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from '../../utils/constants'
 
-const ScoresGrid = ({students, outcomes, rollups}) => {
+export interface ScoresGridProps {
+  students: Student[]
+  outcomes: Outcome[]
+  rollups: StudentRollupData[]
+}
+
+interface ExtendedOutcomeRollup extends OutcomeRollup {
+  studentId: string | number
+}
+
+export const ScoresGrid: React.FC<ScoresGridProps> = ({students, outcomes, rollups}) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
         studentId: r.studentId,
         ...or,
       })),
-    )
+    ) as ExtendedOutcomeRollup[]
+
     return keyBy(outcomeRollups, ({studentId, outcomeId}) => `${studentId}_${outcomeId}`)
   }, [rollups])
 
@@ -64,11 +74,3 @@ const ScoresGrid = ({students, outcomes, rollups}) => {
     </Flex>
   )
 }
-
-ScoresGrid.propTypes = {
-  students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
-  outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
-  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-}
-
-export default ScoresGrid
