@@ -17,7 +17,7 @@
  */
 
 import {render} from '@testing-library/react'
-import ReportDescription from '../account_reports/ReportDescription'
+import ReportDescription from '../ReportDescription'
 
 const props = {
   descHTML: '<h1>Report Description</h1>',

@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import RunReportForm from '../account_reports/RunReportForm'
+import RunReportForm from '../RunReportForm'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import fakeENV from '@canvas/test-utils/fakeENV'
