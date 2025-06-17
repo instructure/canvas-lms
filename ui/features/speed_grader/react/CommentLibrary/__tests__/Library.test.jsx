@@ -78,7 +78,7 @@ describe('Library', () => {
     const {getByText, queryByText} = render(<Library {...defaultProps()} />)
     fireEvent.click(getByText('2'), {detail: 1})
     fireEvent.click(getByText('great comment 2'), {detail: 1})
-    expect(setCommentMock).toHaveBeenCalledWith('great comment 2')
+    expect(setCommentMock).toHaveBeenCalledWith('<p>great comment 2</p>')
     await act(async () => jest.advanceTimersByTime(1000))
     expect(queryByText('Manage Comment Library')).not.toBeInTheDocument()
   })
@@ -104,7 +104,7 @@ describe('Library', () => {
       )
       fireEvent.click(getByText('great comment'))
       expect(queryByText('great comment')).not.toBeInTheDocument()
-      expect(setCommentMock).toHaveBeenCalledWith('great comment')
+      expect(setCommentMock).toHaveBeenCalledWith('<p>great comment</p>')
     })
 
     it('shows results again after being closed if there are new results', () => {
