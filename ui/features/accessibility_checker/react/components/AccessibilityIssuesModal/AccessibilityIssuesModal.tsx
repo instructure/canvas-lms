@@ -40,13 +40,13 @@ interface AccessibilityIssuesModalProps {
   item: ContentItem
 }
 
+const I18n = createI18nScope('accessibility_checker')
+
 export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> = ({
   isOpen,
   onClose,
   item,
 }) => {
-  const I18n = createI18nScope('accessibility_checker')
-
   const [shallReload, setShallReload] = useState(false)
 
   const [solvedIssue, setSolvedIssue] = useState(
