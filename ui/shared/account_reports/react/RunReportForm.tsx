@@ -28,6 +28,7 @@ import {Portal} from '@instructure/ui-portal'
 import {DateTimeInput} from '@instructure/ui-date-time-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
+import {AccountReport} from '../types'
 import $ from 'jquery'
 
 const I18n = createI18nScope('account_reports')
@@ -37,7 +38,7 @@ interface Props {
   path: string
   reportName: string
   closeModal: () => void
-  onSuccess: (reportName: string) => void
+  onSuccess: (report: AccountReport) => void
 }
 
 const getParameterName = (name: string) => {
@@ -145,12 +146,12 @@ export default function ConfigureReportForm(props: Props) {
         })
       }
       try {
-        await doFetchApi({
+        const {json} = await doFetchApi<AccountReport>({
           path: props.path,
           body: formData,
           method: 'POST',
         })
-        props.onSuccess(props.reportName)
+        props.onSuccess(json!)
         props.closeModal()
       } catch (e) {
         showFlashError(I18n.t('Failed to start report.'))(e as Error)
