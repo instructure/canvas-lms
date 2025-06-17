@@ -55,7 +55,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   const hasCompletionRequirement = !!completionRequirement
 
   return (
-    <Flex wrap="wrap" data-testid="module-item-supplemental-info">
+    <Flex wrap="wrap" data-testid="module-item-supplemental-info" padding="0 0 0 xx-small">
       {itemIcon && (
         <>
           <Flex.Item margin="0 small 0 0" aria-hidden="true">
