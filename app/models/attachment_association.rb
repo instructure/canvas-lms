@@ -79,6 +79,31 @@ class AttachmentAssociation < ActiveRecord::Base
     feature_is_on && association.context&.grants_right?(user, session, right_to_check)
   end
 
+  def self.copy_associations(source, targets, context_concern = nil)
+    return if source.nil? || targets.nil? || targets.empty?
+
+    targets = Array(targets)
+    raise ArgumentError, "source and targets must be of same class" unless source.instance_of?(targets.first.class)
+
+    AttachmentAssociation.where(context_type: source.class.name, context_id: targets.pluck(:id), context_concern:).delete_all
+
+    to_create = []
+    AttachmentAssociation.where(context: source, context_concern:).find_each do |assoc|
+      targets.each do |target|
+        to_create << {
+          context_type: target.class.name,
+          context_id: target.id,
+          attachment_id: assoc.attachment_id,
+          user_id: assoc.user_id,
+          context_concern:,
+          root_account_id: target.root_account_id
+        }
+      end
+    end
+
+    AttachmentAssociation.insert_all(to_create, returning: false) if to_create.any?
+  end
+
   def set_root_account_id
     self.root_account_id ||=
       if context_type == "ConversationMessage" || context.nil?

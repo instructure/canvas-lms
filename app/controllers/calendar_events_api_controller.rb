@@ -558,9 +558,6 @@ class CalendarEventsApiController < ApplicationController
     end
 
     params_for_create = calendar_event_params
-    if params_for_create[:description].present?
-      params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
-    end
     if params_for_create.key?(:web_conference)
       web_conference_params = params_for_create[:web_conference]
       unless web_conference_params.empty?
@@ -612,6 +609,10 @@ class CalendarEventsApiController < ApplicationController
 
       return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
 
+      events.each do |ev|
+        ev.saving_user = @current_user
+      end
+
       CalendarEvent.transaction do
         error = events.detect { |event| !event.save }
         if error
@@ -622,6 +623,11 @@ class CalendarEventsApiController < ApplicationController
           InstStatsd::Statsd.distributed_increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
 
           original_event = events.shift
+
+          if original_event.root_account.feature_enabled?(:file_association_access)
+            AttachmentAssociation.copy_associations(original_event, events)
+          end
+
           render json: event_json(
             original_event,
             @current_user,
@@ -774,7 +780,9 @@ class CalendarEventsApiController < ApplicationController
         params_for_update = calendar_event_params
         @event.validate_context! if @event.context.is_a?(AppointmentGroup)
         @event.updating_user = @current_user
+        @event.saving_user = @current_user
       end
+
       context_code = params[:calendar_event].delete(:context_code)
       if context_code
         context = Context.find_by_asset_string(context_code)
@@ -791,9 +799,6 @@ class CalendarEventsApiController < ApplicationController
           @event.context = context
         end
         return unless authorized_action(@event, @current_user, :create)
-      end
-      if params_for_update[:description].present?
-        params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
       if params_for_update.key?(:web_conference)
         web_conference_params = params_for_update[:web_conference]
@@ -966,6 +971,8 @@ class CalendarEventsApiController < ApplicationController
     params_for_update[:context] = Context.find_by_asset_string(params_for_update[:context_code]) if params_for_update[:context_code]
     params_for_update.delete(:context_code)
 
+    target_event.saving_user = @current_user
+
     if which == "one" && rrule.present? && rrule_changed
       render json: { message: t("You may not update one event with a new schedule.") }, status: :bad_request
       return
@@ -1045,6 +1052,10 @@ class CalendarEventsApiController < ApplicationController
 
     events = events.to_a
     update_limit = rrule_changed ? RruleHelper::RECURRING_EVENT_LIMIT : events.length
+
+    events.each do |ev|
+      ev.saving_user = @current_user
+    end
 
     error = nil
     CalendarEvent.skip_touch_context do
@@ -1148,7 +1159,15 @@ class CalendarEventsApiController < ApplicationController
     end
 
     target_event.context.touch
-    json = (front_half_events + events).map do |event|
+    all_events = front_half_events + events
+
+    if all_events[0].root_account.feature_enabled?(:file_association_access) && events.length > 1
+      source_event = all_events.shift
+      AttachmentAssociation.copy_associations(source_event, all_events)
+      all_events.unshift(source_event)
+    end
+
+    json = all_events.map do |event|
       event_json(
         event,
         @current_user,
@@ -2102,8 +2121,10 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def calendar_event_params
-    params.require(:calendar_event)
-          .permit(CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything])
+    cparams = params.require(:calendar_event)
+                    .permit(CalendarEvent.permitted_attributes + [child_event_data: strong_anything, web_conference: strong_anything])
+    cparams[:description] = process_incoming_html_content(cparams[:description]) if cparams[:description].present?
+    cparams
   end
 
   def check_for_past_signup(event)

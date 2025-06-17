@@ -1971,6 +1971,79 @@ describe CalendarEventsApiController, type: :request do
         end
       end
 
+      describe "with attachment associations" do
+        before do
+          @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          json = api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "many me",
+                description: @aa_test_data.base_html,
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+              }
+            }
+          )
+
+          @check_ids = [json["id"]] + json["duplicates"].map { |d| d["calendar_event"]["id"] }
+          @target_event_id = json["id"]
+        end
+
+        it "creates attachment associations for all events in the series" do
+          id_occurences, att_occurences = @aa_test_data.count_aa_records("CalendarEvent", @check_ids)
+
+          expect(id_occurences.keys).to match_array @check_ids
+          expect(id_occurences.values).to all eq 1
+          expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
+          expect(att_occurences.values).to all eq @check_ids.length
+        end
+
+        it "update adds additional attachment" do
+          api_call(:put,
+                   "/api/v1/calendar_events/#{@target_event_id}",
+                   { controller: "calendar_events_api", action: "update", id: @target_event_id.to_s, format: "json" },
+                   { calendar_event: { description: @aa_test_data.added_html }, which: "all" })
+          id_occurences, att_occurences = @aa_test_data.count_aa_records("CalendarEvent", @check_ids)
+
+          expect(id_occurences.keys).to match_array @check_ids
+          expect(id_occurences.values).to all eq 2
+          expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id, @aa_test_data.attachment2.id]
+          expect(att_occurences.values).to all eq @check_ids.length
+        end
+
+        it "update replaces attachment with another" do
+          api_call(:put,
+                   "/api/v1/calendar_events/#{@target_event_id}",
+                   { controller: "calendar_events_api", action: "update", id: @target_event_id.to_s, format: "json" },
+                   { calendar_event: { description: @aa_test_data.replaced_html }, which: "all" })
+          id_occurences, att_occurences = @aa_test_data.count_aa_records("CalendarEvent", @check_ids)
+
+          expect(id_occurences.keys).to match_array @check_ids
+          expect(id_occurences.values).to all eq 1
+          expect(att_occurences.keys).to match_array [@aa_test_data.attachment2.id]
+          expect(att_occurences.values).to all eq @check_ids.length
+        end
+
+        it "update removes all attachments" do
+          api_call(:put,
+                   "/api/v1/calendar_events/#{@target_event_id}",
+                   { controller: "calendar_events_api", action: "update", id: @target_event_id.to_s, format: "json" },
+                   { calendar_event: { description: @aa_test_data.removed_html }, which: "all" })
+          id_occurences, att_occurences = @aa_test_data.count_aa_records("CalendarEvent", @check_ids)
+
+          expect(id_occurences).to be_empty
+          expect(att_occurences).to be_empty
+        end
+      end
+
       describe "update" do
         before do
           start_at = Time.zone.now.utc.change(hour: 0, min: 1)

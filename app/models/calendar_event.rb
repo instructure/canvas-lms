@@ -40,6 +40,17 @@ class CalendarEvent < ActiveRecord::Base
   copy_authorized_links(:description) { [effective_context, nil] }
 
   include Workflow
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[description]
+  end
+
+  def update_attachment_associations
+    return if series_uuid.present? && !series_head
+
+    super
+  end
 
   PERMITTED_ATTRIBUTES = %i[title
                             description
@@ -70,6 +81,7 @@ class CalendarEvent < ActiveRecord::Base
   has_many :child_events, -> { where.not(workflow_state: "deleted") }, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: "Account"
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   validates :context, :workflow_state, presence: true
   validates_associated :context, if: ->(record) { record.validate_context }

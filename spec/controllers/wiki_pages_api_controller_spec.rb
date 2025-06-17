@@ -52,12 +52,43 @@ describe WikiPagesApiController, type: :request do
     api_call_as_user(user, :post, url, path, params, {}, { expected_status: })
   end
 
-  describe "POST #create" do
-    it "creates a new wiki page with attachments" do
-      attachment, html = AttachmentAssociationsSpecHelper.create_attachments_and_html(@course.account, @course)
-      response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: html }, expected_status: 200)
-      page = WikiPage.find(response["page_id"])
-      expect(AttachmentAssociation.find_by(context: page, attachment_id: attachment.id)).to be_present
+  describe "attachment associations" do
+    before do
+      @aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+    end
+
+    it "POST #create creates AAs" do
+      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
+      @wiki_page = WikiPage.find(wiki_response["page_id"])
+      id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
+
+      expect(id_occurences.keys).to match_array [wiki_response["page_id"]]
+      expect(id_occurences.values).to all eq 1
+      expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id]
+      expect(att_occurences.values).to all eq 1
+    end
+
+    it "updates with new attachments" do
+      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
+      @wiki_page = WikiPage.find(wiki_response["page_id"])
+      update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.added_html })
+
+      id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
+
+      expect(id_occurences.keys).to match_array [wiki_response["page_id"]]
+      expect(id_occurences.values).to all eq 2
+      expect(att_occurences.keys).to match_array [@aa_test_data.attachment1.id, @aa_test_data.attachment2.id]
+      expect(att_occurences.values).to all eq 1
+    end
+
+    it "updates with removed attachments" do
+      wiki_response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: @aa_test_data.base_html }, expected_status: 200)
+      @wiki_page = WikiPage.find(wiki_response["page_id"])
+      update_wiki_page(@teacher, @wiki_page, { body: @aa_test_data.removed_html })
+      id_occurences, att_occurences = @aa_test_data.count_aa_records("WikiPage", wiki_response["page_id"])
+
+      expect(id_occurences).to be_empty
+      expect(att_occurences).to be_empty
     end
   end
 
@@ -75,14 +106,6 @@ describe WikiPagesApiController, type: :request do
         id: @wiki_page.id,
         type: "wiki_page"
       )
-    end
-
-    context "check creation of AA records for attachments" do
-      it "creates the records" do
-        attachment, html = AttachmentAssociationsSpecHelper.create_attachments_and_html(@course.account, @course)
-        update_wiki_page(@teacher, @wiki_page, { body: html })
-        expect(AttachmentAssociation.find_by(context: @wiki_page, attachment_id: attachment.id)).to be_present
-      end
     end
 
     context "when the wiki page is part of a context module" do
