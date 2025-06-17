@@ -36,7 +36,7 @@ import PublishButtonView from '@canvas/publish-button-view'
 import htmlEscape from '@instructure/html-escape'
 import get from 'lodash/get'
 import axios from '@canvas/axios'
-import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {dateString, datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -489,30 +489,38 @@ window.modules = (function () {
       if (ENV.MASTER_COURSE_SETTINGS) {
         const params = {tag_id, context_module_id: moduleId}
         // Grab the stuff for master courses if needed
-        $.ajaxJSON(ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL, 'GET', params, data => {
-          if (data.tag_restrictions) {
-            Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
-              const item = document.querySelector(
-                `#context_module_item_${id}:not(.master_course_content)`,
-              )
-              if (item) {
-                item.classList.add('master_course_content')
-                if (Object.keys(restriction).some(r => restriction[r])) {
-                  item.setAttribute('data-master_course_restrictions', JSON.stringify(restriction))
-                }
+        return $.ajaxJSON(
+          ENV.MASTER_COURSE_SETTINGS.MASTER_COURSE_DATA_URL,
+          'GET',
+          params,
+          data => {
+            if (data.tag_restrictions) {
+              Object.entries(data.tag_restrictions).forEach(([id, restriction]) => {
+                const item = document.querySelector(
+                  `#context_module_item_${id}:not(.master_course_content)`,
+                )
+                if (item) {
+                  item.classList.add('master_course_content')
+                  if (Object.keys(restriction).some(r => restriction[r])) {
+                    item.setAttribute(
+                      'data-master_course_restrictions',
+                      JSON.stringify(restriction),
+                    )
+                  }
 
-                if (
-                  !(
-                    ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE &&
-                    ENV.HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN
-                  )
-                ) {
-                  this.initMasterCourseLockButton(item, restriction)
+                  if (
+                    !(
+                      ENV.MASTER_COURSE_SETTINGS.IS_CHILD_COURSE &&
+                      ENV.HIDE_BLUEPRINT_LOCK_ICON_FOR_CHILDREN
+                    )
+                  ) {
+                    this.initMasterCourseLockButton(item, restriction)
+                  }
                 }
-              }
-            })
-          }
-        })
+              })
+            }
+          },
+        )
       }
     },
 
@@ -653,17 +661,21 @@ window.modules = (function () {
     lazyLoadItems(moduleIds, allPages) {
       const itemsCallback = moduleId => {
         initContextModuleItems(moduleId)
-        modules.updateAssignmentData(
+        const uadPromise = modules.updateAssignmentData(
           () => modules.updateProgressions(modules.afterUpdateProgressions, moduleId),
           moduleId,
         )
+        let lmcdPromise = Promise.resolve()
         if ($('#context_modules').hasClass('editable')) {
-          modules.loadMasterCourseData(undefined, moduleId)
+          lmcdPromise = modules.loadMasterCourseData(undefined, moduleId)
         }
+
+        let uedPromise = Promise.resolve()
         if (ENV.horizon_course) {
-          modules.updateEstimatedDurations(moduleId)
+          uedPromise = modules.updateEstimatedDurations(moduleId)
         }
         addShowAllOrLess(moduleId)
+        return Promise.all([uadPromise, lmcdPromise, uedPromise])
       }
 
       const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
@@ -671,9 +683,22 @@ window.modules = (function () {
         itemsCallback,
         new ModuleItemsStore(ENV.COURSE_ID, ENV.current_user_id, ENV.ACCOUNT_ID),
       )
-      moduleItemsLazyLoader.fetchModuleItems(moduleIds, allPages).then(() => {
-        $('#expand_collapse_all').prop('disabled', false)
-      })
+      moduleItemsLazyLoader
+        .fetchModuleItems(moduleIds, allPages)
+        .then(() => {
+          $('#expand_collapse_all').prop('disabled', false)
+        })
+        .then(() => {
+          let msg = I18n.t('Module items loaded')
+          if (moduleIds.length === 1) {
+            const module = moduleFromId(moduleIds[0])
+            const moduleName = module.getAttribute('aria-label')
+            if (moduleName) {
+              msg = I18n.t('"%{moduleName}" items loaded', {moduleName})
+            }
+          }
+          showFlashSuccess(msg)()
+        })
     },
 
     evaluateItemCyoe($item, data) {
