@@ -1022,6 +1022,7 @@ EditView.prototype.hasMasteryConnectData = function () {
 }
 
 EditView.prototype.handleSubmissionTypeChange = function (_ev) {
+  if (this.$submissionType.length === 0) return
   const subVal = this.$submissionType.val()
   this.$onlineSubmissionTypes.toggleAccessibly(subVal === 'online')
   this.$externalToolSettings.toggleAccessibly(subVal === 'external_tool')
@@ -1243,21 +1244,25 @@ EditView.prototype.afterRender = function () {
   this.renderAllowedAttempts()
   this.$graderCommentsVisibleToGradersBox = $('#assignment_grader_comment_visibility')
   this.$gradersAnonymousToGradersLabel = $('label[for="assignment_graders_anonymous_to_graders"]')
-  this.similarityDetectionTools = SimilarityDetectionTools.attach(
-    this.$similarityDetectionTools.get(0),
-    parseInt(ENV.COURSE_ID, 10),
-    this.$secureParams.val(),
-    parseInt(ENV.SELECTED_CONFIG_TOOL_ID, 10),
-    ENV.SELECTED_CONFIG_TOOL_TYPE,
-    ENV.REPORT_VISIBILITY_SETTING,
-  )
-  this.AssignmentExternalTools = AssignmentExternalTools.attach(
-    this.$assignmentExternalTools.get(0),
-    'assignment_edit',
-    parseInt(ENV.COURSE_ID, 10),
-    parseInt(this.assignment.id, 10),
-  )
-  if (window.ENV?.FEATURES?.lti_asset_processor) {
+  if (this.$similarityDetectionTools.length > 0) {
+    this.similarityDetectionTools = SimilarityDetectionTools.attach(
+      this.$similarityDetectionTools.get(0),
+      parseInt(ENV.COURSE_ID, 10),
+      this.$secureParams.val(),
+      parseInt(ENV.SELECTED_CONFIG_TOOL_ID, 10),
+      ENV.SELECTED_CONFIG_TOOL_TYPE,
+      ENV.REPORT_VISIBILITY_SETTING,
+    )
+  }
+  if (this.$assignmentExternalTools.length > 0) {
+    this.AssignmentExternalTools = AssignmentExternalTools.attach(
+      this.$assignmentExternalTools.get(0),
+      'assignment_edit',
+      parseInt(ENV.COURSE_ID, 10),
+      parseInt(this.assignment.id, 10),
+    )
+  }
+  if (window.ENV?.FEATURES?.lti_asset_processor && this.$assetProcessorsContainer.length > 0) {
     assetProcessorsAttach({
       container: this.$assetProcessorsContainer.get(0),
       courseId: ENV.COURSE_ID,
