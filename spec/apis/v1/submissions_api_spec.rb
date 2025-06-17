@@ -7276,20 +7276,71 @@ describe "Submissions API", type: :request do
       expect(response["errors"][0]["message"]).to eq "The specified resource does not exist."
     end
 
-    it "doesnt show submissions from various inactive types of enrollments" do
-      inactive = %w[deleted rejected inactive invited]
+    describe "included enrollment states" do
+      before(:once) do
+        student = student_in_course(active_all: true).user
+        @new_enrollment = @section.enroll_user(student, "StudentEnrollment", "active")
+      end
 
-      @student4 = student_in_course(active_all: true).user
-      enrollment = @section.enroll_user(@student4, "StudentEnrollment", "active")
-      @assignment.submit_homework @student4, body: "EHLO"
+      let(:json) { api_call_as_user(@teacher, :get, @path, @params) }
 
-      inactive.each do |state|
-        enrollment.workflow_state = state
-        enrollment.save!
+      it "includes active enrollments" do
+        expect(json["not_submitted"]).to eq 2
+      end
 
-        json = api_call_as_user(@teacher, :get, @path, @params)
-        expect(json["graded"]).to eq 1
-        expect(json["ungraded"]).to eq 1
+      it "includes inactive enrollments when the include_deactivated param is true" do
+        @params[:include_deactivated] = true
+        @new_enrollment.update!(workflow_state: "inactive")
+        expect(json["not_submitted"]).to eq 2
+      end
+    end
+
+    describe "excluded enrollment states" do
+      before(:once) do
+        student = student_in_course(active_all: true).user
+        @new_enrollment = @section.enroll_user(student, "StudentEnrollment", "active")
+      end
+
+      let(:json) { api_call_as_user(@teacher, :get, @path, @params) }
+
+      it "excludes soft-deleted enrollments" do
+        @new_enrollment.update!(workflow_state: "deleted")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes inactive enrollments when no include_deactivated param is provided" do
+        @new_enrollment.update!(workflow_state: "inactive")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes inactive enrollments when the include_deactivated param is false" do
+        @params[:include_deactivated] = false
+        @new_enrollment.update!(workflow_state: "inactive")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes completed enrollments" do
+        @new_enrollment.update!(workflow_state: "completed")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes invited enrollments" do
+        @new_enrollment.update!(workflow_state: "invited")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes pending enrollments" do
+        @new_enrollment.update!(workflow_state: "pending")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes creation_pending enrollments" do
+        @new_enrollment.update!(workflow_state: "creation_pending")
+        expect(json["not_submitted"]).to eq 1
+      end
+
+      it "excludes rejected enrollments" do
+        @new_enrollment.update!(workflow_state: "rejected")
         expect(json["not_submitted"]).to eq 1
       end
     end
