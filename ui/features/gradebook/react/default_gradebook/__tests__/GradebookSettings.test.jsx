@@ -19,6 +19,8 @@
 import GradebookApi from '../apis/GradebookApi'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import AsyncComponents from '../AsyncComponents'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 // Add fixtures div for Jest tests
 document.body.innerHTML = '<div id="fixtures"></div>'
@@ -26,6 +28,7 @@ document.body.innerHTML = '<div id="fixtures"></div>'
 const $fixtures = document.getElementById('fixtures')
 
 let oldEnv
+let server
 
 window.ENV.SETTINGS = {}
 
@@ -378,16 +381,21 @@ describe('Gradebook "Enter Grades as" Setting', () => {
   let options
   let gradebook
 
-  beforeEach(() => {
-    options = {settings_update_url: '/course/1/gradebook_settings'}
-    // Mock fetch for the POST request
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve({}),
+  beforeAll(() => {
+    server = setupServer(
+      http.post('/course/1/gradebook_settings', () => {
+        return HttpResponse.json({}, {status: 200})
       }),
     )
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(() => {
+    options = {settings_update_url: '/course/1/gradebook_settings'}
     gradebook = createGradebook(options)
     gradebook.setAssignments({
       2301: {id: '2301', grading_type: 'points', name: 'Math Assignment', published: true},
@@ -406,7 +414,7 @@ describe('Gradebook "Enter Grades as" Setting', () => {
   })
 
   afterEach(() => {
-    delete global.fetch
+    server.resetHandlers()
     window.ENV = oldEnv
   })
 
