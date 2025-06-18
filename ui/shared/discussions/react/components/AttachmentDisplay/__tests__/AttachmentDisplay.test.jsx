@@ -22,39 +22,56 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {AttachmentDisplay} from '../AttachmentDisplay'
 import {responsiveQuerySizes} from '../../../utils'
 import userEvent from '@testing-library/user-event'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 jest.mock('@canvas/upload-file')
 
 const setup = props => {
-  return render(
-    <AttachmentDisplay
-      setAttachment={() => {}}
-      setAttachmentToUpload={() => {}}
-      responsiveQuerySizes={responsiveQuerySizes}
-      {...props}
-    />,
+  const mockAlertManager = {
+    setOnFailure: jest.fn(),
+    setOnSuccess: jest.fn(),
+  }
+
+  const renderResult = render(
+    <AlertManagerContext.Provider value={mockAlertManager}>
+      <AttachmentDisplay
+        setAttachment={jest.fn()}
+        setAttachmentToUpload={jest.fn()}
+        responsiveQuerySizes={responsiveQuerySizes}
+        {...props}
+      />
+    </AlertManagerContext.Provider>,
   )
+
+  return renderResult
 }
 
 describe('AttachmentDisplay', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+    jest.clearAllMocks()
+  })
+
   afterEach(() => {
-    window.ENV = {}
+    fakeENV.teardown()
+    jest.restoreAllMocks()
   })
 
   it('displays AttachButton when there is no attachment', () => {
-    window.ENV.can_attach_entries = true
+    fakeENV.setup({can_attach_entries: true})
     const {queryByText} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByText('Attach')).toBeTruthy()
   })
 
   it('does not display AttachButton when can_attach_entries is false', () => {
-    window.ENV.can_attach_entries = false
+    fakeENV.setup({can_attach_entries: false})
     const {queryByText} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByText('Attach')).toBeFalsy()
   })
 
   it('only allows one attachment at a time', () => {
-    window.ENV.can_attach_entries = true
+    fakeENV.setup({can_attach_entries: true})
     const {queryByTestId} = setup({canAttach: window.ENV.can_attach_entries})
     expect(queryByTestId('attachment-input')).toHaveAttribute('type', 'file')
     expect(queryByTestId('attachment-input')).not.toHaveAttribute('multiple')
@@ -87,7 +104,11 @@ describe('AttachmentDisplay', () => {
   })
 
   it('uploads file with submit intent if we do not pass the checkContextQuota param', async () => {
-    uploadFileModule.uploadFile = jest.fn()
+    jest.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
+      id: '1',
+      url: 'http://example.com/file.txt',
+      display_name: 'file.txt',
+    })
     const {findByTestId} = setup({canAttach: true})
     const input = await findByTestId('attachment-input')
     await userEvent.upload(input, new File(['file'], 'file.txt', {type: 'text/plain'}))
@@ -98,7 +119,11 @@ describe('AttachmentDisplay', () => {
   })
 
   it('uploads file with attach_discussion_file intent if we pass the checkContextQuota param', async () => {
-    uploadFileModule.uploadFile = jest.fn()
+    jest.spyOn(uploadFileModule, 'uploadFile').mockResolvedValue({
+      id: '1',
+      url: 'http://example.com/file.txt',
+      display_name: 'file.txt',
+    })
     const {findByTestId} = setup({canAttach: true, checkContextQuota: true})
     const input = await findByTestId('attachment-input')
     await userEvent.upload(input, new File(['file'], 'file.txt', {type: 'text/plain'}))
