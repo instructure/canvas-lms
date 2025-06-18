@@ -127,7 +127,7 @@ describe('SubmissionWorkflowTracker', () => {
   })
 
   it('renders the proxy submitter name when submission was proxy', async () => {
-    renderWithMocks(SubmissionMocks.proxySubmitted)
+    await renderWithMocks(SubmissionMocks.proxySubmitted)
 
     expect(await screen.findByText('by Marty McFly')).toBeInTheDocument()
   })
