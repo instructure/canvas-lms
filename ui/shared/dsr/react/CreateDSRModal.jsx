@@ -163,7 +163,7 @@ export default class CreateDSRModal extends React.Component {
           ),
         )
 
-        this.setState({...initialState})
+        this.close()
         if (this.props.afterSave) this.props.afterSave(response)
       },
       () => {
