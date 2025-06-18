@@ -14,19 +14,24 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import React from 'react'
 import page from 'page'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import store from '../../lib/AppCenterStore'
 import AppList from '../AppList'
+import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('page')
 
-describe('AppList', () => {
-  const originalGetJSON = $.getJSON
-  const originalAJAX = $.ajax
+const server = setupServer()
 
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
+describe('AppList', () => {
   const defaultApps = () => [
     {
       app_type: null,
@@ -110,75 +115,106 @@ describe('AppList', () => {
     },
   ]
 
-  beforeAll(() => {
-    $.getJSON = jest.fn()
-    $.ajax = jest.fn()
-  })
-
   beforeEach(() => {
-    window.ENV = {context_asset_string: 'account_1'}
-    store.setState({apps: defaultApps()})
+    fakeENV.setup({context_asset_string: 'account_1', CONTEXT_BASE_URL: '/accounts/1'})
+    store.reset()
+
+    // Set up default MSW handlers
+    server.use(
+      http.get('/api/v1/accounts/1/app_center/apps', () => {
+        return HttpResponse.json(defaultApps())
+      }),
+      // AppCenterStore triggers ExternalAppsStore.fetch() in its success handler
+      http.get('/api/v1/accounts/1/lti_apps', () => {
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
     store.reset()
+    fakeENV.teardown()
   })
 
-  afterAll(() => {
-    window.ENV = {}
-    $.getJSON = originalGetJSON
-    $.ajax = originalAJAX
-  })
-
-  function renderAppList() {
-    return render(<AppList baseUrl="/the/base/url" />)
+  async function renderAppList() {
+    const result = render(<AppList baseUrl="/the/base/url" />)
+    // Wait for initial fetch to complete
+    await waitFor(() => {
+      expect(store.getState().isLoaded || store.getState().isLoading).toBe(true)
+    })
+    return result
   }
 
-  it('renders loading indicator', () => {
-    store.setState({isLoading: true})
-    const {getByTestId} = renderAppList()
+  it('renders loading indicator', async () => {
+    // Override the handler to delay response
+    server.use(
+      http.get('/api/v1/accounts/1/app_center/apps', async () => {
+        await new Promise(resolve => setTimeout(resolve, 100))
+        return HttpResponse.json(defaultApps())
+      }),
+    )
+
+    const {getByTestId} = render(<AppList baseUrl="/the/base/url" />)
     expect(getByTestId(/Spinner/i)).toBeVisible()
   })
 
-  it('does not apply focus to filter text input on render', () => {
-    const {getByText} = renderAppList()
+  it('does not apply focus to filter text input on render', async () => {
+    const {getByText} = await renderAppList()
     expect(getByText('Filter by name')).not.toHaveFocus()
   })
 
-  it('renders manage app list button if context type is account and user has permissions', () => {
-    window.ENV.APP_CENTER = {can_set_token: true}
-    const stuff = renderAppList()
-    const {getByText} = stuff
+  it('renders manage app list button if context type is account and user has permissions', async () => {
+    fakeENV.setup({
+      context_asset_string: 'account_1',
+      CONTEXT_BASE_URL: '/accounts/1',
+      APP_CENTER: {can_set_token: true},
+    })
+    const {getByText} = await renderAppList()
     expect(getByText('Manage App List')).toBeVisible()
   })
 
-  it('does not render manage app list button if user has no permissions', () => {
-    window.ENV.APP_CENTER = {can_set_token: false}
-    const {queryByText} = renderAppList()
+  it('does not render manage app list button if user has no permissions', async () => {
+    fakeENV.setup({
+      context_asset_string: 'account_1',
+      CONTEXT_BASE_URL: '/accounts/1',
+      APP_CENTER: {can_set_token: false},
+    })
+    const {queryByText} = await renderAppList()
     expect(queryByText('Manage App List')).not.toBeInTheDocument()
   })
 
-  it('does not render manage app list button if context type is not account', () => {
-    window.ENV = {context_asset_string: 'course_1'}
-    const {queryByText} = renderAppList()
+  it('does not render manage app list button if context type is not account', async () => {
+    fakeENV.setup({context_asset_string: 'course_1', CONTEXT_BASE_URL: '/courses/1'})
+
+    // Update MSW handlers for course context
+    server.use(
+      http.get('/api/v1/courses/1/app_center/apps', () => {
+        return HttpResponse.json(defaultApps())
+      }),
+      http.get('/api/v1/courses/1/lti_apps', () => {
+        return HttpResponse.json([])
+      }),
+    )
+
+    const {queryByText} = await renderAppList()
     expect(queryByText('Manage App List')).not.toBeInTheDocument()
   })
 
-  it('renders view app configurations link', () => {
-    const {getByText} = renderAppList()
+  it('renders view app configurations link', async () => {
+    const {getByText} = await renderAppList()
     expect(getByText('View App Configurations')).toBeVisible()
   })
 
-  it('follows the app configurations button to the right place', () => {
-    const {getByText} = renderAppList()
+  it('follows the app configurations button to the right place', async () => {
+    const {getByText} = await renderAppList()
     fireEvent.click(getByText('View App Configurations'))
     expect(page.redirect).toHaveBeenCalledWith('/configurations')
   })
 
-  it('renders app filters', () => {
-    const {getByText} = renderAppList()
-    expect(getByText('All')).toBeVisible()
-    expect(getByText('Not Installed')).toBeVisible()
-    expect(getByText('Installed')).toBeVisible()
+  it('renders app filters', async () => {
+    const {getByRole} = await renderAppList()
+    expect(getByRole('tab', {name: 'All'})).toBeVisible()
+    expect(getByRole('tab', {name: 'Not Installed'})).toBeVisible()
+    expect(getByRole('tab', {name: 'Installed'})).toBeVisible()
   })
 })
