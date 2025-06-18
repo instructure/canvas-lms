@@ -115,7 +115,6 @@ describe('DiscussionTopicForm', () => {
       it('renders require initiator checkbox truth as default', () => {
         ENV = {
           FEATURES: {},
-          CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED: true,
           STUDENT_PLANNER_ENABLED: true,
           DISCUSSION_TOPIC: {
             ATTRIBUTES: {
@@ -137,7 +136,6 @@ describe('DiscussionTopicForm', () => {
         it('renders require initiator checkbox truth as default', () => {
           ENV = {
             FEATURES: {},
-            CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED: true,
             STUDENT_PLANNER_ENABLED: true,
             DISCUSSION_TOPIC: {
               ATTRIBUTES: {
