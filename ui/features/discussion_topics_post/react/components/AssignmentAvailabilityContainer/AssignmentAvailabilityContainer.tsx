@@ -30,10 +30,12 @@ const I18n = createI18nScope('discussion_posts')
 
 interface AssignmentOverride {
   id: string
+  _id?: string
   dueAt?: string | null
   unlockAt?: string | null
   lockAt?: string | null
   title?: string
+  set?: any
 }
 
 interface Checkpoint {
@@ -82,6 +84,7 @@ export function AssignmentAvailabilityContainer({...props}: AssignmentAvailabili
           lockAt: props.assignment?.lockAt,
           title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
           id: props.assignment?.id || '',
+          _id: props.assignment?.id || '',
         })
       : [
           {
@@ -90,6 +93,7 @@ export function AssignmentAvailabilityContainer({...props}: AssignmentAvailabili
             lockAt: props.assignment?.lockAt,
             title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
             id: props.assignment?.id || '',
+            _id: props.assignment?.id || '',
           },
         ]
   }
@@ -108,7 +112,17 @@ export function AssignmentAvailabilityContainer({...props}: AssignmentAvailabili
         />
       )
     } else {
-      return <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
+      // Transform assignmentOverrides to match DueDateTray's expected type
+      const dueDateTrayOverrides = assignmentOverrides.map(override => ({
+        id: override.id,
+        _id: override._id || override.id,
+        dueAt: override.dueAt || null,
+        lockAt: override.lockAt || null,
+        unlockAt: override.unlockAt || null,
+        title: override.title || '',
+        set: override.set || null,
+      }))
+      return <DueDateTray assignmentOverrides={dueDateTrayOverrides} isAdmin={props.isAdmin} />
     }
   }
 
