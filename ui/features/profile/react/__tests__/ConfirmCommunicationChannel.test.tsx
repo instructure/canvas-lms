@@ -24,6 +24,10 @@ import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
 describe('ConfirmCommunicationChannel', () => {
   beforeEach(() => {
     fakeENV.setup()
