@@ -306,4 +306,19 @@ describe "context modules", :ignore_js_errors do
       expect(visible_modules.first.text).to include("module1")
     end
   end
+
+  context "empty module" do
+    before do
+      @empty_module = @course.context_modules.create!(name: "Empty Module")
+    end
+
+    it "displays the module file drop area when a module has no items" do
+      go_to_modules
+      wait_for_ajaximations
+
+      empty_module_el = f("[data-module-id='#{@empty_module.id}']")
+      expect(empty_module_el).to be_displayed
+      expect(empty_module_el.text).to include("Drop files here to upload")
+    end
+  end
 end
