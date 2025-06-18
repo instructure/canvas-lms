@@ -43,7 +43,8 @@ module Canvas::OAuth
       return false unless @client_id.present?
 
       begin
-        !!Integer(@client_id)
+        # Check if client_id is a valid integer within 64-bit range
+        Integer(@client_id).bit_length < 64
       rescue ArgumentError
         false
       end
