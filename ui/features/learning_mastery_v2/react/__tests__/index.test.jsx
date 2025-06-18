@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import {render, act} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../hooks/useRollups')
-
-jest.useFakeTimers()
 
 describe('LearningMastery', () => {
   const ratings = [
@@ -92,9 +91,16 @@ describe('LearningMastery', () => {
       ...props,
     }
   }
-  // EVAL-3711 Remove Evaluate ICE feature flag
-  let oldEnv
   beforeEach(() => {
+    jest.useFakeTimers()
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {
+        outcome_proficiency: {ratings},
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        context_url: '/courses/1',
+      },
+      FEATURES: {instui_nav: true},
+    })
     useRollups.mockReturnValue({
       isLoading: false,
       students: users,
@@ -103,15 +109,14 @@ describe('LearningMastery', () => {
       outcomes,
       rollups,
     })
-    oldEnv = {...window.ENV}
-    window.ENV = {
-      GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true},
-      FEATURES: {instui_nav: true},
-    }
   })
 
   afterEach(() => {
-    window.ENV = oldEnv
+    useRollups.mockClear()
+    jest.clearAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
+    fakeENV.teardown()
   })
 
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
@@ -127,8 +132,11 @@ describe('LearningMastery', () => {
 
   it('renders each student, outcome, rollup from the response', async () => {
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Student 1')).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(getByText('Student 1')).toBeInTheDocument()
+    })
+
     expect(getByText('outcome 1')).toBeInTheDocument()
     expect(getByText('rating description!')).toBeInTheDocument()
   })
