@@ -66,6 +66,21 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "with a sub-account admin" do
+      let(:sub_account_user) do
+        account_admin_user(account: account_model(parent_account: account))
+      end
+
+      before do
+        user_session(sub_account_user)
+      end
+
+      it "redirects to the homepage" do
+        get :index, params: { account_id: account.id }
+        expect(response).to be_redirect
+      end
+    end
+
     context "with flag disabled" do
       before do
         account.disable_feature!(:lti_registrations_page)
@@ -73,6 +88,15 @@ RSpec.describe Lti::RegistrationsController do
 
       it "returns 404" do
         get :index, params: { account_id: account.id }
+        expect(response).to be_not_found
+      end
+    end
+
+    context "from a sub-account context" do
+      let(:subaccount) { account_model(parent_account: account) }
+
+      it "isn't found" do
+        get :index, params: { account_id: subaccount.id }
         expect(response).to be_not_found
       end
     end
@@ -1443,12 +1467,11 @@ RSpec.describe Lti::RegistrationsController do
     end
 
     context "when model-level validations fail" do
-      # for example, when the account is not a root account
-      subject { post "/api/v1/accounts/#{child_account.id}/lti_registrations/#{registration.id}/bind", params: { workflow_state: } }
+      # for example, when the registration isn't in the account chain.
+      subject { post "/api/v1/accounts/#{account.id}/lti_registrations/#{other_registration.id}/bind", params: { workflow_state: } }
 
-      let(:child_account) { account_model(parent_account: account) }
-      let(:registration) { developer_key.lti_registration }
-      let(:developer_key) { lti_developer_key_model(account: child_account) }
+      let(:other_account) { account_model }
+      let(:other_registration) { lti_developer_key_model(account: other_account).lti_registration }
 
       it "returns 422" do
         subject
