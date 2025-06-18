@@ -32,9 +32,11 @@ module Lti
       return [] unless assignment.root_account.feature_enabled?(:lti_asset_processor)
 
       Lti::AssetProcessor.for_assignment_id(assignment.id)
+                         .preload(:context_external_tool)
                          .map(&:context_external_tool)
                          .uniq
                          .select do |tool|
+        next unless tool.eula_enabled?
         next if tool.asset_processor_eula_required == false
         next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_USER_SCOPE)
         next if user.lti_asset_processor_eula_acceptances.active.find_by(context_external_tool_id: tool.id)&.accepted == true

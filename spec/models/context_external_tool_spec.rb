@@ -3466,35 +3466,32 @@ describe ContextExternalTool do
         name: "EULA Tool",
         consumer_key: "key",
         shared_secret: "secret",
-        url: "http://www.tool.com/launch",
-        settings:
+        url: "http://www.tool.com/main_launch",
+        settings: {
+          ActivityAssetProcessor: { enabled: true, eula: }.compact
+        }
       )
     end
-    let(:settings) { {} }
+    let(:eula) { nil }
 
-    describe "#eula_launch_url" do
-      it "returns the extension eula_launch_url if present" do
-        settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
-        expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
-      end
-
-      it "returns the launch_url if extension eula_launch_url is not present" do
-        expect(tool.eula_launch_url).to eq tool.launch_url
-      end
+    context "when the eula object is not present" do
+      it { expect(tool.eula_enabled?).to be false }
+      it { expect(tool.eula_launch_url).to eq "http://www.tool.com/main_launch" }
+      it { expect(tool.eula_custom_fields).to eq({}) }
     end
 
-    describe "#eula_custom_fields" do
-      it "returns the fields if custom_fields is a hash" do
-        custom_fields = { "field1" => "value1", "field2" => "value2" }
-        settings[:ActivityAssetProcessor] = { eula: { custom_fields: } }
-
-        expected = { "field1" => "value1", "field2" => "value2" }
-        expect(tool.eula_custom_fields).to eq(expected)
+    context "when eula fields are present" do
+      let(:eula) do
+        {
+          enabled: true,
+          target_link_uri: "http://www.tool.com/eula_launch",
+          custom_fields: { "field1" => "value1" }
+        }
       end
 
-      it "returns {} if custom_fields is not given" do
-        expect(tool.eula_custom_fields).to eq({})
-      end
+      it { expect(tool.eula_enabled?).to be true }
+      it { expect(tool.eula_launch_url).to eq "http://www.tool.com/eula_launch" }
+      it { expect(tool.eula_custom_fields).to eq({ "field1" => "value1" }) }
     end
   end
 end

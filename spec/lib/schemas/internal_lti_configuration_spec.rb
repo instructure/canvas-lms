@@ -366,6 +366,7 @@ describe Schemas::InternalLtiConfiguration do
     describe "eula subsettings" do
       let(:eula_settings) do
         {
+          enabled: true,
           target_link_uri: "https://example.com/eula",
           custom_fields: { "foo" => "$Canvas.user.id" }
         }
@@ -386,13 +387,16 @@ describe Schemas::InternalLtiConfiguration do
           expect(subject).to be_empty
         end
 
-        context "with invalid eula settings" do
-          let(:eula_settings) { { custom_fields: { "abc" => false } } }
+        context "with invalid eula custom_fields" do
+          let(:eula_settings) { { enabled: true, custom_fields: { "abc" => false } } }
 
-          it "returns errors" do
-            expect(subject).not_to be_empty
-            expect(error_message).to include "eula"
-          end
+          it { expect(error_message).to include "eula" }
+        end
+
+        context "with eula missing enabled field" do
+          let(:eula_settings) { { custom_fields: { "abc" => "def" } } }
+
+          it { expect(error_message).to include "eula" }
         end
       end
     end
