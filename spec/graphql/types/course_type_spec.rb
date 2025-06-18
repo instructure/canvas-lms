@@ -2029,6 +2029,72 @@ describe Types::CourseType do
             expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 0
           end
         end
+
+        context "when the submission is coming from graded discussion assignment" do
+          let(:assignment_for_graded_discussion) do
+            course.assignments.create!(title: "Assignment for graded discussion", workflow_state: "published", submission_types: ["online_text_entry"])
+          end
+
+          let(:graded_discussion) do
+            course.discussion_topics.create!(message: "hi", title: "title", assignment: assignment_for_graded_discussion)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              submission = graded_discussion.assignment.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now + 2.days)
+
+              expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 1
+            end
+          end
+        end
+
+        context "when the submission is coming from checkpoint discussion assignment" do
+          let(:assignment_for_checkpoint_discussion) do
+            parent_assignment = course.assignments.create!(has_sub_assignments: true, title: "Parent Assignment", workflow_state: "published")
+            parent_assignment.sub_assignments.create!(
+              context: course,
+              sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+              title: "Sub Assignment 1",
+              workflow_state: "published",
+              submission_types: "discussion_topic"
+            )
+            parent_assignment
+          end
+
+          let(:checkpoint_discussion) do
+            course.discussion_topics.create!(message: "hi", title: "discussion title", assignment: assignment_for_checkpoint_discussion)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              sub_assignments = assignment_for_checkpoint_discussion.sub_assignments
+              submission = sub_assignments.first.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now + 2.days)
+
+              expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 1
+            end
+          end
+        end
+
+        context "when the submission is coming from classic quiz assignment" do
+          let(:assignment_for_classic_quiz) do
+            course.assignments.create!(title: "Assignment for classic quiz", workflow_state: "published", submission_types: ["online_text_entry"])
+          end
+
+          let(:classic_quiz_with_assignment) do
+            course.quizzes.create!(title: "classic_quiz_with_assignment", assignment: assignment_for_classic_quiz)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              submission = classic_quiz_with_assignment.assignment.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now + 2.days)
+
+              expect(course_type.resolve("submissionStatistics { submissionsDueThisWeekCount }")).to eq 1
+            end
+          end
+        end
       end
 
       describe "missingSubmissionsCount" do
@@ -2106,6 +2172,72 @@ describe Types::CourseType do
             )
 
             expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 0
+          end
+        end
+
+        context "when the submission is coming from graded discussion assignment" do
+          let(:assignment_for_graded_discussion) do
+            course.assignments.create!(title: "Assignment for graded discussion", workflow_state: "published", submission_types: ["online_text_entry"])
+          end
+
+          let(:graded_discussion) do
+            course.discussion_topics.create!(message: "hi", title: "title", assignment: assignment_for_graded_discussion)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              submission = graded_discussion.assignment.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now - 1.day)
+
+              expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
+            end
+          end
+        end
+
+        context "when the submission is coming from checkpoint discussion assignment" do
+          let(:assignment_for_checkpoint_discussion) do
+            parent_assignment = course.assignments.create!(has_sub_assignments: true, title: "Parent Assignment", workflow_state: "published")
+            parent_assignment.sub_assignments.create!(
+              context: course,
+              sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+              title: "Sub Assignment 1",
+              workflow_state: "published",
+              submission_types: "discussion_topic"
+            )
+            parent_assignment
+          end
+
+          let(:checkpoint_discussion) do
+            course.discussion_topics.create!(message: "hi", title: "discussion title", assignment: assignment_for_checkpoint_discussion)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              sub_assignments = assignment_for_checkpoint_discussion.sub_assignments
+              submission = sub_assignments.first.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now - 1.day)
+
+              expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
+            end
+          end
+        end
+
+        context "when the submission is coming from classic quiz assignment" do
+          let(:assignment_for_classic_quiz) do
+            course.assignments.create!(title: "Assignment for classic quiz", workflow_state: "published", submission_types: ["online_text_entry"])
+          end
+
+          let(:classic_quiz_with_assignment) do
+            course.quizzes.create!(title: "classic_quiz_with_assignment", assignment: assignment_for_classic_quiz)
+          end
+
+          it "should use it in the calculation" do
+            Timecop.freeze(now) do
+              submission = classic_quiz_with_assignment.assignment.submissions.find_by(user_id: @student.id)
+              submission.update!(cached_due_date: now - 1.day)
+
+              expect(course_type.resolve("submissionStatistics { missingSubmissionsCount }")).to eq 1
+            end
           end
         end
       end
