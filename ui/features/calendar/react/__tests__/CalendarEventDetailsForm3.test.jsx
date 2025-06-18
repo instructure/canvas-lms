@@ -20,8 +20,6 @@ import React from 'react'
 import $ from 'jquery'
 import moment from 'moment-timezone'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
-import {screen} from '@testing-library/dom'
-import userEvent from '@testing-library/user-event'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
@@ -268,17 +266,20 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('only enables relevant fields when blackout date checkbox is checked', async () => {
-    fakeENV.setup({
-      FEATURES: {
-        account_level_blackout_dates: true,
+    // Create a fresh copy of props to avoid mutation issues
+    const props = {
+      ...eventFormProps(),
+      event: {
+        ...eventFormProps().event,
+        contextInfo: {...courseContext, course_pacing_enabled: true},
+        calendarEvent: {
+          ...eventFormProps().event.calendarEvent,
+          parent_event_id: null,
+        },
       },
-    })
-    defaultProps.event.contextInfo = {...courseContext, course_pacing_enabled: true}
-    defaultProps.event.calendarEvent = {
-      ...defaultProps.event.calendarEvent,
-      parent_event_id: null,
     }
-    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    const component = render(<CalendarEventDetailsForm {...props} />)
     const blackoutCheckbox = component.getByRole('checkbox', {
       name: /Add to Course Pacing blackout dates/i,
     })
@@ -288,7 +289,12 @@ describe('CalendarEventDetailsForm', () => {
     expectFieldsToBeEnabled(component, ['title', 'location'])
 
     // Check blackout date checkbox
-    await userEvent.click(blackoutCheckbox)
+    fireEvent.click(blackoutCheckbox)
+
+    // Wait for state to update
+    await waitFor(() => {
+      expect(blackoutCheckbox).toBeChecked()
+    })
 
     // Only title should be enabled, location should be disabled
     expectFieldsToBeEnabled(component, ['title'])
@@ -370,7 +376,7 @@ describe('CalendarEventDetailsForm', () => {
 
       const component = render(<CalendarEventDetailsForm {...props} />)
       component.getByText('Frequency').click()
-      screen.getByText('Weekly on Monday').click()
+      component.getByText('Weekly on Monday').click()
       await waitFor(() =>
         expect(component.queryByDisplayValue('Weekly on Monday')).toBeInTheDocument(),
       )
