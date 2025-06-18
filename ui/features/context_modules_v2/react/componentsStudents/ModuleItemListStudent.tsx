@@ -39,6 +39,7 @@ export interface ModuleItemListStudentProps {
   progression?: ModuleProgression
   isLoading: boolean
   error: any
+  smallScreen?: boolean
 }
 
 const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
@@ -48,6 +49,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
   progression,
   isLoading,
   error,
+  smallScreen = false,
 }) => {
   return (
     <View as="div" overflowX="hidden">
@@ -72,6 +74,7 @@ const ModuleItemListStudent: React.FC<ModuleItemListStudentProps> = ({
               completionRequirements={completionRequirements}
               requireSequentialProgress={!!requireSequentialProgress}
               progression={progression}
+              smallScreen={smallScreen}
             />
           </View>
         ))

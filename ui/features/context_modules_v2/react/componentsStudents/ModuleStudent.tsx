@@ -19,6 +19,7 @@
 import React, {useState, useEffect, useRef} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
@@ -85,46 +86,59 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   }, [isLoading, maxFetchingCount, name])
 
   return (
-    <View
-      as="div"
-      margin="0 0 large 0"
-      padding="0"
-      background="secondary"
-      borderRadius="medium"
-      shadow="resting"
-      overflowX="hidden"
-      data-module-id={id}
-      className={`context_module module_${id}`}
-      id={`context_module_${id}`}
-    >
-      <Flex direction="column">
-        <Flex.Item>
-          <ModuleHeaderStudent
-            id={id}
-            name={name}
-            expanded={isExpanded}
-            onToggleExpand={toggleExpanded}
-            progression={progression}
-            completionRequirements={completionRequirements}
-            prerequisites={prerequisites}
-            requirementCount={requirementCount}
-            submissionStatistics={submissionStatistics}
-          />
-        </Flex.Item>
-        {isExpanded && (
-          <Flex.Item>
-            <ModuleItemListStudent
-              moduleItems={data?.moduleItems || []}
-              requireSequentialProgress={requireSequentialProgress}
-              completionRequirements={completionRequirements}
-              progression={progression}
-              isLoading={isLoading}
-              error={error}
-            />
-          </Flex.Item>
-        )}
-      </Flex>
-    </View>
+    <Responsive
+      match="media"
+      query={{
+        small: {maxWidth: '1000px'},
+      }}
+      render={(_, matches) => {
+        const smallScreen = !!matches?.includes('small')
+        return (
+          <View
+            as="div"
+            margin="0 0 large 0"
+            padding="0"
+            background="secondary"
+            borderRadius="medium"
+            shadow="resting"
+            overflowX="hidden"
+            data-module-id={id}
+            className={`context_module module_${id}`}
+            id={`context_module_${id}`}
+          >
+            <Flex direction="column">
+              <Flex.Item>
+                <ModuleHeaderStudent
+                  id={id}
+                  name={name}
+                  expanded={isExpanded}
+                  onToggleExpand={toggleExpanded}
+                  progression={progression}
+                  completionRequirements={completionRequirements}
+                  prerequisites={prerequisites}
+                  requirementCount={requirementCount}
+                  submissionStatistics={submissionStatistics}
+                  smallScreen={smallScreen}
+                />
+              </Flex.Item>
+              {isExpanded && (
+                <Flex.Item>
+                  <ModuleItemListStudent
+                    moduleItems={data?.moduleItems || []}
+                    requireSequentialProgress={requireSequentialProgress}
+                    completionRequirements={completionRequirements}
+                    progression={progression}
+                    isLoading={isLoading}
+                    error={error}
+                    smallScreen={smallScreen}
+                  />
+                </Flex.Item>
+              )}
+            </Flex>
+          </View>
+        )
+      }}
+    />
   )
 }
 
