@@ -5822,6 +5822,7 @@ nn:
   cancel_rename_aa60a881: "Avbryt namneendring"
   cancel_submitting_comment_2666e98b: "Avbryt sending av kommentar"
   cancel_updating_comment_6816d855: "Avbryt oppdatering av kommentar"
+  canceled_5a6e0ec8: Avbrote
   canceling_this_attempt_will_permanently_delete_any_21ce850c: "Viss du angrar på dette forsøket, vil arbeidet som vart gjort under forsøket bli permanent sletta. Ønsker du å fortsetje og sletta arbeidet ditt?"
   cannot_access_group_in_concluded_course_90a8db52: "Får ikkje tilgang til gruppe i avslutta emne"
   cannot_add_role_name_name_already_in_use_a523639c: "Kan ikkje legge til rollenamnet %{name}: det er allereie i bruk"
@@ -5911,6 +5912,9 @@ nn:
   canvas_alert_submission_user_name_assignment_title_4503ccf: "Canvas-varsel – innlevering: %{user_name}, %{assignment_title}"
   canvas_attribute_eaa7e31a: Canvas-attributt
   canvas_by_instructure_1490381: "Canvas by Instructure"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "Canvas kan ikkje logge på LDAP-tenaren"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "Canvas kan ikkje kople deg til LDAP-tenaren"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "Canvas kan ikkje søke i LDAP-førekomsten"
   canvas_cartridge_description: "Dette gjer at du kan konvertere Canvas-eksport til mellombels JSON-format som kan importerast"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas emneeksportpakke"
@@ -5947,6 +5951,7 @@ nn:
   canvas_id_f42f6ad: Canvas-ID
   canvas_instructor_guide_7cf106cb: "Canvas guide for undervisarar"
   canvas_introduction_video_2d81f3ad: "Canvas introduksjonsvideo"
+  canvas_is_connecting_to_ips_9af7da93: "Canvas koplar til %{ips}"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
   canvas_lms_6ce68514: "Canvas læringsplattform (LMS)"
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
@@ -6069,6 +6074,7 @@ nn:
   check_to_add_a_user_for_loginid_6cd25597: "Merk av for å legge til ein brukar for %{loginid}"
   check_to_select_all_98e484f1: "Merk for å velje alt"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Merk av for å ikkje legge til ein brukar for %{loginid}"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "Kontroller brannmurinnstillingane. Har alle IP-adressene i Canvas tilgang til tenaren din?"
   checked_883b93fd: "merka av"
   checking_for_translation_25f2b454: "Sjekkar for omsetjing"
   checkpoint_settings_30796b6b: Sjekkpunkt-innstillingar
@@ -10345,6 +10351,7 @@ nn:
   docviewer_strikeout_deleted_ddca34b0: "DocViewer-gjennomstrek er sletta"
   docviewer_strikeout_updated_f06aec74: "Docviewer-gjennomstreking er oppdatert"
   does_not_meet_expectations_b0736d20: "Innfrir ikkje forventningar"
+  does_the_username_require_more_scoping_information_40d51df: "Krev brukarnamnet meir avgrensa informasjon? (i.e. 'cn=Canvas,ou=people,dc=example,dc=com')."
   domain_3b54c511: Domene
   domain_69fe564b: "Domene:"
   domain_editing_is_disabled_when_security_settings__3feb6da0: "Redigering av domenet er slått av når sikkerhets-innstillingar er arva frå forelder-kontoen."
@@ -25823,6 +25830,7 @@ nn:
   summary_statistics_f74852a5: "Samandrag av statistikk"
   sun_298d7c8b: Sol
   sunday_50a31adb: Søndag
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "Tilby eit gyldig LDAP-brukarnamn/-passord for å teste pålogging:"
   support: 
     array: 
       last_word_connector: ", og "
@@ -26160,6 +26168,9 @@ nn:
   terms_of_service_f183ff7f: "Vilkår for bruk"
   test_cluster_only_70e61c19: "Kun for test"
   test_feature_flag_980151e0: "Test funksjonsflagg"
+  test_ldap_authentication_446cce4f: "Test LDAP-godkjenning"
+  test_ldap_settings_c387f136: "Test LDAP-innstillingar"
+  test_login_3dc3c119: Påloggingstest
   testing_state_effd4a82: "Testar status"
   text_7b9bd49c: "%{text}"
   text_7f4593da: Tekst
@@ -26232,6 +26243,7 @@ nn:
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "Chatverktøyet må slåast på av Canvas-admin."
   the_chosen_date_and_time_is_invalid_a7c96651: "Den valgte datoen og tiden er ugyldig."
   the_client_id_clientid_is_disabled_b4a02cb1: "Klient-ID %{clientId} er deaktivert"
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "Tilkoplinga blei anten avbroten eller ikkje godkjend. Dette kan du gjere:"
   the_content_security_policy_allows_you_to_restrict_197ca4ff: |-
       Retningslinjene for innhaldstryggleik tillet å vere restriktiv med eigendefinerte
       JavaScript som kjørar i din Canvas-installasjon. Du kan manuelt legge til
@@ -26431,6 +26443,7 @@ nn:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til rapporteringsbrukaren (student, faglærar, administrator osv.)"
   the_salesforce_account_id_if_it_exists_e7949706: "Salesforce-konto-ID-en (om den finst)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet gjer at du kan opprette tidsluker som studentane (eller studentgruppene) kan melde seg på. Når du skal starte, klikkar du på knappen nedanfor."
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "Søket mislukkast eller returnerte 0 resultat. Dette kan du gjere:"
   the_search_returned_no_results_c2e4d13c: "Søket ga ingen treff."
   the_section_to_report_on_11e3757b: "Seksjonen som rapporten gjeld for"
   the_selected_calculation_method_is_no_longer_avail_e42ee80d: "Den valgte beregningsmetoden er ikkje lenger tilgjengeleg."
@@ -26972,6 +26985,7 @@ nn:
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Brukaren har ikkje tilgang til emnet\""
   this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Denne brukarens siste aktivitet i emnet var %{datetime}"
   this_user_will_be_created_in_3b2a2b52: "Denne brukaren vil bli oppretta i:"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "Dette var berre ein tilkoplingstest. SSL-sertifikat er ikkje validert."
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "Dette vil påverke alle kundar. Er du sikker?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette gjer at du kan autentisere Canvas for posting av vurderingar til SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Temaet vil bli brukt for heile kontoen. Vil du halde fram?"
@@ -28863,6 +28877,9 @@ nn:
   verification_code_5acd64ef: Stadfestingskode
   verify_3dd8f159: Stadfest
   verify_ldap_tls_certificates_70241d8e: "Verifiser LDAP TLS-sertifikat"
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "Verifisere at brukarobjektet i LDAP har søkeprivilegium for oppgitt søkegrunnlag."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "Verifisere filterstrengen (dvs. '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "Verifisere oppgitt søkegrunnlag (i.e. 'ou=people,dc=example,dc=com')."
   verify_tls_certificate_9cfa26d1: "Verifiser TLS-sertifikat"
   version_5599c321: Versjon
   version_versionnumber_updatedat_9f5b7a5b: "Versjon %{versionNumber} %{updatedAt}"
@@ -29738,6 +29755,7 @@ nn:
       
       Your can view it here:
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "LDAP-tenaren forkasta tilkoplingsforsøket. Dette kan du gjere:"
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "Medie-fila er lasta opp, og vil bli synleg her når den er ferdig handsama."
   your_message_has_been_sent_thank_you_e0284316: "Meldinga di er send. Takk."
   your_message_was_sent_977f6583: "Meldinga di er send!"
