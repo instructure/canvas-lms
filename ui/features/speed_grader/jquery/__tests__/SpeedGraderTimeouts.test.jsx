@@ -18,12 +18,24 @@
 
 import fakeENV from '@canvas/test-utils/fakeENV'
 import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import SpeedGrader from '../speed_grader'
 import SpeedGraderHelpers from '../speed_grader_helpers'
+
+const server = setupServer()
 
 describe('SpeedGrader Timeouts', () => {
   let documentLocation = ''
   let documentLocationHash = ''
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     // Set up DOM elements
@@ -73,10 +85,12 @@ describe('SpeedGrader Timeouts', () => {
     jest.spyOn(SpeedGraderHelpers, 'reloadPage').mockImplementation(() => {})
 
     // Mock fetch for timeout simulation
-    global.fetch = jest.fn().mockImplementation(() =>
-      Promise.reject({
-        status: 504,
-        headers: {'Content-Type': 'text/html'},
+    server.use(
+      http.get('*', () => {
+        return new HttpResponse(null, {
+          status: 504,
+          headers: {'Content-Type': 'text/html'},
+        })
       }),
     )
 
@@ -99,6 +113,7 @@ describe('SpeedGrader Timeouts', () => {
     document.body.innerHTML = ''
     fakeENV.teardown()
     jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   describe('when the gateway times out', () => {

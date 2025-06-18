@@ -21,10 +21,13 @@ import 'jquery-migrate'
 import MediaUtils from '../mediaComment'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('mediaComment', () => {
   let $holder
   let originalKalturaSettings
+  let server
 
   const mockMediaObjectResponse = () => {
     const resp = {
@@ -42,13 +45,6 @@ describe('mediaComment', () => {
       ],
     }
 
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(resp),
-      }),
-    )
-
     return resp
   }
 
@@ -57,28 +53,36 @@ describe('mediaComment', () => {
       media_sources: [
         {
           content_type: 'flv',
-           
+
           url: 'javascript:alert(document.cookie);//',
           bitrate: '200',
         },
         {
           content_type: 'mp4',
-           
+
           url: 'javascript:alert(document.cookie);//',
           bitrate: '100',
         },
       ],
     }
 
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(resp),
-      }),
-    )
-
     return resp
   }
+
+  beforeAll(() => {
+    server = setupServer(
+      http.get('*/media_objects/*', ({params}) => {
+        // Return XSS response for inline media, normal response otherwise
+        const resp = params.id === '10' ? mockXssMediaObjectResponse() : mockMediaObjectResponse()
+        return HttpResponse.json(resp)
+      }),
+    )
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     originalKalturaSettings = window.INST.kalturaSettings
@@ -109,6 +113,7 @@ describe('mediaComment', () => {
     document.body.innerHTML = ''
     jest.restoreAllMocks()
     delete $.fn.mediaComment
+    server.resetHandlers()
   })
 
   it('displays video player inline', () => {
