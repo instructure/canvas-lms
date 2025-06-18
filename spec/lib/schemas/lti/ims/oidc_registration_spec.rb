@@ -330,7 +330,7 @@ describe Schemas::Lti::IMS::OidcRegistration do
           expect(errors(ltc: { messages: ["invalid"] })).to include("messages")
         end
 
-        it "requires type to be one of Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES" do
+        it "requires type to be one of Lti::ResourcePlacement::PLACEMENT_BASED_MESSAGE_TYPES" do
           expect(errors(message: { type: "invalid" })).to include("type")
         end
 

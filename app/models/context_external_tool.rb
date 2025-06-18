@@ -1399,6 +1399,10 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(:ActivityAssetProcessor, :eula)
   end
 
+  def eula_enabled?
+    !!eula_settings&.dig("enabled")
+  end
+
   def eula_launch_url
     eula_settings&.dig("target_link_uri")&.to_s || launch_url
   end

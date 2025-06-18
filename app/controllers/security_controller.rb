@@ -40,6 +40,8 @@ class SecurityController < ApplicationController
         type: message_type,
         placements: placements_supported(message_type, account)
       }.with_indifferent_access
+    end + Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.map do |message_type|
+      { type: message_type }.with_indifferent_access
     end
   end
 

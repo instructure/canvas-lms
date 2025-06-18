@@ -145,13 +145,18 @@ class Lti::IMS::Registration < ApplicationRecord
   delegate :update_external_tools!, to: :developer_key
 
   def placements
-    lti_tool_configuration["messages"].map do |message|
-      if message["placements"].blank?
+    messages = lti_tool_configuration["messages"]
+    eula_message = messages.find { it["type"] == LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE }
+
+    messages.map do |message|
+      if Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES.include?(message["type"])
+        [] # EULA -- handled with eula_message variable
+      elsif message["placements"].blank?
         # default to link_selection if no placements are specified
         [build_placement_for("link_selection", message)]
       else
         message["placements"].flat_map do |placement|
-          build_placement_for(placement, message)
+          build_placement_for(placement, message, eula_message:)
         end
       end
     end.flatten.uniq { |p| p[:placement] }
@@ -160,19 +165,12 @@ class Lti::IMS::Registration < ApplicationRecord
   # Builds a placement object for a given message and placement type
   # returns a list with one item, or an empty list if the placement
   # type is not supported by Canvas
-  def build_placement_for(placement_type, message)
+  def build_placement_for(placement_type, message, eula_message: nil)
     placement_name = canvas_placement_name(placement_type)
 
     # Return no placement if the placement type is not supported by Canvas
     unless Lti::ResourcePlacement::PLACEMENTS.include?(placement_name.to_sym)
       return []
-    end
-
-    display_type = message[DISPLAY_TYPE_EXTENSION]
-    window_target = nil
-    if display_type == "new_window"
-      display_type = "default"
-      window_target = "_blank"
     end
 
     [
@@ -184,28 +182,15 @@ class Lti::IMS::Registration < ApplicationRecord
         # TODO: add support for i18n titles
         # labels: ,
         custom_fields: message["custom_parameters"],
-        # TODO: add support for height/width in dyn reg
-        # selection_height:,
-        # selection_width:,
-        # launch_height:,
-        # launch_width:,
         icon_url: message["icon_uri"],
         target_link_uri: message["target_link_uri"],
-        display_type:,
-        windowTarget: window_target,
         visibility: placement_visibility(message),
         default: fetch_default_enabled_setting(message, placement_name),
-      }.merge(width_and_height_settings(message, placement_name)).compact
+        eula: placement_eula(placement_name:, eula_message:),
+        **placement_display_settings(message),
+        **placement_width_and_height_settings(message, placement_name)
+      }.compact
     ]
-  end
-
-  def placement_visibility(message)
-    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
-    if availability
-      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
-    else
-      nil
-    end
   end
 
   # This supports a very old parameter (hence the obtuse name) that *only* applies to the course navigation placement. It hides the
@@ -290,6 +275,22 @@ class Lti::IMS::Registration < ApplicationRecord
     end
   end
 
+  def infer_privacy_level_from(claims)
+    has_picture = claims.include?("picture")
+    has_name = claims.include?("name") || claims.include?("given_name") || claims.include?("family_name") || claims.include?("https://purl.imsglobal.org/spec/lti/claim/lis")
+    has_email = claims.include?("email")
+
+    if has_picture || (has_name && has_email)
+      "public"
+    elsif has_name && !has_email
+      "name_only"
+    elsif has_email
+      "email_only"
+    else
+      "anonymous"
+    end
+  end
+
   def canvas_placement_name(placement)
     # IMS placement names that have different names in Canvas
     return "link_selection" if placement == "ContentArea"
@@ -300,7 +301,39 @@ class Lti::IMS::Registration < ApplicationRecord
     placement.start_with?(canvas_extension) ? placement.sub(canvas_extension, "") : placement
   end
 
-  def width_and_height_settings(message, placement)
+  # placement_* Methods used to construct placement in build_placement_for:
+
+  def placement_display_settings(message)
+    display_type = message[DISPLAY_TYPE_EXTENSION]
+    if display_type == "new_window"
+      { display_type: "default", windowTarget: "_blank" }
+    else
+      { display_type: }
+    end
+  end
+
+  def placement_visibility(message)
+    availability = message[PLACEMENT_VISIBILITY_EXTENSION]
+    if availability
+      PLACEMENT_VISIBILITY_OPTIONS.include?(availability) ? availability : nil
+    else
+      nil
+    end
+  end
+
+  def placement_eula(placement_name:, eula_message:)
+    if eula_message && placement_name == "ActivityAssetProcessor"
+      {
+        enabled: true,
+        target_link_uri: eula_message["target_link_uri"],
+        custom_fields: eula_message["custom_parameters"]
+      }.compact
+    else
+      nil
+    end
+  end
+
+  def placement_width_and_height_settings(message, placement)
     keys = ["selection_width", "selection_height"]
     # placements that use launch_width and launch_height
     # instead of selection_width and selection_height
@@ -316,21 +349,5 @@ class Lti::IMS::Registration < ApplicationRecord
       keys[0].to_sym => values[0],
       keys[1].to_sym => values[1],
     }
-  end
-
-  def infer_privacy_level_from(claims)
-    has_picture = claims.include?("picture")
-    has_name = claims.include?("name") || claims.include?("given_name") || claims.include?("family_name") || claims.include?("https://purl.imsglobal.org/spec/lti/claim/lis")
-    has_email = claims.include?("email")
-
-    if has_picture || (has_name && has_email)
-      "public"
-    elsif has_name && !has_email
-      "name_only"
-    elsif has_email
-      "email_only"
-    else
-      "anonymous"
-    end
   end
 end
