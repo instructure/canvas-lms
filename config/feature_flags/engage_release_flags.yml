@@ -46,3 +46,9 @@ checkpoints_group_discussions:
       state: allowed_on
     ci:
       state: allowed_on
+peer_review_allocation_updates:
+  state: hidden
+  applies_to: Account
+  shadow: true
+  display_name: Peer Review Allocation Updates
+  description: Updates peer review allocation for an assignment to be at-time instead of pre-allocated.
