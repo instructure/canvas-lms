@@ -187,14 +187,22 @@ class Lti::AssetReport < ApplicationRecord
 
   # Returns all reports for the given asset processor and submission IDs.
   # Returns reports by submission, hash of form:
-  #   submission_id => {
+  #   submission_id: {
   #     by_attachment: {
-  #       attachment_id => {
-  #         lti_asset_processor_id => [
+  #       <attachment_id>: {
+  #         <lti_asset_processor_id>: [
   #           { id: report1.id, title: report1.title, ... },
   #           { id: report2.id, title: report2.title, ... },
-  #         ],
-  # ...
+  #         ]
+  #     },
+  #     by_attempt: {
+  #       <attempt>: {
+  #         <lti_asset_processor_id>: [
+  #           { id: report1.id, title: report1.title, ... },
+  #         ]
+  #       }
+  #     }
+  #   }
   def self.info_for_display_by_submission(submission_ids:, for_student: false)
     reports_by_submission = {}
 
@@ -203,20 +211,24 @@ class Lti::AssetReport < ApplicationRecord
         active
         .for_active_processors
         .for_submissions(submission_ids)
-        .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id")
+        .select("lti_asset_reports.*, lti_assets.submission_id as asset_sub_id, lti_assets.attachment_id as asset_att_id, lti_assets.submission_attempt as asset_submission_attempt")
 
       scope = scope.where(visible_to_owner: true) if for_student
 
       scope.find_each do |report|
-        sub_reports = (reports_by_submission[report.asset_sub_id] ||= {})
+        submission_reports = (reports_by_submission[report.asset_sub_id] ||= {})
 
         if report.asset_att_id
-          by_attachment = (sub_reports[:by_attachment] ||= {})
+          by_attachment = (submission_reports[:by_attachment] ||= {})
           by_processor = (by_attachment[report.asset_att_id] ||= {})
           report_list = (by_processor[report.lti_asset_processor_id] ||= [])
           report_list << report.info_for_display
+        elsif report.asset_submission_attempt
+          by_attempt = (submission_reports[:by_attempt] ||= {})
+          by_processor = (by_attempt[report.asset_submission_attempt] ||= {})
+          report_list = (by_processor[report.lti_asset_processor_id] ||= [])
+          report_list << report.info_for_display
         end
-        # else if submission version (RCE content) -- TODO
       end
     end
 

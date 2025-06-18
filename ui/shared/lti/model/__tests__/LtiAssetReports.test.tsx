@@ -21,7 +21,7 @@ import {render, waitFor} from '@testing-library/react'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReport, LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReport, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
 import {LtiAssetReportsWrapper} from '../../react/LtiAssetReportsWrapper'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -59,13 +59,21 @@ function makeMockReport(title: string, overrides: Partial<LtiAssetReport> = {}):
 describe('LtiAssetReports', () => {
   let assetProcessors: ExistingAttachedAssetProcessor[] = []
   let versionedAttachments: {attachment: {id: string; display_name: string}}[] = []
-  let reportsByAttachment: Record<string, LtiAssetReportsByProcessor> = {}
+  let reports: SpeedGraderLtiAssetReports = {by_attachment: {}, by_attempt: {}}
   let firstRep: LtiAssetReport
 
   const setup = () => {
-    const attempt = 1
+    const attempt = '1'
     const studentId = '101'
-    const props = {versionedAttachments, reportsByAttachment, assetProcessors, attempt, studentId}
+    const submissionType = 'online_upload' as const
+    const props = {
+      versionedAttachments,
+      reports,
+      assetProcessors,
+      attempt,
+      studentId,
+      submissionType,
+    }
     return render(<LtiAssetReportsWrapper {...props} />)
   }
 
@@ -74,16 +82,23 @@ describe('LtiAssetReports', () => {
       {attachment: {id: '20001', display_name: 'file1.pdf'}},
       {attachment: {id: '20002', display_name: 'file2.pdf'}},
     ]
-    reportsByAttachment = {
-      '20001': {
-        '123': [makeMockReport('file1-AP123-report1'), makeMockReport('file1-AP123-report2')],
-        '456': [makeMockReport('file1-AP456-report1')],
+    reports = {
+      by_attachment: {
+        '20001': {
+          '123': [makeMockReport('file1-AP123-report1'), makeMockReport('file1-AP123-report2')],
+          '456': [makeMockReport('file1-AP456-report1')],
+        },
+        '20002': {
+          '123': [makeMockReport('file2-AP123-report1')],
+        },
       },
-      '20002': {
-        '123': [makeMockReport('file2-AP123-report1')],
+      by_attempt: {
+        '1': {
+          '123': [makeMockReport('attempt1-AP123-report1')],
+        },
       },
     }
-    firstRep = reportsByAttachment['20001']['123'][0]
+    firstRep = reports.by_attachment!['20001']['123'][0]
     assetProcessors = [
       {
         id: 123,
@@ -240,14 +255,14 @@ describe('LtiAssetReports', () => {
 
     it('does not show resubmit button if there are no resubmittable/missing reports', () => {
       // Now AP 456 cannot be resubmitted as it has all reports
-      reportsByAttachment['20002']['456'] = [makeMockReport('file2-AP456-report1')]
+      reports.by_attachment!['20002']['456'] = [makeMockReport('file2-AP456-report1')]
       const {queryByText} = setup()
       expect(queryByText('Resubmit All Files')).not.toBeInTheDocument()
     })
 
     it('shows resubmit button if there is at least one resubmittable report', () => {
       const badreport = makeMockReport('file2-AP456-report1', {resubmitAvailable: true})
-      reportsByAttachment['20002']['456'] = [badreport]
+      reports.by_attachment!['20002']['456'] = [badreport]
       const {getAllByText} = setup()
       const resubmitButtons = getAllByText('Resubmit All Files')
       expect(resubmitButtons).toHaveLength(1)
@@ -255,10 +270,151 @@ describe('LtiAssetReports', () => {
 
     it('shows a resubmit button per AP', () => {
       const badreport = makeMockReport('file2-AP123-report1', {resubmitAvailable: true})
-      reportsByAttachment['20002']['123'] = [badreport]
+      reports.by_attachment!['20002']['123'] = [badreport]
       const {getAllByText} = setup()
       const resubmitButtons = getAllByText('Resubmit All Files')
       expect(resubmitButtons).toHaveLength(2)
+    })
+
+    describe('when submissionType is "online_text_entry"', () => {
+      const setupWithTextEntry = () => {
+        const attempt = '1'
+        const studentId = '101'
+        const submissionType = 'online_text_entry' as const
+        const props = {
+          versionedAttachments,
+          reports,
+          assetProcessors,
+          attempt,
+          studentId,
+          submissionType,
+        }
+        return render(<LtiAssetReportsWrapper {...props} />)
+      }
+
+      beforeEach(() => {
+        versionedAttachments = []
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [makeMockReport('attempt1-AP123-report1')],
+            },
+          },
+        }
+      })
+
+      it('renders a single report for the attempt', () => {
+        const {getByText} = setupWithTextEntry()
+        expect(getByText('tool1000label · ap123title')).toBeInTheDocument()
+        expect(getByText('attempt1-AP123-report1')).toBeInTheDocument()
+      })
+
+      it('renders "Text submitted to Canvas" heading for each AP', () => {
+        const {getAllByText} = setupWithTextEntry()
+        const textHeadings = getAllByText('Text submitted to Canvas')
+        expect(textHeadings).toHaveLength(assetProcessors.length)
+      })
+
+      it('shows resubmit button when there is no report for an asset processor', () => {
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [makeMockReport('attempt1-AP123-report1')],
+              // AP 456 has no reports
+            },
+          },
+        }
+        const {getAllByText} = setupWithTextEntry()
+        const resubmitButtons = getAllByText('Resubmit All Files')
+        // We should have a resubmit button for AP 456
+        expect(resubmitButtons).toHaveLength(1)
+      })
+
+      it('allows clicking resubmit button to make API call', async () => {
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [makeMockReport('attempt1-AP123-report1')],
+              // AP 456 has no reports
+            },
+          },
+        }
+        const {getAllByText} = setupWithTextEntry()
+        const resubmitButtons = getAllByText('Resubmit All Files')
+
+        // @ts-expect-error
+        doFetchApi.mockResolvedValue({status: 204})
+
+        resubmitButtons[0].click()
+
+        await waitFor(() => {
+          expect(doFetchApi).toHaveBeenCalledWith({
+            method: 'POST',
+            path: '/api/lti/asset_processors/456/notices/101/attempts/1',
+          })
+        })
+
+        await waitFor(() => {
+          expect(showFlashSuccess).toHaveBeenCalledWith('Resubmitted to Document Processing App')
+        })
+      })
+
+      it('does not show resubmit button if all reports are available', () => {
+        // Make sure both processors have reports
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [makeMockReport('attempt1-AP123-report1')],
+              '456': [makeMockReport('attempt1-AP456-report1')],
+            },
+          },
+        }
+        const {queryByText} = setupWithTextEntry()
+        expect(queryByText('Resubmit All Files')).not.toBeInTheDocument()
+      })
+
+      it('shows resubmit button if there is at least one resubmittable report', () => {
+        const resubmittableReport = makeMockReport('attempt1-AP456-report1', {
+          resubmitAvailable: true,
+        })
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [makeMockReport('attempt1-AP123-report1')],
+              '456': [resubmittableReport],
+            },
+          },
+        }
+        const {getAllByText} = setupWithTextEntry()
+        const resubmitButtons = getAllByText('Resubmit All Files')
+        expect(resubmitButtons).toHaveLength(1)
+      })
+
+      it('shows a resubmit button per AP that needs it', () => {
+        const resubmittableReport1 = makeMockReport('attempt1-AP123-report1', {
+          resubmitAvailable: true,
+        })
+        const resubmittableReport2 = makeMockReport('attempt1-AP456-report1', {
+          resubmitAvailable: true,
+        })
+        reports = {
+          by_attachment: {},
+          by_attempt: {
+            '1': {
+              '123': [resubmittableReport1],
+              '456': [resubmittableReport2],
+            },
+          },
+        }
+        const {getAllByText} = setupWithTextEntry()
+        const resubmitButtons = getAllByText('Resubmit All Files')
+        expect(resubmitButtons).toHaveLength(2)
+      })
     })
   })
 })

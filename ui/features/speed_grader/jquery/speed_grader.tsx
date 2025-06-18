@@ -885,16 +885,24 @@ function renderLtiAssetReports(
 ) {
   if (!ENV.FEATURES?.lti_asset_processor) return
   if (!jsonData.lti_asset_processors) return
+  if (!historicalSubmission.attempt) return
+  if (
+    !historicalSubmission.submission_type ||
+    (historicalSubmission.submission_type !== 'online_text_entry' &&
+      historicalSubmission.submission_type !== 'online_upload')
+  )
+    return
 
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
   const props = {
     versionedAttachments: historicalSubmission?.versioned_attachments,
-    reportsByAttachment: submission.lti_asset_reports?.by_attachment,
+    reports: submission.lti_asset_reports,
     assetProcessors: jsonData.lti_asset_processors,
     studentId: submission.user_id,
-    attempt: historicalSubmission.attempt,
+    attempt: historicalSubmission.attempt.toString(),
+    submissionType: historicalSubmission.submission_type,
   }
   ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
 }

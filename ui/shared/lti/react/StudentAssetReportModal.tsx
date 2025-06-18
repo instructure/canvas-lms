@@ -20,10 +20,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
 import groupBy from 'lodash/groupBy'
 import {LtiAssetReports} from './LtiAssetReports'
-import {type LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -65,8 +64,10 @@ export default function StudentAssetReportModal({
       },
     },
   ]
-  const reportsByAttachment: Record<string, LtiAssetReportsByProcessor> = {
-    [attachmentId]: groupBy(reports, rep => rep.asset_processor_id),
+  const sgReports: SpeedGraderLtiAssetReports = {
+    by_attachment: {
+      [attachmentId]: groupBy(reports, rep => rep.asset_processor_id),
+    },
   }
 
   return (
@@ -108,11 +109,12 @@ export default function StudentAssetReportModal({
           </FlexItem>
         </Flex>
         <LtiAssetReports
-          assetProcessors={assetProcessorsWithReports}
-          attempt={null}
-          reportsByAttachment={reportsByAttachment}
+          assetProcessors={assetProcessors}
+          attempt=""
+          reports={sgReports}
           studentId={undefined}
           versionedAttachments={attachments}
+          submissionType="online_upload"
         />
       </Modal.Body>
     </Modal>

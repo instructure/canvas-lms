@@ -64,7 +64,13 @@ export type LtiAssetReport = z.infer<typeof ZLtiAssetReport>
 
 export const ZLtiAssetReportsByProcessor = z.record(z.string(), z.array(ZLtiAssetReport))
 
+export const ZSpeedGraderLtiAssetReports = z.object({
+  by_attachment: z.record(z.string() /* attachment ID */, ZLtiAssetReportsByProcessor).optional(),
+  by_attempt: z.record(z.string(), ZLtiAssetReportsByProcessor).optional(),
+})
+
 export type LtiAssetReportsByProcessor = z.infer<typeof ZLtiAssetReportsByProcessor>
+export type SpeedGraderLtiAssetReports = z.infer<typeof ZSpeedGraderLtiAssetReports>
 
 export type LtiAssetReportWithAsset = LtiAssetReport & {
   asset_processor_id: number
