@@ -20,6 +20,9 @@ import {Model} from '@canvas/backbone'
 import ValidatedFormView from '../ValidatedFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../../msw/mswServer'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 class MyForm extends ValidatedFormView {
   fieldSelectors = {last_name: '[name="user[last_name]"]'}
@@ -40,49 +43,29 @@ class MyForm extends ValidatedFormView {
   }
 }
 
+const server = mswServer([
+  http.post('/fail', () => {
+    return new HttpResponse('', {status: 200})
+  }),
+])
+
 describe('ValidatedFormView', () => {
   let form
-  let mockServer
 
-  const setupMockServer = () => {
-    const originalAjax = $.ajax
-    $.ajax = jest.fn().mockImplementation(options => {
-      const deferred = $.Deferred()
-      const mockResponse = mockServer.responses[options.url]
+  beforeAll(() => {
+    server.listen()
+  })
 
-      if (mockResponse) {
-        if (mockResponse.status >= 200 && mockResponse.status < 300) {
-          deferred.resolve(mockResponse.data, 'success', {status: mockResponse.status})
-        } else {
-          deferred.reject({
-            status: mockResponse.status,
-            statusText: mockResponse.statusText,
-            responseText: JSON.stringify(mockResponse.data),
-          })
-        }
-      }
+  afterEach(() => {
+    server.resetHandlers()
+  })
 
-      return deferred.promise()
-    })
-
-    return () => {
-      $.ajax = originalAjax
-    }
-  }
-
-  const sendSuccess = (response = '') => {
-    mockServer.responses['/success'] = {
-      status: 200,
-      statusText: 'OK',
-      data: response,
-    }
-  }
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
-    mockServer = {
-      responses: {},
-    }
-    setupMockServer()
+    fakeENV.setup()
     jest.useFakeTimers()
     document.body.innerHTML = '<div id="fixtures"></div>'
     form = new MyForm()
@@ -95,6 +78,7 @@ describe('ValidatedFormView', () => {
     jest.advanceTimersByTime(250) // tick past errorBox animations
     jest.useRealTimers()
     document.body.innerHTML = ''
+    fakeENV.teardown()
   })
 
   it('disables inputs while loading', () => {
@@ -106,7 +90,6 @@ describe('ValidatedFormView', () => {
     })
 
     form.submit()
-    sendSuccess()
   })
 
   it('delegates submit to saveFormData', () => {
@@ -184,15 +167,12 @@ describe('ValidatedFormView', () => {
   })
 
   describe('RCE Integration', () => {
-    let origEnvValue
-
     beforeEach(() => {
-      origEnvValue = window.ENV.use_rce_enhancements
-      window.ENV.use_rce_enhancements = true
+      fakeENV.setup({use_rce_enhancements: true})
     })
 
     afterEach(() => {
-      window.ENV.use_rce_enhancements = origEnvValue
+      fakeENV.teardown()
     })
 
     it('calls the sendFunc to determine if RCE is ready', () => {
