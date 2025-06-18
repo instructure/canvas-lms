@@ -24,6 +24,19 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jqueryui/tabs'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// Mock the child components to avoid their AJAX calls
+jest.mock('../gradingPeriodCollection', () => {
+  return function MockGradingPeriodCollection() {
+    return <div data-testid="grading-period-collection">Grading Period Collection</div>
+  }
+})
+
+jest.mock('@canvas/grading-standard-collection', () => {
+  return function MockGradingStandardCollection() {
+    return <div data-testid="grading-standard-collection">Grading Standard Collection</div>
+  }
+})
+
 const renderCourseTabContainer = (props = {}) => render(<CourseTabContainer {...props} />)
 
 describe('CourseTabContainer', () => {
@@ -33,17 +46,6 @@ describe('CourseTabContainer', () => {
       GRADING_STANDARDS_URL: '/api/v1/courses/1/grading_standards',
       current_user_roles: ['admin'],
     })
-
-    jest
-      .spyOn($, 'getJSON')
-      .mockImplementation(() => ({success: () => ({error: () => {}}), done: () => {}}))
-
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
-      }),
-    )
   })
 
   afterEach(() => {
@@ -68,12 +70,14 @@ describe('CourseTabContainer', () => {
     const tabsSpy = jest.spyOn($.fn, 'tabs')
     renderCourseTabContainer({hasGradingPeriods: true})
     expect(tabsSpy).toHaveBeenCalled()
+    tabsSpy.mockRestore()
   })
 
   it('jquery-ui tabs() is not called when there are no grading periods', () => {
     const tabsSpy = jest.spyOn($.fn, 'tabs')
     renderCourseTabContainer({hasGradingPeriods: false})
     expect(tabsSpy).not.toHaveBeenCalled()
+    tabsSpy.mockRestore()
   })
 
   it('does not render grading periods if there are no grading periods', () => {
