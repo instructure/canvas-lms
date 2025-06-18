@@ -24,23 +24,33 @@ import AssignmentOverrideCollection from '@canvas/assignments/backbone/collectio
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 import PandaPubPoller from '@canvas/panda-pub-poller'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../../msw/mswServer'
 
 jest.mock('@canvas/panda-pub-poller')
 
+const server = mswServer([])
+
 describe('Quiz', () => {
   let quiz
-  let ajaxStub
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     quiz = new Quiz({
       id: 1,
       html_url: 'http://localhost:3000/courses/1/quizzes/24',
     })
-    $.ajaxJSON = jest.fn().mockImplementation(() => Promise.resolve())
-    ajaxStub = $.ajaxJSON
   })
 
   afterEach(() => {
+    server.resetHandlers()
     jest.restoreAllMocks()
   })
 
@@ -162,9 +172,17 @@ describe('Quiz', () => {
     expect(quiz.get('possible_points_label')).toBe('')
   })
 
-  it('saves to the server on publish', () => {
-    quiz.publish()
-    expect(ajaxStub).toHaveBeenCalled()
+  it('saves to the server on publish', async () => {
+    let requestReceived = false
+    server.use(
+      http.post('*/courses/1/quizzes/publish', () => {
+        requestReceived = true
+        return HttpResponse.json({})
+      }),
+    )
+
+    await quiz.publish()
+    expect(requestReceived).toBe(true)
   })
 
   it('sets published attribute to true on publish', () => {
@@ -172,9 +190,17 @@ describe('Quiz', () => {
     expect(quiz.get('published')).toBeTruthy()
   })
 
-  it('saves to the server on unpublish', () => {
-    quiz.unpublish()
-    expect(ajaxStub).toHaveBeenCalled()
+  it('saves to the server on unpublish', async () => {
+    let requestReceived = false
+    server.use(
+      http.post('*/courses/1/quizzes/unpublish', () => {
+        requestReceived = true
+        return HttpResponse.json({})
+      }),
+    )
+
+    await quiz.unpublish()
+    expect(requestReceived).toBe(true)
   })
 
   it('sets published attribute to false on unpublish', () => {
@@ -200,12 +226,11 @@ describe('Quiz#multipleDueDates', () => {
 describe('Quiz.Next', () => {
   const testUrl = (isFeatureFlagEnabled, expectedDisplay) => {
     let quiz
-    let ajaxStub
     describe(`when new_quizzes_navigation_updates FF is ${isFeatureFlagEnabled ? 'enabled' : 'disabled'}`, () => {
       beforeEach(() => {
         fakeENV.setup({
           FEATURES: {
-            new_quizzes_navigation_updates : isFeatureFlagEnabled,
+            new_quizzes_navigation_updates: isFeatureFlagEnabled,
           },
         })
         quiz = new Quiz({
@@ -214,28 +239,26 @@ describe('Quiz.Next', () => {
           assignment_id: 7,
           quiz_type: 'quizzes.next',
         })
-        $.ajaxJSON = jest.fn().mockImplementation(() => Promise.resolve())
-        ajaxStub = $.ajaxJSON
       })
 
       afterEach(() => {
-        jest.restoreAllMocks()
         fakeENV.teardown()
       })
 
       it(`should set build url from html url using ${expectedDisplay} display type`, () => {
-        expect(quiz.get('build_url')).toBe(`http://localhost:3000/courses/1/assignments/7?display=${expectedDisplay}`)
+        expect(quiz.get('build_url')).toBe(
+          `http://localhost:3000/courses/1/assignments/7?display=${expectedDisplay}`,
+        )
       })
     })
   }
 
-  testUrl(true, 'full_width_with_nav');
-  testUrl(false, 'full_width');
+  testUrl(true, 'full_width_with_nav')
+  testUrl(false, 'full_width')
 })
 
 describe('Quiz.Next with manage enabled', () => {
   let quiz
-  let ajaxStub
 
   beforeEach(() => {
     fakeENV.setup({
@@ -247,12 +270,9 @@ describe('Quiz.Next with manage enabled', () => {
       assignment_id: 7,
       quiz_type: 'quizzes.next',
     })
-    $.ajaxJSON = jest.fn().mockImplementation(() => Promise.resolve())
-    ajaxStub = $.ajaxJSON
   })
 
   afterEach(() => {
-    jest.restoreAllMocks()
     fakeENV.teardown()
   })
 
@@ -270,7 +290,7 @@ describe('Quiz polling', () => {
     fakeENV.setup({
       FEATURES: {
         new_quizzes_navigation_updates: false,
-      }
+      },
     })
     jest.useFakeTimers()
     quiz = new Quiz({
@@ -294,7 +314,7 @@ describe('Quiz polling', () => {
       start: jest.fn(),
       stop: jest.fn(),
     }
-    PandaPubPoller.mockImplementation((interval, maxAttempts, callback) => {
+    PandaPubPoller.mockImplementation((_interval, _maxAttempts, callback) => {
       callback(() => {})
       return pollerMock
     })
