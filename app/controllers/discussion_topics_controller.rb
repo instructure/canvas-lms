@@ -665,8 +665,8 @@ class DiscussionTopicsController < ApplicationController
       DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: Account.site_admin.feature_enabled?(:assignment_edit_placement_not_on_announcements),
       ANNOUNCEMENTS_COMMENTS_DISABLED: Announcement.new(context: @context).comments_disabled?,
-      DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
-      DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
+      DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
+      DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
       DISCUSSION_CONTENT_LOCKED: @topic.editing_restricted?(:content),
     }
     mutate_js_hash_sections_for_show_method(js_hash, @topic)
@@ -924,8 +924,8 @@ class DiscussionTopicsController < ApplicationController
                checkpointed_discussion_without_feature_flag:
                  @topic.assignment&.has_sub_assignments? && !@context.discussion_checkpoints_enabled?,
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
-               DISCUSSION_DEFAULT_EXPAND_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_expand),
-               DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
+               DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
+               DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
@@ -1621,23 +1621,19 @@ class DiscussionTopicsController < ApplicationController
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
     end
 
-    if Account.site_admin.feature_enabled?(:discussion_default_sort)
-      @topic.sort_order_locked = params[:sort_order_locked] unless params[:sort_order_locked].nil?
-      unless params[:sort_order].nil?
-        if DiscussionTopic::SortOrder::TYPES.include?(params[:sort_order])
-          @topic.sort_order = params[:sort_order]
-        else
-          @errors[:sort_order] = t(:error_sort_order,
-                                   "Sort order type not valid")
-        end
-
+    @topic.sort_order_locked = params[:sort_order_locked] unless params[:sort_order_locked].nil?
+    unless params[:sort_order].nil?
+      if DiscussionTopic::SortOrder::TYPES.include?(params[:sort_order])
+        @topic.sort_order = params[:sort_order]
+      else
+        @errors[:sort_order] = t(:error_sort_order,
+                                 "Sort order type not valid")
       end
+
     end
 
-    if Account.site_admin.feature_enabled?(:discussion_default_expand)
-      @topic.expanded = params[:expanded] unless params[:expanded].nil?
-      @topic.expanded_locked = params[:expanded_locked] unless params[:expanded_locked].nil?
-    end
+    @topic.expanded = params[:expanded] unless params[:expanded].nil?
+    @topic.expanded_locked = params[:expanded_locked] unless params[:expanded_locked].nil?
 
     prefer_assignment_availability_dates(discussion_topic_hash)
 

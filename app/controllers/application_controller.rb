@@ -406,8 +406,6 @@ class ApplicationController < ActionController::Base
     dashboard_graphql_integration
     discussion_ai_survey_link
     discussion_checkpoints
-    discussion_default_sort
-    discussion_default_expand
     discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert

@@ -467,11 +467,6 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('view settings', () => {
-    beforeEach(() => {
-      window.ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED = true
-      window.ENV.DISCUSSION_DEFAULT_SORT_ENABLED = true
-    })
-
     it('renders view settings, if the discussion is not announcement', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
       const {queryByTestId} = setup({
@@ -483,16 +478,6 @@ describe('DiscussionTopicForm', () => {
 
     it('does not render view settings, if the discussion is announcement', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      const {queryByTestId} = setup({
-        isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({published: false}),
-      })
-      expect(queryByTestId('discussion-view-settings')).not.toBeInTheDocument()
-    })
-
-    it('does not render view settings, if no features are enabled', () => {
-      window.ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED = false
-      window.ENV.DISCUSSION_DEFAULT_SORT_ENABLED = false
       const {queryByTestId} = setup({
         isEditing: true,
         currentDiscussionTopic: DiscussionTopic.mock({published: false}),

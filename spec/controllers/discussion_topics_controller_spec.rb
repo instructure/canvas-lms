@@ -1687,20 +1687,6 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
     end
 
-    it "js_env DISCUSSION_DEFAULT_EXPAND_ENABLED is set to true when creating a discussion and discussion default expand ff is on" do
-      Account.site_admin.enable_feature! :discussion_default_expand
-      user_session(@teacher)
-      get :new, params: { course_id: @course.id }
-      expect(assigns[:js_env][:DISCUSSION_DEFAULT_EXPAND_ENABLED]).to be_truthy
-    end
-
-    it "js_env DISCUSSION_DEFAULT_SORT_ENABLED is set to true when creating a discussion and discussion default sort ff is on" do
-      Account.site_admin.enable_feature! :discussion_default_sort
-      user_session(@teacher)
-      get :new, params: { course_id: @course.id }
-      expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
-    end
-
     it "js_env GROUP_CATEGORIES excludes non_collaborative and student_organized categories regardless of allow_assign_to_differentiation_tags setting state" do
       @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
       @course.account.save!
@@ -1930,20 +1916,6 @@ describe DiscussionTopicsController do
       @course.account.enable_feature!(:discussion_checkpoints)
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:DISCUSSION_CHECKPOINTS_ENABLED]).to be_truthy
-    end
-
-    it "js_env DISCUSSION_DEFAULT_EXPAND_ENABLED is set to true when editing a discussion and discussion default expand ff is on" do
-      Account.site_admin.enable_feature! :discussion_default_expand
-      user_session(@teacher)
-      get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:DISCUSSION_DEFAULT_EXPAND_ENABLED]).to be_truthy
-    end
-
-    it "js_env DISCUSSION_DEFAULT_SORT_ENABLED is set to true when editing a discussion and discussion default sort ff is on" do
-      Account.site_admin.enable_feature! :discussion_default_sort
-      user_session(@teacher)
-      get :edit, params: { course_id: @course.id, id: @topic.id }
-      expect(assigns[:js_env][:DISCUSSION_DEFAULT_SORT_ENABLED]).to be_truthy
     end
 
     it "js_env RESTRICT_QUANTITATIVE_DATA is set to true if enabled in course" do

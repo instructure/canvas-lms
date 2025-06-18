@@ -86,20 +86,11 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
   end
 
   it "does not update when discussion topic default sort order locked is true" do
-    Account.site_admin.enable_feature!(:discussion_default_sort)
     expect(discussion_type.resolve(:sortOrder)).to eq("desc")
     @topic.update!(sort_order_locked: true)
     result = run_mutation(discussion_topic_id: @topic.id, sort: :asc)
     # it did not update
     expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:sortOrder]).to eq("desc")
-  end
-
-  it "does update when discussion_default_sort flag is off" do
-    Account.site_admin.disable_feature!(:discussion_default_sort)
-    expect(discussion_type.resolve(:sortOrder)).to eq("desc")
-    result = run_mutation(discussion_topic_id: @topic.id, sort: :asc)
-    # it did update
-    expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:sortOrder]).to eq("asc")
   end
 
   it "updates a discussion topic participant's expanded" do
@@ -114,20 +105,11 @@ RSpec.describe Mutations::UpdateDiscussionTopicParticipant do
   end
 
   it "does not update when discussion topic default expand locked is true" do
-    Account.site_admin.enable_feature!(:discussion_default_expand)
     expect(discussion_type.resolve(:expanded)).to be(false)
     @topic.update!(expanded: true)
     @topic.update!(expanded_locked: true)
     result = run_mutation(discussion_topic_id: @topic.id, expanded: false)
     # it did not update
-    expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:expanded]).to be true
-  end
-
-  it "does update when discussion_default_expand flag is off" do
-    Account.site_admin.disable_feature!(:discussion_default_expand)
-    expect(discussion_type.resolve(:expanded)).to be(false)
-    result = run_mutation(discussion_topic_id: @topic.id, expanded: true)
-    # it did update
     expect(result[:data][:updateDiscussionTopicParticipant][:discussionTopic][:participant][:expanded]).to be true
   end
 

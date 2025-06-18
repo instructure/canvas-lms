@@ -81,44 +81,12 @@ const DiscussionPostButtonsToolbar = props => {
     )
 
   const renderSort = () => {
-    if (props.discDefaultSortEnabled) {
-      return (
-        <SortOrderDropDown
-          isLocked={props.isSortOrderLocked}
-          selectedSortType={props.sortDirection}
-          onSortClick={props.onSortClick}
-        />
-      )
-    }
     return (
-      <Tooltip
-        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
-        width="78px"
-        data-testid="sortButtonTooltip"
-      >
-        <span className="discussions-sort-button">
-          <Button
-            style={{width: '100%'}}
-            display="block"
-            onClick={props.onSortClick}
-            renderIcon={
-              props.sortDirection === 'desc' ? (
-                <IconArrowDownLine data-testid="DownArrow" />
-              ) : (
-                <IconArrowUpLine data-testid="UpArrow" />
-              )
-            }
-            data-testid="sortButton"
-          >
-            {I18n.t('Sort')}
-            <ScreenReaderContent>
-              {props.sortDirection === 'asc'
-                ? I18n.t('Sorted by Ascending')
-                : I18n.t('Sorted by Descending')}
-            </ScreenReaderContent>
-          </Button>
-        </span>
-      </Tooltip>
+      <SortOrderDropDown
+        isLocked={props.isSortOrderLocked}
+        selectedSortType={props.sortDirection}
+        onSortClick={props.onSortClick}
+      />
     )
   }
 
@@ -151,14 +119,11 @@ const DiscussionPostButtonsToolbar = props => {
 
   const renderExpandsThreads = () => (
     <ExpandCollapseThreadsButton
-      isExpanded={props.isExpanded || (props.discDefaultExpandEnabled && props.isExpandedLocked)}
+      isExpanded={props.isExpanded}
       onCollapseRepliesToggle={props.onCollapseRepliesToggle}
       showText={true}
       tooltipEnabled={props.breakpoints.ICEDesktop}
-      disabled={
-        props.userSplitScreenPreference ||
-        (props.discDefaultExpandEnabled && props.isExpandedLocked)
-      }
+      disabled={props.userSplitScreenPreference}
       expandedLocked={props.isExpandedLocked}
     />
   )
@@ -297,27 +262,14 @@ const DiscussionPostButtonsToolbar = props => {
     ]
 
     const buttonsMobile = () => {
-      if (window.ENV?.FEATURES?.discussion_default_sort) {
-        if (ENV.current_user_is_student) {
-          return [renderExpandsThreads(), renderGroup()]
-        } else {
-          return [
-            renderAssignToButton(),
-            renderExpandsThreads(),
-            renderButtonDrillDown(drillDownOptions),
-          ]
-        }
+      if (ENV.current_user_is_student) {
+        return [renderExpandsThreads(), renderGroup()]
       } else {
-        if (ENV.current_user_is_student) {
-          return [renderExpandsThreads(), renderSort(), renderGroup()]
-        } else {
-          return [
-            renderAssignToButton(),
-            renderExpandsThreads(),
-            renderButtonDrillDown(drillDownOptions),
-            renderSort(),
-          ]
-        }
+        return [
+          renderAssignToButton(),
+          renderExpandsThreads(),
+          renderButtonDrillDown(drillDownOptions),
+        ]
       }
     }
 
@@ -400,8 +352,6 @@ DiscussionPostButtonsToolbar.propTypes = {
   showAssignTo: PropTypes.bool,
   isSortOrderLocked: PropTypes.bool,
   isExpandedLocked: PropTypes.bool,
-  discDefaultSortEnabled: PropTypes.bool,
-  discDefaultExpandEnabled: PropTypes.bool,
   isAnnouncement: PropTypes.bool,
 }
 

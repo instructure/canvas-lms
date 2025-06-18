@@ -6129,7 +6129,12 @@ describe AssignmentsApiController, type: :request do
                                                  "only_graders_can_rate" => false,
                                                  "sort_by_rating" => false,
                                                  "todo_date" => nil,
-                                                 "anonymous_state" => nil
+                                                 "anonymous_state" => nil,
+                                                 "sort_order" => "desc",
+                                                 "sort_order_locked" => false,
+                                                 "expanded" => false,
+                                                 "expanded_locked" => false,
+
                                                })
       end
 
