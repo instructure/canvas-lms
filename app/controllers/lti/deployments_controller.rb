@@ -107,7 +107,11 @@ module Lti
 
     # @API Create LTI Deployment
     #
-    # Create a new deployment for the specified LTI registration in this context.
+    # Create a new deployment for the specified LTI registration for the given context.
+    # If no context is specified, the deployment will be created in the root account.
+    #
+    # @param for_subaccount_id [Integer] (optional) If provided, the deployment will be created in the specified subaccount.
+    # @param for_course_id [Integer] (optional) If provided, the deployment will be created in the specified course.
     #
     # @returns Lti::Deployment
     #
@@ -116,8 +120,20 @@ module Lti
     #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments' \
     #        -H "Authorization: Bearer <token>"
     def create
+      if params[:for_subaccount_id].present? && params[:for_course_id].present?
+        return render json: { error: "Cannot specify both for_subaccount_id and for_course_id" }, status: :unprocessable_entity
+      end
+
+      context = if params[:for_subaccount_id].present?
+                  Account.find(params[:for_subaccount_id])
+                elsif params[:for_course_id].present?
+                  Course.find(params[:for_course_id])
+                else
+                  @context
+                end
+
       lti_registration = Lti::Registration.find(params[:registration_id])
-      deployment = lti_registration.new_external_tool(@context, current_user: @current_user)
+      deployment = lti_registration.new_external_tool(context, current_user: @current_user)
 
       ContextExternalTool.invalidate_nav_tabs_cache(deployment, @domain_root_account)
       render json: lti_deployment_json(deployment, @current_user, session, @context)
@@ -146,7 +162,7 @@ module Lti
 
     # @API List LTI Deployments
     #
-    # List all deployments available in this context for the specified LTI registration.
+    # List all deployments available for the specified LTI registration.
     #
     # @returns [Lti::Deployment]
     #
@@ -157,7 +173,7 @@ module Lti
     def list
       lti_registration = Lti::Registration.find(params[:registration_id])
       bookmark = BookmarkedCollection::SimpleBookmarker.new(ContextExternalTool, :id)
-      tool_collection = BookmarkedCollection.wrap(bookmark, ContextExternalTool.active.where(account: @context, lti_registration:))
+      tool_collection = BookmarkedCollection.wrap(bookmark, ContextExternalTool.active.where(lti_registration:))
       tools = Api.paginate(tool_collection, self, api_v1_list_deployments_path)
 
       render json: tools.map { |tool| lti_deployment_json(tool, @current_user, session, @context) }
