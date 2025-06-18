@@ -23,6 +23,7 @@
       <i class="icon-email"></i>
       <%= t 'links.message_user', "Message %{user}", :user => context_user_name(@context, @user) %>
     </a>
+    <div id="dsr-modal-mount-point"></div>
     <div id="manage-temp-enrollments-mount-point"></div>
     <% if @context_account.is_a?(Account) &&
           @user.grants_right?(@current_user, :generate_observer_pairing_code) &&

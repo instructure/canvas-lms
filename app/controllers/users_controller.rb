@@ -1382,7 +1382,8 @@ class UsersController < ApplicationController
 
           js_permissions = {
             can_manage_sis_pseudonyms: @context_account.root_account.grants_right?(@current_user, :manage_sis),
-            can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details)
+            can_manage_user_details: @user.grants_right?(@current_user, :manage_user_details),
+            can_manage_dsr_requests: @context_account.grants_right?(@current_user, :manage_dsr_requests)
           }
           if @context_account.root_account.feature_enabled?(:temporary_enrollments)
             js_permissions[:can_read_sis] = @context_account.grants_right?(@current_user, session, :read_sis)
