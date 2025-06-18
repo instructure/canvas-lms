@@ -54,9 +54,11 @@ export const LongDescriptionModal = ({
         <Heading>{modalHeader}</Heading>
       </Modal.Header>
       <Modal.Body>
-        <Text lineHeight="double" wrap="break-word">
-          <div dangerouslySetInnerHTML={{__html: longDescription}} />
-        </Text>
+        <Text
+          lineHeight="double"
+          wrap="break-word"
+          dangerouslySetInnerHTML={{__html: longDescription ?? ''}}
+        />
       </Modal.Body>
     </Modal>
   )

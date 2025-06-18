@@ -38,6 +38,7 @@ import {RatingsHeader} from './RatingsHeader'
 import {reorderRatingsAtIndex} from '../../../utils'
 import {DEFAULT_RUBRIC_RATINGS} from '../../constants'
 import {RatingRows} from './RatingRows'
+import {TextArea} from '@instructure/ui-text-area'
 
 const I18n = createI18nScope('rubrics-criterion-modal')
 
@@ -273,13 +274,13 @@ export const CriterionModal = ({
                 />
               </View>
               <View as="span">
-                <TextInput
-                  renderLabel={I18n.t('Criterion Description')}
+                <TextArea
+                  label={I18n.t('Criterion Description')}
                   placeholder={I18n.t('Enter the description')}
-                  display="inline-block"
+                  maxHeight="6.75rem"
                   width="41.75rem"
-                  value={criterionLongDescription ?? ''}
-                  onChange={(_e, value) => setCriterionLongDescription(value)}
+                  value={criterionLongDescription?.replace(/<br\/>/g, '') ?? ''}
+                  onChange={e => setCriterionLongDescription(e.target.value)}
                   data-testid="rubric-criterion-description-input"
                 />
               </View>
