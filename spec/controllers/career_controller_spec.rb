@@ -16,138 +16,105 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
 describe CareerController do
   before :once do
     course_with_teacher(active_all: true)
-    @course.account.enable_feature!(:horizon_learning_provider_app_for_accounts)
+    @account = @course.account
+    @account.enable_feature!(:horizon_learning_provider_app_for_accounts)
     @course.update!(horizon_course: true)
   end
 
-  describe "GET catch_all" do
+  let(:config) { double("Config", learning_provider_app_launch_url: "https://example.com/lp", learner_app_launch_url: "https://example.com/learner") }
+  let(:resolver) { instance_double(CanvasCareer::ExperienceResolver) }
+
+  before do
+    allow(CanvasCareer::ExperienceResolver).to receive(:new).and_return(resolver)
+    allow(CanvasCareer::Config).to receive(:new).with(@course.root_account).and_return(config)
+  end
+
+  describe "GET show" do
     it "returns unauthorized without a valid session" do
-      get :catch_all, params: { course_id: @course.id }
+      get :show
       assert_unauthorized
     end
 
     context "with authenticated user" do
       before do
         user_session(@teacher)
+        allow(controller).to receive(:deferred_js_bundle)
+        allow(controller).to receive(:remote_env)
       end
 
-      it "renders with bare layout when course_id is valid" do
-        allow(controller).to receive_messages(
-          canvas_career_learning_provider_app_enabled?: true,
-          canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
-        )
+      context "when ExperienceResolver returns ACADEMIC" do
+        before do
+          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::ACADEMIC)
+        end
 
-        get :catch_all, params: { course_id: @course.id }
-
-        expect(response).to be_successful
-        expect(response).to render_template("layouts/bare")
+        it "redirects to root path" do
+          get :show, params: { course_id: @course.id }
+          expect(response).to redirect_to(root_path)
+        end
       end
 
-      it "sets course context for content-libraries route" do
-        allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
+      context "when ExperienceResolver returns CAREER_LEARNING_PROVIDER" do
+        before do
+          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER)
+        end
 
-        get :catch_all, params: { path: "content-libraries", course_id: @course.id }
+        it "sets up the JS environment with features" do
+          @account.enable_feature!(:horizon_crm_integration)
 
-        expect(assigns(:context)).to eq(@course)
-        expect(response).to be_successful
+          get :show, params: { course_id: @course.id }
+
+          expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES]).to include(
+            horizon_crm_integration: true,
+            horizon_leader_dashboards: false,
+            horizon_admin_dashboards: false,
+            horizon_roles_and_permissions: false,
+            horizon_agent: false,
+            horizon_content_library: false,
+            horizon_program_management: false,
+            horizon_skill_management: false
+          )
+        end
+
+        it "calls remote_env with learning provider URL" do
+          expect(controller).to receive(:remote_env).with(
+            canvas_career_learning_provider: "https://example.com/lp"
+          )
+          get :show, params: { course_id: @course.id }
+        end
+
+        it "calls deferred_js_bundle with :canvas_career" do
+          expect(controller).to receive(:deferred_js_bundle).with(:canvas_career)
+          get :show, params: { course_id: @course.id }
+        end
+
+        it "renders with bare layout" do
+          get :show, params: { course_id: @course.id }
+          expect(response).to render_template("layouts/bare")
+        end
       end
 
-      it "calls remote_env and deferred_js_bundle when app is enabled" do
-        allow(controller).to receive_messages(
-          canvas_career_learning_provider_app_enabled?: true,
-          canvas_career_learning_provider_app_launch_url: "https://test.canvasforcareer.com/learning-provider/remoteEntry.js"
-        )
+      context "when ExperienceResolver returns CAREER_LEARNER" do
+        before do
+          allow(resolver).to receive(:resolve).and_return(CanvasCareer::Constants::App::CAREER_LEARNER)
+        end
 
-        expect(controller).to receive(:remote_env).with(canvascareer: "https://test.canvasforcareer.com/learning-provider/remoteEntry.js")
-        expect(controller).to receive(:deferred_js_bundle).with(:canvas_career)
+        it "calls remote_env with learner URL" do
+          expect(controller).to receive(:remote_env).with(
+            canvas_career_learner: "https://example.com/learner"
+          )
+          get :show, params: { course_id: @course.id }
+        end
 
-        get :catch_all, params: { course_id: @course.id }
+        it "calls deferred_js_bundle with :canvas_career" do
+          expect(controller).to receive(:deferred_js_bundle).with(:canvas_career)
+          get :show, params: { course_id: @course.id }
+        end
       end
-
-      it "adds career features to js_env" do
-        @course.account.enable_feature!(:horizon_crm_integration)
-        allow(controller).to receive_messages(
-          canvas_career_learning_provider_app_enabled?: true,
-          canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
-        )
-
-        get :catch_all, params: { course_id: @course.id }
-
-        expect(assigns[:js_env][:CANVAS_CAREER][:FEATURES][:horizon_crm_integration]).to be(true)
-      end
-    end
-
-    context "with student user" do
-      before do
-        course_with_student(active_all: true, course: @course)
-        user_session(@student)
-      end
-
-      it "renders successfully when horizon_redirect_url is nil" do
-        allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
-        allow_any_instance_of(Account).to receive(:horizon_redirect_url).and_return(nil)
-
-        get :catch_all, params: { course_id: @course.id }
-
-        expect(response).to be_successful
-      end
-    end
-  end
-
-  describe "#require_enabled_learning_provider_app" do
-    before do
-      user_session(@teacher)
-    end
-
-    it "redirects to root_path when canvas_career_learning_provider_app_enabled? returns false" do
-      allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(false)
-
-      get :catch_all, params: { course_id: @course.id }
-
-      expect(response).to redirect_to(root_path)
-    end
-
-    it "allows access when canvas_career_learning_provider_app_enabled? returns true" do
-      allow(controller).to receive(:canvas_career_learning_provider_app_enabled?).and_return(true)
-
-      get :catch_all, params: { course_id: @course.id }
-
-      expect(response).not_to redirect_to(root_path)
-      expect(response).to be_successful
-    end
-  end
-
-  describe "#require_context" do
-    before do
-      user_session(@teacher)
-
-      allow(controller).to receive_messages(
-        canvas_career_learning_provider_app_enabled?: true,
-        canvas_career_learning_provider_app_launch_url: "https://example.com/app.js"
-      )
-    end
-
-    it "sets context from params when course_id is provided" do
-      get :catch_all, params: { course_id: @course.id }
-
-      expect(assigns(:context)).to eq(@course)
-    end
-
-    it "sets context from params when account_id is provided" do
-      account = Account.default
-      get :catch_all, params: { account_id: account.id }
-
-      expect(assigns(:context)).to eq(account)
-    end
-  end
-
-  describe "HorizonMode inclusion" do
-    it "includes the HorizonMode module" do
-      expect(CareerController.included_modules).to include(HorizonMode)
     end
   end
 end

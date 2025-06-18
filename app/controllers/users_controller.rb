@@ -195,6 +195,7 @@ class UsersController < ApplicationController
   include DashboardHelper
   include Api::V1::Submission
   include ObserverEnrollmentsHelper
+  include HorizonMode
 
   before_action :require_user, only: %i[grades
                                         merge
@@ -230,6 +231,7 @@ class UsersController < ApplicationController
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
   before_action :check_limited_access_for_students, only: %i[create_file set_custom_color]
+  before_action :load_canvas_career, only: %i[user_dashboard]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?

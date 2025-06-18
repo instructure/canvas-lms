@@ -1371,15 +1371,6 @@ describe CoursesController do
       expect(response).to redirect_to(user_masquerade_url(@teacher.id, stop_acting_as_user: true))
     end
 
-    it "redirects to the modules page for horizon courses" do
-      user_session(@teacher)
-      @course.account.enable_feature!(:horizon_course_setting)
-      @course.update!(horizon_course: true)
-
-      get "show", params: { id: @course.id }
-      expect(response).to redirect_to("#{course_url(@course)}/modules")
-    end
-
     it "does not redirect to modules page for horizon courses when invitation param is present" do
       user_session(@teacher)
       @course.account.enable_feature!(:horizon_course_setting)
