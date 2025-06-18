@@ -547,8 +547,8 @@ function DiscussionTopicForm({
       published: shouldPublish,
       isAnnouncement,
       fileId: attachment?._id,
-      delayedPostAt: availableFrom,
-      lockAt: availableUntil,
+      delayedPostAt: isCheckpoints ? null : availableFrom,
+      lockAt: isCheckpoints ? null : availableUntil,
       // Conditional payload properties
       assignment: prepareAssignmentPayload(
         abGuid,
@@ -606,7 +606,7 @@ function DiscussionTopicForm({
           masteryPathsOption,
         ),
       )
-    } else if (isGraded && !isGroupDiscussion && ENV.context_type !== 'Group') {
+    } else if (isGraded && !isGroupDiscussion && ENV.context_type !== 'Group' && !isCheckpoints) {
       // Well, its fairly lame to call prepUngraded inside if isGraded, but availableUntil/From is ignored by selective release, so we need to fetch it somehow.
       const {delayedPostAt, lockAt} = prepareUngradedDiscussionOverridesPayload(
         assignedInfoList,
