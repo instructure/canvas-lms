@@ -3963,7 +3963,6 @@ describe DiscussionTopic do
 
   describe "sort_order and expand" do
     before(:once) do
-      Account.site_admin.enable_feature! :discussion_default_sort
       @topic = @course.discussion_topics.create!(sort_order: "asc")
     end
 
@@ -3989,15 +3988,6 @@ describe DiscussionTopic do
         @topic.sort_order = DiscussionTopic::SortOrder::DESC
         @topic.save!
         expect(@topic.sort_order_for_user(@student)).to eq DiscussionTopic::SortOrder::DESC
-      end
-    end
-
-    context "when no feature flag is enabled" do
-      it "does not consider the sort_order_locked flag" do
-        Account.site_admin.disable_feature! :discussion_default_sort
-        @topic.update!(sort_order_locked: true, sort_order: "asc")
-        @topic.update_or_create_participant(current_user: @student, sort_order: "desc")
-        expect(@topic.sort_order_for_user(@student)).to eq "desc"
       end
     end
 

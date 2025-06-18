@@ -162,20 +162,6 @@ disallow_threaded_replies_fix_alert:
   description: |-
     This feature flag controls the visibility of the alert that allows teachers to fix threaded replies on the Discussions Index page.
 
-discussion_default_sort:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: discussion default sort
-  description: |-
-    Allow discussion's default sorting setting
-
-discussion_default_expand:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: discussion default expand
-  description: |-
-    Allow discussion's default expand setting
-
 discussion_permalink:
   state: hidden
   applies_to: SiteAdmin

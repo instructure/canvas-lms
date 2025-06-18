@@ -2225,7 +2225,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def sort_order_for_user(current_user = nil)
-    return sanitized_sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort) && sort_order_locked
+    return sanitized_sort_order if sort_order_locked
 
     current_user ||= self.current_user
     participant_sort_order = participant(current_user)&.sort_order
@@ -2234,7 +2234,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def expanded_for_user(current_user = nil)
-    return expanded if Account.site_admin.feature_enabled?(:discussion_default_expand) && expanded_locked
+    return expanded if expanded_locked
 
     current_user ||= self.current_user
     participant_expanded = participant(current_user)&.expanded

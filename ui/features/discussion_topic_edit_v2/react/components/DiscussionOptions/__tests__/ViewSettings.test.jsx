@@ -38,8 +38,6 @@ const defaultProps = {
 
 const setup = (props = {}, env = {}) => {
   window.ENV = {
-    DISCUSSION_DEFAULT_EXPAND_ENABLED: true,
-    DISCUSSION_DEFAULT_SORT_ENABLED: true,
     ...env,
   }
 
@@ -55,13 +53,6 @@ describe('ViewSettings', () => {
   it('renders thread folding settings, if enabled in ENV', () => {
     const {queryByTestId} = setup(defaultProps)
     expect(queryByTestId('view-default-thread-state')).toBeInTheDocument()
-  })
-
-  it('does not render thread folding settings, if disabled in ENV', () => {
-    const {queryByTestId} = setup(defaultProps, {
-      DISCUSSION_DEFAULT_EXPAND_ENABLED: false,
-    })
-    expect(queryByTestId('view-default-thread-state')).not.toBeInTheDocument()
   })
 
   it('disables thread folding lock setting, if the thread folding is set to collapsed', () => {
@@ -108,12 +99,5 @@ describe('ViewSettings', () => {
       'data-action-state',
       'unlockSortOrder',
     )
-  })
-
-  it('does not render sort order settings, if disabled in ENV', () => {
-    const {queryByTestId} = setup(defaultProps, {
-      DISCUSSION_DEFAULT_SORT_ENABLED: false,
-    })
-    expect(queryByTestId('view-default-sort-order')).not.toBeInTheDocument()
   })
 })

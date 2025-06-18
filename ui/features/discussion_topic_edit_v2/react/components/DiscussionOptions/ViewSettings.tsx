@@ -64,119 +64,115 @@ export const ViewSettings = ({
       <Text size="large" as="h2">
         {I18n.t('View')}
       </Text>
-      {ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED && (
-        <View display="block" margin="small 0 medium">
-          <RadioInputGroup
-            name="expanded"
-            description={
-              <>
-                <View display="inline-block">
-                  <Heading level="h4">{I18n.t('Default Thread State')}</Heading>
-                </View>
-                <Tooltip renderTip={infoToolTipExpand} on={['hover', 'focus']} color="primary">
-                  <IconButton
-                    renderIcon={IconInfoLine}
-                    withBackground={false}
-                    withBorder={false}
-                    color="primary"
-                    size="small"
-                    cursor="default"
-                    screenReaderLabel={infoToolTipExpand}
-                  />
-                </Tooltip>
-              </>
+      <View display="block" margin="small 0 medium">
+        <RadioInputGroup
+          name="expanded"
+          description={
+            <>
+              <View display="inline-block">
+                <Heading level="h4">{I18n.t('Default Thread State')}</Heading>
+              </View>
+              <Tooltip renderTip={infoToolTipExpand} on={['hover', 'focus']} color="primary">
+                <IconButton
+                  renderIcon={IconInfoLine}
+                  withBackground={false}
+                  withBorder={false}
+                  color="primary"
+                  size="small"
+                  cursor="default"
+                  screenReaderLabel={infoToolTipExpand}
+                />
+              </Tooltip>
+            </>
+          }
+          value={expanded + ''}
+          onChange={(_event, value) => {
+            setExpanded(value === 'true')
+            if (value !== 'true') {
+              setExpandedLocked(false)
             }
-            value={expanded + ''}
-            onChange={(_event, value) => {
-              setExpanded(value === 'true')
-              if (value !== 'true') {
-                setExpandedLocked(false)
+          }}
+          data-testid="view-default-thread-state"
+        >
+          <RadioInput
+            key="expanded"
+            value="true"
+            label={I18n.t('Expanded')}
+            data-testid="view-default-thread-state-expanded"
+          />
+          <RadioInput
+            key="collapsed"
+            value="false"
+            label={I18n.t('Collapsed')}
+            data-testid="view-default-thread-state-collapsed"
+          />
+        </RadioInputGroup>
+        <FormFieldGroup description="" rowSpacing="small">
+          <View display="block" margin="small 0 0 0">
+            <Checkbox
+              label={I18n.t('Lock thread state for students')}
+              value="expandedLocked"
+              inline={true}
+              checked={expandedLocked}
+              onChange={() => {
+                setExpandedLocked(!expandedLocked)
+              }}
+              disabled={!expanded}
+              data-testid="view-expanded-locked"
+              data-action-state={expandedLocked ? 'unlockExpandedState' : 'lockExpandedState'}
+            />
+          </View>
+        </FormFieldGroup>
+      </View>
+      <View display="block" margin="medium 0">
+        <RadioInputGroup
+          name="sortOrder"
+          description={
+            <>
+              <View display="inline-block">
+                <Heading level="h4">{I18n.t('Default Sort Order')}</Heading>
+              </View>
+              <Tooltip renderTip={infoToolTipSortOrder} on={['hover', 'focus']} color="primary">
+                <IconButton
+                  renderIcon={IconInfoLine}
+                  withBackground={false}
+                  withBorder={false}
+                  color="primary"
+                  size="small"
+                  cursor="default"
+                  screenReaderLabel={infoToolTipSortOrder}
+                />
+              </Tooltip>
+            </>
+          }
+          value={sortOrder}
+          onChange={(_event, value) => {
+            setSortOrder(value)
+          }}
+          data-testid="view-default-sort-order"
+        >
+          <RadioInput key="asc" value="asc" label={I18n.t('Oldest First')} />
+          <RadioInput key="desc" value="desc" label={I18n.t('Newest First')} />
+        </RadioInputGroup>
+        <FormFieldGroup description="" rowSpacing="small">
+          <View display="block" margin="small 0 0 0">
+            <Checkbox
+              label={I18n.t('Lock sort order for students')}
+              value="sortOrderLocked"
+              inline={true}
+              checked={sortOrderLocked}
+              onChange={() => {
+                setSortOrderLocked(!sortOrderLocked)
+              }}
+              disabled={
+                false // Could be disabled, if the Discussion Topic author is Student
               }
-            }}
-            data-testid="view-default-thread-state"
-          >
-            <RadioInput
-              key="expanded"
-              value="true"
-              label={I18n.t('Expanded')}
-              data-testid="view-default-thread-state-expanded"
+              data-testid="view-sort-order-locked"
+              data-action-state={sortOrderLocked ? 'unlockSortOrder' : 'lockSortOrder'}
             />
-            <RadioInput
-              key="collapsed"
-              value="false"
-              label={I18n.t('Collapsed')}
-              data-testid="view-default-thread-state-collapsed"
-            />
-          </RadioInputGroup>
-          <FormFieldGroup description="" rowSpacing="small">
-            <View display="block" margin="small 0 0 0">
-              <Checkbox
-                label={I18n.t('Lock thread state for students')}
-                value="expandedLocked"
-                inline={true}
-                checked={expandedLocked}
-                onChange={() => {
-                  setExpandedLocked(!expandedLocked)
-                }}
-                disabled={!expanded}
-                data-testid="view-expanded-locked"
-                data-action-state={expandedLocked ? 'unlockExpandedState' : 'lockExpandedState'}
-              />
-            </View>
-          </FormFieldGroup>
-        </View>
-      )}
-      {ENV.DISCUSSION_DEFAULT_SORT_ENABLED && (
-        <View display="block" margin="medium 0">
-          <RadioInputGroup
-            name="sortOrder"
-            description={
-              <>
-                <View display="inline-block">
-                  <Heading level="h4">{I18n.t('Default Sort Order')}</Heading>
-                </View>
-                <Tooltip renderTip={infoToolTipSortOrder} on={['hover', 'focus']} color="primary">
-                  <IconButton
-                    renderIcon={IconInfoLine}
-                    withBackground={false}
-                    withBorder={false}
-                    color="primary"
-                    size="small"
-                    cursor="default"
-                    screenReaderLabel={infoToolTipSortOrder}
-                  />
-                </Tooltip>
-              </>
-            }
-            value={sortOrder}
-            onChange={(_event, value) => {
-              setSortOrder(value)
-            }}
-            data-testid="view-default-sort-order"
-          >
-            <RadioInput key="asc" value="asc" label={I18n.t('Oldest First')} />
-            <RadioInput key="desc" value="desc" label={I18n.t('Newest First')} />
-          </RadioInputGroup>
-          <FormFieldGroup description="" rowSpacing="small">
-            <View display="block" margin="small 0 0 0">
-              <Checkbox
-                label={I18n.t('Lock sort order for students')}
-                value="sortOrderLocked"
-                inline={true}
-                checked={sortOrderLocked}
-                onChange={() => {
-                  setSortOrderLocked(!sortOrderLocked)
-                }}
-                disabled={
-                  false // Could be disabled, if the Discussion Topic author is Student
-                }
-                data-testid="view-sort-order-locked"
-                data-action-state={sortOrderLocked ? 'unlockSortOrder' : 'lockSortOrder'}
-              />
-            </View>
-          </FormFieldGroup>
-        </View>
-      )}
+          </View>
+        </FormFieldGroup>
+      </View>
     </View>
   )
 }

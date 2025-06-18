@@ -239,34 +239,6 @@ describe('DiscussionPostToolbar', () => {
     })
   })
 
-  describe('Sort control', () => {
-    it('should show up arrow when ascending', () => {
-      const {getByTestId} = setup({
-        sortDirection: 'asc',
-      })
-      const upArrow = getByTestId('UpArrow')
-      expect(upArrow).toBeTruthy()
-    })
-
-    it('should show down arrow when descending', () => {
-      const {getByTestId} = setup({
-        sortDirection: 'desc',
-      })
-      const downArrow = getByTestId('DownArrow')
-      expect(downArrow).toBeTruthy()
-    })
-
-    it('should call onClick when clicked', () => {
-      const onSortClickMock = jest.fn()
-      const {getByTestId} = setup({
-        onSortClick: onSortClickMock,
-      })
-      const button = getByTestId('sortButton')
-      button.click()
-      expect(onSortClickMock.mock.calls).toHaveLength(1)
-    })
-  })
-
   describe('Groups Menu Button', () => {
     it('should not render when the child topics is undefined', () => {
       const container = setup({

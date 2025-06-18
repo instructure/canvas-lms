@@ -161,43 +161,13 @@ export const DiscussionPostToolbar = props => {
   }
 
   const renderSort = width => {
-    if (props.discDefaultSortEnabled) {
-      return (
-        <SortOrderDropDown
-          isLocked={props.isSortOrderLocked}
-          selectedSortType={props.sortDirection}
-          onSortClick={props.onSortClick}
-          width={width}
-        />
-      )
-    }
     return (
-      <Tooltip
-        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
-        width="78px"
-        data-testid="sortButtonTooltip"
-      >
-        <span className="discussions-sort-button">
-          <Button
-            onClick={props.onSortClick}
-            renderIcon={
-              props.sortDirection === 'desc' ? (
-                <IconArrowDownLine data-testid="DownArrow" />
-              ) : (
-                <IconArrowUpLine data-testid="UpArrow" />
-              )
-            }
-            data-testid="sortButton"
-          >
-            {I18n.t('Sort')}
-            <ScreenReaderContent>
-              {props.sortDirection === 'asc'
-                ? I18n.t('Sorted by Ascending')
-                : I18n.t('Sorted by Descending')}
-            </ScreenReaderContent>
-          </Button>
-        </span>
-      </Tooltip>
+      <SortOrderDropDown
+        isLocked={props.isSortOrderLocked}
+        selectedSortType={props.sortDirection}
+        onSortClick={props.onSortClick}
+        width={width}
+      />
     )
   }
 
@@ -239,8 +209,8 @@ export const DiscussionPostToolbar = props => {
             filter: {
               shouldGrow: true,
               shouldShrink: true,
-              width: window.ENV?.FEATURES?.discussion_default_sort ? '100%' : null,
-              margin: window.ENV?.FEATURES?.discussion_default_sort ? null : '0 xx-small 0 0',
+              width: '100%',
+              margin: null,
             },
             viewSplitScreen: {
               shouldGrow: true,
@@ -262,7 +232,7 @@ export const DiscussionPostToolbar = props => {
             search: {
               shouldGrow: true,
               shouldShrink: true,
-              width: window.ENV?.FEATURES?.discussion_default_sort ? '100%' : null,
+              width: '100%',
             },
             filter: {
               shouldGrow: false,
@@ -285,83 +255,8 @@ export const DiscussionPostToolbar = props => {
         render={(responsiveProps, matches) => (
           <View maxWidth="56.875em">
             <Flex width="100%" direction={responsiveProps.direction} wrap="wrap">
-              {!window.ENV?.FEATURES?.discussion_default_sort && (
-                <Flex.Item
-                  margin={responsiveProps?.dividingMargin}
-                  shouldShrink={responsiveProps.shouldShrink}
-                >
-                  <Flex>
-                    {/* Search */}
-                    {!hideStudentNames && (
-                      <Flex.Item
-                        shouldGrow={responsiveProps?.search?.shouldGrow}
-                        shouldShrink={responsiveProps?.search?.shouldShrink}
-                        padding={responsiveProps.padding}
-                      >
-                        <span className="discussions-search-filter">
-                          <TextInput
-                            data-testid="search-filter"
-                            onChange={event => {
-                              props.onSearchChange(event.target.value)
-                            }}
-                            renderLabel={
-                              <ScreenReaderContent>{searchElementText}</ScreenReaderContent>
-                            }
-                            value={props.searchTerm}
-                            renderBeforeInput={<IconSearchLine display="block" />}
-                            renderAfterInput={clearButton}
-                            placeholder={searchElementText}
-                            shouldNotWrap={true}
-                            width={responsiveProps?.search?.width}
-                          />
-                        </span>
-                      </Flex.Item>
-                    )}
-                  </Flex>
-                </Flex.Item>
-              )}
               <Flex.Item shouldGrow={true}>
                 <Flex wrap="wrap">
-                  {!window.ENV?.FEATURES?.discussion_default_sort && (
-                    <>
-                      {/* Filter */}
-                      <Flex.Item
-                        margin={responsiveProps?.filter?.margin}
-                        padding={responsiveProps.padding}
-                        shouldGrow={responsiveProps?.filter?.shouldGrow}
-                        shouldShrink={false}
-                      >
-                        <span data-testid="toggle-filter-menu">
-                          <SimpleSelect
-                            renderLabel={
-                              <ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>
-                            }
-                            defaultValue={props.selectedView}
-                            onChange={props.onViewFilter}
-                            width={responsiveProps?.filter?.width}
-                          >
-                            <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                              {Object.entries(getMenuConfig(props)).map(
-                                ([viewOption, viewOptionLabel]) => (
-                                  <SimpleSelect.Option
-                                    id={viewOption}
-                                    key={viewOption}
-                                    value={viewOption}
-                                  >
-                                    {viewOptionLabel.call()}
-                                  </SimpleSelect.Option>
-                                ),
-                              )}
-                            </SimpleSelect.Group>
-                          </SimpleSelect>
-                        </span>
-                      </Flex.Item>
-                      {/* Sort */}
-                      <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
-                        {renderSort()}
-                      </Flex.Item>
-                    </>
-                  )}
                   {!isSpeedGraderInTopUrl && (
                     <Flex.Item
                       margin={responsiveProps?.viewSplitScreen?.margin}
@@ -380,15 +275,9 @@ export const DiscussionPostToolbar = props => {
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       <ExpandCollapseThreadsButton
                         showText={!matches.includes('mobile')}
-                        isExpanded={
-                          props.isExpanded ||
-                          (props.discDefaultExpandEnabled && props.isExpandedLocked)
-                        }
+                        isExpanded={props.isExpanded || props.isExpandedLocked}
                         onCollapseRepliesToggle={props.onCollapseRepliesToggle}
-                        disabled={
-                          props.userSplitScreenPreference ||
-                          (props.discDefaultExpandEnabled && props.isExpandedLocked)
-                        }
+                        disabled={props.userSplitScreenPreference || props.isExpandedLocked}
                         expandedLocked={props.isExpandedLocked}
                       />
                     </Flex.Item>
@@ -447,90 +336,88 @@ export const DiscussionPostToolbar = props => {
                   )}
                 </Flex>
               </Flex.Item>
-              {window.ENV?.FEATURES?.discussion_default_sort && (
-                <Flex.Item
-                  margin={responsiveProps?.dividingMargin}
-                  shouldShrink={responsiveProps.shouldShrink}
+              <Flex.Item
+                margin={responsiveProps?.dividingMargin}
+                shouldShrink={responsiveProps.shouldShrink}
+                width="100%"
+              >
+                <Flex
+                  wrap="wrap"
                   width="100%"
+                  direction={responsiveProps?.direction}
+                  height="100%"
+                  padding="xx-small 0 0 0"
                 >
-                  <Flex
-                    wrap="wrap"
-                    width="100%"
-                    direction={responsiveProps?.direction}
-                    height="100%"
-                    padding="xx-small 0 0 0"
+                  {/* Filter */}
+                  <Flex.Item
+                    margin={responsiveProps?.filter?.margin}
+                    padding={responsiveProps.padding}
+                    shouldGrow={responsiveProps?.filter?.shouldGrow}
+                    shouldShrink={false}
                   >
-                    {/* Filter */}
+                    <span data-testid="toggle-filter-menu">
+                      <SimpleSelect
+                        id="viewSelect"
+                        renderLabel={
+                          <ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>
+                        }
+                        defaultValue={props.selectedView}
+                        onChange={props.onViewFilter}
+                        width={responsiveProps?.filter?.width}
+                      >
+                        <SimpleSelect.Group renderLabel={I18n.t('View')}>
+                          {Object.entries(getMenuConfig(props)).map(
+                            ([viewOption, viewOptionLabel]) => (
+                              <SimpleSelect.Option
+                                id={viewOption}
+                                key={viewOption}
+                                value={viewOption}
+                              >
+                                {viewOptionLabel.call()}
+                              </SimpleSelect.Option>
+                            ),
+                          )}
+                        </SimpleSelect.Group>
+                      </SimpleSelect>
+                    </span>
+                  </Flex.Item>
+                  {/* Search */}
+                  {!hideStudentNames && (
                     <Flex.Item
-                      margin={responsiveProps?.filter?.margin}
+                      shouldGrow={responsiveProps?.search?.shouldGrow}
+                      shouldShrink={responsiveProps?.search?.shouldShrink}
                       padding={responsiveProps.padding}
-                      shouldGrow={responsiveProps?.filter?.shouldGrow}
-                      shouldShrink={false}
                     >
-                      <span data-testid="toggle-filter-menu">
-                        <SimpleSelect
-                          id="viewSelect"
+                      <span className="discussions-search-filter">
+                        <TextInput
+                          data-testid="search-filter"
+                          onChange={event => {
+                            props.onSearchChange(event.target.value)
+                          }}
                           renderLabel={
-                            <ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>
+                            <ScreenReaderContent>{searchElementText}</ScreenReaderContent>
                           }
-                          defaultValue={props.selectedView}
-                          onChange={props.onViewFilter}
-                          width={responsiveProps?.filter?.width}
-                        >
-                          <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                            {Object.entries(getMenuConfig(props)).map(
-                              ([viewOption, viewOptionLabel]) => (
-                                <SimpleSelect.Option
-                                  id={viewOption}
-                                  key={viewOption}
-                                  value={viewOption}
-                                >
-                                  {viewOptionLabel.call()}
-                                </SimpleSelect.Option>
-                              ),
-                            )}
-                          </SimpleSelect.Group>
-                        </SimpleSelect>
+                          value={props.searchTerm}
+                          renderBeforeInput={<IconSearchLine display="block" />}
+                          renderAfterInput={clearButton}
+                          placeholder={searchElementText}
+                          shouldNotWrap={true}
+                          width="100%"
+                        />
                       </span>
                     </Flex.Item>
-                    {/* Search */}
-                    {!hideStudentNames && (
-                      <Flex.Item
-                        shouldGrow={responsiveProps?.search?.shouldGrow}
-                        shouldShrink={responsiveProps?.search?.shouldShrink}
-                        padding={responsiveProps.padding}
-                      >
-                        <span className="discussions-search-filter">
-                          <TextInput
-                            data-testid="search-filter"
-                            onChange={event => {
-                              props.onSearchChange(event.target.value)
-                            }}
-                            renderLabel={
-                              <ScreenReaderContent>{searchElementText}</ScreenReaderContent>
-                            }
-                            value={props.searchTerm}
-                            renderBeforeInput={<IconSearchLine display="block" />}
-                            renderAfterInput={clearButton}
-                            placeholder={searchElementText}
-                            shouldNotWrap={true}
-                            width="100%"
-                          />
-                        </span>
-                      </Flex.Item>
-                    )}
-                    {/* Sort */}
-                    <Flex.Item
-                      margin={responsiveProps?.sortOrder?.margin}
-                      padding={responsiveProps.padding}
-                      shouldGrow={responsiveProps?.sortOrder?.shouldGrow}
-                      shouldShrink={responsiveProps?.sortOrder?.shouldShrink}
-                    >
-                      {renderSort(responsiveProps?.sortOrder?.width)}
-                    </Flex.Item>
-                  </Flex>
-                </Flex.Item>
-              )}
+                  )}
+                  {/* Sort */}
+                  <Flex.Item
+                    margin={responsiveProps?.sortOrder?.margin}
+                    padding={responsiveProps.padding}
+                    shouldGrow={responsiveProps?.sortOrder?.shouldGrow}
+                    shouldShrink={responsiveProps?.sortOrder?.shouldShrink}
+                  >
+                    {renderSort(responsiveProps?.sortOrder?.width)}
+                  </Flex.Item>
+                </Flex>
+              </Flex.Item>
             </Flex>
             {showAssignToTray && (
               <ItemAssignToManager
@@ -586,6 +473,4 @@ DiscussionPostToolbar.propTypes = {
   showAssignTo: PropTypes.bool,
   isSortOrderLocked: PropTypes.bool,
   isExpandedLocked: PropTypes.bool,
-  discDefaultSortEnabled: PropTypes.bool,
-  discDefaultExpandEnabled: PropTypes.bool,
 }

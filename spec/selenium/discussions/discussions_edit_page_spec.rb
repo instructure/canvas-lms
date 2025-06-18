@@ -205,7 +205,7 @@ describe "discussions" do
         f("[data-testid='attachment-input']").send_keys(fullpath)
 
         # we can change anonymity on edit, if there is no reply
-        expect(ffj("fieldset:contains('Anonymous Discussion') input[type=radio]").count).to eq 3
+        expect(ffj("fieldset:contains('Anonymous Discussion') input[type=radio]").count).to eq 7
 
         force_click_native("input[value='must-respond-before-viewing-replies']")
 

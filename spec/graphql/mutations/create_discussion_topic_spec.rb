@@ -1694,29 +1694,5 @@ describe Mutations::CreateDiscussionTopic do
       result = result.dig("data", "createDiscussionTopic")
       expect(result["errors"][0]["message"]).to match(/Cannot set default thread state locked, when threads are collapsed/)
     end
-
-    it "sort order is not necessary when discussion_default_sort ff is off" do
-      Account.site_admin.disable_feature!(:discussion_default_sort)
-
-      context_type = "Course"
-      title = "Test Title"
-      message = "A message"
-      published = false
-      require_initial_post = true
-
-      query = <<~GQL
-        contextId: "#{@course.id}"
-        contextType: #{context_type}
-        title: "#{title}"
-        message: "#{message}"
-        published: #{published}
-        requireInitialPost: #{require_initial_post}
-      GQL
-
-      result = execute_with_input(query)
-      result = result.dig("data", "createDiscussionTopic")
-      expect(result["errors"]).to be_nil
-      expect(result["discussionTopic"]["sortOrder"]).to eq DiscussionTopic::SortOrder::DESC
-    end
   end
 end

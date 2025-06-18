@@ -197,10 +197,10 @@ module Api::V1::DiscussionTopics
     # topic can be announcement
     json[:is_announcement] = topic.is_announcement
 
-    json[:sort_order] = topic.sanitized_sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort)
-    json[:sort_order_locked] = topic.sort_order_locked if Account.site_admin.feature_enabled?(:discussion_default_sort)
-    json[:expanded] = topic.expanded if Account.site_admin.feature_enabled?(:discussion_default_expand)
-    json[:expanded_locked] = topic.expanded_locked if Account.site_admin.feature_enabled?(:discussion_default_expand)
+    json[:sort_order] = topic.sanitized_sort_order
+    json[:sort_order_locked] = topic.sort_order_locked
+    json[:expanded] = topic.expanded
+    json[:expanded_locked] = topic.expanded_locked
 
     json
   end
