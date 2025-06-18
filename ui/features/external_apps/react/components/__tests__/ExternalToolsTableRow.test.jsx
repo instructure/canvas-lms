@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {act, render, fireEvent, waitFor} from '@testing-library/react'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../../lib/ExternalAppsStore'
 import ExternalToolsTableRow from '../ExternalToolsTableRow'
 import fakeENV from '@canvas/test-utils/fakeENV'
@@ -68,12 +69,16 @@ const tools = [
   },
 ]
 
-const ajax = $.ajax
+const server = setupServer()
+
+beforeAll(() => server.listen())
+
 beforeEach(() => {
   fakeENV.setup({
     FEATURES: {
       top_navigation_placement: true,
     },
+    CONTEXT_BASE_URL: '/accounts/1',
   })
   store.setState({
     externalTools: tools,
@@ -82,15 +87,17 @@ beforeEach(() => {
     isLoading: false,
   })
   global.INST = {
-    editorButtons: []
+    editorButtons: [],
   }
 })
 
 afterEach(() => {
   fakeENV.teardown()
-  $.ajax = ajax
   delete global.INST
+  server.resetHandlers()
 })
+
+afterAll(() => server.close())
 
 function renderRow(props) {
   const table = document.createElement('table')
@@ -148,7 +155,7 @@ describe('ExternalToolsTableRow', () => {
         is_rce_favorite: false,
         is_top_nav_favorite: false,
         editor_button_settings: {enabled: true},
-        top_navigation_settings: {enabled: true}
+        top_navigation_settings: {enabled: true},
       }
       const {getByLabelText} = renderRow({tool, showLTIFavoriteToggles: true})
       expect(getByLabelText('RCE Favorite')).toBeInTheDocument()
@@ -196,11 +203,11 @@ describe('ExternalToolsTableRow', () => {
         is_rce_favorite: false,
         is_top_nav_favorite: false,
         editor_button_settings: {enabled: true},
-        top_navigation_settings: {enabled: true}
+        top_navigation_settings: {enabled: true},
       }
       global.INST.editorButtons = [
         {id: 'other_tool', on_by_default: true},
-        {id: 'another_tool', on_by_default: true}
+        {id: 'another_tool', on_by_default: true},
       ]
       const {getByLabelText} = renderRow({
         tool,
@@ -263,9 +270,14 @@ describe('ExternalToolsTableRow', () => {
     })
 
     it('updates the store on successfully updating canvas db', async () => {
-      $.ajax = opts => {
-        setTimeout(opts.success, 1)
-      }
+      server.use(
+        http.post('/api/v1/accounts/1/external_tools/rce_favorites/1', () => {
+          return HttpResponse.json({}, {status: 200})
+        }),
+        http.post('/api/v1/accounts/1/external_tools/top_nav_favorites/1', () => {
+          return HttpResponse.json({}, {status: 200})
+        }),
+      )
 
       const {getByLabelText} = renderRow({showLTIFavoriteToggles: true})
       expect(store.getState().externalTools[0].is_rce_favorite).toBe(false)
