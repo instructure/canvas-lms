@@ -483,9 +483,13 @@ class Folder < ActiveRecord::Base
   def self.unfiled_folder(context)
     return unless context.respond_to?(:folders)
 
-    folder = context.folders.where(parent_folder_id: Folder.root_folders(context).first, workflow_state: "visible", name: "unfiled").first
+    parent_folder = Folder.root_folders(context).first
+    folder = context.folders
+                    .where(parent_folder_id: parent_folder, workflow_state: "visible")
+                    .where(%q{name SIMILAR TO 'unfiled(\s\d+)?'})
+                    .first
     unless folder
-      folder = context.folders.build(parent_folder: Folder.root_folders(context).first, name: "unfiled")
+      folder = context.folders.build(parent_folder:, name: "unfiled")
       folder.workflow_state = "visible"
       folder.save!
     end
