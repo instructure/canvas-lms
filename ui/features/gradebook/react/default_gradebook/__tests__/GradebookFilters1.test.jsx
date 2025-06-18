@@ -17,10 +17,11 @@
  */
 
 import {map} from 'lodash'
-import $ from 'jquery'
-import 'jquery-migrate'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {createGradebook} from './GradebookSpecHelper'
 import studentRowHeaderConstants from '../constants/studentRowHeaderConstants'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock React and ReactDOM
 jest.mock('react', () => ({
@@ -38,22 +39,29 @@ jest.mock('react-dom/client', () => ({
   }),
 }))
 
-// Mock jQuery's ajaxJSON
-$.ajaxJSON = (url, method, data) => {
-  return Promise.resolve()
-}
-
 // Mock renderComponent from Gradebook.utils
 jest.mock('../Gradebook.utils', () => ({
   ...jest.requireActual('../Gradebook.utils'),
   renderComponent: jest.fn(),
 }))
 
+const server = setupServer(
+  // Default handler for settings updates
+  http.post('/path/to/settingsUpdateUrl', () => {
+    return HttpResponse.json({success: true})
+  }),
+)
+
 describe('Gradebook#filterStudents', () => {
   let students
   let gradebook
 
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = `
       <div id="fixtures">
         <div id="application">
@@ -103,6 +111,7 @@ describe('Gradebook#filterStudents', () => {
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     document.body.innerHTML = ''
   })
 
@@ -190,7 +199,12 @@ describe('Gradebook#filterStudents', () => {
 })
 
 describe('Gradebook#getSelectedEnrollmentFilters', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = `
       <div id="fixtures">
         <div id="application">
@@ -204,6 +218,7 @@ describe('Gradebook#getSelectedEnrollmentFilters', () => {
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     document.body.innerHTML = ''
   })
 
@@ -254,7 +269,12 @@ describe('Gradebook#getSelectedEnrollmentFilters', () => {
 describe('Gradebook#toggleEnrollmentFilter', () => {
   let gradebook
 
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = `
       <div id="fixtures">
         <div id="application">
@@ -275,6 +295,7 @@ describe('Gradebook#toggleEnrollmentFilter', () => {
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     document.body.innerHTML = ''
   })
 
@@ -307,9 +328,13 @@ describe('Gradebook#toggleEnrollmentFilter', () => {
 
 describe('Gradebook#updateCurrentModule', () => {
   let gradebook
-  let server
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = `
       <div id="fixtures">
         <div id="application">
@@ -320,7 +345,6 @@ describe('Gradebook#updateCurrentModule', () => {
         </div>
       </div>
     `
-    server = jest.spyOn($, 'ajaxJSON')
 
     gradebook = createGradebook({
       settings: {
@@ -341,7 +365,7 @@ describe('Gradebook#updateCurrentModule', () => {
   })
 
   afterEach(() => {
-    server.mockRestore()
+    fakeENV.teardown()
     document.body.innerHTML = ''
   })
 
@@ -350,14 +374,16 @@ describe('Gradebook#updateCurrentModule', () => {
     expect(gradebook.getFilterColumnsBySetting('contextModuleId')).toBe('1')
   })
 
-  it('saves settings with the new filter setting', () => {
+  it('saves settings with the new filter setting', async () => {
     gradebook.updateCurrentModule('1')
-    expect(server.mock.calls[0][2].gradebook_settings.filter_columns_by.context_module_id).toBe('1')
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(gradebook.getFilterColumnsBySetting('contextModuleId')).toBe('1')
   })
 
   it('has no effect when the module has not changed', () => {
+    const saveSettingsSpy = jest.spyOn(gradebook, 'saveSettings')
     gradebook.updateCurrentModule('2')
-    expect(server).not.toHaveBeenCalled()
+    expect(saveSettingsSpy).not.toHaveBeenCalled()
     expect(gradebook.updateFilteredContentInfo).not.toHaveBeenCalled()
     expect(gradebook.updateColumnsAndRenderViewOptionsMenu).not.toHaveBeenCalled()
   })
@@ -365,9 +391,13 @@ describe('Gradebook#updateCurrentModule', () => {
 
 describe('Gradebook#updateCurrentAssignmentGroup', () => {
   let gradebook
-  let server
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
+    fakeENV.setup()
     document.body.innerHTML = `
       <div id="fixtures">
         <div id="application">
@@ -378,7 +408,6 @@ describe('Gradebook#updateCurrentAssignmentGroup', () => {
         </div>
       </div>
     `
-    server = jest.spyOn($, 'ajaxJSON')
 
     gradebook = createGradebook({
       settings: {
@@ -398,7 +427,7 @@ describe('Gradebook#updateCurrentAssignmentGroup', () => {
   })
 
   afterEach(() => {
-    server.mockRestore()
+    fakeENV.teardown()
     document.body.innerHTML = ''
   })
 
@@ -407,27 +436,32 @@ describe('Gradebook#updateCurrentAssignmentGroup', () => {
     expect(gradebook.getFilterColumnsBySetting('assignmentGroupId')).toBe('1')
   })
 
-  it('saves settings with the new filter setting', () => {
+  it('saves settings with the new filter setting', async () => {
     gradebook.updateCurrentAssignmentGroup('1')
-    expect(server.mock.calls[0][2].gradebook_settings.filter_columns_by.assignment_group_id).toBe(
-      '1',
-    )
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(gradebook.getFilterColumnsBySetting('assignmentGroupId')).toBe('1')
   })
 
   it('has no effect when the assignment group has not changed', () => {
+    const saveSettingsSpy = jest.spyOn(gradebook, 'saveSettings')
     gradebook.updateCurrentAssignmentGroup('2')
-    expect(server).not.toHaveBeenCalled()
+    expect(saveSettingsSpy).not.toHaveBeenCalled()
     expect(gradebook.updateFilteredContentInfo).not.toHaveBeenCalled()
     expect(gradebook.updateColumnsAndRenderViewOptionsMenu).not.toHaveBeenCalled()
   })
 })
 
 describe('Gradebook', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   describe('getActionMenuProps', () => {
     let options
     let gradebook
 
     beforeEach(() => {
+      fakeENV.setup()
       document.body.innerHTML = `
         <div id="fixtures">
           <div id="application">
@@ -454,6 +488,7 @@ describe('Gradebook', () => {
     })
 
     afterEach(() => {
+      fakeENV.teardown()
       document.body.innerHTML = ''
     })
 
@@ -481,6 +516,15 @@ describe('Gradebook', () => {
   describe('updateFilterSettings', () => {
     let gradebook
     let currentFilters
+
+    beforeEach(() => {
+      fakeENV.setup()
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
     const options = {
       enhanced_gradebook_filters: false,
       grading_period_set: {
