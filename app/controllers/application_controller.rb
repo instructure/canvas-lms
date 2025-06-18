@@ -1765,6 +1765,7 @@ class ApplicationController < ActionController::Base
             pseudonym_session.non_explicit_session = true
             pseudonym_session.save!
             session[:used_remember_me_token] = true if token.used_remember_me_token
+            @session_token = token
           end
           if pseudonym && token.current_user_id
             target_user = User.find(token.current_user_id)
