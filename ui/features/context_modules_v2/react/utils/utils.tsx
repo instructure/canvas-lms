@@ -136,7 +136,8 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
     prevProps.url === nextProps.url &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
-    prevProps.content === nextProps.content
+    prevProps.content === nextProps.content &&
+    prevProps.smallScreen === nextProps.smallScreen
   )
 }
 
