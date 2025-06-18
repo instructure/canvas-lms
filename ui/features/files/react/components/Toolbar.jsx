@@ -239,16 +239,18 @@ export default class Toolbar extends React.Component {
     if (canManage) {
       return (
         <div className="ef-actions">
-          {ENV.FEATURES?.files_a11y_rewrite_toggle && ENV.FEATURES?.files_a11y_rewrite && (
-            <button
-              type="button"
-              className="btn btn-switch-to-new-files-page"
-              aria-label={I18n.t('Switch to New Files Page')}
-              onClick={() => this.handleSwitchToNewFiles()}
-            >
-              <span className={phoneHiddenSet}>{I18n.t('Switch to New Files Page')}</span>
-            </button>
-          )}
+          {ENV.FEATURES?.files_a11y_rewrite_toggle &&
+            ENV.FEATURES?.files_a11y_rewrite &&
+            ENV.current_user_id && (
+              <button
+                type="button"
+                className="btn btn-switch-to-new-files-page"
+                aria-label={I18n.t('Switch to New Files Page')}
+                onClick={() => this.handleSwitchToNewFiles()}
+              >
+                <span className={phoneHiddenSet}>{I18n.t('Switch to New Files Page')}</span>
+              </button>
+            )}
           <button
             type="button"
             onClick={() => this.addFolder()}

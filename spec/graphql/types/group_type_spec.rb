@@ -42,6 +42,7 @@ describe Types::GroupType do
       .to eq @group.group_memberships.map(&:to_param)
     expect(group_type.resolve("membersCount")).to eq @group.members_count
     expect(group_type.resolve("nonCollaborative")).to eq @group.non_collaborative
+    expect(group_type.resolve("state")).to eq @group.workflow_state
   end
 
   it "requires read permission" do

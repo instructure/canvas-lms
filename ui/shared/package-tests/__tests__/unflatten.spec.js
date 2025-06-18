@@ -61,7 +61,7 @@ describe('unflatten', () => {
     }
 
     const safe_result = Object.create(null)
-    // eslint-disable-next-line no-proto
+
     safe_result.__proto__ = {admin: true}
 
     const user = {name: 'Dale'}

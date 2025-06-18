@@ -84,7 +84,11 @@ describe Lti::Messages::ReportReviewRequest do
   end
 
   it "includes custom params claim" do
-    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({})
+    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({
+                                                          "customkey" => "report_overrided",
+                                                          "raid2" => asset_processor.root_account_id.to_s,
+                                                          "raid" => asset_processor.root_account_id.to_s
+                                                        })
   end
 
   context "when asset_report is nil" do

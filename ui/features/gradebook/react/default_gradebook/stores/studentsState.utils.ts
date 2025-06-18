@@ -103,12 +103,12 @@ export function getSubmissionsForStudents(
   allEnqueued,
   dispatch: RequestDispatch,
 ) {
-  return new Promise((resolve, reject) => {
+  return new Promise<UserSubmissionGroup[]>((resolve, reject) => {
     const url = `/api/v1/courses/${courseId}/students/submissions`
     const params = {...submissionsParams, student_ids: studentIds, per_page: submissionsPerPage}
 
     dispatch
-      .getDepaginated<Student[]>(url, params, undefined, allEnqueued)
+      .getDepaginated<UserSubmissionGroup[]>(url, params, undefined, allEnqueued)
       .then(resolve)
       .catch(() => {
         flashSubmissionLoadError()
@@ -138,8 +138,7 @@ export function getContentForStudentIdChunk(
   const submissionRequests: Promise<void>[] = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
-    // @ts-expect-error
-    let submissions
+    let submissions: UserSubmissionGroup[] = []
 
     const submissionRequest = getSubmissionsForStudents(
       submissionsPerPage,
@@ -156,7 +155,6 @@ export function getContentForStudentIdChunk(
       .then(() => {
         // if the student request fails, this callback will not be called
         // the failure will be caught and otherwise ignored
-        // @ts-expect-error
         return gotSubmissionsChunk(submissions)
       })
       .catch(reportCatch)

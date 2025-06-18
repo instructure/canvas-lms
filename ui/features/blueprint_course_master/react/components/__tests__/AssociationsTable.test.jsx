@@ -19,7 +19,6 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import AssociationsTable from '../AssociationsTable'
 import FocusManager from '../../focusManager'
 import getSampleData from './getSampleData'
@@ -39,9 +38,9 @@ describe('AssociationsTable component', () => {
   })
 
   test('renders the AssociationsTable component', () => {
-    const tree = shallow(<AssociationsTable {...defaultProps()} />)
-    const node = tree.find('.bca-associations-table')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<AssociationsTable {...defaultProps()} />)
+    const node = container.querySelector('.bca-associations-table')
+    expect(node).toBeInTheDocument()
   })
 
   test('displays correct table data', () => {

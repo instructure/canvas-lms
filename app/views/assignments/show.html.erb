@@ -165,7 +165,7 @@
   <div id="assignment_external_tools"></div>
   <% end %>
 
-  <% description = @assignment.description.present? ? public_user_content(@assignment.description, location: (@assignment.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) : t("No additional details were added for this assignment.") %>
+  <% description = @assignment.description.present? ? user_content(@assignment.description, location: (@assignment.asset_string if @domain_root_account.feature_enabled?(:file_association_access))) : t("No additional details were added for this assignment.") %>
 
   <% if @assignment.annotated_document? %>
     <div class="accessibility_warning">

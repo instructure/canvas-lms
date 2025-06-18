@@ -19,7 +19,6 @@
 import GradebookApi from '../apis/GradebookApi'
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import AsyncComponents from '../AsyncComponents'
-import sinon from 'sinon'
 
 // Add fixtures div for Jest tests
 document.body.innerHTML = '<div id="fixtures"></div>'
@@ -28,57 +27,58 @@ const $fixtures = document.getElementById('fixtures')
 
 let oldEnv
 
+window.ENV.SETTINGS = {}
+
 describe('Gradebook#saveSettings', () => {
   let gradebook
 
   describe('when enhanced_gradebook_filters is enabled', () => {
     let errorFn
     let successFn
-    let saveUserSettingsStub
 
     beforeEach(() => {
       gradebook = createGradebook({
         enhanced_gradebook_filters: true,
       })
 
-      errorFn = sinon.stub()
-      successFn = sinon.stub()
+      errorFn = jest.fn()
+      successFn = jest.fn()
 
-      saveUserSettingsStub = sinon.stub(GradebookApi, 'saveUserSettings')
+      jest.spyOn(GradebookApi, 'saveUserSettings').mockImplementation(() => Promise.resolve({}))
 
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: true}}
     })
 
     afterEach(() => {
-      saveUserSettingsStub.restore()
+      jest.restoreAllMocks()
       window.ENV = oldEnv
     })
 
     test('calls the provided successFn if the request succeeds', async () => {
-      saveUserSettingsStub.resolves({})
+      GradebookApi.saveUserSettings.mockResolvedValue({})
       await gradebook.saveSettings({}).then(successFn).catch(errorFn)
-      expect(successFn.callCount).toBe(1)
-      expect(errorFn.notCalled).toBeTruthy()
+      expect(successFn).toHaveBeenCalledTimes(1)
+      expect(errorFn).not.toHaveBeenCalled()
     })
 
     test('calls the provided errorFn if the request fails', async () => {
-      saveUserSettingsStub.rejects(new Error(':('))
+      GradebookApi.saveUserSettings.mockRejectedValue(new Error(':('))
       await gradebook.saveSettings({}).then(successFn).catch(errorFn)
-      expect(errorFn.callCount).toBe(1)
-      expect(successFn.notCalled).toBeTruthy()
+      expect(errorFn).toHaveBeenCalledTimes(1)
+      expect(successFn).not.toHaveBeenCalled()
     })
 
     test('just returns if the request succeeds and no successFn is provided', async () => {
       // QUnit.expect(0) is not needed in Jest
-      saveUserSettingsStub.resolves({})
+      GradebookApi.saveUserSettings.mockResolvedValue({})
       await gradebook.saveSettings({})
       // No assertions needed
     })
 
     test('throws an error if the request fails and no errorFn is provided', async () => {
       // QUnit.expect(1) is not needed in Jest
-      saveUserSettingsStub.rejects(new Error('>:('))
+      GradebookApi.saveUserSettings.mockRejectedValue(new Error('>:('))
 
       await expect(gradebook.saveSettings({})).rejects.toThrow('>:(')
     })
@@ -89,29 +89,31 @@ describe('#renderGradebookSettingsModal', () => {
   let gradebook
 
   function gradebookSettingsModalProps() {
-    return AsyncComponents.renderGradebookSettingsModal.lastCall.args[0]
+    return AsyncComponents.renderGradebookSettingsModal.mock.calls[
+      AsyncComponents.renderGradebookSettingsModal.mock.calls.length - 1
+    ][0]
   }
 
   beforeEach(() => {
     setFixtureHtml($fixtures)
-    sinon.stub(AsyncComponents, 'renderGradebookSettingsModal')
+    jest.spyOn(AsyncComponents, 'renderGradebookSettingsModal').mockImplementation(() => {})
     oldEnv = window.ENV
     window.ENV = {FEATURES: {instui_nav: true}}
   })
 
   afterEach(() => {
-    if (gradebook) {
-      gradebook.destroy && gradebook.destroy()
+    if (gradebook && gradebook.destroy) {
+      gradebook.destroy()
     }
     $fixtures.innerHTML = ''
-    AsyncComponents.renderGradebookSettingsModal.restore()
+    jest.restoreAllMocks()
     window.ENV = oldEnv
   })
 
   test('renders the GradebookSettingsModal component', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-    expect(AsyncComponents.renderGradebookSettingsModal.callCount).toBe(1)
+    expect(AsyncComponents.renderGradebookSettingsModal).toHaveBeenCalledTimes(1)
   })
 
   test('sets the .courseFeatures prop to #courseFeatures from Gradebook', () => {
@@ -154,27 +156,27 @@ describe('#renderGradebookSettingsModal', () => {
     beforeEach(() => {
       gradebook = createGradebook()
       gradebook.renderGradebookSettingsModal()
-      sinon.stub(gradebook.courseSettings, 'handleUpdated')
+      jest.spyOn(gradebook.courseSettings, 'handleUpdated').mockImplementation(() => {})
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: true}}
     })
 
     afterEach(() => {
       window.ENV = oldEnv
-      gradebook.courseSettings.handleUpdated.restore()
+      jest.restoreAllMocks()
     })
 
     test('updates the course settings when called', () => {
       const settings = {allowFinalGradeOverride: true}
       gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
-      expect(gradebook.courseSettings.handleUpdated.callCount).toBe(1)
+      expect(gradebook.courseSettings.handleUpdated).toHaveBeenCalledTimes(1)
     })
 
     test('updates the course settings using the given course settings data', () => {
       const settings = {allowFinalGradeOverride: true}
       gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
-      const [givenSettings] = gradebook.courseSettings.handleUpdated.lastCall.args
-      expect(givenSettings).toBe(settings)
+      expect(gradebook.courseSettings.handleUpdated).toHaveBeenCalledTimes(1)
+      expect(gradebook.courseSettings.handleUpdated.mock.calls[0][0]).toBe(settings)
     })
   })
 
@@ -212,6 +214,7 @@ describe('#renderGradebookSettingsModal', () => {
     }
 
     test('is passed as true if the course has at least one anonymous assignment', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([anonymousAssignmentGroup, nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()
@@ -220,6 +223,7 @@ describe('#renderGradebookSettingsModal', () => {
     })
 
     test('is passed as false if the course has no anonymous assignments', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()
@@ -371,18 +375,19 @@ describe('#renderGradebookSettingsModal', () => {
 })
 
 describe('Gradebook "Enter Grades as" Setting', () => {
-  let server
   let options
   let gradebook
 
   beforeEach(() => {
     options = {settings_update_url: '/course/1/gradebook_settings'}
-    server = sinon.fakeServer.create({respondImmediately: true})
-    server.respondWith('POST', options.settings_update_url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{}',
-    ])
+    // Mock fetch for the POST request
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      }),
+    )
     gradebook = createGradebook(options)
     gradebook.setAssignments({
       2301: {id: '2301', grading_type: 'points', name: 'Math Assignment', published: true},
@@ -401,7 +406,7 @@ describe('Gradebook "Enter Grades as" Setting', () => {
   })
 
   afterEach(() => {
-    server.restore()
+    delete global.fetch
     window.ENV = oldEnv
   })
 
@@ -468,17 +473,17 @@ describe('Gradebook "Enter Grades as" Setting', () => {
 
   describe('#updateEnterGradesAsSetting', () => {
     beforeEach(() => {
-      sinon.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
-      sinon.stub(gradebook.gradebookGrid, 'invalidate')
-      sinon.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+      jest.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
+      jest.spyOn(gradebook.gradebookGrid, 'invalidate').mockImplementation(() => {})
+      jest
+        .spyOn(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+        .mockImplementation(() => {})
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: false}}
     })
 
     afterEach(() => {
-      gradebook.saveSettings.restore()
-      gradebook.gradebookGrid.invalidate.restore()
-      gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.restore()
+      jest.restoreAllMocks()
       window.ENV = oldEnv
     })
 
@@ -489,7 +494,7 @@ describe('Gradebook "Enter Grades as" Setting', () => {
 
     test('saves gradebooks settings', () => {
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
-      expect(gradebook.saveSettings.callCount).toBe(1)
+      expect(gradebook.saveSettings).toHaveBeenCalledTimes(1)
     })
 
     test('saves gradebooks settings after updating the "enter grades as" setting', async () => {
@@ -499,62 +504,66 @@ describe('Gradebook "Enter Grades as" Setting', () => {
 
     test('updates the column header for the related assignment column', async () => {
       await gradebook.updateEnterGradesAsSetting('2301', 'percent')
-      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount).toBe(1)
+      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).toHaveBeenCalledTimes(
+        1,
+      )
     })
 
     test('updates the column header with the assignment column id', async () => {
       await gradebook.updateEnterGradesAsSetting('2301', 'percent')
-      const [columnIds] =
-        gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
-      expect(columnIds).toEqual(['assignment_2301'])
+      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).toHaveBeenCalledWith([
+        'assignment_2301',
+      ])
     })
 
     test('updates the column header after settings have been saved', async () => {
-      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount).toBe(0)
+      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).not.toHaveBeenCalled()
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
       // Assuming saveSettings is already stubbed to resolve
       await gradebook.saveSettings()
-      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount).toBe(1)
+      expect(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders).toHaveBeenCalledTimes(
+        1,
+      )
     })
 
     test('invalidates the grid', async () => {
       await gradebook.updateEnterGradesAsSetting('2301', 'percent')
-      expect(gradebook.gradebookGrid.invalidate.callCount).toBe(1)
+      expect(gradebook.gradebookGrid.invalidate).toHaveBeenCalledTimes(1)
     })
 
     test('invalidates the grid after updating the column header', () => {
-      gradebook.gradebookGrid.invalidate.callsFake(() => {
-        expect(gradebook.gradebookGrid.invalidate.callCount).toBe(1)
+      gradebook.gradebookGrid.invalidate.mockImplementation(() => {
+        expect(
+          gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders,
+        ).toHaveBeenCalledTimes(1)
       })
       gradebook.updateEnterGradesAsSetting('2301', 'percent')
     })
   })
 
   describe('#postAssignmentGradesTrayOpenChanged', () => {
-    let updateGridStub
-
     beforeEach(() => {
       const assignment = {id: '2301'}
       const column = gradebook.buildAssignmentColumn(assignment)
       gradebook.gridData.columns.definitions[column.id] = column
-      updateGridStub = sinon.stub(gradebook, 'updateGrid')
+      jest.spyOn(gradebook, 'updateGrid').mockImplementation(() => {})
       oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: false}}
     })
 
     afterEach(() => {
-      updateGridStub.restore()
+      jest.restoreAllMocks()
       window.ENV = oldEnv
     })
 
     test('calls updateGrid if a corresponding column is found', () => {
       gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
-      expect(updateGridStub.callCount).toBe(1)
+      expect(gradebook.updateGrid).toHaveBeenCalledTimes(1)
     })
 
     test('does not call updateGrid if a corresponding column is not found', () => {
       gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2399', isOpen: true})
-      expect(updateGridStub.callCount).toBe(0)
+      expect(gradebook.updateGrid).not.toHaveBeenCalled()
     })
   })
 })

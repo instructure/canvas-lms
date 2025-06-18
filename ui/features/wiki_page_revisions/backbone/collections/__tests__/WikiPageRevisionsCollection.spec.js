@@ -36,7 +36,7 @@ describe('WikiPageRevisionsCollection', () => {
     const parentModel = new WikiPage({url: 'a-page'}, {contextAssetString: 'course_73'})
     const collection = new WikiPageRevisionsCollection([], {parentModel})
     collection.add({revision_id: 37})
-    expect(collection.models.length).toBe(1)
+    expect(collection.models).toHaveLength(1)
     expect(collection.models[0].url()).toBe('/api/v1/courses/73/pages/a-page/revisions/37')
   })
 })

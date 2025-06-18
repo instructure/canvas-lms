@@ -21,6 +21,7 @@ import axios from '@canvas/axios'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
+import {assignLocation} from '@canvas/util/globalUtils'
 import ExportList from './components/ExportList'
 import ExportInProgress from './components/ExportInProgress'
 import Errors from './components/Errors'
@@ -31,11 +32,11 @@ class WebZipExportApp extends React.Component {
   static webZipFormat(webZipExports, newExportId = null) {
     return webZipExports
       .map(webZipExport => {
-        const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : null
+        const url = webZipExport.zip_attachment ? webZipExport.zip_attachment.url : ''
         const isNewExport = newExportId === webZipExport.progress_id
         return {
           date: webZipExport.created_at,
-          link: url,
+          link: url || '',
           workflowState: webZipExport.workflow_state,
           progressId: webZipExport.progress_id,
           newExport: isNewExport,
@@ -98,7 +99,7 @@ class WebZipExportApp extends React.Component {
   }
 
   downloadLink(link) {
-    window.location = link
+    assignLocation(link)
   }
 
   render() {

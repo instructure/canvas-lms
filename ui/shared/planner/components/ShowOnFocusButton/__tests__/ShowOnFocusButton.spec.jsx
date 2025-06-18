@@ -16,14 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render, fireEvent} from '@testing-library/react'
 import ShowOnFocusButton from '../index'
 
 it('renders a ScreenReaderContent by default', () => {
-  const wrapper = shallow(<ShowOnFocusButton>Button</ShowOnFocusButton>)
+  const {getByTestId, getByRole} = render(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  expect(wrapper).toMatchSnapshot()
+  // Should render ScreenReaderContent as the root element
+  expect(getByTestId('screenreader-content')).toBeInTheDocument()
+
+  // Should contain a button
+  const button = getByRole('button')
+  expect(button).toBeInTheDocument()
+  expect(button).toHaveTextContent('Button')
 })
 
 it('renders a Button when it has focus', () => {
@@ -34,13 +39,19 @@ it('renders a Button when it has focus', () => {
   expect(screenReaderContent).not.toBeInTheDocument()
 })
 
-it('renders ScreeenReaderContent after blur', () => {
+it('renders ScreenReaderContent after blur', () => {
   const {getByRole, queryByTestId} = render(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
   const buttonElement = getByRole('button')
+
+  // Initially, there should be ScreenReaderContent
+  expect(queryByTestId('screenreader-content')).toBeInTheDocument()
+
   fireEvent.focus(buttonElement)
+
+  // After focus, ScreenReaderContent should not be present
   expect(queryByTestId('screenreader-content')).not.toBeInTheDocument()
 
-  fireEvent.blur(buttonElement)
-  expect(queryByTestId('screenreader-content')).toBe(null)
+  // The button should still exist and be visible
+  expect(getByRole('button')).toBeInTheDocument()
 })

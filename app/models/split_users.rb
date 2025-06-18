@@ -410,33 +410,48 @@ class SplitUsers
 
   def handle_submissions(records)
     [Submission, Quizzes::QuizSubmission].each do |model|
-      ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
-      other_ids_by_shard = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
+      to_restored_user = records.where(context_type: model.to_s, previous_user_id: restored_user)
+                                .pluck(:context_id).group_by { |id| Shard.shard_for(id) }
+      to_source_user = records.where(context_type: model.to_s, previous_user_id: source_user)
+                              .pluck(:context_id).group_by { |id| Shard.shard_for(id) }
 
-      (ids_by_shard.keys + other_ids_by_shard.keys).uniq.each do |shard|
-        ids = ids_by_shard[shard] || []
-        other_ids = other_ids_by_shard[shard] || []
+      (to_restored_user.keys + to_source_user.keys).uniq.each do |shard|
+        ids = to_restored_user[shard] || []
+        other_ids = to_source_user[shard] || []
+
         shard.activate do
           if model == Submission
-            # also swap restored user's deleted/unsubmitted submissions that need to be moved out of the way
-            other_ids += model.where(user_id: restored_user,
-                                     workflow_state: %w[deleted unsubmitted],
-                                     assignment_id: model.where(id: ids).select(:assignment_id))
-                              .where.not(id: other_ids)
-                              .pluck(:id)
-            # Delete existing source_user unsubmitted/deleted submissions that would otherwise
-            # clash with the restored_user submission user_id swap to the source_user.
-            # Exclude known submission ids present in the user merge data records.
-            conflicting_submissions = model.where(user_id: source_user,
-                                                  workflow_state: %w[deleted unsubmitted],
-                                                  assignment_id: model.where(id: other_ids).select(:assignment_id))
-                                           .where.not(id: ids)
-            conflicting_submissions.delete_all if conflicting_submissions.exists?
+            other_ids += find_inactive_submissions_to_move(ids, other_ids)
+            other_ids -= find_inactive_submissions_that_conflict(ids, other_ids)
           end
           swap_records(model, ids, other_ids)
         end
       end
     end
+  end
+
+  def find_inactive_submissions_to_move(ids, other_ids)
+    # Find deleted/unsubmitted submissions from restored_user that need to be moved to source_user
+    Submission.where(user_id: restored_user,
+                     workflow_state: %w[deleted unsubmitted],
+                     assignment_id: Submission.where(id: ids).select(:assignment_id))
+              .where.not(id: other_ids).ids
+  end
+
+  def find_inactive_submissions_that_conflict(ids, other_ids)
+    # Find assignments where source_user has submissions that conflict
+    # with submissions we're trying to move back to them
+    conflicting_assignment_ids =
+      Submission.where(user_id: source_user)
+                .where(assignment_id: Submission.where(id: other_ids).select(:assignment_id))
+                .where.not(id: ids)
+                .select(:assignment_id) # used for subquery filter
+
+    # Return IDs of restored_user's deleted/unsubmitted submissions for these conflicting assignments
+    # These submissions should be excluded from the move operation to avoid conflicts
+    Submission.where(user_id: restored_user,
+                     workflow_state: %w[deleted unsubmitted],
+                     assignment_id: conflicting_assignment_ids).ids
   end
 
   def swap_records(model, ids_to_restored_user, ids_to_source_user)

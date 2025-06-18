@@ -64,6 +64,12 @@ class DueDateTokenWrapper extends React.Component {
   //      Lifecycle
   // -------------------
 
+  constructor(props) {
+    super(props)
+    this.disabledTokenInputRef = React.createRef()
+    this.tokenInputRef = React.createRef()
+  }
+
   state = {
     userInput: '',
     currentlyTyping: false,
@@ -349,8 +355,10 @@ class DueDateTokenWrapper extends React.Component {
   renderTokenInput = () => {
     if (this.props.disabled) {
       return (
-        // eslint-disable-next-line react/no-string-refs
-        <DisabledTokenInput tokens={map(this.props.tokens, 'name')} ref="DisabledTokenInput" />
+        <DisabledTokenInput
+          tokens={map(this.props.tokens, 'name')}
+          ref={this.disabledTokenInputRef}
+        />
       )
     }
     const ariaLabel = I18n.t(
@@ -376,8 +384,7 @@ class DueDateTokenWrapper extends React.Component {
           combobox-aria-label={ariaLabel}
           value={true}
           showListOnFocus={!this.props.disabled}
-          // eslint-disable-next-line react/no-string-refs
-          ref="TokenInput"
+          ref={this.tokenInputRef}
         />
       </div>
     )

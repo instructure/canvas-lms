@@ -20,13 +20,17 @@
 describe Lti::AssetProcessorController do
   describe "#resubmit_notice" do
     let(:course) { course_model }
-    let(:assignment) { assignment_model(course:) }
+    let(:assignment) { assignment_model(course:, submission_types: "online_upload") }
     let(:student) { course_with_student(course:, active_all: true).user }
     let(:teacher) { course_with_teacher(course:, active_all: true).user }
     let(:asset_processor) { lti_asset_processor_model(assignment:) }
-    let(:submission) { submission_model(assignment:, user: student) }
+    let(:attachment) { attachment_model(user: student) }
+    let(:submission) do
+      assignment.submit_homework(student, submission_type: "online_upload", attachments: [attachment])
+    end
 
-    let(:params) { { asset_processor_id: asset_processor.id, student_id: student.id } }
+    let(:params) { { asset_processor_id: asset_processor.id, student_id: student.id, attempt: } }
+    let(:attempt) { "latest" }
 
     before do
       Account.site_admin.enable_feature!(:lti_asset_processor)
@@ -37,14 +41,63 @@ describe Lti::AssetProcessorController do
         user_session(teacher)
       end
 
-      it "notifies asset processors and returns success" do
+      def expect_submission(attempt: nil, attachment_ids: nil)
+        attempt ||= submission.attempt
+        attachment_ids ||= attachment.id.to_s
+
+        received_submission = nil
         expect(Lti::AssetProcessorNotifier).to receive(:notify_asset_processors).with(
           submission,
           asset_processor
-        ).and_return(true)
+        ) do |sub, _ap|
+          received_submission = sub
+          true
+        end
 
         post(:resubmit_notice, params:)
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:no_content)
+
+        expect(received_submission.attempt).to eq(attempt)
+        expect(received_submission.attachment_ids).to eq(attachment_ids)
+      end
+
+      it "notifies asset processors and returns success" do
+        expect_submission
+      end
+
+      context "when there are multiple attempts" do
+        let(:attachment2) { attachment_model(user: student) }
+
+        before do
+          opts = { submission_type: "online_upload", attachments: [attachment] }
+          # Create a second submission with attempt number 1
+          assignment.submit_homework(student, **opts, submitted_at: submission.submitted_at)
+
+          opts = { submission_type: "online_upload", attachments: [attachment2] }
+          # Create a third submission with a attempt number 2
+          submission2 = assignment.submit_homework(student, **opts)
+
+          # Create a fourth submission with attempt number 2
+          assignment.submit_homework(student, **opts, submitted_at: submission2.submitted_at)
+        end
+
+        context "when attempt is given" do
+          let(:attempt) { "1" }
+
+          it "uses the given attempt" do
+            expect_submission(attempt: 1, attachment_ids: attachment.id.to_s)
+          end
+        end
+
+        context "when attempt is not found" do
+          let(:attempt) { "100" }
+
+          it("uses the latest attempt") { expect_submission(attempt: 2, attachment_ids: attachment2.id.to_s) }
+        end
+
+        context "when attempt is 'latest'" do
+          it("uses the latest attempt") { expect_submission(attempt: 2, attachment_ids: attachment2.id.to_s) }
+        end
       end
     end
 
@@ -74,7 +127,7 @@ describe Lti::AssetProcessorController do
         end
 
         it "returns not found when asset processor doesn't exist" do
-          post :resubmit_notice, params: { asset_processor_id: "nonexistent", student_id: student.id }
+          post :resubmit_notice, params: { asset_processor_id: "nonexistent", student_id: student.id, attempt: "latest" }
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -97,13 +150,13 @@ describe Lti::AssetProcessorController do
         end
 
         it "returns not found when student doesn't exist" do
-          post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: "nonexistent" }
+          post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: "nonexistent", attempt: "latest" }
           expect(response).to have_http_status(:not_found)
         end
 
         it "returns not found when submission doesn't exist" do
           other_student = user_model
-          post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: other_student.id }
+          post :resubmit_notice, params: { asset_processor_id: asset_processor.id, student_id: other_student.id, attempt: "latest" }
           expect(response).to have_http_status(:not_found)
         end
       end

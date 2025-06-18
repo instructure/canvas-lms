@@ -62,7 +62,7 @@ module AssignmentVisibility
         assignment_visibilities
       end
 
-      def assignments_visible_to_students(course_ids: nil, user_ids: nil, assignment_ids: nil)
+      def assignments_visible_to_students(course_ids: nil, user_ids: nil, assignment_ids: nil, include_concluded: true)
         # Must have a course_id or assignment_id for performance of the all_tags section of the query
         # General query performance requires at least one non-nil course_id, assignment_id, or user_id
         unless course_ids || assignment_ids
@@ -73,14 +73,14 @@ module AssignmentVisibility
         user_ids = Array(user_ids) if user_ids
         assignment_ids = Array(assignment_ids) if assignment_ids
 
-        service_cache_fetch(service: name, course_ids:, user_ids:, additional_ids: assignment_ids) do
+        service_cache_fetch(service: name, course_ids:, user_ids:, additional_ids: assignment_ids, include_concluded:) do
           AssignmentVisibility::Repositories::AssignmentVisibleToStudentRepository.visibility_query(
-            course_ids:, user_ids:, assignment_ids:
+            course_ids:, user_ids:, assignment_ids:, include_concluded:
           )
         end
       end
 
-      def invalidate_cache(course_ids: nil, user_ids: nil, assignment_ids: nil)
+      def invalidate_cache(course_ids: nil, user_ids: nil, assignment_ids: nil, include_concluded: true)
         unless course_ids || assignment_ids
           raise ArgumentError, "at least one non nil course_id or assignment_id is required (for query performance reasons)"
         end
@@ -89,7 +89,7 @@ module AssignmentVisibility
         user_ids = Array(user_ids) if user_ids
         assignment_ids = Array(assignment_ids) if assignment_ids
 
-        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: assignment_ids)
+        key = service_cache_key(service: name, course_ids:, user_ids:, additional_ids: assignment_ids, include_concluded:)
 
         Rails.cache.delete(key)
       end

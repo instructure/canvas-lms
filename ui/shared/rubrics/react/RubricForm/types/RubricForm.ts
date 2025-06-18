@@ -23,6 +23,7 @@ export type GenerateCriteriaFormProps = {
   ratingCount: number
   pointsPerCriterion: string
   useRange: boolean
+  additionalPromptInfo: string
 }
 
 export type RubricFormProps = {

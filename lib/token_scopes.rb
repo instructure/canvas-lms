@@ -45,7 +45,8 @@ class TokenScopes
   LTI_PNS_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/noticehandlers"
   LTI_ASSET_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/asset.readonly"
   LTI_ASSET_REPORT_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/report"
-  LTI_EULA_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/eula"
+  LTI_EULA_USER_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/eula/user"
+  LTI_EULA_DEPLOYMENT_SCOPE = "https://purl.imsglobal.org/spec/lti/scope/eula/deployment"
 
   # LTI: Canvas (non-1EdTech standard) Extensions
   LTI_UPDATE_PUBLIC_JWK_SCOPE = "https://canvas.instructure.com/lti/public_jwk/scope/update"
@@ -79,7 +80,8 @@ class TokenScopes
     LTI_PNS_SCOPE => I18n.t("Can register event notice handlers using the Platform Notification Service."),
     LTI_ASSET_READ_ONLY_SCOPE => I18n.t("Can fetch assets from the platform using the Asset Service."),
     LTI_ASSET_REPORT_SCOPE => I18n.t("Can create reports using the Asset Report Service."),
-    LTI_EULA_SCOPE => I18n.t("Can update or remove the tool's EULA accepted flag."),
+    LTI_EULA_DEPLOYMENT_SCOPE => I18n.t("Can update or remove the tool's EULA requirement flag."),
+    LTI_EULA_USER_SCOPE => I18n.t("Can update or remove the tool's EULA accepted flag."),
 
     # Canvas Extensions
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
@@ -124,11 +126,11 @@ class TokenScopes
   ALL_LTI_SCOPES = [*LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].uniq.freeze
 
   SCOPES_MADE_VISIBLE_BY_FEATURE_FLAG = {
-    platform_notification_service: [LTI_PNS_SCOPE],
     lti_asset_processor: [
       LTI_ASSET_READ_ONLY_SCOPE,
       LTI_ASSET_REPORT_SCOPE,
-      LTI_EULA_SCOPE
+      LTI_EULA_DEPLOYMENT_SCOPE,
+      LTI_EULA_USER_SCOPE
     ]
   }.freeze
 

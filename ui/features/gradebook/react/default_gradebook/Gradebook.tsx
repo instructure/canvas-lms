@@ -287,7 +287,7 @@ export type GradebookProps = {
     columnData: CustomColumnData[]
   }
   fetchFinalGradeOverrides: () => Promise<void>
-  fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
+  fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap | void>
   loadDataForCustomColumn: (customColumnId: string) => Promise<CustomColumnData[]>
   finalGradeOverrides: FinalGradeOverrideMap
   flashAlerts: FlashMessage[]
@@ -414,6 +414,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   gradingPeriodId = '0'
 
+  _isMounted = false
+
   options: GradebookOptions
 
   sections_enabled = false
@@ -485,6 +487,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   scoreToUngradedManager: ScoreToUngradedManager | null
 
   returnFocusTo: HTMLButtonElement | null
+
+  has_suppressed_assignments: boolean = false
 
   constructor(props: GradebookProps) {
     super(props)
@@ -607,6 +611,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         ? this.props.enhancedActionMenuNode
         : this.props.actionMenuNode
     ).querySelector('button')
+
+    this._isMounted = false
   }
 
   bindGridEvents = () => {
@@ -785,7 +791,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         group = assignmentGroup
         this.assignmentGroups[group.id] = group
       }
-
       // @ts-expect-error
       group.assignments = group.assignments || [] // perhaps unnecessary
       assignmentGroup.assignments.forEach(assignment => {
@@ -793,7 +798,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         // @ts-expect-error
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
-        this.addAssignmentColumnDefinition(assignment)
+
+        if (window.ENV.SETTINGS.suppress_assignments) {
+          if (assignment.suppress_assignment) {
+            // If suppressed, then has_suppressed_assignments is true
+            this.has_suppressed_assignments = true
+          } else {
+            // If not suppressed, then add the column for the assignment
+            this.addAssignmentColumnDefinition(assignment)
+          }
+        } else {
+          this.addAssignmentColumnDefinition(assignment)
+        }
         this.assignments[assignment.id] = assignment
         if (!group.assignments.some(a => a.id === assignment.id)) {
           group.assignments.push(assignment)
@@ -934,7 +950,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  updateAssignmentEffectiveDueDates = (assignment: Assignment) => {
+  updateAssignmentEffectiveDueDates = (
+    assignment: Pick<Assignment, 'effectiveDueDates' | 'inClosedGradingPeriod' | 'id'>,
+  ) => {
     assignment.effectiveDueDates = this.effectiveDueDates[assignment.id] || {}
     assignment.inClosedGradingPeriod = some(
       assignment.effectiveDueDates,
@@ -1134,7 +1152,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return assignments.filter(matchesAllFilters)
   }
 
-  filterAssignmentBySearchInput = (assignment: Assignment) => {
+  filterAssignmentBySearchInput = (assignment: Pick<Assignment, 'id'>) => {
     if (this.searchFilteredAssignmentIds.length > 0) {
       return this.searchFilteredAssignmentIds.includes(assignment.id)
     }
@@ -1142,18 +1160,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return true
   }
 
-  filterAssignmentBySubmissionTypes = (assignment: Assignment) => {
+  filterAssignmentBySubmissionTypes = (assignment: Pick<Assignment, 'submission_types'>) => {
     const submissionType = '' + assignment.submission_types
     return (
       submissionType !== 'not_graded' && (submissionType !== 'attendance' || this.show_attendance)
     )
   }
 
-  filterAssignmentByPublishedStatus = (assignment: Assignment) => {
+  filterAssignmentByPublishedStatus = (assignment: Pick<Assignment, 'published'>) => {
     return assignment.published || this.gridDisplaySettings.showUnpublishedAssignments
   }
 
-  filterAssignmentByAssignmentGroup = (assignment: Assignment) => {
+  filterAssignmentByAssignmentGroup = (assignment: Pick<Assignment, 'assignment_group_id'>) => {
     if (!this.options.enhanced_gradebook_filters) {
       if (!this.isFilteringColumnsByAssignmentGroup()) {
         return true
@@ -1167,14 +1185,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  filterAssignmentByGradingPeriod = (assignment: Assignment) => {
+  filterAssignmentByGradingPeriod = (assignment: Pick<Assignment, 'id'>) => {
     if (!this.isFilteringColumnsByGradingPeriod()) return true
 
     const assignmentsForPeriod = this.getGradingPeriodAssignments(this.gradingPeriodId)
     return assignmentsForPeriod.includes(assignment.id)
   }
 
-  filterAssignmentByModule = (assignment: Assignment) => {
+  filterAssignmentByModule = (assignment: Pick<Assignment, 'module_ids'>) => {
     if (!this.options.enhanced_gradebook_filters) {
       const contextModuleFilterSetting = this.getModuleToShow()
       if (contextModuleFilterSetting === '0') {
@@ -1191,7 +1209,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
   }
 
-  filterAssignmentByStartDate = (assignment: Assignment) => {
+  filterAssignmentByStartDate = (assignment: Pick<Assignment, 'effectiveDueDates'>) => {
     const date = findFilterValuesOfType('start-date', this.props.appliedFilters)[0]
     if (!date) {
       return true
@@ -1203,7 +1221,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     )
   }
 
-  filterAssignmentByEndDate = (assignment: Assignment) => {
+  filterAssignmentByEndDate = (assignment: Pick<Assignment, 'effectiveDueDates'>) => {
     const date = findFilterValuesOfType('end-date', this.props.appliedFilters)[0]
     if (!date) {
       return true
@@ -1217,7 +1235,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Course Content Event Handlers
-  handleSubmissionPostedChange = (assignment: Assignment) => {
+  handleSubmissionPostedChange = (
+    assignment: Pick<Assignment, 'anonymize_students' | 'id' | 'assignment_group_id'>,
+  ) => {
     let anonymousColumnIds
     if (assignment.anonymize_students) {
       anonymousColumnIds = [
@@ -1353,9 +1373,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       student.loaded = true
     }
     this.updateEffectiveDueDatesFromSubmissions(submissions)
-    each(this.assignments, (assignment: Assignment) => {
-      return this.updateAssignmentEffectiveDueDates(assignment)
-    })
+    each(
+      this.assignments,
+      (assignment: Pick<Assignment, 'effectiveDueDates' | 'inClosedGradingPeriod' | 'id'>) => {
+        return this.updateAssignmentEffectiveDueDates(assignment)
+      },
+    )
     changedStudentIds = [...new Set(changedStudentIds)]
     const students = changedStudentIds.map(this.student)
     this.setupGrading(students)
@@ -2203,9 +2226,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   renderGradebookSettingsModal = () => {
     const props: GradebookSettingsModalProps = {
-      anonymousAssignmentsPresent: some(this.assignments, (assignment: Assignment) => {
-        return assignment.anonymous_grading
-      }),
+      anonymousAssignmentsPresent: some(
+        this.assignments,
+        (assignment: Pick<Assignment, 'anonymous_grading'>) => {
+          return assignment.anonymous_grading
+        },
+      ),
       courseId: this.options.context_id,
       courseFeatures: this.courseFeatures,
       courseSettings: this.courseSettings,
@@ -2639,7 +2665,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // # Grid Column Definitions
 
   // Assignment Column
-  buildAssignmentColumn = (assignment: Assignment): GridColumn => {
+  buildAssignmentColumn = (
+    assignment: Pick<Assignment, 'grading_type' | 'points_possible' | 'name' | 'id'>,
+  ): GridColumn => {
     let assignmentWidth
     const shrinkForOutOfText =
       assignment && assignment.grading_type === 'points' && assignment.points_possible != null
@@ -2769,7 +2797,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Grid DOM Access/Reference Methods
-  addAssignmentColumnDefinition = (assignment: Assignment) => {
+  addAssignmentColumnDefinition = (
+    assignment: Pick<Assignment, 'grading_type' | 'points_possible' | 'name' | 'id'>,
+  ) => {
     const assignmentColumn = this.buildAssignmentColumn(assignment)
     if (!this.gridData.columns.definitions[assignmentColumn.id]) {
       this.gridData.columns.definitions[assignmentColumn.id] = assignmentColumn
@@ -4150,7 +4180,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   setCurrentGradingPeriod = () => {
     if (this.gradingPeriodSet == null) {
       this.gradingPeriodId = '0'
-      this.setState({gradingPeriodId: this.gradingPeriodId})
+      if (this._isMounted) {
+        this.setState({gradingPeriodId: this.gradingPeriodId})
+      }
       return
     }
 
@@ -4162,7 +4194,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     } else {
       this.gradingPeriodId = '0'
     }
-    this.setState({gradingPeriodId: this.gradingPeriodId})
+    if (this._isMounted) {
+      this.setState({gradingPeriodId: this.gradingPeriodId})
+    }
   }
 
   getCurrentGradingPeriod = (): string => {
@@ -4674,7 +4708,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
-  changeGroupMemberStickers = (userId: string, assignment: Assignment, sticker: string | null) => {
+  changeGroupMemberStickers = (
+    userId: string,
+    assignment: Pick<Assignment, 'course_id' | 'id'>,
+    sticker: string | null,
+  ) => {
     const path = `/api/v1/courses/${assignment.course_id}/assignments/${assignment.id}/users/${userId}/group_members`
     doFetchApi<{id: string}[]>({path})
       .then(({json: students}) => {
@@ -4811,7 +4849,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }, 0)
   }
 
-  requireStudentGroupForSpeedGrader = (assignment: Assignment) => {
+  requireStudentGroupForSpeedGrader = (
+    assignment: Pick<Assignment, 'group_category_id' | 'grade_group_students_individually'>,
+  ) => {
     if (assignmentHelper.gradeByGroup(assignment)) {
       // Assignments that grade by group (not by student) don't require a group selection
       return false
@@ -4950,6 +4990,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   destroy = () => {
+    this._isMounted = false
     $(window).unbind('resize.fillWindowWithMe')
     $(document).unbind('gridready')
     this.gradebookGrid?.destroy()
@@ -4979,6 +5020,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   componentDidMount() {
+    this._isMounted = true
     this.onShow()
   }
 
@@ -5367,6 +5409,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
               />
             )}
         </div>
+
+        {window.ENV.SETTINGS.suppress_assignments && this.has_suppressed_assignments && (
+          <div>
+            <p>{I18n.t('* Some items are hidden from gradebook view.')}</p>
+          </div>
+        )}
         {this.state.isGridLoaded &&
           !this.props.isSubmissionDataLoaded &&
           Object.keys(this.props.assignmentMap).length * this.props.totalStudentsToLoad > 200 && (

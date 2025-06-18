@@ -83,7 +83,7 @@ test('renders the RSSFeedList component with 5 rows for 5 feeds', () => {
   feeds.forEach(feed => {
     expect(tree.getByText(feed.display_name)).toBeInTheDocument()
   })
-  expect(tree.getAllByRole('button').length).toBe(5)
+  expect(tree.getAllByRole('button')).toHaveLength(5)
 })
 
 test('calls getExternalFeeds when feed has not been loaded', () => {

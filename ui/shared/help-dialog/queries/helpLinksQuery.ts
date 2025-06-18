@@ -29,7 +29,6 @@ export default async function helpLinksQuery({signal}: QueryFunctionContext): Pr
   let path = HELP_LINKS_PATH
 
   while (path) {
-    // eslint-disable-next-line no-await-in-loop
     const {json, link} = await doFetchApi<HelpLink[]>({path, fetchOpts})
     if (json) data.push(...json)
     // @ts-expect-error

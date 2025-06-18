@@ -36,6 +36,7 @@ export const ConfiguredDateInput = ({
   infoMessage,
   courseTimeZone,
   userTimeZone,
+  dataTestId,
 }: {
   selectedDate?: string | null
   placeholder?: string
@@ -47,6 +48,7 @@ export const ConfiguredDateInput = ({
   infoMessage?: string
   courseTimeZone?: string
   userTimeZone?: string
+  dataTestId?: string
 }) => {
   const formatDate = (date: Date) => {
     return datetimeString(date, {timezone: userTimeZone})
@@ -98,6 +100,7 @@ export const ConfiguredDateInput = ({
           interaction={disabled ? 'disabled' : 'enabled'}
           width="100%"
           messages={generateMessages()}
+          dataTestid={dataTestId}
         />
       </Flex>
     </>

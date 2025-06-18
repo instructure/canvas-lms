@@ -38,7 +38,7 @@ module Login::Shared
             session[:return_to] = url
           elsif (target_account == domain_root_account) ||
                 (target_account && target_account != domain_root_account &&
-                pseudonym.works_for_account?(target_account, true))
+                pseudonym&.works_for_account?(target_account, true))
             token = SessionToken.new(pseudonym.global_id,
                                      current_user_id: pseudonym.global_user_id).to_s
             uri.query&.concat("&")
@@ -106,18 +106,9 @@ module Login::Shared
     # there
     session.delete(:shown_instfs_pixel)
 
-    if pseudonym.account_id != @domain_root_account.id
-      # they have no reason to be at this account; send them to where they belong
-      if (session[:return_to].blank? || session[:return_to] == "/") &&
-         session[:oauth2].blank? &&
-         @domain_root_account.user_account_associations.where(user_id: pseudonym.user_id).none? &&
-         !@domain_root_account.grants_right?(user, :read)
-        return redirect_to dashboard_url(host: HostUrl.context_host(pseudonym.account, request.host_with_port), cross_domain_login: request.host_with_port)
-      end
-
-      flash[:notice] = t("You are logged in at %{institution1} using your credentials from %{institution2}",
-                         institution1: @domain_root_account.name,
-                         institution2: pseudonym.account.name)
+    # redirect if user shouldn’t be at this account; otherwise set flash notice
+    if redirect_if_wrong_account(user, pseudonym)
+      return
     end
 
     if pseudonym.account_id == Account.site_admin.id && Account.site_admin.delegated_authentication?
@@ -229,6 +220,37 @@ module Login::Shared
   end
 
   private
+
+  def redirect_if_wrong_account(user, pseudonym)
+    return false if pseudonym.account_id == @domain_root_account.id
+
+    # they have no reason to be at this account; send them to where they belong
+    if (session[:return_to].blank? || session[:return_to] == "/") &&
+       session[:oauth2].blank? &&
+       @domain_root_account.user_account_associations.where(user_id: pseudonym.user_id).none? &&
+       !@domain_root_account.grants_right?(user, :read)
+
+      home_account_url = dashboard_url(
+        host: HostUrl.context_host(pseudonym.account, request.host_with_port),
+        cross_domain_login: request.host_with_port
+      )
+
+      respond_to do |format|
+        format.html { redirect_to home_account_url }
+        format.json { render json: { location: home_account_url }, status: :ok }
+      end
+
+      return true
+    end
+
+    flash[:notice] = t(
+      "You are logged in at %{institution1} using your credentials from %{institution2}",
+      institution1: @domain_root_account.name,
+      institution2: pseudonym.account.name
+    )
+
+    false
+  end
 
   def increment_statsd(counter, tags: {}, action: nil, reason: nil, authentication_provider: nil)
     action ||= params[:action]

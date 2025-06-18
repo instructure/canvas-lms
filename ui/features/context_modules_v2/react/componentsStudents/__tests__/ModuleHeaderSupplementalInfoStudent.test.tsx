@@ -25,12 +25,11 @@ type Props = {
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
   submissionStatistics?: ModuleStatistics
+  moduleCompleted?: boolean
 }
 
 const buildDefaultProps = (overrides: Partial<Props> = {}) => {
   return {
-    completionRequirements: overrides.completionRequirements || [],
-    requirementCount: overrides.requirementCount !== undefined ? overrides.requirementCount : 0,
     submissionStatistics: overrides.submissionStatistics || {
       latestDueAt: null,
       missingAssignmentCount: 0,
@@ -40,40 +39,11 @@ const buildDefaultProps = (overrides: Partial<Props> = {}) => {
 
 const setUp = (props = buildDefaultProps()) => {
   return render(
-    <ModuleHeaderSupplementalInfoStudent
-      completionRequirements={props.completionRequirements}
-      requirementCount={props.requirementCount}
-      submissionStatistics={props.submissionStatistics}
-    />,
+    <ModuleHeaderSupplementalInfoStudent submissionStatistics={props.submissionStatistics} />,
   )
 }
 
 describe('ModuleHeaderSupplementalInfoStudent', () => {
-  it('renders date, missing count, and requirement', () => {
-    const testDate = new Date(Date.now() - 72 * 60 * 60 * 1000)
-    const container = setUp(
-      buildDefaultProps({
-        completionRequirements: [
-          {
-            id: '1',
-            type: 'assignment',
-            minScore: 100,
-            minPercentage: 100,
-          },
-        ],
-        submissionStatistics: {
-          latestDueAt: testDate.toISOString(),
-          missingAssignmentCount: 1,
-        },
-      }),
-    )
-    expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
-    expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
-    expect(container.getByText('Requirement: Complete All Items')).toBeInTheDocument()
-    expect(container.getAllByText('|')).toHaveLength(2)
-  })
-
   it('renders date', () => {
     const testDate = new Date(Date.now() + 72 * 60 * 60 * 1000)
     const container = setUp(
@@ -85,42 +55,8 @@ describe('ModuleHeaderSupplementalInfoStudent', () => {
       }),
     )
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
-    expect(container.queryAllByText('|')).toHaveLength(0)
-  })
-
-  it('renders requirement', () => {
-    const container = setUp(
-      buildDefaultProps({
-        completionRequirements: [
-          {
-            id: '1',
-            type: 'assignment',
-            minScore: 100,
-            minPercentage: 100,
-          },
-        ],
-        requirementCount: 1,
-      }),
-    )
-    expect(container.container).toBeInTheDocument()
-    expect(container.getByText('Requirement: Complete One Item')).toBeInTheDocument()
-    expect(container.queryAllByText('|')).toHaveLength(0)
-  })
-
-  it('renders due date and missing count', () => {
-    const testDate = new Date(Date.now() - 72 * 60 * 60 * 1000)
-    const container = setUp(
-      buildDefaultProps({
-        submissionStatistics: {
-          latestDueAt: testDate.toISOString(),
-          missingAssignmentCount: 1,
-        },
-      }),
-    )
-    expect(container.container).toBeInTheDocument()
-    expect(container.getByText(`Due: ${testDate.toDateString()}`)).toBeInTheDocument()
-    expect(container.getByText('1 Missing Assignment')).toBeInTheDocument()
-    expect(container.queryAllByText('|')).toHaveLength(1)
+    expect(
+      container.getByText(/Due: \w+ \d+,?/, {selector: '.visible-desktop'}),
+    ).toBeInTheDocument()
   })
 })

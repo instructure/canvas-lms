@@ -27,6 +27,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Menu} from '@instructure/ui-menu'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {reloadWindow} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('horizon_toggle_page')
 
@@ -50,7 +51,7 @@ export const HorizonAccount = ({hasCourses, accountId, locked}: HorizonAccountPr
         },
       })
 
-      window.location.reload()
+      reloadWindow()
     } catch (e) {
       showFlashError(I18n.t('Failed to switch to Canvas Career. Please try again.'))
     }

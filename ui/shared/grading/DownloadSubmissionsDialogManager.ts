@@ -20,7 +20,7 @@ import type {Assignment} from '../../api'
 import replaceTags from '@canvas/util/replaceTags'
 
 class DownloadSubmissionsDialogManager {
-  assignment: Assignment
+  assignment: Pick<Assignment, 'id' | 'submission_types' | 'has_submitted_submissions'>
 
   downloadUrl: string
 
@@ -29,7 +29,7 @@ class DownloadSubmissionsDialogManager {
   submissionsDownloading: (assignmentId: string) => void
 
   constructor(
-    assignment: Assignment,
+    assignment: Pick<Assignment, 'id' | 'submission_types' | 'has_submitted_submissions'>,
     // @ts-expect-error
     downloadUrlTemplate,
     submissionsDownloading: (assignmentId: string) => void,

@@ -1820,7 +1820,7 @@ describe('util', () => {
         true,
       )
 
-      expect(filtered.length).toBe(4)
+      expect(filtered).toHaveLength(4)
 
       assignments[0].gradingType = 'not_graded'
       filtered = filteredAssignments(
@@ -1830,7 +1830,7 @@ describe('util', () => {
         true,
       )
 
-      expect(filtered.length).toBe(3)
+      expect(filtered).toHaveLength(3)
 
       assignments[1].submissionsConnection.nodes = []
       filtered = filteredAssignments(
@@ -1840,7 +1840,7 @@ describe('util', () => {
         true,
       )
 
-      expect(filtered.length).toBe(2)
+      expect(filtered).toHaveLength(2)
     })
   })
 })

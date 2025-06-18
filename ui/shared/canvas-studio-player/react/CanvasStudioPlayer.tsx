@@ -326,8 +326,12 @@ export default function CanvasStudioPlayer({
     }
     return (
       <>
-        {/* @ts-expect-error */}
-        <Alert key="loadingalert" variant="info" liveRegion={liveRegion} screenReaderOnly={true}>
+        <Alert
+          key="loadingalert"
+          variant="info"
+          liveRegion={() => liveRegion() as Element}
+          screenReaderOnly={!!liveRegion()}
+        >
           {I18n.t('Loading')}
         </Alert>
         <LoadingIndicator

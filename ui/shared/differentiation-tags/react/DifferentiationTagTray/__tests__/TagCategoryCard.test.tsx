@@ -121,7 +121,7 @@ describe('TagCategoryCard', () => {
   describe('Delete functionality', () => {
     it('opens the delete warning modal when delete button is clicked', async () => {
       renderComponent()
-      const deleteButton = screen.getByText('Delete').closest('button')
+      const deleteButton = screen.getByText(`Delete ${noTagsCategory.name}`).closest('button')
       if (!deleteButton) throw new Error('Delete button not found')
       await userEvent.click(deleteButton)
       expect(screen.getByText('Delete Tag')).toBeInTheDocument()
@@ -133,7 +133,7 @@ describe('TagCategoryCard', () => {
         isPending: true,
       })
       renderComponent()
-      const deleteButton = screen.getByText('Delete').closest('button')
+      const deleteButton = screen.getByText(`Delete ${noTagsCategory.name}`).closest('button')
       if (!deleteButton) throw new Error('Delete button not found')
       await userEvent.click(deleteButton)
       // The confirm button should now display "Deleting..." and be disabled.
@@ -151,7 +151,7 @@ describe('TagCategoryCard', () => {
         isLoading: false,
       })
       renderComponent()
-      const deleteButton = screen.getByText('Delete').closest('button')
+      const deleteButton = screen.getByText(`Delete ${noTagsCategory.name}`).closest('button')
       if (!deleteButton) throw new Error('Delete button not found')
       await userEvent.click(deleteButton)
       const confirmButton = screen.getByText('Confirm').closest('button')
@@ -172,7 +172,7 @@ describe('TagCategoryCard', () => {
         isLoading: false,
       })
       renderComponent()
-      const deleteButton = screen.getByText('Delete').closest('button')
+      const deleteButton = screen.getByText(`Delete ${noTagsCategory.name}`).closest('button')
       if (!deleteButton) throw new Error('Delete button not found')
       await userEvent.click(deleteButton)
       const confirmButton = screen.getByText('Confirm').closest('button')

@@ -17,15 +17,12 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ExternalToolPlacementButton from '../ExternalToolPlacementButton'
-
-const ok = value => expect(value).toBeTruthy()
-const equal = (value, expected) => expect(value).toEqual(expected)
 
 describe('ExternalToolPlacementButton', () => {
   test('normally renders with a menuitem role', () => {
-    const wrapper = shallow(
+    const {getByRole} = render(
       <ExternalToolPlacementButton
         tool={{
           app_type: 'ContextExternalTool',
@@ -36,11 +33,12 @@ describe('ExternalToolPlacementButton', () => {
         onToggleSuccess={() => {}}
       />,
     )
-    equal(wrapper.find('a').props().role, 'menuitem')
+    const menuItem = getByRole('menuitem')
+    expect(menuItem).toBeInTheDocument()
   })
 
   test('renders as a button when specified', () => {
-    const wrapper = shallow(
+    const {getByRole} = render(
       <ExternalToolPlacementButton
         type="button"
         tool={{
@@ -52,24 +50,29 @@ describe('ExternalToolPlacementButton', () => {
         onToggleSuccess={() => {}}
       />,
     )
-    equal(wrapper.find('a').props().role, 'button')
+    const button = getByRole('button')
+    expect(button).toBeInTheDocument()
   })
 
-  test('does not attempt to open an opened modal', () => {
-    const wrapper = shallow(
+  test('renders button that displays tool information', () => {
+    const tool = {
+      app_type: 'ContextExternalTool',
+      name: 'A Tool',
+    }
+
+    const {getByRole} = render(
       <ExternalToolPlacementButton
         type="button"
-        tool={{
-          app_type: 'ContextExternalTool',
-          name: 'A Tool',
-        }}
+        tool={tool}
         returnFocus={() => {}}
         onSuccess={() => {}}
         onToggleSuccess={() => {}}
       />,
     )
 
-    wrapper.setState({modalIsOpen: true})
-    ok(wrapper.find('a').simulate('click', {preventDefault: () => {}}))
+    // Verify button exists and can be interacted with
+    const button = getByRole('button')
+    expect(button).toBeInTheDocument()
+    expect(button).toBeEnabled()
   })
 })

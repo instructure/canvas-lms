@@ -26,6 +26,15 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as FinalGradeOverrideApi from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrides from '../index'
 
+// Mock the external dependencies
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+}))
+
+jest.mock('@canvas/grading/FinalGradeOverrideApi', () => ({
+  updateFinalGradeOverride: jest.fn(),
+}))
+
 describe('Gradebook FinalGradeOverrides', () => {
   let finalGradeOverrides
   let gradebook
@@ -162,28 +171,33 @@ describe('Gradebook FinalGradeOverrides', () => {
     })
   })
 
-  // EVAL-3907 - remove or rewrite to remove spies on imports
-  describe.skip('#updateGrade()', () => {
+  describe('#updateGrade()', () => {
+    const mockUpdateFinalGradeOverride =
+      FinalGradeOverrideApi.updateFinalGradeOverride as jest.MockedFunction<
+        typeof FinalGradeOverrideApi.updateFinalGradeOverride
+      >
+    const mockShowFlashAlert = FlashAlert.showFlashAlert as jest.MockedFunction<
+      typeof FlashAlert.showFlashAlert
+    >
+
     beforeEach(() => {
-      jest
-        .spyOn(FinalGradeOverrideApi, 'updateFinalGradeOverride')
-        .mockResolvedValue({percentage: 90.0})
-      jest.spyOn(FlashAlert, 'showFlashAlert')
+      mockUpdateFinalGradeOverride.mockResolvedValue({percentage: 90.0})
+      mockShowFlashAlert.mockImplementation(() => {})
     })
 
     afterEach(() => {
-      jest.restoreAllMocks()
+      jest.clearAllMocks()
     })
 
     async function finished() {
-      await waitFor(() => FlashAlert.showFlashAlert.mock.calls.length > 0)
+      await waitFor(() => mockShowFlashAlert.mock.calls.length > 0)
     }
 
     it('updates the grade info via the api when the grade info is valid', async () => {
       const gradeInfo = new GradeOverrideInfo({valid: true})
       finalGradeOverrides.updateGrade('1101', gradeInfo)
       await finished()
-      expect(FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls).toHaveLength(1)
+      expect(mockUpdateFinalGradeOverride.mock.calls).toHaveLength(1)
     })
 
     describe('before updating via the api', () => {
@@ -191,9 +205,7 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       beforeEach(() => {
         gradeInfo = new GradeOverrideInfo({valid: true})
-        jest
-          .spyOn(FinalGradeOverrideApi, 'updateFinalGradeOverride')
-          .mockReturnValue(new Promise(() => {}))
+        mockUpdateFinalGradeOverride.mockReturnValue(new Promise(() => {}))
       })
 
       it('adds the grade info as pending grade info', () => {
@@ -261,8 +273,8 @@ describe('Gradebook FinalGradeOverrides', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
         const [enrollmentId] =
-          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
-            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          mockUpdateFinalGradeOverride.mock.calls[
+            mockUpdateFinalGradeOverride.mock.calls.length - 1
           ]
         expect(enrollmentId).toEqual('2901')
       })
@@ -272,8 +284,8 @@ describe('Gradebook FinalGradeOverrides', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
         const [, gradingPeriodId] =
-          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
-            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          mockUpdateFinalGradeOverride.mock.calls[
+            mockUpdateFinalGradeOverride.mock.calls.length - 1
           ]
         expect(gradingPeriodId).toEqual('1501')
       })
@@ -282,8 +294,8 @@ describe('Gradebook FinalGradeOverrides', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
         const gradingPeriodId =
-          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
-            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          mockUpdateFinalGradeOverride.mock.calls[
+            mockUpdateFinalGradeOverride.mock.calls.length - 1
           ][1]
         expect(gradingPeriodId).toBe(null)
       })
@@ -292,8 +304,8 @@ describe('Gradebook FinalGradeOverrides', () => {
         finalGradeOverrides.updateGrade('1101', gradeInfo)
         await finished()
         const gradeParam =
-          FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls[
-            FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls.length - 1
+          mockUpdateFinalGradeOverride.mock.calls[
+            mockUpdateFinalGradeOverride.mock.calls.length - 1
           ][2]
         expect(gradeParam).toBe(gradeInfo.grade)
       })
@@ -312,8 +324,10 @@ describe('Gradebook FinalGradeOverrides', () => {
         // Use a separate instance to mimic a new instance from the API call.
         gradeFromApi = new GradeOverride({percentage: 90.0})
 
-        FinalGradeOverrideApi.updateFinalGradeOverride.mockImplementation(resolve => {
-          resolvePromise = resolve
+        mockUpdateFinalGradeOverride.mockImplementation(() => {
+          return new Promise(resolve => {
+            resolvePromise = resolve
+          })
         })
       })
 
@@ -388,13 +402,12 @@ describe('Gradebook FinalGradeOverrides', () => {
 
       it('shows a flash alert', async () => {
         await requestAndResolve()
-        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
+        expect(mockShowFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "success" type for the flash alert', async () => {
         await requestAndResolve()
-        const [{type}] =
-          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
+        const [{type}] = mockShowFlashAlert.mock.calls[mockShowFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('success')
       })
     })
@@ -409,8 +422,10 @@ describe('Gradebook FinalGradeOverrides', () => {
           valid: true,
         })
 
-        FinalGradeOverrideApi.updateFinalGradeOverride.mockImplementation((resolve, reject) => {
-          rejectPromise = reject
+        mockUpdateFinalGradeOverride.mockImplementation(() => {
+          return new Promise((resolve, reject) => {
+            rejectPromise = reject
+          })
         })
 
         finalGradeOverrides.updateGrade('1101', gradeInfo)
@@ -419,12 +434,11 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('shows a flash alert', () => {
-        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
+        expect(mockShowFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "error" type for the flash alert', () => {
-        const [{type}] =
-          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
+        const [{type}] = mockShowFlashAlert.mock.calls[mockShowFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('error')
       })
     })
@@ -442,16 +456,15 @@ describe('Gradebook FinalGradeOverrides', () => {
       })
 
       it('does not update the grade via the api', () => {
-        expect(FinalGradeOverrideApi.updateFinalGradeOverride.mock.calls).toHaveLength(0)
+        expect(mockUpdateFinalGradeOverride.mock.calls).toHaveLength(0)
       })
 
       it('shows a flash alert', () => {
-        expect(FlashAlert.showFlashAlert.mock.calls).toHaveLength(1)
+        expect(mockShowFlashAlert.mock.calls).toHaveLength(1)
       })
 
       it('uses the "error" type for the flash alert', () => {
-        const [{type}] =
-          FlashAlert.showFlashAlert.mock.calls[FlashAlert.showFlashAlert.mock.calls.length - 1]
+        const [{type}] = mockShowFlashAlert.mock.calls[mockShowFlashAlert.mock.calls.length - 1]
         expect(type).toEqual('error')
       })
     })

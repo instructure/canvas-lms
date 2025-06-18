@@ -151,7 +151,6 @@ describe "courses" do
 
       # first try setting the quota explicitly
       get "/courses/#{@course.id}/settings"
-      f("#ui-id-1").click
       form = f("#course_form")
       expect(form).to be_displayed
       quota_input = form.find_element(:css, "input#course_storage_quota_mb")

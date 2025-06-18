@@ -47,9 +47,9 @@ const noRecentAnnouncementsFauxAnnouncement = {
 }
 
 export const K5AnnouncementLoadingMask = props => {
-  const {notForHomeroom, ...rest} = props
+  const {notForHomeroom, key, ...rest} = props
   return (
-    <div {...rest}>
+    <div key={key} {...rest}>
       {notForHomeroom || (
         <LoadingSkeleton
           screenReaderLabel={I18n.t('Loading Homeroom Course Name')}

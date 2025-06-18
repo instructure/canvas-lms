@@ -44,19 +44,21 @@ class Quizzes::QuizzesController < ApplicationController
 
   add_crumb(proc { t("#crumbs.quizzes", "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get(:@context), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
-  before_action :require_quiz, only: %i[
-    statistics
-    edit
-    show
-    history
-    update
-    destroy
-    moderate
-    read_only
-    managed_quiz_data
-    submission_versions
-    submission_html
-  ]
+  before_action :require_quiz,
+                only: %i[
+                  statistics
+                  edit
+                  show
+                  history
+                  update
+                  destroy
+                  moderate
+                  read_only
+                  managed_quiz_data
+                  submission_versions
+                  submission_html
+                ],
+                unless: -> { @context.root_account.feature_enabled?(:ams_service) }
   before_action :set_download_submission_dialog_title, only: [:show, :statistics]
   after_action :lock_results, only: [:show, :submission_html]
   # The number of questions that can display "details". After this number, the "Show details" option is disabled
@@ -69,6 +71,11 @@ class Quizzes::QuizzesController < ApplicationController
   QUIZ_TYPE_SURVEYS = ["survey", "graded_survey"].freeze
 
   def index
+    if @context.root_account.feature_enabled?(:ams_service)
+      render_ams_service
+      return
+    end
+
     GuardRail.activate(:secondary) do
       return unless authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
@@ -185,6 +192,11 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def show
+    if @context.root_account.feature_enabled?(:ams_service)
+      render_ams_service
+      return
+    end
+
     if @quiz.deleted?
       flash[:error] = t("errors.quiz_deleted", "That quiz has been deleted")
       redirect_to named_context_url(@context, :context_quizzes_url)
@@ -528,6 +540,7 @@ class Quizzes::QuizzesController < ApplicationController
               old_assignment.id = @quiz.assignment.id
 
               @quiz.assignment.post_to_sis = params[:post_to_sis] == "1"
+              @quiz.assignment.suppress_assignment = params[:suppress_assignment] == "1" if @context.root_account.suppress_assignments?
               @quiz.assignment.validate_overrides_for_sis(prepared_batch) if overrides
 
               @quiz.assignment.important_dates = value_to_boolean(params[:important_dates])
@@ -1124,6 +1137,12 @@ class Quizzes::QuizzesController < ApplicationController
     return quiz.assignment ? quiz.assignment.due_at : quiz.lock_at if quiz.is_a?(Quizzes::Quiz)
 
     quiz.due_at || quiz.lock_at
+  end
+
+  def render_ams_service
+    js_env(context_url: context_url(@context, :context_quizzes_url))
+    remote_env(ams: { launch_url: Services::Ams.launch_url })
+    render html: '<div id="ams_container"></div>'.html_safe, layout: true
   end
 
   protected

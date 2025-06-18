@@ -20,10 +20,40 @@
 import {render} from '@testing-library/react'
 import React from 'react'
 import {DiscussionTopicEdit} from '../index'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicEdit', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      DISCUSSION_TOPIC: {
+        PERMISSIONS: {
+          CAN_ATTACH: true,
+          CAN_MODERATE: true,
+          CAN_CREATE_ASSIGNMENT: true,
+          CAN_SET_GROUP: true,
+          CAN_MANAGE_ASSIGN_TO_GRADED: true,
+          CAN_MANAGE_ASSIGN_TO_UNGRADED: true,
+        },
+        ATTRIBUTES: {},
+      },
+      FEATURES: {},
+      PERMISSIONS: {},
+      allow_student_anonymous_discussion_topics: false,
+      USAGE_RIGHTS_REQUIRED: false,
+      K5_HOMEROOM_COURSE: false,
+      current_user: {},
+      STUDENT_PLANNER_ENABLED: true,
+      DISCUSSION_CHECKPOINTS_ENABLED: true,
+      ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   test('renders', () => {
     const document = render(<DiscussionTopicEdit />)
     expect(document).toBeTruthy()

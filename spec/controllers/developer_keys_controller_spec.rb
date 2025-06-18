@@ -106,17 +106,6 @@ describe DeveloperKeysController do
             eq(sample_scopes_for_root_account)
         end
 
-        context "when the platform_notification_service feature flag is disabled" do
-          before do
-            Account.default.disable_feature!(:platform_notification_service)
-          end
-
-          it "excludes the platform_notification_service scope" do
-            get "index", params: { account_id: Account.site_admin.id }
-            expect(assigns[:js_env][:validLtiScopes]).to eq TokenScopes::LTI_SCOPES.except(TokenScopes::LTI_PNS_SCOPE)
-          end
-        end
-
         it "includes all valid LTI placements in js env" do
           # enable conference placement
           Account.site_admin.enable_feature! :conference_selection_lti_placement
@@ -361,8 +350,10 @@ describe DeveloperKeysController do
         end
 
         context "when key validation fails" do
+          let(:long_string) { "a" * 5000 }
+
           it "reports error metric with code 400" do
-            put :update, params: { id: dk.id, developer_key: { scopes: ["bad_scope"] }, account_id: Account.site_admin.id }
+            put :update, params: { id: dk.id, developer_key: { redirect_uris: long_string }, account_id: Account.site_admin.id }
             expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(error_metric_name, tags: { action: "update", code: 400 })
           end
         end
@@ -397,14 +388,9 @@ describe DeveloperKeysController do
           expect(developer_key.reload.scopes).to match_array valid_scopes
         end
 
-        it "returns an error if an invalid scope is used" do
-          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes } }
-          expect(json_parse.dig("errors", "scopes").first["attribute"]).to eq "scopes"
-        end
-
-        it "does not persist scopes if any are invalid" do
-          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
-          expect(developer_key.reload.scopes).to be_blank
+        it "removes invalid scopes and saves valid ones" do
+          put "update", params: { id: developer_key.id, developer_key: { scopes: invalid_scopes | valid_scopes } }
+          expect(developer_key.reload.scopes).to match_array valid_scopes
         end
 
         it "sets the scopes to empty if the scopes parameter is an empty string" do

@@ -33,6 +33,8 @@ const defaultProps = {
   },
 }
 
+window.ENV.SETTINGS = {}
+
 describe('GradebookData', () => {
   it('renders', () => {
     render(<GradebookData {...defaultProps} />)

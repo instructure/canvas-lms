@@ -42,7 +42,8 @@ describe Lti::AssetProcessor do
         assign = subject.assignment
         assign.destroy!
         expect(subject.reload.active?).not_to be_truthy
-        expect(assign.lti_asset_processors.first.id).to equal subject.id
+        ap = Lti::AssetProcessor.where(assignment: assign).first
+        expect(ap.id).to equal subject.id
       end
 
       it "resolves root account through assignment" do

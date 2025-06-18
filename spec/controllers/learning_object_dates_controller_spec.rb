@@ -999,6 +999,28 @@ describe LearningObjectDatesController do
         expect(aos.reload).to be_deleted
       end
 
+      it "allows removing differentiation tag overrides when account setting is disabled" do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
+        @course.account.save
+
+        @group_category = @course.group_categories.create!(name: "Non-Collaborative Group", non_collaborative: true)
+        @group_category.create_groups(2)
+        @group = @group_category.groups.first
+        @group.add_user(@student, "accepted")
+
+        differentiable.assignment_overrides.create!(set_type: "Group", set: @group)
+        expect(differentiable.assignment_overrides.active.count).to eq 1
+
+        # disable account setting
+        @course.account.settings = { allow_assign_to_differentiation_tags: { value: false } }
+        @course.account.save
+
+        put :update, params: { **default_params, assignment_overrides: [] }
+        expect(response).to be_no_content
+        expect(differentiable.assignment_overrides.active.count).to eq 0
+      end
+
       it "returns bad_request if trying to create duplicate overrides" do
         put :update, params: { **default_params,
           assignment_overrides: [{ course_section_id: @course.default_section.id },
@@ -1140,6 +1162,21 @@ describe LearningObjectDatesController do
             assignment_id: group_assignment.id }
 
           adds_an_override_for_a_group
+        end
+
+        it "successful when removing differentiation tag overrides and account setting is disabled" do
+          # Add diff tag override
+          put :update, params: { **default_params, assignment_overrides: [{ group_id: @group.id, due_at: 7.days.from_now.to_json }] }
+          expect(response).to be_no_content
+          expect(differentiable.assignment_overrides.active.count).to eq 1
+
+          @course.account.settings = { allow_assign_to_differentiation_tags: { value: false } }
+          @course.account.save
+
+          # Remove diff tag override
+          put :update, params: { **default_params, assignment_overrides: [] }
+          expect(response).to be_no_content
+          expect(differentiable.assignment_overrides.active.count).to eq 0
         end
 
         context "works with TAs" do
@@ -2008,6 +2045,22 @@ describe LearningObjectDatesController do
         expect(response).to be_no_content
 
         successfully_removes_diff_tag_overrides(discussion, honors_dates, standard_dates, :lock_at)
+      end
+
+      it "converts diff tags for Graded Discussions" do
+        discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Discussion")
+
+        honors_dates = { unlock_at: 1.day.from_now, due_at: 2.days.from_now, lock_at: 3.days.from_now }
+        standard_dates = { unlock_at: 4.days.from_now, due_at: 5.days.from_now, lock_at: 6.days.from_now }
+
+        create_diff_tag_override_for(discussion.assignment, @honors_tag, honors_dates)
+        create_diff_tag_override_for(discussion.assignment, @standard_tag, standard_dates)
+
+        put :convert_tag_overrides_to_adhoc_overrides, params: { course_id: @course.id, discussion_topic_id: discussion.id }
+
+        expect(response).to be_no_content
+
+        successfully_removes_diff_tag_overrides(discussion.assignment, honors_dates, standard_dates, :due_at)
       end
 
       it "converts diff tags for Wiki Pages" do

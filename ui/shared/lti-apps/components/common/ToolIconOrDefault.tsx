@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// This file is used in SG2, if making changes, consider updating the code
+// there too by re-copying the contents of this file.
+
 type ToolIconUrlOrDefaultProps = {
   iconUrl: string | null | undefined
   toolId: number | string
@@ -25,13 +28,19 @@ type ToolIconUrlOrDefaultProps = {
   // requires margin to not have the border clippped,
   // But the Apps page usage isn't treating margin="0 12 0 0"
   // the same as marginRight=12
-  margin?: string | number,
+  margin?: string | number
   marginRight?: string | number
 }
 
-export const ToolIconOrDefault = (
-  {iconUrl, toolId, toolName, size, margin, marginRight}: ToolIconUrlOrDefaultProps
-) => {
+export const ToolIconOrDefault = ({
+  iconUrl,
+  toolId,
+  toolName,
+  size,
+  margin,
+  marginRight,
+}: ToolIconUrlOrDefaultProps) => {
+  const defaultIconUrl = `/lti/tool_default_icon?id=${toolId}&name=${encodeURIComponent(toolName)}`
   if (iconUrl) {
     return (
       <img
@@ -45,16 +54,18 @@ export const ToolIconOrDefault = (
           border: '0.75px solid #E8EAEC',
         }}
         src={iconUrl}
-        onError={e => { (e.target as HTMLImageElement).src = `/lti/tool_default_icon?id=${toolId}&name=${toolName}`}}
-      />
-    )
-  } else {
-    return (
-      <img
-        alt={toolName}
-        style={{height: size, width: size, margin, marginRight}}
-        src={`/lti/tool_default_icon?id=${toolId}&name=${toolName}`}
+        onError={e => {
+          ;(e.target as HTMLImageElement).src = defaultIconUrl
+        }}
       />
     )
   }
+
+  return (
+    <img
+      alt={toolName}
+      style={{height: size, width: size, margin, marginRight}}
+      src={defaultIconUrl}
+    />
+  )
 }

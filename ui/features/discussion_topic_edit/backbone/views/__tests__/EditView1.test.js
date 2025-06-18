@@ -62,10 +62,24 @@ describe('EditView', () => {
 
   beforeEach(() => {
     $container = $('<div>').appendTo(document.body)
-    fakeENV.setup()
-    fetchMock.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
-      overwriteRoutes: true,
+    fakeENV.setup({
+      COURSE_ID: '1',
+      context_asset_string: 'course_1',
+      DISCUSSION_TOPIC: {
+        ATTRIBUTES: {
+          is_announcement: false,
+        },
+      },
+      SETTINGS: {},
     })
+
+    fetchMock
+      .mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200, {
+        overwriteRoutes: true,
+      })
+      .get('path:/api/v1/courses/1/settings', {})
+      .get('path:/api/v1/courses/1/sections', [])
+      .post(/.*\/api\/graphql/, {})
     RCELoader.RCE = null
     return RCELoader.loadRCE()
   })

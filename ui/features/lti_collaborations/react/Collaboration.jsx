@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
 import DeleteConfirmation from './DeleteConfirmation'
@@ -31,6 +30,7 @@ class Collaboration extends React.Component {
   constructor(props) {
     super(props)
     this.state = {deleteConfirmationOpen: false}
+    this.wrapperRef = React.createRef()
   }
 
   openConfirmation = () => {
@@ -45,7 +45,7 @@ class Collaboration extends React.Component {
         deleteConfirmationOpen: false,
       },
       () => {
-        ReactDOM.findDOMNode(this.deleteButtonRef).focus()
+        this.deleteButtonRef.focus()
       },
     )
   }
@@ -65,7 +65,7 @@ class Collaboration extends React.Component {
     const editUrl = `/${context}/${contextId}/lti_collaborations/external_tools/retrieve?content_item_id=${collaboration.id}&placement=collaboration&url=${collaboration.update_url}&display=borderless`
 
     return (
-      <div ref="wrapper" className="Collaboration">
+      <div ref={this.wrapperRef} className="Collaboration">
         <div className="Collaboration-body">
           <a
             className="Collaboration-title"

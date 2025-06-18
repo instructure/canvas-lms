@@ -43,6 +43,8 @@ export type Enrollment = Readonly<{
   updated_at: string
   user_id: string
   grades: {
+    // *_grades are represented as strings in the backend, but for some reason they are defined as
+    // number here
     html_url: string
     current_grade: null | number
     current_score: null | number
@@ -229,6 +231,7 @@ export type Assignment = Readonly<{
   secure_params: string
   sis_assignment_id: null | string
   submission_types: string[]
+  suppress_assignment: boolean
   submissions_download_url: string
   unlock_at: null | string
   unpublishable: boolean

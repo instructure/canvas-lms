@@ -120,6 +120,7 @@ const ANONYMOUS_GRADING_BOX = '#assignment_anonymous_grading'
 const HIDE_ZERO_POINT_QUIZZES_BOX = '#assignment_hide_in_gradebook'
 const HIDE_ZERO_POINT_QUIZZES_OPTION = '#assignment_hide_in_gradebook_option'
 const OMIT_FROM_FINAL_GRADE_BOX = '#assignment_omit_from_final_grade'
+const SUPPRESS_FROM_GRADEBOOK = '#assignment_suppress_from_gradebook'
 const ASSIGNMENT_EXTERNAL_TOOLS = '#assignment_external_tools'
 const USAGE_RIGHTS_CONTAINER = '#annotated_document_usage_rights_container'
 const USAGE_RIGHTS_SELECTOR = '#usageRightSelector'
@@ -279,6 +280,7 @@ EditView.prototype.els = {
     els['' + HIDE_ZERO_POINT_QUIZZES_BOX] = '$hideZeroPointQuizzesBox'
     els['' + HIDE_ZERO_POINT_QUIZZES_OPTION] = '$hideZeroPointQuizzesOption'
     els['' + OMIT_FROM_FINAL_GRADE_BOX] = '$omitFromFinalGradeBox'
+    els['' + SUPPRESS_FROM_GRADEBOOK] = '$suppressAssignment'
     return els
   })(),
 }
@@ -305,6 +307,7 @@ EditView.prototype.events = {
     events['change ' + GROUP_CATEGORY_BOX] = 'handleGroupCategoryChange'
     events['change ' + ANONYMOUS_GRADING_BOX] = 'handleAnonymousGradingChange'
     events['change ' + HIDE_ZERO_POINT_QUIZZES_BOX] = 'handleHideZeroPointQuizChange'
+    events['change ' + SUPPRESS_FROM_GRADEBOOK] = 'handlesuppressFromGradebookChange'
     events['input ' + `[name="${EXTERNAL_TOOL_URL_INPUT_NAME}"]`] = 'clearErrorsOnInput'
     events['input ' + `[name="${ASSIGNMENT_NAME_INPUT_NAME}"]`] = 'validateInput'
     events['input ' + `[name="${ALLOWED_EXTENSIONS_INPUT_NAME}"]`] = 'validateInput'
@@ -441,7 +444,8 @@ EditView.prototype.checkboxAccessibleAdvisory = function (box) {
     box === this.$peerReviewsBox ||
     box === this.$groupCategoryBox ||
     box === this.$anonymousGradingBox ||
-    box === this.$omitFromFinalGradeBox
+    box === this.$omitFromFinalGradeBox ||
+    box === this.$suppressAssignment
       ? ''
       : 'screenreader-only'
   advisory = label.find('div.accessible_label')
@@ -488,6 +492,10 @@ EditView.prototype.enableCheckbox = function (box) {
     this.setImplicitCheckboxValue(box, '0')
     return this.checkboxAccessibleAdvisory(box).text('')
   }
+}
+
+EditView.prototype.handlesuppressFromGradebookChange = function () {
+  return this.model.suppressAssignment(this.$suppressAssignment.prop('checked'))
 }
 
 EditView.prototype.handleGroupCategoryChange = function () {
@@ -1222,7 +1230,8 @@ EditView.prototype.handleOnlineSubmissionTypeChange = function (_env) {
   const showAssetProcessors =
     window.ENV?.FEATURES?.lti_asset_processor &&
     this.$submissionType.val() === 'online' &&
-    this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked')
+    (this.$onlineSubmissionTypes.find(ALLOW_FILE_UPLOADS).prop('checked') ||
+      this.$onlineSubmissionTypes.find(ALLOW_TEXT_ENTRY).prop('checked'))
   this.$assetProcessorsContainer.toggleAccessibly(showAssetProcessors)
 
   const showConfigTools =
@@ -1242,6 +1251,7 @@ EditView.prototype.afterRender = function () {
   this.$anonymousGradingBox = $('' + ANONYMOUS_GRADING_BOX)
   this.renderModeratedGradingFormFieldGroup()
   this.renderAllowedAttempts()
+  // this.renderEnhancedRubrics()
   this.$graderCommentsVisibleToGradersBox = $('#assignment_grader_comment_visibility')
   this.$gradersAnonymousToGradersLabel = $('label[for="assignment_graders_anonymous_to_graders"]')
   if (this.$similarityDetectionTools.length > 0) {

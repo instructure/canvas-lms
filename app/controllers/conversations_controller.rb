@@ -319,11 +319,6 @@ class ConversationsController < ApplicationController
                })
         @page_title = t("Inbox")
         InstStatsd::Statsd.distributed_increment("inbox.visit.react")
-        InstStatsd::Statsd.count("inbox.visit.scope.inbox.count.react", @current_user.conversations.default.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.sent.count.react", @current_user.all_conversations.sent.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.unread.count.react", @current_user.conversations.unread.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.starred.count.react", @current_user.starred_conversations.size)
-        InstStatsd::Statsd.count("inbox.visit.scope.archived.count.react", @current_user.conversations.archived.size)
         css_bundle :canvas_inbox
         js_bundle :inbox
         render html: "", layout: true

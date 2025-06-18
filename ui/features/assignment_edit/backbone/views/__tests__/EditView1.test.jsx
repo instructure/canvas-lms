@@ -174,6 +174,9 @@ describe('EditView', () => {
       PERMISSIONS: {
         can_edit_grades: true,
       },
+      SETTINGS: {
+        suppress_assignments: false,
+      },
       GROUP_CATEGORIES: [],
       SUBMISSION_TYPE_SELECTION_TOOLS: [
         {

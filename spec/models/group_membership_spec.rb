@@ -431,6 +431,51 @@ describe GroupMembership do
       @group = Account.default.groups.create!(name: "Group!")
       @group.group_memberships.create!(user: user_factory)
     end
+
+    context "non-collaborative group" do
+      before do
+        account = @course.account
+        account.enable_feature!(:assign_to_differentiation_tags)
+        account.tap do |a|
+          a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          a.save!
+        end
+        student1 = user_factory
+        diff_tag_category = @course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true)
+        @diff_tag = @course.groups.create!(name: "Diff Tag 1", group_category: diff_tag_category, non_collaborative: true)
+        @dt_membership = @diff_tag.group_memberships.create(user: student1)
+
+        @da = assignment_model(course: @course)
+        diff_tag_override = assignment_override_model(assignment: @da)
+        diff_tag_override.set_type = "Group"
+        diff_tag_override.set_id = @diff_tag.id
+        diff_tag_override.save!
+        @da.update!(only_visible_to_overrides: true)
+      end
+
+      it "triggers a batch when membership is created" do
+        new_user = user_factory
+
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+          new_user.id,
+          @course.id,
+          match_array([@da.id])
+        )
+
+        @diff_tag.group_memberships.create(user: new_user)
+      end
+
+      it "triggers a batch when membership is deleted" do
+        expect(SubmissionLifecycleManager).not_to receive(:recompute)
+        expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+          @dt_membership.user.id,
+          @course.id,
+          match_array([@da.id])
+        )
+        @dt_membership.destroy
+      end
+    end
   end
 
   it "runs due date updates for discussion assignments" do

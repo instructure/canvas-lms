@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import MasterChildStack from '../MasterChildStack'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
@@ -29,20 +29,20 @@ describe('MasterChildStack component', () => {
   })
 
   test('renders the MasterChildStack component', () => {
-    const tree = shallow(<MasterChildStack {...defaultProps()} />)
-    const node = tree.find('.bcc__master-child-stack')
-    expect(node.exists()).toBeTruthy()
+    const {container} = render(<MasterChildStack {...defaultProps()} />)
+    const node = container.querySelector('.bcc__master-child-stack')
+    expect(node).toBeInTheDocument()
   })
 
   test('renders two boxes', () => {
-    const tree = shallow(<MasterChildStack {...defaultProps()} />)
-    const nodes = tree.find('.bcc__master-child-stack__box')
+    const {container} = render(<MasterChildStack {...defaultProps()} />)
+    const nodes = container.querySelectorAll('.bcc__master-child-stack__box')
     expect(nodes).toHaveLength(2)
   })
 
   test('renders the first box as a master box', () => {
-    const tree = shallow(<MasterChildStack {...defaultProps()} />)
-    const node = tree.find('.bcc__master-child-stack__box').at(0)
-    expect(node.hasClass('bcc__master-child-stack__box__master')).toBeTruthy()
+    const {container} = render(<MasterChildStack {...defaultProps()} />)
+    const node = container.querySelector('.bcc__master-child-stack__box')
+    expect(node).toHaveClass('bcc__master-child-stack__box__master')
   })
 })

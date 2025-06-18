@@ -45,7 +45,6 @@ describe('ContextModulesHelper', () => {
       preventDefault: jest.fn(),
     }
     const elt = {
-      // eslint-disable-next-line no-script-url
       attr: jest.fn().mockReturnValue('javascript:alert("hi")'),
     }
     Helper.externalUrlLinkClick(event, elt)

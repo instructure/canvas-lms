@@ -1066,26 +1066,30 @@ describe('Submission Draft and Comment Behavior', () => {
     const submissionId = 'test-submission-id'
 
     const submissionQuery = gql`
-    query GetSubmission {
-      node(id: "${submissionId}") {
-        __typename
-        submissionHistoriesConnection(filter: { includeCurrentSubmission: false }) {
-          nodes {
-            id
+        query GetHistory {
+          node(id: "${submissionId}") {
+            __typename
+            ... on Submission {
+              submissionHistoriesConnection(filter: { includeCurrentSubmission: false }) {
+                nodes {
+                  attempt
+                }
+              }
+            }
           }
         }
-      }
-    }
-  `
+      `
 
     const commentQuery = gql`
         query GetComments {
           node(id: "${submissionId}") {
             __typename
-            commentsConnection(filter: { forAttempt: 1, peerReview: false }, last: 20) {
-              nodes {
-                id
-                content
+            ... on Submission {
+              commentsConnection(filter: { forAttempt: 1, peerReview: false }, last: 20) {
+                nodes {
+                  _id
+                  comment
+                }
               }
             }
           }
@@ -1098,7 +1102,7 @@ describe('Submission Draft and Comment Behavior', () => {
         __typename: 'Submission',
         submissionHistoriesConnection: {
           __typename: 'SubmissionHistoryConnection',
-          nodes: [{id: 'draft-1'}],
+          nodes: [{attempt: 1}],
         },
       },
     })
@@ -1128,7 +1132,7 @@ describe('Submission Draft and Comment Behavior', () => {
         __typename: 'Submission',
         commentsConnection: {
           __typename: 'CommentConnection',
-          nodes: [{id: 'comment-1', content: 'This is a comment'}],
+          nodes: [{_id: 'comment-1', comment: 'This is a comment'}],
         },
       },
     })
@@ -1136,6 +1140,6 @@ describe('Submission Draft and Comment Behavior', () => {
     // Verify comment is added to cache
     cacheData = readFromCache(client, commentQuery)
     expect(cacheData.node.commentsConnection.nodes).toHaveLength(1)
-    expect(cacheData.node.commentsConnection.nodes[0].content).toBe('This is a comment')
+    expect(cacheData.node.commentsConnection.nodes[0].comment).toBe('This is a comment')
   })
 })

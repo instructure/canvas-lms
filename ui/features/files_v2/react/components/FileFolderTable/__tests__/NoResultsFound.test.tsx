@@ -27,6 +27,7 @@ jest.mock('@canvas/images/react/EmptyDesert', () => {
 const mockFlashScreenReaderHolder = () => {
   const div = document.createElement('div')
   div.id = 'flash_screenreader_holder'
+  div.setAttribute('role', 'alert')
   document.body.appendChild(div)
   return div
 }

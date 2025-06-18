@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState, useRef, useMemo, Ref} from 'react'
+import React, {useCallback, useState, useMemo, Ref} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Flex} from '@instructure/ui-flex'
@@ -24,15 +24,13 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getUniqueId} from '../../../utils/fileFolderUtils'
+import {getUniqueId, pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
 import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
-import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
-import FileTableUpload from './FileTableUpload'
 import PermissionsModal from './PermissionsModal'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
@@ -41,15 +39,15 @@ import {
   getSelectionScreenReaderText,
   setColumnWidths,
 } from './FileFolderTableUtils'
+import {DragAndDropWrapper} from './DragAndDropWrapper'
+import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 
 const I18n = createI18nScope('files_v2')
-const MIN_HEIGHT = 450
 
 export interface FileFolderTableProps {
   size: 'small' | 'medium' | 'large'
   rows: (File | Folder)[]
   isLoading: boolean
-  contextType: string
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   userCanRestrictFilesForContext: boolean
@@ -67,7 +65,6 @@ const FileFolderTable = ({
   size,
   rows,
   isLoading,
-  contextType,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   userCanRestrictFilesForContext,
@@ -80,7 +77,7 @@ const FileFolderTable = ({
   handleFileDropRef,
   selectAllRef,
 }: FileFolderTableProps) => {
-  const {currentFolder} = useFileManagement()
+  const {currentFolder, contextId, contextType} = useFileManagement()
   const isStacked = size !== 'large'
   const columnHeaders: ColumnHeader[] = useMemo(() => {
     const actionsTitle = isStacked ? '' : I18n.t('Actions')
@@ -93,11 +90,6 @@ const FileFolderTable = ({
     return getSelectionScreenReaderText(selectedRows.size, rows.length)
   })
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
-
-  const [isDragging, setIsDragging] = useState(false)
-  const [directoryMinHeight, setDirectoryMinHeight] = useState('auto')
-
-  const filesDirectoryRef = useRef<HTMLDivElement | null>(null)
 
   const setModalOrTrayOptions = useCallback(
     (options: ModalOrTrayOptions | null) => () => _setModalOrTrayOptions(options),
@@ -190,70 +182,19 @@ const FileFolderTable = ({
     },
   )
 
-  const showDrop = !isLoading && !searchString && !isStacked
-
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    if (e.dataTransfer?.types.includes('Files')) {
-      e.preventDefault()
-      if (!isDragging && showDrop) {
-        if (filesDirectoryRef.current && filesDirectoryRef.current.offsetHeight < MIN_HEIGHT) {
-          setDirectoryMinHeight(MIN_HEIGHT + 'px')
-        }
-        setIsDragging(true)
-      }
-      return false
-    } else {
-      return true
-    }
-  }
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    if (filesDirectoryRef.current) {
-      const rect = filesDirectoryRef.current.getBoundingClientRect()
-      if (
-        rect &&
-        (e.clientY < rect.top ||
-          e.clientY >= rect.bottom ||
-          e.clientX < rect.left ||
-          e.clientX >= rect.right)
-      ) {
-        setIsDragging(false)
-        setDirectoryMinHeight('auto')
-      }
-    }
-  }
-
-  const handleDropState = () => {
-    setIsDragging(false)
-    setDirectoryMinHeight('auto')
-  }
-
-  const handleDrop = (
-    accepted: ArrayLike<DataTransferItem | globalThis.File>,
-    _rejected: ArrayLike<DataTransferItem | globalThis.File>,
-    e: React.DragEvent<Element>,
-  ) => {
-    e.preventDefault()
-    e.stopPropagation()
-    handleDropState()
-    FileOptionsCollection.setFolder(currentFolder)
-    FileOptionsCollection.setOptionsFromFiles(accepted, true)
-  }
+  const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
+  const isEmpty = rows.length === 0 && !isLoading
 
   return (
     <>
       {renderModals()}
       <Flex direction="column">
-        <div
-          data-testid="files-directory"
-          ref={filesDirectoryRef}
-          style={{minHeight: rows.length === 0 && showDrop ? MIN_HEIGHT : directoryMinHeight}}
-          className="files_directory"
-          onDragEnter={e => handleDragEnter(e as React.DragEvent<HTMLDivElement>)}
-          onDragLeave={e => handleDragLeave(e as React.DragEvent<HTMLDivElement>)}
-          onDragOver={e => e.preventDefault()}
-          onDrop={_e => handleDropState()}
+        <DragAndDropWrapper
+          enabled={!isEmpty && showDrop && !!currentFolder}
+          minHeight={420}
+          currentFolder={currentFolder!}
+          contextId={contextId}
+          contextType={pluralizeContextTypeString(contextType)}
         >
           <Table
             caption={tableCaption}
@@ -292,27 +233,15 @@ const FileFolderTable = ({
                 usageRightsRequiredForContext,
                 setModalOrTrayOptions,
               )}
-              {/* Only render the upload row when needed, else screenreaders count an extra row 
-                  and the upload has to be in a <tr> else browsers will complain */}
-              {userCanEditFilesForContext && showDrop && (isDragging || rows.length === 0) && (
-                <Table.Row data-upload>
-                  <Table.Cell>
-                    <FileTableUpload
-                      currentFolder={currentFolder!}
-                      isDragging={isDragging}
-                      handleDrop={handleDrop}
-                      handleFileDropRef={handleFileDropRef}
-                    />
-                  </Table.Cell>
-                </Table.Row>
-              )}
             </Table.Body>
           </Table>
-        </div>
+        </DragAndDropWrapper>
         <SubTableContent
           isLoading={isLoading}
-          isEmpty={rows.length === 0 && !isLoading}
+          isEmpty={isEmpty}
           searchString={searchString}
+          showDrop={showDrop}
+          handleFileDropRef={handleFileDropRef}
         />
         {selectionAnnouncement && (
           <Alert

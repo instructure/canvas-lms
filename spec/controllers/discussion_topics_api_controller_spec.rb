@@ -812,6 +812,7 @@ describe DiscussionTopicsApiController do
       )
 
       user_session(@teacher)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
     end
 
     it "returns an error if the user can't access insights" do
@@ -848,7 +849,7 @@ describe DiscussionTopicsApiController do
       expect(response).to be_bad_request
     end
 
-    it "updates the insight entry" do
+    it "dislike the insight entry" do
       expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
 
       put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "dislike", relevance_human_feedback_notes: "new notes" }, format: "json"
@@ -860,6 +861,22 @@ describe DiscussionTopicsApiController do
       expect(@insight_entry.ai_evaluation_human_feedback_liked).to be_falsey
       expect(@insight_entry.ai_evaluation_human_feedback_disliked).to be_truthy
       expect(@insight_entry.ai_evaluation_human_feedback_notes).to eq("new notes")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.insight.entry_disliked").at_least(:once)
+    end
+
+    it "like the insight entry" do
+      expect_any_instance_of(DiscussionTopic).to receive(:user_can_access_insights?).and_return(true)
+
+      put "insight_entry_update", params: { topic_id: @topic.id, course_id: @course.id, user_id: @teacher.id, entry_id: @insight_entry.id, relevance_human_feedback_action: "like", relevance_human_feedback_notes: "nice" }, format: "json"
+
+      expect(response).to be_successful
+
+      @insight_entry.reload
+      expect(@insight_entry.ai_evaluation_human_reviewer).to eq(@teacher)
+      expect(@insight_entry.ai_evaluation_human_feedback_liked).to be_truthy
+      expect(@insight_entry.ai_evaluation_human_feedback_disliked).to be_falsey
+      expect(@insight_entry.ai_evaluation_human_feedback_notes).to eq("nice")
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.insight.entry_liked").at_least(:once)
     end
   end
 

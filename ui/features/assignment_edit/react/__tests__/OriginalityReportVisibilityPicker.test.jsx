@@ -17,31 +17,31 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import OriginalityReportVisibilityPicker from '../OriginalityReportVisibilityPicker'
 
 describe('OriginalityReportVisibilityPicker', () => {
   test('it renders', () => {
-    const wrapper = shallow(
+    const {getByRole} = render(
       <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="immediate" />,
     )
-    expect(wrapper.exists()).toBe(true)
+    expect(getByRole('combobox')).toBeInTheDocument()
   })
 
   const options = ['immediate', 'after_grading', 'after_due_date', 'never']
   options.forEach(option => {
     test(`it renders "${option}" option`, () => {
-      const wrapper = shallow(
+      const {container} = render(
         <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="immediate" />,
       )
-      expect(wrapper.find(`option[value='${option}']`).exists()).toBe(true)
+      expect(container.querySelector(`option[value='${option}']`)).toBeInTheDocument()
     })
   })
 
   test('it selects the "selectedOption"', () => {
-    const wrapper = shallow(
+    const {getByDisplayValue} = render(
       <OriginalityReportVisibilityPicker isEnabled={true} selectedOption="after_due_date" />,
     )
-    expect(wrapper.find('#report_visibility_picker_select').prop('value')).toBe('after_due_date')
+    expect(getByDisplayValue('After the due date')).toBeInTheDocument()
   })
 })

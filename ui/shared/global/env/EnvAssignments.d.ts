@@ -51,6 +51,8 @@ export interface EnvAssignmentsA2StudentView {
   belongs_to_unpublished_module: boolean
   LTI_TOOL?: string
   LTI_TOOL_ID?: string
+  LTI_TOOL_SELECTION_WIDTH?: string
+  LTI_TOOL_SELECTION_HEIGHT?: string
   ASSIGNMENT_ID: string | number
   CONFETTI_ENABLED: boolean
   CURRENT_USER_CAN_GRADE_SUBMISSION: boolean

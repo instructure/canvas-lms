@@ -74,6 +74,17 @@ describe HorizonMode do
         controller.load_canvas_career
       end
 
+      it "does not redirect when api_request?" do
+        setup(@student, @course)
+
+        allow(controller).to receive(:api_request?).and_return(true)
+
+        expect(controller).not_to receive(:load_canvas_career_for_student)
+        expect(controller).not_to receive(:load_canvas_career_for_provider)
+
+        controller.load_canvas_career
+      end
+
       it "calls both student and provider methods in correct order" do
         setup(@teacher, @course)
 

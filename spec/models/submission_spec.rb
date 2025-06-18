@@ -242,6 +242,33 @@ describe Submission do
     end
   end
 
+  describe "#body_for_attempt" do
+    before(:once) do
+      @assignment.update!(submission_types: "online_text_entry,online_url")
+      now = Time.zone.now
+      Timecop.freeze(10.minutes.from_now(now)) do
+        @assignment.submit_homework(@student, body: "body1", submission_type: "online_text_entry")
+      end
+
+      Timecop.freeze(20.minutes.from_now(now)) do
+        @assignment.submit_homework(@student, body: "body2", submission_type: "online_text_entry")
+      end
+    end
+
+    let(:submission) { @assignment.submissions.find_by(user: @student) }
+
+    it "returns the correct body given the attempt number" do
+      aggregate_failures do
+        expect(submission.body_for_attempt(1)).to eq "body1"
+        expect(submission.body_for_attempt(2)).to eq "body2"
+      end
+    end
+
+    it "returns nil if given a non-existent attempt number" do
+      expect(submission.body_for_attempt(3)).to be_nil
+    end
+  end
+
   describe ".anonymous_ids_for" do
     subject { Submission.anonymous_ids_for(@first_assignment) }
 
@@ -2485,6 +2512,33 @@ describe Submission do
       stream_item_ids       = StreamItem.where(asset_type: "Submission", asset_id: @assignment.submissions.all).pluck(:id)
       stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
       stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
+    end
+
+    context "stream item comments" do
+      before :once do
+        course_with_student(active_all: true)
+        @a1 = assignment_model(course: @course, group_category: "Study Groups", due_at: Time.zone.now - 1000, submission_types: ["online_text_entry"], suppress_assignment: true)
+      end
+
+      it "does not show stream item comments when suppress_assignment is true" do
+        @a1.suppress_assignment = true
+        @a1.save!
+        @submission = @a1.submit_homework(@student, body: "some message")
+        @submission.add_comment(author: @teacher, comment: "a")
+        stream_item_ids       = StreamItem.where(asset_type: "Submission", asset_id: @a1.submissions.all).pluck(:id)
+        stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
+        expect(stream_item_instances).to all be_hidden
+      end
+
+      it "shows stream item comments when suppress_assignment is false" do
+        @a1.suppress_assignment = false
+        @a1.save!
+        @submission = @a1.submit_homework(@student, body: "some message")
+        @submission.add_comment(author: @teacher, comment: "a")
+        stream_item_ids       = StreamItem.where(asset_type: "Submission", asset_id: @a1.submissions.all).pluck(:id)
+        stream_item_instances = StreamItemInstance.where(stream_item_id: stream_item_ids)
+        stream_item_instances.each { |sii| expect(sii).not_to be_hidden }
+      end
     end
 
     context "Submission Grade Changed" do

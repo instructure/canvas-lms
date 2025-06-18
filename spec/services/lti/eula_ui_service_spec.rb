@@ -47,7 +47,7 @@ describe Lti::EulaUiService do
 
     context "when tool has eula service scope" do
       before do
-        tool.developer_key.update!(scopes: [TokenScopes::LTI_EULA_SCOPE])
+        tool.developer_key.update!(scopes: [TokenScopes::LTI_EULA_USER_SCOPE, TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE])
       end
 
       it "returns [] if tool has opted out of EULA" do
@@ -82,7 +82,7 @@ describe Lti::EulaUiService do
 
       it "returns multiple launch urls if there are multiple APs from multiple tools attached" do
         tool2 = external_tool_1_3_model(context: course.root_account, opts: { name: "test tool2" })
-        tool2.developer_key.update!(scopes: [TokenScopes::LTI_EULA_SCOPE])
+        tool2.developer_key.update!(scopes: [TokenScopes::LTI_EULA_USER_SCOPE, TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE])
         lti_asset_processor_model(tool: tool2, assignment:)
         # multiple APs for the same tool should result only one launch url
         lti_asset_processor_model(tool: tool2, assignment:)

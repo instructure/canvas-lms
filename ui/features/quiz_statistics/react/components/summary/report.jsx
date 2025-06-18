@@ -38,15 +38,20 @@ class Report extends React.Component {
     isGenerated: false,
   }
 
+  constructor(props) {
+    super(props)
+    this.popupRef = React.createRef()
+  }
+
   componentDidUpdate(prevProps /* , prevState */) {
     // Restore focus to the generation button which is now the download button
     if (!prevProps.isGenerated && this.props.isGenerated) {
-      if (this.refs.popup.screenReaderContentHasFocus()) {
-        this.refs.popup.focusAnchor()
+      if (this.popupRef.current.screenReaderContentHasFocus()) {
+        this.popupRef.current.focusAnchor()
       }
     } else if (!prevProps.isGenerating && this.props.isGenerating) {
-      if (!this.refs.popup.screenReaderContentHasFocus()) {
-        this.refs.popup.focusScreenReaderContent(true)
+      if (!this.popupRef.current.screenReaderContentHasFocus()) {
+        this.popupRef.current.focusScreenReaderContent(true)
       }
     }
   }
@@ -55,7 +60,7 @@ class Report extends React.Component {
     return (
       <div className="report-generator inline">
         <Popup
-          ref="popup"
+          ref={this.popupRef}
           content={ReportStatus}
           id={this.props.id}
           isGenerated={this.props.isGenerated}

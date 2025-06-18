@@ -19,7 +19,13 @@
     "paths": {
       "@canvas/*": ["shared/*"],
       "@instructure/*": ["./packages/*"]
-    }
+    },
+    "plugins": [
+      {
+        "name": "@0no-co/graphqlsp",
+        "schema": "./schema.graphql"
+      }
+    ]
   },
   "include": ["ui/**/*.ts", "ui/**/*.tsx"],
   "exclude": ["node_modules"],

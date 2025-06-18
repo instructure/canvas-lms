@@ -17,12 +17,9 @@
  */
 
 import React from 'react'
-import * as enzyme from 'enzyme'
+import {render} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import LockCheckList from '../LockCheckList'
-
-const ok = value => expect(value).toBeTruthy()
-const equal = (value, expected) => expect(value).toEqual(expected)
-const deepEqual = (value, expected) => expect(value).toEqual(expected)
 
 const defaultProps = () => ({
   locks: {
@@ -37,38 +34,32 @@ const defaultProps = () => ({
 
 describe('LockCheckList component', () => {
   test('renders the LockCheckList', () => {
-    const tree = enzyme.shallow(<LockCheckList {...defaultProps()} />)
-    const node = tree.find('.bcs_check_box-group')
-    ok(node.exists())
+    const {container} = render(<LockCheckList {...defaultProps()} />)
+    const node = container.querySelector('.bcs_check_box-group')
+    expect(node).toBeTruthy()
   })
 
   test('renders the appropriate amount of Checkboxes', () => {
     const props = defaultProps()
     props.lockableAttributes = ['content', 'points']
-    const tree = enzyme.shallow(<LockCheckList {...props} />)
-    const node = tree.find('.bcs_check_box-group')
-    equal(node.length, 2)
+    const {container} = render(<LockCheckList {...props} />)
+    const nodes = container.querySelectorAll('.bcs_check_box-group')
+    expect(nodes).toHaveLength(2)
   })
 
-  test('selecting checkbox calls onChange', done => {
+  test('selecting checkbox calls onChange', async () => {
     const props = defaultProps()
     props.onChange = jest.fn()
-    const tree = enzyme.shallow(<LockCheckList {...props} />)
-    const checkbox = tree.find('.bcs_check_box-group Checkbox')
-    checkbox.at(0).simulate('change', {
-      target: {
-        checked: true,
-      },
+    const {container} = render(<LockCheckList {...props} />)
+    const checkbox = container.querySelector('.bcs_check_box-group input[type="checkbox"]')
+    await userEvent.click(checkbox)
+
+    expect(props.onChange).toHaveBeenCalledTimes(1)
+    expect(props.onChange).toHaveBeenCalledWith({
+      content: true,
+      points: false,
+      due_dates: false,
+      availability_dates: false,
     })
-    setTimeout(() => {
-      expect(props.onChange).toHaveBeenCalledTimes(1)
-      expect(props.onChange).toHaveBeenCalledWith({
-        content: true,
-        points: false,
-        due_dates: false,
-        availability_dates: false,
-      })
-      done()
-    }, 0)
   })
 })

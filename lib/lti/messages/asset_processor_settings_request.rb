@@ -41,5 +41,9 @@ module Lti::Messages
       @message.activity.id = @asset_processor.assignment.lti_context_id
       @message.activity.title = @asset_processor.assignment.title
     end
+
+    def unexpanded_custom_parameters
+      super.merge!(@asset_processor.custom || {})
+    end
   end
 end

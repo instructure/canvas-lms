@@ -1186,8 +1186,8 @@ class ContextExternalTool < ActiveRecord::Base
     if tool_id == ANALYTICS_2
       context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
     elsif tool_id == ADMIN_ANALYTICS
-      if context.is_a?(Course) && context.feature_enabled?(:analytics_2_lti_13_enabled)
-        true
+      if context.is_a?(Course)
+        context.feature_enabled?(:analytics_2_lti_13_enabled) && context.feature_enabled?(:analytics_2)
       else
         context.feature_enabled?(:admin_analytics)
       end
@@ -1367,6 +1367,10 @@ class ContextExternalTool < ActiveRecord::Base
       context_external_tool_id: id,
       host: context.root_account.environment_specific_domain
     ).delete_suffix("/deployment")
+  end
+
+  def eula_launch_url
+    extension_setting(:ActivityAssetProcessor, :eula)&.dig("target_link_uri") || launch_url
   end
 
   private

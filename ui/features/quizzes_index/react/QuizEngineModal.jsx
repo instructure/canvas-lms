@@ -28,6 +28,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('quiz_engine_modal')
 
@@ -145,17 +146,38 @@ function QuizEngineModal({setOpen, onDismiss}) {
       padding="medium"
       label={I18n.t('Choose a Quiz Engine')}
       footer={footer}
+      aria-modal={true}
     >
       {description}
       <RadioInputGroup
         name="quizEngine"
         onChange={handleChange}
         defaultValue={option}
-        description=""
+        description={I18n.t('Select a quiz engine')}
       >
-        <RadioInput key={NEW} value={NEW} label={newQuizLabel} size="large" />
+        <RadioInput
+          key={NEW}
+          value={NEW}
+          label={
+            <span>
+              {newQuizLabel}
+              <ScreenReaderContent>- {newDesc}</ScreenReaderContent>
+            </span>
+          }
+          size="large"
+        />
         {newDesc}
-        <RadioInput key={CLASSIC} value={CLASSIC} label={classicLabel} size="large" />
+        <RadioInput
+          key={CLASSIC}
+          value={CLASSIC}
+          label={
+            <span>
+              {classicLabel}
+              <ScreenReaderContent>- {classicDesc}</ScreenReaderContent>
+            </span>
+          }
+          size="large"
+        />
         {classicDesc}
       </RadioInputGroup>
       <hr />

@@ -17,7 +17,7 @@
  */
 
 import {gql} from '@apollo/client'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import type {
   RubricQueryResponse,
   DeleteRubricQueryResponse,
@@ -54,6 +54,7 @@ const COURSE_RUBRICS_QUERY = gql`
             description
             ignoreForScoring
             learningOutcomeId
+            criterionUseRange
           }
           hasRubricAssociations
           hidePoints
@@ -92,6 +93,7 @@ const ACCOUNT_RUBRICS_QUERY = gql`
             description
             ignoreForScoring
             learningOutcomeId
+            criterionUseRange
           }
           hasRubricAssociations
           hidePoints
@@ -197,6 +199,7 @@ type DuplicateRubricProps = {
   pointsPossible: number
   buttonDisplay?: string
   ratingOrder?: string
+  workflowState?: string
 }
 
 type RubricArchiveResponse = {
@@ -330,6 +333,7 @@ export const duplicateRubric = async ({
   criteria,
   ratingOrder,
   buttonDisplay,
+  workflowState,
 }: DuplicateRubricProps): Promise<DuplicateRubricQueryResponse> => {
   const urlPrefix = accountId ? `/accounts/${accountId}` : `/courses/${courseId}`
   const url = `${urlPrefix}/rubrics/`
@@ -342,6 +346,7 @@ export const duplicateRubric = async ({
       long_description: criterion.longDescription,
       points: criterion.points,
       learning_outcome_id: criterion.learningOutcomeId,
+      criterion_use_range: criterion.criterionUseRange,
       ratings: criterion.ratings.map(rating => ({
         description: rating.description,
         long_description: rating.longDescription,
@@ -367,6 +372,7 @@ export const duplicateRubric = async ({
         button_display: buttonDisplay,
         rating_order: ratingOrder,
         is_duplicate: true,
+        workflow_state: workflowState,
       },
       rubric_association: {
         association_id: accountId ?? courseId,

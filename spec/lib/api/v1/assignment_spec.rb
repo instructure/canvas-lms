@@ -1337,7 +1337,7 @@ describe "Api::V1::Assignment" do
       context "when the content_items are valid" do
         it "creates, deletes, and retains asset processors as appropriate" do
           expect { subject }.to \
-            change { assignment.lti_asset_processors.active.pluck(:title).sort }
+            change { assignment.lti_asset_processors.pluck(:title).sort }
             .from(["Existing1", "Existing2"])
             .to(["AP Title", "Existing1"])
         end
@@ -1346,7 +1346,7 @@ describe "Api::V1::Assignment" do
       context "when the assignment is no longer asset processor capable" do
         it "deletes any previous asset processors" do
           assignment_update_params[:submission_types] = ["online_url"]
-          expect { subject }.to change { assignment.lti_asset_processors.active.count }.from(2).to(0)
+          expect { subject }.to change { assignment.lti_asset_processors.count }.from(2).to(0)
         end
       end
     end

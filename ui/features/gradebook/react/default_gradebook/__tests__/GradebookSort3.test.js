@@ -18,7 +18,6 @@
 
 import {createGradebook, setFixtureHtml} from './GradebookSpecHelper'
 import AsyncComponents from '../AsyncComponents'
-import sinon from 'sinon'
 
 function gradebookSettingsModalProps() {
   return {
@@ -74,26 +73,28 @@ function gradebookSettingsModalProps() {
 }
 describe('#renderGradebookSettingsModal', () => {
   let gradebook
-  let sandbox
   let $fixtures
   let oldEnv
+  let renderGradebookSettingsModalMock
 
   function gradebookSettingsModalProps() {
-    return AsyncComponents.renderGradebookSettingsModal.lastCall.args[0]
+    return renderGradebookSettingsModalMock.mock.calls[
+      renderGradebookSettingsModalMock.mock.calls.length - 1
+    ][0]
   }
 
   beforeEach(() => {
     $fixtures = document.createElement('div')
     document.body.appendChild($fixtures)
     setFixtureHtml($fixtures)
-    sandbox = sinon.createSandbox()
     oldEnv = window.ENV
     window.ENV = {
       FEATURES: {instui_nav: true},
       current_user_id: '1',
       context_id: '1',
     }
-    sandbox.stub(AsyncComponents, 'renderGradebookSettingsModal')
+    renderGradebookSettingsModalMock = jest.fn()
+    AsyncComponents.renderGradebookSettingsModal = renderGradebookSettingsModalMock
   })
 
   afterEach(() => {
@@ -101,14 +102,14 @@ describe('#renderGradebookSettingsModal', () => {
       gradebook.destroy && gradebook.destroy()
     }
     $fixtures.remove()
-    sandbox.restore()
     window.ENV = oldEnv
+    jest.clearAllMocks()
   })
 
   test('renders the GradebookSettingsModal component', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-    expect(AsyncComponents.renderGradebookSettingsModal.callCount).toBe(1)
+    expect(renderGradebookSettingsModalMock).toHaveBeenCalledTimes(1)
   })
 
   test('sets the .courseFeatures prop to #courseFeatures from Gradebook', () => {
@@ -148,29 +149,30 @@ describe('#renderGradebookSettingsModal', () => {
   })
 
   describe('.onCourseSettingsUpdated prop', () => {
+    let handleUpdatedMock
+
     beforeEach(() => {
       gradebook = createGradebook()
+      handleUpdatedMock = jest.fn()
+      gradebook.courseSettings.handleUpdated = handleUpdatedMock
       gradebook.renderGradebookSettingsModal()
-      sandbox.stub(gradebook.courseSettings, 'handleUpdated')
-      const oldEnv = window.ENV
       window.ENV = {FEATURES: {instui_nav: true}}
     })
 
     afterEach(() => {
       window.ENV = oldEnv
-      gradebook.courseSettings.handleUpdated.restore()
     })
 
     test('updates the course settings when called', () => {
       const settings = {allowFinalGradeOverride: true}
       gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
-      expect(gradebook.courseSettings.handleUpdated.callCount).toBe(1)
+      expect(handleUpdatedMock).toHaveBeenCalledTimes(1)
     })
 
     test('updates the course settings using the given course settings data', () => {
       const settings = {allowFinalGradeOverride: true}
       gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
-      const [givenSettings] = gradebook.courseSettings.handleUpdated.lastCall.args
+      const [givenSettings] = handleUpdatedMock.mock.calls[0]
       expect(givenSettings).toBe(settings)
     })
   })
@@ -209,6 +211,7 @@ describe('#renderGradebookSettingsModal', () => {
     }
 
     test('is passed as true if the course has at least one anonymous assignment', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([anonymousAssignmentGroup, nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()
@@ -217,6 +220,7 @@ describe('#renderGradebookSettingsModal', () => {
     })
 
     test('is passed as false if the course has no anonymous assignments', () => {
+      window.ENV.SETTINGS = {}
       gradebook = createGradebook()
       gradebook.gotAllAssignmentGroups([nonAnonymousAssignmentGroup])
       gradebook.renderGradebookSettingsModal()
@@ -372,11 +376,9 @@ describe.skip('when enhanced gradebook filters are not enabled', () => {
 
 describe('Gradebook "Enter Grades as" Setting', () => {
   let gradebook
-  let sandbox
-  let updateGridStub
+  let updateGridMock
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     window.ENV = {
       current_user_id: '1',
       context_id: '1',
@@ -397,16 +399,17 @@ describe('Gradebook "Enter Grades as" Setting', () => {
         submission_types: ['online_text_entry'],
       },
     })
-    updateGridStub = sandbox.stub(gradebook.gradebookGrid, 'updateColumns')
+    updateGridMock = jest.fn()
+    gradebook.gradebookGrid.updateColumns = updateGridMock
   })
 
   afterEach(() => {
-    sandbox.restore()
     window.ENV = undefined
+    jest.clearAllMocks()
   })
 
   test.skip('calls updateGrid if a corresponding column is found', () => {
     gradebook.postAssignmentGradesTrayOpenChanged({assignmentId: '2301', isOpen: true})
-    expect(updateGridStub.callCount).toBe(1)
+    expect(updateGridMock).toHaveBeenCalledTimes(1)
   })
 })

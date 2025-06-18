@@ -34,6 +34,11 @@ class BBTreeBrowser extends React.Component {
     onSelectFolder: PropTypes.func.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.folderTreeHolderRef = React.createRef()
+  }
+
   componentDidMount() {
     const rootFoldersFinder = new RootFoldersFinder({
       rootFoldersToShow: this.props.rootFoldersToShow,
@@ -49,14 +54,14 @@ class BBTreeBrowser extends React.Component {
         selectedStyleClass: 'MoveDialog__folderItem--selected',
       },
       {
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
+        element: ReactDOM.findDOMNode(this.folderTreeHolderRef.current),
       },
     ).index
 
     window.setTimeout(() => {
       BBTreeBrowserView.getView(this.treeBrowserViewId)
         .render()
-        .$el.appendTo(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+        .$el.appendTo(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
         .find(':tabbable:first')
         .focus()
     }, 0)
@@ -69,7 +74,7 @@ class BBTreeBrowser extends React.Component {
   render() {
     return (
       <aside role="region" aria-label={I18n.t('folder_browsing_tree', 'Folder Browsing Tree')}>
-        <div ref="FolderTreeHolder" />
+        <div ref={this.folderTreeHolderRef} />
       </aside>
     )
   }

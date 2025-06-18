@@ -15,6 +15,9 @@ limit_section_visibility_in_lmgb:
   description:
     Hides certain students and sections in the LMGB if the teacher only
     has access to a particular section
+  environments:
+    development:
+      state: on
 outcome_alignments_course_migration:
   state: hidden
   applies_to: RootAccount
@@ -36,6 +39,9 @@ improved_outcomes_management:
   description:
     Helps administrators and teachers make more meaningful decisions as they import,
     organize, and edit outcomes in their account and courses.
+  environments:
+    development:
+      state: on
 assignment_comment_library:
   type: setting
   state: hidden
@@ -60,6 +66,9 @@ menu_option_for_outcome_details_page:
   applies_to: SiteAdmin
   display_name: Menu Option for Outcome Details Page
   description: Adds menu option for accessing alignments at the outcome level with Improved Outcomes Management
+  environments:
+    development:
+      state: on
 outcomes_friendly_description:
   state: hidden
   applies_to: SiteAdmin
@@ -67,26 +76,41 @@ outcomes_friendly_description:
   description:
     Allows users to add a friendly description to outcomes for student and parent view
     in the Student Learning Mastery Gradebook.
+  environments:
+    development:
+      state: on
 outcome_service_results_to_canvas:
   state: hidden
   applies_to: Course
   display_name: Outcome Service Results to Canvas Reporting
   description: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
+  environments:
+    development:
+      state: on
 outcome_average_calculation:
   state: allowed_on
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
   description: Allows users to use average as a calculation method for a given outcome.
+  environments:
+    development:
+      state: on
 outcome_alignment_summary_with_new_quizzes:
   state: hidden
   applies_to: Course
   display_name: New Quizzes included on Outcome Alignment Summary Tab
   description: New Quizzes outcome alignments are included on the Outcome Alignment Summary Tab, which provides a list of alignments for each outcome in a course.
+  environments:
+    development:
+      state: on
 outcomes_new_decaying_average_calculation:
   state: hidden
   applies_to: RootAccount
   display_name: Outcomes New Decaying Average Calculation Method
   description: Allows users to use new decaying average as a calculation method for a given outcome.
+  environments:
+    development:
+      state: on
 archive_outcomes:
   state: hidden
   applies_to: SiteAdmin
@@ -109,3 +133,6 @@ improved_outcome_report_generation:
   description: Enables postprocessing records after SQL execution to reduce query complexity in Outcome reports.
   applies_to: SiteAdmin
   shadow: true
+  environments:
+    development:
+      state: on

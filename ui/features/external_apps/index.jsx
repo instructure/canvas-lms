@@ -16,34 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import ReactDOM from 'react-dom'
 import router from './react/router'
-import ready from '@instructure/ready'
+import {LoadTab} from '../../shared/tabs/react/LoadTab'
 
 let alreadyRendered = false
 
-function renderReactApps(tabId) {
+function loadToolsTab(tabId) {
   const targetNode = document.getElementById('external_tools')
-  if (tabId === 'tab-tools-link') {
+  if (tabId === 'tab-tools-selected') {
     router.start(targetNode)
     alreadyRendered = true
   } else if (alreadyRendered) {
-    ReactDOM.unmountComponentAtNode(targetNode)
     alreadyRendered = false
     router.stop()
   }
 }
 
-ready(() => {
-  const activeTabId = $('li.ui-state-active > a').prop('id')
-  if (activeTabId) {
-    renderReactApps(activeTabId)
-  }
-
-  $('#account_settings_tabs, #course_details_tabs').on('tabscreate tabsactivate', (event, ui) => {
-    const selectedTab = ui.tab || ui.newTab
-    const tabId = $(selectedTab).find('a').attr('id')
-    renderReactApps(tabId)
-  })
-})
+LoadTab(loadToolsTab)

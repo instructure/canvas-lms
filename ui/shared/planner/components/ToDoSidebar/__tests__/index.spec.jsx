@@ -178,8 +178,21 @@ it('does not render out items that are completed', () => {
 
 it('can handles no items', () => {
   // suppress Show All button and display "Nothing for now" instead of list
-  const wrapper = render(<ToDoSidebar {...defaultProps} changeDashboardView={null} />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByTestId, getByText, queryByText} = render(
+    <ToDoSidebar {...defaultProps} changeDashboardView={null} />,
+  )
+
+  // Should render the ToDoSidebar container
+  expect(getByTestId('ToDoSidebar')).toBeInTheDocument()
+
+  // Should render the To Do header
+  expect(getByText('To Do')).toBeInTheDocument()
+
+  // Should display "Nothing for now" when there are no items
+  expect(getByText('Nothing for now')).toBeInTheDocument()
+
+  // Should not display "Show All" button when changeDashboardView is null
+  expect(queryByText('Show All')).not.toBeInTheDocument()
 })
 
 it('renders an error message when loading fails', () => {

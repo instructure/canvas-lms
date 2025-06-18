@@ -59,6 +59,7 @@ export const FormControlButtons = ({
         display={breakpoints.mobileOnly ? 'block' : 'inline-block'}
         color="secondary"
         margin={breakpoints.mobileOnly ? 'none none small none' : 'none xx-small none xx-small'}
+        data-testid="announcement-cancel-button"
         onClick={() => {
           // @ts-expect-error
           assignLocation(ENV?.CANCEL_TO)

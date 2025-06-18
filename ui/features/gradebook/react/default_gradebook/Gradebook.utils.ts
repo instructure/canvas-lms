@@ -79,7 +79,10 @@ export function compareAssignmentDueDates(assignment1: GridColumn, assignment2: 
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
 
-export function ensureAssignmentVisibility(assignment: Assignment, submission: Submission) {
+export function ensureAssignmentVisibility(
+  assignment: Pick<Assignment, 'visible_to_everyone' | 'assignment_visibility'>,
+  submission: Submission,
+) {
   if (
     assignment?.visible_to_everyone === false &&
     !assignment.assignment_visibility.includes(submission.user_id)
@@ -217,7 +220,10 @@ export async function confirmViewUngradedAsZero({
   }
 }
 
-export function hiddenStudentIdsForAssignment(studentIds: string[], assignment: Assignment) {
+export function hiddenStudentIdsForAssignment(
+  studentIds: string[],
+  assignment: Pick<Assignment, 'assignment_visibility'>,
+) {
   return _.difference(studentIds, assignment.assignment_visibility)
 }
 
@@ -731,7 +737,7 @@ export const filterStudentBySubmissionFn = (
     appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (student: Pick<Student, 'id'>) => {
     if (submissionFilters.length === 0) {
       return true
     }
@@ -766,7 +772,11 @@ export const filterStudentBySectionFn = (
     appliedFilters,
   ) as SubmissionFilterValue[]
 
-  return (student: Student) => {
+  return (
+    student: Pick<Student, 'sections'> & {
+      enrollments: Pick<Student['enrollments'][number], 'course_section_id' | 'enrollment_state'>[]
+    },
+  ) => {
     if (sectionFilters.length === 0) {
       return true
     }
@@ -796,7 +806,7 @@ export const filterAssignmentsBySubmissionsFn = (
     customStatuses,
   )
 
-  return (assignment: Assignment) => {
+  return (assignment: Pick<Assignment, 'id'>) => {
     if (filtersNeedingSome.length === 0 && filtersNeedingEvery.length === 0) {
       return true
     }

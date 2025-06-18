@@ -19,8 +19,7 @@
 #
 
 module Types
-  class GroupMembershipStateType < BaseEnum
-    graphql_name "GroupMembershipState"
+  class GroupMembershipStateType < Types::BaseEnum
     value "accepted"
     value "invited"
     value "requested"
@@ -28,9 +27,7 @@ module Types
     value "deleted"
   end
 
-  class GroupMembershipType < ApplicationObjectType
-    graphql_name "GroupMembership"
-
+  class GroupMembershipType < ApplicationObjectType # rubocop:disable GraphQL/NotAuthorizedNodeType
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
@@ -39,6 +36,11 @@ module Types
     field :user, UserType, null: true
     def user
       load_association(:user)
+    end
+
+    field :group, GroupType, null: false
+    def group
+      load_association(:group)
     end
   end
 end

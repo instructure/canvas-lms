@@ -42,7 +42,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers({legacyFakeTimers: true})
+jest.useFakeTimers()
 
 const delayImportOutcomesProgress = () => {
   let realResolve

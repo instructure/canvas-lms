@@ -23,33 +23,47 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../utils/types'
+import {filterRequirementsMet} from '../utils/utils'
 import {IconShapeOvalLine} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemStatusIconProps {
   itemId: string
-  completionRequirement?: CompletionRequirement
+  moduleCompleted: boolean
+  completionRequirements?: CompletionRequirement[]
   requirementsMet?: ModuleRequirement[]
   content?: ModuleItemContent
 }
 
 const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   itemId,
-  completionRequirement,
+  moduleCompleted,
+  completionRequirements,
   requirementsMet = [],
   content,
 }) => {
+  const completionRequirement = useMemo(
+    () => completionRequirements?.find(req => req.id === itemId),
+    [completionRequirements, itemId],
+  )
+  const hasCompletionRequirements = !!completionRequirements?.length
+
   const isMissing = useMemo(() => {
     if (!content) return false
 
     return !!content?.submissionsConnection?.nodes?.[0]?.missing
   }, [content])
 
+  const filteredRequirementsMet = useMemo(() => {
+    return filterRequirementsMet(requirementsMet, completionRequirements ?? []).some(
+      req => req.id === itemId,
+    )
+  }, [requirementsMet, completionRequirements, itemId])
+
   const isCompleted = useMemo(
-    () =>
-      requirementsMet.some(req => req.id.toString() === itemId.toString()) && completionRequirement,
-    [requirementsMet, itemId, completionRequirement],
+    () => filteredRequirementsMet && !!completionRequirement,
+    [filteredRequirementsMet, completionRequirement],
   )
 
   const isSubmissionEmpty = useMemo(
@@ -74,19 +88,19 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   )
 
   const renderPill = useMemo(() => {
-    if (isMissing) {
+    if (isMissing && (!moduleCompleted || !hasCompletionRequirements)) {
       return <StatusPill color="danger" text={I18n.t('Missing')} />
     } else if (isCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
-    } else if (completionRequirement) {
+    } else if (completionRequirement && !moduleCompleted) {
       return <IconShapeOvalLine data-testid="assigned-icon" />
     } else {
       return null
     }
-  }, [isCompleted, isMissing, completionRequirement])
+  }, [isCompleted, isMissing, completionRequirement, moduleCompleted, hasCompletionRequirements])
 
   return renderPill && (completionRequirement || isSubmissionEmpty) ? (
-    <View as="div" margin="0 0 0 small">
+    <View as="div" margin="0 0 0 small" data-testid="module-item-status-icon">
       {renderPill}
     </View>
   ) : null

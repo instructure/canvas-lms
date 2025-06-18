@@ -57,6 +57,7 @@ describe('EditView', () => {
   beforeEach(() => {
     $container = $('<div>').appendTo(document.body)
     fakeENV.setup()
+    ENV.SETTINGS = {suppress_assignments: false}
 
     // Mock API endpoints
     fetchMock

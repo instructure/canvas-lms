@@ -71,14 +71,14 @@
   <% end %>
 
   <div class="ic-Form-control">
-    <div class="ic-Label" id="aria-announcements-send-to-group">
+    <div class="ic-Label">
       <%= t "Show to" %>
       <%= roles_message(@account) %>
     </div>
     <div class="grid-row">
       <div class="col-xs-12 col-lg-4">
-        <i><%= t "Course roles" %></i>
-        <div class="ic-Checkbox-group" role="group" aria-labelledby="aria-announcements-send-to-group">
+        <i id="course-roles-label"><%= t "Course roles" %></i>
+        <div class="ic-Checkbox-group" role="group" aria-labelledby="course-roles-label">
           <% role_ids = announcement.account_notification_roles.map {|r| r.role_id} %>
           <% @course_roles.each do |r| %>
             <% course_role_checked = role_ids.include? r[:id] %>
@@ -107,19 +107,21 @@
         </div>
       </div>
       <div class="col-xs-12 col-lg-4">
-        <i><%= t "Account roles" %></i>
-        <% @account_roles.each do |r| %>
-          <% account_role_checked = role_ids.include? r[:id] %>
-          <div class="ic-Form-control ic-Form-control--checkbox">
-            <%= check_box_tag "account_notification_roles[]", r[:id], account_role_checked, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx_#{announcement.id}" } %>
-            <label class="ic-Label" for="<%= "account_notification_role_#{r[:id]}_cbx_#{announcement.id}" %>">
-              <%= r[:label] %>
-              <span class="screenreader-only">
-                <%=t "Send this announcement to users with the account role of %{role}", :role => r[:label] %>
-              </span>
-            </label>
-          </div>
-        <% end %>
+        <i id="account-roles-label"><%= t "Account roles" %></i>
+        <div class="ic-Checkbox-group" role="group" aria-labelledby="account-roles-label">
+          <% @account_roles.each do |r| %>
+            <% account_role_checked = role_ids.include? r[:id] %>
+            <div class="ic-Form-control ic-Form-control--checkbox">
+              <%= check_box_tag "account_notification_roles[]", r[:id], account_role_checked, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx_#{announcement.id}" } %>
+              <label class="ic-Label" for="<%= "account_notification_role_#{r[:id]}_cbx_#{announcement.id}" %>">
+                <%= r[:label] %>
+                <span class="screenreader-only">
+                  <%=t "Send this announcement to users with the account role of %{role}", :role => r[:label] %>
+                </span>
+              </label>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>

@@ -23,14 +23,20 @@ module Factories
     props = {
       title: "title",
       text: "text",
-      custom: { customkey: "customvar" },
+      custom: { customkey: "customvar", raid: "$Canvas.root_account.id" },
       icon: { url: "https://example.com/icon.png", width: 32, height: 32 },
       window: { targetName: "mytoolwin", width: 500, height: 400, windowFeatures: "left=100,top=100" },
       iframe: { width: 500, height: 400 },
-      report: { released: false, indicator: true, url: "https://example.com/my_special_target_uri", custom: {} },
+      report: { released: false,
+                indicator: true,
+                url: "https://example.com/my_special_target_uri",
+                custom: {
+                  customkey: "report_overrided",
+                  raid2: "$Canvas.root_account.id",
+                } },
     }.with_indifferent_access.merge(overrides)
     props[:context_external_tool] ||=
-      props.delete(:tool) || external_tool_1_3_model(context: external_tool_context)
+      props.delete(:tool) || external_tool_1_3_model(context: external_tool_context, placements: ["ActivityAssetProcessor"])
     props[:assignment] ||= assignment_model(assingment_opts)
     props[:url] ||= props[:context_external_tool].url
     Lti::AssetProcessor.create!(**props)
@@ -52,7 +58,7 @@ module Factories
     props[:asset] ||=
       props.delete(:lti_asset_id)&.then { Lti::Asset.find(_1) } ||
       lti_asset_model(
-        submission: submission_model(
+        submission: props.delete(:submission) || submission_model(
           user: props[:user],
           assignment: props[:asset_processor].assignment
         )
@@ -84,8 +90,12 @@ module Factories
 
   def lti_asset_model(overrides = {})
     props = overrides.dup
-    props[:attachment] ||= attachment_model
     props[:submission] ||= submission_model
+    if props[:submission].submission_type == "online_text_entry"
+      props[:submission_attempt] ||= props[:submission].attempt
+    else
+      props[:attachment] ||= attachment_model
+    end
     Lti::Asset.create!(**props)
   end
 

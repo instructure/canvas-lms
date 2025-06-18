@@ -125,6 +125,7 @@ function Assignment() {
   this.hasSubmittedSubmissions = this.hasSubmittedSubmissions.bind(this)
   this.hideInGradebook = this.hideInGradebook.bind(this)
   this.hideZeroPointQuizzesOptionEnabled = this.hideZeroPointQuizzesOptionEnabled.bind(this)
+  this.suppressAssignmentAllowed = this.suppressAssignmentAllowed.bind(this)
   this.htmlBuildUrl = this.htmlBuildUrl.bind(this)
   this.htmlEditUrl = this.htmlEditUrl.bind(this)
   this.htmlUrl = this.htmlUrl.bind(this)
@@ -202,6 +203,7 @@ function Assignment() {
   this.submissionTypes = this.submissionTypes.bind(this)
   this.submissionTypeSelectionTools = this.submissionTypeSelectionTools.bind(this)
   this.submissionTypesFrozen = this.submissionTypesFrozen.bind(this)
+  this.suppressAssignment = this.suppressAssignment.bind(this)
   this.toView = this.toView.bind(this)
   this.turnitinAvailable = this.turnitinAvailable.bind(this)
   this.turnitinEnabled = this.turnitinEnabled.bind(this)
@@ -994,9 +996,9 @@ Assignment.prototype.htmlEditUrl = function () {
 
 Assignment.prototype.htmlBuildUrl = function () {
   if (this.isQuizLTIAssignment() && canManage()) {
-    let displayType = "full_width"
+    let displayType = 'full_width'
     if (ENV.FEATURES.new_quizzes_navigation_updates) {
-      displayType = "full_width_with_nav"
+      displayType = 'full_width_with_nav'
     }
     return this.get('html_url') + `?display=${displayType}`
   } else {
@@ -1010,6 +1012,10 @@ Assignment.prototype.labelId = function () {
 
 Assignment.prototype.postToSISEnabled = function () {
   return ENV.POST_TO_SIS
+}
+
+Assignment.prototype.suppressAssignmentAllowed = function () {
+  return ENV.SETTINGS.suppress_assignments
 }
 
 Assignment.prototype.postToSISName = function () {
@@ -1197,6 +1203,12 @@ Assignment.prototype.submissionTypesFrozen = function () {
   return includes(this.frozenAttributes(), 'submission_types')
 }
 
+Assignment.prototype.suppressAssignment = function (suppressAssignment) {
+  return suppressAssignment !== undefined
+    ? this.set('suppress_assignment', suppressAssignment)
+    : this.get('suppress_assignment')
+}
+
 Assignment.prototype.toView = function () {
   const fields = [
     'abGuid',
@@ -1248,6 +1260,7 @@ Assignment.prototype.toView = function () {
     'hasSubAssignments',
     'hideInGradebook',
     'hideZeroPointQuizzesOptionEnabled',
+    'suppressAssignmentAllowed',
     'htmlBuildUrl',
     'htmlEditUrl',
     'htmlUrl',
@@ -1301,6 +1314,7 @@ Assignment.prototype.toView = function () {
     'submissionType',
     'submissionTypeSelectionTools',
     'submissionTypesFrozen',
+    'suppressAssignment',
     'turnitinAvailable',
     'turnitinEnabled',
     'unlockAt',

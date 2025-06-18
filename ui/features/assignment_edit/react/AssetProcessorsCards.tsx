@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcessor'
+import type {AssetProcessorWindowSettings} from '@canvas/lti/model/AssetProcessor'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
 import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWithTooltip'
-import {IframeDimensions} from '@canvas/lti/model/common'
-import {Spacing} from '@instructure/emotion'
+import type {IframeDimensions} from '@canvas/lti/model/common'
+import type {Spacing} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconExternalLinkLine, IconMoreLine} from '@instructure/ui-icons'
@@ -75,6 +75,7 @@ const AttachedAssetProcessorsMenu = ({
     <Menu
       trigger={
         <IconButton
+          data-pendo="asset-processor-menu-button"
           renderIcon={IconMoreLine}
           withBackground={false}
           withBorder={false}
@@ -93,7 +94,7 @@ const AttachedAssetProcessorsMenu = ({
       }}
     >
       {onModify && (
-        <Menu.Item value="modify">
+        <Menu.Item data-pendo="asset-processor-modify-button" value="modify">
           <View padding="0 x-large 0 small">
             {I18n.t('Modify')}
             {modifyInNewWindow && (
@@ -106,7 +107,7 @@ const AttachedAssetProcessorsMenu = ({
           </View>
         </Menu.Item>
       )}
-      <Menu.Item value="delete">
+      <Menu.Item data-pendo="asset-processor-delete-button" value="delete">
         <View padding="0 x-large 0 small">{I18n.t('Delete')}</View>
       </Menu.Item>
     </Menu>
@@ -183,10 +184,12 @@ export const AssetProcessorsCard = ({
   description,
   children,
   onClick,
-  extraColumns: extraColumns,
+  extraColumns,
   margin,
 }: AssetProcessorsCardProps) => (
   <View
+    data-pendo="asset-processor-add-modal-tool"
+    data-testid="asset-processor-card"
     aria-label={title}
     as="div"
     background="secondary"

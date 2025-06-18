@@ -22,6 +22,12 @@ import EditHeaderView from '../EditHeaderView'
 import editViewTemplate from '../../../jst/EditView.handlebars'
 import Backbone from '@canvas/backbone'
 import axe from 'axe-core'
+import {assignLocation} from '@canvas/util/globalUtils'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
 
 const createEditHeaderView = (
   assignmentOptions = {},
@@ -47,13 +53,14 @@ describe('EditHeaderView', () => {
   let container
 
   beforeEach(() => {
-    window.ENV = {
+    fakeENV.setup({
       current_user_roles: ['teacher'],
       current_user_is_admin: false,
       FEATURES: {
         instui_nav: true,
       },
-    }
+      SETTINGS: {},
+    })
     container = document.createElement('div')
     container.id = 'fixtures'
     container.setAttribute('role', 'main')
@@ -63,10 +70,11 @@ describe('EditHeaderView', () => {
   })
 
   afterEach(() => {
-    window.ENV = null
+    fakeENV.teardown()
     container.remove()
     $(document).off('submit')
     jest.resetAllMocks()
+    jest.clearAllMocks()
   })
 
   // TODO: Fix accessibility test - requires more complex DOM setup
@@ -165,10 +173,13 @@ describe('EditHeaderView', () => {
 
   describe('delete functionality', () => {
     it('calls onDeleteSuccess for unsaved assignments', () => {
+      fakeENV.setup({ASSIGNMENT_INDEX_URL: '/assignments', SETTINGS: {}})
       const view = createEditHeaderView()
       const onDeleteSuccess = jest.spyOn(view, 'onDeleteSuccess')
       view.delete()
       expect(onDeleteSuccess).toHaveBeenCalled()
+      expect(assignLocation).toHaveBeenCalledWith('/assignments')
+      fakeENV.teardown()
     })
 
     it('disables delete for frozen assignments', () => {
@@ -211,7 +222,11 @@ describe('EditHeaderView', () => {
 
   describe('SpeedGrader link', () => {
     beforeEach(() => {
-      window.ENV.SHOW_SPEED_GRADER_LINK = true
+      fakeENV.setup({SHOW_SPEED_GRADER_LINK: true, SETTINGS: {}})
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
     })
 
     it('shows when assignment is published', () => {

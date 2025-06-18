@@ -411,7 +411,7 @@ class FilesController < ApplicationController
     if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
-      files_version_2 = Account.site_admin.feature_enabled?(:files_a11y_rewrite) && (!Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1")
+      files_version_2 = files_version_2?
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
 
       root_folders_by_context = {}
@@ -681,7 +681,20 @@ class FilesController < ApplicationController
       end
 
       if @attachment.inline_content? && params[:sf_verifier] && redirect_for_inline?(params[:sf_verifier])
-        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
+        # with cross-site cookie protections, we can't set the cookie on the files domain
+        # and we can't leave the sf_verifier in the url because of security issues (FOO-2918)
+        sf_token = {}
+        begin
+          # User files need a verifier to grant access anyway, so the token is redundant
+          if Account.site_admin.feature_enabled?(:safe_files_token) && !@context.is_a?(User)
+            validate_access_verifier
+            sf_token = SecureRandom.hex(16)
+            Rails.cache.write("sf_token:#{sf_token}", { full_path: @attachment.full_path, used: false }, expires_in: 5.minutes)
+          end
+        rescue Canvas::Security::TokenExpired, Users::AccessVerifier::InvalidVerifier
+          nil
+        end
+        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier).merge(sf_token:))
       end
 
       params[:download] ||= params[:preview]
@@ -1689,6 +1702,18 @@ class FilesController < ApplicationController
   end
 
   private
+
+  def files_version_2?
+    unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
+      return false
+    end
+
+    unless @current_user
+      return true
+    end
+
+    !Account.site_admin.feature_enabled?(:files_a11y_rewrite_toggle) || @current_user.files_ui_version != "v1"
+  end
 
   def quota_exempt?
     @attachment.verify_quota_exemption_key(params[:quota_exemption]) ||

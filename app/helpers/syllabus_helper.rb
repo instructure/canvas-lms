@@ -30,6 +30,6 @@ module SyllabusHelper
                  "course_syllabus_#{@context.id}"
                end
 
-    public_user_content(syllabus_body, context: @context, user:, is_public:, location:)
+    user_content(syllabus_body, context: @context, user:, is_public:, location:)
   end
 end

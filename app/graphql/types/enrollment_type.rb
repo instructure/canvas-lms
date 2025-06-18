@@ -19,6 +19,11 @@
 #
 
 module Types
+  class EnrollmentRoleType < ApplicationObjectType
+    field :_id, ID, "legacy canvas id", method: :id, null: true
+    field :name, String, null: true
+  end
+
   class EnrollmentWorkflowState < Types::BaseEnum
     graphql_name "EnrollmentWorkflowState"
     value "invited"
@@ -50,6 +55,11 @@ module Types
              default_value: []
     argument :states, [EnrollmentWorkflowState], required: false, default_value: nil
     argument :types, [EnrollmentTypeType], required: false, default_value: nil
+    argument :user_ids,
+             [ID],
+             prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+             required: false,
+             default_value: []
   end
 
   class EnrollmentType < ApplicationObjectType
@@ -68,6 +78,11 @@ module Types
     field :_id, ID, "legacy canvas id", method: :id, null: true
     def _id
       unless_hiding_user_for_anonymous_grading { enrollment.id }
+    end
+
+    field :user_id, ID, null: true
+    def user_id
+      unless_hiding_user_for_anonymous_grading { object.user_id }
     end
 
     field :user, UserType, null: true
@@ -94,13 +109,48 @@ module Types
 
     field :state, EnrollmentWorkflowState, method: :workflow_state, null: false
 
+    # This field has been copied from Api::V1::User#enrollment_json
+    # This field is provided for the gradebook
+    field :enrollment_state, EnrollmentWorkflowState, null: false
+    def enrollment_state
+      load_association(:course).then do |course|
+        if course.workflow_state == "deleted"
+          "deleted"
+        else
+          load_association(:course_section).then do |section|
+            (section.workflow_state == "deleted") ? "deleted" : enrollment.workflow_state
+          end
+        end
+      end
+    end
+
     field :type, EnrollmentTypeType, null: false
 
     field :limit_privileges_to_course_section, Boolean, null: true
 
+    field :end_at, DateTimeType, null: true
+    field :start_at, DateTimeType, null: true
+
     field :sis_import_id, ID, null: true
     def sis_import_id
+      return nil unless enrollment.root_account.grants_right?(current_user, :manage_sis)
+
       enrollment.sis_batch_id
+    end
+
+    field :sis_section_id, ID, null: true
+    def sis_section_id
+      load_association(:course).then do |course|
+        if course.grants_right?(current_user, :read_sis) || enrollment.root_account.grants_right?(current_user, :manage_sis)
+          load_association(:course_section).then(&:sis_source_id)
+        end
+        nil
+      end
+    end
+
+    field :role, EnrollmentRoleType, null: true
+    def role
+      load_association(:role)
     end
 
     field :grades, GradesType, null: true do

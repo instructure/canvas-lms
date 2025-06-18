@@ -30,7 +30,7 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 jest.mock('@canvas/upload-file')
 
-const defaultMocks = (result = {data: {}}) => [
+const defaultMocks = (result = {data: {course: {externalToolsConnection: {nodes: []}}}}) => [
   {
     request: {
       query: EXTERNAL_TOOLS_QUERY,

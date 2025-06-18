@@ -1694,4 +1694,127 @@ describe "Importing assignments" do
       expect(assignment.assignment_group.name).to eq("Imported Assignments")
     end
   end
+
+  describe "assignment group association on wiki page assignment and conditional release course" do
+    let(:course) { Course.create! }
+    let(:migration) { course.content_migrations.create! }
+    let(:assignment_migration_id) { "assignment_migration_id" }
+    let(:assignment_group_migration_id) { "assignment_group_migration_id" }
+    let(:assignment_group) { course.assignment_groups.create!(migration_id: assignment_group_migration_id) }
+    let(:assignment) do
+      course.assignments.create!(
+        assignment_group:,
+        submission_types: "wiki_page",
+        migration_id: assignment_migration_id
+      )
+    end
+    let(:assignment_hash) do
+      {
+        migration_id: assignment_migration_id,
+        title: "wiki page assignment",
+        submission_types: "wiki_page",
+        assignment_group_migration_id:,
+        wiki_page_migration_id: "mig"
+      }
+    end
+
+    before do
+      allow_any_instance_of(Course).to receive(:conditional_release?).and_return(true)
+    end
+
+    context "when wiki_page_mastery_path_no_assignment_group FF is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:wiki_page_mastery_path_no_assignment_group)
+      end
+
+      it "should not nil the assignment_group" do
+        imported_assignment = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration, assignment)
+
+        expect(imported_assignment.assignment_group).to eq(assignment_group)
+      end
+    end
+
+    context "when wiki_page_mastery_path_no_assignment_group FF is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:wiki_page_mastery_path_no_assignment_group)
+      end
+
+      context "when submission_types is not wiki_page" do
+        it "should not nil the assignment_group" do
+          assignment
+          assignment_hash[:submission_types] = "somethingelse"
+
+          imported_assignment = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+
+          expect(imported_assignment.assignment_group).to eq(assignment_group)
+        end
+      end
+
+      context "when not conditional_release?" do
+        it "should not nil the assignment_group" do
+          allow_any_instance_of(Course).to receive(:conditional_release?).and_return(false)
+          assignment
+
+          imported_assignment = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+
+          expect(imported_assignment.assignment_group).to eq(assignment_group)
+        end
+      end
+
+      context "when conditional_release? and submission_types" do
+        it "should set nil the assignment_group" do
+          assignment
+
+          imported_assignment = Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
+
+          expect(imported_assignment.assignment_group).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "#associate_assignment_group" do
+    let(:course) { Course.create! }
+    let(:assignment_group_migration_id) { "assignment_group_migration_id" }
+    let(:assignment_group) { course.assignment_groups.create!(migration_id: assignment_group_migration_id) }
+    let(:assignment) { course.assignments.create! }
+    let(:assignment_hash) { { migration_id:, assignment_group_migration_id: } }
+
+    it "associate assignment group that we find for assignment_group_migration_id from import hash" do
+      assignment_group
+
+      Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
+
+      expect(assignment.assignment_group).to eq(assignment_group)
+    end
+
+    it "keep the original assignment group on the assignment if there's no assignment_group_migration_id from import hash" do
+      assignment_hash.delete(:assignment_group_migration_id)
+      assignment.assignment_group = assignment_group
+
+      Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
+
+      expect(assignment.assignment_group).to eq(assignment_group)
+    end
+
+    it "default to 'Imported Assignments' if there is no assignment group found for the given assignment_group_migration_id" do
+      assignment_hash[:assignment_group_migration_id] = "a random migration id"
+      assignment.assignment_group = assignment_group
+
+      Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
+
+      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.name).to eq("Imported Assignments")
+    end
+
+    it "default to 'Imported Assignments' if there is no assignment_group_migration_id and assignment has no assignment_group associated" do
+      assignment_hash.delete(:assignment_group_migration_id)
+      assignment.assignment_group = nil
+
+      Importers::AssignmentImporter.associate_assignment_group(assignment_hash, course, assignment)
+
+      expect(assignment.assignment_group.id).to_not eq(assignment_group.id)
+      expect(assignment.assignment_group.name).to eq("Imported Assignments")
+    end
+  end
 end

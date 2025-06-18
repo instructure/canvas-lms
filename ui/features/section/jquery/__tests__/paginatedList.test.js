@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import 'jquery-migrate'
 import PaginatedList from '../PaginatedList'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = x => expect(x).toBeTruthy()
-const sandbox = sinon.createSandbox()
 const equal = (x, y) => expect(x).toEqual(y)
 
 const fixturesDiv = document.createElement('div')
@@ -39,17 +39,19 @@ const paginatedListFixture = `
 let response
 let template
 let fixture
-let server
 let el
-let clock
+
+const server = setupServer()
 
 describe('PaginatedList', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    response = [
-      200,
-      {'Content-Type': 'application/json'},
-      '[{ "value": "one" }, { "value": "two" }]',
-    ]
+    jest.useFakeTimers()
+
+    response = [{value: 'one'}, {value: 'two'}]
 
     // fake template (mimics a handlebars function)
     template = opts => opts.map(opt => `<li>${opt.value}</li>`).join('')
@@ -58,88 +60,109 @@ describe('PaginatedList', () => {
       wrapper: $('#list-wrapper'),
       list: $('#list-wrapper').find('ul'),
     }
-    clock = sinon.useFakeTimers()
-    server = sinon.fakeServer.create()
   })
 
   afterEach(() => {
-    clock.restore()
-    server.restore()
+    jest.useRealTimers()
     fixture.remove()
   })
 
-  test('should fetch and display results', function () {
-    server.respondWith(/.+/, response)
+  test('should fetch and display results', async function () {
+    server.use(
+      http.get('*/api/v1/test.json', () => {
+        return HttpResponse.json(response)
+      }),
+    )
+
     new PaginatedList(el.wrapper, {
       template,
       url: '/api/v1/test.json',
     })
-    server.respond()
-    clock.tick(500)
+
+    await jest.runAllTimersAsync()
     equal(el.list.children().length, 2)
   })
 
-  test('should display a view more link if next page is available', function () {
-    server.respondWith(/.+/, [
-      response[0],
-      {
-        'Content-Type': 'application/json',
-        Link: '<http://api?page=bookmarkstuff>; rel="next"',
-      },
-      response[2],
-    ])
+  test('should display a view more link if next page is available', async function () {
+    server.use(
+      http.get('*/api/v1/test.json', () => {
+        return new HttpResponse(JSON.stringify(response), {
+          headers: {
+            'Content-Type': 'application/json',
+            Link: '<http://api?page=bookmarkstuff>; rel="next"',
+          },
+        })
+      }),
+    )
+
     const list = new PaginatedList(el.wrapper, {
       template,
       url: '/api/v1/test.json',
     })
-    server.respond()
-    clock.tick(500)
+
+    await jest.runAllTimersAsync()
     ok(el.wrapper.find('.view-more-link').length > 0)
     equal(list.options.requestParams.page, 'bookmarkstuff')
   })
 
-  test('should not display a view more link if there is no next page', function () {
-    server.respondWith(/.+/, response)
+  test('should not display a view more link if there is no next page', async function () {
+    server.use(
+      http.get('*/api/v1/test.json', () => {
+        return HttpResponse.json(response)
+      }),
+    )
+
     new PaginatedList(el.wrapper, {
       template,
       url: '/api/v1/test.json',
     })
-    server.respond()
-    clock.tick(500)
+
+    await jest.runAllTimersAsync()
     ok(el.wrapper.find('.view-more-link').length === 0)
   })
 
-  test('should accept a template function', function () {
-    server.respondWith(/.+/, response)
+  test('should accept a template function', async function () {
+    server.use(
+      http.get('*/api/v1/test.json', () => {
+        return HttpResponse.json(response)
+      }),
+    )
+
     new PaginatedList(el.wrapper, {
       template,
       url: '/api/v1/test.json',
     })
-    server.respond()
-    clock.tick(500)
+
+    await jest.runAllTimersAsync()
     equal(el.list.find('li:first-child').text(), 'one')
     equal(el.list.find('li:last-child').text(), 'two')
   })
 
-  test('should accept a presenter function', function () {
-    server.respondWith(/.+/, response)
+  test('should accept a presenter function', async function () {
+    server.use(
+      http.get('*/api/v1/test.json', () => {
+        return HttpResponse.json(response)
+      }),
+    )
+
     new PaginatedList(el.wrapper, {
-      presenter: list => list.map(l => ({value: 'changed'})),
+      presenter: list => list.map(() => ({value: 'changed'})),
       template,
       url: '/api/v1/test.json',
     })
-    server.respond()
-    clock.tick(500)
+
+    await jest.runAllTimersAsync()
     equal(el.list.find('li:first-child').text(), 'changed')
   })
 
   test('should allow user to defer getJSON', function () {
-    sandbox.spy($, 'getJSON')
+    const getJSONSpy = jest.spyOn($, 'getJSON')
     new PaginatedList(el.wrapper, {
       start: false,
       template,
       url: '/api/v1/not-called.json',
     })
-    equal($.getJSON.callCount, 0)
+    expect(getJSONSpy).not.toHaveBeenCalled()
+    getJSONSpy.mockRestore()
   })
 })

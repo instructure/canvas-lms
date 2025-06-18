@@ -162,6 +162,7 @@ const featureBundles: {
   outcome_alignment_v2: () => import('./features/outcome_alignment_v2/index'),
   outcome_alignments: () => import('./features/outcome_alignments/index'),
   outcome_management: () => import('./features/outcome_management/index'),
+  pages: () => import('./features/pages/index'),
   password_complexity_configuration: () =>
     import('./features/password_complexity_configuration/index'),
   past_global_alert: () => import('./features/past_global_alert/index'),

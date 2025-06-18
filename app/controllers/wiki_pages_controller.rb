@@ -83,6 +83,9 @@ class WikiPagesController < ApplicationController
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
         log_asset_access(["pages", @context], "pages", "other")
         js_env(ConditionalRelease::Service.env_for(@context))
+        js_env({
+                 NEW_PAGE_URL: course_new_page_url(@context)
+               })
         wiki_pages_js_env(@context)
         set_tutorial_js_env
         @padless = true
@@ -126,6 +129,17 @@ class WikiPagesController < ApplicationController
       end
 
       css_bundle :wiki_page
+    end
+  end
+
+  def new
+    GuardRail.activate(:secondary) do
+      unless @context.account.feature_enabled?(:canvas_content_builder)
+        return render_unauthorized_action
+      end
+      unless authorized_action(@context.wiki, @current_user, :update)
+        return render_unauthorized_action
+      end
     end
   end
 
@@ -173,10 +187,22 @@ class WikiPagesController < ApplicationController
 
   private
 
+  def determine_editor_feature(context)
+    is_block_editor_enabled = context.account.feature_enabled?(:block_editor)
+    is_canvas_content_builder_enabled = context.account.feature_enabled?(:canvas_content_builder)
+
+    return :canvas_content_builder if is_canvas_content_builder_enabled
+    return :block_editor if is_block_editor_enabled
+
+    nil
+  end
+
   def wiki_pages_js_env(context)
     set_k5_mode # we need this to run now, even though we haven't hit the render hook yet
 
     assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+
+    editor_feature = determine_editor_feature(context)
 
     @wiki_pages_env ||= {
       wiki_page_menu_tools: external_tools_display_hashes(:wiki_page_menu),
@@ -184,10 +210,11 @@ class WikiPagesController < ApplicationController
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, no_render: true) && !@k5_details_view,
       CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
       ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
-      CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+      CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
+      EDITOR_FEATURE: editor_feature
     }
 
-    if @context.account.feature_enabled?(:block_editor)
+    if editor_feature == :block_editor
       @wiki_pages_env[:text_editor_preference] = @current_user&.reload&.get_preference(:text_editor_preference)
     end
 
@@ -208,7 +235,6 @@ class WikiPagesController < ApplicationController
       @wiki_pages_env[:TITLE_AVAILABILITY_PATH] = title_availability_path
     end
     js_env(@wiki_pages_env)
-    @js_env[:FEATURES][:BLOCK_EDITOR] = true if context.account.feature_enabled?(:block_editor)
     @wiki_pages_env
   end
 end

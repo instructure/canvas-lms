@@ -28,11 +28,82 @@ describe Types::EnrollmentType do
   let(:teacher_enrollment_type) { GraphQLTypeTester.new(teacher_enrollment, current_user: @teacher) }
 
   it "works" do
+    # must update enrolmment start_at, end_at here, otherwise it causes concluded test to fail
+    enrollment.update!(start_at: Time.zone.now, end_at: 1.year.from_now)
     expect(enrollment_type.resolve("_id")).to eq enrollment.id.to_s
     expect(enrollment_type.resolve("type")).to eq "StudentEnrollment"
     expect(enrollment_type.resolve("state")).to eq "active"
     expect(enrollment_type.resolve("sisImportId")).to eq enrollment.sis_batch_id
     expect(enrollment_type.resolve("limitPrivilegesToCourseSection")).to eq enrollment.limit_privileges_to_course_section
+    expect(enrollment_type.resolve("startAt")).to eq enrollment.start_at.iso8601
+    expect(enrollment_type.resolve("endAt")).to eq enrollment.end_at.iso8601
+  end
+
+  context "sisImportId returns" do
+    it "nil if current user has no permission :manage_sis" do
+      expect(enrollment_type.resolve("sisImportId")).to be_nil
+    end
+
+    it "sisImportId" do
+      expect(enrollment_type.resolve("sisImportId", current_user: @teacher)).to eq enrollment.sis_batch_id
+    end
+  end
+
+  context "enrollmentState returns" do
+    let(:enrollment) { student_in_course(active_all: true) }
+
+    it '"deleted" if course is deleted' do
+      enrollment.course.update!(workflow_state: "deleted")
+      expect(enrollment_type.resolve("enrollmentState")).to eq "deleted"
+    end
+
+    it '"deleted" if course section is deleted' do
+      enrollment.course_section.update!(workflow_state: "deleted")
+      expect(enrollment.course.workflow_state).not_to eq "deleted"
+      expect(enrollment_type.resolve("enrollmentState")).to eq "deleted"
+    end
+
+    it "enrollment's workflow state" do
+      expect(enrollment_type.resolve("enrollmentState")).to eq enrollment.workflow_state
+    end
+  end
+
+  context "sisSectionId returns" do
+    let(:enrollment) { student_in_course(active_all: true) }
+
+    let(:admin) { account_admin_user }
+
+    it "nil when requesting user has no persmission [:read_sis, :manage_sis]" do
+      account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
+      expect(enrollment_type.resolve("sisSectionId")).to be_nil
+    end
+
+    context "sisSectionId" do
+      it "if requesting user has permission :read_sis" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: true, manage_sis: false })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+
+      it "if requesting user has permission :manage_sis" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: true })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+
+      it "if requesting user has both permissions" do
+        account_admin_user_with_role_changes(role_changes: { read_sis: true, manage_sis: true })
+        expect(enrollment_type.resolve("sisSectionId")).to eq enrollment.course_section.sis_source_id
+      end
+    end
+  end
+
+  context "role" do
+    it "returns role id" do
+      expect(enrollment_type.resolve("role { _id }")).to eq enrollment.role.id.to_s
+    end
+
+    it "returns role name" do
+      expect(enrollment_type.resolve("role { name }")).to eq enrollment.role.name
+    end
   end
 
   it "returns correct value for limitPrivilegesToCourseSection" do
@@ -334,9 +405,47 @@ describe Types::EnrollmentType do
     end
   end
 
+  describe "non-anonymous grading" do
+    let(:context) { { hide_the_user_for_anonymous_grading: false } }
+    let(:enrollment_type) { GraphQLTypeTester.new(enrollment, current_user: @student) }
+
+    it "returns user id" do
+      expect(enrollment_type.resolve("userId", context)).to eql @student.id.to_s
+    end
+
+    it "returns user" do
+      expect(enrollment_type.resolve("user { _id }", context)).to eql @student.id.to_s
+    end
+
+    it "returns grades" do
+      expect(enrollment_type.resolve("grades { state }", context)).to eql "active"
+    end
+
+    it "returns course sections" do
+      expect(enrollment_type.resolve("section { _id }", context)).to eql enrollment.course_section.id.to_s
+    end
+
+    it "returns _id" do
+      expect(enrollment_type.resolve("_id", context)).to eql enrollment.id.to_s
+    end
+
+    it "returns associated user" do
+      observer = User.create!
+      observer_enrollment = observer_in_course(course: @course, user: observer)
+      observer_enrollment.update!(associated_user: @student)
+
+      tester = GraphQLTypeTester.new(observer_enrollment, current_user: @observer)
+      expect(tester.resolve("associatedUser { _id }", context)).to eql @student.id.to_s
+    end
+  end
+
   describe "anonymous grading" do
     let(:context) { { hide_the_user_for_anonymous_grading: true } }
     let(:enrollment_type) { GraphQLTypeTester.new(enrollment, current_user: @student) }
+
+    it "returns nil for the user id" do
+      expect(enrollment_type.resolve("userId", context)).to be_nil
+    end
 
     it "returns nil for the user" do
       expect(enrollment_type.resolve("user { _id }", context)).to be_nil

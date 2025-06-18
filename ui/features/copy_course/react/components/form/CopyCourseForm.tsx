@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useReducer} from 'react'
+import React, {useMemo, useState, useReducer} from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -90,8 +90,8 @@ export const CopyCourseForm = ({
   onSubmit: (data: CopyCourseFormSubmitData) => void
   onCancel: () => void
 }) => {
-  const dateOrNullStartAt = dateOrNull(course?.start_at)
-  const dateOrNullEndAt = dateOrNull(course?.end_at)
+  const dateOrNullStartAt = useMemo(() => dateOrNull(course?.start_at), [course?.start_at])
+  const dateOrNullEndAt = useMemo(() => dateOrNull(course?.end_at), [course?.end_at])
   const [courseName, setCourseName] = useState<string>(course.name)
   const [courseCode, setCourseCode] = useState<string>(course?.course_code || '')
   const [newCourseStartDate, setNewCourseStartDate] = useState<Date | null>(dateOrNullStartAt)
@@ -157,11 +157,16 @@ export const CopyCourseForm = ({
   }
 
   const newStartDateToParse = restrictEnrollmentsToCourseDates
-    ? dateOrNullStartAt
+    ? newCourseStartDate
     : selectedTerm?.startAt
-  const newEndDateToParse = restrictEnrollmentsToCourseDates ? dateOrNullEndAt : selectedTerm?.endAt
+  const newEndDateToParse = restrictEnrollmentsToCourseDates
+    ? newCourseEndDate
+    : selectedTerm?.endAt
   const isoNewCourseStartDate = parseDateToISOString(newStartDateToParse)
   const isoNewCourseEndDate = parseDateToISOString(newEndDateToParse)
+
+  const isoOldCourseStartDate = parseDateToISOString(dateOrNullStartAt)
+  const isoOldCourseEndDate = parseDateToISOString(dateOrNullEndAt)
 
   const canImportBpSettings = course.blueprint || false
   const invalidNewCourseEndDateMessage = invalidForm.elements.newCourseEndDateErrorMsg
@@ -221,6 +226,7 @@ export const CopyCourseForm = ({
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseStartDateMessage}
             infoMessage={disableStartEndDateMessage}
+            dataTestId="course_start_date"
           />
         </View>
         <View as="div" margin="medium none none none" data-testid="course-end-date">
@@ -235,6 +241,7 @@ export const CopyCourseForm = ({
             disabled={isSubmitting || !restrictEnrollmentsToCourseDates}
             errorMessage={invalidNewCourseEndDateMessage}
             infoMessage={disableStartEndDateMessage}
+            dataTestId="course_end_date"
           />
         </View>
       </View>
@@ -245,8 +252,8 @@ export const CopyCourseForm = ({
         canImportAsNewQuizzes={canImportAsNewQuizzes}
         newStartDate={isoNewCourseStartDate}
         newEndDate={isoNewCourseEndDate}
-        oldStartDate={isoNewCourseStartDate}
-        oldEndDate={isoNewCourseEndDate}
+        oldStartDate={isoOldCourseStartDate}
+        oldEndDate={isoOldCourseEndDate}
         fileUploadProgress={null}
         isSubmitting={isSubmitting}
         onCancel={onCancel}

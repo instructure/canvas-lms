@@ -107,6 +107,7 @@ class CanvasSecurity::ServicesJwt
 
     payload = {
       sub: user.global_id,
+      user_uuid: user.uuid,
       domain:
     }
     payload[:masq_sub] = real_user.global_id if real_user

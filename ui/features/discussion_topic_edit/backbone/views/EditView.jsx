@@ -108,6 +108,7 @@ EditView.prototype.els = {
   '#discussion-details-tab': '$discussionDetailsTab',
   '#conditional-release-target': '$conditionalReleaseTarget',
   '#assignment_external_tools': '$AssignmentExternalTools',
+  '#assignment_suppress_from_gradebook': '$suppressAssignment',
   '#discussion_form_options': '$discussionFormOptions',
 }
 
@@ -119,6 +120,7 @@ EditView.prototype.events = lodashExtend(EditView.prototype.events, {
   'change #discussion_topic_assignment_points_possible': 'handlePointsChange',
   change: 'onChange',
   'tabsbeforeactivate #discussion-edit-view': 'onTabChange',
+  'change #assignment_suppress_from_gradebook': 'handleSuppressFromGradebookChange',
 })
 
 EditView.prototype.messages = {
@@ -968,6 +970,10 @@ EditView.prototype.toggleConditionalReleaseTab = function () {
       return this.$discussionEditView.tabs('option', 'active', 0)
     }
   }
+}
+
+EditView.prototype.handleSuppressFromGradebookChange = function () {
+  return this.assignment.suppressAssignment(this.$suppressAssignment.prop('checked'))
 }
 
 EditView.prototype.onChange = function () {

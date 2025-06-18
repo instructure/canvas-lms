@@ -85,9 +85,9 @@ describe('NamingConfirmationWrapper', () => {
       expect(el).toBeInTheDocument()
       // Defaults to the configuration's launch setting's text
       expect(el).toHaveAttribute('placeholder', 'Default Title')
-      // eslint-disable-next-line no-await-in-loop
+
       await userEvent.clear(el)
-      // eslint-disable-next-line no-await-in-loop
+
       await userEvent.type(el, 'New Name')
       expect(el).toHaveValue('New Name')
     }

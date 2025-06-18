@@ -23,6 +23,7 @@ const files = [
     thumbnail_url:
       'http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
     display_name: 'image_one.png',
+    title: 'image_one.png',
     href: 'http://canvas.docker/courses/21/files/722?wrap=1',
     download_url: 'http://canvas.docker/files/722/download?download_frd=1',
     content_type: 'image/png',
@@ -40,6 +41,7 @@ const files = [
     thumbnail_url:
       'http://canvas.docker/images/thumbnails/716/9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
     display_name: 'image_two.jpg',
+    title: 'image_two.jpg',
     href: 'http://canvas.docker/courses/21/files/716?wrap=1',
     download_url: 'http://canvas.docker/files/716/download?download_frd=1',
     content_type: 'image/jpeg',
@@ -57,6 +59,7 @@ const files = [
     thumbnail_url:
       'http://canvas.docker/images/thumbnails/715/rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
     display_name: 'image_three.jpg',
+    title: 'image_three.jpg',
     href: 'http://canvas.docker/courses/21/files/715?wrap=1',
     download_url: 'http://canvas.docker/files/715/download?download_frd=1',
     content_type: 'image/jpeg',

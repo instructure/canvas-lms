@@ -3356,4 +3356,27 @@ describe ContextExternalTool do
       expect(tool.asset_processor_eula_url).to eq(expected_url)
     end
   end
+
+  describe "#eula_launch_url" do
+    let(:tool) do
+      ContextExternalTool.create!(
+        context: @root_account,
+        name: "EULA Tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        url: "http://www.tool.com/launch",
+        settings:
+      )
+    end
+    let(:settings) { {} }
+
+    it "returns the extension eula_launch_url if present" do
+      settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
+      expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
+    end
+
+    it "returns the launch_url if extension eula_launch_url is not present" do
+      expect(tool.eula_launch_url).to eq tool.launch_url
+    end
+  end
 end

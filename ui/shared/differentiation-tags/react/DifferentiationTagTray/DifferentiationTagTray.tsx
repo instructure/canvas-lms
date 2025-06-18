@@ -83,7 +83,7 @@ const EmptyState = ({onCreate}: {onCreate: () => void}) => (
       )}
     </Text>
     <Text size="small">
-      <Link href="#" isWithinText={false}>
+      <Link href={I18n.t('#community.differentiation_tags')} isWithinText={false} target="_blank">
         {I18n.t('Learn more about how we used your input to create differentiation tags.')}
       </Link>
     </Text>

@@ -42,7 +42,7 @@ interface DueDate {
 }
 
 const getCheckpointDueDates = (
-  checkpoint: Checkpoint | undefined,
+  checkpoint?: Pick<Checkpoint, 'overrides' | 'due_at'>,
 ): {multipleDueDates: boolean; dates: DueDate[]} => {
   if (!checkpoint)
     return {multipleDueDates: false, dates: [{dueFor: I18n.t('Everyone'), dueAt: null}]}
@@ -69,7 +69,7 @@ const getCheckpointDueDates = (
 }
 
 const getAvailabilityInfo = (
-  checkpoint: Checkpoint | undefined,
+  checkpoint?: Pick<Checkpoint, 'overrides' | 'unlock_at' | 'lock_at'> | undefined,
 ): {title: string; multipleDueDates: boolean; dates: DueDate[]} => {
   let title = ''
   let availability = null
@@ -119,7 +119,7 @@ const getAvailabilityText = (unlockAt: string | null, lockAt: string | null): Du
 
 const renderRequiredRepliesTitle = (assignment: AssignmentCheckpoints): string => {
   const translatedReplyToEntryRequiredCount = I18n.n(
-    assignment.discussion_topic.reply_to_entry_required_count,
+    assignment.discussion_topic?.reply_to_entry_required_count ?? 0,
   )
   return I18n.t('Required Replies (%{requiredReplies})', {
     requiredReplies: translatedReplyToEntryRequiredCount,

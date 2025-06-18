@@ -55,6 +55,7 @@ describe('GradebookGrid AssignmentGroupColumnHeaderRenderer', () => {
       message_attachment_upload_folder_id: '1',
       show_message_students_with_observers_dialog: true,
     })
+    ENV.SETTINGS = {}
     jest.spyOn(gradebook, 'saveSettings')
 
     assignmentGroup = {

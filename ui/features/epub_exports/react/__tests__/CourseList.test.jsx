@@ -39,12 +39,12 @@ describe('CourseListSpec', () => {
   it('render', function () {
     let component = render(<CourseList courses={{}} />)
     // 'should not render list items'
-    expect(component.container.querySelectorAll('li').length).toBe(0)
+    expect(component.container.querySelectorAll('li')).toHaveLength(0)
     component.unmount()
 
     component = render(<CourseList courses={props} />)
     // 'should have an li element per course in @props'
-    expect(component.container.querySelectorAll('li').length).toEqual(Object.keys(props).length)
+    expect(component.container.querySelectorAll('li')).toHaveLength(Object.keys(props).length)
     component.unmount()
   })
 })

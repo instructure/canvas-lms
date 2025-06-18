@@ -68,9 +68,9 @@ const Translations: Capability = {
       // loading Canvas this way is better than just rendering a blank page
       // because none of the front-end code could start.
       registerTranslations(ENV.LOCALE || navigator.language || 'en', fallbacks)
-      // eslint-disable-next-line no-console
+
       console.error(
-        `CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`
+        `CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`,
       )
       captureException(new Error(`Could not load translations for "${ENV.LOCALE}"`))
     }

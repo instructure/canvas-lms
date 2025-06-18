@@ -21,6 +21,7 @@ require_relative "../common"
 require_relative "groups_common"
 require_relative "shared_examples_common"
 require_relative "../rcs/pages/rce_next_page"
+require_relative "../files_v2/pages/files_page"
 
 # ======================================================================================================================
 # Shared Examples
@@ -306,12 +307,66 @@ shared_examples "discussions_page" do |context|
 end
 
 #-----------------------------------------------------------------------------------------------------------------------
-shared_examples "files_page" do |context|
+shared_examples "files_page_old_ui" do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
+  folder_name = "new folder"
+
+  it "allows group members to add a new folder", priority: pick_priority(context, student: "1", teacher: "2") do
+    get files_page
+    add_folder
+    expect(ff(".ef-name-col__text").first.text).to eq folder_name
+  end
+
+  it "allows group members to delete a folder", priority: pick_priority(context, student: "1", teacher: "2") do
+    skip_if_safari(:alert)
+    get files_page
+    add_folder
+    delete_file(0, :cog_icon)
+    expect(f("body")).not_to contain_css(".ef-item-row")
+  end
+
+  it "allows a group member to delete a file", priority: pick_priority(context, student: "1", teacher: "2") do
+    skip_if_safari(:alert)
+    add_test_files(false)
+    get files_page
+    delete_file(0, :cog_icon)
+    wait_for_ajaximations
+    expect(all_files_folders.count).to eq 1
+    # Now try to delete the other one using toolbar menu
+    delete_file(0, :toolbar_menu)
+    expect(f("body")).not_to contain_css(".ef-item-row")
+  end
+
+  it "allows group members to move a file", priority: pick_priority(context, student: "1", teacher: "2") do
+    add_test_files
+    get files_page
+    add_folder("destination_folder")
+    move_file_to_folder("example.pdf", "destination_folder")
+  end
+
+  it "allows group members to move a folder", priority: pick_priority(context, student: "1", teacher: "2") do
+    get files_page
+    create_folder_structure
+    move_folder(@inner_folder)
+  end
+
+  it "hides the publish cloud", priority: "1" do
+    add_test_files
+    get files_page
+    expect(f("#content")).not_to contain_css(".btn-link.published-status")
+  end
+
+  it "does not allow group members to restrict access to a file", priority: "1" do
+    add_test_files
+    get files_page
+    f(".ef-item-row .ef-date-created-col").click
+    expect(f(".ef-header")).to contain_css(".ef-header__secondary")
+    expect(f(".ef-header__secondary")).not_to contain_css(".btn-restrict")
+  end
+
   it "allows group users to rename a file", priority: "2" do
-    skip("RCX-1829: Files cog not working maybe from jquery update")
     add_test_files
     get files_page
     edit_name_from_cog_icon("cool new name")
@@ -328,6 +383,104 @@ shared_examples "files_page" do |context|
     # This checks to make sure there is only one file and it is the group-level one
     expect(all_files_folders.count).to eq 1
     expect(ff(".ef-name-col__text").first).to include_text("example.pdf")
+  end
+end
+
+#-----------------------------------------------------------------------------------------------------------------------
+shared_examples "files_page_files_rewrite_ui" do |context|
+  include GroupsCommon
+  include SharedExamplesCommon
+  include FilesPage
+
+  folder_name = "new folder"
+
+  it "allows group members to add a new folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
+    get files_page
+    create_folder(folder_name)
+    expect(content).to include_text(folder_name)
+  end
+
+  it "allows group members to move a file on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
+    Folder.create!(name: folder_name, context: @testgroup.first)
+    add_test_files
+    get files_page
+    move_file_from(2, :toolbar_menu)
+    get "/groups/#{@testgroup.first.id}/files/folder/new%20folder"
+    expect(get_item_content_files_table(1, 1)).to include("example.pdf")
+  end
+
+  it "allows group members to move a folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
+    @other_folder = "Other Folder"
+    Folder.create!(name: folder_name, context: @testgroup.first)
+    Folder.create!(name: @other_folder, context: @testgroup.first)
+    get files_page
+    move_file_from(2, :toolbar_menu)
+    get "/groups/#{@testgroup.first.id}/files/folder/new%20folder"
+    expect(get_item_content_files_table(1, 1)).to include(@other_folder)
+  end
+
+  it "allows a group member to delete a file on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
+    skip_if_safari(:alert)
+    add_test_files(false)
+    get files_page
+    expect(all_files_table_rows.count).to eq 2
+    delete_file_from(1, :toolbar_menu)
+    wait_for_ajaximations
+    expect(all_files_table_rows.count).to eq 1
+  end
+
+  it "allows group members to delete a folder on new files UI", priority: pick_priority(context, student: "1", teacher: "2") do
+    skip_if_safari(:alert)
+    Folder.create!(name: folder_name, context: @testgroup.first)
+    get files_page
+    delete_file_from(1, :toolbar_menu)
+    expect(content).not_to contain_link(folder_name)
+  end
+
+  it "does not allow group members to edit permissions on new files UI", priority: "1" do
+    add_test_files
+    get files_page
+    expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']") # not display permission icon on the table row
+    action_menu_button.click
+    expect(action_menu_modal).not_to contain_css("[data-testid='action-menu-button-Edit Permissions']") # not display edit permission on action menu
+    select_item_to_edit_from_kebab_menu(1)
+    expect(bulk_action_menu_modal).not_to contain_css("[data-testid='bulk-actions-edit-permissions-button']") # not display edit permission on bulk action menu
+  end
+
+  it "does not allow group members to edit usage rights on new files UI", priority: "1" do
+    add_test_files
+    get files_page
+    expect(f(all_files_table_row)).not_to contain_css('[aria-label="Set usage rights"]') # not display usage rights icon on the table row
+    action_menu_button.click
+    expect(action_menu_modal).not_to contain_css("[data-testid='action-menu-button-Manage Usage Right']") # not display edit usage rights on action menu
+    select_item_to_edit_from_kebab_menu(1)
+    expect(bulk_action_menu_modal).not_to contain_css("[data-testid='bulk-actions-manage-usage-rights-button']") # not display edit usage rights on bulk action menu
+  end
+
+  it "allows group users to rename a file on new files UI", priority: "2" do
+    add_test_files
+    get files_page
+    expect("example.pdf").to be_present
+    file_rename_to = "Example_edited.pdf"
+    action_menu_button.click
+    action_menu_item_by_name("Rename").click
+    expect(body).to contain_css(rename_folder_form_selector)
+    file_name_textbox_el = rename_folder_component("input-folder-name")
+    replace_content(file_name_textbox_el, file_rename_to)
+    file_name_textbox_el.send_keys(:return)
+    expect(file_rename_to).to be_present
+    expect(content).not_to contain_link("a_file.txt")
+  end
+
+  it "searches files only within the scope of a group", priority: pick_priority(context, student: "1", teacher: "2") do
+    add_test_files
+    get files_page
+    search_input.send_keys("example.pdf")
+    search_button.click
+    refresh_page
+    # This checks to make sure there is only one file and it is the group-level one
+    expect(all_files_table_rows.count).to eq 1
+    expect(get_item_content_files_table(1, 1)).to include("example.pdf")
   end
 end
 

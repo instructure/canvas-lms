@@ -88,6 +88,8 @@ export const DiscussionEdit = props => {
               label={I18n.t('Include quoted reply in message')}
               variant="toggle"
               value="medium"
+              data-testid="quotedReplyToggle"
+              data-action-state={includeQuotedReply ? 'excludeQuotedReply' : 'includeQuotedReply'}
               checked={includeQuotedReply}
               onChange={() => {
                 setIncludeQuotedReply(!includeQuotedReply)

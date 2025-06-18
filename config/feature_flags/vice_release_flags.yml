@@ -138,7 +138,7 @@ react_people_page:
   applies_to: RootAccount
 
 discussion_checkpoints:
-  state: hidden
+  state: allowed
   display_name: Discussion Checkpoints
   description: |-
     Enables checkpoints for graded discussions. Checkpoints allow teachers to

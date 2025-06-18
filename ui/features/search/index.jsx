@@ -22,6 +22,5 @@ import ReactDOM from 'react-dom'
 import SearchApp from './react/SearchApp'
 
 $(() => {
-  // eslint-disable-next-line no-restricted-properties
   ReactDOM.render(<SearchApp />, $('<div/>').appendTo('#search_app')[0])
 })

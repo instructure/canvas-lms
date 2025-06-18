@@ -18,7 +18,7 @@
 
 import {useQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
@@ -261,7 +261,6 @@ const EXTERNAL_TOOLS_QUERY = gql`
         externalToolsConnection(first: 100) {
           nodes {
             _id
-            id
             name
             url
           }

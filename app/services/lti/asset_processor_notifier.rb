@@ -23,20 +23,21 @@ module Lti
     module_function
 
     def notify_asset_processors(submission, asset_processor = nil)
-      return unless submission.submission_type == "online_upload"
-      return unless submission.root_account.feature_enabled?(:lti_asset_processor)
+      return unless submission.asset_processor_compatible?
 
       asset_processors = Lti::AssetProcessor.for_assignment_id(submission.assignment.id)
-
       if asset_processor.present?
         asset_processors = asset_processors.where(id: asset_processor.id)
       end
-
       return if asset_processors.empty?
 
-      lti_assets = submission.attachments.map do |attachment|
-        Lti::Asset.find_or_create_by!(attachment:, submission:)
-      end
+      lti_assets = if submission.text_entry_submission?
+                     [Lti::Asset.find_or_create_by!(submission_attempt: submission.attempt, submission:)]
+                   else
+                     submission.versioned_attachments.map do |attachment|
+                       Lti::Asset.find_or_create_by!(attachment:, submission:)
+                     end
+                   end
       return if lti_assets.empty?
 
       lti_assets.each(&:calculate_sha256_checksum!)
@@ -52,19 +53,7 @@ module Lti
       {
         assignment: submission.assignment,
         asset_report_service_url: asset_report_service_url(asset_processor),
-        assets: assets.map do |asset|
-          attachment = asset.attachment
-          {
-            asset_id: asset.uuid,
-            content_type: attachment.content_type,
-            filename: attachment.display_name,
-            sha256_checksum: asset.sha256_checksum,
-            size: attachment.size,
-            timestamp: attachment.modified_at.iso8601,
-            title: submission.assignment.title,
-            url: asset_url(asset_processor, asset),
-          }
-        end,
+        assets: assets.map { |asset| asset_hash(submission, asset, asset_processor) },
         custom: asset_processor.custom || {},
         for_user_id: submission.user.lti_id,
         notice_event_timestamp: Time.now.utc.iso8601,
@@ -73,6 +62,26 @@ module Lti
       }
     end
     private_class_method :notice_params
+
+    def asset_hash(submission, asset, asset_processor)
+      hash = {
+        asset_id: asset.uuid,
+        sha256_checksum: asset.sha256_checksum,
+        size: asset.content_size,
+        url: asset_url(asset_processor, asset),
+        title: submission.assignment.title,
+        content_type: asset.content_type
+      }
+      if submission.text_entry_submission?
+        hash[:timestamp] = submission.submitted_at.iso8601
+        # filename is optional and we don't have name in canvas for text entry,
+      else
+        hash[:timestamp] = asset.attachment.modified_at.iso8601
+        hash[:filename] = asset.attachment.display_name
+      end
+      hash
+    end
+    private_class_method :asset_hash
 
     def asset_url(asset_processor, asset)
       Rails.application.routes.url_helpers.lti_asset_processor_asset_show_url(

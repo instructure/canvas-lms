@@ -141,12 +141,12 @@ shared_examples_for "module show all or less" do |context|
       wait_for_dom_ready
       expect(context_module(@module.id)).to be_displayed
       expect(ff(module_items_selector(@module.id)).size).to eq(10)
-      expect(show_all_button).to be_displayed
-      show_all_button.click
-      expect(show_less_button).to be_displayed
+      expect(show_all_button(@module)).to be_displayed
+      show_all_button(@module).click
+      expect(show_less_button(@module)).to be_displayed
       expect(ff(module_items_selector(@module.id)).size).to eq(11)
-      show_less_button.click
-      expect(show_all_button).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module)).to be_displayed
       expect(ff(module_items_selector(@module.id)).size).to eq(10)
     end
 
@@ -160,7 +160,7 @@ shared_examples_for "module show all or less" do |context|
     it "shows the number of items in the module" do
       get @mod_url
       wait_for_dom_ready
-      expect(show_all_button.text).to include("(11)")
+      expect(show_all_button(@module).text).to include("(11)")
     end
 
     it "is removed on clicking Collapse All" do
@@ -218,11 +218,11 @@ shared_examples_for "add module items to list" do |context|
 
     expect(ff(module_items_selector(@module.id)).size).to eq(12)
     expect(pagination_exists?(@module.id)).to be_falsey
-    expect(show_less_button).to be_displayed
+    expect(show_less_button(@module)).to be_displayed
     expect(ff(module_items_selector(@module.id)).last.text).to include(item.title)
 
-    show_less_button.click
-    expect(show_all_button.text).to include("(12)")
+    show_less_button(@module).click
+    expect(show_all_button(@module).text).to include("(12)")
   end
 
   it "stays paginated when an item is deleted" do
@@ -236,7 +236,7 @@ shared_examples_for "add module items to list" do |context|
     driver.switch_to.alert.accept
     expect(ff(module_items_selector(@module.id)).size).to eq(9)
     expect(pagination_exists?(@module.id)).to be_truthy
-    expect(show_all_button.text).to include("(10)")
+    expect(show_all_button(@module).text).to include("(10)")
 
     refresh_page
     wait_for_dom_ready
@@ -247,7 +247,7 @@ shared_examples_for "add module items to list" do |context|
   it "shows correct items after delete in expanded module list" do
     get @mod_url
     wait_for_dom_ready
-    show_all_button.click
+    show_all_button(@module).click
 
     item = ContentTag.first
     manage_module_item_button(item).click
@@ -268,6 +268,7 @@ shared_examples_for "add module items to list" do |context|
     end
 
     it "paginated list created after refresh when item is added to initiate pagination" do
+      skip "not a valid test now that we save the show all/less state"
       get @mod_url
       wait_for_dom_ready
 
@@ -283,8 +284,8 @@ shared_examples_for "add module items to list" do |context|
 
       expect(pagination_exists?(@module.id)).to be_truthy
 
-      expect(show_all_button).to be_displayed
-      expect(show_all_button.text).to include("(11)")
+      expect(show_all_button(@module)).to be_displayed
+      expect(show_all_button(@module).text).to include("(11)")
     end
   end
 end
@@ -337,9 +338,9 @@ shared_examples_for "module moving items" do |context|
       expect(ff(module_items_selector(@module.id)).last.text).to include(item.title)
       expect(ff(module_items_selector(@module2.id)).size).to eq(1)
       driver.execute_script("window.scrollTo(0, 0)")
-      expect(show_less_button).to be_displayed
-      show_less_button.click
-      expect(show_all_button.text).to include("(12)")
+      expect(show_less_button(@module)).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module).text).to include("(12)")
     end
 
     it "moves item from one module to the top of first module" do
@@ -360,9 +361,9 @@ shared_examples_for "module moving items" do |context|
       expect(ff(module_items_selector(@module.id)).first.text).to include(item.title)
       expect(ff(module_items_selector(@module2.id)).size).to eq(1)
       driver.execute_script("window.scrollTo(0, 0)")
-      expect(show_less_button).to be_displayed
-      show_less_button.click
-      expect(show_all_button.text).to include("(12)")
+      expect(show_less_button(@module)).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module).text).to include("(12)")
     end
 
     it "moves item from one module after assignment in first module" do
@@ -386,9 +387,9 @@ shared_examples_for "module moving items" do |context|
       expect(ff(module_items_selector(@module.id))[3].text).to include(item.title)
       expect(ff(module_items_selector(@module2.id)).size).to eq(1)
       driver.execute_script("window.scrollTo(0, 0)")
-      expect(show_less_button).to be_displayed
-      show_less_button.click
-      expect(show_all_button.text).to include("(12)")
+      expect(show_less_button(@module)).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module).text).to include("(12)")
     end
 
     it "moves item from one module before assignment in first module" do
@@ -414,9 +415,9 @@ shared_examples_for "module moving items" do |context|
       expect(ff(module_items_selector(@module.id))[10].text).to include(item.title)
       expect(ff(module_items_selector(@module2.id)).size).to eq(1)
       driver.execute_script("window.scrollTo(0, 0)")
-      expect(show_less_button).to be_displayed
-      show_less_button.click
-      expect(show_all_button.text).to include("(12)")
+      expect(show_less_button(@module)).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module).text).to include("(12)")
     end
 
     it "moves item to different page in same module" do
@@ -441,9 +442,257 @@ shared_examples_for "module moving items" do |context|
 
       expect(ff(module_items_selector(@module.id))[2].text).to include(item.title)
       driver.execute_script("window.scrollTo(0, 0)")
-      expect(show_less_button).to be_displayed
-      show_less_button.click
-      expect(show_all_button.text).to include("(11)")
+      expect(show_less_button(@module)).to be_displayed
+      show_less_button(@module).click
+      expect(show_all_button(@module).text).to include("(11)")
+    end
+  end
+
+  context "move module contents with the move contents tray" do
+    before do
+      @module2 = @course.context_modules.create!(name: "module 2")
+      2.times do |i|
+        @module2.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment 2-#{i}").id)
+      end
+      @course.reload
+    end
+
+    it "moves content from one module to another module with first module open/paginated and second module collapsed" do
+      last_tag_title = @module.content_tags.last.title
+
+      get @mod_url
+      wait_for_dom_ready
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Bottom")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(ff(module_items_selector(@module2.id)).last.text).to include(last_tag_title)
+      expect(any_module_items?(@module.id)).to be_falsey
+      expect(ff(module_items_selector(@module2.id)).size).to eq(13)
+      driver.execute_script("window.scrollTo(0, 0)")
+      expect(show_less_button(@module2)).to be_displayed
+      show_less_button(@module2).click
+      expect(show_all_button(@module2).text).to include("(13)")
+    end
+
+    it "moves content from one module to another module with first module open/all and second module collapsed" do
+      first_tag_title = @module.content_tags.first.title
+
+      get @mod_url
+      wait_for_dom_ready
+
+      show_all_button(@module).click
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Top")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(ff(module_items_selector(@module2.id)).first.text).to include(first_tag_title)
+      expect(any_module_items?(@module.id)).to be_falsey
+      expect(ff(module_items_selector(@module2.id)).size).to eq(13)
+      driver.execute_script("window.scrollTo(0, 0)")
+      expect(show_less_button(@module2)).to be_displayed
+      show_less_button(@module2).click
+      expect(show_all_button(@module2).text).to include("(13)")
+    end
+
+    it "moves content from one module to another module with first module open and second module expanded/paginated" do
+      first_tag_title = @module.content_tags.first.title
+
+      get @mod_url
+      wait_for_dom_ready
+
+      expand_module_link(@module2.id).click
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("After..")
+      select_module_move_contents_tray_sibling(@module2.content_tags.first.title)
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(ff(module_items_selector(@module2.id))[1].text).to include(first_tag_title)
+      expect(any_module_items?(@module.id)).to be_falsey
+      expect(ff(module_items_selector(@module2.id)).size).to eq(13)
+      driver.execute_script("window.scrollTo(0, 0)")
+      expect(show_less_button(@module2)).to be_displayed
+      show_less_button(@module2).click
+      expect(show_all_button(@module2).text).to include("(13)")
+    end
+
+    it "moves content from one module to another module with first module collapsed and second module collapsed" do
+      first_tag_title = @module.content_tags.first.title
+
+      get @mod_url
+      wait_for_dom_ready
+      collapse_module_link(@module.id).click
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("Before..")
+      select_module_move_contents_tray_sibling(@module2.content_tags.last.title)
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(ff(module_items_selector(@module2.id))[1].text).to include(first_tag_title)
+      expect(any_module_items?(@module.id)).to be_falsey
+      expect(ff(module_items_selector(@module2.id)).size).to eq(13)
+      driver.execute_script("window.scrollTo(0, 0)")
+      expect(show_less_button(@module2)).to be_displayed
+      show_less_button(@module2).click
+      expect(show_all_button(@module2).text).to include("(13)")
+    end
+
+    it "moves content from one module to another module and show all is removed in original module" do
+      get @mod_url
+      wait_for_dom_ready
+      expect(show_all_button(@module).text).to include("(11)")
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Top")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(show_all_button_exists?(@module)).to be_falsey
+    end
+
+    it "moves content from one module to another module and show less is removed in original module" do
+      get @mod_url
+      wait_for_dom_ready
+      show_all_button(@module).click
+      expect(show_less_button(@module)).to be_displayed
+
+      click_manage_module_button(@module)
+      click_module_move_contents(@module.id)
+      wait_for_ajaximations
+
+      select_module_move_contents_tray_module(@module2.name)
+      select_module_move_contents_tray_place("At the Top")
+      click_module_item_move_tray_move_button
+      wait_for_ajaximations
+
+      expect(show_less_button_exists?(@module)).to be_falsey
+    end
+  end
+
+  context "drag and drop module items" do
+    before do
+      @module2 = @course.context_modules.create!(name: "module 2")
+      2.times do |i|
+        @module2.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment 2-#{i}").id)
+      end
+      @course.reload
+    end
+
+    it "drag and drops item within a paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module_item_ids[5])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_all_button(@module)).to be_displayed
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+      expect(module_item_ids_after[1]).to eq(module_item_ids[5])
+    end
+
+    it "drag and drops item within a non-paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+      expect(show_all_button(@module)).to be_displayed
+      show_all_button(@module).click
+      expect(show_less_button(@module)).to be_displayed
+
+      module_item_selector1 = module_item_drag_handle_selector(module_item_ids[5])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_less_button(@module)).to be_displayed
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+      expect(module_item_ids_after[1]).to eq(module_item_ids[5])
+    end
+
+    it "drag and drops item from a module to a paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      expand_module_link(@module2.id).click
+      wait_for_ajaximations
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module2_item_ids[1])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_all_button(@module)).to be_displayed
+
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+
+      expect(module_item_ids_after[2]).to eq(module2_item_ids[1])
+
+      expect(ff(module_items_selector(@module2.id)).size).to eq(1)
+    end
+
+    it "drag and drops item from a module to a non-paginated module" do
+      get @mod_url
+      wait_for_dom_ready
+
+      show_all_button(@module).click
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      expand_module_link(@module2.id).click
+      wait_for_ajaximations
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module2_item_ids[1])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+
+      expect(show_less_button(@module)).to be_displayed
+
+      module_items_elements_after = ff(module_items_selector(@module.id))
+      module_item_ids_after = module_items_elements_after.map { |item| item.attribute("id") }
+
+      expect(module_item_ids_after[2]).to eq(module2_item_ids[1])
+
+      expect(ff(module_items_selector(@module2.id)).size).to eq(1)
     end
   end
 end

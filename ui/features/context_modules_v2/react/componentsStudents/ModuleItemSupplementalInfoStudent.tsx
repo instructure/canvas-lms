@@ -44,13 +44,15 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   const hasCompletionRequirement = !!completionRequirement
 
   return (
-    <Flex gap="xx-small" wrap="wrap">
+    <Flex gap="xx-small" wrap="wrap" data-testid="module-item-supplemental-info">
       {hasDueDate && (
         <Flex.Item padding="0 0 0 small">
           <Text weight="normal" size="x-small">
             <FriendlyDatetime
               data-testid="due-date"
-              format={I18n.t('#date.formats.medium')}
+              prefix={I18n.t('Due: ')}
+              format={I18n.t('#date.formats.date_at_time')}
+              showTime={true}
               dateTime={cachedDueDate || null}
             />
           </Text>

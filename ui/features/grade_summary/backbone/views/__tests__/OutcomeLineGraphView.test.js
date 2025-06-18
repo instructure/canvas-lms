@@ -23,11 +23,9 @@ import OutcomeResultCollection from '../../collections/OutcomeResultCollection'
 import OutcomeLineGraphView from '../OutcomeLineGraphView'
 import * as tz from '@instructure/moment-utils'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
 
 describe('OutcomeLineGraphView', () => {
   let outcomeLineGraphView
-  let server
   const response = {
     outcome_results: [
       {
@@ -50,7 +48,6 @@ describe('OutcomeLineGraphView', () => {
     ENV.context_asset_string = 'course_1'
     ENV.current_user = {display_name: 'Student One'}
     ENV.student_id = 6
-    server = sinon.createFakeServer()
     outcomeLineGraphView = new OutcomeLineGraphView({
       el: $('<div class="line-graph"></div>')[0],
       model: new Outcome({
@@ -64,7 +61,6 @@ describe('OutcomeLineGraphView', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    server.restore()
   })
 
   it('should have an OutcomeResultCollection', () => {

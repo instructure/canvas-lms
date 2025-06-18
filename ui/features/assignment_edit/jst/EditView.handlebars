@@ -119,6 +119,21 @@
         {{#t}}Do not count this assignment towards the final grade{{/t}}
       </label>
     </div>
+    {{#if suppressAssignmentAllowed}}
+      <div class="control-group">
+        <div class="form-column-left no-group"></div>
+        <div id="suppress_from_gradebook" class="form-column-right" style="margin-top: 14px;">
+          <label class="checkbox">
+
+              {{checkbox "suppressAssignment"
+                id="assignment_suppress_from_gradebook"
+                name="suppress_from_gradebook"
+              }}
+              {{#t}}Hide from gradebook view and student grades view{{/t}}
+          </label>
+        </div>
+      </div>
+    {{/if}}
     {{#if hideZeroPointQuizzesOptionEnabled}}
       {{#if isQuizLTIAssignment}}
           <div id="assignment_hide_in_gradebook_option">

@@ -17,9 +17,13 @@ module Interfaces::AssignmentsConnectionInterface
     argument :search_term, String, <<~MD, required: false
       only return assignments whose title matches this search term
     MD
+    argument :submission_types, [Types::AssignmentSubmissionType], <<~MD, required: false
+      only return assignments for the given submission types. Defaults to
+      all.
+    MD
   end
 
-  def assignments_scope(course, grading_period_id, has_grading_periods = nil, user_id = nil, search_term = nil)
+  def assignments_scope(course, grading_period_id, has_grading_periods = nil, user_id = nil, search_term = nil, submission_types = nil)
     scoped_user = user_id.nil? ? current_user : User.find(user_id)
     assignments = Assignments::ScopedToUser.new(course, scoped_user).scope
     unless can_current_user_read_given_user_submissions(course, scoped_user)
@@ -35,6 +39,19 @@ module Interfaces::AssignmentsConnectionInterface
     # Apply hide_in_gradebook filter if the feature flag is enabled
     if Account.site_admin.feature_enabled?(:hide_zero_point_quizzes_option)
       assignments = assignments.not_hidden_in_gradebook
+    end
+
+    if submission_types.present?
+      # Filter assignments where any of the requested submission_types overlap with the
+      # assignment's submission_types. The assignments.submission_types column is a comma-separated
+      # string (e.g., 'online_upload,online_quiz'). To efficiently filter, we convert this string
+      # to a PostgreSQL text[] array on the fly using string_to_array. The overlap operator (&&)
+      # checks if any of the requested submission_types are present in the array. Both sides are
+      # explicitly cast to text[] to avoid type errors (e.g., text[] && text[]).
+      assignments = assignments.where(
+        "string_to_array(assignments.submission_types, ',')::text[] && ARRAY[?]::text[]",
+        submission_types
+      )
     end
 
     if grading_period_id
@@ -68,13 +85,13 @@ module Interfaces::AssignmentsConnectionInterface
   def assignments_connection(course:, filter: {})
     if filter.key?(:grading_period_id) || filter.key?(:user_id)
       apply_assignment_order(
-        assignments_scope(course, filter[:grading_period_id], nil, filter[:user_id], filter[:search_term])
+        assignments_scope(course, filter[:grading_period_id], nil, filter[:user_id], filter[:search_term], filter[:submission_types])
       )
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
                                          .then do |gp, has_grading_periods|
         apply_assignment_order(
-          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id], filter[:search_term])
+          assignments_scope(course, gp&.id, has_grading_periods, filter[:user_id], filter[:search_term], filter[:submission_types])
         )
       end
     end

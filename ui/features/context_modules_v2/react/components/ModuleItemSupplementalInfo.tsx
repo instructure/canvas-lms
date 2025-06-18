@@ -52,7 +52,6 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
     if (!completionRequirement) return null
 
     const {type, minScore, minPercentage, completed = false} = completionRequirement
-    const fulfillmentStatus = completed ? 'fulfilled' : 'unfulfilled'
 
     return (
       <CompletionRequirementInfo
@@ -60,7 +59,6 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
         minScore={minScore}
         minPercentage={minPercentage}
         completed={completed}
-        fulfillmentStatus={fulfillmentStatus}
         id={content.id || ''}
       />
     )

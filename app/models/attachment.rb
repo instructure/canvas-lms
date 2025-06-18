@@ -1717,10 +1717,13 @@ class Attachment < ActiveRecord::Base
     reload
   end
 
-  def self.batch_destroy(attachments)
+  def self.not_deleted_content_tags_for_attachments(attachments)
     ContentTag.not_deleted.where(content_type: "Attachment", content_id: attachments)
               .union(ContentTag.not_deleted.where(context_type: "Attachment", context_id: attachments))
-              .find_each(&:destroy)
+  end
+
+  def self.batch_destroy(attachments)
+    not_deleted_content_tags_for_attachments(attachments).find_each(&:destroy)
     while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     Lti::Asset.where(attachment_id: attachments).in_batches(of: 1000).destroy_all
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
@@ -1758,9 +1761,10 @@ class Attachment < ActiveRecord::Base
   def destroy_content_and_replace(deleted_by_user = nil)
     shard.activate do
       file_removed_path = self.class.file_removed_path
-      new_name = File.basename(file_removed_path)
+      placeholder_filename = File.basename(file_removed_path)
       att = root_attachment_id? ? root_attachment : self
-      return true if att.display_name == new_name
+      content_already_replaced = att.display_name == placeholder_filename
+      return true if content_already_replaced
 
       att.send_to_purgatory(deleted_by_user) unless Purgatory.where(attachment_id: att).active.exists?
       att.destroy_content
@@ -1772,15 +1776,28 @@ class Attachment < ActiveRecord::Base
       else
         Attachments::Storage.store_for_attachment(att, File.open(file_removed_path))
       end
-      att.filename = new_name
-      att.display_name = new_name
-      att.content_type = "application/pdf"
-      CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
-      canvadoc_scope = Canvadoc.where(attachment_id: att.children_and_self.select(:id))
+      attachment_ids = att.children_and_self.select(:id)
+      CrocodocDocument.where(attachment_id: attachment_ids).delete_all
+      canvadoc_scope = Canvadoc.where(attachment_id: attachment_ids)
       CanvadocsSubmission.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
       AnonymousOrModerationEvent.where(canvadoc_id: canvadoc_scope.select(:id)).delete_all
       canvadoc_scope.delete_all
+
+      att.filename = placeholder_filename
+      att.display_name = placeholder_filename
+      att.content_type = "application/pdf"
       att.save!
+
+      # update copies as well to avoid broken file references.
+      att.children.find_each do |copy_attachment|
+        copy_attachment.filename = placeholder_filename
+        copy_attachment.display_name = placeholder_filename
+        copy_attachment.content_type = "application/pdf"
+        copy_attachment.instfs_uuid = att.instfs_uuid
+        copy_attachment.md5 = att.md5
+        copy_attachment.size = att.size
+        copy_attachment.save!
+      end
     end
   end
 

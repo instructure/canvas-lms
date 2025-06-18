@@ -16,11 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {screen} from '@testing-library/dom'
 import {DEFAULT_PAGE_SIZE} from '../types'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {
   addShowAllOrLess,
   shouldShowAllOrLess,
   itemCount,
+  hasAllItemsInTheDOM,
   isModuleCurrentPageEmpty,
   isModuleCollapsed,
   isModulePaginated,
@@ -73,6 +76,14 @@ const makeModule = (options: MakeModuleOptions = {}): HTMLElement => {
   contextModuleItems.className = 'context_module_items'
   if (options.totalItemsValue !== undefined) {
     contextModuleItems.setAttribute('data-total-items', options.totalItemsValue.toString())
+    const n = Number(options.totalItemsValue)
+    if (!isNaN(n)) {
+      for (let i = 0; i < n; i++) {
+        const item = document.createElement('li')
+        item.className = 'context_module_item'
+        contextModuleItems.appendChild(item)
+      }
+    }
   }
   content.appendChild(contextModuleItems)
   module.appendChild(content)
@@ -85,10 +96,14 @@ const makeModule = (options: MakeModuleOptions = {}): HTMLElement => {
 
 describe('showAllOrLess', () => {
   beforeEach(() => {
-    ENV.IS_STUDENT = false
+    fakeENV.setup({
+      IS_STUDENT: false,
+      FEATURE_MODULES_PERF: true,
+    })
   })
   afterEach(() => {
     document.body.innerHTML = ''
+    fakeENV.teardown()
   })
 
   describe('isModuleCurrentPageEmpty', () => {
@@ -146,6 +161,26 @@ describe('showAllOrLess', () => {
     it('should return false if the module is not collapsed', () => {
       const module = document.createElement('div')
       expect(isModuleCollapsed(module)).toBe(false)
+    })
+  })
+
+  describe('hasAllItemsInTheDOM', () => {
+    it('should return false if the module is paginated', () => {
+      const module = document.createElement('div')
+      module.setAttribute('data-module-id', '1')
+      module.dataset.loadstate = 'paginated'
+      expect(hasAllItemsInTheDOM(module)).toBe(false)
+    })
+
+    it('should return false if the module is collapsed', () => {
+      const module = document.createElement('div')
+      module.classList.add('collapsed_module')
+      expect(hasAllItemsInTheDOM(module)).toBe(false)
+    })
+
+    it('should return true if the module is not collapsed and not paginated', () => {
+      const module = document.createElement('div')
+      expect(hasAllItemsInTheDOM(module)).toBe(true)
     })
   })
 
@@ -257,11 +292,12 @@ describe('showAllOrLess', () => {
 
   describe('addShowAllOrLess', () => {
     it('should add the show all button to the module', () => {
-      const module = makeModule()
+      const module = makeModule({totalItemsValue: 2})
       module.dataset.loadstate = 'paginated'
       addShowAllOrLess('1')
       expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
       expect(module.querySelector('.show-all')).toBeInTheDocument()
+      expect(screen.getByText('Show All (2)')).toBeInTheDocument()
     })
 
     it('should add the show less button to the module', () => {
@@ -270,6 +306,7 @@ describe('showAllOrLess', () => {
       addShowAllOrLess('1')
       expect(module.querySelector('.show-all-or-less-button')).toBeInTheDocument()
       expect(module.querySelector('.show-less')).toBeInTheDocument()
+      expect(screen.getByText('Show Less')).toBeInTheDocument()
     })
 
     it('should not add either button while the module is loading', () => {
@@ -291,6 +328,7 @@ describe('showAllOrLess', () => {
       addShowAllOrLess('1')
 
       expect(button.dataset.isLoading).toBe('false')
+      expect(button.disabled).toBe(false)
     })
 
     it('should set the button dataset isLoading to true when method is called', () => {
@@ -302,6 +340,7 @@ describe('showAllOrLess', () => {
       button.click()
 
       expect(button.dataset.isLoading).toBe('true')
+      expect(button.disabled).toBe(true)
     })
 
     it('should not call document dispatchEvent on isLoading true', () => {

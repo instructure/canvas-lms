@@ -34,7 +34,7 @@ describe('Modules Utilities: setupContentIds', () => {
     const $fakeModule = $(fakeModuleHtml)
     setupContentIds($fakeModule, 42)
 
-    expect($fakeModule.find('#context_module_content_42').length).toBe(1)
+    expect($fakeModule.find('#context_module_content_42')).toHaveLength(1)
     expect($fakeModule.find('#place1').attr('aria-controls')).toBe('context_module_content_42')
     expect($fakeModule.find('#place2').attr('aria-controls')).toBe('context_module_content_42')
   })

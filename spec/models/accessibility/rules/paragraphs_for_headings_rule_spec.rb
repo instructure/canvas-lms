@@ -49,4 +49,14 @@ RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
       end
     end
   end
+
+  context "when fixing headings to paragraphs" do
+    it "changes a heading to a paragraph" do
+      input_html = '<div><h2 id="test-element">Heading text</h2></div>'
+      fixed_html = fix_issue(:paragraphs_for_headings, input_html, './/h2[@id="test-element"]', "true")
+
+      expect(fixed_html).to include('<p id="test-element">Heading text</p>')
+      expect(fixed_html).not_to include('<h2 id="test-element">Heading text</h2>')
+    end
+  end
 end

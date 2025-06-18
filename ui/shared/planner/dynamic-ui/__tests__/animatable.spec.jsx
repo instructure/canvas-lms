@@ -21,7 +21,6 @@ import {render} from '@testing-library/react'
 import {animatable} from '../animatable'
 import {DynamicUiProvider} from '../provider'
 
- 
 class MockComponent extends React.Component {
   render() {
     return <div data-testid="mock-component" />
@@ -47,7 +46,8 @@ it('passes trigger property functions and forwards the calls to the dynamic ui m
       <Wrapped innerRef={ref} />
     </DynamicUiProvider>,
   )
-  expect(wrapper.getByTestId('mock-component')).toMatchSnapshot()
+
+  expect(wrapper.getByTestId('mock-component')).toBeInTheDocument()
 
   const mockComponentProps = ref.current.props
   mockComponentProps.registerAnimatable('type', 'component', 42, ['item'])

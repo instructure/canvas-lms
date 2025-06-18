@@ -261,9 +261,10 @@ export const CriterionRow = ({
 
   const pointsInputValue = pointsInput?.toString() ?? ''
   const totalPointsValue = criterion.points.toString()
-  const instructorPointsText = I18n.t(
-    'Instructor Points %{pointsInputValue} out of %{totalPointsValue}',
-    {pointsInputValue, totalPointsValue},
+  const pointsPrefix = isSelfAssessment ? I18n.t('Self Assessment') : I18n.t('Instructor')
+  const pointsLabelText = I18n.t(
+    '%{pointsPrefix} Points %{pointsInputValue} out of %{totalPointsValue}',
+    {pointsPrefix, pointsInputValue, totalPointsValue},
   )
 
   const grabFailedValidationMessage = () => {
@@ -295,7 +296,7 @@ export const CriterionRow = ({
             </Flex.Item>
             <Flex.Item margin={isPreviewMode ? '0 0 0 x-small' : '0'}>
               {isPreviewMode ? (
-                <Text size="small" weight="bold" aria-label={instructorPointsText}>
+                <Text size="small" weight="bold" aria-label={pointsLabelText}>
                   {pointsInputValue}
                 </Text>
               ) : criterion.ignoreForScoring ? (
@@ -303,7 +304,7 @@ export const CriterionRow = ({
               ) : (
                 <TextInput
                   autoComplete="off"
-                  renderLabel={<ScreenReaderContent>{instructorPointsText}</ScreenReaderContent>}
+                  renderLabel={<ScreenReaderContent>{pointsLabelText}</ScreenReaderContent>}
                   placeholder="--"
                   width="3.375rem"
                   height="2.375rem"

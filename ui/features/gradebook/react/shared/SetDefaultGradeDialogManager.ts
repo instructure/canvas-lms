@@ -25,7 +25,7 @@ import type {Assignment, StudentMap} from '../../../../api.d'
 const I18n = createI18nScope('gradebooksharedSetDefaultGradeDialogManager')
 
 class SetDefaultGradeDialogManager {
-  assignment: Assignment
+  assignment: Pick<Assignment, 'id' | 'grades_published' | 'inClosedGradingPeriod'>
 
   isAdmin: boolean
 
@@ -40,7 +40,7 @@ class SetDefaultGradeDialogManager {
   getStudents: (assignmentId: string) => StudentMap
 
   constructor(
-    assignment: Assignment,
+    assignment: Pick<Assignment, 'id' | 'grades_published' | 'inClosedGradingPeriod'>,
     getStudents: (assignmentId: string) => StudentMap,
     contextId: string,
     missingShortcutEnabled: boolean,

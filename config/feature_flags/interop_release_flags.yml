@@ -347,21 +347,6 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
-platform_notification_service:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: Enable Platform Notification Service
-  description: >-
-    When on, 1Edtech Platform Notification service (used to subscribe tools for notices, list existing notice handlers, notify subscribed tools, etc.) will
-    be enabled.
-  environments:
-    development:
-      state: allowed_on
-    test:
-      state: allowed_on
-    ci:
-      state: allowed_on
 refactor_custom_variables:
   state: hidden
   shadow: true
@@ -412,3 +397,14 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
+lti_apps_page_ai_translation:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: AI Translation for LTI Apps Discover Page
+  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on

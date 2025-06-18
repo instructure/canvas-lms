@@ -190,7 +190,7 @@ export default class WikiPageView extends Backbone.View {
     if (
       this.model.get('body') === null &&
       !this.model.get('block_editor_attributes')?.blocks &&
-      ENV.FEATURES?.BLOCK_EDITOR
+      ENV.EDITOR_FEATURE !== null
     ) {
       if (window.ENV.text_editor_preference == null) {
         renderChooseEditorModal(e, async editor => {

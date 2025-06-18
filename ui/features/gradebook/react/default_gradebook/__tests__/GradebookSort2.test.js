@@ -53,6 +53,7 @@ describe('Gradebook#sortGridRows', () => {
     gradebook.gridDisplaySettings.viewUngradedAsZero = false
     sandbox.stub(gradebook.gradebookGrid, 'updateColumns')
     sandbox.stub(gradebook.gradebookGrid.gridSupport.columns, 'updateColumnHeaders')
+    sandbox.stub(gradebook, 'saveSettings').resolves({})
   })
 
   afterEach(() => {
@@ -144,15 +145,18 @@ describe('Gradebook#getColumnSortSettingsViewOptionsMenuProps', () => {
     }
     gradebook = createGradebook()
     sandbox.stub(gradebook, 'arrangeColumnsBy')
+    sandbox.stub(gradebook, 'saveSettings').resolves({})
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     if (gradebook) {
       gradebook.destroy && gradebook.destroy()
     }
     $fixtures.remove()
     sandbox.restore()
     window.ENV = oldEnv
+    // Wait a tick to let any pending promises settle
+    await new Promise(resolve => setTimeout(resolve, 0))
   })
 
   function getProps(sortType = 'due_date', direction = 'ascending') {
@@ -307,7 +311,7 @@ describe('when enhanced_gradebook_filters is enabled', () => {
     errorFn = sandbox.stub()
     successFn = sandbox.stub()
 
-    saveUserSettingsStub = sandbox.stub(GradebookApi, 'saveUserSettings')
+    saveUserSettingsStub = sandbox.stub(GradebookApi, 'saveUserSettings').resolves({})
   })
 
   afterEach(() => {

@@ -18,7 +18,7 @@
 
 import {useQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {CourseStudentResponse, CourseStudentGraphQLResult} from '../../utils/types.d'
 
 const COURSE_STUDENT_QUERY = gql`

@@ -30,6 +30,7 @@ class LearnPlatformController < ApplicationController
     }
     params[:q][:canvas_integrated_only] = true
     options[:q] = params[:q].to_unsafe_h if params[:q]
+    set_translate_lang_option(options)
 
     response = learnplatform_api.products(options)
 
@@ -39,7 +40,9 @@ class LearnPlatformController < ApplicationController
   end
 
   def index_by_category
-    response = learnplatform_api.products_by_category
+    options = {}
+    set_translate_lang_option(options)
+    response = learnplatform_api.products_by_category(options)
 
     return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
 
@@ -47,7 +50,9 @@ class LearnPlatformController < ApplicationController
   end
 
   def show
-    response = learnplatform_api.product(params[:id])
+    options = {}
+    set_translate_lang_option(options)
+    response = learnplatform_api.product(params[:id], options)
 
     return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
 
@@ -55,7 +60,9 @@ class LearnPlatformController < ApplicationController
   end
 
   def filters
-    response = learnplatform_api.product_filters
+    options = {}
+    set_translate_lang_option(options)
+    response = learnplatform_api.product_filters(options)
 
     return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
 
@@ -82,5 +89,14 @@ class LearnPlatformController < ApplicationController
     return render json: response, status: :internal_server_error if response.key?(:lp_server_error)
 
     render json: response
+  end
+
+  private
+
+  # Set the translate_lang option if needed.
+  def set_translate_lang_option(options)
+    if context&.root_account&.feature_enabled?(:lti_apps_page_ai_translation) && I18n.locale.present? && I18n.locale != :en
+      options[:translate_lang] = I18n.locale
+    end
   end
 end

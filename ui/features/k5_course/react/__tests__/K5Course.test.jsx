@@ -23,7 +23,7 @@ import {act, render, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import moxios from 'moxios'
 import React from 'react'
-import sinon from 'sinon'
+import $ from 'jquery'
 import {K5Course} from '../K5Course'
 import {
   MOCK_ASSIGNMENT_GROUPS,
@@ -197,10 +197,7 @@ const createStudentView = () => {
   return studentViewBarContainer
 }
 
-let fakeXhrServer
-
 beforeEach(() => {
-  fakeXhrServer = sinon.fakeServer.create({autoRespond: true})
   moxios.install()
   fetchMock.get(FETCH_IMPORTANT_INFO_URL, MOCK_COURSE_SYLLABUS)
   fetchMock.get(FETCH_APPS_URL, MOCK_COURSE_APPS)
@@ -209,11 +206,40 @@ beforeEach(() => {
   fetchMock.get(ASSIGNMENT_GROUPS_URL, MOCK_ASSIGNMENT_GROUPS)
   fetchMock.get(ENROLLMENTS_URL, MOCK_ENROLLMENTS)
   fetchMock.get(ANNOUNEMENTS_URL_REGEX, [])
-  fakeXhrServer.respondWith('GET', GROUPS_URL, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(MOCK_GROUPS),
-  ])
+  fetchMock.get(GROUPS_URL, MOCK_GROUPS)
+
+  // Mock jQuery AJAX for the Groups URL (used by Backbone)
+  jest.spyOn($, 'ajax').mockImplementation(options => {
+    const url = typeof options === 'string' ? options : options.url
+
+    if (url === GROUPS_URL) {
+      // Create a jQuery Deferred-like object
+      const deferred = $.Deferred()
+
+      // Simulate successful response
+      setTimeout(() => {
+        const response = MOCK_GROUPS
+        if (typeof options === 'object' && options.success) {
+          options.success(response, 'success', {
+            getResponseHeader: () => null,
+            getAllResponseHeaders: () => '',
+          })
+        }
+        deferred.resolve(response, 'success', {
+          getResponseHeader: () => null,
+          getAllResponseHeaders: () => '',
+        })
+      }, 0)
+
+      return deferred.promise()
+    }
+
+    // Let other requests through - return a rejected deferred
+    const deferred = $.Deferred()
+    deferred.reject(new Error('Unmocked AJAX request'))
+    return deferred.promise()
+  })
+
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
 })
@@ -229,7 +255,7 @@ afterEach(() => {
   localStorage.clear()
   moxios.uninstall()
   fetchMock.restore()
-  fakeXhrServer.restore()
+  $.ajax.mockRestore()
   window.location.hash = ''
 })
 

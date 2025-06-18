@@ -210,7 +210,6 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 size={size}
                 rows={isLoading ? [] : currentRows!}
                 isLoading={isLoading}
-                contextType={contextType}
                 userCanEditFilesForContext={userCanEditFilesForContext}
                 userCanDeleteFilesForContext={userCanDeleteFilesForContext}
                 userCanRestrictFilesForContext={userCanRestrictFilesForContext}

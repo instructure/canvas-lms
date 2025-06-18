@@ -19,7 +19,6 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
-import ReactDOM from 'react-dom'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
 import UsageRightsDialog from './UsageRightsDialog'
@@ -28,6 +27,9 @@ const I18n = createI18nScope('react_files')
 
 export default class UsageRightsIndicator extends React.Component {
   warningMessage = I18n.t('Before publishing this file, you must specify usage rights.')
+  screenreaderTextRef = React.createRef()
+  iconRef = React.createRef()
+  buttonRef = React.createRef()
 
   static propTypes = {
     model: customPropTypes.filesystemObject.isRequired,
@@ -57,7 +59,7 @@ export default class UsageRightsIndicator extends React.Component {
       />
     )
     this.props.modalOptions.openModal(contents, () => {
-      ReactDOM.findDOMNode(this).focus()
+      this.buttonRef.current?.focus()
     })
   }
 
@@ -86,6 +88,7 @@ export default class UsageRightsIndicator extends React.Component {
       if (this.props.userCanEditFilesForContext) {
         return (
           <button
+            ref={this.buttonRef}
             type="submit"
             className="UsageRightsIndicator__openModal btn-link"
             onClick={this.handleClick}
@@ -108,6 +111,7 @@ export default class UsageRightsIndicator extends React.Component {
 
       return (
         <button
+          ref={this.buttonRef}
           type="submit"
           className="UsageRightsIndicator__openModal btn-link"
           onClick={this.handleClick}
@@ -116,13 +120,13 @@ export default class UsageRightsIndicator extends React.Component {
           data-tooltip="top"
           aria-label={I18n.t('Set usage rights')}
         >
-          <span ref="screenreaderText" className="screenreader-only">
+          <span ref={this.screenreaderTextRef} className="screenreader-only">
             {iconData.text}
           </span>
           <span className="screenreader-only">
             {this.props.model.get('usage_rights').license_name}
           </span>
-          <i ref="icon" className={iconData.iconClass} />
+          <i ref={this.iconRef} className={iconData.iconClass} />
         </button>
       )
     }

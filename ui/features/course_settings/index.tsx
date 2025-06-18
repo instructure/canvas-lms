@@ -34,6 +34,8 @@ import ready from '@instructure/ready'
 
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import type {EnvCourseSettings} from '@canvas/global/env/EnvCourse'
+import SettingsTabs from '../../shared/tabs/SettingsTabs'
+
 declare const ENV: GlobalEnv & EnvCourseSettings
 
 const I18n = createI18nScope('course_settings')
@@ -91,7 +93,7 @@ ready(() => {
   }
 
   // @ts-expect-error
-  const navView = new NavigationView({el: $('#tab-navigation')})
+  const navView = new NavigationView({el: $('#tab-navigation-mount')})
 
   // @ts-expect-error
   $(() => navView.render())
@@ -170,7 +172,7 @@ ready(() => {
     }
   }
 
-  const integrationsContainer = document.getElementById('tab-integrations')
+  const integrationsContainer = document.getElementById('tab-integrations-mount')
   if (integrationsContainer) {
     const integrationsRoot = createRoot(integrationsContainer)
     integrationsRoot.render(
@@ -182,13 +184,26 @@ ready(() => {
     )
   }
 
-  const appsMountpoint = document.getElementById('tab-apps')
+  const appsMountpoint = document.getElementById('tab-apps-mount')
   if (appsMountpoint) {
     const appsRoot = createRoot(appsMountpoint)
     appsRoot.render(
       <Suspense fallback={<Loading />}>
         <ErrorBoundary errorComponent={<ErrorMessage />}>
           <CourseApps />
+        </ErrorBoundary>
+      </Suspense>,
+    )
+  }
+
+  const tabsMountpoint = document.getElementById('course_settings_tabs_mount')
+  if (tabsMountpoint && tabsMountpoint.dataset.props) {
+    const {tabs} = JSON.parse(tabsMountpoint.dataset.props)
+    const root = createRoot(tabsMountpoint)
+    root.render(
+      <Suspense fallback={<Loading />}>
+        <ErrorBoundary errorComponent={<ErrorMessage />}>
+          <SettingsTabs tabs={tabs} />
         </ErrorBoundary>
       </Suspense>,
     )

@@ -24,12 +24,11 @@ interface AmsModule {
 }
 
 export function Component(): JSX.Element | null {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const mountedContainer = useRef<HTMLDivElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(document.querySelector('#ams_container'))
   const moduleRef = useRef<AmsModule | null>(null)
 
   React.useEffect(() => {
-    if (!window.ENV.FEATURES.ams_service || !containerRef.current) {
+    if (!ENV.FEATURES.ams_service || !containerRef.current) {
       return
     }
 
@@ -39,8 +38,11 @@ export function Component(): JSX.Element | null {
       .then(module => {
         if (stillMounting && containerRef.current) {
           moduleRef.current = module
-          mountedContainer.current = containerRef.current
-          module.render(mountedContainer.current, {routerBasename: '/ams'})
+          module.render(containerRef.current, {
+            routerBasename: ENV.context_url ?? '',
+            themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
+            useHighContrast: ENV.use_high_contrast ?? false,
+          })
         }
       })
       .catch(err => {
@@ -49,17 +51,17 @@ export function Component(): JSX.Element | null {
 
     return () => {
       stillMounting = false
-      if (mountedContainer.current && moduleRef.current) {
-        moduleRef.current.unmount(mountedContainer.current)
+      if (containerRef.current && moduleRef.current) {
+        moduleRef.current.unmount(containerRef.current)
       }
     }
   }, [])
 
-  return <div ref={containerRef} id="ams-container" />
+  return null
 }
 
 async function loadAmsModule() {
-  const moduleUrl = window.REMOTES?.ams?.launch_url
+  const moduleUrl = REMOTES?.ams?.launch_url
 
   if (!moduleUrl) {
     throw new Error('AMS module URL not found')

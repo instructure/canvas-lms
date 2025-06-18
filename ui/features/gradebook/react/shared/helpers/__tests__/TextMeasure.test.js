@@ -58,7 +58,7 @@ describe('TextMeasure', () => {
     test('creates only one "text-measure" element', () => {
       getTextWidth('example')
       getTextWidth('sample')
-      expect(document.getElementById('content').children.length).toBe(1)
+      expect(document.getElementById('content').children).toHaveLength(1)
     })
   })
 })

@@ -24,6 +24,8 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG21/#contrast-minimum"
 
       CONTRAST_THRESHOLD = 4.5
+      SMALL_TEXT_MAX_SIZE_PX = 18.5
+      SMALL_TEXT_MAX_SIZE_BOLD_PX = 14.0
 
       def self.test(elem)
         tag_name = elem.tag_name.downcase
@@ -35,6 +37,8 @@ module Accessibility
         style_str = elem.attribute("style")&.value.to_s
         return true if style_str.include?("display: none") || style_str.include?("visibility: hidden")
 
+        return true unless small_text?(style_str)
+
         foreground = extract_color(style_str, "color") || "000000"
         background = extract_color(style_str, "background-color") || "FFFFFF"
 
@@ -44,15 +48,56 @@ module Accessibility
       end
 
       def self.message
-        I18n.t("Small text should have sufficient contrast.")
+        I18n.t("Text smaller than 18pt (or bold 14pt) should display a minimum contrast ratio of 4.5:1.")
       end
 
       def self.why
-        I18n.t("When text is too small, users may have difficulty reading it.")
+        I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
       end
 
       def self.link_text
         I18n.t("Learn more about small text contrast")
+      end
+
+      def self.small_text?(style_str)
+        font_size = extract_font_size(style_str) || 16
+        font_weight = extract_font_weight(style_str) || "normal"
+
+        is_bold = %w[bold bolder 700 800 900].include?(font_weight.to_s.downcase)
+
+        font_size < if is_bold
+                      SMALL_TEXT_MAX_SIZE_BOLD_PX
+                    else
+                      SMALL_TEXT_MAX_SIZE_PX
+                    end
+      end
+
+      def self.extract_font_size(style_str)
+        return nil unless style_str
+
+        if style_str =~ /font-size:\s*([^;]+)/
+          size_str = $1.strip
+
+          if size_str.end_with?("px")
+            return size_str.to_f
+          elsif size_str.end_with?("pt")
+            return size_str.to_f * 1.333
+          elsif size_str.end_with?("em", "rem")
+            return size_str.to_f * 16 # Assume 1em = 16px
+          end
+        end
+
+        nil
+      end
+
+      def self.extract_font_weight(style_str)
+        return nil unless style_str
+
+        if style_str =~ /font-weight:\s*([^;]+)/
+          $1.strip
+        else
+          nil
+        end
       end
 
       def self.extract_color(style_str, property)
@@ -86,6 +131,18 @@ module Accessibility
           label: "Change color",
           value: ""
         )
+      end
+
+      def self.fix(elem, value)
+        style_str = elem.attribute("style")&.value.to_s
+        styles = style_str.split(";").to_h { |s| s.strip.split(":") }
+
+        styles["color"] = value
+
+        new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
+        elem.set_attribute("style", new_style)
+
+        elem
       end
     end
   end

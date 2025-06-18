@@ -386,6 +386,12 @@ class DiscussionTopicsApiController < ApplicationController
       return render(json: { error: "Missing notes." }, status: :bad_request)
     end
 
+    if action == "like"
+      InstStatsd::Statsd.distributed_increment("discussion_topic.insight.entry_liked")
+    elsif action == "dislike"
+      InstStatsd::Statsd.distributed_increment("discussion_topic.insight.entry_disliked")
+    end
+
     insight_entry.update!(
       ai_evaluation_human_reviewer: @current_user,
       ai_evaluation_human_feedback_liked: action == "like",

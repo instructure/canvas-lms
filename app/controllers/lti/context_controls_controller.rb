@@ -114,12 +114,41 @@ module Lti
     include Api::V1::Lti::Deployment
     include Api::V1::Lti::ContextControl
 
+    module ContextControlsBookmarker
+      def self.bookmark_for(context_controls)
+        [context_controls.deployment_id, context_controls.path]
+      end
+
+      def self.validate(bookmark)
+        return false unless bookmark.is_a?(Array) && bookmark.length == 2
+
+        bookmark.first.is_a?(Integer) && bookmark.second.is_a?(String)
+      end
+
+      def self.restrict_scope(scope, pager)
+        if pager.current_bookmark
+          comparison = (pager.include_bookmark ? ">=" : ">")
+          deployment_id, path = pager.current_bookmark
+          scope = scope.where(
+            "(deployment_id > ?) OR (deployment_id = ? AND path #{comparison} ?)",
+            deployment_id,
+            deployment_id,
+            path
+          )
+        end
+        scope.order(:deployment_id, :path)
+      end
+    end
+
     before_action :require_user
     before_action :require_feature_flag
     before_action :require_manage_lti_registrations
     before_action :validate_bulk_params, only: [:create_many]
 
     MAX_BULK_CREATE = 100
+
+    CONTROLS_DEFAULT_LIST_PAGE_SIZE = 20
+    CONTROLS_MAX_LIST_PAGE_SIZE = 100
 
     # @API List All Context Controls
     #
@@ -138,44 +167,36 @@ module Lti
     #   curl -X GET 'https://<canvas>/api/v1/lti_registrations/<registration_id>/controls' \
     #        -H "Authorization: Bearer <token>"
     def index
-      deployment_scope = registration.deployments.active
-      if deployment_scope.empty?
-        return render json: []
-      end
+      bookmarked = BookmarkedCollection.wrap(
+        ContextControlsBookmarker,
+        Lti::ContextControl
+               .eager_load(:deployment)
+               .where(registration:)
+               .where.not(context_external_tools: { workflow_state: ["deleted", "disabled"] })
+               .order(:deployment_id, :path)
+      )
 
-      # sort contexts (and deployments) by account hierarchy, with root account first
-      # TODO: controls will be sorted by hierarchy as part of INTEROP-8992,
-      # and this can flip: deployments can be pulled from and sorted by controls
-      # and this sorting can be removed
-      contexts = deployment_scope.preload(:context).map(&:context).uniq.sort_by do |context|
-        if context.respond_to?(:parent_account_id)
-          # root account first
-          context.parent_account_id || 0
-        else
-          context.account_id
+      paginated = Api.paginate(bookmarked, self, api_v1_lti_context_controls_index_url, per_page: controls_page_size)
+
+      render json: (
+        paginated
+        .group_by(&:deployment)
+        .map do |deployment, context_controls|
+          lti_deployment_json(deployment, @current_user, session, context, context_controls:)
         end
-      end
-
-      deployments = deployment_scope.joins(Lti::ContextToolFinder.context_ordering_sql(contexts)).order("context_order.ordering")
-      controls_by_deployment = Lti::ContextControl.active.where(deployment: deployments).group_by(&:deployment_id)
-
-      json = deployments.map do |deployment|
-        context_controls = controls_by_deployment[deployment.id] || []
-
-        # for now, only get the "root" control, for the context in which the deployment is installed
-        # TODO: remove as part of INTEROP-8992
-        context_controls = context_controls.select do |cc|
-          (cc.account_id == deployment.context_id && deployment.context_type == "Account") ||
-            (cc.course_id == deployment.context_id && deployment.context_type == "Course")
-        end
-
-        lti_deployment_json(deployment, @current_user, session, context, context_controls:)
-      end
-
-      render json:
+      )
     rescue => e
       report_error(e)
       raise e
+    end
+
+    def controls_page_size
+      per_page = params[:per_page].to_i
+      if per_page <= 0
+        CONTROLS_DEFAULT_LIST_PAGE_SIZE
+      else
+        [per_page, CONTROLS_MAX_LIST_PAGE_SIZE].min
+      end
     end
 
     # @API Show LTI Context Control

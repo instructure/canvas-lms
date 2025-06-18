@@ -72,7 +72,6 @@ describe "RCE next tests" do
     before do
       course_with_teacher_logged_in
       stub_rcs_config
-      Account.site_admin.disable_feature! :remove_rce_resize_button
     end
 
     context "Full RCE" do

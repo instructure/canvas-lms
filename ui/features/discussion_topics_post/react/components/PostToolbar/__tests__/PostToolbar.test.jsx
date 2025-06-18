@@ -72,11 +72,12 @@ describe('PostToolbar', () => {
 
     it('displays if callback is provided', () => {
       const onTogglePublishMock = jest.fn()
-      const {getByText} = setup({
+      const {getByText, getByTestId} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
         canUnpublish: true,
       })
+      expect(getByTestId('publishToggle')).toHaveAttribute('data-action-state', 'unpublishButton')
       expect(onTogglePublishMock.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Published'))
       expect(onTogglePublishMock.mock.calls).toHaveLength(1)
@@ -91,6 +92,16 @@ describe('PostToolbar', () => {
       })
       expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
+
+    it('adds proper tracing state when it is unpublished', () => {
+      const onTogglePublishMock = jest.fn()
+      const {getByTestId} = setup({
+        onTogglePublish: onTogglePublishMock,
+        isPublished: false,
+        canUnpublish: true,
+      })
+      expect(getByTestId('publishToggle')).toHaveAttribute('data-action-state', 'publishButton')
+    })
   })
 
   describe('subscription button', () => {
@@ -101,15 +112,29 @@ describe('PostToolbar', () => {
 
     it('displays if callback is provided', () => {
       const onToggleSubscriptionMock = jest.fn()
-      const {queryByText, getByText} = setup({
+      const {queryByText, getByText, getByTestId} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
         discussion: Discussion.mock({groupSet: null}),
       })
       expect(queryByText('Subscribed')).toBeTruthy()
+      expect(getByTestId('subscribeToggle')).toHaveAttribute(
+        'data-action-state',
+        'unsubscribeButton',
+      )
       expect(onToggleSubscriptionMock.mock.calls).toHaveLength(0)
       fireEvent.click(getByText('Subscribed'))
       expect(onToggleSubscriptionMock.mock.calls).toHaveLength(1)
+    })
+
+    it('adds proper tracing state when it is unsubscibed', () => {
+      const onToggleSubscriptionMock = jest.fn()
+      const {getByTestId} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: false,
+        discussion: Discussion.mock({groupSet: null}),
+      })
+      expect(getByTestId('subscribeToggle')).toHaveAttribute('data-action-state', 'subscribeButton')
     })
 
     it('displays if user does not have teacher, designer, ta', () => {
@@ -176,6 +201,8 @@ describe('PostToolbar', () => {
         const {getByTestId, getByText} = setup({onReadAll: onReadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onReadAllMock.mock.calls).toHaveLength(0)
+        // This attribute is used for user tracking
+        expect(getByTestId('discussion-thread-menuitem-read-all')).toBeDefined()
         fireEvent.click(getByText('Mark All as Read'))
         expect(onReadAllMock.mock.calls).toHaveLength(1)
       })
@@ -187,6 +214,8 @@ describe('PostToolbar', () => {
         const {getByTestId, getByText} = setup({onUnreadAll: onUnreadAllMock})
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onUnreadAllMock.mock.calls).toHaveLength(0)
+        // This attribute is used for user tracking
+        expect(getByTestId('discussion-thread-menuitem-unread-all')).toBeDefined()
         fireEvent.click(getByText('Mark All as Unread'))
         expect(onUnreadAllMock.mock.calls).toHaveLength(1)
       })

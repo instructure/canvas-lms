@@ -19,7 +19,7 @@
 import {gql} from 'graphql-tag'
 import {Assignment} from './Assignment'
 import {Submission} from './Submission'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {QueryFunctionContext, InfiniteData} from '@tanstack/react-query'
 import {useAllPages} from '@canvas/query'
 

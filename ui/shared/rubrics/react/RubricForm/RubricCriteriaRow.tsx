@@ -21,6 +21,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {possibleString, possibleStringRange} from '@canvas/rubrics/react/Points'
 import {OutcomeTag, escapeNewLineText, rangingFrom} from '@canvas/rubrics/react/RubricAssessment'
+import classnames from 'classnames'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
@@ -29,6 +30,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {
+  IconAiColoredSolid,
   IconDragHandleLine,
   IconDuplicateLine,
   IconEditLine,
@@ -36,7 +38,6 @@ import {
   IconTrashLine,
   IconLockLine,
 } from '@instructure/ui-icons'
-import {IgniteAiIcon} from '@canvas/ignite-ai-icon/react/IgniteAiIcon'
 import {Draggable} from 'react-beautiful-dnd'
 import './drag-and-drop/styles.css'
 
@@ -49,6 +50,7 @@ type RubricCriteriaRowProps = {
   rowIndex: number
   unassessed: boolean
   isGenerated?: boolean
+  nextIsGenerated?: boolean
   onDeleteCriterion: () => void
   onDuplicateCriterion: () => void
   onEditCriterion: () => void
@@ -61,6 +63,7 @@ export const RubricCriteriaRow = ({
   rowIndex,
   unassessed,
   isGenerated,
+  nextIsGenerated,
   onDeleteCriterion,
   onDuplicateCriterion,
   onEditCriterion,
@@ -81,7 +84,11 @@ export const RubricCriteriaRow = ({
         return (
           <div
             ref={provided.innerRef}
-            className={snapshot.isDragging ? 'draggable dragging' : 'draggable'}
+            className={classnames('draggable', 'criterion-row', {
+              dragging: snapshot.isDragging,
+              'generated-criterion-row': isGenerated,
+              'divided-criterion-row': !isGenerated && !nextIsGenerated,
+            })}
             {...provided.draggableProps}
           >
             <Flex data-testid="rubric-criteria-row">
@@ -90,14 +97,14 @@ export const RubricCriteriaRow = ({
                   <IconDragHandleLine />
                 </div>
               </Flex.Item>
-              <Flex.Item align="start" shouldShrink={true}>
-                <View as="div" margin="xxx-small 0 0 small" themeOverride={{marginSmall: '1.5rem'}}>
+              <Flex.Item align="start">
+                <View as="div" margin="xxx-small 0 0 medium">
                   <Text weight="bold" data-testid="rubric-criteria-row-index">
                     {rowIndex}.
                   </Text>
                 </View>
               </Flex.Item>
-              <Flex.Item margin="0 small" align="start" shouldGrow={true} shouldShrink={true}>
+              <Flex.Item margin="0 x-small" align="start" shouldGrow={true} shouldShrink={true}>
                 {learningOutcomeId ? (
                   <>
                     <View as="div">
@@ -153,7 +160,7 @@ export const RubricCriteriaRow = ({
                       <Flex alignItems="center" gap="x-small">
                         {isGenerated && (
                           <span data-testid="rubric-criteria-row-ai-icon">
-                            <IgniteAiIcon />
+                            <IconAiColoredSolid />
                           </span>
                         )}
                         <Text weight="bold">{description}</Text>
@@ -252,15 +259,6 @@ export const RubricCriteriaRow = ({
                 isGenerated={isGenerated}
               />
             )}
-            <View
-              as="hr"
-              margin="medium 0 medium 0"
-              className={
-                snapshot.isDragging
-                  ? 'draggable dragging rubric-divider'
-                  : 'draggable rubric-divider'
-              }
-            />
           </div>
         )
       }}
@@ -281,11 +279,7 @@ const RatingScaleAccordion = ({
   isGenerated = false,
 }: RatingScaleAccordionProps) => {
   return (
-    <View
-      as="div"
-      padding="small 0 0 large"
-      themeOverride={{paddingMedium: '1.5rem', paddingLarge: '3.35rem'}}
-    >
+    <View as="div" padding="small 0 0 xx-large">
       <ToggleDetails
         data-testid="criterion-row-rating-accordion"
         defaultExpanded={isGenerated}
@@ -293,7 +287,7 @@ const RatingScaleAccordion = ({
       >
         {ratings.map((rating, index) => {
           const scale = ratings.length - (index + 1)
-          const spacing = index === 0 ? '1.5rem' : '2.25rem'
+          const spacing = index === 0 ? 'medium' : 'large'
           const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
           return (
             <RatingScaleAccordionItem
@@ -326,20 +320,10 @@ const RatingScaleAccordionItem = ({
   min,
 }: RatingScaleAccordionItemProps) => {
   return (
-    <View
-      as="div"
-      margin="small 0 0 xx-small"
-      themeOverride={{marginSmall: spacing}}
-      data-testid="rating-scale-accordion-item"
-    >
+    <View as="div" margin={`${spacing} 0 0 xx-small`} data-testid="rating-scale-accordion-item">
       <Flex>
         <Flex.Item align="start">
-          <View
-            as="div"
-            width="2.25rem"
-            margin="0 0 0 small"
-            themeOverride={{marginSmall: '0.25rem'}}
-          >
+          <View as="div" width="2.25rem" margin="0 0 0 xx-small">
             <Text width="0.75rem">{scale}</Text>
           </View>
         </Flex.Item>
@@ -359,7 +343,7 @@ const RatingScaleAccordionItem = ({
           </View>
         </Flex.Item>
         <Flex.Item align="start">
-          <View as="div" margin="0 0 0 medium" themeOverride={{marginMedium: '1.5rem'}}>
+          <View as="div" margin="0 0 0 medium">
             {!hidePoints && (
               <Text>
                 {min != null

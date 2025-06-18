@@ -49,7 +49,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
   useEffect(() => {
     if (groupCategory.name)
       setName(I18n.t('(Clone) %{groupCategoryName}', {groupCategoryName: groupCategory.name}))
-    if (!modalProps.open){
+    if (!modalProps.open) {
       resetState()
       setCategoryNameMessages([])
     }
@@ -58,14 +58,16 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
   function handleSend() {
     const categoryNameErrors = []
     const trimmedName = name.trim()
-    if(!trimmedName.length){
-      categoryNameErrors.push({type: "newError", text: I18n.t("Group set name is required")})
-    }
-    else if(trimmedName.length > CATEGORY_NAME_MAX_LENGTH){
-      categoryNameErrors.push({type: "newError", text: I18n.t("%{number} character limit exceeded", {number: CATEGORY_NAME_MAX_LENGTH})})
+    if (!trimmedName.length) {
+      categoryNameErrors.push({type: 'newError', text: I18n.t('Group set name is required')})
+    } else if (trimmedName.length > CATEGORY_NAME_MAX_LENGTH) {
+      categoryNameErrors.push({
+        type: 'newError',
+        text: I18n.t('Must be fewer than %{number} characters', {number: CATEGORY_NAME_MAX_LENGTH}),
+      })
     }
 
-    if(categoryNameErrors.length){
+    if (categoryNameErrors.length) {
       setCategoryNameMessages(categoryNameErrors)
       categoryNameRef.current?.focus()
       return
@@ -106,11 +108,11 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     setStatus(null)
   }
 
-  function handleCategoryNameRef(ref){
+  function handleCategoryNameRef(ref) {
     categoryNameRef.current = ref
   }
 
-  function handleCategoryNameChange(value){
+  function handleCategoryNameChange(value) {
     setName(value)
     setCategoryNameMessages([])
   }
@@ -119,7 +121,9 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     const saveButtonState = status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
-        <Button data-testid="cancel_clone_group_set" onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
+        <Button data-testid="cancel_clone_group_set" onClick={modalProps.onDismiss}>
+          {I18n.t('Cancel')}
+        </Button>
         <Button
           type="submit"
           interaction={saveButtonState}

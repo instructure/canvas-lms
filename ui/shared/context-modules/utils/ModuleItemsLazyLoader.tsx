@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {type Links} from '@canvas/parse-link-header'
 import {FetchError} from './FetchError'
 import {ModuleItemPaging, type PaginationData} from './ModuleItemPaging'
@@ -24,6 +24,7 @@ import {ModuleItemLoadingData} from './ModuleItemLoadingData'
 import {ModuleItemsLoadingSpinner} from './ModuleItemsLoadingSpinner'
 import {ModuleItemsStore} from './ModuleItemsStore'
 import {moduleFromId} from './showAllOrLess'
+import {updateModuleFileDrop} from './moduleHelpers'
 import {DEFAULT_PAGE_SIZE, type ModuleId} from './types'
 
 const BATCH_SIZE = 6
@@ -51,16 +52,21 @@ class ModuleItemsLazyLoader {
     this.moduleItemStore = moduleItemStore
   }
 
-  emptyModuleOfItems(moduleItemContainer: Element) {
-    const currentItems = moduleItemContainer.querySelector('.context_module_items')
-    if (currentItems) {
-      currentItems.remove()
+  emptyModuleOfItems(moduleItemContainer: Element, leaveList?: boolean) {
+    if (leaveList) {
+      moduleItemContainer.querySelector('.context_module_items')?.replaceChildren()
+    } else {
+      moduleItemContainer.querySelector('.context_module_items')?.remove()
     }
   }
 
-  renderResult(moduleId: ModuleId, moduleItemContainer: Element, text: string, links?: Links) {
-    this.emptyModuleOfItems(moduleItemContainer)
+  renderResult(moduleId: ModuleId, text: string, links?: Links) {
+    const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
+    if (!moduleItemContainer) return
+
+    this.emptyModuleOfItems(moduleItemContainer, text.trim().length === 0)
     moduleItemContainer.insertAdjacentHTML('afterbegin', text)
+
     const module = moduleFromId(moduleId)
     if (!module) return
     module.dataset.loadstate = 'loaded'
@@ -96,6 +102,7 @@ class ModuleItemsLazyLoader {
     } else {
       ModuleItemsLazyLoader.loadingData.unmountModuleRoot(moduleId)
     }
+    updateModuleFileDrop(module)
   }
 
   onPageChange = (page: number, moduleId: ModuleId) => {
@@ -118,9 +125,7 @@ class ModuleItemsLazyLoader {
     moduleId: ModuleId,
     pageParam?: number,
     allPagesParam?: boolean,
-  ): Promise<void> {
-    const moduleItemContainer = document.querySelector(`#context_module_content_${moduleId}`)
-    if (!moduleItemContainer) return
+  ): Promise<DoFetchApiResults<string> | undefined> {
     const module = moduleFromId(moduleId)
     if (!module) return
 
@@ -156,17 +161,19 @@ class ModuleItemsLazyLoader {
       })
 
       if (!allPages && !result.link?.last && page > 1) {
-        return await this.fetchModuleItemsHtml(moduleId, page - 1)
+        return this.fetchModuleItemsHtml(moduleId, page - 1)
       }
 
       this.clearPageNumberIfAllPages(moduleId, allPages)
       this.savePageNumber(moduleId, allPages, page)
       this.saveAllPage(moduleId, allPages)
-      this.renderResult(moduleId, moduleItemContainer, result.text, result.link)
+      this.renderResult(moduleId, result.text, result.link)
       this.callback(moduleId)
-    } catch (_e) {
+      return result
+    } catch (e) {
       module.dataset.loadstate = 'error'
       this.renderError(moduleId, page)
+      return undefined
     }
   }
 
@@ -194,19 +201,18 @@ class ModuleItemsLazyLoader {
     }
   }
 
-  async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean): Promise<void[]> {
-    const allPromises: Promise<void>[] = []
+  async fetchModuleItems(moduleIds: ModuleId[], allPages?: boolean) {
     for (let i = 0; i < moduleIds.length; i += BATCH_SIZE) {
       const batch = moduleIds.slice(i, i + BATCH_SIZE)
       await Promise.all(
         batch.map(moduleId => {
-          const p = this.fetchModuleItemsHtml(moduleId, undefined, allPages)
-          allPromises.push(p)
-          return p
+          return this.fetchModuleItemsHtml(moduleId, undefined, allPages).catch(error => {
+            console.error(`Error fetching module ${moduleId} items:`, error)
+            // swallow the error to ensure other fetches continue
+          })
         }),
       )
     }
-    return Promise.all(allPromises)
   }
 }
 

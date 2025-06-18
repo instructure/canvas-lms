@@ -49,15 +49,12 @@ describe('RenderGuard', () => {
     expect(screen.queryByText('Should Not Appear')).not.toBeInTheDocument()
   })
 
-  it('logs a warning when blocked', () => {
-    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+  it('renders nothing when blocked', () => {
     render(
       <RenderGuard>
         <div>Blocked</div>
       </RenderGuard>,
     )
-    expect(consoleSpy).toHaveBeenCalledWith(
-      'RenderGuard blocked mount: #new_login_safe_to_mount not found',
-    )
+    expect(screen.queryByText('Blocked')).not.toBeInTheDocument()
   })
 })

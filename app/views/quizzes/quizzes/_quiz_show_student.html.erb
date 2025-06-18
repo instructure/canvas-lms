@@ -22,7 +22,7 @@
   <% if @quiz.description.present? %>
     <h2><%= t 'Instructions' %></h2>
     <div class="description user_content" role="region" aria-label="<%= t 'Quiz Instructions' %>">
-      <%= public_user_content(@quiz.description) %>
+      <%= user_content(@quiz.description) %>
     </div>
   <% end %>
 <% end %>

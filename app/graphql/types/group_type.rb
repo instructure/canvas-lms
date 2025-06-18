@@ -19,6 +19,11 @@
 #
 
 module Types
+  class GroupStateType < Types::BaseEnum
+    value "available"
+    value "deleted"
+  end
+
   class GroupType < ApplicationObjectType
     graphql_name "Group"
 
@@ -36,6 +41,8 @@ module Types
     field :members_count, Integer, null: true
 
     field :non_collaborative, Boolean, null: true
+
+    field :state, GroupStateType, method: :workflow_state, null: false
 
     field :can_message, Boolean, null: false
     def can_message

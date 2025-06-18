@@ -78,7 +78,7 @@ export default class BaseUploader {
         this.inFlight = false
         if (axios.isCancel(failReason)) {
           this.onUploadCancelled()
-          // eslint-disable-next-line no-throw-literal
+
           throw 'user_aborted_upload'
         } else {
           this.error = failReason

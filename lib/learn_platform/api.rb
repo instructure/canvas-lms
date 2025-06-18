@@ -63,25 +63,25 @@ module LearnPlatform
       fetch_learnplatform_response(endpoint, 1.hour, params)
     end
 
-    def product(id)
+    def product(id, params = {})
       return {} unless valid_learnplatform?
 
       endpoint = "/api/v2/lti/tools/#{id}"
-      fetch_learnplatform_response(endpoint, 1.hour)
+      fetch_learnplatform_response(endpoint, 1.hour, params)
     end
 
-    def products_by_category
+    def products_by_category(params = {})
       return {} unless valid_learnplatform?
 
       endpoint = "/api/v2/lti/tools_by_display_group"
-      fetch_learnplatform_response(endpoint, 1.hour)
+      fetch_learnplatform_response(endpoint, 1.hour, params)
     end
 
-    def product_filters
+    def product_filters(params = {})
       return {} unless valid_learnplatform?
 
       endpoint = "/api/v2/lti/tools_filters"
-      fetch_learnplatform_response(endpoint, 1.hour)
+      fetch_learnplatform_response(endpoint, 1.hour, params)
     end
 
     def products_by_organization(organization_salesforce_id, params = {})

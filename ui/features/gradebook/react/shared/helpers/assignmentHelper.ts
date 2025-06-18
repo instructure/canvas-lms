@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Assignment} from 'api.d'
 import type {GridColumnObject} from '../../default_gradebook/grid.d'
 
 const assignmentHelper = {
@@ -70,8 +71,9 @@ const assignmentHelper = {
     return diffOfAssignmentGroupPosition
   },
 
-  // @ts-expect-error
-  gradeByGroup(assignment) {
+  gradeByGroup(
+    assignment: Pick<Assignment, 'group_category_id' | 'grade_group_students_individually'>,
+  ) {
     return !!assignment.group_category_id && !assignment.grade_group_students_individually
   },
 }

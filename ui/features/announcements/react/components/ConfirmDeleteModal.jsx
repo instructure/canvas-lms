@@ -111,6 +111,7 @@ export default class ConfirmDeleteModal extends Component {
         <Modal.Footer>
           <Button
             id="cancel_delete_announcements"
+            data-testid="cancel-delete-announcements"
             ref={c => {
               this.cancelBtn = c
             }}
@@ -124,6 +125,7 @@ export default class ConfirmDeleteModal extends Component {
               this.confirmBtn = c
             }}
             id="confirm_delete_announcements"
+            data-testid="confirm-delete-announcements"
             onClick={this.onConfirm}
             color="danger"
           >

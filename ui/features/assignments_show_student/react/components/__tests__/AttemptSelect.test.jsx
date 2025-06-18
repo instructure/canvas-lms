@@ -81,7 +81,7 @@ describe('Attempt', () => {
     const {getAllByText, getByTestId} = render(mockContext(<AttemptSelect {...props} />))
     const select = getByTestId('attemptSelect')
     fireEvent.click(select) // open select dropdown
-    expect(getAllByText('Attempt 1').length).toBe(1)
+    expect(getAllByText('Attempt 1')).toHaveLength(1)
   })
 
   it('renders the current submission attempt', async () => {

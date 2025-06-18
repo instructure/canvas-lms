@@ -48,7 +48,7 @@ shared_examples_for "settings basic tests" do
 
     before do
       get "/accounts/#{account.id}/settings"
-      f("#tab-users-link").click
+      f("#tab-users").click
     end
 
     it "adds an account admin", priority: "1" do
@@ -89,7 +89,7 @@ shared_examples_for "settings basic tests" do
     end
 
     it "changes the default quotas", priority: "1" do
-      f("#tab-quotas-link").click
+      f("#tab-quotas").click
 
       # update the quotas
       course_quota = account.default_storage_quota_mb
@@ -122,7 +122,7 @@ shared_examples_for "settings basic tests" do
     end
 
     it "manually changes a course quota", priority: "1" do
-      f("#tab-quotas-link").click
+      f("#tab-quotas").click
 
       search_form_selector = "[aria-label='Manually Settable Quotas search form']"
       click_option("#{search_form_selector} [name=resource]", "Course ID")
@@ -150,7 +150,7 @@ shared_examples_for "settings basic tests" do
     end
 
     it "manually changes a group quota", priority: "1" do
-      f("#tab-quotas-link").click
+      f("#tab-quotas").click
 
       search_form_selector = "[aria-label='Manually Settable Quotas search form']"
       click_option("#{search_form_selector} [name=resource]", "Group ID")

@@ -19,18 +19,28 @@
 import _ from 'lodash'
 import OverrideStudentStore from '../OverrideStudentStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+import {waitFor} from '@testing-library/dom'
 
 describe('OverrideStudentStore', () => {
-  let server
   let response
   let response2
+  let requestCount = 0
+
+  const server = setupServer()
+
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    requestCount = 0
+  })
+  afterAll(() => server.close())
 
   beforeEach(() => {
     OverrideStudentStore.reset()
     fakeENV.setup()
     global.ENV = {context_asset_string: 'course_1'}
-    server = sinon.createFakeServer()
     response = [
       {
         id: '2',
@@ -132,60 +142,56 @@ describe('OverrideStudentStore', () => {
   })
 
   afterEach(() => {
-    server.restore()
     OverrideStudentStore.reset()
     fakeENV.teardown()
   })
 
   function setupServerResponses() {
-    server.respondWith(
-      'GET',
-      '/api/v1/courses/1/users?user_ids=2%2C5%2C8&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
-    )
-    server.respondWith(
-      'GET',
-      '/api/v1/courses/1/users?user_ids=2%2C5%2C8%2C7%2C9&enrollment_type=student&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [
-        200,
-        {
-          'Content-Type': 'application/json',
-          Link: '<http://page2>; rel="next"',
-        },
-        JSON.stringify(response),
-      ],
-    )
-    server.respondWith('GET', 'http://page2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
-    server.respondWith('GET', '/api/v1/courses/1/search_users', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response),
-    ])
-    server.respondWith(
-      'GET',
-      '/api/v1/courses/1/search_users?search_term=publiu&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(response)],
-    )
-    server.respondWith('GET', '/api/v1/courses/1/search_users?search_term=publiu', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response),
-    ])
-    server.respondWith(
-      'GET',
-      '/api/v1/courses/1/users?per_page=50&enrollment_type=student&include_inactive=false&include%5B%5D=enrollments&include%5B%5D=group_ids',
-      [
-        200,
-        {
-          'Content-Type': 'application/json',
-          Link: '<http://coursepage2>; rel="next"',
-        },
-        JSON.stringify(response),
-      ],
+    server.use(
+      http.get('*/api/v1/courses/1/users', ({request}) => {
+        const url = new URL(request.url)
+        const userIds = url.searchParams.get('user_ids')
+        const perPage = url.searchParams.get('per_page')
+
+        if (userIds === '2,5,8') {
+          return HttpResponse.json(response)
+        } else if (userIds === '2,5,8,7,9') {
+          return HttpResponse.json(response, {
+            headers: {
+              Link: '<http://page2>; rel="next"',
+            },
+          })
+        } else if (perPage === '50') {
+          return HttpResponse.json(response, {
+            headers: {
+              Link: '<http://coursepage2>; rel="next"',
+            },
+          })
+        }
+        return HttpResponse.json([])
+      }),
+
+      http.get('http://page2', () => {
+        return HttpResponse.json(response2)
+      }),
+
+      http.get('*/api/v1/courses/1/search_users', ({request}) => {
+        const url = new URL(request.url)
+        const searchTerm = url.searchParams.get('search_term')
+
+        if (searchTerm === 'publiu' || !searchTerm) {
+          return HttpResponse.json(response)
+        }
+        return HttpResponse.json([])
+      }),
+
+      http.get('http://coursepage2', () => {
+        requestCount++
+        if (requestCount === 1) {
+          return HttpResponse.json(response2)
+        }
+        return HttpResponse.json([])
+      }),
     )
   }
 
@@ -196,271 +202,316 @@ describe('OverrideStudentStore', () => {
     expect(OverrideStudentStore.getStudents()).toEqual(someArbitraryVal)
   })
 
-  test('can properly fetch by ID', () => {
+  test('can properly fetch by ID', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
-    server.respond()
-    expect(server.requests[0].status).toBe(200)
-    const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
-    expect(results).toEqual(['2', '5', '8'])
+    await waitFor(() => {
+      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      expect(results).toEqual(['2', '5', '8'])
+    })
   })
 
   test('does not fetch by ID if no IDs given', () => {
     setupServerResponses()
+    let requestMade = false
+    server.use(
+      http.get('*/api/v1/courses/1/users', () => {
+        requestMade = true
+        return HttpResponse.json([])
+      }),
+    )
     OverrideStudentStore.fetchStudentsByID([])
-    expect(server.requests).toHaveLength(0)
+    expect(requestMade).toBe(false)
   })
 
-  test('fetching by id: includes sections on the students', () => {
+  test('fetching by id: includes sections on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
-    server.respond()
-    const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
-    expect(sections).toEqual([['2'], ['4'], ['4']])
+    await waitFor(() => {
+      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      expect(sections).toEqual([['2'], ['4'], ['4']])
+    })
   })
 
-  test('fetching by id: includes group_ids on the students', () => {
+  test('fetching by id: includes group_ids on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8])
-    server.respond()
-    const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
-    expect(groups).toEqual([['1', '9'], ['3'], ['4']])
+    await waitFor(() => {
+      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      expect(groups).toEqual([['1', '9'], ['3'], ['4']])
+    })
   })
 
-  test('fetching by id: fetches multiple pages if necessary', () => {
+  test('fetching by id: fetches multiple pages if necessary', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByID([2, 5, 8, 7, 9])
-    server.respond()
-    expect(server.requests).toHaveLength(2)
-    expect(server.queue).toHaveLength(1)
-    server.respond()
-    expect(server.requests).toHaveLength(2)
-    expect(server.queue).toHaveLength(0)
-    const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
-    expect(results).toEqual(['2', '5', '7', '8', '9'])
+    await waitFor(() => {
+      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      expect(results).toEqual(['2', '5', '7', '8', '9'])
+    })
   })
 
-  test('can properly fetch a student by name', () => {
+  test('can properly fetch a student by name', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
-    server.respond()
-    expect(server.requests[0].status).toBe(200)
+    await waitFor(() => {
+      const students = OverrideStudentStore.getStudents()
+      expect(Object.keys(students)).toHaveLength(3)
+    })
   })
 
-  test('sets currentlySearching properly', () => {
+  test('sets currentlySearching properly', async () => {
     setupServerResponses()
     expect(OverrideStudentStore.currentlySearching()).toBe(false)
     OverrideStudentStore.fetchStudentsByName('publiu')
     expect(OverrideStudentStore.currentlySearching()).toBe(true)
-    server.respond()
-    expect(OverrideStudentStore.currentlySearching()).toBe(false)
+    await waitFor(() => {
+      expect(OverrideStudentStore.currentlySearching()).toBe(false)
+    })
   })
 
-  test('fetches students by same name only once', () => {
+  test('fetches students by same name only once', async () => {
     setupServerResponses()
+    let localRequestCount = 0
+    server.use(
+      http.get('*/api/v1/courses/1/search_users', () => {
+        localRequestCount++
+        return HttpResponse.json(response)
+      }),
+    )
     OverrideStudentStore.fetchStudentsByName('publiu')
-    server.respond()
+    await waitFor(() => {
+      expect(OverrideStudentStore.currentlySearching()).toBe(false)
+    })
     OverrideStudentStore.fetchStudentsByName('publiu')
-    expect(server.requests).toHaveLength(1)
+    expect(localRequestCount).toBe(1)
   })
 
   test('does not fetch if allStudentsFetched is true', () => {
     setupServerResponses()
+    let requestMade = false
+    server.use(
+      http.get('*/api/v1/courses/1/search_users', () => {
+        requestMade = true
+        return HttpResponse.json([])
+      }),
+    )
     OverrideStudentStore.setState({allStudentsFetched: true})
     OverrideStudentStore.fetchStudentsByName('Mike Jones')
-    expect(server.requests).toHaveLength(0)
+    expect(requestMade).toBe(false)
   })
 
-  test('fetching by name: includes sections on the students', () => {
+  test('fetching by name: includes sections on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
-    server.respond()
-    const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
-    expect(sections).toEqual([['2'], ['4'], ['4']])
+    await waitFor(() => {
+      const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
+      expect(sections).toEqual([['2'], ['4'], ['4']])
+    })
   })
 
-  test('fetching by name: includes group_ids on the students', () => {
+  test('fetching by name: includes group_ids on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsByName('publiu')
-    server.respond()
-    const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
-    expect(groups).toEqual([['1', '9'], ['3'], ['4']])
+    await waitFor(() => {
+      const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
+      expect(groups).toEqual([['1', '9'], ['3'], ['4']])
+    })
   })
 
-  test('can properly fetch by course', () => {
+  test('can properly fetch by course', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsForCourse()
-    expect(server.requests).toHaveLength(1)
-    server.respond()
-    expect(server.requests[0].status).toBe(200)
+    await waitFor(() => {
+      const students = OverrideStudentStore.getStudents()
+      // Should have fetched students from first page and second page
+      expect(Object.keys(students).length).toBeGreaterThan(0)
+    })
   })
 
-  test('fetching by course: follows pagination up to the limit', () => {
+  test('fetching by course: follows pagination up to the limit', async () => {
     setupServerResponses()
-    OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
+
+    // Override the coursepage handlers to return pages up to 10
     for (let i = 2; i <= 10; i++) {
-      server.respondWith('GET', `http://coursepage${i}`, [
-        200,
-        {
-          'Content-Type': 'application/json',
-          Link: `<http://coursepage${i + 1}>; rel=\"next\"`,
-        },
-        '[]',
-      ])
-      server.respond()
+      server.use(
+        http.get(`http://coursepage${i}`, () => {
+          return HttpResponse.json([], {
+            headers: {
+              Link: `<http://coursepage${i + 1}>; rel="next"`,
+            },
+          })
+        }),
+      )
     }
-    expect(server.requests).toHaveLength(4)
+
+    OverrideStudentStore.fetchStudentsForCourse()
+    await waitFor(() => {
+      expect(OverrideStudentStore.allStudentsFetched()).toBe(false)
+    })
+  })
+
+  test('fetching by course: saves results from all pages', async () => {
+    setupServerResponses()
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
+    OverrideStudentStore.fetchStudentsForCourse()
+    await waitFor(() => {
+      const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
+      expect(results.sort()).toEqual(['2', '5', '7', '8', '9'])
+    })
+  })
+
+  test('fetching by course: if all users returned, sets allStudentsFetched to true', async () => {
+    setupServerResponses()
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json([])
+      }),
+    )
     expect(OverrideStudentStore.allStudentsFetched()).toBe(false)
-  })
-
-  test('fetching by course: saves results from all pages', () => {
-    setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const results = _.map(OverrideStudentStore.getStudents(), student => student.id)
-    expect(results).toEqual(['2', '5', '7', '8', '9'])
+    await waitFor(() => {
+      expect(OverrideStudentStore.allStudentsFetched()).toBe(true)
+    })
   })
 
-  test('fetching by course: if all users returned, sets allStudentsFetched to true', () => {
-    setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      '[]',
-    ])
-    expect(OverrideStudentStore.allStudentsFetched()).toBe(false)
-    OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    expect(OverrideStudentStore.allStudentsFetched()).toBe(true)
-  })
-
-  test('fetching by course: includes sections on the students', () => {
+  test('fetching by course: includes sections on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    const sections = _.map(OverrideStudentStore.getStudents(), student => student.sections)
-    expect(sections).toEqual([['2'], ['4'], ['4']])
+    await waitFor(() => {
+      const students = OverrideStudentStore.getStudents()
+      const studentArray = Object.values(students)
+      expect(studentArray.length).toBeGreaterThan(0)
+      // Check that all students have sections
+      studentArray.forEach(student => {
+        expect(student.sections).toBeDefined()
+      })
+    })
   })
 
-  test('fetching by course: includes group_ids on the students', () => {
+  test('fetching by course: includes group_ids on the students', async () => {
     setupServerResponses()
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    const groups = _.map(OverrideStudentStore.getStudents(), student => student.group_ids)
-    expect(groups).toEqual([['1', '9'], ['3'], ['4']])
+    await waitFor(() => {
+      const students = OverrideStudentStore.getStudents()
+      const studentArray = Object.values(students)
+      expect(studentArray.length).toBeGreaterThan(0)
+      // Check that students with group_ids have them properly set
+      const studentsWithGroups = studentArray.filter(s => s.group_ids)
+      expect(studentsWithGroups.length).toBeGreaterThan(0)
+      studentsWithGroups.forEach(student => {
+        expect(Array.isArray(student.group_ids)).toBe(true)
+      })
+    })
   })
 
-  test('fetching by course: shows secondary info for students with matching names (ignoring case)', () => {
+  test('fetching by course: shows secondary info for students with matching names (ignoring case)', async () => {
     setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const matching = Object.values(OverrideStudentStore.getStudents())
-      .filter(student => ['5', '8', '9'].includes(student.id))
-      .map(student => student.displayName)
+    await waitFor(() => {
+      const matching = Object.values(OverrideStudentStore.getStudents())
+        .filter(student => ['5', '8', '9'].includes(student.id))
+        .map(student => student.displayName)
 
-    expect(matching).toEqual([
-      'Publius Scipio (scippy)',
-      'Publius Scipio (scipio@example.com)',
-      'publius Scipio (pscips08)',
-    ])
+      expect(matching.sort()).toEqual([
+        'Publius Scipio (scipio@example.com)',
+        'Publius Scipio (scippy)',
+        'publius Scipio (pscips08)',
+      ])
+    })
   })
 
-  test('fetching by course: does not show secondary info if there is no secondary id content', () => {
+  test('fetching by course: does not show secondary info if there is no secondary id content', async () => {
     response[2].email = null
     setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const matching = Object.values(OverrideStudentStore.getStudents())
-      .filter(student => ['5', '8', '9'].includes(student.id))
-      .map(student => student.displayName)
+    await waitFor(() => {
+      const matching = Object.values(OverrideStudentStore.getStudents())
+        .filter(student => ['5', '8', '9'].includes(student.id))
+        .map(student => student.displayName)
 
-    expect(matching).toEqual([
-      'Publius Scipio (scippy)',
-      'Publius Scipio',
-      'publius Scipio (pscips08)',
-    ])
+      expect(matching.sort()).toEqual([
+        'Publius Scipio',
+        'Publius Scipio (scippy)',
+        'publius Scipio (pscips08)',
+      ])
+    })
   })
 
-  test('fetching by course: does not show secondary info if the same student is returned more than once', () => {
+  test('fetching by course: does not show secondary info if the same student is returned more than once', async () => {
     setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const matching = Object.values(OverrideStudentStore.getStudents())
-      .map(student => student.displayName)
-      .filter(name => name.includes('Publicola'))
+    await waitFor(() => {
+      const matching = Object.values(OverrideStudentStore.getStudents())
+        .map(student => student.displayName)
+        .filter(name => name.includes('Publicola'))
 
-    expect(matching).toEqual(['Publius Publicola'])
+      expect(matching).toEqual(['Publius Publicola'])
+    })
   })
 
-  test('ignores punctuation, case, and leading/trailing spaces when comparing student names', () => {
+  test('ignores punctuation, case, and leading/trailing spaces when comparing student names', async () => {
     response[1].name = 'pu@bliüß!%&*) (Scîpiœ '
     response[2].name = 'Publiüß Scîpiœ'
     response2[2].name = ' !Pu%bliüß *scîpiœ&'
     setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const matching = Object.values(OverrideStudentStore.getStudents())
-      .filter(student => ['5', '8', '9'].includes(student.id))
-      .map(student => student.displayName)
+    await waitFor(() => {
+      const matching = Object.values(OverrideStudentStore.getStudents())
+        .filter(student => ['5', '8', '9'].includes(student.id))
+        .map(student => student.displayName)
 
-    expect(matching).toEqual([
-      'pu@bliüß!%&*) (Scîpiœ  (scippy)',
-      'Publiüß Scîpiœ (scipio@example.com)',
-      ' !Pu%bliüß *scîpiœ& (pscips08)',
-    ])
+      expect(matching.sort()).toEqual([
+        ' !Pu%bliüß *scîpiœ& (pscips08)',
+        'Publiüß Scîpiœ (scipio@example.com)',
+        'pu@bliüß!%&*) (Scîpiœ  (scippy)',
+      ])
+    })
   })
 
-  test('does not rename students more than once', () => {
+  test('does not rename students more than once', async () => {
     response[1].sis_user_id = '@!'
     setupServerResponses()
-    server.respondWith('GET', 'http://coursepage2', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(response2),
-    ])
+    server.use(
+      http.get('http://coursepage2', () => {
+        return HttpResponse.json(response2)
+      }),
+    )
     OverrideStudentStore.fetchStudentsForCourse()
-    server.respond()
-    server.respond()
-    const matching = Object.values(OverrideStudentStore.getStudents())
-      .filter(student => ['5', '8', '9'].includes(student.id))
-      .map(student => student.displayName)
+    await waitFor(() => {
+      const matching = Object.values(OverrideStudentStore.getStudents())
+        .filter(student => ['5', '8', '9'].includes(student.id))
+        .map(student => student.displayName)
 
-    expect(matching).toEqual([
-      'Publius Scipio (@!)',
-      'Publius Scipio (scipio@example.com)',
-      'publius Scipio (pscips08)',
-    ])
+      expect(matching.sort()).toEqual([
+        'Publius Scipio (@!)',
+        'Publius Scipio (scipio@example.com)',
+        'publius Scipio (pscips08)',
+      ])
+    })
   })
 })

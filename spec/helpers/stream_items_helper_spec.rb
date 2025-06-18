@@ -158,6 +158,13 @@ describe StreamItemsHelper do
       expect(@categorized["DiscussionEntry"].first.path).to match("/courses/#{@course.id}/discussion_topics/#{@discussion.id}?entry_id=#{DiscussionEntry.last.id}")
       expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}")
     end
+
+    it "provides correct link for AssessmentRequest when assignments_2_student feature flag is enabled" do
+      @course.enable_feature!(:assignments_2_student)
+      @items = @teacher.recent_stream_items
+      @categorized = helper.categorize_stream_items(@items, @teacher)
+      expect(@categorized["AssessmentRequest"].first.path).to match("/courses/#{@course.id}/assignments/#{@assignment.id}?reviewee_id=#{@student.id}")
+    end
   end
 
   context "extract_context" do

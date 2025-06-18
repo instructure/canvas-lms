@@ -681,7 +681,7 @@ describe Attachment do
     it "replaces uploaded data on destroy_content_and_replace" do
       expect(a.content_type).to eq "application/msword"
       a.destroy_content_and_replace
-      expect(a.content_type).to eq "application/pdf"
+      expect(a.reload.content_type).to eq "application/pdf"
     end
 
     it "also destroys thumbnails" do
@@ -812,8 +812,31 @@ describe Attachment do
         expect(a.reload.filename).to eq old_filename
         allow(a).to receive(:destroy_content).and_return(true)
         expect { a.destroy_content_and_replace }.not_to change { purgatory }
+        a.reload
         expect(a.filename).to eq "file_removed.pdf"
         expect(a.display_name).to eq "file_removed.pdf"
+      end
+
+      context "an attachment have more copies" do
+        it "succeeds in destroying content and replacing for the main attachment as well as for the copies" do
+          attachment = attachment_model(uploaded_data: default_uploaded_data, instfs_uuid: "instfs_uuid")
+          attachment.clone_for(course_factory(course_name: "Course 1", account: @account)).save!
+          attachment.clone_for(course_factory(course_name: "Course 2", account: @account)).save!
+          allow(InstFS).to receive(:duplicate_file)
+          allow(InstFS).to receive(:delete_file)
+          allow(InstFS).to receive(:direct_upload)
+
+          attachment.destroy_content_and_replace
+
+          attachment.cloned_item.attachments.each do |att|
+            expect(att.filename).to eq "file_removed.pdf"
+            expect(att.display_name).to eq "file_removed.pdf"
+            expect(att.content_type).to eq "application/pdf"
+            expect(att.instfs_uuid).to eq attachment.instfs_uuid
+            expect(att.md5).to eq attachment.md5
+            expect(att.size).to eq attachment.size
+          end
+        end
       end
     end
 

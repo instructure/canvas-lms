@@ -36,7 +36,7 @@ module Lti
                          .uniq
                          .select do |tool|
         next if tool.asset_processor_eula_required == false
-        next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_SCOPE)
+        next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_USER_SCOPE)
         next if user.lti_asset_processor_eula_acceptances.active.find_by(context_external_tool_id: tool.id)&.accepted == true
 
         true

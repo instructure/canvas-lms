@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
 import {render} from '@testing-library/react'
 import LockToggle from '../LockToggle'
 
@@ -44,16 +43,15 @@ describe('LockToggle component', () => {
   test('does not render a button when LockToggle is not toggleable', () => {
     const props = defaultProps()
     props.isToggleable = false
-    const tree = shallow(<LockToggle {...props} />)
-    const node = tree.find('button')
-    expect(node.exists()).toBeFalsy()
+    const tree = render(<LockToggle {...props} />)
+    const node = tree.container.querySelector('button')
+    expect(node).toBeFalsy()
   })
 
   test('renders a locked icon when LockToggle is locked', () => {
     const props = defaultProps()
     props.isLocked = true
     const tree = render(<LockToggle {...props} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelector('svg[name="IconBlueprintLock"]')
     expect(node).toBeTruthy()
   })
@@ -62,7 +60,6 @@ describe('LockToggle component', () => {
     const props = defaultProps()
     props.isLocked = false
     const tree = render(<LockToggle {...props} />)
-    console.log(tree.container.innerHTML)
     const node = tree.container.querySelector('svg[name="IconBlueprint"]')
     expect(node).toBeTruthy()
   })

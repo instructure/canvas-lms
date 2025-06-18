@@ -27,7 +27,14 @@ const I18n = createI18nScope('gradebook')
 
 const CurveGradesDialogManager = {
   createCurveGradesAction(
-    assignment: Assignment,
+    assignment: Pick<
+      Assignment,
+      | 'grading_type'
+      | 'points_possible'
+      | 'grades_published'
+      | 'inClosedGradingPeriod'
+      | 'checkpoints'
+    >,
     students: StudentMap,
     {
       isAdmin,

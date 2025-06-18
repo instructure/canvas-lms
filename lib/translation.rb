@@ -112,7 +112,7 @@ module Translation
           { id: "uz", name: I18n.t("Uzbek"), translated_to_name: I18n.t("Translated to Uzbek") },
           { id: "vi", name: I18n.t("Vietnamese"), translated_to_name: I18n.t("Translated to Vietnamese") },
           { id: "cy", name: I18n.t("Welsh"), translated_to_name: I18n.t("Translated to Welsh") },
-        ]
+        ].sort_by { |language| Canvas::ICU.collation_key(language[:name]) }
       end
 
       [
@@ -216,7 +216,7 @@ module Translation
         { id: "yo", name: I18n.t("Yoruba"), translated_to_name: I18n.t("Translated to Yoruba") },
         { id: "zh", name: I18n.t("Chinese"), translated_to_name: I18n.t("Translated to Chinese") },
         { id: "zu", name: I18n.t("Zulu"), translated_to_name: I18n.t("Translated to Zulu") }
-      ].sort_by { |a| a[:name] }
+      ].sort_by { |language| Canvas::ICU.collation_key(language[:name]) }
     end
 
     delegate :logger, to: :Rails

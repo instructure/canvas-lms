@@ -22,6 +22,8 @@ describe Flamegraphs::FlamegraphService do
     let(:service) { Flamegraphs::FlamegraphService }
     let(:user) { site_admin_user }
     let(:source_name) { "gradebooks#speed_grader" }
+    let(:attachment) { user.attachments.last }
+    let(:html) { attachment.open.read }
 
     it "creates an attachment with an HTML flamegraph" do
       expect do
@@ -32,8 +34,6 @@ describe Flamegraphs::FlamegraphService do
         end
       end.to change { user.attachments.count }.by(1)
 
-      attachment = user.attachments.last
-      html = attachment.open.read
       aggregate_failures do
         expect(attachment.display_name).to match(/^flamegraph-custom-label-gradebooks#speed_grader-.+$/)
         expect(attachment.filename).to match(/^flamegraph-custom-label-gradebooks#speed_grader-.+\.html$/)
@@ -41,6 +41,20 @@ describe Flamegraphs::FlamegraphService do
         expect(attachment.root_account).to eql Account.site_admin
         expect(html).to start_with("<!DOCTYPE html>")
         expect(html).to match(%r{<title>stackprof \(mode: wall\)</title>})
+      end
+    end
+
+    it "creates an attachment with error information if an error occurs while generating the flamegraph" do
+      service.call(user:, source_name:) { raise "Kaboom!" }
+
+      aggregate_failures do
+        expect(attachment.display_name).to match(/^flamegraph-error-gradebooks#speed_grader-.+$/)
+        expect(attachment.filename).to match(/^flamegraph-error-gradebooks#speed_grader-.+\.html$/)
+        expect(attachment.content_type).to eql "text/html"
+        expect(attachment.root_account).to eql Account.site_admin
+        expect(html).to start_with("<!DOCTYPE html>")
+        expect(html).to include("<h1>Error Generating Flamegraph</h1>")
+        expect(html).to include("<h2>Kaboom! (RuntimeError)</h2>")
       end
     end
 

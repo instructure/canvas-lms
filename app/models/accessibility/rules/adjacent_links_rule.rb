@@ -23,10 +23,6 @@ module Accessibility
       self.id = "adjacent-links"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 
-      def self.not_whitespace(node)
-        node.node_type != 3 || node.text_content.match(/\S/)
-      end
-
       def self.test(elem)
         return true if elem.tag_name != "a"
 
@@ -62,6 +58,60 @@ module Accessibility
           label: "Merge links",
           value: "false"
         )
+      end
+
+      def self.fix(elem, value)
+        return elem unless test(elem) == false
+        return elem unless value == "true" || elem.tag_name == "a"
+
+        next_elem = elem.next_element_sibling
+
+        return elem unless next_elem && next_elem.tag_name == "a" && elem.get_attribute("href") == next_elem.get_attribute("href")
+
+        left_image = single_child_image(elem)
+        right_image = single_child_image(next_elem)
+
+        if left_image && !right_image && normalize_text(left_image.get_attribute("alt")) == normalize_text(next_elem.text_content)
+          left_image.set_attribute("alt", "")
+        elsif right_image && !left_image && normalize_text(right_image.get_attribute("alt")) == normalize_text(elem.text_content)
+          right_image.set_attribute("alt", "")
+        end
+
+        elem.inner_html += " " + next_elem.inner_html
+
+        next_elem.remove
+
+        elem
+      end
+
+      def self.single_child_image(link)
+        parent = link
+        child = only_child(parent)
+        while child
+          return child if child.tag_name == "img"
+
+          parent = child
+          child = only_child(parent)
+        end
+        nil
+      end
+
+      def self.only_child(parent)
+        child = parent.first_element_child
+        return nil unless child
+
+        non_whitespace_children = parent.child_nodes.select { |node| not_whitespace(node) }
+        return nil if non_whitespace_children.length > 1
+
+        child
+      end
+
+      def self.not_whitespace(node)
+        node.node_type != 3 || node.text_content.match(/\S/)
+      end
+
+      def self.normalize_text(text)
+        text.gsub(/\s+/, " ").strip
       end
     end
   end

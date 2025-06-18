@@ -53,6 +53,7 @@ import ItemAssignToCard, {
 import {getOverriddenAssignees, itemTypeToApiURL} from '../../utils/assignToHelper'
 import {getEveryoneOption, type ItemAssignToTrayProps} from './ItemAssignToTray'
 import {getDueAtForCheckpointTag} from './utils'
+import DifferentiationTagConverterMessage from '@canvas/differentiation-tags/react/DifferentiationTagConverterMessage/DifferentiationTagConverterMessage'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -64,6 +65,8 @@ export interface ItemAssignToTrayContentProps
   handleDismiss: () => void
   hasModuleOverrides: boolean
   setHasModuleOverrides: (state: boolean) => void
+  hasDifferentiationTagOverrides: boolean
+  setHasDifferentiationTagOverrides: (state: boolean) => void
   setModuleAssignees: (assignees: string[]) => void
   defaultGroupCategoryId: string | null
   initialLoadRef: React.MutableRefObject<boolean>
@@ -150,6 +153,8 @@ const ItemAssignToTrayContent = ({
   cardsRefs,
   hasModuleOverrides,
   setHasModuleOverrides,
+  hasDifferentiationTagOverrides,
+  setHasDifferentiationTagOverrides,
   setModuleAssignees,
   defaultGroupCategoryId,
   allOptions,
@@ -168,6 +173,7 @@ const ItemAssignToTrayContent = ({
   const [initialCards, setInitialCards] = useState<ItemAssignToCardSpec[]>([])
   const [fetchInFlight, setFetchInFlight] = useState(false)
   const [hasFetched, setHasFetched] = useState(false)
+  const [refetchPages, setRefetchPages] = useState(false)
 
   const lastPerformedAction = useRef<{action: 'add' | 'delete'; index?: number} | null>(null)
   const addCardButtonRef = useRef<Element | null>(null)
@@ -318,9 +324,9 @@ const ItemAssignToTrayContent = ({
           path: url,
           params: {
             per_page: 100,
-            ...itemType === 'discussion_topic' && {
-              include: ''
-            }
+            ...(itemType === 'discussion_topic' && {
+              include: '',
+            }),
           },
         }
         while (url && pageCount < MAX_PAGES) {
@@ -418,7 +424,7 @@ const ItemAssignToTrayContent = ({
                 // @ts-expect-error
                 allModuleAssignees.push(...override.student_ids.map(id => `student-${id}`))
               }
-              // Normal groups are not supported for module overrides 
+              // Normal groups are not supported for module overrides
               // but differentiation tags are supported
               if (override.group_id && override.non_collaborative === true) {
                 allModuleAssignees.push(`tag-${override.group_id}`)
@@ -467,6 +473,8 @@ const ItemAssignToTrayContent = ({
             }
             // Differentiation Tags
             if (override.group_id && override.non_collaborative) {
+              setHasDifferentiationTagOverrides(true)
+
               defaultOptions.push(`tag-${override.group_id}`)
               initialAssigneeOptions.push({
                 id: `tag-${override.group_id}`,
@@ -523,9 +531,11 @@ const ItemAssignToTrayContent = ({
         initialLoadRef.current = true
       }
     }
-    !hasFetched && fetchAllPages()
+    if (!hasFetched || refetchPages) {
+      fetchAllPages()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards)])
+  }, [courseId, itemContentId, itemType, JSON.stringify(defaultCards), refetchPages])
 
   const handleAddCard = () => {
     lastPerformedAction.current = {action: 'add'}
@@ -553,6 +563,19 @@ const ItemAssignToTrayContent = ({
     setAssignToCards(cards)
   }
 
+  const checkForDifferentiationTagOverrides = () => {
+    const hasDifferentiationTagOverrides = assignToCardsRef.current.some(card => {
+      const selectedAssigneeIds = card.selectedAssigneeIds
+      return selectedAssigneeIds.length > 0 && selectedAssigneeIds.some(id => id.includes('tag-'))
+    })
+
+    if (hasDifferentiationTagOverrides) {
+      setHasDifferentiationTagOverrides(true)
+    } else {
+      setHasDifferentiationTagOverrides(false)
+    }
+  }
+
   const handleDeleteCard = useCallback(
     (cardId: string) => {
       const cardIndex = assignToCardsRef.current.findIndex(card => card.key === cardId)
@@ -563,6 +586,10 @@ const ItemAssignToTrayContent = ({
       setAssignToCards(cards)
       disabledOptionIdsRef.current = newDisabled
       onCardRemove?.(cardId)
+
+      if (!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides === true) {
+        checkForDifferentiationTagOverrides()
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [onCardRemove, setAssignToCards],
@@ -572,17 +599,15 @@ const ItemAssignToTrayContent = ({
     if (!overriddenTargets) {
       return false
     }
-    const alreadyHasItemSectionOverride = (
-      override.context_module_id
-      && override?.course_section_id
-      && overriddenTargets?.sections?.includes(override.course_section_id)
-    )
-    const alreadyHasItemDifferentiationTagOverride = (
-      override.context_module_id
-      && override?.group_id
-      && overriddenTargets?.differentiationTags?.includes(override.group_id)
-    )
-    return (alreadyHasItemSectionOverride || alreadyHasItemDifferentiationTagOverride)
+    const alreadyHasItemSectionOverride =
+      override.context_module_id &&
+      override?.course_section_id &&
+      overriddenTargets?.sections?.includes(override.course_section_id)
+    const alreadyHasItemDifferentiationTagOverride =
+      override.context_module_id &&
+      override?.group_id &&
+      overriddenTargets?.differentiationTags?.includes(override.group_id)
+    return alreadyHasItemSectionOverride || alreadyHasItemDifferentiationTagOverride
   }
 
   const handleCardValidityChange = useCallback(
@@ -627,7 +652,10 @@ const ItemAssignToTrayContent = ({
         parsedCard.course_section_id = idData[1]
       } else if (parsedCard.id && idData[0] === 'student') {
         parsedCard.short_name = newSelectedOption.value
-      } else if ((parsedCard.id && idData[0] === 'group') || (parsedCard.id && idData[0] === 'tag')) {
+      } else if (
+        (parsedCard.id && idData[0] === 'group') ||
+        (parsedCard.id && idData[0] === 'tag')
+      ) {
         parsedCard.group_id = idData[1]
         parsedCard.group_category_id = newSelectedOption.groupCategoryId
         parsedCard.non_collaborative = idData[0] === 'tag' ? true : false
@@ -676,7 +704,9 @@ const ItemAssignToTrayContent = ({
 
       const studentAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('student'))
       const sectionAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('section'))
-      const differentiationTagAssignees = selectedAssigneeIds.filter(assignee => assignee.includes('tag'))
+      const differentiationTagAssignees = selectedAssigneeIds.filter(assignee =>
+        assignee.includes('tag'),
+      )
 
       // this is useful in the page edit page for checking if a module override has been changed
       const hasInitialAssignees =
@@ -842,6 +872,18 @@ const ItemAssignToTrayContent = ({
 
   return (
     <Flex.Item padding="small medium" shouldGrow={true} shouldShrink={true}>
+      {!ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS && hasDifferentiationTagOverrides && (
+        <DifferentiationTagConverterMessage
+          courseId={courseId}
+          learningObjectId={String(itemContentId)}
+          learningObjectType={itemType}
+          onFinish={() => {
+            setRefetchPages(true)
+            setHasFetched(false)
+            setHasDifferentiationTagOverrides(false)
+          }}
+        />
+      )}
       {shouldShowAddCard && assignToCardsRef.current.length > 3 && addCardButton(true)}
       {fetchInFlight || !loadedAssignees || isLoading ? (
         isTray ? (

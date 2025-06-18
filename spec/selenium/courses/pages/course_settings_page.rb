@@ -22,23 +22,23 @@ require_relative "../../common"
 module CourseSettingsPage
   #------------------------- Selectors --------------------------
   def course_details_tab_link_selector
-    "#course_details_tab"
+    "#tab-details"
   end
 
   def sections_tab_link_selector
-    "#sections_tab"
+    "#tab-sections"
   end
 
   def navigation_tab_link_selector
-    "#navigation_tab"
+    "#tab-navigation"
   end
 
   def apps_tab_link_selector
-    "#external_tools_tab"
+    "#tab-tools"
   end
 
   def feature_options_tab_link_selector
-    "#feature_flags_tab"
+    "#tab-features"
   end
 
   def course_show_announcements_on_home_page_selector

@@ -22,72 +22,76 @@ import ModuleProgressionStatusBar from '../ModuleProgressionStatusBar'
 import {CompletionRequirement, ModuleProgression} from '../../utils/types'
 
 interface TestPropsOverrides {
-  completionRequirements?: Partial<CompletionRequirement>[] | []
+  completionRequirements?: CompletionRequirement[] | []
   progression?: Partial<ModuleProgression>
-  // For controlling the number of requirements
   requirementCount?: number
-  // For controlling how many requirements are met
-  metRequirementsCount?: number
 }
 
 const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
-  const requirementCount = overrides.requirementCount ?? 2
-  const metRequirementsCount = overrides.metRequirementsCount ?? requirementCount
+  const defaultCompletionRequirements: CompletionRequirement[] = []
 
-  // Create default requirements
-  const defaultRequirements: CompletionRequirement[] = Array.from(
-    {length: requirementCount},
-    (_, index) => ({
-      id: `req-${index + 1}`,
-      type: 'assignment',
-      minScore: 100,
-      minPercentage: 100,
-      completed: index < metRequirementsCount, // Mark as completed if index < metRequirementsCount
-    }),
-  )
-
-  // Apply any requirement overrides if provided
-  const completionRequirements =
-    overrides.completionRequirements === undefined
-      ? defaultRequirements
-      : overrides.completionRequirements.length === 0
-        ? []
-        : defaultRequirements.map((req, index) => ({
-            ...req,
-            ...(overrides.completionRequirements?.[index] || {}),
-          }))
-
-  // Create requirements met array based on metRequirementsCount
-  const requirementsMet = completionRequirements.filter((_, index) => index < metRequirementsCount)
-
-  // Create default progression
   const defaultProgression: ModuleProgression = {
     id: 'module-1',
     _id: 'module-1',
-    workflowState: metRequirementsCount === requirementCount ? 'completed' : 'started',
-    requirementsMet,
-    completed: metRequirementsCount === requirementCount,
+    workflowState: 'completed',
+    requirementsMet: [],
+    completed: true,
     locked: false,
     unlocked: true,
     started: true,
-    ...overrides.progression,
   }
 
   return {
-    completionRequirements,
-    progression: defaultProgression,
+    completionRequirements: Array.isArray(overrides.completionRequirements)
+      ? overrides.completionRequirements
+      : defaultCompletionRequirements,
+    progression: overrides.progression
+      ? {
+          ...defaultProgression,
+          ...overrides.progression,
+        }
+      : defaultProgression,
+    requirementCount: overrides.requirementCount || undefined,
   }
 }
 
 const setUp = (props: TestPropsOverrides = {}) => {
-  const {completionRequirements, progression} = buildDefaultProps(props)
+  const {completionRequirements, progression, requirementCount} = buildDefaultProps(props)
   return render(
     <ModuleProgressionStatusBar
       completionRequirements={completionRequirements}
       progression={progression}
+      requirementCount={requirementCount}
     />,
   )
 }
+
+const baseReqs = [
+  {
+    id: '1',
+    type: 'must_view',
+    minScore: undefined,
+    minPercentage: undefined,
+  },
+  {
+    id: '2',
+    type: 'must_view',
+    minScore: undefined,
+    minPercentage: undefined,
+  },
+  {
+    id: '3',
+    type: 'must_view',
+    minScore: undefined,
+    minPercentage: undefined,
+  },
+  {
+    id: '4',
+    type: 'must_view',
+    minScore: undefined,
+    minPercentage: undefined,
+  },
+]
 
 describe('ModuleProgressionStatusBar', () => {
   it('when completionRequirements is empty', () => {
@@ -95,38 +99,151 @@ describe('ModuleProgressionStatusBar', () => {
       completionRequirements: [],
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.queryByText('0/0 Required Items Completed')).not.toBeInTheDocument()
+    expect(container.queryByText('0 of 0 Required Items')).not.toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 100%', () => {
     // All requirements are met by default
-    const container = setUp()
+    const container = setUp({
+      completionRequirements: [
+        {
+          id: '1',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+        {
+          id: '2',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+      ],
+      progression: {
+        requirementsMet: [
+          {
+            id: '1',
+            type: 'must_view',
+            minScore: undefined,
+            minPercentage: undefined,
+          },
+          {
+            id: '2',
+            type: 'must_view',
+            minScore: undefined,
+            minPercentage: undefined,
+          },
+        ],
+      },
+    })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('2/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('2 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 50%', () => {
     const container = setUp({
-      metRequirementsCount: 1, // Only 1 of 2 requirements met
+      completionRequirements: [
+        {
+          id: '1',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+        {
+          id: '2',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+      ],
+      progression: {
+        requirementsMet: [
+          {
+            id: '1',
+            type: 'must_view',
+            minScore: undefined,
+            minPercentage: undefined,
+          },
+        ],
+      },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('1/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should render the correct completion percentage 0%', () => {
     const container = setUp({
-      metRequirementsCount: 0, // No requirements met
+      progression: {
+        requirementsMet: [],
+      },
+      completionRequirements: [
+        {
+          id: '1',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+        {
+          id: '2',
+          type: 'must_view',
+          minScore: undefined,
+          minPercentage: undefined,
+        },
+      ],
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('0/2 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('0 of 2 Required Items')).toBeInTheDocument()
   })
 
   it('should handle custom requirement counts', () => {
     const container = setUp({
-      requirementCount: 4,
-      metRequirementsCount: 2,
+      completionRequirements: baseReqs,
+      progression: {
+        requirementsMet: baseReqs.slice(0, 2),
+      },
     })
     expect(container.container).toBeInTheDocument()
-    expect(container.getByText('2/4 Required Items Completed')).toBeInTheDocument()
+    expect(container.getByText('2 of 4 Required Items')).toBeInTheDocument()
+  })
+
+  it('should render progress bar with a x/1 when requirementCount is 1', () => {
+    const container = setUp({
+      completionRequirements: baseReqs,
+      requirementCount: 1,
+      progression: {
+        requirementsMet: baseReqs.slice(0, 1),
+      },
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.getByText('1 of 1 Required Items')).toBeInTheDocument()
+  })
+
+  it('should render the correct completion percentage 50% when a requirement is met but does not match a completion requirement', () => {
+    const container = setUp({
+      completionRequirements: [
+        {
+          id: '1',
+          type: 'must_view',
+        },
+        {
+          id: '2',
+          type: 'must_view',
+        },
+      ],
+      progression: {
+        requirementsMet: [
+          {
+            id: '1',
+            type: 'must_view',
+          },
+          {
+            id: '2',
+            type: 'must_mark_done',
+          },
+        ],
+      },
+    })
+    expect(container.container).toBeInTheDocument()
+    expect(container.getByText('1 of 2 Required Items')).toBeInTheDocument()
   })
 })

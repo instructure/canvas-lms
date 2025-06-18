@@ -49,4 +49,14 @@ RSpec.describe "AdjacentLinksRule", type: :feature do
       end
     end
   end
+
+  context "when fixing adjacent links" do
+    it "merges adjacent links with the same URL" do
+      input_html = '<div><a id="test-link" href="https://example.com">Link 1</a> <a href="https://example.com">Link 2</a></div>'
+      fixed_html = fix_issue(:adjacent_links, input_html, ".//a[@id='test-link']", "true")
+
+      expect(fixed_html).to include('<a id="test-link" href="https://example.com">Link 1 Link 2</a>')
+      expect(fixed_html).not_to include('<a id="test-link" href="https://example.com">Link 2</a>')
+    end
+  end
 end

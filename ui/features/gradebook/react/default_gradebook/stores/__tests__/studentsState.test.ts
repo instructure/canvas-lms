@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 /*
  * Copyright (C) 2022 - present Instructure, Inc.
  *
@@ -24,6 +22,82 @@ import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../../PerformanceControls'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {getUsers} from '../graphql/users/getUsers'
+
+// Helper function to validate student data loading
+const verifyStudentDataLoaded = () => {
+  expect(store.getState().isStudentDataLoaded).toStrictEqual(true)
+  expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
+  expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
+  expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
+  expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([
+    {
+      submissions: [
+        {
+          assignment_id: '2301',
+          score: 9,
+          user_id: '1103',
+        },
+      ],
+      user_id: '1103',
+    },
+  ])
+  expect(store.getState().studentList).toMatchObject([{id: '1101'}, {id: '1102'}, {id: '1103'}])
+  expect(store.getState().studentMap).toMatchObject({
+    1101: {id: '1101'},
+    1102: {id: '1102'},
+    1103: {id: '1103'},
+  })
+  expect(store.getState().assignmentUserSubmissionMap).toStrictEqual({
+    '2301': {
+      '1101': {
+        assignment_id: '2301',
+        score: 7,
+        user_id: '1101',
+      },
+      '1102': {
+        assignment_id: '2301',
+        score: 8,
+        user_id: '1102',
+      },
+      '1103': {
+        assignment_id: '2301',
+        score: 9,
+        user_id: '1103',
+      },
+    },
+  })
+}
+
+jest.mock('../graphql/users/getUsers', () => {
+  const actual = jest.requireActual('../graphql/users/getUsers')
+  return {
+    ...actual,
+    getUsers: jest.fn(),
+  }
+})
+
+jest.mock('../graphql/enrollments/getEnrollments', () => {
+  const actual = jest.requireActual('../graphql/enrollments/getEnrollments')
+  return {
+    ...actual,
+    getEnrollments: jest.fn().mockResolvedValue({
+      course: {
+        enrollmentsConnection: {
+          nodes: [],
+          pageInfo: {
+            hasNextPage: false,
+            endCursor: '',
+          },
+        },
+      },
+    }),
+  }
+})
+
+jest.mock('../graphql/users/transformUser', () => ({
+  transformUser: jest.fn(user => ({id: user._id})),
+}))
 
 const initialState = store.getState()
 
@@ -63,8 +137,8 @@ const urls = {
 describe('Gradebook > fetchStudentIds', () => {
   const url = '/courses/0/gradebook/user_ids'
 
-  let exampleData_
-  let network
+  let exampleData_: {studentIds: string[]}
+  let network: NetworkFake
 
   beforeEach(() => {
     exampleData_ = {
@@ -125,7 +199,29 @@ describe('Gradebook > fetchStudentIds', () => {
 })
 
 describe('#loadStudentData()', () => {
-  let server
+  beforeEach(() => {
+    store.setState({loadCompositeStudentData: jest.fn(), loadGraphqlStudentData: jest.fn()})
+  })
+
+  afterEach(() => {
+    store.setState(initialState, true)
+  })
+
+  it('calls loadCompositeStudentData if useGraphQL is false', async () => {
+    await store.getState().loadStudentData(false)
+    expect(store.getState().loadCompositeStudentData).toHaveBeenCalledTimes(1)
+    expect(store.getState().loadGraphqlStudentData).not.toHaveBeenCalled()
+  })
+
+  it('calls loadGraphqlStudentData if useGraphQL is true', async () => {
+    await store.getState().loadStudentData(true)
+    expect(store.getState().loadGraphqlStudentData).toHaveBeenCalledTimes(1)
+    expect(store.getState().loadCompositeStudentData).not.toHaveBeenCalled()
+  })
+})
+
+describe('#loadCompositeStudentData()', () => {
+  let server: FakeServer
 
   beforeEach(() => {
     const performanceControls = new PerformanceControls({
@@ -161,48 +257,72 @@ describe('#loadStudentData()', () => {
   })
 
   test('returns student and submission data', async () => {
-    const promise1 = await store.getState().loadStudentData()
-    await promise1
-    expect(store.getState().isStudentDataLoaded).toStrictEqual(true)
-    expect(store.getState().isSubmissionDataLoaded).toStrictEqual(true)
-    expect(store.getState().studentIds).toMatchObject(['1101', '1102', '1103'])
-    expect(store.getState().recentlyLoadedStudents).toMatchObject([{id: '1103'}])
-    expect(store.getState().recentlyLoadedSubmissions).toStrictEqual([
-      {
-        submissions: [
-          {
-            assignment_id: '2301',
-            score: 9,
-            user_id: '1103',
+    await store.getState().loadCompositeStudentData()
+    verifyStudentDataLoaded()
+  })
+})
+
+describe('#loadGraphqlStudentData()', () => {
+  let server: FakeServer
+  const mockUsers = [{id: '1101'}, {id: '1102'}, {id: '1103'}]
+
+  beforeEach(() => {
+    ;(getUsers as jest.Mock).mockImplementation((params: {after?: string}) => {
+      const firstPage = mockUsers.slice(0, 2)
+      const secondPage = mockUsers.slice(2, 3)
+      let res = null
+
+      if (params.after === '') {
+        res = {
+          course: {
+            usersConnection: {
+              nodes: firstPage.map(it => ({_id: it.id})),
+              pageInfo: {hasNextPage: true, endCursor: 'cursor-0-end'},
+            },
           },
-        ],
-        user_id: '1103',
-      },
-    ])
-    expect(store.getState().studentList).toMatchObject([{id: '1101'}, {id: '1102'}, {id: '1103'}])
-    expect(store.getState().studentMap).toMatchObject({
-      1101: {id: '1101'},
-      1102: {id: '1102'},
-      1103: {id: '1103'},
+        }
+      } else {
+        res = {
+          course: {
+            usersConnection: {
+              nodes: secondPage.map(it => ({_id: it.id})),
+              pageInfo: {hasNextPage: false, endCursor: 'cursor-1-end'},
+            },
+          },
+        }
+      }
+      return Promise.resolve(res)
     })
-    expect(store.getState().assignmentUserSubmissionMap).toStrictEqual({
-      '2301': {
-        '1101': {
-          assignment_id: '2301',
-          score: 7,
-          user_id: '1101',
-        },
-        '1102': {
-          assignment_id: '2301',
-          score: 8,
-          user_id: '1102',
-        },
-        '1103': {
-          assignment_id: '2301',
-          score: 9,
-          user_id: '1103',
-        },
-      },
+
+    const performanceControls = new PerformanceControls({
+      studentsChunkSize: 2,
+      submissionsChunkSize: 2,
     })
+
+    const dispatch = new RequestDispatch({
+      activeRequestLimit: performanceControls.activeRequestLimit,
+    })
+
+    store.setState({performanceControls, dispatch})
+
+    server = new FakeServer()
+    server.for(urls.studentIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
+    server
+      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
+      .respond([{status: 200, body: exampleData.submissions.slice(0, 2)}])
+    server
+      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
+      .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+    server.teardown()
+    store.setState(initialState, true)
+  })
+
+  test('returns student and submission data', async () => {
+    await store.getState().loadGraphqlStudentData()
+    verifyStudentDataLoaded()
   })
 })

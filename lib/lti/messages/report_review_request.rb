@@ -71,5 +71,9 @@ module Lti::Messages
     def assignment
       @assignment ||= submission.assignment
     end
+
+    def unexpanded_custom_parameters
+      super.merge!(@asset_report.asset_processor.report_custom_variables)
+    end
   end
 end

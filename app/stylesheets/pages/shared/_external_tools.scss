@@ -332,10 +332,6 @@ fieldset.rate_app_wrapper {
   input.input-block-level {
     height: 38px;
   }
-  label {
-    display: block;
-    margin-bottom: 2px;
-  }
 }
 
 @include mobile-only {

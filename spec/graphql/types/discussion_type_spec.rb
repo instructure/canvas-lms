@@ -1026,4 +1026,33 @@ describe Types::DiscussionType do
       expect(replies_required).to eq 3
     end
   end
+
+  context "admin groups" do
+    before do
+      @account = Account.create!
+      @group = Group.create!(name: "Admin Group", context: @account)
+      @group_student, @group_teacher = create_users(2, return_type: :record)
+      puts @group_teacher
+      puts "Hello"
+      group.bulk_add_users_to_group([@group_teacher, @group_student])
+
+      @group_topic = DiscussionTopic.create!(title: "Admin Group Topic", context: group, user: @group_teacher, editor: @group_teacher)
+      @group_topic.discussion_entries.create!(message: "Group Entry", user: @group_student)
+    end
+
+    it "returns the correct htmlUrl for" do
+      puts @group_topic
+      discussion_type = GraphQLTypeTester.new(
+        @group_topic,
+        current_user: @group_teacher,
+        request: ActionDispatch::TestRequest.create
+      )
+      expect(discussion_type.resolve("author { htmlUrl }")).to end_with("/groups/#{@group.id}/users/#{@group_teacher.id}")
+      entries_url = discussion_type.resolve("discussionEntriesConnection { nodes { author { htmlUrl }}}")
+
+      entries_url.each do |entry|
+        expect(entry).to end_with("/groups/#{@group.id}/users/#{@group_student.id}")
+      end
+    end
+  end
 end

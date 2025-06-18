@@ -26,6 +26,7 @@ export default class Indicator extends Component {
     title: string.isRequired,
     variant: string.isRequired,
     indicatorRef: func,
+    testId: string,
   }
 
   static defaultProps = {
@@ -34,7 +35,7 @@ export default class Indicator extends Component {
 
   render() {
     return (
-      <div ref={this.props.indicatorRef}>
+      <div ref={this.props.indicatorRef} data-testid={this.props.testId}>
         {this.props.variant !== 'invisible' && (
           <Badge standalone={true} type="notification" variant={this.props.variant} />
         )}

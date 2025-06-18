@@ -170,6 +170,7 @@ CanvasRails::Application.routes.draw do
     get "wiki/:id" => "wiki_pages#show_redirect", :id => %r{[^/]+}
     get "wiki/:id/revisions" => "wiki_pages#revisions_redirect", :id => %r{[^/]+}
     get "wiki/:id/revisions/:revision_id" => "wiki_pages#revisions_redirect", :id => %r{[^/]+}
+    get "new_page" => "wiki_pages#new", :as => :new_page
   end
 
   concern :conferences do
@@ -394,6 +395,13 @@ CanvasRails::Application.routes.draw do
     concerns :pages
     concerns :conferences
     concerns :question_banks
+
+    resources :item_banks, controller: "item_banks", only: [] do
+      collection do
+        get "/", to: "item_banks#show"
+        get "*path", to: "item_banks#show"
+      end
+    end
 
     post "quizzes/publish"   => "quizzes/quizzes#publish"
     post "quizzes/unpublish" => "quizzes/quizzes#unpublish"
@@ -904,6 +912,7 @@ CanvasRails::Application.routes.draw do
   get "login/oauth2" => "login/oauth2#new" if Rails.env.test?
 
   get "login/apple" => "login/apple#new", :as => :apple_login
+  post "login/apple" => "login/apple#new"
   get "login/clever" => "login/clever#new", :as => :clever_login
   # Clever gets their own callback, cause we have to add additional processing
   # for their Instant Login feature
@@ -912,11 +921,14 @@ CanvasRails::Application.routes.draw do
   get "login/facebook" => "login/facebook#new", :as => :facebook_login
   get "login/github" => "login/github#new", :as => :github_login
   get "login/google" => "login/google#new", :as => :google_login
+  post "login/google" => "login/google#new"
   get "login/google/:id" => "login/google#new"
   get "login/linkedin" => "login/linkedin#new", :as => :linkedin_login
   get "login/microsoft" => "login/microsoft#new"
+  post "login/microsoft" => "login/microsoft#new"
   get "login/microsoft/:id" => "login/microsoft#new", :as => :microsoft_login
   get "login/openid_connect" => "login/openid_connect#new"
+  post "login/openid_connect" => "login/openid_connect#new"
   get "login/openid_connect/:id" => "login/openid_connect#new", :as => :openid_connect_login
   post "login/openid_connect/logout" => "login/openid_connect#destroy", :as => :openid_connect_logout
 
@@ -2007,7 +2019,7 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "lti/context_controls") do
-      get "lti_registrations/:registration_id/controls", action: :index
+      get "lti_registrations/:registration_id/controls", action: :index, as: :lti_context_controls_index
       post "lti_registrations/:registration_id/controls", action: :create
       post "lti_registrations/:registration_id/controls/bulk", action: :create_many
       get "lti_registrations/:registration_id/controls/:id", action: :show
@@ -2859,10 +2871,6 @@ CanvasRails::Application.routes.draw do
 
   get "lti/tool_default_icon" => "lti/tool_default_icon#show"
 
-  scope(controller: :ams) do
-    get "ams(/*path)", action: :show, as: :ams
-  end
-
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
     post "tools/:tool_id/ext_grade_passback", controller: :lti_api, action: :legacy_grade_passback, as: "blti_legacy_grade_passback_api"
@@ -2998,7 +3006,7 @@ CanvasRails::Application.routes.draw do
 
     # Asset Processor internal endpoints
     scope(controller: "lti/asset_processor") do
-      post "asset_processors/:asset_processor_id/notices/:student_id", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
+      post "asset_processors/:asset_processor_id/notices/:student_id/attempts/:attempt", action: :resubmit_notice, as: :lti_asset_processor_notice_resubmit
     end
 
     # Dynamic Registration Service

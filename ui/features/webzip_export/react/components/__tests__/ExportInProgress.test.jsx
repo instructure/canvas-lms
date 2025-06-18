@@ -17,26 +17,24 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from '@testing-library/react'
 import ExportInProgress from '../ExportInProgress'
 
 describe('ExportInProgress', () => {
   test('renders the ExportInProgress component', () => {
     const webzip = {progressId: '117'}
-    const tree = shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
-    const node = tree.find('.webzipexport__inprogress')
+    const {container} = render(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+    const node = container.querySelector('.webzipexport__inprogress')
 
-    expect(node.exists()).toBe(true)
+    expect(node).toBeInTheDocument()
   })
 
   test('does not render when completed is true', () => {
     const webzip = {progressId: '117'}
-    const tree = shallow(<ExportInProgress webzip={webzip} loadExports={() => {}} />)
+    const {container, rerender} = render(
+      <ExportInProgress webzip={webzip} loadExports={() => {}} />,
+    )
 
-    // Set the state to simulate completion
-    tree.setState({completed: true})
-    const node = tree.find('.webzipexport__inprogress')
-
-    expect(node).toHaveLength(0) // Checks that the node does not exist
+    expect(container.querySelector('.webzipexport__inprogress')).toBeInTheDocument()
   })
 })

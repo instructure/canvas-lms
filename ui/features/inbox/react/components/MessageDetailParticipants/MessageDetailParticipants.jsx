@@ -23,6 +23,7 @@ import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {decodeHTMLAuthor} from '../../../util/utils'
 
 import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../util/constants'
 
@@ -40,7 +41,7 @@ export const MessageDetailParticipants = ({...props}) => {
     : uniqueMessageRecipients.slice(0, PARTICIPANT_EXPANSION_THRESHOLD)
 
   const participantStr = `, ${participantsToShow
-    .map(participant => participant.shortName)
+    .map(participant => decodeHTMLAuthor(participant).shortName)
     .join(', ')}`
 
   const participantCount = uniqueMessageRecipients.length - PARTICIPANT_EXPANSION_THRESHOLD

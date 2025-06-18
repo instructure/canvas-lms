@@ -26,132 +26,160 @@ import TruncateWithTooltip from '@canvas/lti-apps/components/common/TruncateWith
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {QueryClientProvider} from '@tanstack/react-query'
-import {queryClient} from '@canvas/query'
-import {LtiAssetReportsCard} from './LtiAssetReports/LtiAssetReportsCard'
+import {
+  LtiAssetReportsCard,
+  LtiAssetReportsMissingReportsCard,
+} from './LtiAssetReports/LtiAssetReportsCard'
+import {
+  ResubmitLtiAssetReportsProps,
+  useResubmitLtiAssetReports,
+} from './LtiAssetReports/useResubmitLtiAssetReports'
+import {Button} from '@instructure/ui-buttons'
+import {useScope as createI18nScope} from '@canvas/i18n'
 
-type AttachmentAndReports = {
-  attachmentName: string
-  reportsByProcessor: LtiAssetReportsByProcessor
-}
+const I18n = createI18nScope('speed_grader')
+
+// Below here, code should be copiable to SG2
 
 export type LtiAssetReportsProps = {
-  attachmentsAndReports: AttachmentAndReports[]
+  versionedAttachments: {attachment: {id: string; display_name: string}}[] | undefined
+  reportsByAttachment: Record<string, LtiAssetReportsByProcessor> | undefined
   assetProcessors: ExistingAttachedAssetProcessor[]
+  studentId: string | undefined
+  attempt: number | null | undefined
 }
 
-type LtiAssetReportsProcessorGroupProps = {
-  reportsArray: LtiAssetReport[]
-  assetProcessor: ExistingAttachedAssetProcessor
-}
-
-function LtiAssetReportsCardGroup({
-  reportsArray,
-  assetProcessor,
-}: LtiAssetReportsProcessorGroupProps) {
+function ltiAssetProcessorHeader(assetProcessor: ExistingAttachedAssetProcessor) {
   return (
-    <ToggleDetails
-      summary={
-        <Flex direction="row" gap="small">
-          <Flex.Item>
-            <ToolIconOrDefault
-              size={24}
-              toolId={assetProcessor.tool_id}
-              toolName={assetProcessor.tool_name}
-              iconUrl={assetProcessor.icon_or_tool_icon_url}
-            />
-          </Flex.Item>
-          <Flex.Item padding="0 large 0 0">
-            <Heading level="h4">
-              <TruncateWithTooltip
-                linesAllowed={1}
-                backgroundColor={undefined}
-                horizontalOffset={0}
-              >
-                {buildAPDisplayTitle({
-                  toolName: assetProcessor.tool_name,
-                  toolPlacementLabel: assetProcessor.tool_placement_label,
-                  title: assetProcessor.title,
-                })}
-              </TruncateWithTooltip>
-            </Heading>
-          </Flex.Item>
-        </Flex>
-      }
-      iconPosition="end"
-      icon={() => <IconArrowOpenDownSolid />}
-      iconExpanded={() => <IconArrowOpenUpSolid />}
-      defaultExpanded
-      fluidWidth
-    >
-      <Flex direction="column" gap="xx-small">
-        {reportsArray.map((report, index) => (
-          <Flex.Item key={index} margin="x-small 0 0 0">
-            <LtiAssetReportsCard report={report} />
-          </Flex.Item>
-        ))}
-      </Flex>
-    </ToggleDetails>
+    <Flex direction="row" gap="small">
+      <Flex.Item>
+        <ToolIconOrDefault
+          size={24}
+          toolId={assetProcessor.tool_id}
+          toolName={assetProcessor.tool_name}
+          iconUrl={assetProcessor.icon_or_tool_icon_url}
+        />
+      </Flex.Item>
+      <Flex.Item padding="0 large 0 0">
+        <Heading level="h4">
+          <TruncateWithTooltip linesAllowed={1} backgroundColor={undefined} horizontalOffset={0}>
+            {buildAPDisplayTitle({
+              toolName: assetProcessor.tool_name,
+              toolPlacementLabel: assetProcessor.tool_placement_label,
+              title: assetProcessor.title,
+            })}
+          </TruncateWithTooltip>
+        </Heading>
+      </Flex.Item>
+    </Flex>
   )
 }
 
-export function LtiAssetReports({attachmentsAndReports, assetProcessors}: LtiAssetReportsProps) {
-  const assetProcessorsById = Object.fromEntries(assetProcessors.map(ap => [ap.id, ap]))
+type LtiAssetReportsCardGroupProps = {
+  attachment: {id: string; display_name: string}
+  reports: LtiAssetReport[] | undefined
+}
+
+function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGroupProps) {
+  const anyReports = reports && reports.length > 0
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <View as="div" borderColor="primary" borderWidth="none none small none">
-        <Flex direction="column" gap="xxx-small">
-          {attachmentsAndReports.map(
-            ({attachmentName, reportsByProcessor: reportsByProcessor}, index) => (
-              <View
-                as="div"
-                margin="xxx-small none none none"
-                padding="small none"
-                borderColor="primary"
-                borderWidth="small none none none"
-                key={`a-${index}`}
-              >
-                <Flex direction="column" gap="medium" margin="xxx-small none">
-                  <Heading level="h4">{attachmentName}</Heading>
-                  {Object.keys(reportsByProcessor)
-                    .sort()
-                    .map((processorId, index) => (
-                      <LtiAssetReportsCardGroup
-                        key={index}
-                        reportsArray={reportsByProcessor[processorId]}
-                        assetProcessor={assetProcessorsById[processorId]}
-                      />
-                    ))}
-                </Flex>
-              </View>
-            ),
-          )}
-        </Flex>
-      </View>
-    </QueryClientProvider>
+    <Flex direction="column" gap="x-small">
+      <Heading level="h4">{attachment.display_name}</Heading>
+      {anyReports ? (
+        reports.map(r => <LtiAssetReportsCard key={r._id} report={r} />)
+      ) : (
+        <LtiAssetReportsMissingReportsCard />
+      )}
+    </Flex>
   )
 }
 
-/**
- * Lookup each attachment in versionedAttachments (which comes from
- * a HistoricalSubmission) in the table of reports by attachment.
- * Returns undefined if there are no reports for any of the
- * attachments.
- */
-export function joinAttachmentsAndReports(
-  versionedAttachments: {attachment: {id: string; display_name: string}}[] | undefined,
-  reportsByAttachment: Record<string, LtiAssetReportsByProcessor> | undefined,
-): AttachmentAndReports[] | undefined {
+function shouldShowResubmitButton({
+  processorId,
+  reportsByAttachment,
+  versionedAttachments,
+}: {
+  processorId: string
+  reportsByAttachment: Record<string, LtiAssetReportsByProcessor>
+  versionedAttachments: {attachment: {id: string}}[]
+}) {
+  return versionedAttachments.some(({attachment}) => {
+    const reports = reportsByAttachment[attachment.id]?.[processorId]
+
+    // Resubmit button is available for a processor if there are any
+    // attachments missing reports, or if any reports are resubmittable
+    return !reports || reports.length === 0 || reports.some(rep => rep.resubmitAvailable)
+  })
+}
+
+export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
+  const resubmitMutation = useResubmitLtiAssetReports()
+  return (
+    <Flex.Item>
+      <Button
+        size="small"
+        disabled={!(resubmitMutation.isIdle || resubmitMutation.isError)}
+        onClick={() => {
+          resubmitMutation.mutate(props)
+        }}
+      >
+        {I18n.t('Resubmit All Files')}
+      </Button>
+    </Flex.Item>
+  )
+}
+
+export function LtiAssetReports({
+  versionedAttachments,
+  reportsByAttachment,
+  assetProcessors,
+  studentId,
+  attempt,
+}: LtiAssetReportsProps) {
   if (!versionedAttachments || !reportsByAttachment) {
-    return undefined
+    return null
   }
 
-  const res = versionedAttachments
-    .map(a => ({
-      attachmentName: a.attachment.display_name,
-      reportsByProcessor: reportsByAttachment[a.attachment.id.toString()],
-    }))
-    .filter(attAndRep => attAndRep.reportsByProcessor)
-
-  return res?.length ? res : undefined
+  return (
+    <View as="div" padding="small none none none">
+      <Flex direction="column" gap="small">
+        {assetProcessors.map(processor => (
+          <ToggleDetails
+            summary={ltiAssetProcessorHeader(processor)}
+            key={processor.id}
+            iconPosition="end"
+            icon={() => <IconArrowOpenDownSolid />}
+            iconExpanded={() => <IconArrowOpenUpSolid />}
+            defaultExpanded
+            fluidWidth
+          >
+            <View as="div" padding="small none">
+              <Flex direction="column" gap="small">
+                {versionedAttachments.map(({attachment}) => (
+                  <LtiAssetReportsCardGroup
+                    key={attachment.id}
+                    attachment={attachment}
+                    reports={reportsByAttachment[attachment.id]?.[processor.id]}
+                  />
+                ))}
+                {studentId &&
+                  shouldShowResubmitButton({
+                    processorId: processor.id.toString(),
+                    reportsByAttachment,
+                    versionedAttachments,
+                  }) && (
+                    <ResubmitButton
+                      processorId={processor.id.toString()}
+                      studentId={studentId}
+                      attempt={attempt}
+                    />
+                  )}
+              </Flex>
+            </View>
+          </ToggleDetails>
+        ))}
+      </Flex>
+    </View>
+  )
 }

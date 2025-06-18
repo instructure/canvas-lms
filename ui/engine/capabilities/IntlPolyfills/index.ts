@@ -91,7 +91,7 @@ function polyfillerFactory({
     const fallback = locales[0] ?? 'en'
 
     try {
-      /* eslint-disable no-await-in-loop */ // it's actually fine in for-loops
+      // it's actually fine in for-loops
       for (const locale of locales) {
         // @ts-expect-error
         const nativeSupport = Intl[subsysName].supportedLocalesOf([locale])
@@ -108,7 +108,7 @@ function polyfillerFactory({
         if (typeof doable === 'string') retval.loaded = doable
         return retval
       }
-      /* eslint-enable no-await-in-loop */
+
       return {subsys: subsysName, locale: fallback, error: 'polyfill unavailable'}
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e)
@@ -185,14 +185,13 @@ function polyfillUp(...polyfills: unknown[]) {
     const r = polyfillResult as PolyfillerUpValue
     if (r.error) {
       const errorMessage = `${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`
-      // eslint-disable-next-line no-console
+
       console.error(errorMessage)
       captureException(
-        new Error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`)
+        new Error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`),
       )
     }
     if (r.source === 'polyfill')
-      // eslint-disable-next-line no-console
       console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`)
   })
 }

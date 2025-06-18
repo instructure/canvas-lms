@@ -2,6 +2,6 @@
 ams_service:
   state: hidden
   shadow: true
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: Assessment Management Service
   description: Enables the Assessment Management Service.

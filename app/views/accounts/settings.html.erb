@@ -53,46 +53,64 @@
   }
 </style>
 
-<div id="account_settings_tabs" style="display:none;" class="ui-tabs-minimal">
-  <ul aria-label="<%= t("Account setting tabs") %>">
-    <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
-    <% end %>
-    <% if can_do(@context, @current_user, :manage_storage_quotas) %>
-    <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
-    <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
-    <li><a href="#tab-integrations" id="tab-integrations-link"><%= t(:tab_integrations, "Integrations") %></a></li>
-    <% end %>
-    <% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
-    <li><a href="#tab-notifications" id="tab-notifications-link"><%= t(:tab_notifications, "Notifications") %></a></li>
-    <% end %>
-    <li><a href="#tab-users" id="tab-users-link"><%= t(:tab_admins, "Admins") %></a></li>
-    <li><a href="#tab-announcements" id="tab-announcements-link"><%= t(:tab_announcements, "Announcements") %></a></li>
-    <% if can_do(@context, @current_user, :read_reports) %>
-      <li><a href="#tab-reports" id="tab-reports-link"><%= t(:tab_reports, "Reports") %></a></li>
-    <% end %>
-    <% if can_do(@context, @current_user, :read_as_admin) %>
-      <li><a href="#tab-tools" id="tab-tools-link"><%= t(:tab_external_tools, "Apps") %></a></li>
-    <% end %>
-    <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
-      <li><a href="#tab-alerts" id="tab-alerts-link"><%= t(:tab_alerts, "Alerts") %></a></li>
-    <% end %>
-    <% if can_do(@context, @current_user, :view_feature_flags) %>
-      <li><a href="#tab-features" id="tab-features-link"><%= t("Feature Options") %></a></li>
-    <% end %>
-    <% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
-      <li><a href="#tab-internal-settings" id="tab-internal-settings-link"><%= t("Internal Settings") %></a></li>
-    <% end %>
-    <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
-      <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
-    <% end %>
-    <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
-      <li id="canvas_career_tab"><a href="#tab-canvas-career" id="tab-canvas-career-link"><%= t('Canvas Career') %></a></li>
-    <% end %>
-  </ul>
+<% tabs = [] %>
+
+<% if can_do(@context, @current_user, :manage_account_settings) %>
+  <% tabs << { id: "settings", title: t(:tab_settings, "Settings"), contentMount: "tab-settings-mount" } %>
+<% end %>
+
+<% if can_do(@context, @current_user, :manage_storage_quotas) %>
+  <% tabs << { id: "quotas", title: t(:tab_quotas, "Quotas"), contentMount: "tab-quotas-mount" } %>
+<% end %>
+
+<% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
+  <% tabs << { id: "integrations", title: t(:tab_integrations, "Integrations"), contentMount: "tab-integrations-mount" } %>
+<% end %>
+
+<% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
+  <% tabs << { id: "notifications", title: t(:tab_notifications, "Notifications"), contentMount: "tab-notifications-mount" } %>
+<% end %>
+
+<% tabs << { id: "users", title: t(:tab_admins, "Admins"), contentMount: "tab-users-mount" } %>
+<% tabs << { id: "announcements", title: t(:tab_announcements, "Announcements"), contentMount: "tab-announcements-mount" } %>
+
+<% if can_do(@context, @current_user, :read_reports) %>
+  <% tabs << { id: "reports", title: t(:tab_reports, "Reports"), contentMount: "tab-reports-mount" } %>
+<% end %>
+
+<% if can_do(@context, @current_user, :read_as_admin) %>
+  <% tabs << { id: "tools", title: t(:tab_external_tools, "Apps"), contentMount: "tab-tools-mount" } %>
+<% end %>
+
+<% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
+  <% tabs << { id: "alerts", title: t(:tab_alerts, "Alerts"), contentMount: "tab-alerts-mount" } %>
+<% end %>
+
+<% if can_do(@context, @current_user, :view_feature_flags) %>
+  <% tabs << { id: "features", title: t("Feature Options"), contentMount: "tab-features-mount" } %>
+<% end %>
+
+<% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
+  <% tabs << { id: "internal-settings", title: t("Internal Settings"), contentMount: "tab-internal-settings-mount" } %>
+<% end %>
+
+<% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
+  <% tabs << { id: "security", title: t("Security"), contentMount: "tab-security-mount" } %>
+<% end %>
+
+<% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
+  <% tabs << { id: "canvas-career", title: t("Canvas Career"), contentMount: "tab-canvas-career-mount" } %>
+<% end %>
+
+<%= tag.div id: "account_settings_tabs_mount",
+            data: {
+              component: "SettingsTabs",
+              props: { tabs: tabs }.to_json
+            } %>
+
+<%= tag.div id: "account_settings_tabs", style: "display: none;" do %>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
-    <div  tabindex="0" id="tab-settings">
+    <div  tabindex="0" id="tab-settings-mount">
       <h2 class="screenreader-only"><%= t('headings.settings', "Account Settings") %></h2>
       <%= form_for :account, url: account_url(@account), html: {novalidate: true, method: :put, id: "account_settings", class: "account_settings"} do |f| %>
         <fieldset>
@@ -606,7 +624,17 @@
                   <%= diff.check_box :value, checked: diff_tags[:value], disabled: disabled %>
                   <%= diff.label :value, t("Differentiation Tags") %>
                 <% end %>
-                <div class="account_settings__help-text">
+                <div id="differentiation_tags_account_settings_warning_message" class="account_settings__diff-tags-help-text" data-diff-tags-originally-enabled="<%= diff_tags[:value] %>" <%= hidden(include_style: true) %>>
+                  <i class='icon-warning-borderless'></i>
+                  <div class="account_settings__diff-tags-help-text-container">
+                    <p>
+                      <%= t do %>
+                        Disabling tags will block users who have used tags to assign content from being able to modify that content (assignments, modules, etc) until the differentiation tags have been converted to be assigned to individual students or assigning via tag has been removed from that content. For more details, please refer to <a href="<%= t(:'#community.differentiation_tags_settings') %>" target="_blank">our documentation</a>.
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+                <div id="differentiation_tags_account_settings_description_message" class="account_settings__help-text">
                   <%= t("Differentiation Tags allow instructors to organize students by tags for a more personalized learning experience.") %>
                 </div>
                 <% unless disabled %>
@@ -792,6 +820,10 @@
               <div>
                 <%= settings.check_box :enable_turnitin, :checked => @account.settings[:enable_turnitin] %>
                 <%= settings.label :enable_turnitin, :en => "Turnitin" %>
+              </div>
+              <div>
+                <%= settings.check_box :suppress_assignments, :checked => @account.settings[:suppress_assignments] %>
+                <%= settings.label :suppress_assignments, :en => "Allow assignments to be suppressed" %>
               </div>
             <% end %>
           <% end %>
@@ -1054,17 +1086,17 @@ acknowledge that you have read and agreed to the
   <% end %>
 
   <% if can_do(@context, @current_user, :manage_storage_quotas) %>
-    <div  tabindex="0" id="tab-quotas">
+    <div  tabindex="0" id="tab-quotas-mount">
       <h2 class="screenreader-only"><%= t('headings.quotas', "Account Quotas") %></h2>
       <div id="quotas_tab_content_mount_point"></div>
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && @account.feature_enabled?(:microsoft_group_enrollments_syncing) %>
-    <div  tabindex="0" id="tab-integrations">
+    <div  tabindex="0" id="tab-integrations-mount">
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :manage_account_settings) && @account.primary_settings_root_account? && !@account.site_admin? %>
-    <div  tabindex="0" id="tab-notifications" data-values="<%=
+    <div  tabindex="0" id="tab-notifications-mount" data-values="<%=
       default_name = @account.settings[:outgoing_email_default_name]
       {
         externalWarning: @account.settings[:external_notification_warning],
@@ -1075,7 +1107,7 @@ acknowledge that you have read and agreed to the
     %>"></div>
   <% end %>
 
-  <div tabindex="0" id="tab-users">
+  <div tabindex="0" id="tab-users-mount">
     <h2><%= t(:account_admins_title, "Account Admins") %></h2>
     <ul class="admins_list user_list list admins">
       <%= render :partial => 'account_user', :collection => @account_users %>
@@ -1111,7 +1143,7 @@ acknowledge that you have read and agreed to the
     <% end %>
   </div>
 
-  <div tabindex="0" id="tab-announcements">
+  <div tabindex="0" id="tab-announcements-mount">
     <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
         <% if can_do(@account, @current_user, :manage_alerts) %>
       <button id="add_announcement_button" class="Button Button--primary element_toggler add_notification_toggle_focus" title="<%= t('Add New Announcement') %>" aria-label="<%= t('Add New Announcement') %>">
@@ -1196,7 +1228,7 @@ acknowledge that you have read and agreed to the
           <div class="grid-row">
             <div class="col-xs-12 col-lg-4">
               <i id="course-roles-label"><%= t "Course roles" %></i>
-              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="course-roles-label">
+              <div class="ic-Checkbox-group" role="group" aria-labelledby="course-roles-label">
                 <% @course_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
@@ -1223,7 +1255,7 @@ acknowledge that you have read and agreed to the
             </div>
             <div class="col-xs-12 col-lg-4">
               <i id="account-roles-label"><%= t "Account roles" %></i>
-              <div class="ic-Checkbox-group" role="radiogroup" aria-labelledby="account-roles-label">
+              <div class="ic-Checkbox-group" role="group" aria-labelledby="account-roles-label">
                 <% @account_roles.each do |r| %>
                   <div class="ic-Form-control ic-Form-control--checkbox">
                     <%= check_box_tag "account_notification_roles[]", r[:id], false, { :class => "account_notification_role_cbx", :id => "account_notification_role_#{r[:id]}_cbx" } %>
@@ -1293,7 +1325,7 @@ acknowledge that you have read and agreed to the
       <% end %>
     <% end %>
     <ul class="announcements_list unstyled_list">
-      <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
+      <%= will_paginate(@announcements, params: {anchor: "tab-announcements-mount"}) %>
       <% @announcements.each do |announcement| %>
         <li class="announcements_list_item">
           <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
@@ -1408,35 +1440,36 @@ acknowledge that you have read and agreed to the
     </ul>
   </div>
   <% if can_do(@context, @current_user, :read_reports) %>
-    <div tabindex="0" id="tab-reports">
+    <div tabindex="0" id="tab-reports-mount" data-state="loading">
       <p><%= t("Loading...") %></p>
       <!-- this will be populated by an xhr request to AccountsController::reports_tab -->
     </div>
   <% end %>
   <% if can_do(@context, @current_user, :read_as_admin) %>
-      <div tabindex="0" id="tab-tools">
+      <div tabindex="0" id="tab-tools-mount">
         <%= render :partial => 'external_tools/external_tools' %>
       </div>
   <% end %>
   <% if @context.root_account.settings[:enable_alerts] && can_do(@context, @current_user, :manage_interaction_alerts) %>
-      <div  tabindex="0" id="tab-alerts">
+      <div  tabindex="0" id="tab-alerts-mount">
         <div id="alerts_mount_point"></div>
       </div>
   <% end %>
   <% if can_do(@context, @current_user, :view_feature_flags) %>
-    <div tabindex="0" id="tab-features"></div>
+    <div tabindex="0" id="tab-features-mount"></div>
   <% end %>
   <% if @account.root_account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && !@account.site_admin? %>
-    <div tabindex="0" id="tab-security"></div>
+    <div tabindex="0" id="tab-security-mount"></div>
   <% end %>
   <% if @account.site_admin? && can_do(@context, @current_user, :manage_internal_settings) %>
-    <div  tabindex="0" id="tab-internal-settings"></div>
+    <div  tabindex="0" id="tab-internal-settings-mount"></div>
   <% end %>
   <% if @account.feature_enabled?(:horizon_course_setting) && can_do(@context, @current_user, :read_as_admin) %>
-    <div tabindex="0" id="tab-canvas-career">
+    <div tabindex="0" id="tab-canvas-career-mount">
       <% js_bundle :horizon_toggle %>
     </div>
   <% end %>
+<% end %>
 </div>
 <div id="rqd_mount"></div>
 

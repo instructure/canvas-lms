@@ -23,6 +23,8 @@ import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import CurrentUploads from '../CurrentUploads'
 import FileUploader from '@canvas/files/react/modules/FileUploader'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
+import {FileManagementProvider} from '../../../contexts/FileManagementContext'
+import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 
 function makeUploader(name: string, error?: object) {
   const uploader = new FileUploader({file: new File(['foo'], name, {type: 'text/plain'})})
@@ -63,9 +65,11 @@ const nonDuplicateError = {response: {status: 500}}
 
 const renderComponent = () => {
   return render(
-    <MockedQueryClientProvider client={queryClient}>
-      <CurrentUploads />
-    </MockedQueryClientProvider>,
+    <FileManagementProvider value={createMockFileManagementContext()}>
+      <MockedQueryClientProvider client={queryClient}>
+        <CurrentUploads />
+      </MockedQueryClientProvider>
+    </FileManagementProvider>,
   )
 }
 

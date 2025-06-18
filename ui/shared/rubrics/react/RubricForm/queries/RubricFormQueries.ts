@@ -18,10 +18,10 @@
 
 import {gql} from '@apollo/client'
 import qs from 'qs'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import type {RubricFormProps, GenerateCriteriaFormProps} from '../types/RubricForm'
 import type {CanvasProgress} from '@canvas/progress/ProgressHelpers'
-import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {Rubric, RubricAssociation} from '@canvas/rubrics/react/types/rubric'
 import {
   mapRubricAssociationUnderscoredKeysToCamelCase,
   mapRubricUnderscoredKeysToCamelCase,
@@ -29,7 +29,7 @@ import {
 import getCookie from '@instructure/get-cookie'
 
 const RUBRIC_QUERY = gql`
-  query RubricQuery($rubricId: ID!) {
+  query SharedRubricQuery($rubricId: ID!) {
     rubric(id: $rubricId) {
       id: _id
       title
@@ -246,6 +246,7 @@ export const generateCriteria = async (
         rating_count: generateCriteriaProps.ratingCount,
         points_per_criterion: generateCriteriaProps.pointsPerCriterion,
         use_range: generateCriteriaProps.useRange,
+        additional_prompt_info: generateCriteriaProps.additionalPromptInfo,
       },
     }),
   })

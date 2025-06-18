@@ -18,13 +18,14 @@
 
 import React from 'react'
 import CreateFolderModal from '../CreateFolderModal'
-import {fireEvent, render, screen, within} from '@testing-library/react'
+import {fireEvent, render, screen, within, waitFor} from '@testing-library/react'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultProps = {
   isOpen: true,
@@ -43,12 +44,16 @@ const renderComponent = (props = {}) => {
 }
 describe('CreateFolderModal', () => {
   beforeEach(() => {
+    fakeENV.setup()
     jest.clearAllMocks()
+    fetchMock.reset()
     fetchMock.post(/.*\/folders/, 200)
   })
 
   afterEach(() => {
+    fetchMock.reset()
     fetchMock.restore()
+    fakeENV.teardown()
   })
 
   it('closes when Cancel is clicked', async () => {
@@ -73,15 +78,32 @@ describe('CreateFolderModal', () => {
     renderComponent()
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
-    expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+      },
+      {timeout: 5000},
+    )
   })
 
   it('submits on enter', async () => {
+    const user = userEvent.setup()
     renderComponent()
     const input = screen.getByRole('textbox', {name: /Folder Name/i})
-    await userEvent.click(input)
-    await userEvent.type(input, '{Enter}')
-    expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+    await user.click(input)
+
+    // Use fireEvent.keyDown instead of user.keyboard for more reliable Enter handling
+    fireEvent.keyDown(input, {key: 'Enter', code: 'Enter', charCode: 13, keyCode: 13})
+
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual('{"name":""}')
+      },
+      {timeout: 5000},
+    )
   })
 
   it('displays loading spinner when submitting', async () => {
@@ -130,6 +152,13 @@ describe('CreateFolderModal', () => {
     fireEvent.change(input, {target: {value: name}})
     const createFolderButton = screen.getByRole('button', {name: /Create Folder/i})
     await user.click(createFolderButton)
-    expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+
+    await waitFor(
+      () => {
+        expect(fetchMock.lastCall()).toBeTruthy()
+        expect(fetchMock.lastCall()?.[1]?.body).toEqual(`{"name":"${name}"}`)
+      },
+      {timeout: 5000},
+    )
   })
 })

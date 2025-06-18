@@ -34,6 +34,7 @@ import {unfudgeDateForProfileTimezone} from '@instructure/moment-utils'
 import EventDataSource from '@canvas/calendar/jquery/EventDataSource'
 import MessageParticipantsDialog from '@canvas/calendar/jquery/MessageParticipantsDialog'
 import axios from '@canvas/axios'
+import {assignLocation} from '@canvas/util/globalUtils'
 import AppointmentGroupList from './AppointmentGroupList'
 import ContextSelector from './ContextSelector'
 import TimeBlockSelector from './TimeBlockSelector'
@@ -192,7 +193,7 @@ class EditPage extends React.Component {
         axios
           .delete(`/api/v1/appointment_groups/${this.props.appointment_group_id}`)
           .then(() => {
-            window.location = '/calendar'
+            assignLocation('/calendar')
           })
           .catch(() => {
             $.flashError(I18n.t('An error occurred while deleting the appointment group'))
@@ -259,7 +260,7 @@ class EditPage extends React.Component {
     axios
       .put(url, requestObj)
       .then(() => {
-        window.location.href = '/calendar?edit_appointment_group_success=1'
+        assignLocation('/calendar?edit_appointment_group_success=1')
       })
       .catch(() => {
         $.flashError(I18n.t('An error occurred while saving the appointment group'))
@@ -271,11 +272,13 @@ class EditPage extends React.Component {
       <div className="EditPage" data-testid="edit-page">
         <Breadcrumb label={I18n.t('You are here:')}>
           <Breadcrumb.Link href="/calendar">{I18n.t('Calendar')}</Breadcrumb.Link>
-          {...(this.state.appointmentGroup.title ?
-            [<Breadcrumb.Link>
-              {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
-            </Breadcrumb.Link>]
-          :[])}
+          {...(this.state.appointmentGroup.title
+            ? [
+                <Breadcrumb.Link>
+                  {I18n.t('Edit %{pageTitle}', {pageTitle: this.state.appointmentGroup.title})}
+                </Breadcrumb.Link>,
+              ]
+            : [])}
         </Breadcrumb>
         <ScreenReaderContent>
           <h1>

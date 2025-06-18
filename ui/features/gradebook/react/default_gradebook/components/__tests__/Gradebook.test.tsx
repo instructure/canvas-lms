@@ -30,6 +30,8 @@ import '@testing-library/jest-dom/extend-expect'
 
 const originalState = store.getState()
 
+window.ENV.SETTINGS = {}
+
 describe('Gradebook', () => {
   beforeEach(() => {
     fetchMock.mock('*', 200)

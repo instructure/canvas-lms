@@ -25,14 +25,41 @@ import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
+// Mock jQuery to prevent flashError errors from unrelated components
+jest.mock('jquery', () => {
+  const jQueryMock = {
+    flashError: jest.fn(),
+    Deferred: jest.fn(() => ({
+      resolve: jest.fn(),
+      reject: jest.fn(),
+      promise: jest.fn(),
+    })),
+  }
+  return jest.fn(() => jQueryMock)
+})
+
 const server = mswServer(handlers)
 beforeAll(() => {
-  server.listen()
+  // Start the server with more specific options
+  server.listen({
+    onUnhandledRequest: 'bypass', // Don't throw on unhandled requests
+  })
+})
+
+beforeEach(() => {
+  // Set up default ENV values for all tests
+  fakeENV.setup({
+    current_user_id: 1,
+    SETTINGS: {
+      can_add_pronouns: false,
+    },
+  })
 })
 
 afterEach(() => {
   server.resetHandlers()
   fakeENV.teardown()
+  jest.clearAllMocks()
 })
 
 afterAll(() => {
@@ -132,14 +159,37 @@ describe('Address Book Component', () => {
         })
 
         it('do not show up pronouns', async () => {
+          // Create test data with a user that has pronouns but they should not be shown
+          const testUserWithPronouns = {
+            id: '1',
+            name: 'Test User',
+            full_name: 'Test User',
+            pronouns: 'he/him',
+            itemType: USER_TYPE,
+          }
+
+          const testData = {
+            contextData: [],
+            userData: [testUserWithPronouns],
+          }
+
           const mockSetIsMenuOpen = jest.fn()
           const {queryByText} = setup({
-            ...defaultProps,
+            menuData: testData,
             isMenuOpen: true,
             isSubMenu: true,
             setIsMenuOpen: mockSetIsMenuOpen,
+            onUserFilterSelect: jest.fn(),
           })
-          await screen.findByTestId('address-book-popover')
+
+          // Wait for the user's name to appear
+          const userText = await screen.findByText('Test User')
+          expect(userText).toBeInTheDocument()
+
+          // Verify ENV settings
+          expect(ENV.SETTINGS.can_add_pronouns).toBe(false)
+
+          // Verify pronouns are not shown
           expect(queryByText('he/him')).not.toBeInTheDocument()
         })
       })

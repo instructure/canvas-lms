@@ -438,25 +438,30 @@ class GradeChangeAuditApiController < AuditorApiController
 
     events_with_grading_period = events.select(&:in_grading_period?)
     if events_with_grading_period.present?
-      values = events_with_grading_period.map do |event|
-        key = [event.context_id, event.student_id, event.grading_period_id].join(",")
-        "(#{key})"
-      end.join(", ")
+      conditions = events_with_grading_period.map do
+        "(enrollments.course_id = ? AND enrollments.user_id = ? AND scores.grading_period_id = ?)"
+      end.join(" OR ")
 
-      scopes << base_score_scope
-                .where("(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{values})")
+      values = events_with_grading_period.flat_map do |event|
+        [event.context_id, event.student_id, event.grading_period_id]
+      end
+
+      scopes << base_score_scope.where(conditions, *values)
     end
 
     events_without_grading_period = events.reject(&:in_grading_period?)
     if events_without_grading_period.present?
-      values = events_without_grading_period.map do |event|
-        key = [event.context_id, event.student_id].join(",")
-        "(#{key})"
-      end.join(", ")
+      conditions = events_without_grading_period.map do
+        "(enrollments.course_id = ? AND enrollments.user_id = ?)"
+      end.join(" OR ")
+
+      values = events_without_grading_period.flat_map do |event|
+        [event.context_id, event.student_id]
+      end
 
       scopes << base_score_scope
                 .where(course_score: true)
-                .where("(enrollments.course_id, enrollments.user_id) IN (#{values})")
+                .where(conditions, *values)
     end
 
     scopes.reduce { |result, scope| result.union(scope) }

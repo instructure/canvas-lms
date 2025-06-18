@@ -225,7 +225,6 @@ module RuleTestHelper
   }.freeze
 
   def apply_rule(rule_name, html)
-    puts "TRANSFORMATIONS #{rule_name}"
     transformations = RULE_TRANSFORMATIONS[rule_name.to_sym]
     raise ArgumentError, "Unknown rule: #{rule_name}" unless transformations
 
@@ -252,5 +251,22 @@ module RuleTestHelper
     end
 
     issues
+  end
+
+  def fix_issue(rule_name, html, selector, value)
+    rule_class = RULE_MAP[rule_name.to_sym]
+    raise ArgumentError, "Unknown rule: #{rule_name}" unless rule_class
+
+    document = Nokogiri::HTML::DocumentFragment.parse(html)
+    AccessibilityControllerHelper.extend_nokogiri_with_dom_adapter(document)
+    element = document.at_xpath(selector)
+
+    if element
+      rule_class.fix(element, value)
+    else
+      raise ArgumentError, "Element not found for selector: '" + selector + "', please fix test case. HTML was '" + html + "'"
+    end
+
+    document.to_html
   end
 end

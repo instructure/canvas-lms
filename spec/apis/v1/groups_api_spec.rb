@@ -1063,6 +1063,34 @@ describe "Groups API", type: :request do
       expect(user2.differentiation_tag_memberships.pluck(:group_id)).to include @group.id
     end
 
+    it "calls SLM when assignmnets are assigned to the non-collaborative group" do
+      course_with_teacher(active_all: true)
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+      category = @course.group_categories.create(name: "category", non_collaborative: true)
+      @group = @course.groups.create!(name: "G1", group_category: category, non_collaborative: true)
+      da = assignment_model(course: @course)
+      diff_tag_override = assignment_override_model(assignment: da)
+      diff_tag_override.set_type = "Group"
+      diff_tag_override.set_id = @group.id
+      diff_tag_override.save!
+      da.update!(only_visible_to_overrides: true)
+      user = student_in_course(active_all: true).user
+      user2 = student_in_course(active_all: true).user
+      user_session(@teacher)
+
+      expect(SubmissionLifecycleManager).not_to receive(:recompute)
+      expect(SubmissionLifecycleManager).to receive(:recompute_users_for_course).with(
+        [user.id, user2.id],
+        @course.id,
+        match_array([da.id])
+      )
+      post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [user.id, user2.id] }
+      expect(response).to be_successful
+    end
+
     describe "POST /api/v1/groups/:group_id/memberships (Differentiation Tag Membership)" do
       before do
         course_with_teacher(active_all: true)

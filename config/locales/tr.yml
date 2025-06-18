@@ -4313,6 +4313,7 @@ tr:
   cancel_custom_link_creation_39ec70bd: "Özelleştirilmiş bağlantı oluşturmayı iptal et"
   cancel_submitting_comment_2666e98b: "Yorum Gönderimini İptal Et"
   cancel_updating_comment_6816d855: "Yorum Güncelleştirmeyi İptal Et"
+  canceled_5a6e0ec8: "İptal Edildi"
   cannot_access_group_in_concluded_course_90a8db52: "Sonlandırılmış derste gruplara erişilemez"
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Bölüm özelliği eklenmemiş tartışmaya bölüm eklenemez"
   cannot_autograde_at_this_time_a146ad9d: "Bu sefer otomatik notlandırma yapılamaz"
@@ -4369,6 +4370,9 @@ tr:
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas Uyarısı - Geç Gönderim : %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "Canvas Özelliği"
   canvas_by_instructure_1490381: "Instructure Canvas"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "Canvas LDAP sunucusuna bağlanamıyor"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "Canvas LDAP sunucusuna bağlanamadı"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "Canvas bu LDAP durumunu arayamaz"
   canvas_cartridge_description: "Bu eklenti ile canvas dışa aktarımı, içe aktarılacak bir aracı json formatına dönüştürülür"
   canvas_cartridge_display: "Ortak Canvas Paketi"
   canvas_cartridge_file_description: "Canvas Dersi Dışarı Aktarma Paketi"
@@ -4384,6 +4388,7 @@ tr:
   canvas_error_report_ff678539: "Canvas Hata Raporu"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "Canvas Tanıtım Videosu"
+  canvas_is_connecting_to_ips_9af7da93: "Canvas bağlanıyor %{ips}"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas oturum açma hata mesajı"
   canvas_login_instructure_271b8d00: "Canvas'ta Oturum Aç"
@@ -4461,6 +4466,7 @@ tr:
   check_to_add_a_user_for_loginid_6cd25597: " %{loginid}'e kullanıcı eklemek için tik atın"
   check_to_select_all_98e484f1: "Tümünü seç"
   check_to_skip_adding_a_user_for_loginid_5fa643da: " %{loginid}'e kullanıcı eklemeyi atlamak için tik atın"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "Güvenlik duvarı ayarlarınızı kontrol ediniz. Tüm Canvas IP adreslerinin sunucunuza erişim izni sağlandı mı?"
   checked_883b93fd: seçili
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "Alt ders ana ders ile aynı kök ana hesapta olmalı"
   child_s_username_dde3aa9: "Alt Birim'in Kullanıcı Adı"
@@ -7776,6 +7782,7 @@ tr:
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Bu ödevi final puanı hesaplamasına katma"
   do_nothing_9672b478: "Hiçbir Şey Yapma"
   does_not_meet_expectations_b0736d20: "Beklentileri Karşılamıyor"
+  does_the_username_require_more_scoping_information_40d51df: "Kullanıcı adınının daha fazla bilgi içermesi gerekir mi? (Örn: 'cn=Canvas,ou=people,dc=example,dc=com')."
   domain_3b54c511: Alan
   domain_69fe564b: "Alan Adı:"
   domain_is_required_1d4c8b25: "Alan adı gerekli"
@@ -14948,6 +14955,7 @@ tr:
   presentation_2d9387ca: Sunum
   prev_f82cbc48: Önceki
   preview_53003fd2: Önizleme
+  preview_9cbd064e: önizleme
   preview_your_submission_and_view_teacher_feedback__81a45279: "Gönderilerinizi ön izleyin ve varsa öğretmen geribildirimine bakın"
   previous_announcements_page_79c0ada1: "Önceki Duyurular Sayfası"
   previous_assignment_cc8cf7f3: "Önceki Ödev"
@@ -19076,6 +19084,7 @@ tr:
   successfully_updated_the_comment_946360d5: "Yorum başarılı bir şekilde güncellendi"
   suggestions_b8b03b9d: "Öneriler:"
   summary_statistics_f74852a5: "Özet İstatistikleri"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "Test oturumu açmak için, geçerli bir LDAP kullanıcı adı/şifresi gerekmektedir: "
   support: 
     array: 
       last_word_connector: ", ve"
@@ -19276,6 +19285,9 @@ tr:
         unspecified: "olduğu her zaman"
       timespan: "%{start_at} *ile* %{end_at} arası"
   terms_of_service_attributes_not_valid_f3f9fca9: "Kullanım Koşulları özellikleri geçerli değil"
+  test_ldap_authentication_446cce4f: "LDAP Kimlik Doğrulamasını Test et"
+  test_ldap_settings_c387f136: "LDAP Ayarlarını Test Et"
+  test_login_3dc3c119: "Oturum Açmayı Test Et"
   testing_state_effd4a82: "Durum test ediliyor"
   text_document_eacbcdb7: "Metin belgesi"
   text_entry_e1808b2f: "Metin Girişi"
@@ -19291,6 +19303,7 @@ tr:
   the_app_was_added_successfully_3f785a23: "Uygulama başarıyla eklendi"
   the_app_was_deactivated_573520ab: "Uygulama devre dışı bırakıldı"
   the_app_was_updated_successfully_3d71cd1b: "Uygulama başarıyla güncellendi"
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "Bağlantı ya reddedildi ya da zaman aşımına uğradı. Dikkat edilmesi gerekenler:"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "Dosyalar sekmesi, ders slaytlarını, örnek belgeleri, derse yardımcı malzemeleri -- öğrencilerinizin indirmek isteyeceği herşeyin paylaşıldığı yerdir. Canvas ile yükleme ve yüklenen dosyaları düzenleme kolaydır. Nasıl yapıldığını göstereceğiz."
   the_grading_period_set_was_updated_successfully_d8dd5d0f: "Notlandırma Peryot ayarı başarılı bir şekilde güncellendi."
   the_group_category_can_t_be_changed_because_studen_9d7b1432: "Öğrenciler bu ödev için gönderim yaptıkları için grup kategorisi değiştirilemez."
@@ -19307,6 +19320,7 @@ tr:
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: " %{current_user_name} için en son puan ve %{outcome_name} öğrenme çıktısı."
   the_profile_picture_has_been_reported_d609d6dd: "Profil resmi rapor edildi"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Sağlanan Academic Benchmark dosyasında hata var"
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "Arama başarısız veya 0 sonuç verdi. Dikkat edilmesi gerekenler:"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Belirtilen kullanıcı (%{id}) bu derste öğrenci değildir"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Belirtilen kullanıcı bu derste öğrenci değildir"
   the_state_parameter_is_required_ffadf213: "Bölge parametresi gereklidir"
@@ -19370,6 +19384,7 @@ tr:
   this_student_f8239fed: "Bu Öğrenci"
   this_student_wrote_f1a3f22d: "Bu öğrenci şunu yazmış:"
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Bu kullanıcı henüz ders davetinizi kabul etmedi"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "Bu yalnızca bir bağlantı testidir. SSL sertifikaları doğrulanmamıştır."
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Bu, Canvas'ı notları ÖBS'ne aktarmak için yetkilendirmenizi sağlayacak"
   threshold_pts_45f0e5d8: "sınır: %{pts}"
   ticket_successfully_submitted_f6254460: "İstek başarılı bir şekilde gönderildi."
@@ -20295,6 +20310,9 @@ tr:
   vericite_similarity_score_more_information_7df9ea5c: "VeriCite benzerlik puanı -- daha fazla bilgi"
   verification_code_5acd64ef: "Doğrulama Kodu"
   verify_3dd8f159: Onay
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "Sağlanan arama tabanı için LDAP kullanıcı nesnesinin arama ayrıcalıklarına sahip olduğunu doğrulayın."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "Sağlanan filtre dizesini doğrulayın (Örn: '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "Girilen arama değerini doğrulayın (örn. 'ou=people,dc=example,dc=com')."
   version_5599c321: Versiyon
   video_b9f27375: Video
   video_options_24ef6e5d: "Video Seçenekleri"
@@ -20662,6 +20680,7 @@ tr:
       
       İncelemek için tıklayın:
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "LDAP sunucusu bağlantı girişimini reddetti. Dikkat edilmesi gerekenler:"
   your_message_has_been_sent_thank_you_e0284316: "Mesajınız başarıyla gönderildi. Teşekkürler!"
   your_message_was_sent_977f6583: "Mesaj gönderildi!"
   your_name_7665e1d8: Adınız

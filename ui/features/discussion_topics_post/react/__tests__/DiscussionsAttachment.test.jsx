@@ -26,9 +26,11 @@ import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
 import {DiscussionThreadContainer} from '../containers/DiscussionThreadContainer/DiscussionThreadContainer'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   openWindow: jest.fn(),
+  windowPathname: jest.fn(() => '/courses/1'),
 }))
 
 injectGlobalAlertContainers()
@@ -42,12 +44,13 @@ describe('DiscussionsAttachment', () => {
   const onFailureStub = jest.fn()
   const onSuccessStub = jest.fn()
   beforeAll(() => {
-    delete window.location
-    window.location = {search: ''}
-    window.ENV = {
+    fakeENV.setup({
       course_id: '1',
       SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
-    }
+      RICH_CONTENT_CAN_UPLOAD_FILES: true,
+      context_asset_string: 'course_1',
+      current_user_id: '1',
+    })
 
     window.matchMedia = jest.fn().mockImplementation(() => {
       return {
@@ -58,6 +61,10 @@ describe('DiscussionsAttachment', () => {
         removeListener: jest.fn(),
       }
     })
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
   })
 
   const defaultProps = ({

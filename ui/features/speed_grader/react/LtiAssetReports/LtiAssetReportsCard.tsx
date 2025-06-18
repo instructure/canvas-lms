@@ -29,9 +29,6 @@ import {Tooltip} from '@instructure/ui-tooltip'
 // Canvas-specific imports:
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {useMutation} from '@tanstack/react-query'
 
 const I18n = createI18nScope('speed_grader')
 const t = I18n.t.bind(I18n)
@@ -71,7 +68,7 @@ function defaultInfoText(progress: LtiAssetReport['processingProgress']) {
   switch (progress) {
     case 'Processed':
     case 'Failed':
-      throw 'Unreacheable'
+      throw 'Unreachable'
 
     case 'Processing':
       return t('The content is being processed and the final report being generated.')
@@ -111,25 +108,30 @@ function TooltipIfTruncated({
   )
 }
 
-/* BEGIN Resubmit stuff will be moved soon */
-const resubmit = async function (url: string) {
-  return await doFetchApi({
-    path: url,
-    method: 'POST',
-  })
+export function LtiAssetReportsMissingReportsCard() {
+  return (
+    <View
+      as="div"
+      borderColor="primary"
+      borderRadius="medium"
+      borderWidth="small"
+      padding="small"
+      aria-label={t('No reports from Document Processing App')}
+    >
+      <Flex direction="column" gap="xx-small">
+        <Flex.Item>
+          <Text as="div" size="small">
+            <IconInfoSolid inline={true} style={{paddingRight: '0.3em'}} />
+            {t('The document processor has not returned any reports for this file.')}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    </View>
+  )
 }
-/* END Resubmit stuff will be moved soon */
 
 export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
   const {comment, infoText} = reportCommentAndInfoText(report)
-
-  /* BEGIN Resubmit stuff will be moved soon */
-  const resubmitMutation = useMutation({
-    mutationFn: resubmit,
-    onSuccess: () => showFlashSuccess(t('Resubmitted to Document Processing App'))(),
-    onError: () => showFlashError(t('Resubmission failed'))(),
-  })
-  /* END Resubmit stuff will be moved soon */
 
   return (
     <View
@@ -143,7 +145,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
       <Flex direction="column" gap="xx-small">
         {report.title && (
           <Flex.Item>
-            <Heading>{report.title}</Heading>
+            <Heading level="h4">{report.title}</Heading>
           </Flex.Item>
         )}
         {comment && (
@@ -204,6 +206,7 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
           report.launchUrlPath && (
             <Flex.Item overflowY="visible">
               <Button
+                id="asset-processor-view-report-button"
                 size="small"
                 onClick={() =>
                   // TS/biome complain without the || ""
@@ -215,20 +218,6 @@ export function LtiAssetReportsCard({report}: {report: LtiAssetReport}) {
             </Flex.Item>
           )
         }
-
-        {/* BEGIN Resubmit stuff will be moved soon */}
-        {report.resubmitUrlPath && !resubmitMutation.isSuccess && (
-          <Flex.Item overflowY="visible">
-            <Button
-              data-pendo="asset-processor-resubmit-notice"
-              size="small"
-              onClick={() => resubmitMutation.mutate(report.resubmitUrlPath!)}
-            >
-              {t('Resubmit')}
-            </Button>
-          </Flex.Item>
-        )}
-        {/* END Resubmit stuff will be moved soon */}
       </Flex>
     </View>
   )

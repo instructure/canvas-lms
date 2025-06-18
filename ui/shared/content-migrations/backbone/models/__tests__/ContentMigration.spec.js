@@ -63,9 +63,9 @@ describe('ContentMigration', () => {
       new Backbone.Model(),
     ])
     const model = new ContentMigration({someCollection: collection})
-    expect(model.get('someCollection').length).toBe(3)
+    expect(model.get('someCollection')).toHaveLength(3)
     model.resetModel()
-    expect(model.get('someCollection').length).toBe(0)
+    expect(model.get('someCollection')).toHaveLength(0)
   })
 
   test('toJSON adds a date_shift_options namespace if none exists', () => {

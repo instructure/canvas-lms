@@ -69,8 +69,8 @@ DashboardCardHeaderHero.propTypes = {
 }
 
 export const LatestAnnouncementLink = ({courseId, color, loading, title, html_url}) => {
-  const customSkeleton = props => (
-    <Flex alignItems="start" margin="xx-small small xx-small small" {...props}>
+  const customSkeleton = ({key, ...props}) => (
+    <Flex key={key} alignItems="start" margin="xx-small small xx-small small" {...props}>
       <Flex.Item shouldGrow={true} shouldShrink={true}>
         <LoadingSkeleton
           screenReaderLabel={I18n.t('Loading latest announcement link')}

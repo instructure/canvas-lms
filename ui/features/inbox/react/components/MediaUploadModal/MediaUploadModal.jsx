@@ -20,7 +20,6 @@ import {Heading} from '@instructure/ui-heading'
 import {IconAudioSolid, IconVideoCameraSolid} from '@instructure/ui-icons'
 import {MediaCapture, canUseMediaCapture} from '@instructure/media-capture'
 import {Modal} from '@instructure/ui-modal'
-import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tabs} from '@instructure/ui-tabs'
@@ -54,7 +53,13 @@ const mapObject = (obj, fn) => {
   return Object.fromEntries(Object.entries(obj).map(([k, v], i) => [k, fn(v, k, i)]))
 }
 
-export function MediaUploadModal({onClose, onFileUpload, onOpen, onRecordingSave, open}) {
+export function MediaUploadModal({
+  onClose = () => {},
+  onFileUpload,
+  onOpen = () => {},
+  onRecordingSave,
+  open = false,
+}) {
   const hiddenFileInput = React.useRef(null)
   const [selectedTab, setTab] = React.useState(0)
 
@@ -122,20 +127,6 @@ export function MediaUploadModal({onClose, onFileUpload, onOpen, onRecordingSave
       </Modal.Body>
     </Modal>
   )
-}
-
-MediaUploadModal.propTypes = {
-  onClose: PropTypes.func,
-  onFileUpload: PropTypes.func.isRequired,
-  onOpen: PropTypes.func,
-  onRecordingSave: PropTypes.func.isRequired,
-  open: PropTypes.bool,
-}
-
-MediaUploadModal.defaultProps = {
-  onClose: () => {},
-  onOpen: () => {},
-  open: false,
 }
 
 export default MediaUploadModal

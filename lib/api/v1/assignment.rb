@@ -64,6 +64,7 @@ module Api::V1::Assignment
       moderated_grading
       hide_in_gradebook
       omit_from_final_grade
+      suppress_assignment
       anonymous_instructor_annotations
       anonymous_grading
       allowed_attempts
@@ -161,6 +162,7 @@ module Api::V1::Assignment
     hash["lti_context_id"] = assignment.lti_context_id if assignment.has_attribute?(:lti_context_id)
     hash["course_id"] = assignment.context_id
     hash["name"] = assignment.title
+    hash["suppress_assignment"] = assignment.suppress_assignment
     hash["submission_types"] = assignment.submission_types_array
     hash["has_submitted_submissions"] = assignment.has_submitted_submissions?
     hash["due_date_required"] = assignment.due_date_required?
@@ -581,6 +583,7 @@ module Api::V1::Assignment
     integration_id
     hide_in_gradebook
     omit_from_final_grade
+    suppress_assignment
     anonymous_instructor_annotations
     allowed_attempts
     important_dates
@@ -1197,6 +1200,11 @@ module Api::V1::Assignment
     :created
   end
 
+  def remove_differentiation_tag_overrides(overrides_to_delete)
+    tag_overrides = overrides_to_delete.select { |o| o.set_type == "Group" && o.set.non_collaborative? }
+    tag_overrides.each(&:destroy!)
+  end
+
   def update_api_assignment_with_overrides(prepared_update, user)
     assignment = prepared_update[:assignment]
     overrides = prepared_update[:overrides]
@@ -1209,6 +1217,13 @@ module Api::V1::Assignment
 
     assignment.transaction do
       assignment.validate_overrides_for_sis(prepared_batch)
+
+      # remove differentiation tag overrides if they are being deleted
+      # and account setting is disabled. The assignment will fail validation
+      # if these overrides exist and the account setting is disabled
+      unless @context.account.allow_assign_to_differentiation_tags?
+        remove_differentiation_tag_overrides(prepared_batch[:overrides_to_delete])
+      end
 
       # validate_assignment_overrides runs as a save callback, but if the group
       # category is changing, remove overrides for old groups first so we don't
@@ -1269,7 +1284,7 @@ module Api::V1::Assignment
       add_or_remove_asset_processors(assignment, assignment_params)
     elsif asset_processor_capable?(submission_types: assignment.submission_types_array)
       # Remove APs if the assignment is no longer capable.
-      assignment.lti_asset_processors.active.destroy_all
+      assignment.lti_asset_processors.destroy_all
     end
   end
 
@@ -1278,7 +1293,7 @@ module Api::V1::Assignment
     existing_ids_to_keep = asset_processors.filter_map { |ap| ap["existing_id"] }
     content_items_to_create = asset_processors.filter_map { |ap| ap["new_content_item"] }
 
-    assignment.lti_asset_processors.active.where.not(id: existing_ids_to_keep).destroy_all
+    assignment.lti_asset_processors.where.not(id: existing_ids_to_keep).destroy_all
     assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|
       Lti::AssetProcessor.build_for_assignment(content_item:, context: assignment.context)
     end
@@ -1315,7 +1330,8 @@ module Api::V1::Assignment
   end
 
   def asset_processor_capable?(submission_types:)
-    submission_types.presence&.include?("online_upload")
+    submission_types.presence&.include?("online_upload") ||
+      submission_types.presence&.include?("online_text_entry")
   end
 
   def submissions_download_url(context, assignment)
@@ -1339,6 +1355,7 @@ module Api::V1::Assignment
       { "external_tool_tag_attributes" => strong_anything },
       ({ "submission_types" => strong_anything } if should_update_submission_types),
       { "ab_guid" => strong_anything },
+      ({ "suppress_assignment" => strong_anything } if assignment.root_account.suppress_assignments?),
       ({ "estimated_duration_attributes" => strong_anything } if estimated_duration_enabled?(assignment)),
     ].compact
   end

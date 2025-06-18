@@ -71,7 +71,6 @@ function renderCoursePacingNotice() {
         renderNotice($mountPoint, ENV.COURSE_ID)
       })
       .catch(ex => {
-        // eslint-disable-next-line no-console
         console.warn('Falied loading CoursePacingNotice', ex)
       })
   }

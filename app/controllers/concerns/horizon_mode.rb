@@ -22,6 +22,7 @@ module HorizonMode
   # Combines both student and provider career loading in one method
   def load_canvas_career
     return if Canvas::Plugin.value_to_boolean(params[:force_classic])
+    return if api_request?
 
     if @context.is_a?(Account)
       # We'd only ever load the provider app for an account

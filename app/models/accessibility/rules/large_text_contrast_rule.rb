@@ -48,33 +48,15 @@ module Accessibility
       end
 
       def self.message
-        I18n.t("Large text should have sufficient contrast.")
+        I18n.t("Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1.")
       end
 
       def self.why
-        I18n.t("When text is too small, users may have difficulty reading it.")
+        I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
       end
 
       def self.link_text
         I18n.t("Learn more about large text contrast")
-      end
-
-      def self.fix(elem, form_data)
-        return unless elem
-
-        foreground = form_data[:foreground]
-        background = form_data[:background]
-
-        contrast_ratio = WCAGColorContrast.ratio(foreground, background)
-
-        if contrast_ratio >= CONTRAST_THRESHOLD
-          style_str = elem.attribute("style")&.value.to_s
-
-          style_str = update_style(style_str, "color", foreground)
-          style_str = update_style(style_str, "background-color", background)
-
-          elem.set_attribute("style", style_str)
-        end
       end
 
       def self.large_text?(style_str)
@@ -175,6 +157,18 @@ module Accessibility
           label: "Change color",
           value: ""
         )
+      end
+
+      def self.fix(elem, value)
+        style_str = elem.attribute("style")&.value.to_s
+        styles = style_str.split(";").to_h { |s| s.strip.split(":") }
+
+        styles["color"] = value
+
+        new_style = styles.map { |k, v| "#{k.strip}: #{v.strip}" }.join("; ") + ";"
+        elem.set_attribute("style", new_style)
+
+        elem
       end
     end
   end

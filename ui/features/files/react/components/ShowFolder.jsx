@@ -41,6 +41,13 @@ ShowFolder.getInitialState = function () {
   }
 }
 
+ShowFolder.componentWillMount = function () {
+  this.folderEmptyRef = React.createRef()
+  this.emptyDivRef = React.createRef()
+  this.accessibilityMessageRef = React.createRef()
+  this.columnHeadersRef = React.createRef()
+}
+
 ShowFolder.closeFilePreview = function (url) {
   page(url)
   FocusStore.setFocusToItem()
@@ -69,7 +76,7 @@ ShowFolder.renderFilePreview = function () {
 ShowFolder.renderFolderChildOrEmptyContainer = function () {
   if (this.props.currentFolder.isEmpty()) {
     return (
-      <div ref="folderEmpty" className="muted">
+      <div ref={this.folderEmptyRef} className="muted">
         {I18n.t('this_folder_is_empty', 'This folder is empty')}
       </div>
     )
@@ -118,7 +125,7 @@ ShowFolder.render = function () {
   }
 
   if (!this.props.currentFolder) {
-    return <div ref="emptyDiv" />
+    return <div ref={this.emptyDivRef} />
   }
 
   const foldersNextPageOrFilesNextPage =
@@ -153,7 +160,7 @@ ShowFolder.render = function () {
       <div role="grid" style={{flex: '1 1 auto'}}>
         {this.props.userCanEditFilesForContext && (
           <div
-            ref="accessibilityMessage"
+            ref={this.accessibilityMessageRef}
             className="ShowFolder__accessbilityMessage col-xs"
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
             tabIndex={0}
@@ -172,7 +179,7 @@ ShowFolder.render = function () {
               />
             )}
             <ColumnHeaders
-              ref="columnHeaders"
+              ref={this.columnHeadersRef}
               query={this.props.query}
               pathname={this.props.pathname}
               areAllItemsSelected={this.props.areAllItemsSelected}

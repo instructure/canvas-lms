@@ -232,11 +232,12 @@ module UserLearningObjectScopes
       if opts[:course_ids].present?
         active_enrollment_course_ids = Enrollment.where(Enrollment.active_student_conditions)
                                                  .where(user_id: id, course_id: opts[:course_ids]).pluck(:course_id)
-        assignments = assignments.visible_to_students_in_course_with_da([id], active_enrollment_course_ids)
+        assignments = assignments.visible_to_students_in_course_with_da([id], active_enrollment_course_ids, nil, opts[:include_concluded])
       end
 
       assignments = assignments.need_submitting_info(id, limit) if purpose == "submitting"
       assignments = assignments.having_submissions_for_user(id) if purpose == "submitted"
+      assignments = assignments.without_suppressed_assignments
       if purpose == "submitting"
         assignments = assignments.submittable.or(assignments.where("assignments.user_due_date > ?", Time.zone.now))
       end

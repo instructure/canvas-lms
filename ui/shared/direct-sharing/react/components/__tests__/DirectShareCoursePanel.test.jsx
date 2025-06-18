@@ -63,6 +63,7 @@ describe('DirectShareCoursePanel', () => {
   afterEach(() => {
     fetchMock.restore()
     fakeENV.teardown()
+    jest.clearAllMocks()
   })
 
   it('shows the overwrite warning', () => {
@@ -109,13 +110,14 @@ describe('DirectShareCoursePanel', () => {
     expect(getByText('Close')).toBeInTheDocument()
   })
 
-  it('deletes the module and removes the position selector when a new course is selected', () => {
+  it('deletes the module and removes the position selector when a new course is selected', async () => {
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
         {id: '2', name: 'Module 2'},
       ])
     })
+
     const {getByText, getByLabelText, queryByText} = render(
       <DirectShareCoursePanel
         sourceCourseId="42"
@@ -126,7 +128,19 @@ describe('DirectShareCoursePanel', () => {
     fireEvent.click(courseSelector)
     fireEvent.click(getByText('abc'))
     fireEvent.click(getByText(/select a module/i))
-    fireEvent.click(getByText(/Module 1/))
+
+    // Mock useCourseModuleItemApi just before the module is selected
+    useCourseModuleItemApi.mockImplementationOnce(({success}) => {
+      success([
+        {id: 'item1', title: 'Item 1'},
+        {id: 'item2', title: 'Item 2'},
+      ])
+    })
+
+    await act(async () => {
+      fireEvent.click(getByText(/Module 1/))
+    })
+
     expect(getByText(/Place/)).toBeInTheDocument()
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([{id: 'ghi', name: 'foo'}])

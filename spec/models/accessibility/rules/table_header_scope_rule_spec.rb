@@ -48,5 +48,14 @@ RSpec.describe "TableHeaderScopeRule", type: :feature do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+
+    it "fixes table headers by adding the correct scope attribute" do
+      input_html = "<table><tr><th id=\"test-element\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+      expected_html = "<table><tr><th id=\"test-element\" scope=\"column\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header_scope, input_html, './/th[@id="test-element"]', "Column")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
   end
 end

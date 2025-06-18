@@ -46,23 +46,33 @@ class AccessibilityController < ApplicationController
     content = request.body.read
     content_data = JSON.parse(content)
 
-    unless Accessibility::Rule.registry.key?(content_data["rule"])
-      render json: {
-               error: "Invalid rule identifier '#{content_data["rule"]}', should be one of #{Accessibility::Rule.registry.keys}"
-             },
-             status: :bad_request and return
+    response = update_accessibility_issues(content_data)
+
+    render json: response[:json], status: response[:status]
+  end
+
+  def update_accessibility_issues(content_data, rules = Accessibility::Rule.registry)
+    unless rules.key?(content_data["rule"])
+      return {
+        json: {
+          error: "Invalid rule identifier '#{content_data["rule"]}', should be one of #{Accessibility::Rule.registry.keys}"
+        },
+        status: :bad_request
+      }
     end
 
-    rule = Accessibility::Rule.registry[content_data["rule"]]
+    rule = rules[content_data["rule"]]
 
     case content_data["content_type"]
     when "Page"
       wiki_page = @context.wiki_pages.find_by(id: content_data["content_id"])
       unless wiki_page
-        render json: {
-                 error: "Wiki page #{content_data["content_id"]} not found"
-               },
-               status: :not_found and return
+        return {
+          json: {
+            error: "Wiki page #{content_data["content_id"]} not found"
+          },
+          status: :not_found
+        }
       end
 
       wiki_page.body = AccessibilityControllerHelper.fix_content(
@@ -72,30 +82,34 @@ class AccessibilityController < ApplicationController
     when "Assignment"
       assignment = @context.assignments.find_by(id: content_data["content_id"])
       unless assignment
-        render json: {
-                 error: "Assignment #{content_data["content_id"]} not found"
-               },
-               status: :not_found and return
+        return {
+          json: {
+            error: "Assignment #{content_data["content_id"]} not found"
+          },
+          status: :not_found
+        }
       end
 
       assignment.description = AccessibilityControllerHelper.fix_content(
-        assignment.body, rule, content_data["path"], content_data["value"]
+        assignment.description, rule, content_data["path"], content_data["value"]
       )
       assignment.save!
     else
-      render json: { error: "Invalid content type" }, status: :unprocessable_entity and return
+      return { json: { error: "Invalid content type" }, status: :unprocessable_entity }
     end
 
-    render json: { success: true }
+    { json: { success: true }, status: :ok }
   end
 
-  def create_accessibility_issues(rules = Accessibility::Rule.registry)
+  def create_accessibility_issues(rules = Accessibility::Rule.registry, pdf_rules = Accessibility::Rule.pdf_registry)
     course_pages = @context.wiki_pages.not_deleted.order(updated_at: :desc)
     course_assignments = @context.assignments.active.order(updated_at: :desc)
+    attachments = @context.attachments.not_deleted.order(updated_at: :desc)
 
     {
       pages: create_page_issues(course_pages, rules),
       assignments: create_assignment_issues(course_assignments, rules),
+      attachments: create_attachment_issues(attachments, pdf_rules),
       last_checked: Time.zone.now.strftime("%b %-d, %Y")
     }
   end
@@ -136,6 +150,24 @@ class AccessibilityController < ApplicationController
       assignment_url = polymorphic_url([@context, assignment])
       issues[assignment.id][:url] = assignment_url
       issues[assignment.id][:edit_url] = "#{assignment_url}/edit"
+    end
+    issues
+  end
+
+  def create_attachment_issues(attachments, rules)
+    issues = {}
+    attachments.each do |attachment|
+      result = {}
+      if attachment.content_type == "application/pdf"
+        result = AccessibilityControllerHelper.check_pdf_accessibility(attachment, rules)
+      end
+
+      issues[attachment.id] = result
+      issues[attachment.id][:title] = attachment.title
+      issues[attachment.id][:content_type] = attachment.content_type
+      issues[attachment.id][:published] = attachment.published?
+      issues[attachment.id][:updated_at] = attachment.updated_at&.iso8601 || ""
+      issues[attachment.id][:url] = course_files_url(@context, preview: attachment.id)
     end
     issues
   end

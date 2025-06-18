@@ -24,7 +24,7 @@ import PaginatedCollection from '../mixins/paginated_collection'
 
 export default Backbone.Collection.extend({
   model: Event,
-  // eslint-disable-next-line object-shorthand
+
   constructor: function () {
     PaginatedCollection(this)
     return Backbone.Collection.apply(this, arguments)

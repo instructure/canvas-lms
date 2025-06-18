@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
+import 'jquery-migrate'
+import '@canvas/jquery/jquery.ajaxJSON'
 import GravatarView from '../GravatarView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
-import sinon from 'sinon'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toBe(y)
-
-let server = sinon.createFakeServer()
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -55,7 +55,7 @@ describe('GravatarView', () => {
   afterEach(() => {
     window.ENV = oldEnv
     view.remove()
-    if (server) server.restore()
+    jest.restoreAllMocks()
   })
 
   test('it should be accessible', function (done) {
@@ -75,19 +75,19 @@ describe('GravatarView', () => {
   })
 
   test('calls avatar url with specified size', function () {
-    server = sinon.fakeServer.create()
-    server.respond(request => {
-      const url_match = request.url.match(/api\/v1\/users\/self/)
-      ok(url_match, 'call to unexpected url')
-      const body_param = encodeURIComponent('user[avatar][url]')
-      const body_match = request.requestBody.match(body_param)
-      ok(body_match, 'did not specify avatar url parameter')
-      const size_param = encodeURIComponent('s=42')
-      const size_match = request.requestBody.match(size_param)
-      ok(size_match, 'did not specify correct size')
-      request.respond(200, {'Content-Type': 'application/json'}, '{}')
-    })
+    $.ajaxJSON = jest.fn()
+
     view.updateAvatar()
-    server.respond()
+
+    expect($.ajaxJSON).toHaveBeenCalledWith(
+      '/api/v1/users/self',
+      'PUT',
+      expect.objectContaining({
+        'user[avatar][url]': expect.stringContaining('s=42'),
+      }),
+    )
+
+    const avatarUrl = $.ajaxJSON.mock.calls[0][2]['user[avatar][url]']
+    ok(avatarUrl.includes('s=42'), 'did not specify correct size')
   })
 })

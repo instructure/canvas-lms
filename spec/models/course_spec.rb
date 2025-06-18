@@ -3300,6 +3300,18 @@ describe Course do
           available_tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
           expect(available_tabs).not_to include("Item Banks")
         end
+
+        context "and the ams_service is enabled" do
+          before do
+            @course.root_account.enable_feature!(:ams_service)
+          end
+
+          it "replaces the content external tool tab with the ams_service Item Banks tab" do
+            available_tabs = @course.tabs_available(@user, include_external: true).pluck(:id)
+            expect(available_tabs).to include(Course::TAB_ITEM_BANKS)
+            expect(available_tabs).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+          end
+        end
       end
 
       it "sets the target value on the tab if the external tool has a windowTarget" do

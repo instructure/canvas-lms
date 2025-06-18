@@ -44,6 +44,10 @@ class DiscussionTopic < ActiveRecord::Base
                                  allow_rating
                                  only_graders_can_rate
                                  sort_by_rating
+                                 sort_order
+                                 expanded
+                                 sort_order_locked
+                                 expanded_locked
                                  group_category_id]
   restrict_columns :state, [:workflow_state]
   restrict_columns :availability_dates, %i[unlock_at delayed_post_at lock_at]
@@ -292,6 +296,10 @@ class DiscussionTopic < ActiveRecord::Base
       allow_rating
       only_graders_can_rate
       sort_by_rating
+      sort_order
+      sort_order_locked
+      expanded
+      expanded_locked
     ].each { |attr| self[attr] = false if self[attr].nil? }
   end
   protected :default_values
@@ -384,6 +392,7 @@ class DiscussionTopic < ActiveRecord::Base
         topic = DiscussionTopic.where(context_id: group, context_type: "Group", root_topic_id: self).first
         topic ||= group.discussion_topics.build { |dt| dt.root_topic = self }
         topic.message = message
+        topic.reply_to_entry_required_count = reply_to_entry_required_count if reply_to_entry_required_count
         topic.title = CanvasTextHelper.truncate_text("#{title} - #{group.name}", { max_length: 250 }) # because of course people do this
         topic.assignment_id = assignment_id
         topic.attachment_id = attachment_id
@@ -394,6 +403,10 @@ class DiscussionTopic < ActiveRecord::Base
         topic.allow_rating = allow_rating
         topic.only_graders_can_rate = only_graders_can_rate
         topic.sort_by_rating = sort_by_rating
+        topic.sort_order = sort_order
+        topic.sort_order_locked = sort_order_locked
+        topic.expanded = expanded
+        topic.expanded_locked = expanded_locked
         topic.save if topic.changed?
         topic
       end
@@ -529,6 +542,10 @@ class DiscussionTopic < ActiveRecord::Base
                           allow_rating:,
                           only_graders_can_rate:,
                           sort_by_rating:,
+                          sort_order:,
+                          sort_order_locked:,
+                          expanded:,
+                          expanded_locked:,
                           todo_date:,
                           is_section_specific:,
                           anonymous_state:,

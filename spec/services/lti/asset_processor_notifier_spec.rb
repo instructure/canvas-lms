@@ -16,7 +16,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative "../../spec_helper"
 require_relative "../../lti_spec_helper"
 
 describe Lti::AssetProcessorNotifier do
@@ -30,8 +29,9 @@ describe Lti::AssetProcessorNotifier do
     let(:student) { course.student_enrollments.first.user }
     let(:assignment) { assignment_model({ course: }) }
     let(:assignment2) { assignment_model({ course: }) }
-    let(:attachment) { attachment_with_context student, { uploaded_data: StringIO.new("hello world") } }
-    let(:attachment2) { attachment_with_context student, { uploaded_data: StringIO.new("hello world") } }
+    let(:attachment) { attachment_with_context student, { display_name: "a1.txt", uploaded_data: StringIO.new("hello") } }
+    let(:attachment2) { attachment_with_context student, { display_name: "a2.txt", uploaded_data: StringIO.new("world") } }
+    let(:tool) { new_valid_external_tool(course) }
 
     it "does not create Lti::Attachment if feature flag is off" do
       course.root_account.disable_feature!(:lti_asset_processor)
@@ -48,7 +48,6 @@ describe Lti::AssetProcessorNotifier do
     end
 
     it "does not create Lti::Attachment if there's no asset processor registered" do
-      tool = new_valid_external_tool course
       # Register asset processor for different assignment
       lti_asset_processor_model(tool:, assignment: assignment2)
 
@@ -58,7 +57,6 @@ describe Lti::AssetProcessorNotifier do
     end
 
     it "sends the notice again for already existing assets" do
-      tool = new_valid_external_tool course
       ap = lti_asset_processor_model(tool:, assignment:)
       received_notifications = []
       allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
@@ -70,17 +68,23 @@ describe Lti::AssetProcessorNotifier do
 
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).twice
       notice_params = received_notifications[0]
-      builder_params = notice_params[:builders].first.instance_variable_get(:@params)
       expect(notice_params[:cet_id_or_ids]).to eq(tool.id)
-      expect(builder_params[:asset_report_service_url]).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
-      expect(builder_params[:submission_lti_id]).to eq(submission.lti_attempt_id)
-      expect(builder_params[:assets][0][:title]).to eq(assignment.title)
-      expect(builder_params[:assets][0][:filename]).to eq(attachment.display_name)
-      expect(builder_params[:assets][0][:sha256_checksum]).to eq "uU0nuZNNPgilLlLX2n2r+sSE7+N6U4DukIj3rOLvzek="
+
+      builder_params = notice_params[:builders].first.instance_variable_get(:@params)
+      builder_params => {asset_report_service_url:, submission_lti_id:, assets:}
+      expect(asset_report_service_url).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
+      expect(submission_lti_id).to eq(submission.lti_attempt_id)
+
+      assets = assets.sort_by { _1[:display_name] }
+      expect(assets.pluck(:title)).to eq([assignment.title, assignment.title])
+      expect(assets.pluck(:filename)).to eq([attachment, attachment2].map(&:display_name))
+      expect(assets.pluck(:sha256_checksum)).to eq([
+                                                     "LPJNul+wow4m6DsqxbninhsWHlwfp0JecwQzYpOLmCQ=",
+                                                     "SG6kYiTRu0+2gPNPfJrZao8k7Ii+c+qOWmxlJg6cuKc="
+                                                   ])
     end
 
     it "creates Lti::Asset for each attachment" do
-      tool = new_valid_external_tool course
       lti_asset_processor_model(tool:, assignment:)
       lti_asset_processor_model(tool:, assignment:)
       allow(Lti::PlatformNotificationService).to receive(:notify_tools)
@@ -94,7 +98,6 @@ describe Lti::AssetProcessorNotifier do
     end
 
     it "can resubmit for a specific asset processor" do
-      tool = new_valid_external_tool course
       ap = lti_asset_processor_model(tool:, assignment:)
       lti_asset_processor_model(tool:, assignment:)
       allow(Lti::PlatformNotificationService).to receive(:notify_tools)
@@ -110,6 +113,63 @@ describe Lti::AssetProcessorNotifier do
       Lti::AssetProcessorNotifier.notify_asset_processors(submission, ap)
 
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
+    end
+
+    it "can resubmit for an old version of a submission" do
+      ap = lti_asset_processor_model(tool:, assignment:)
+      received_notifications = []
+      allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+        received_notifications << payload
+      end
+
+      submission = assignment.submit_homework(student, attachments: [attachment])
+      assignment.submit_homework(student, attachments: [attachment2])
+
+      Lti::AssetProcessorNotifier.notify_asset_processors(submission, ap)
+
+      expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
+      notice_params = received_notifications.last
+      builder_params = notice_params[:builders].first.instance_variable_get(:@params)
+      asset_filenames = builder_params[:assets].map { _1[:filename] }
+      expect(asset_filenames).to eq([attachment.display_name])
+    end
+
+    context "when the submission is a text entry" do
+      before do
+        lti_asset_processor_model(tool:, assignment:)
+        allow(Lti::PlatformNotificationService).to receive(:notify_tools)
+        allow(Rails.application.routes.url_helpers).to receive(:lti_asset_processor_asset_show_url).and_return("http://example.com")
+      end
+
+      it "creates Lti::Asset for text entry submission" do
+        submission = assignment.submit_homework(student, body: "Hello world")
+        expect(Lti::Asset.where(submission:).active.count).to eq(1)
+        expect(Lti::Asset.first.text_entry?).to be true
+      end
+
+      it "calculates the SHA256 checksum for text entry" do
+        assignment.submit_homework(student, body: "Hello world")
+        asset = Lti::Asset.first
+        asset.calculate_sha256_checksum!
+        expect(asset.sha256_checksum).to eq("ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=")
+      end
+
+      it "sends correct notice content for text entry asset" do
+        received_notifications = []
+        allow(Lti::PlatformNotificationService).to receive(:notify_tools) do |payload|
+          received_notifications << payload
+        end
+        assignment.submit_homework(student, body: "Hello world")
+        expect(Lti::PlatformNotificationService).to have_received(:notify_tools)
+        notice_params = received_notifications.first
+        builder_params = notice_params[:builders].first.instance_variable_get(:@params)
+        asset = builder_params[:assets].first
+        expect(asset[:filename]).to be_nil
+        expect(asset[:title]).to eq(assignment.title)
+        expect(asset[:sha256_checksum]).to eq("ZOyIygCyaOW6GjVnihtTFtIS9PNmskdyMlNKiuyjfzw=")
+        expect(asset[:content_type]).to eq("text/html")
+        expect(asset[:size]).to eq("Hello world".bytesize)
+      end
     end
   end
 end

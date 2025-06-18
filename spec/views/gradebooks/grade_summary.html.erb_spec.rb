@@ -1145,4 +1145,60 @@ describe "gradebooks/grade_summary" do
       expect(topic_index).to be < entry_index
     end
   end
+
+  describe "suppress assignment feature" do
+    before do
+      course_with_student(active_all: true)
+      @course.assignments.create!(title: "Hidden Assignment")
+      view_context(@course, @student)
+    end
+
+    context "with feature on" do
+      before do
+        root_account = @course.root_account
+        root_account.settings[:suppress_assignments] = true
+        root_account.save
+
+        @assignment = @course.assignments.create!(title: "Hidden Assignment", suppress_assignment: true)
+        @assignment2 = @course.assignments.create!(title: "Not Hidden Assignment", suppress_assignment: false)
+      end
+
+      it "renders suppress message" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+        render "gradebooks/grade_summary"
+
+        expect(response.body).to include('data-testid="suppressed-assignment-notification"')
+      end
+
+      it "does not render suppressed assignment" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+        render "gradebooks/grade_summary"
+        expect(response.body).not_to include("submission_#{@assignment.id}")
+      end
+
+      it "does render non-suppressed assignment" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+        render "gradebooks/grade_summary"
+        expect(response.body).to include("submission_#{@assignment2.id}")
+      end
+    end
+
+    context "with feature off" do
+      it "does not render suppress message" do
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+        render "gradebooks/grade_summary"
+        expect(response.body).not_to include("Some items are hidden from grades view")
+      end
+    end
+
+    it "does render assignment if feature is disabled" do
+      assignment = @course.assignments.create!(title: "Fallback Visible Assignment", suppress_assignment: true)
+      assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+      render "gradebooks/grade_summary"
+      expect(response.body).to include("submission_#{assignment.id}")
+    end
+  end
 end

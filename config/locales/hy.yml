@@ -3426,6 +3426,7 @@ hy:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "Հնարավոր չէ չեղարկել հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները:"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Հնարավոր չէ չեղարկել %{item_name} հրապարակումը, եթե առկա են ունկնդիրների ներկայացրած աշխատանքները"
   cancel_caeb1e68: "Չեղյալ համարել"
+  canceled_5a6e0ec8: "Չեղյալ է համարվել"
   cannot_be_blank_c4e30496: "Չի կարող դատարկ լինել"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "չի կարող առկա լինել, եթե account_id է առկա"
   cannot_be_present_when_course_id_is_present_785e6a59: "չի կարող առկա լինել, եթե course_id  է առկա"
@@ -3452,6 +3453,9 @@ hy:
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas համակարգի նախազգուշացում - Հրավիրված եք %{course} դասընթացին որպես %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas համակարգի նախազգուշացում - Հրավիրված եք դասընթացին որպես %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas համակարգի նախազգուշացում. ուշացրած ուղարկում՝ %{user_name}, %{assignment_name}"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "Canvas-ը չի կարող կապվել (մուտք գործել) LDAP սերվերի հետ"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "Canvas-ը չի կարողանում կապվել LDAP սերվերին"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "Canvas-ը չի կարող որոնել LDAP օրինակը:"
   canvas_cartridge_description: "Սա թույլ է տալիս փոխակերպել canvas export-ը միջանկյալ json ֆորմատի՝ ներմուծման համար"
   canvas_cartridge_display: "Ընդհանուր Canvas Cartridge"
   canvas_cartridge_file_description: "Canvas-ի դասընթացի արտահանման փաթեթ"
@@ -3462,6 +3466,7 @@ hy:
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas չի ճանաչում ձեր նույնականացուցչի պրովայդերին"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas համակարգը չունի %{user} օգտատիրոջ համար հաշիվ"
   canvas_error_report_ff678539: "Canvas սխալի մասին հաշվետվություն"
+  canvas_is_connecting_to_ips_9af7da93: "Canvas-ը միանում է  %{ips}-ին"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Հաղորդագրություն Canvas մուտք գործելու ձախողման մասին "
   canvas_login_instructure_271b8d00: "Մուտք գործել Canvas համակարգ"
@@ -3509,6 +3514,7 @@ hy:
       update_assignment_points: "Փոխե՞լ հանձնարարության կետերը ըստ ռուբրիկների:"
   change_to_b757d327: փոխել
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Փոփոխությունները կշարունակեն գործել, եթե դուք դուրս գաք այս էջից:"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "Ստուգեք միջցանցային էկրանի կարգաբերումները: Արդյո՞ք Canvas-ի բոլոր IP-ներին թույլատրված է կապվել ձեր սերվերին:"
   child_s_username_dde3aa9: "Երեխա օգտատիրոջ անունը"
   choose_a_course_home_page_8059c7b: "Ընտրել դասընթացի հիմնական էջը"
   choose_a_csv_file_to_upload_9644480c: "Ընտրել CSV ֆայլը բեռնման համար"
@@ -6341,6 +6347,7 @@ hy:
       \x20բոլոր ունկնդիրների գծով: "
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Բաժանել %{num_minutes}  րոպեների հավասար միջակայքերի: *Սկսել*"
   does_not_meet_expectations_b0736d20: "Չի համապատասխանում սպասումներին"
+  does_the_username_require_more_scoping_information_40d51df: "Արդյո՞ք օգտատիրոջ անվան համար պահանջվում է լրացուցիչ տեղեկատվություն (օր.՝ 'cn=Canvas,ou=people,dc=example,dc=com'):"
   domain_3b54c511: Դոմեն
   domain_69fe564b: Դոմեն
   domain_is_required_1d4c8b25: "Անհրաժեշտ է նշել դոմենը"
@@ -16541,6 +16548,7 @@ hy:
   successfully_moved_model_to_newgroup_f7b7aa5a: "%{model}-ը հաջողությամբ տեղափոխվել է %{newGroup}"
   suggestions_b8b03b9d: Առաջարկություններ
   summary_statistics_f74852a5: "Վիճակագրության ամփոփագիր"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "Համակարգ մուտքի փորձակման համար տրամադրեք LDAP օգտատիրոջ ընդունելի անուն/գաղտնաբառ"
   support: 
     array: 
       last_word_connector: ", և"
@@ -16723,6 +16731,9 @@ hy:
         term_start: "ժամանակահատվածի սկիզբը"
         unspecified: "ցանկացած ժամանակ"
       timespan: "%{start_at} *մինչև* %{end_at}"
+  test_ldap_authentication_446cce4f: "Փորձել  LDAP  իսկության ստուգումը"
+  test_ldap_settings_c387f136: "Ստուգել LDAP կարգաբերումները"
+  test_login_3dc3c119: "Համակարգ մուտքի ստուգում"
   testing_state_effd4a82: "Ստուգման վիճակը"
   text_document_eacbcdb7: "Տեքստային փաստաթուղթ"
   text_entry_e1808b2f: "Տեքստի մուտքագրում"
@@ -16737,6 +16748,7 @@ hy:
   the_app_was_added_successfully_3f785a23: "Հավելվածը հաջողությամբ ավելացվել է"
   the_app_was_deactivated_573520ab: "Հավելվածի ապաակտիվացվել է"
   the_app_was_updated_successfully_3d71cd1b: "Հավելվածը հաջողությամբ թարմացվել է"
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "Միացումը մերժվել է կամ ժամանակը սպառվել է: Պետք է դիտարկել հետևյալը."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Սթեք թրեյսինգի սխալ, եթե այդպիսին առկա է"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "\"Ֆայլեր\" ներդիրը անհրաժեշտ է կիսվելու դասախոսությունների սլայդներով, փաստաթղթերի օրինակներով, ուսումնական ձեռնարկներով՝ այն ամենով, ինչը ձեր ունկնդիրները կցանկանան ներբեռնել: Canvas-ից ձեր ֆայլերը բեռնելու և կազմակերպելու գործընթացը հեշտ է: Մենք ցույց կտանք, ինչպես դա անել:"
   the_following_fields_are_invalid_fields_b3565800: "Հետևյալ դաշտերը անընդունելի են՝ %{fields}"
@@ -16765,6 +16777,7 @@ hy:
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Տրամադրված Ակադեմիական չափանիշների ֆայլում առկա է սխալ"
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "հաշվետու օգտատիրոջ (ունկնդրի, դասավանդողի, ադմինիստրատորի և այլնի) կողմից կատարվող դերերը"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Պլանավորող գործիքը թույլ է տալիս սահմանել ժամանակային այն միջակայքը, որը նախընտրում են ունկնդիրները (կամ ունկնդիրների խմբերը): Սկսելու համար սեղմեք ներքևի կոճակը: "
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "Որոնումները կամ ձախողվեցին կամ չտվեցին ոչ մի արդյունք: Դիտարկման համար պետք է՝"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Հարցի լրջությունը բացվող մենյուից ընտրվում է օգտատիրոջ կողմից: "
   the_state_parameter_is_required_ffadf213: "Անհրաժեշտ է մուտքագրել վիճակի պարամետրը:"
   the_top_track_represents_days_on_which_the_student_2a347099: "Վերևի գրանցումը ներկայացնում է այն օրերը, երբ *ունկնդիրը հաղորդագրություններ է ուղարկել* դասընթացի դասավանդողին: Ներքևի գրանցումը ցույց է տալիս, երբ **դասավանդողը հաղորդագրություններ է ուղարկել** ունկնդրին:"
@@ -16841,6 +16854,7 @@ hy:
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "Այս աշխատանքն արդեն գնահատված է եւ պատրաստ է մոդերացման:"
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Այս օգտատերը դեռևս չի ընդունել դասընթացի հրավերը"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Այս օգտատերն այս պահին չի կարող տեսնել դասընթացը"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "Սա միայն միացման ստուգում էր: SSL սերտիֆիկատները չեն հաստատվել: "
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Սա ձեզ թույլ կտա մտնել Canvas՝ SIS-ում գնահատականները տեղադրելու համար"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Այս փոփոխությունները կտարածվեն, ձեր ամբողջ հաշվին: Ցանկանում եք շարունակել՞"
   ticketing_system_52205bff: "Սխալներին հետևելու համակարգ"
@@ -17679,6 +17693,9 @@ hy:
   value_must_be_positive_3e086d5a: "Պետք է դրական մեծություն լինի"
   verification_code_5acd64ef: "Ստուգման կոդ"
   verify_3dd8f159: "Ստուգել "
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "Համոզվել, որ LDAP-ում օգտատիրոջ օբյեկտը որոնումների տրված բազայի համար ունի համապատասխան իրավասություններ:"
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "Ստուգել ֆիլտրի տրված պարամետրերը (օր.՝ '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "Ստուգել տրված որոնումների բազան (օր.՝'ou=people,dc=example,dc=com'): "
   version_5599c321: Տարբերակ
   video_b9f27375: Վիդեո
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Տեսաձայնագրության բովանդակությունը հնարավոր չէ տեսնել Ձեր կողմից ընտրված սարքի կամ հավելվածի միջոցով:"
@@ -18059,6 +18076,7 @@ hy:
       Ձեր դասավանդողը ներկայացրել է գնահատականների փոփոխությունները և նոր մեկնաբանությունն է տվել %{title}-ին: Այդ փոփոխությունները այժմ կարելի է տեսնել:
       Դրանք կարող եք տեսնել այստեղ՝
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "LDAP սերվերը մերժել է կապվելու փորձը: Պետք է դիտարկել հետևայլը."
   your_message_has_been_sent_thank_you_e0284316: "Ձեր հաղորդագրությունն ուղարկվել է: Շնորհակալություն:"
   your_name_7665e1d8: "Ձեր անունը"
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "Ձեր պրոֆիլի նկարը հնարավոր չէ բեռնել: Հնարավոր է, որ դուք գերազանցել եք բեռնման սահմանաչափը:"

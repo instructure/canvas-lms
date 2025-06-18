@@ -29,6 +29,11 @@ export default class ConfigurationTypeSelector extends React.Component {
     configurationType: PropTypes.string.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.configurationTypeRef = React.createRef()
+  }
+
   componentDidMount() {
     const configSelector = $('#configuration_type_selector')
     if (configSelector && configSelector.length >= 0) {
@@ -45,7 +50,7 @@ export default class ConfigurationTypeSelector extends React.Component {
             {I18n.t('Configuration Type')}
             <select
               id="configuration_type_selector"
-              ref="configurationType"
+              ref={this.configurationTypeRef}
               defaultValue={this.props.configurationType}
               className="input-block-level show-tick"
             >

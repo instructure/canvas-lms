@@ -635,23 +635,6 @@ class DiscussionTopicsController < ApplicationController
       hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
     end
 
-    section_visibilities =
-      if @context.respond_to?(:course_section_visibility)
-        @context.course_section_visibility(@current_user)
-      else
-        :none
-      end
-
-    sections =
-      case section_visibilities
-      when :none
-        []
-      when :all
-        @context.course_sections.active.order(:name).to_a
-      else
-        @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
-      end
-
     assign_to_tags = @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
 
     js_hash = {
@@ -665,7 +648,6 @@ class DiscussionTopicsController < ApplicationController
       ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS: assign_to_tags,
       CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS),
       HAS_GRADING_PERIODS: @context.grading_periods?,
-      SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
@@ -687,6 +669,7 @@ class DiscussionTopicsController < ApplicationController
       DISCUSSION_DEFAULT_SORT_ENABLED: Account.site_admin.feature_enabled?(:discussion_default_sort),
       DISCUSSION_CONTENT_LOCKED: @topic.editing_restricted?(:content),
     }
+    mutate_js_hash_sections_for_show_method(js_hash, @topic)
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
     js_hash[:POST_TO_SIS] = post_to_sis
@@ -696,34 +679,14 @@ class DiscussionTopicsController < ApplicationController
     js_hash[:STUDENT_PLANNER_ENABLED] =
       @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
-    if @topic.is_section_specific && @context.is_a?(Course)
-      selected_section_ids = @topic.discussion_topic_section_visibilities.pluck(:course_section_id)
-      js_hash["SELECTED_SECTION_LIST"] = sections.select { |s| selected_section_ids.include?(s.id) }.map do |section|
-        {
-          id: section.id,
-          name: section.name
-        }
-      end
-    end
-
     js_hash[:SECTION_SPECIFIC_DISCUSSIONS_ENABLED] = !@context.is_a?(Group)
     js_hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
     js_hash[:MAX_NAME_LENGTH] = AssignmentUtil.assignment_max_name_length(@context)
     js_hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
     js_hash[:SIS_NAME] = AssignmentUtil.post_to_sis_friendly_name(@context)
 
-    if @context.is_a?(Course)
-      js_hash["SECTION_LIST"] = sections.map do |section|
-        {
-          id: section.id,
-          name: section.name,
-          start_at: section.start_at,
-          end_at: section.end_at,
-          override_course_and_term_dates: section.restrict_enrollments_to_section_dates
-        }
-      end
-      js_hash["VALID_DATE_RANGE"] = CourseDateRange.new(@context)
-    end
+    js_hash["VALID_DATE_RANGE"] = CourseDateRange.new(@context) if @context.is_a?(Course)
+
     js_hash[:CANCEL_TO] = cancel_redirect_url
     append_sis_data(js_hash)
 
@@ -2071,6 +2034,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def set_section_list_js_env
+    # TODO: Replace this with Course#sections_visible_to
     section_visibilities =
       if @context.respond_to?(:course_section_visibility)
         @context.course_section_visibility(@current_user)
@@ -2097,5 +2061,52 @@ class DiscussionTopicsController < ApplicationController
         override_course_and_term_dates: section.restrict_enrollments_to_section_dates
       }
     }
+  end
+
+  def mutate_js_hash_sections_for_show_method(js_hash, topic)
+    # TODO: Replace this with Course#sections_visible_to taking into account Groups as well
+
+    section_visibilities =
+      if @context.respond_to?(:course_section_visibility)
+        # Course.course_section_visibility can also return :none
+        @context.course_section_visibility(@current_user)
+      else
+        :none
+      end
+
+    sections =
+      case section_visibilities
+      when :none
+        []
+      when :all
+        @context.course_sections.active.order(:name).to_a
+      else
+        @context.course_sections.active.order(:name).select { |s| section_visibilities.include?(s.id) }
+      end
+
+    js_hash[:SECTION_LIST] = sections.map { |section| { id: section.id, name: section.name } } if @context.is_a?(Group)
+
+    if @context.is_a?(Course)
+      js_hash[:SECTION_LIST] = sections.map do |section|
+        {
+          id: section.id,
+          name: section.name,
+          start_at: section.start_at,
+          end_at: section.end_at,
+          override_course_and_term_dates: section.restrict_enrollments_to_section_dates
+        }
+      end
+      js_hash[:USER_HAS_RESTRICTED_VISIBILITY] = section_visibilities != :all
+
+      if topic.is_section_specific
+        selected_section_ids = topic.discussion_topic_section_visibilities.pluck(:course_section_id)
+        js_hash[:SELECTED_SECTION_LIST] = sections.select { |s| selected_section_ids.include?(s.id) }.map do |section|
+          {
+            id: section.id,
+            name: section.name
+          }
+        end
+      end
+    end
   end
 end

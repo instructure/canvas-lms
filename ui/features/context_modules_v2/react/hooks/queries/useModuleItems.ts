@@ -17,7 +17,7 @@
  */
 
 import {gql} from 'graphql-tag'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ModuleItemsResponse, ModuleItemsGraphQLResult, ModuleItem} from '../../utils/types.d'
 import {useScope as createI18nScope} from '@canvas/i18n'

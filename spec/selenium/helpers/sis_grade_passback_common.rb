@@ -131,7 +131,7 @@ module SisGradePassbackCommon
     @course.save!
 
     get "/courses/#{@course.id}/settings"
-    f("#tab-grade-publishing-link").click
+    f("#tab-grade-publishing").click
     wait_for_ajaximations
 
     expect(f("#publish_grades_messages").text).to eq "Unpublished - 6"

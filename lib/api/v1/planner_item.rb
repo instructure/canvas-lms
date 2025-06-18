@@ -30,6 +30,7 @@ module Api::V1::PlannerItem
   include Api::V1::PlannerNote
   include Api::V1::AssessmentRequest
   include PlannerApiHelper
+  include AssignmentsHelper
 
   API_PLANNABLE_FIELDS = %i[id
                             title
@@ -119,11 +120,20 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
         title_date = { title: item.asset&.assignment&.title, todo_date: hash[:plannable_date] }
         hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
-        hash[:html_url] = Submission::ShowPresenter.new(
-          submission: item.asset,
-          current_user: user,
-          assessment_request: item
-        ).submission_data_url
+        submission = item.asset
+        hash[:html_url] = if submission.context&.feature_enabled?(:assignments_2_student)
+                            student_peer_review_url_in_a2_for(
+                              submission.context,
+                              submission.assignment,
+                              item
+                            )
+                          else
+                            Submission::ShowPresenter.new(
+                              submission:,
+                              current_user: user,
+                              assessment_request: item
+                            ).submission_data_url
+                          end
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)

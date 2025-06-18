@@ -358,7 +358,7 @@ module Api::V1::Attachment
                          current_user
                        end
 
-    if params[:on_duplicate] == "error" && folder.active_file_attachments.where(display_name: infer_upload_filename(params)).exists?
+    if params[:on_duplicate] == "error" && folder && folder.active_file_attachments.where(display_name: infer_upload_filename(params)).exists?
       return render json: { message: "file already exists; use on_duplicate='overwrite' or 'rename'" }, status: :conflict
     end
 

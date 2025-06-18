@@ -57,6 +57,7 @@ export type GridColumn = {
   maxWidth: number
   minWidth: number
   postAssignmentGradesTrayOpenForAssignmentId: boolean
+  suppressAssignment: boolean
   resizable: boolean
   teacher_notes: string
   toolTip: string

@@ -142,17 +142,20 @@ const GradeDetails = ({
     }
   }, [error, courseName])
 
-  const gradeRowSkeleton = props => (
-    <Table.Row {...props}>
-      <Table.Cell colSpan={4}>
-        <LoadingSkeleton
-          height="2.5em"
-          width="100%"
-          screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
-        />
-      </Table.Cell>
-    </Table.Row>
-  )
+  const gradeRowSkeleton = props => {
+    const {key, ...otherProps} = props
+    return (
+      <Table.Row key={key} {...otherProps}>
+        <Table.Cell colSpan={4}>
+          <LoadingSkeleton
+            height="2.5em"
+            width="100%"
+            screenReaderLabel={I18n.t('Loading grades for %{courseName}', {courseName})}
+          />
+        </Table.Cell>
+      </Table.Row>
+    )
+  }
 
   const gradesDetailsTable = content => (
     <div className={isStacked ? 'grade-details narrow' : 'grade-details'}>

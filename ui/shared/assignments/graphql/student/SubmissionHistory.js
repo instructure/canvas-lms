@@ -31,7 +31,6 @@ export const SubmissionHistory = {
   `,
 
   shape: shape({
-    // eslint-disable-next-line react/forbid-foreign-prop-types
     ...SubmissionInterface.shape.propTypes,
   }),
 }

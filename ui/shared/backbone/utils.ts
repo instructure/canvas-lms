@@ -29,7 +29,7 @@ export const extend = function (child: Function, parent: Function) {
   }
   ctor.prototype = parent.prototype
   // @ts-expect-error
-  // eslint-disable-next-line new-cap
+
   child.prototype = new ctor()
   // @ts-expect-error
   child.__super__ = parent.prototype

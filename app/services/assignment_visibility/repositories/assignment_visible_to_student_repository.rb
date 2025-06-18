@@ -21,7 +21,7 @@ module AssignmentVisibility
   module Repositories
     class AssignmentVisibleToStudentRepository
       class << self
-        def visibility_query(course_ids:, user_ids:, assignment_ids:)
+        def visibility_query(course_ids:, user_ids:, assignment_ids:, include_concluded: true)
           filter_condition_sql = filter_condition_sql(course_ids:, user_ids:, assignment_ids:)
           query_sql = <<~SQL.squish
             WITH #{assignment_module_items_cte_sql(course_ids:, assignment_ids:)}
@@ -30,7 +30,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* (logical) join context modules */
             #{assignment_module_items_join_sql}
@@ -47,7 +47,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* join context modules */
             #{assignment_module_items_join_sql}
@@ -64,7 +64,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
                 VisibilitySqlHelper.full_section_without_left_joins_sql(filter_condition_sql:, id_column_name: "assignment_id", table_name: Assignment)
@@ -78,7 +78,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* join assignment override for 'CourseSection' (no module check) */
             #{VisibilitySqlHelper.assignment_override_unassign_section_join_sql(id_column_name: "assignment_id")}
@@ -92,7 +92,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* assignments visible to adhoc overrides */
             #{if Account.site_admin.feature_enabled?(:visibility_performance_improvements)
@@ -107,7 +107,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* join assignment overrides for 'ADHOC' (no module check) */
             #{VisibilitySqlHelper.assignment_override_unassign_adhoc_join_sql(id_column_name: "assignment_id")}
@@ -121,7 +121,7 @@ module AssignmentVisibility
             #{assignment_select_sql}
 
             /* join active student enrollments */
-            #{VisibilitySqlHelper.enrollment_join_sql}
+            #{VisibilitySqlHelper.enrollment_join_sql(include_concluded:)}
 
             /* join assignment override for 'Course' */
             #{VisibilitySqlHelper.assignment_override_course_join_sql(id_column_name: "assignment_id")}

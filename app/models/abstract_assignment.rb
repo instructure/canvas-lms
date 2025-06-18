@@ -68,6 +68,7 @@ class AbstractAssignment < ActiveRecord::Base
   DUPLICATED_IN_CONTEXT = "duplicated_in_context"
   QUIZ_SUBMISSION_VERSIONS_LIMIT = 65
   QUIZZES_NEXT_TIMEOUT = 15.minutes
+  QUIZZES_NEXT_IMPORTING_TIMEOUT = 30.minutes
 
   attr_accessor(
     :resource_map,
@@ -152,7 +153,7 @@ class AbstractAssignment < ActiveRecord::Base
            inverse_of: :context,
            class_name: "Lti::ResourceLink",
            dependent: :destroy
-  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor", dependent: :destroy, inverse_of: :assignment
+  has_many :lti_asset_processors, -> { active }, class_name: "Lti::AssetProcessor", dependent: :destroy, inverse_of: :assignment
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: "trigger_assignment_id", inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment, foreign_key: :assignment_id
@@ -711,6 +712,10 @@ class AbstractAssignment < ActiveRecord::Base
 
   def name
     title
+  end
+
+  def suppress!
+    update(suppress_assignment: true)
   end
 
   def name=(val)
@@ -3190,6 +3195,8 @@ class AbstractAssignment < ActiveRecord::Base
     where(assignment_group_id: group_id.to_s)
   }
 
+  scope :without_suppressed_assignments, -> { where(suppress_assignment: false) }
+
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
   scope :for_context_codes, lambda { |codes|
     ids = codes.filter_map do |code|
@@ -3205,8 +3212,8 @@ class AbstractAssignment < ActiveRecord::Base
   scope :for_course, ->(course_id) { where(context_type: "Course", context_id: course_id) }
   scope :for_group_category, ->(group_category_id) { where(group_category_id:) }
 
-  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids, assignment_ids = nil|
-    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:).map(&:assignment_id)
+  scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids, assignment_ids = nil, include_concluded = true|
+    visible_assignment_ids = AssignmentVisibility::AssignmentVisibilityService.assignments_visible_to_students(user_ids:, course_ids:, assignment_ids:, include_concluded:).map(&:assignment_id)
 
     if visible_assignment_ids.any?
       where(id: visible_assignment_ids)
@@ -3354,7 +3361,7 @@ class AbstractAssignment < ActiveRecord::Base
   scope :importing_for_too_long, lambda {
     where(
       "workflow_state = 'importing' AND importing_started_at < ?",
-      QUIZZES_NEXT_TIMEOUT.ago
+      QUIZZES_NEXT_IMPORTING_TIMEOUT.ago
     )
   }
 
@@ -3385,7 +3392,6 @@ class AbstractAssignment < ActiveRecord::Base
     return true if unsupported_grading_types.include?(grading_type)
 
     known_features = {
-      moderated: -> { moderated_grading? },
       peer: -> { peer_reviews? },
       group: -> { has_group_category? },
       group_graded_group: -> { grade_as_group? },
@@ -3395,6 +3401,11 @@ class AbstractAssignment < ActiveRecord::Base
       new_quiz: -> { quiz_lti? },
       rubric: -> { active_rubric_association? },
     }
+
+    unless Account.site_admin.feature_enabled?(:moderated_grading_modernized_speedgrader)
+      known_features[:moderated] = -> { moderated_grading? }
+    end
+
     unsupported_features = Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
     unsupported_features.any? { |feature| known_features.fetch(feature).call }
   end

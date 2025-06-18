@@ -367,6 +367,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
     last: Int
     orderBy: AssignmentTargetSortOrder
   ): AssignmentOverrideConnection
+  assignmentVisibility: [ID!]
 
   """
   Issues related to the assignment
@@ -422,6 +423,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   gradesPublishedAt: String
   gradingPeriodId: String
   gradingStandard: GradingStandard
+  gradingStandardId: ID
   gradingType: GradingType
   groupCategoryId: Int
   groupSet: GroupSet
@@ -458,6 +460,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   """
   hasGroupCategory: Boolean!
   hasMultipleDueDates: Boolean
+  hasRubric: Boolean
   hasSubAssignments: Boolean!
 
   """
@@ -469,6 +472,11 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   importantDates: Boolean
   inClosedGradingPeriod: Boolean
   isLockedByMasterCourse: Boolean!
+
+  """
+  Assignment is connected to a New Quiz
+  """
+  isNewQuiz: Boolean!
 
   """
   the lock date (assignment is locked after this date)
@@ -483,9 +491,32 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
     applyOverrides: Boolean = true
   ): DateTime
   lockInfo: LockInfo
+  ltiAssetProcessorsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): LtiAssetProcessorConnection
   moderatedGrading: ModeratedGrading
   moderatedGradingEnabled: Boolean
+  moduleItems: [ModuleItem!]
   modules: [Module!]
+  muted: Boolean
   mySubAssignmentSubmissionsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -594,6 +625,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   ): SubmissionConnection
   submissionsDownloads: Int
   supportsGradeByQuestion: Boolean!
+  suppressAssignment: Boolean
   timeZoneEdited: String
   title: String
   totalGradedSubmissions: Int
@@ -688,6 +720,12 @@ input AssignmentFilter {
   only return assignments whose title matches this search term
   """
   searchTerm: String
+
+  """
+  only return assignments for the given submission types. Defaults to
+  all.
+  """
+  submissionTypes: [SubmissionType!]
 
   """
   only return assignments for the given user. Defaults to
@@ -840,7 +878,9 @@ type AssignmentOverride implements Timestamped {
   """
   _id: ID
   allDay: Boolean
+  allDayDate: DateTime
   assignment: Assignment
+  assignmentId: ID
   contextModule: Module
   createdAt: DateTime
   dueAt: DateTime
@@ -1392,14 +1432,8 @@ type CommunicationChannel implements LegacyIDInterface & Node & Timestamped {
   _id: ID!
   createdAt: DateTime
   id: ID!
-  notificationPolicies(
-    contextType: NotificationPreferencesContextType
-  ): [NotificationPolicy!]
-  notificationPolicyOverrides(
-    accountId: ID
-    contextType: NotificationPreferencesContextType!
-    courseId: ID
-  ): [NotificationPolicy!]
+  notificationPolicies(contextType: NotificationPreferencesContextType): [NotificationPolicy!]
+  notificationPolicyOverrides(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): [NotificationPolicy!]
   path: String
   pathType: String
   updatedAt: DateTime
@@ -3270,14 +3304,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
     """
     roleTypes: [String!]
   ): User
-  entriesTotalPages(
-    filter: DiscussionFilterType
-    perPage: Int!
-    rootEntries: Boolean
-    searchTerm: String
-    sortOrder: DiscussionSortOrderType
-    unreadBefore: String
-  ): Int
+  entriesTotalPages(filter: DiscussionFilterType, perPage: Int!, rootEntries: Boolean, searchTerm: String, sortOrder: DiscussionSortOrderType, unreadBefore: String): Int
   entryCounts: DiscussionEntryCounts
   expanded: Boolean
   expandedLocked: Boolean
@@ -3329,12 +3356,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   published: Boolean!
   replyToEntryRequiredCount: Int!
   requireInitialPost: Boolean
-  rootEntriesTotalPages(
-    filter: DiscussionFilterType
-    perPage: Int!
-    searchTerm: String
-    sortOrder: DiscussionSortOrderType
-  ): Int
+  rootEntriesTotalPages(filter: DiscussionFilterType, perPage: Int!, searchTerm: String, sortOrder: DiscussionSortOrderType): Int
   rootTopic: Discussion
   searchEntryCount(filter: DiscussionFilterType, searchTerm: String): Int
   sortByRating: Boolean
@@ -3787,6 +3809,8 @@ type Enrollment implements AssetString & Node & Timestamped {
   course: Course
   courseSectionId: ID
   createdAt: DateTime
+  endAt: DateTime
+  enrollmentState: EnrollmentWorkflowState!
   grades(
     """
     The grading period to return grades for. If not specified, will use the
@@ -3799,14 +3823,18 @@ type Enrollment implements AssetString & Node & Timestamped {
   id: ID!
   lastActivityAt: DateTime
   limitPrivilegesToCourseSection: Boolean
+  role: EnrollmentRole
   section: Section
   sisImportId: ID
   sisRole: String
+  sisSectionId: ID
+  startAt: DateTime
   state: EnrollmentWorkflowState!
   totalActivityTime: Int
   type: EnrollmentType!
   updatedAt: DateTime
   user: User
+  userId: ID
 }
 
 """
@@ -3848,6 +3876,15 @@ input EnrollmentFilterInput {
   associatedUserIds: [ID!] = []
   states: [EnrollmentWorkflowState!] = null
   types: [EnrollmentType!] = null
+  userIds: [ID!] = []
+}
+
+type EnrollmentRole {
+  """
+  legacy canvas id
+  """
+  _id: ID
+  name: String
 }
 
 enum EnrollmentType {
@@ -3916,6 +3953,7 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   description: String
   graded: Boolean
   isLockedByMasterCourse: Boolean!
+  labelFor(placement: ExternalToolPlacement!): String
   modules: [Module!]
   name: String
   pointsPossible: Float
@@ -3976,6 +4014,7 @@ input ExternalToolFilterInput {
 Placements that an External Tool can have
 """
 enum ExternalToolPlacement {
+  ActivityAssetProcessor
   homework_submission
 }
 
@@ -4238,6 +4277,7 @@ type Grades {
   """
   finalScore: Float
   gradingPeriod: GradingPeriod
+  htmlUrl: URL
 
   """
   The override grade. Supersedes the computed final grade if set.
@@ -4474,6 +4514,7 @@ type Group implements AssetString & LegacyIDInterface & Node & Timestamped {
   name: String
   nonCollaborative: Boolean
   sisId: String
+  state: GroupState!
   updatedAt: DateTime
 }
 
@@ -4518,6 +4559,7 @@ type GroupMembership implements LegacyIDInterface & Timestamped {
   """
   _id: ID!
   createdAt: DateTime
+  group: Group!
   state: GroupMembershipState!
   updatedAt: DateTime
   user: User
@@ -4651,6 +4693,11 @@ type GroupSetEdge {
   node: GroupSet
 }
 
+enum GroupState {
+  available
+  deleted
+}
+
 """
 Autogenerated input type of HideAssignmentGradesForSections
 """
@@ -4697,8 +4744,7 @@ scalar HtmlEncodedString
 """
 An ISO 8601-encoded datetime
 """
-scalar ISO8601DateTime
-  @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
+scalar ISO8601DateTime @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
 
 """
 An ISO 8601-encoded duration
@@ -4781,10 +4827,7 @@ type LearningOutcome implements LegacyIDInterface & Node & Timestamped {
   createdAt: DateTime
   description: String
   displayName: String
-  friendlyDescription(
-    contextId: ID!
-    contextType: String!
-  ): OutcomeFriendlyDescriptionType
+  friendlyDescription(contextId: ID!, contextType: String!): OutcomeFriendlyDescriptionType
   id: ID!
   isImported(targetContextId: ID!, targetContextType: String!): Boolean
   masteryPoints: Float
@@ -4915,6 +4958,116 @@ type LockInfo {
 Types that can be locked
 """
 union Lockable = Assignment | Discussion | Module | Page | Quiz
+
+type LtiAsset implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  attachmentId: ID
+}
+
+type LtiAssetProcessor implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  externalTool: ExternalTool
+  iconOrToolIconUrl: String
+  text: String
+  title: String
+}
+
+"""
+The connection type for LtiAssetProcessor.
+"""
+type LtiAssetProcessorConnection {
+  """
+  A list of edges.
+  """
+  edges: [LtiAssetProcessorEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [LtiAssetProcessor]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type LtiAssetProcessorEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: LtiAssetProcessor
+}
+
+type LtiAssetReport implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  asset: LtiAsset
+  comment: String
+  errorCode: String
+  indicationAlt: String
+  indicationColor: String
+  launchUrlPath: String
+  priority: Int!
+  processingProgress: String!
+  processorId: ID!
+  reportType: String!
+  resubmitAvailable: Boolean!
+  result: String
+  resultTruncated: String
+  title: String
+}
+
+"""
+The connection type for LtiAssetReport.
+"""
+type LtiAssetReportConnection {
+  """
+  A list of edges.
+  """
+  edges: [LtiAssetReportEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [LtiAssetReport]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type LtiAssetReportEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: LtiAssetReport
+}
 
 """
 Autogenerated input type of MarkSubmissionCommentsRead
@@ -5191,7 +5344,7 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   published: Boolean
   requireSequentialProgress: Boolean
   requirementCount: Int
-  statistics: ModuleStatistics
+  submissionStatistics: ModuleStatistics
   unlockAt: DateTime
   updatedAt: DateTime
 }
@@ -5302,6 +5455,7 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): ModuleItemConnection
+  position: Int
   previous: ModuleItem
 
   """
@@ -7842,6 +7996,31 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   lastCommentedByUserAt: DateTime
   late: Boolean
   latePolicyStatus: LatePolicyStatusType
+
+  """
+  Lti Asset Reports with active processors, with assets preloaded
+  """
+  ltiAssetReportsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): LtiAssetReportConnection
   mediaObject: MediaObject
   missing: Boolean
   originalityData: JSON
@@ -8265,14 +8444,7 @@ input SubmissionHistoryFilterInput {
   history results. Defaults to true.
   """
   includeCurrentSubmission: Boolean = true
-  states: [SubmissionState!] = [
-    deleted
-    graded
-    pending_review
-    submitted
-    ungraded
-    unsubmitted
-  ]
+  states: [SubmissionState!] = [deleted, graded, pending_review, submitted, ungraded, unsubmitted]
 }
 
 """
@@ -9476,6 +9648,8 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): GroupConnection
+  firstName: HtmlEncodedString
+  groupMemberships(filter: UserGroupMembershipsFilterInput): [GroupMembership!]!
 
   """
   **NOTE**: this only returns groups for the currently logged-in user.
@@ -9485,14 +9659,11 @@ type User implements LegacyIDInterface & Node & Timestamped {
   id: ID!
   inboxLabels: [String!]
   integrationId: String
+  lastName: HtmlEncodedString
   loginId: String
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
-  notificationPreferencesEnabled(
-    accountId: ID
-    contextType: NotificationPreferencesContextType!
-    courseId: ID
-  ): Boolean!
+  notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
   pronouns: String
   recipients(context: String, search: String): Recipients
   recipientsObservers(
@@ -9599,6 +9770,23 @@ type UserEdge {
   The item at the end of the edge.
   """
   node: User
+}
+
+input UserGroupMembershipsFilterInput {
+  """
+  Only return group memberships in the specified group course ids
+  """
+  groupCourseId: [ID!]
+
+  """
+  Only return group memberships with the specified group workflow states
+  """
+  groupState: [GroupState!]
+
+  """
+  Only return group memberships with the specified workflow states
+  """
+  state: [GroupMembershipState!]
 }
 
 type ValidationError {

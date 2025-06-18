@@ -30,6 +30,7 @@ describe "eportfolios" do
   end
 
   it "validates creation and visibility of eportfolio" do
+    skip "RCX-3504 (6/4/2025)"
     get "/dashboard/eportfolios"
     f("#add_eportfolio_button").click
 

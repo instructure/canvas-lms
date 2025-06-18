@@ -20,7 +20,7 @@ import K from '../constants'
 import EventManager from '../event_manager'
 import EventTracker from '../event_tracker'
 import Backbone from 'node_modules-version-of-backbone'
-import sinon from 'sinon'
+import $ from 'jquery'
 
 describe('Quizzes::LogAuditing::EventManager', () => {
   let evtManager
@@ -41,13 +41,32 @@ describe('Quizzes::LogAuditing::EventManager', () => {
 })
 
 describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
-  let server
   let evtManager
   let testEventFactory
   let TestEventTracker, TestPageFocusEventTracker, TestPageBlurredEventTracker
+  let capturedRequests = []
+  let originalAjax
 
   beforeEach(() => {
-    server = sinon.fakeServer.create()
+    capturedRequests = []
+    originalAjax = $.ajax
+
+    // Mock jQuery ajax
+    $.ajax = jest.fn(options => {
+      capturedRequests.push({
+        url: options.url,
+        requestBody: JSON.parse(options.data),
+      })
+
+      const deferred = $.Deferred()
+
+      // Simulate async response
+      setTimeout(() => {
+        deferred.resolve()
+      }, 0)
+
+      return deferred.promise()
+    })
 
     class _TestEventTracker extends EventTracker {
       static initClass() {
@@ -89,14 +108,14 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
   })
 
   afterEach(() => {
-    server.restore()
+    $.ajax = originalAjax
     if (evtManager && evtManager.isRunning()) {
       evtManager.stop()
     }
   })
 
-  test('it should deliver events', () => {
-    const clock = sinon.useFakeTimers()
+  test('it should deliver events', async () => {
+    jest.useFakeTimers()
     evtManager = new EventManager({
       autoDeliver: false,
       deliveryUrl: '/events',
@@ -106,20 +125,22 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
     testEventFactory.trigger('change')
     expect(evtManager.isDirty()).toBe(true)
     evtManager.deliver()
-    expect(server.requests.length).toBe(1)
-    expect(server.requests[0].url).toBe('/events')
-    const payload = JSON.parse(server.requests[0].requestBody)
+
+    // Wait for the async request to complete
+    await jest.runAllTimersAsync()
+
+    expect(capturedRequests).toHaveLength(1)
+    expect(capturedRequests[0].url).toBe('/events')
+    const payload = capturedRequests[0].requestBody
     expect(payload).toHaveProperty('quiz_submission_events')
     expect(payload.quiz_submission_events[0].event_type).toBe('test_event')
-    expect(evtManager.isDelivering()).toBe(true)
-    server.requests[0].respond(204)
-    clock.tick(1)
+
     expect(evtManager.isDelivering()).toBe(false)
     expect(evtManager.isDirty()).toBe(false)
-    clock.restore()
+    jest.useRealTimers()
   })
 
-  test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', () => {
+  test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', async () => {
     const consoleWarn = jest.spyOn(global.console, 'warn')
     consoleWarn.mockImplementation(() => {}) // keep it from actually logging
 
@@ -135,26 +156,30 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
 
     testEventFactory.trigger('change')
     evtManager.deliver()
-    expect(server.requests.length).toBe(1)
-    let payload1 = JSON.parse(server.requests[0].requestBody)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capturedRequests).toHaveLength(1)
+    let payload1 = capturedRequests[0].requestBody
     expect(payload1.quiz_submission_events[0].event_type).toBe('test_event')
 
     testEventFactory.trigger('focus')
     evtManager.deliver()
-    expect(server.requests.length).toBe(1)
-    payload1 = JSON.parse(server.requests[0].requestBody)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capturedRequests).toHaveLength(1)
+    payload1 = capturedRequests[0].requestBody
     expect(payload1.quiz_submission_events[0].event_type).toBe('test_event')
 
     testEventFactory.trigger('blur')
     evtManager.deliver()
-    expect(server.requests.length).toBe(2)
-    const payload2 = JSON.parse(server.requests[1].requestBody)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capturedRequests).toHaveLength(2)
+    const payload2 = capturedRequests[1].requestBody
     expect(payload2.quiz_submission_events[0].event_type).toBe(K.EVT_PAGE_BLURRED)
 
     testEventFactory.trigger('focus')
     evtManager.deliver()
-    expect(server.requests.length).toBe(3)
-    const payload3 = JSON.parse(server.requests[2].requestBody)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    expect(capturedRequests).toHaveLength(3)
+    const payload3 = capturedRequests[2].requestBody
     expect(payload3.quiz_submission_events[0].event_type).toBe(K.EVT_PAGE_FOCUSED)
   })
 

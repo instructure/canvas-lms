@@ -36,6 +36,10 @@ const consoleMessagesToIgnore = {
 
     /uses the legacy childContextTypes API which is no longer supported/,
     /findDOMNode is deprecated/,
+
+    // React 18 act() warnings for Popup component that creates its own roots
+    /Warning: The current testing environment is not configured to support act\(\.\.\.\)/,
+    /Warning: Attempted to synchronously unmount a root while React was already rendering/,
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up

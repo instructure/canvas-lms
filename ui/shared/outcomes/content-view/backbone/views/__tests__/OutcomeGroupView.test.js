@@ -21,9 +21,11 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import OutcomeContentBase from '../OutcomeContentBase'
 import OutcomeGroup from '../../../../backbone/models/OutcomeGroup'
 import OutcomeGroupView from '../OutcomeGroupView'
+import {waitFor} from '@testing-library/dom'
 
 // Stub RCE initialization
-OutcomeContentBase.prototype.readyForm = () => {}
+const readyForm = jest.fn()
+OutcomeContentBase.prototype.readyForm = readyForm
 
 const createView = opts => {
   const view = new OutcomeGroupView(opts)
@@ -65,9 +67,23 @@ describe('OutcomeGroupView', () => {
         state: 'add',
         model: outcomeGroup,
       })
-      await new Promise(resolve => requestAnimationFrame(resolve))
-      const titleInput = view.$('input[name="title"]')[0]
-      expect(titleInput.getAttribute('placeholder')).toBe('New Outcome Group')
+
+      // Use waitFor from testing-library to wait for the element to be available
+      await waitFor(
+        () => {
+          // First verify the container exists
+          const container = document.getElementById('outcome_group_title_container')
+          expect(container).not.toBeNull()
+
+          // Then check for the input with the correct placeholder
+          // The input is rendered inside the React component
+          const input = document.querySelector('input[placeholder="New Outcome Group"]')
+          expect(input).not.toBeNull()
+          expect(input.getAttribute('placeholder')).toBe('New Outcome Group')
+        },
+        {timeout: 1000},
+      )
+
       view.remove()
     })
 

@@ -120,26 +120,3 @@ export function getSuffixErrorMessages(state) {
     return []
   }
 }
-
-/**
- * Sets the hint message that is shown when changing
- * the tenant.
- *
- * @param {import('./settingsReducer').State} state The state containing the tenant to be validated
- * @param payload The data given to the reducer, which contains the new tenant input text
- * @returns {{text: string, type: string}[]} The array of tenantInfoMessages
- */
-export function setTenantInfoMessages(state, payload) {
-  let tenantInfoMessages = []
-
-  if (payload.microsoft_sync_tenant !== state.last_saved_microsoft_sync_tenant) {
-    tenantInfoMessages = [
-      {
-        text: I18n.t('Changing the tenant will delete existing groups.'),
-        type: 'hint',
-      },
-    ]
-  }
-
-  return tenantInfoMessages
-}

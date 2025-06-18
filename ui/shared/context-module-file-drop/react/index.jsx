@@ -24,7 +24,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
 import {IconUploadLine} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-text'
+import {Text as InstuiText} from '@instructure/ui-text'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
@@ -187,9 +187,9 @@ export default class ModuleFileDrop extends React.Component {
             </View>
 
             <View as="span" display="block" margin="small 0 0">
-              <Text size="small" color="brand">
+              <InstuiText size="small" color="brand">
                 {folder ? I18n.t('or choose files') : ''}
-              </Text>
+              </InstuiText>
             </View>
           </AccessibleContent>
         }

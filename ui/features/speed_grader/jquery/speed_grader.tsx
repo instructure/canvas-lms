@@ -73,7 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReports, joinAttachmentsAndReports} from '../react/LtiAssetReports'
+import {LtiAssetReportsWrapper} from '../react/LtiAssetReportsWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,
@@ -884,17 +884,14 @@ function renderLtiAssetReports(
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
-  const attachmentsAndReports = joinAttachmentsAndReports(
-    historicalSubmission?.versioned_attachments,
-    submission.lti_asset_reports?.by_attachment,
-  )
-
-  if (attachmentsAndReports) {
-    const props = {attachmentsAndReports, assetProcessors: jsonData.lti_asset_processors}
-    ReactDOM.render(<LtiAssetReports {...props} />, mountPoint)
-  } else {
-    ReactDOM.unmountComponentAtNode(mountPoint)
+  const props = {
+    versionedAttachments: historicalSubmission?.versioned_attachments,
+    reportsByAttachment: submission.lti_asset_reports?.by_attachment,
+    assetProcessors: jsonData.lti_asset_processors,
+    studentId: submission.user_id,
+    attempt: historicalSubmission.attempt,
   }
+  ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
 }
 
 function renderCheckpoints(submission: Submission) {

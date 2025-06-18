@@ -23,9 +23,9 @@ import useModuleCourseSearchApi, {
   useCourseModuleItemApi,
 } from '../../effects/useModuleCourseSearchApi'
 import CourseAndModulePicker from '../CourseAndModulePicker'
-import {executeQuery} from '@canvas/query/graphql'
+import {executeQuery} from '@canvas/graphql'
 
-jest.mock('@canvas/query/graphql')
+jest.mock('@canvas/graphql')
 jest.mock('../../effects/useManagedCourseSearchApi')
 jest.mock('../../effects/useModuleCourseSearchApi')
 

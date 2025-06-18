@@ -33,7 +33,7 @@ import {AUPRoutes} from '../../features/acceptable_use_policy/routes/AUPRoutes'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
 import {getTheme} from '@canvas/instui-bindings'
-import {InstUISettingsProvider} from '@instructure/emotion'
+import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/DynamicInstUISettingProvider'
 
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
@@ -89,7 +89,7 @@ const portalRouter = createBrowserRouter(
         lazy={() => import('../../features/account_admin_tools/react/AccountAdminToolsRoute')}
       />
       <Route
-        path="/accounts/:accountId/settings"
+        path="/accounts/:accountId/settings/*"
         lazy={() => import('../../features/account_settings/react/AccountSettingsRoute')}
       />
       <Route
@@ -116,7 +116,20 @@ const portalRouter = createBrowserRouter(
         path="/profile/qr_mobile_login"
         lazy={() => import('../../features/qr_mobile_login/react/QRMobileLoginRoute')}
       />
-      <Route path="/ams/*" lazy={() => import('../../features/ams/react/AmsRoute')} />
+
+      {ENV.FEATURES.ams_service && (
+        <Route
+          path="/courses/:courseId/quizzes/*"
+          lazy={() => import('../../features/ams/react/AmsRoute')}
+        />
+      )}
+
+      {ENV.FEATURES.ams_service && (
+        <Route
+          path="/courses/:courseId/item_banks/*"
+          lazy={() => import('../../features/ams/react/AmsRoute')}
+        />
+      )}
 
       {accountGradingSettingsRoutes}
 
@@ -161,11 +174,11 @@ export function loadReactRouter() {
     const theme = getTheme()
     const root = ReactDOM.createRoot(mountNode)
     root.render(
-      <InstUISettingsProvider theme={theme}>
+      <DynamicInstUISettingsProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={portalRouter} fallbackElement={<FallbackSpinner />} />
         </QueryClientProvider>
-      </InstUISettingsProvider>,
+      </DynamicInstUISettingsProvider>,
     )
   }
 }

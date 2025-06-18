@@ -70,6 +70,7 @@ export function Like({...props}) {
             as="button"
             onClick={props.onClick}
             data-testid="like-button"
+            data-action-state={props.isLiked ? 'unlikeButton' : 'likeButton'}
             interaction={props.interaction}
           >
             <PresentationContent>

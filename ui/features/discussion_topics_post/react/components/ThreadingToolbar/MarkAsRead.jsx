@@ -61,6 +61,7 @@ export const MarkAsRead = props => {
             onClick={() => props.onClick()}
             renderIcon={props.isRead ? <UnreadIcon /> : <ReadIcon />}
             data-testid="threading-toolbar-mark-as-read"
+            data-action-state={props.isRead ? 'unreadButton' : 'readButton'}
           >
             {!responsiveProps.isMobile && !props.isSplitScreenView && (
               <AccessibleContent alt={currentText}>

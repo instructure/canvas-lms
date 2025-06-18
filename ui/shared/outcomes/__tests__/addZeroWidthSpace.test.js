@@ -23,7 +23,7 @@ describe('addZeroWidthSpace', () => {
 
   it('returns text with zero width space added properly', () => {
     const result = addZeroWidthSpace(input)
-    expect(result.length).toEqual(input.length + 5)
+    expect(result).toHaveLength(input.length + 5)
   })
 
   it('returns empty string if arg is empty', () => {

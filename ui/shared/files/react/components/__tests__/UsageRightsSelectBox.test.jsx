@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import {render, act} from '@testing-library/react'
-import {shallow} from 'enzyme'
 import UsageRightsSelectBox from '../UsageRightsSelectBox'
 
 const ok = x => expect(x).toBeTruthy()
@@ -47,12 +46,11 @@ describe('UsageRightsSelectBox', () => {
   })
 
   test('shows alert message if nothing is chosen and component is setup for a message', () => {
-    const wrapper = shallow(<UsageRightsSelectBox showMessage={true} />)
+    const {container} = render(<UsageRightsSelectBox showMessage={true} />)
+    const alertElement = container.querySelector('.alert')
     ok(
-      wrapper
-        .find('.alert')
-        .text()
-        .includes(
+      alertElement &&
+        alertElement.textContent.includes(
           "If you do not select usage rights now, this file will be unpublished after it's uploaded.",
         ),
       'message is being shown',
@@ -75,8 +73,9 @@ describe('UsageRightsSelectBox', () => {
 
   test('inserts copyright into textbox when passed in', () => {
     const copyright = 'all dogs go to taco bell'
-    const wrapper = shallow(<UsageRightsSelectBox copyright={copyright} />)
-    equal(wrapper.find('#copyrightHolder').find('input').prop('defaultValue'), copyright)
+    const {container} = render(<UsageRightsSelectBox copyright={copyright} />)
+    const copyrightInput = container.querySelector('#copyrightHolder')
+    equal(copyrightInput.defaultValue, copyright)
   })
 
   test('shows creative commons options when set up', async () => {

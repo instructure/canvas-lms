@@ -25,13 +25,8 @@ import apiClient, {
   DEFAULT_TEACHERS_LIMIT_PARAM,
 } from '../apiClient'
 import axios from '@canvas/axios'
-import sinon from 'sinon'
 
-let sandbox = null
-const mockAxiosClient = (method, res) => {
-  sandbox = sinon.createSandbox()
-  return sandbox.stub(axios, method).returns(res)
-}
+jest.mock('@canvas/axios')
 
 const mockBaseDomain = 'http://canvas.docker'
 const accountParams = {accountId: 1}
@@ -42,24 +37,20 @@ const getCourseParams = {
 
 describe('Blueprint Course apiClient', () => {
   afterEach(() => {
-    if (sandbox) sandbox.restore()
-    sandbox = null
+    jest.clearAllMocks()
   })
 
   test('getCourse generated uri', async () => {
-    const axiosStub = mockAxiosClient(
-      'get',
-      Promise.resolve({
-        data: [],
-        headers: {
-          link: '<http://canvas.docker/api/v1/accounts/1/courses?page=2>; rel="next"',
-        },
-      }),
-    )
+    axios.get.mockResolvedValue({
+      data: [],
+      headers: {
+        link: '<http://canvas.docker/api/v1/accounts/1/courses?page=2>; rel="next"',
+      },
+    })
 
     await apiClient.getCourses(accountParams, getCourseParams)
 
-    const url = new URL(axiosStub.args[0][0], mockBaseDomain)
+    const url = new URL(axios.get.mock.calls[0][0], mockBaseDomain)
     expect(url.pathname).toBe(`/api/v1/accounts/${accountParams.accountId}/courses`)
     expect(url.searchParams.get('per_page')).toBe(DEFAULT_PER_PAGE_PARAM)
     expect(url.searchParams.get('blueprint')).toBe(DEFAULT_BLUEPRINT_PARAM)
@@ -73,59 +64,50 @@ describe('Blueprint Course apiClient', () => {
 
   test('getCourse generated uri on subAccount given', async () => {
     const expectedSubAccount = 'sub'
-    const axiosStub = mockAxiosClient(
-      'get',
-      Promise.resolve({
-        data: [],
-        headers: {
-          link: '<http://canvas.docker/api/v1/accounts/sub/courses?page=2>; rel="next"',
-        },
-      }),
-    )
+    axios.get.mockResolvedValue({
+      data: [],
+      headers: {
+        link: '<http://canvas.docker/api/v1/accounts/sub/courses?page=2>; rel="next"',
+      },
+    })
 
     await apiClient.getCourses(accountParams, {...getCourseParams, subAccount: expectedSubAccount})
 
-    const url = new URL(axiosStub.args[0][0], mockBaseDomain)
+    const url = new URL(axios.get.mock.calls[0][0], mockBaseDomain)
     expect(url.pathname).toBe(`/api/v1/accounts/${expectedSubAccount}/courses`)
   })
 
   test('getCourse generated uri on search contains URI reserved character', async () => {
     const expectedSearch = 'search#reserved'
-    const axiosStub = mockAxiosClient(
-      'get',
-      Promise.resolve({
-        data: [],
-        headers: {
-          link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
-            expectedSearch,
-          )}&page=2>; rel="next"`,
-        },
-      }),
-    )
+    axios.get.mockResolvedValue({
+      data: [],
+      headers: {
+        link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
+          expectedSearch,
+        )}&page=2>; rel="next"`,
+      },
+    })
 
     await apiClient.getCourses(accountParams, {...getCourseParams, search: expectedSearch})
 
-    const url = new URL(axiosStub.args[0][0], mockBaseDomain)
+    const url = new URL(axios.get.mock.calls[0][0], mockBaseDomain)
     expect(url.searchParams.get('search_term')).toBe(expectedSearch)
   })
 
   test('getCourse generated uri on search starts with URI reserved character', async () => {
     const expectedSearch = '#searchstring'
-    const axiosStub = mockAxiosClient(
-      'get',
-      Promise.resolve({
-        data: [],
-        headers: {
-          link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
-            expectedSearch,
-          )}&page=2>; rel="next"`,
-        },
-      }),
-    )
+    axios.get.mockResolvedValue({
+      data: [],
+      headers: {
+        link: `<http://canvas.docker/api/v1/accounts/1/courses?search_term=${encodeURIComponent(
+          expectedSearch,
+        )}&page=2>; rel="next"`,
+      },
+    })
 
     await apiClient.getCourses(accountParams, {...getCourseParams, search: expectedSearch})
 
-    const url = new URL(axiosStub.args[0][0], mockBaseDomain)
+    const url = new URL(axios.get.mock.calls[0][0], mockBaseDomain)
     expect(url.searchParams.get('search_term')).toBe(expectedSearch)
   })
 })

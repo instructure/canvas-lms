@@ -92,7 +92,7 @@ describe('PeopleReadyList', () => {
     let peopleReadyList = wrapper.container.querySelector('.addpeople__peoplereadylist')
 
     let cols = peopleReadyList.querySelectorAll('thead th')
-    expect(cols.length).toEqual(5) // incluldes SIS ID column
+    expect(cols).toHaveLength(5) // incluldes SIS ID column
     expect(cols[3].textContent).toEqual('SIS ID')
 
     wrapper.rerender(<PeopleReadyList {...props} canReadSIS={false} />)
