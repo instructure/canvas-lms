@@ -69,6 +69,7 @@ module Lti
         context.shard.activate do
           scope = ContextExternalTool.active.where(id:, context: Lti::ContextToolFinder.contexts_to_search(context))
           scope = scope.placements(placement) if placement
+          scope = filter_by_unavailable_context_controls(scope, context)
           scope.first
         end
       end

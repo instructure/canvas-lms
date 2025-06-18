@@ -278,16 +278,23 @@ describe ExternalToolsController do
       include_context "key_storage_helper"
 
       let(:tool) do
-        tool = @course.context_external_tools.new(
-          name: "bob",
-          consumer_key: "bob",
-          shared_secret: "bob"
+        registration = lti_registration_with_tool(
+          account: @course.account,
+          configuration_params: {
+            name: "bob",
+            target_link_uri: "http://www.example.com/basic_lti",
+            redirect_uris: ["http://www.example.com/launch"],
+            domain: "www.example.com",
+            placements: [
+              {
+                placement: "course_navigation",
+                enabled: true,
+                target_link_uri: "http://www.example.com/basic_lti",
+              }
+            ]
+          }
         )
-        tool.url = "http://www.example.com/basic_lti"
-        tool.course_navigation = { enabled: true }
-        tool.use_1_3 = true
-        tool.developer_key = DeveloperKey.create!
-        tool.save!
+        tool = registration.new_external_tool(@course)
         tool
       end
 
@@ -2157,10 +2164,11 @@ describe ExternalToolsController do
 
       context "when tool is 1.3" do
         let(:tool) do
-          t = super()
-          t.use_1_3 = true
-          t.developer_key = DeveloperKey.create!
-          t.save
+          reg = lti_registration_with_tool(account: @course.account)
+          t = reg.new_external_tool(@course)
+          t.editor_button = { message_type:, icon_url: "http://example.com/icon" }
+          t.custom_fields = { contents: "$com.instructure.Editor.contents", selection: "$com.instructure.Editor.selection" }
+          t.save!
           t
         end
 
