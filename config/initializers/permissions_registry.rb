@@ -261,11 +261,11 @@ Rails.application.config.to_prepare do
         available_to: %w[AccountAdmin AccountMembership],
       },
       manage_lti_registrations: {
-        label: -> { I18n.t("LTI Registrations - manage ") },
-        account_only: true,
+        label: -> { I18n.t("LTI Registrations - Manage") },
+        account_only: :root,
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) }
+        account_allows: ->(a) { a.feature_enabled?(:lti_registrations_page) }
       },
       manage_release_notes: {
         label: -> { I18n.t("Manage release notes") },
