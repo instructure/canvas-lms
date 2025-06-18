@@ -127,6 +127,12 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = %i[workflow_state editing_roles notify_of_update].freeze
 
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[body]
+  end
+
   def ensure_wiki_and_context
     self.wiki_id ||= context.wiki_id || context.wiki.id
   end
