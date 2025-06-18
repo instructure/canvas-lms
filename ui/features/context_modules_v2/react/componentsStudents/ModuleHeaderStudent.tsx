@@ -73,6 +73,10 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   const showMissingCount =
     missingCount > 0 && (!progression?.completed || !hasCompletionRequirements)
 
+  const screenReaderLabel = expanded
+    ? I18n.t('Collapse "%{name}"', {name})
+    : I18n.t('Expand "%{name}"', {name})
+
   return (
     <View as="div" background="transparent">
       <Flex padding="small" justifyItems="space-between" direction="row">
@@ -143,10 +147,11 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             data-testid="module-header-expand-toggle"
             size="small"
             withBorder={false}
-            screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
+            screenReaderLabel={screenReaderLabel}
             renderIcon={expanded ? IconArrowOpenDownLine : IconArrowOpenUpLine}
             withBackground={false}
             onClick={onToggleExpandRef}
+            aria-expanded={expanded}
           />
         </Flex.Item>
       </Flex>

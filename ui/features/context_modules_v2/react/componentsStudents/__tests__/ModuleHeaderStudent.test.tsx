@@ -109,4 +109,22 @@ describe('ModuleHeaderStudent', () => {
       expect(container.queryByTestId('module-header-prerequisites')).toBeNull()
     })
   })
+
+  describe('Screen Reader Label is shown correctly', () => {
+    it('Module items expanded', () => {
+      const {getByTestId} = setUp(buildDefaultProps({expanded: true}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
+      expect(toggleButton).toHaveTextContent('Collapse "Test Module"')
+    })
+
+    it('Module items collapsed', () => {
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
+      expect(toggleButton).toHaveTextContent('Expand "Test Module"')
+    })
+  })
 })
