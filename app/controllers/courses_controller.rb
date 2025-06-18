@@ -367,7 +367,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
-  before_action :load_canvas_career, only: [:show, :settings]
+  before_action :load_canvas_career, only: %i[settings index]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -2233,10 +2233,8 @@ class CoursesController < ApplicationController
 
       @context ||= api_find(Course.active, params[:id])
 
-      if @context.horizon_course? && !request.path.include?("/modules") && params[:invitation].blank?
-        redirect_to course_context_modules_path(@context.id)
-        return
-      end
+      # can't run in before_action because it needs @context
+      return if load_canvas_career
 
       assign_localizer
       if request.xhr?

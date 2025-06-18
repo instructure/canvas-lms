@@ -506,6 +506,12 @@
 - verb: POST
   path: '/api/v1/canvadoc_session'
 - verb: GET
+  path: '/api/v1/career/experience_summary'
+- verb: POST
+  path: '/api/v1/career/switch_experience'
+- verb: POST
+  path: '/api/v1/career/switch_role'
+- verb: GET
   path: '/api/v1/collaborations/:id/members'
 - verb: GET
   path: '/api/v1/comm_messages'

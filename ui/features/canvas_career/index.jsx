@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -61,7 +61,20 @@ ready(() => {
     mountPoint,
   )
 
-  Promise.all([import('canvascareer/bootstrap'), import('canvascareer/setupEnvContext')])
+  let bundles = []
+  if (window.REMOTES.canvas_career_learner) {
+    bundles = [
+      import('canvas_career_learner/bootstrap'),
+      import('canvas_career_learner/setupEnvContext'),
+    ]
+  } else if (window.REMOTES.canvas_career_learning_provider) {
+    bundles = [
+      import('canvas_career_learning_provider/bootstrap'),
+      import('canvas_career_learning_provider/setupEnvContext'),
+    ]
+  }
+
+  Promise.all(bundles)
     .then(([{mount}, {setupEnvContext}]) => {
       mount(mountPoint, setupEnvContext())
     })
