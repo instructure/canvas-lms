@@ -1296,9 +1296,11 @@ describe "Api::V1::Assignment" do
       end
 
       let(:account) { assignment.root_account }
-      let(:developer_key) { lti_developer_key_model(account:) }
-      let(:tool) { external_tool_1_3_model(context: account, developer_key:) }
-      let(:tool2) { external_tool_1_3_model(context: account, developer_key:) }
+      let(:tool) do
+        reg = lti_registration_with_tool(account:)
+        reg.deployments.first
+      end
+      let(:tool2) { tool.lti_registration.new_external_tool(account) }
 
       let(:existing_ap1) { make_ap("Existing1", tool) }
       let(:existing_ap2) { make_ap("Existing2", tool2) }
