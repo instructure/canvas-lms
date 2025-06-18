@@ -23,11 +23,18 @@ import {render} from '@testing-library/react'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const server = setupServer()
 
 beforeAll(() => server.listen())
-afterEach(() => server.resetHandlers())
+beforeEach(() => {
+  fakeENV.setup()
+})
+afterEach(() => {
+  server.resetHandlers()
+  fakeENV.teardown()
+})
 afterAll(() => server.close())
 
 const defaultProps = () => ({
@@ -82,13 +89,30 @@ describe('GenericErrorPage component', () => {
 
   test('show the loading indicator when comment is submitted', async () => {
     const user = userEvent.setup({pointerEventsCheck: PointerEventsCheckLevel.Never})
-    const {getByText, getByTitle, getByPlaceholderText} = render(
+    const {getByText, getByPlaceholderText, findByTitle} = render(
       <GenericErrorPage {...defaultProps()} />,
     )
+
+    let resolveRequest
+    const requestPromise = new Promise(resolve => {
+      resolveRequest = resolve
+    })
+
+    server.use(
+      http.post('/error_reports', async () => {
+        await requestPromise
+        return HttpResponse.json({logged: true, id: '7'})
+      }),
+    )
+
     await user.click(getByText('Report Issue'))
     await user.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
-    await user.click(getByText('Submit'))
-    expect(getByTitle('Loading')).toBeInTheDocument()
+    const submitPromise = user.click(getByText('Submit'))
+
+    expect(await findByTitle('Loading')).toBeInTheDocument()
+
+    resolveRequest()
+    await submitPromise
   })
 
   test('correct info posted to server', async () => {
