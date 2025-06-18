@@ -61,7 +61,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
           <Flex.Item margin="0 small 0 0" aria-hidden="true">
             <View as="div">{itemIcon}</View>
           </Flex.Item>
-          <Flex.Item margin="0" aria-hidden="true">
+          <Flex.Item margin="0">
             <Text size="x-small" transform="capitalize">
               {itemTypeText}
             </Text>
