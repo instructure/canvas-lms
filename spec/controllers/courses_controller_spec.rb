@@ -3575,15 +3575,48 @@ describe CoursesController do
       expect(json["errors"].keys).to include "unparsable_content"
     end
 
-    it "doesn't overwrite stuck sis fields" do
-      user_session(@teacher)
-      init_course_name = @course.name
+    context "override_sis_stickiness" do
+      let_once(:account) { Account.default }
+      let_once(:sub_account) { account_model(parent_account: account) }
+      let_once(:admin) { account_admin_user(active_all: true, account:) }
 
-      put "update", params: { id: @course.id, course: { name: "123456" }, override_sis_stickiness: false, format: :json }
-      expect(response).to be_successful
+      it "doesn't overwrite stuck sis fields" do
+        user_session(@teacher)
+        init_course_name = @course.name
+        put "update", params: { id: @course.id, course: { name: "123456" }, override_sis_stickiness: false, format: :json }
+        expect(response).to be_successful
+        @course.reload
+        expect(@course.name).to eq init_course_name
+      end
 
-      @course.reload
-      expect(@course.name).to eq init_course_name
+      it "doesn't override a sticky account_id field when explicit false" do
+        user_session(admin)
+        put "update", params: { id: @course.id,
+                                course: { account_id: sub_account.id },
+                                override_sis_stickiness: false,
+                                format: :json }
+        expect(response).to be_successful
+        expect(@course.reload.account).to eq account
+      end
+
+      it "overrides a sticky account_id field when explicit true" do
+        user_session(admin)
+        put "update", params: { id: @course.id,
+                                course: { account_id: sub_account.id },
+                                override_sis_stickiness: true,
+                                format: :json }
+        expect(response).to be_successful
+        expect(@course.reload.account).to eq sub_account
+      end
+
+      it "overrides a sticky account_id field when implicit true (the default)" do
+        user_session(admin)
+        put "update", params: { id: @course.id,
+                                course: { account_id: sub_account.id },
+                                format: :json }
+        expect(response).to be_successful
+        expect(@course.reload.account).to eq sub_account
+      end
     end
 
     context "course availability options" do
