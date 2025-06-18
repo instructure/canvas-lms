@@ -21,6 +21,7 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItem from './ModuleItem'
+import AddItemInline from './AddItemModalComponents/AddItemInline'
 import {Droppable, Draggable} from 'react-beautiful-dnd'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
@@ -111,7 +112,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
               </View>
             ) : moduleItems.length === 0 ? (
               <View as="div" textAlign="center" padding="medium">
-                <Text>{I18n.t('No items in this module')}</Text>
+                <AddItemInline moduleId={moduleId} itemCount={0} />
               </View>
             ) : (
               moduleItems.map((item, index) => (

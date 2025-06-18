@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {prepareModuleItemData, buildFormData, createNewItemApiPath} from '../addItemHandlers'
+import {
+  prepareModuleItemData,
+  buildFormData,
+  createNewItemApiPath,
+  sharedHandleFileDrop,
+} from '../addItemHandlers'
 
 describe('addItemHandlers', () => {
   describe('prepareModuleItemData', () => {
@@ -261,6 +266,48 @@ describe('addItemHandlers', () => {
       const courseId = '1'
       const result = createNewItemApiPath(type, courseId, false)
       expect(result).toEqual('/api/v1/courses/1/pages')
+    })
+  })
+
+  describe('sharedHandleFileDrop', () => {
+    const dummyFile = new File(['hello'], 'hello.txt', {type: 'text/plain'})
+
+    it('should call setFile and onChange with File object', () => {
+      const setFile = jest.fn()
+      const onChange = jest.fn()
+
+      sharedHandleFileDrop([dummyFile], [], {} as React.DragEvent<Element>, {setFile, onChange})
+
+      expect(setFile).toHaveBeenCalledWith(dummyFile)
+      expect(onChange).toHaveBeenCalledWith('file', dummyFile)
+    })
+
+    it('should call setFile and onChange with DataTransferItem as file', () => {
+      const setFile = jest.fn()
+      const onChange = jest.fn()
+
+      const mockItem: DataTransferItem = {
+        kind: 'file',
+        type: 'text/plain',
+        getAsFile: () => dummyFile,
+        getAsString: jest.fn(),
+        webkitGetAsEntry: jest.fn(),
+      }
+
+      sharedHandleFileDrop([mockItem], [], {} as React.DragEvent<Element>, {setFile, onChange})
+
+      expect(setFile).toHaveBeenCalledWith(dummyFile)
+      expect(onChange).toHaveBeenCalledWith('file', dummyFile)
+    })
+
+    it('should do nothing when no accepted files are provided', () => {
+      const setFile = jest.fn()
+      const onChange = jest.fn()
+
+      sharedHandleFileDrop([], [], {} as React.DragEvent<Element>, {setFile, onChange})
+
+      expect(setFile).not.toHaveBeenCalled()
+      expect(onChange).not.toHaveBeenCalled()
     })
   })
 })
