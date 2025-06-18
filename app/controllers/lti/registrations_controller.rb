@@ -988,7 +988,7 @@
 #     }
 #
 class Lti::RegistrationsController < ApplicationController
-  before_action :require_account_context_instrumented
+  before_action :require_root_account_instrumented
   before_action :require_feature_flag
   before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search]
   before_action :require_manage_lti_registrations
@@ -1480,7 +1480,7 @@ class Lti::RegistrationsController < ApplicationController
   def context_search
     account_id = params[:by_account_id]
     search_term = params[:search_term].to_s.strip
-    can_read_sis = @context.root_account.grants_any_right?(@current_user, :read_sis, :manage_sis)
+    can_read_sis = @context.grants_any_right?(@current_user, :read_sis, :manage_sis)
 
     account_scope = Account.active.where(root_account_id: @domain_root_account.id).or(Account.where(id: @domain_root_account.id))
     if account_id.present?
@@ -1645,8 +1645,18 @@ class Lti::RegistrationsController < ApplicationController
     raise e
   end
 
+  def require_root_account_instrumented
+    require_account_context
+    unless @account.root_account?
+      raise ActiveRecord::RecordNotFound
+    end
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
+  end
+
   def require_feature_flag
-    unless @context.root_account.feature_enabled?(:lti_registrations_page)
+    unless @account.feature_enabled?(:lti_registrations_page)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
@@ -1655,7 +1665,7 @@ class Lti::RegistrationsController < ApplicationController
   end
 
   def require_lti_registrations_next_feature_flag
-    unless @context.root_account.feature_enabled?(:lti_registrations_next)
+    unless @account.feature_enabled?(:lti_registrations_next)
       respond_to do |format|
         format.html { render "shared/errors/404_message", status: :not_found }
         format.json { render_error(:not_found, "The specified resource does not exist.", status: :not_found) }
@@ -1698,9 +1708,9 @@ class Lti::RegistrationsController < ApplicationController
                canvasBaseUrl: request.base_url,
                firstName: @current_user.short_name,
                locale: I18n.locale,
-               rootAccountId: @account.root_account.id,
-               rootAccountUuid: @account.root_account.uuid,
-               isPremiumAccount: @account.root_account.feature_enabled?(:lti_usage_premium)
+               rootAccountId: @account.id,
+               rootAccountUuid: @account.uuid,
+               isPremiumAccount: @account.feature_enabled?(:lti_usage_premium)
              },
            })
 
