@@ -3200,7 +3200,10 @@ class CoursesController < ApplicationController
       end
 
       account_id = params[:course].delete :account_id
-      if account_id && @course.account.grants_right?(@current_user, session, :manage_courses_admin)
+      sticky_account_id = params.key?(:override_sis_stickiness) &&
+                          !value_to_boolean(params[:override_sis_stickiness]) &&
+                          @course.stuck_sis_fields.include?(:account_id)
+      if account_id && !sticky_account_id && @course.account.grants_right?(@current_user, session, :manage_courses_admin)
         account = api_find(Account, account_id)
         if account && account != @course.account && account.grants_right?(@current_user, session, :manage_courses_admin)
           @course.account = account
