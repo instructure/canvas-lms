@@ -311,17 +311,28 @@ async function showSinonImportStats(verbose = false) {
 
 async function countSkippedTests(verbose = false) {
   try {
-    const {stdout: itSkipStdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | xargs grep -l "it\\.skip("`,
-      {cwd: projectRoot},
-    )
-    const {stdout: describeSkipStdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | xargs grep -l "describe\\.skip("`,
-      {cwd: projectRoot},
-    )
+    let itSkipFiles = []
+    let describeSkipFiles = []
 
-    const itSkipFiles = itSkipStdout.trim().split('\n').filter(Boolean)
-    const describeSkipFiles = describeSkipStdout.trim().split('\n').filter(Boolean)
+    try {
+      const {stdout: itSkipStdout} = await execAsync(
+        `git ls-files "ui/" "packages/" | xargs grep -l 'it\\.skip(' 2>/dev/null || true`,
+        {cwd: projectRoot},
+      )
+      itSkipFiles = itSkipStdout.trim().split('\n').filter(Boolean)
+    } catch (e) {
+      // grep returns exit code 1 when no matches found
+    }
+
+    try {
+      const {stdout: describeSkipStdout} = await execAsync(
+        `git ls-files "ui/" "packages/" | xargs grep -l 'describe\\.skip(' 2>/dev/null || true`,
+        {cwd: projectRoot},
+      )
+      describeSkipFiles = describeSkipStdout.trim().split('\n').filter(Boolean)
+    } catch (e) {
+      // grep returns exit code 1 when no matches found
+    }
 
     // Combine and deduplicate files
     const allFiles = [...new Set([...itSkipFiles, ...describeSkipFiles])]
@@ -486,18 +497,29 @@ async function countReactDomRenderFiles(verbose = false) {
 
 async function countReactClassComponentFiles(verbose = false) {
   try {
-    // Find files containing class components using both patterns
-    const {stdout: reactComponentStdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | xargs grep -l "extends React.Component"`,
-      {cwd: projectRoot},
-    )
-    const {stdout: componentStdout} = await execAsync(
-      `git ls-files "ui/" "packages/" | xargs grep -l "extends Component"`,
-      {cwd: projectRoot},
-    )
+    let reactComponentFiles = []
+    let componentFiles = []
 
-    const reactComponentFiles = reactComponentStdout.trim().split('\n').filter(Boolean)
-    const componentFiles = componentStdout.trim().split('\n').filter(Boolean)
+    // Find files containing class components using both patterns
+    try {
+      const {stdout: reactComponentStdout} = await execAsync(
+        `git ls-files "ui/" "packages/" | xargs grep -l "extends React.Component" 2>/dev/null || true`,
+        {cwd: projectRoot},
+      )
+      reactComponentFiles = reactComponentStdout.trim().split('\n').filter(Boolean)
+    } catch (e) {
+      // grep returns exit code 1 when no matches found
+    }
+
+    try {
+      const {stdout: componentStdout} = await execAsync(
+        `git ls-files "ui/" "packages/" | xargs grep -l "extends Component" 2>/dev/null || true`,
+        {cwd: projectRoot},
+      )
+      componentFiles = componentStdout.trim().split('\n').filter(Boolean)
+    } catch (e) {
+      // grep returns exit code 1 when no matches found
+    }
 
     // Combine and deduplicate files
     const allFiles = [...new Set([...reactComponentFiles, ...componentFiles])]
@@ -912,7 +934,7 @@ async function printDashboard() {
       console.log()
     }
 
-    if (selectedSections.length === 0 || selectedSections.includes('react-compiler')) {
+    if (selectedSections.includes('react-compiler')) {
       console.log(getSectionTitle('reactCompiler'))
       await showReactCompilerViolationStats(verbose)
     }
