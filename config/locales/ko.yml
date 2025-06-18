@@ -2912,6 +2912,7 @@ ko:
         new: "새 행사 만들기"
   calendars_a756c286: 달력
   cancel_caeb1e68: 취소
+  canceled_5a6e0ec8: 취소했음
   cannot_be_blank_c4e30496: "값이 있어야 함"
   canvas: 
     migration: 
@@ -2929,12 +2930,16 @@ ko:
   canvas_3962b702: Canvas
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas 알림 - 변경: %{assignment_name}, %{course_name}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas 알림 - 지연된 과제: %{user_name}, %{assignment_name}"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "Canvas가 LDAP 서버에 바인딩(로그인)할 수 없음"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "Canvas가 LDAP 서버에 접속할 수 없음"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "Canvas가 LDAP 인스턴스를 찾을 수 없음"
   canvas_cartridge_description: "Canvas 내보내기를 가져올 수 있는 중재 JSON 형식으로 변환"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 과목 내보내기 패키지"
   canvas_cartridge_name: "Canvas Cartridge 가져오기"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "Canvas에서 ID 공급자를 인식할 수 없음"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "Canvas에 다음 사용자를 위한 계정이 없습니다: %{user}"
+  canvas_is_connecting_to_ips_9af7da93: "Canvas가 %{ips}에 연결 중"
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas 로그인 실패 메시지"
   canvas_login_instructure_271b8d00: "Canvas에 로그인"
@@ -2965,6 +2970,7 @@ ko:
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
   change_to_b757d327: "다음으로 변경"
   check_f9bb054a: 확인
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "방화벽 설정을 확인하십시오. 모든 Canvas IP 주소가 서버에 접속할 수 있습니까?"
   child_s_username_dde3aa9: "자식의 사용자 이름"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
@@ -5388,6 +5394,7 @@ ko:
   discussions_a5f96392: 토론
   display_one_time_pop_up_warning_on_notification_pr_3a027c1d: "알림 기본 설정 페이지에 팝업 경고를 한 번 표시합니다."
   does_not_meet_expectations_b0736d20: "기대치에 미치지 못함"
+  does_the_username_require_more_scoping_information_40d51df: "사용자 이름에 더 많은 범위 정보가 필요합니까? ('cn=Canvas,ou=people,dc=example,dc=com')."
   domain_3b54c511: 도메인
   domain_69fe564b: "도메인:"
   don_t_indent_b35ae9fb: "들여쓰지 않음"
@@ -10525,6 +10532,7 @@ ko:
       completion_prerequisites: "완료 필수 구성 요소"
     labels: 
       requirements_must_be_completed: "이 페이지를 잠금 해제하기 전에 다음 요구 사항이 완료되어야 합니다."
+  preview_9cbd064e: "미리 보기"
   previous_assignment_cc8cf7f3: "이전 과제"
   previous_module_8801a74b: "이전 모듈"
   previous_student_899a6732: "이전 학생"
@@ -13664,6 +13672,7 @@ ko:
   subscribed_fe74d22a: 구독함
   substitution_713c65b9: 대체
   suggestions_b8b03b9d: "제안:"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "로그인 테스트를 위해 유효한 LDAP 사용자 이름/암호를 제공:"
   support: 
     array: 
       last_word_connector: ", "
@@ -13829,13 +13838,17 @@ ko:
         term_start: "학기 시작"
         unspecified: 항상
       timespan: "%{start_at}*부터* %{end_at}까지"
+  test_ldap_settings_c387f136: "LDAP 설정 테스트"
+  test_login_3dc3c119: "테스트 로그인"
   testing_state_effd4a82: "테스트 상태"
   text_entry_e1808b2f: "텍스트 항목"
   text_header_48fa9c37: "텍스트 머리글"
   text_sms_4e2d82a7: "텍스트 (SMS)"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "연결 시간이 초과되었거나 연결이 거부되었습니다. 살펴볼 사항은:"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
   the_profile_picture_has_been_reported_d609d6dd: "프로필 사진이 신고되었습니다"
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "검색에 실패했거나 반환된 결과가 없습니다. 살펴볼 사항은:"
   their_grade_for_the_assignment_c36a60ef: "과제에 대한 평점"
   themes_89bfe9c4: 테마
   there_was_a_problem_logging_in_at_institution_5a298155: "%{institution}에 로그인하는 데 문제가 있습니다."
@@ -13852,6 +13865,7 @@ ko:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "교사들이 채점할 때 이 이름을 사용합니다."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*이 퀴즈를 게시하지 않았습니다.* 게시하기 전까지 교사만 이 퀴즈를 볼 수 있습니다."
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "이 사용자는 아직 과목 초대를 수락하지 않음"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "이는 연결만 테스트한 것입니다. SSL 인증서의 유효성은 검사하지 않았습니다."
   time: 
     am: 오전
     count_hours_ago: 
@@ -14581,6 +14595,9 @@ ko:
   value_must_be_positive_3e086d5a: "값이 양수이어야 함"
   verification_code_5acd64ef: "인증 코드"
   verify_3dd8f159: 확인
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "제공된 검색 기준에 대해서 LDAP에 있는 사용자 개체가 검색 권한을 가지고 있는지 확인하십시오."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "제공된 필터 문자열을 확인하십시오('(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "제공된 검색 기준을 확인하십시오('ou=people,dc=example,dc=com')."
   version_5599c321: 버전
   view_app_center_6c89a3fe: "앱 센터 보기"
   view_app_configurations_52b52441: "앱 구성 보기"
@@ -14803,6 +14820,7 @@ ko:
       
       여기에서 볼 수 있습니다:
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "LDAP 서버가 바인딩 시도를 거부했습니다. 살펴볼 사항은:"
   your_message_was_sent_977f6583: "메세지가 전송되었습니다!"
   your_name_7665e1d8: 이름
   your_password_has_been_changed_df0e72aa: "비밀번호가 변경되었습니다."
