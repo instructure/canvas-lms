@@ -142,6 +142,12 @@ describe('utils', () => {
     it('should return "Unknown" on missing content', () => {
       expect(getItemTypeText(null)).toBe('Unknown')
     })
+
+    it('should return "External Tool" for an external tool', () => {
+      expect(getItemTypeText({type: 'ModuleExternalTool', title: 'ModuleExternalTool'})).toBe(
+        'External Tool',
+      )
+    })
   })
 
   describe('validateModuleStudentRenderRequirements', () => {

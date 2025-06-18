@@ -42,6 +42,7 @@ export type ModuleItemContent = {
     | 'ExternalUrl'
     | 'Attachment'
     | 'SubHeader'
+    | 'ModuleExternalTool'
   pointsPossible?: number
   published?: boolean
   canUnpublish?: boolean
