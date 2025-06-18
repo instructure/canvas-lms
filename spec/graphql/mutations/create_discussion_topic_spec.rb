@@ -1518,50 +1518,6 @@ describe Mutations::CreateDiscussionTopic do
       expect(discussion_topics[1].group_category_id).to eq gc.id
     end
 
-    it "returns an error when attempting to create a checkpointed discussion topic with a group category" do
-      @course.account.disable_feature!(:checkpoints_group_discussions)
-      context_type = "Course"
-      title = "Graded Discussion"
-      message = "Lorem ipsum..."
-      published = true
-      @course.enroll_student(User.create!, enrollment_state: "active").user
-      group_category = @course.group_categories.create! name: "foo"
-
-      query = <<~GQL
-        contextId: "#{@course.id}"
-        contextType: #{context_type}
-        title: "#{title}"
-        message: "#{message}"
-        published: #{published}
-        groupCategoryId: "#{group_category.id}"
-        assignment: {
-          courseId: "#{@course.id}",
-          name: "#{title}",
-          forCheckpoints: true,
-          groupCategoryId: "#{group_category.id}"
-        }
-        checkpoints: [
-          {
-            checkpointLabel: reply_to_topic,
-            pointsPossible: 10,
-            dates: [{ type: everyone, dueAt: "#{5.days.from_now.iso8601}" }]
-          },
-          {
-            checkpointLabel: reply_to_entry,
-            pointsPossible: 15,
-            dates: [{ type: everyone, dueAt: "#{10.days.from_now.iso8601}" }],
-            repliesRequired: 3
-          }
-        ]
-      GQL
-
-      result = execute_with_input_with_assignment(query)
-      Assignment.last
-      discussion_topic = result.dig("data", "createDiscussionTopic", "discussionTopic")
-      expect(discussion_topic).to be_nil
-      expect(result["data"]["createDiscussionTopic"]["errors"][0]["message"]).to eq "Group discussions cannot have checkpoints."
-    end
-
     it "creates a checkpointed graded group discussion successfully" do
       context_type = "Course"
       title = "Graded Discussion"

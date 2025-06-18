@@ -1667,20 +1667,6 @@ describe "discussions" do
             expect(sub_assignment2.points_possible).to eq 7
           end
 
-          it "disallows setting the group discussion checkbox when checkpoints_group_discussions ff is disabled" do
-            course.account.disable_feature!(:checkpoints_group_discussions)
-            get "/courses/#{course.id}/discussion_topics/new"
-
-            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_truthy
-
-            force_click_native('input[type=checkbox][value="graded"]')
-            wait_for_ajaximations
-
-            force_click_native('input[type=checkbox][value="checkpoints"]')
-
-            expect(element_exists?("input[data-testid='group-discussion-checkbox']")).to be_falsey
-          end
-
           it "successfully creates a checkpointed graded group discussion" do
             group_category
             group

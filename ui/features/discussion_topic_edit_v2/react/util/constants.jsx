@@ -107,10 +107,7 @@ export const useShouldShowContent = (
   const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
 
   const shouldShowGroupOptions =
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP &&
-    (!isCheckpoints || isAlreadyAGroupDiscussion || ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED)
+    !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
 
   const shouldShowGradedDiscussionOptions =
     !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT

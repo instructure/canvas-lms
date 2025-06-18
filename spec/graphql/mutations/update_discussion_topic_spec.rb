@@ -1224,18 +1224,6 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect_error(result, "The value of possible points for this assignment cannot exceed 999999999.")
     end
 
-    it "returns an error when attempting add a group category to a discussion with checkpoints" do
-      @course.account.disable_feature!(:checkpoints_group_discussions)
-      group_category = @course.group_categories.create!(name: "My Group Category")
-      # even though @graded_topic has checkpoints, we still need to pass in the actual checkpoints so they are not cleared out
-      result = run_mutation(id: @graded_topic.id, group_category_id: group_category.id, assignment: { forCheckpoints: true, groupCategoryId: group_category.id }, checkpoints: [
-                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
-                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
-                            ])
-
-      expect_error(result, "Group discussions cannot have checkpoints.")
-    end
-
     it "can turn a checkpointed discussion into a group discussion as well" do
       group_category = @course.group_categories.create!(name: "My Group Category")
       @course.groups.create!(name: "g1", group_category:)
@@ -1250,20 +1238,7 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
       expect(@graded_topic.child_topics.count).to eq 2
     end
 
-    it "returns an error when attempting to add checkpoints to a graded group discussion" do
-      @course.account.disable_feature!(:checkpoints_group_discussions)
-      group_category = @course.group_categories.create!(name: "My Group Category")
-      topic = group_discussion_assignment
-
-      result = run_mutation(id: topic.id, group_category_id: group_category.id, assignment: { forCheckpoints: true, groupCategoryId: group_category.id }, checkpoints: [
-                              { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601 }], pointsPossible: 6 },
-                              { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
-                            ])
-
-      expect_error(result, "Group discussions cannot have checkpoints.")
-    end
-
-    it "group discussions can still become checkpointed if checkpoints_group_discussions feature is enabled" do
+    it "group discussions can still become checkpointed" do
       group_category = @course.group_categories.create!(name: "My Group Category")
       topic = group_discussion_assignment
 

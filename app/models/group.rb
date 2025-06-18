@@ -96,12 +96,6 @@ class Group < ActiveRecord::Base
     context&.discussion_checkpoints_enabled? || false
   end
 
-  def checkpoints_group_discussions_enabled?
-    # Groups in a Course don't always belong to the same account, for this reason,
-    # we have to rely on context
-    context&.checkpoints_group_discussions_enabled? || false
-  end
-
   include StickySisFields
   are_sis_sticky :name
 

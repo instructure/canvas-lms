@@ -1552,18 +1552,7 @@ describe "discussions" do
           expect(DiscussionTopic.last.assignment).to be_nil
         end
 
-        it "clears out group category selection if discussion is turned into a checkpointed discussion" do
-          course.account.disable_feature!(:checkpoints_group_discussions)
-          topic = group_discussion_assignment
-          get "/courses/#{course.id}/discussion_topics/#{topic.id}/edit"
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_truthy
-          expect(f("#discussion_group_category_id").attribute("value")).to eq topic.group_category.name
-
-          force_click_native("input[data-testid='checkpoints-checkbox']")
-          expect(f("input[data-testid='group-discussion-checkbox']").attribute("checked")).to be_falsey
-        end
-
-        it "preserves group category selection if discussion is turned into a checkpointed discussion when checkpoints_group_discussions is enabled" do
+        it "preserves group category selection if discussion is turned into a checkpointed discussion" do
           topic = group_discussion_assignment
           preserved_id = topic.group_category.id
           get "/courses/#{course.id}/discussion_topics/#{topic.id}/edit"
