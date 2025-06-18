@@ -27,7 +27,7 @@ import {
   buildAPDisplayTitle,
   type ExistingAttachedAssetProcessor,
 } from '@canvas/lti/model/AssetProcessor'
-import type {LtiAssetReport, LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
+import type {LtiAssetReport, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
 import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,
@@ -45,10 +45,11 @@ const I18n = createI18nScope('speed_grader')
 
 export type LtiAssetReportsProps = {
   versionedAttachments: {attachment: {id: string; display_name?: string}}[] | undefined
-  reportsByAttachment: Record<string, LtiAssetReportsByProcessor> | undefined
+  reports: SpeedGraderLtiAssetReports | undefined
   assetProcessors: ExistingAttachedAssetProcessor[]
   studentId: string | undefined
-  attempt: number | null | undefined
+  attempt: string
+  submissionType: 'online_text_entry' | 'online_upload'
 }
 
 function ltiAssetProcessorHeader(assetProcessor: ExistingAttachedAssetProcessor) {
@@ -78,16 +79,16 @@ function ltiAssetProcessorHeader(assetProcessor: ExistingAttachedAssetProcessor)
 }
 
 type LtiAssetReportsCardGroupProps = {
-  attachment: {id: string; display_name?: string}
+  displayName?: string
   reports: LtiAssetReport[] | undefined
 }
 
-function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGroupProps) {
+function LtiAssetReportsCardGroup({displayName, reports}: LtiAssetReportsCardGroupProps) {
   const anyReports = reports && reports.length > 0
 
   return (
     <Flex direction="column" gap="x-small">
-      {attachment.display_name && <Heading level="h4">{attachment.display_name}</Heading>}
+      {displayName && <Heading level="h4">{displayName}</Heading>}
       {anyReports ? (
         reports.map(r => <LtiAssetReportsCard key={r._id} report={r} />)
       ) : (
@@ -97,22 +98,35 @@ function LtiAssetReportsCardGroup({attachment, reports}: LtiAssetReportsCardGrou
   )
 }
 
+type ShouldShowResubmitButtonProps = {
+  processorId: string
+  reports: SpeedGraderLtiAssetReports
+  versionedAttachments: {attachment: {id: string}}[]
+  attempt: string
+  submissionType: 'online_text_entry' | 'online_upload'
+}
+
 function shouldShowResubmitButton({
   processorId,
-  reportsByAttachment,
+  reports,
   versionedAttachments,
-}: {
-  processorId: string
-  reportsByAttachment: Record<string, LtiAssetReportsByProcessor>
-  versionedAttachments: {attachment: {id: string}}[]
-}) {
-  return versionedAttachments.some(({attachment}) => {
-    const reports = reportsByAttachment[attachment.id]?.[processorId]
+  attempt,
+  submissionType,
+}: ShouldShowResubmitButtonProps) {
+  const hasResubmittableReports = (reportsList: LtiAssetReport[] | undefined) =>
+    !reportsList || reportsList.length === 0 || reportsList.some(rep => rep.resubmitAvailable)
 
-    // Resubmit button is available for a processor if there are any
-    // attachments missing reports, or if any reports are resubmittable
-    return !reports || reports.length === 0 || reports.some(rep => rep.resubmitAvailable)
-  })
+  if (submissionType === 'online_text_entry') {
+    const reportForAttempt = reports.by_attempt?.[attempt]?.[processorId]
+    return hasResubmittableReports(reportForAttempt)
+  } else if (submissionType === 'online_upload') {
+    return versionedAttachments.some(({attachment}) => {
+      const reportsForAttachment = reports.by_attachment?.[attachment.id]?.[processorId]
+      return hasResubmittableReports(reportsForAttachment)
+    })
+  }
+
+  return false // Handle unexpected submission types
 }
 
 export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
@@ -134,12 +148,13 @@ export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
 
 export function LtiAssetReports({
   versionedAttachments,
-  reportsByAttachment,
+  reports,
   assetProcessors,
   studentId,
   attempt,
+  submissionType,
 }: LtiAssetReportsProps) {
-  if (!versionedAttachments || !reportsByAttachment) {
+  if (!versionedAttachments || !reports) {
     return null
   }
 
@@ -161,15 +176,23 @@ export function LtiAssetReports({
                 {versionedAttachments.map(({attachment}) => (
                   <LtiAssetReportsCardGroup
                     key={attachment.id}
-                    attachment={attachment}
-                    reports={reportsByAttachment[attachment.id]?.[processor.id]}
+                    displayName={attachment.display_name}
+                    reports={reports.by_attachment?.[attachment.id]?.[processor.id]}
                   />
                 ))}
+                {submissionType === 'online_text_entry' && (
+                  <LtiAssetReportsCardGroup
+                    displayName={I18n.t('Text submitted to Canvas')}
+                    reports={reports.by_attempt?.[attempt]?.[processor.id] ?? []}
+                  />
+                )}
                 {studentId &&
                   shouldShowResubmitButton({
                     processorId: processor.id.toString(),
-                    reportsByAttachment,
+                    reports,
                     versionedAttachments,
+                    attempt,
+                    submissionType,
                   }) && (
                     <ResubmitButton
                       processorId={processor.id.toString()}
