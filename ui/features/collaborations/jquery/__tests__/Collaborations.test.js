@@ -20,22 +20,51 @@ import collaborations from '../index'
 import $ from 'jquery'
 import 'jquery-migrate' // required
 import '@canvas/jquery/jquery.ajaxJSON'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
 
-let oldAjaxJSON = null
-let oldScreenReaderFlashMessage = null
+const server = setupServer()
 
 describe('Collaborations', () => {
+  let originalRemoveCollaboration
+
+  beforeAll(() => {
+    server.listen()
+    fakeENV.setup()
+    originalRemoveCollaboration = collaborations.Util.removeCollaboration
+    collaborations.Util.removeCollaboration = jest.fn()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+    $('#delete_collaboration_dialog').remove()
+    $('#fixtures').empty()
+  })
+
+  afterAll(() => {
+    server.close()
+    fakeENV.teardown()
+    collaborations.Util.removeCollaboration = originalRemoveCollaboration
+  })
+
   beforeEach(() => {
-    oldAjaxJSON = $.ajaxJSON
-    oldScreenReaderFlashMessage = $.screenReaderFlashMessage
+    $.screenReaderFlashMessage = jest.fn()
+    const collaboration = $('<div class="collaboration">')
+    collaboration.dim = jest.fn()
     const link = $('<a></a>')
     link.addClass('delete_collaboration_link')
     link.attr('href', 'http://test.com')
-    const dialog = $('<div id=delete_collaboration_dialog></div>').data('collaboration', link)
+    collaboration.append(link)
+
+    const dialog = $('<div id=delete_collaboration_dialog></div>').data(
+      'collaboration',
+      collaboration,
+    )
     dialog.dialog({
       width: 550,
       height: 500,
@@ -43,31 +72,33 @@ describe('Collaborations', () => {
       modal: true,
       zIndex: 1000,
     })
+    dialog.dialog = jest.fn()
     const dom = $('<div></div>')
     dom.append(dialog)
     $('#fixtures').append(dom)
   })
 
-  afterEach(() => {
-    $('#delete_collaboration_dialog').remove()
-    $('#fixtures').empty()
-    $.ajaxJSON = oldAjaxJSON
-    $.screenReaderFlashMessage = oldScreenReaderFlashMessage
-  })
+  test('shows a flash message when deletion is complete', async () => {
+    server.use(
+      http.post('http://test.com', () => {
+        return HttpResponse.json({})
+      }),
+    )
 
-  test('shows a flash message when deletion is complete', () => {
-    $.screenReaderFlashMessage = jest.fn()
+    const button = $('<button class="delete_button"></button>')
     const e = {
       originalEvent: MouseEvent,
       type: 'click',
       timeStamp: 1433863761376,
-      jQuery17209791898143012077: true,
+      currentTarget: button[0],
     }
-    $.ajaxJSON = function (_url, _method, _data, callback) {
-      const responseData = {}
-      return callback.call(responseData)
-    }
-    collaborations.Events.onDelete(e)
+
+    collaborations.Events.onDelete.call(button[0], e)
+
+    // Wait for the ajax request to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     expect($.screenReaderFlashMessage).toHaveBeenCalledTimes(1)
+    expect($.screenReaderFlashMessage).toHaveBeenCalledWith('Collaboration was deleted')
   })
 })
