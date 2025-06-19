@@ -25,6 +25,7 @@ import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getUniqueId, pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
+import {useHandleKbdShortcuts} from '../../hooks/useHandleKbdShortcuts'
 import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
 import renderTableBody from './RenderTableBody'
@@ -40,7 +41,6 @@ import {
   setColumnWidths,
 } from './FileFolderTableUtils'
 import {DragAndDropWrapper} from './DragAndDropWrapper'
-import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 
 const I18n = createI18nScope('files_v2')
 
@@ -110,15 +110,25 @@ const FileFolderTable = ({
     [selectedRows, setSelectedRows, rows.length],
   )
 
+  const deselectAll = useCallback(() => {
+    setSelectedRows(new Set())
+    setSelectionAnnouncement(getSelectionScreenReaderText(0, rows.length))
+  }, [rows, setSelectedRows])
+
+  const selectAll = useCallback(() => {
+    setSelectedRows(new Set(rows.map(row => getUniqueId(row))))
+    setSelectionAnnouncement(getSelectionScreenReaderText(rows.length, rows.length))
+  }, [rows, setSelectedRows])
+
+  useHandleKbdShortcuts(selectAll)
+
   const toggleSelectAll = useCallback(() => {
     if (selectedRows.size === rows.length) {
-      setSelectedRows(new Set()) // Unselect all
-      setSelectionAnnouncement(getSelectionScreenReaderText(0, rows.length))
+      deselectAll()
     } else {
-      setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
-      setSelectionAnnouncement(getSelectionScreenReaderText(rows.length, rows.length))
+      selectAll()
     }
-  }, [rows, selectedRows.size, setSelectedRows])
+  }, [rows, selectedRows, deselectAll, selectAll])
 
   enum SortOrder {
     ASCENDING = 'asc',
