@@ -34,7 +34,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Account Roles'),
       description: I18n.t(
-        'To allow users to view IP address information, the "Admin - add/remove permission" permission must be enabled for the Quizzes.Next Service.',
+        'To allow users to view IP address information, the "Admin - add/remove permission" and the "Permissions - manage" permission must be enabled for the Quizzes.Next Service.',
       ),
     },
   ],
