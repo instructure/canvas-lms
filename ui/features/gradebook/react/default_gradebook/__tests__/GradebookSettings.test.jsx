@@ -411,6 +411,9 @@ describe('Gradebook "Enter Grades as" Setting', () => {
   })
 
   describe('#getEnterGradesAsSetting', () => {
+    beforeEach(() => {
+      jest.spyOn(gradebook, 'saveSettings').mockImplementation(() => Promise.resolve())
+    })
     test('returns the setting when stored', () => {
       gradebook.setEnterGradesAsSetting('2301', 'percent')
       expect(gradebook.getEnterGradesAsSetting('2301')).toBe('percent')
