@@ -2568,6 +2568,49 @@ describe MasterCourses::MasterMigration do
       expect(copied_att.reload.full_path).to eq "course files/B/C/file.txt"
     end
 
+    describe "moving sub folder to root folder sync" do
+      subject do
+        folder_A = Folder.root_folders(@copy_from).first.sub_folders.create!(name: "A", context: @copy_from)
+        folder_B = folder_A.sub_folders.create!(name: "B", context: @copy_from)
+        # this needs to be here because empty folders don't sync
+        Attachment.create!(filename: "decoy.txt", uploaded_data: StringIO.new("1"), folder: folder_B, context: @copy_from)
+
+        @copy_to = course_factory
+        @sub = @template.add_child_course!(@copy_to)
+        run_master_migration
+
+        cloned_item_id_folder_A = folder_A.reload.cloned_item_id
+        expect(Folder.find_by(cloned_item_id: cloned_item_id_folder_A)).not_to be_nil
+        cloned_item_id_folder_B = folder_B.reload.cloned_item_id
+        expect(Folder.find_by(cloned_item_id: cloned_item_id_folder_B)).not_to be_nil
+
+        Timecop.travel(10.minutes.from_now) do
+          folder_B.parent_folder = Folder.root_folders(@copy_from).first
+          folder_B.save!
+          run_master_migration
+        end
+
+        synced_folder = @copy_to.folders.find_by(cloned_item_id: cloned_item_id_folder_B)
+        synced_folder
+      end
+
+      context "when blueprint_support_sync_for_folder_movement_to_root_folder enabled" do
+        it "syncs folder move from sub folder to root folder" do
+          expect(subject.parent_folder.root_folder?).to be_truthy
+        end
+      end
+
+      context "when blueprint_support_sync_for_folder_movement_to_root_folder disabled" do
+        before do
+          Account.site_admin.disable_feature!(:blueprint_support_sync_for_folder_movement_to_root_folder)
+        end
+
+        it "does not sync folder move from sub folder to root folder" do
+          expect(subject.parent_folder.root_folder?).to be_falsey
+        end
+      end
+    end
+
     it "baleets assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)

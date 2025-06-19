@@ -83,6 +83,17 @@ class MasterCourses::FolderHelper
     return unless dest_folder.parent_folder && source_folder.parent_folder
 
     source_parent_folder = source_folder.parent_folder
+
+    if Account.site_admin.feature_enabled?(:blueprint_support_sync_for_folder_movement_to_root_folder)
+      source_parent_folder_is_root = source_parent_folder.cloned_item_id.nil? && source_parent_folder.parent_folder_id.nil?
+
+      if source_parent_folder_is_root
+        dest_course_parent_folder = dest_course.folders.find_by(parent_folder_id: nil)
+        dest_folder.parent_folder = dest_course_parent_folder if dest_course_parent_folder
+        return
+      end
+    end
+
     return unless source_parent_folder.cloned_item_id.present?
 
     if dest_folder.parent_folder.cloned_item_id != source_parent_folder.cloned_item_id

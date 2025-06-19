@@ -224,3 +224,15 @@ wiki_page_mastery_path_no_assignment_group:
       state: allowed_on
     development:
       state: allowed_on
+
+blueprint_support_sync_for_folder_movement_to_root_folder:
+  state: hidden
+  display_name: Blueprint support sync for folder movement to root folder
+  description: |-
+    Moving a folder from a sub folder to the root folder then bp sync should sync over the change.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
