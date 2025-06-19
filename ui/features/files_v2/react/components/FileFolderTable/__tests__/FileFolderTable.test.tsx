@@ -23,14 +23,36 @@ import {renderComponent} from './testUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {getUniqueId} from '../../../../utils/fileFolderUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
   showFlashError: jest.fn(),
 }))
 
+const server = setupServer(
+  // Mock any potential API calls
+  http.get('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.post('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.put('*', () => {
+    return HttpResponse.json({})
+  }),
+  http.delete('*', () => {
+    return HttpResponse.json({})
+  }),
+)
+
 describe('FileFolderTable', () => {
   let flashElements: any
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup()
