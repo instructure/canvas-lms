@@ -96,9 +96,10 @@ ready(() => {
   if (ENV.ACCOUNT) {
     ready(function () {
       const mountPoint = document.getElementById('quotas_tab_content_mount_point')
-      const root = createRoot(mountPoint)
-
-      root.render(<QuotasTabContent accountWithQuotas={ENV.ACCOUNT} />)
+      if (mountPoint) {
+        const root = createRoot(mountPoint)
+        root.render(<QuotasTabContent accountWithQuotas={ENV.ACCOUNT} />)
+      }
     })
   }
 
