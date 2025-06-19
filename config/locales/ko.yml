@@ -9436,6 +9436,7 @@ ko:
     grading_standard_type: "평점 도출 기준"
     group_type: 그룹
     learning_outcome_type: "학습 성과"
+    module_item_type: "모듈 항목"
     module_type: 모듈
     quiz_question_type: "퀴즈 문제"
     quiz_type: 퀴즈
