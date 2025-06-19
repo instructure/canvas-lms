@@ -5255,6 +5255,7 @@ hu:
   cancel_rename_aa60a881: "Az átnevezés megszakítása"
   cancel_submitting_comment_2666e98b: "Hozzászólás küldésének visszavonása"
   cancel_updating_comment_6816d855: "Hozzászólás frissítésének visszavonása"
+  canceled_5a6e0ec8: Megszakítva
   canceling_this_attempt_will_permanently_delete_any_21ce850c: "A kísérlet megszakítása véglegesen törli a kísérlet során végrehajtott összes munkát. Szeretné folytatni és törölni a munkáját?"
   cannot_access_group_in_concluded_course_90a8db52: "Lezárult kurzushoz tartozó csoporthoz nem lehet hozzáférni."
   cannot_add_a_temporary_enrollment_to_a_concluded_c_459a44fa: "Nem lehet ideiglenes beiratkozást hozzáadni egy lezárt kurzushoz."
@@ -5353,6 +5354,9 @@ hu:
   canvas_alert_submission_user_name_assignment_title_4503ccf: "Canvas értesítés - Beadás: %{user_name}, %{assignment_title}"
   canvas_attribute_eaa7e31a: "Canvas tulajdonságai"
   canvas_by_instructure_1490381: "Canvas az Instructure-től"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "Canvas nem tud bind-olni (belépni) az LDAP szerverre"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "A Canvas nem tud csatlakozni az LDAP szerveréhez"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "A Canvas nem tud keresni az LDAP példányban"
   canvas_cartridge_description: "Ez lehetővé teszi egy canvas export közbenső json formátumra történő átalakítását az importáláshoz"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas Kurzus Exportálás Csomag"
@@ -5387,6 +5391,7 @@ hu:
   canvas_id_f42f6ad: "Canvas ID"
   canvas_instructor_guide_7cf106cb: "Canvas oktatói útmutató"
   canvas_introduction_video_2d81f3ad: "Canvas bemutató videó"
+  canvas_is_connecting_to_ips_9af7da93: "A Canvas csatlakozik ehhez: %{ips}"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "A Canvas a jelenlegi beállítások mellett nem tud bejelentkezést fogadni a következőtől: %{issuer}."
   canvas_lms_6ce68514: "Canvas LMS"
   canvas_login_failure_message_4c922f2f: "Canvas sikertelen belépési üzenet"
@@ -5474,6 +5479,7 @@ hu:
   change_existing_group_2c91a32b: "Meglévő csoport módosítása"
   change_gradebook_view_d2d9a101: "Osztálynapló nézet módosítása"
   change_groups_4e2ab6c3: "Csoportok megváltoztatása"
+  change_image_d56c695f: "Kép megváltoztatása"
   change_mastery_f4d43c07: "Jártassági szint változtatása"
   change_mastery_points_c4f68a36: "Jártassági szint pontok változtatása"
   change_name_c8cce76c: "Név megváltoztatása"
@@ -5516,6 +5522,7 @@ hu:
   check_to_add_a_user_for_loginid_6cd25597: "Jelölje be felhasználó hozzáadásához a %{loginid} számára"
   check_to_select_all_98e484f1: "Jelölje be az összes kiválasztásához"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Jelölje be felhasználó hozzáadásához a %{loginid} számára"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "Ellenőrizze a tűzfalának a beállításait. Minden Canvas IP cím hozzáférhet a szerveréhez?"
   check_your_spelling_or_try_fewer_letters_70769a90: "Ellenőrizze a helyesírást, vagy próbáljon meg kevesebb betűt írni."
   checked_883b93fd: ellenőrizve
   checking_add_to_calendar_will_invite_all_course_me_6779c8df: "A Hozzáadás a naptárhoz jelölőnégyzet bejelölésével a kurzus összes tagja meghívható."
@@ -9519,6 +9526,7 @@ hu:
       A DocViewer biztonságosabban fog elindulni (JWT-t használva JTI-követeléssel a token
                 újrafelhasználásának megakadályozása érdekében).
   does_not_meet_expectations_b0736d20: "Nem teljesíti az elvárásokat"
+  does_the_username_require_more_scoping_information_40d51df: "Szükség van több hatókör információra a felhasználónév esetén? (pl. 'cn=Canvas,ou=people,dc=example,dc=com')."
   domain_3b54c511: Tartomány
   domain_69fe564b: "Tartomány:"
   domain_editing_is_disabled_when_security_settings__3feb6da0: "A domain szerkesztése le van tiltva, ha a biztonsági beállításokat a szülőfióktól örökölték."
@@ -16352,6 +16360,7 @@ hu:
     grading_standard_type: "Értékelési szabvány"
     group_type: Csoport
     learning_outcome_type: "Tanulási eredmény"
+    module_item_type: Modulelem
     module_type: Modul
     quiz_question_type: Kvízkérdés
     quiz_type: Kvíz
@@ -24136,6 +24145,7 @@ hu:
   summary_statistics_f74852a5: "Összegzés statisztikák"
   sun_298d7c8b: Vas
   sunday_50a31adb: Vasárnap
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "Adjon meg egy érvényes LDAP felhasználónév/jelszót a kapcsolódás ellenőrzéséhez:"
   support: 
     array: 
       last_word_connector: " és "
@@ -24456,6 +24466,9 @@ hu:
   terms_of_service_f183ff7f: "Felhasználási feltételek"
   test_cluster_only_70e61c19: "Csak a tesztklaszter"
   test_feature_flag_980151e0: "Tesztfunkció zászló"
+  test_ldap_authentication_446cce4f: "LDAP hitelesítés tesztelése"
+  test_ldap_settings_c387f136: "LDAP beállítások tesztelése"
+  test_login_3dc3c119: "Belépés tesztelése"
   testing_state_effd4a82: "Állapot ellenőrzése"
   text_7b9bd49c: "%{text}"
   text_7f4593da: Szöveg
@@ -24525,6 +24538,7 @@ hu:
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "A Chat eszközt a Canvas adminisztrátornak kell engedélyeznie."
   the_chosen_date_and_time_is_invalid_a7c96651: "A kiválasztott dátum és időpont érvénytelen."
   the_client_id_clientid_is_disabled_b4a02cb1: "Az ügyfél azonosítója %{clientId} le van tiltva"
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "A kapcsolat túllépte az időkorlátot vagy vissza lett utasítva. Megfontolandó dolgok:"
   the_content_security_policy_allows_you_to_restrict_eaa7c0d6: |-
       A Tartalombiztonsági házirend lehetővé teszi az egyéni
       JavaScriptet, amely a Canvas példányában fut. Kézzel is hozzáadhat
@@ -24721,6 +24735,7 @@ hu:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "A jelentést beadó felhasználó szerepköre (hallgató, oktató, admin, stb.)"
   the_salesforce_account_id_if_it_exists_e7949706: "A Salesforce Account ID (ha létezik)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Az ütemező eszköz lehetővé teszi, hogy a hallgatók (vagy hallgatói csoportok) időpontokra jelentkezzenek be. A kezdéshez kattintson az alábbi gombra."
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "A keresés sikertelen volt vagy 0 találatot eredményezett. Megfontolandó dolgok:"
   the_search_returned_no_results_c2e4d13c: "A keresés nem hozott eredményt."
   the_section_to_report_on_11e3757b: "A következő szekcióról szóló jelentés"
   the_selected_calculation_method_is_no_longer_avail_e42ee80d: "A kiválasztott számítási módszer már nem elérhető"
@@ -25284,6 +25299,7 @@ hu:
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Ez a felhasználó jelenleg nem fér hozzá a kurzushoz\""
   this_user_s_last_activity_in_the_course_was_dateti_74d3ac3b: "Ennek a felhasználónak az utolsó tevékenysége a kurzusban %{datetime} volt."
   this_user_will_be_created_in_3b2a2b52: "Ez a felhasználó létrejön itt:"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "Ez csupán egy kapcsolat teszt volt. Az SSL tanúsítványok nem lettek ellenőrizve."
   this_will_allow_the_user_to_manage_their_labels_ad_a8870396: |-
       Ez lehetővé teszi a felhasználó számára, hogy kezelje a címkéket, címkéket adjon hozzá beszélgetésekhez
       és
@@ -26985,6 +27001,9 @@ hu:
   verification_code_5acd64ef: Ellenőrzőkód
   verify_3dd8f159: Ellenőrzés
   verify_ldap_tls_certificates_70241d8e: "LDAP TLS tanúsítványok ellenőrzése"
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "Ellenőrizze, hogy az LDAP-beli felhasználó objektumnak vannak-e kereső jogosultágai a megadott keresés kezdetéhez."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "Ellenőrizze a megadott szűrő stringet (pl. '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "Ellenőrizze a megadott keresés kezdetét (pl. 'ou=people,dc=example,dc=com')."
   verify_tls_certificate_9cfa26d1: "TLS tanúsítvány ellenőrzése"
   verify_tls_certificates_presented_by_ldap_authenti_946337a3: "Az LDAP-hitelesítési szolgáltatók által bemutatott TLS-tanúsítványok ellenőrzése.\n\
       \x20                       "
@@ -27904,6 +27923,7 @@ hu:
       Az Ön oktatója módosított a jegyén és megjegyzéseket írt ehhez: %{title}. Ezek a módosítások már elérhetőek.
       Itt tekintheti meg:
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "Az LDAP szerver visszautasította a bind műveletet. Megfontolandó dolgok:"
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "A médiát feltöltöttük, és feldolgozás után itt fog megjelenni."
   your_message_has_been_sent_thank_you_e0284316: "Üzenetét elküldtük! Köszönjük!"
   your_message_was_sent_977f6583: "Üzenetét elküldtük!"
