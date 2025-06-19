@@ -773,14 +773,21 @@ function DiscussionTopicForm({
   }
 
   const getPublishStatus = () => {
-    return published ? (
-      <Text color="success" weight="normal">
-        <IconPublishSolid /> {I18n.t('Published')}
-      </Text>
-    ) : (
-      <Text color="secondary" weight="normal">
-        <IconUnpublishedLine /> {I18n.t('Not Published')}
-      </Text>
+    return (
+      <div
+        aria-label={published ? I18n.t('Published') : I18n.t('Not Published')}
+        style={{display: 'inline-flex', alignItems: 'center'}}
+      >
+        {published ? (
+          <Text color="success" weight="normal">
+            <IconPublishSolid aria-hidden="true" /> {I18n.t('Published')}
+          </Text>
+        ) : (
+          <Text color="secondary" weight="normal">
+            <IconUnpublishedLine aria-hidden="true" /> {I18n.t('Not Published')}
+          </Text>
+        )}
+      </div>
     )
   }
 
@@ -788,7 +795,11 @@ function DiscussionTopicForm({
     return (
       <Flex justifyItems="space-between">
         <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
-        {!isAnnouncement && !instUINavEnabled() && <Flex.Item>{getPublishStatus()}</Flex.Item>}
+        {!isAnnouncement && !instUINavEnabled() && (
+          <Flex.Item style={{marginLeft: '1rem', whiteSpace: 'nowrap'}}>
+            {getPublishStatus()}
+          </Flex.Item>
+        )}
       </Flex>
     )
   }
@@ -982,8 +993,9 @@ function DiscussionTopicForm({
           <TextInput
             data-testid="discussion-topic-title"
             renderLabel={renderLabelWithPublishStatus()}
-            type={I18n.t('text')}
+            aria-label={I18n.t('Topic Title')}
             placeholder={I18n.t('Topic Title')}
+            type="text"
             value={title}
             ref={textInputRef}
             onChange={(_event, value) => {
