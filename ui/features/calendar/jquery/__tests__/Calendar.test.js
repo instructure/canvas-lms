@@ -68,7 +68,6 @@ describe('Calendar', () => {
 
     fixtures.setup()
     $('<div id="fixtures" />').appendTo(document.body)
-    jest.spyOn($, 'getJSON')
     fakeENV.setup()
   })
 
@@ -81,7 +80,6 @@ describe('Calendar', () => {
     }
     $('#fixtures').remove()
     fixtures.teardown()
-    $.getJSON.mockRestore()
     fakeENV.teardown()
   })
 

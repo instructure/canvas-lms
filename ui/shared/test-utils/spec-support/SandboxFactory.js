@@ -17,17 +17,13 @@
  */
 
 import FetchSandbox from './sandboxes/FetchSandbox'
-import SinonSandbox from './sandboxes/SinonSandbox'
 
 export default class SandboxFactory {
   constructor(options) {
     this._options = options
 
-    this._options.global.sandbox = {}
-
     this._sandboxes = {
       fetch: new FetchSandbox(options),
-      sinon: new SinonSandbox(options),
     }
 
     this._options.contextTracker.onContextStart(() => {
@@ -45,16 +41,13 @@ export default class SandboxFactory {
 
   setup() {
     this._sandboxes.fetch.setup()
-    this._sandboxes.sinon.setup()
   }
 
   teardown() {
-    this._sandboxes.sinon.teardown()
     this._sandboxes.fetch.teardown()
   }
 
   verify() {
     this._sandboxes.fetch.verify()
-    this._sandboxes.sinon.verify()
   }
 }

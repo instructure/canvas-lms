@@ -156,13 +156,22 @@ describe('PaginatedList', () => {
   })
 
   test('should allow user to defer getJSON', function () {
-    const getJSONSpy = jest.spyOn($, 'getJSON')
+    let requestMade = false
+    server.use(
+      http.get('*/api/v1/not-called.json', () => {
+        requestMade = true
+        return HttpResponse.json([])
+      }),
+    )
+
     new PaginatedList(el.wrapper, {
       start: false,
       template,
       url: '/api/v1/not-called.json',
     })
-    expect(getJSONSpy).not.toHaveBeenCalled()
-    getJSONSpy.mockRestore()
+
+    // Give time for potential request
+    jest.runAllTimers()
+    expect(requestMade).toBe(false)
   })
 })

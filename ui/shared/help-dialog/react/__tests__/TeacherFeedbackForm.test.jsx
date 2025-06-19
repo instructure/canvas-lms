@@ -14,13 +14,15 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import TeacherFeedbackForm from '../TeacherFeedbackForm'
 
+const server = setupServer()
+
 describe('TeacherFeedbackForm', () => {
-  const originalGetJSON = $.getJSON
   const onCancel = jest.fn()
   const onSubmit = jest.fn()
   const courses = [
@@ -39,14 +41,26 @@ describe('TeacherFeedbackForm', () => {
     onSubmit,
   }
 
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
-    $.getJSON = jest.fn((_url, successCallback) => successCallback(courses))
+    server.use(
+      http.get('/api/v1/courses.json', () => {
+        return HttpResponse.json(courses)
+      }),
+    )
   })
 
   afterEach(() => {
     onCancel.mockClear()
     onSubmit.mockClear()
-    $.getJSON = originalGetJSON
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('renders form label header', () => {
@@ -55,27 +69,39 @@ describe('TeacherFeedbackForm', () => {
   })
 
   it('renders loading text if courses are not loaded', () => {
-    $.getJSON.mockRestore()
+    server.use(
+      http.get('/api/v1/courses.json', async () => {
+        await new Promise(() => {}) // Never resolves
+      }),
+    )
     const {getByText} = render(<TeacherFeedbackForm {...props} />)
     expect(getByText('Loading courses...')).toBeVisible()
   })
 
   it('disables send message button if courses are not loaded', () => {
-    $.getJSON.mockRestore()
+    server.use(
+      http.get('/api/v1/courses.json', async () => {
+        await new Promise(() => {}) // Never resolves
+      }),
+    )
     const {getByText} = render(<TeacherFeedbackForm {...props} />)
     expect(getByText('Send Message')).toBeDisabled()
   })
 
-  it('renders select options for courses', () => {
+  it('renders select options for courses', async () => {
     const {getByText} = render(<TeacherFeedbackForm {...props} />)
-    expect(getByText('Engineering 101')).toBeVisible()
+    await waitFor(() => {
+      expect(getByText('Engineering 101')).toBeVisible()
+    })
     expect(getByText('Security 202')).toBeVisible()
   })
 
-  it('sets focus on recipients select options', () => {
+  it('sets focus on recipients select options', async () => {
     const {container} = render(<TeacherFeedbackForm {...props} />)
-    const recipients = container.querySelector("select[name = 'recipients[]']")
-    expect(recipients).toHaveFocus()
+    await waitFor(() => {
+      const recipients = container.querySelector("select[name = 'recipients[]']")
+      expect(recipients).toHaveFocus()
+    })
   })
 
   it('only submits form if required fields are provided', () => {

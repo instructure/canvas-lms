@@ -16,7 +16,6 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import sinon from 'sinon'
 import {render, cleanup, fireEvent} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
 import React from 'react'
@@ -629,6 +628,21 @@ describe('FileBrowser', () => {
     })
 
     it('uploads a file', async () => {
+      server.use(
+        http.post('/api/v1/folders/1/files', () => {
+          return HttpResponse.json({
+            upload_url: 'http://example.com/upload',
+            upload_params: {key: 'value'},
+          })
+        }),
+        http.options('http://example.com/upload', () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+        http.post('http://example.com/upload', () => {
+          return HttpResponse.json({id: '123', display_name: 'dummyValue.png'})
+        }),
+      )
+
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
         0: {id: 0, collections: [1]},
@@ -642,7 +656,7 @@ describe('FileBrowser', () => {
           context: '/courses/1',
         },
       }
-      const spy = sinon.spy(ref.current, 'submitFile')
+      const spy = jest.spyOn(ref.current, 'submitFile')
 
       ref.current.setState({collections})
 
@@ -652,7 +666,7 @@ describe('FileBrowser', () => {
           files: ['dummyValue.png'],
         },
       })
-      expect(spy.called).toBeTruthy()
+      expect(spy).toHaveBeenCalled()
     })
 
     it('allows uploads without folder selection when a default folder is provided', () => {
@@ -679,6 +693,21 @@ describe('FileBrowser', () => {
     })
 
     it('renders a spinner while uploading files', async () => {
+      server.use(
+        http.post('/api/v1/folders/1/files', () => {
+          return HttpResponse.json({
+            upload_url: 'http://example.com/upload',
+            upload_params: {key: 'value'},
+          })
+        }),
+        http.options('http://example.com/upload', () => {
+          return new HttpResponse(null, {status: 200})
+        }),
+        http.post('http://example.com/upload', () => {
+          return HttpResponse.json({id: '123', display_name: 'dummyValue.png'})
+        }),
+      )
+
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
         0: {id: 0, collections: [1]},

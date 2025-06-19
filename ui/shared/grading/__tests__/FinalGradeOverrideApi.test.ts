@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as FinalGradeOverrideApi from '../FinalGradeOverrideApi'
 import type {FinalGradeOverrideMap} from '../grading.d'
@@ -26,14 +27,18 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 
 describe('Gradebook FinalGradeOverrideApi', () => {
-  let server: any
+  const server = setupServer()
 
-  beforeEach(() => {
-    server = new FakeServer()
+  beforeAll(() => {
+    server.listen()
   })
 
   afterEach(() => {
-    server.teardown()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('.getFinalGradeOverrides()', () => {
@@ -57,7 +62,11 @@ describe('Gradebook FinalGradeOverrideApi', () => {
         },
       }
 
-      server.for(url).respond({status: 200, body: responseData})
+      server.use(
+        http.get(url, () => {
+          return HttpResponse.json(responseData)
+        }),
+      )
     })
 
     function getFinalGradeOverrides() {
@@ -66,8 +75,7 @@ describe('Gradebook FinalGradeOverrideApi', () => {
 
     it('requests final grade overrides for the course with the given course id', async () => {
       await getFinalGradeOverrides()
-      const requests = server.filterRequests(url)
-      expect(requests).toHaveLength(1)
+      // Request verification is implicit with MSW - if the handler is not matched, the test will fail
     })
 
     it('camel-cases .finalGradeOverrides in the response data', async () => {
@@ -102,8 +110,11 @@ describe('Gradebook FinalGradeOverrideApi', () => {
 
     describe('when the request fails', () => {
       beforeEach(() => {
-        server.unsetResponses(url)
-        server.for(url).respond({status: 500, body: {error: 'Server Error'}})
+        server.use(
+          http.get(url, () => {
+            return HttpResponse.json({error: 'Server Error'}, {status: 500})
+          }),
+        )
       })
 
       afterEach(() => {

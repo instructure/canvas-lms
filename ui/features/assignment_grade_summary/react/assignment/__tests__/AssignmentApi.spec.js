@@ -17,21 +17,19 @@
  */
 
 import * as AssignmentApi from '../AssignmentApi'
-import FakeServer, {
-  paramsFromRequest,
-  pathFromRequest,
-} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('GradeSummary AssignmentApi', () => {
-  let server
+  const server = setupServer()
+  let capturedRequests = []
 
-  beforeEach(() => {
-    server = new FakeServer()
-  })
-
+  beforeAll(() => server.listen())
   afterEach(() => {
-    server.teardown()
+    server.resetHandlers()
+    capturedRequests = []
   })
+  afterAll(() => server.close())
 
   describe('.speedGraderUrl()', () => {
     test('returns the SpeedGrader url for the given course, assignment, and student', () => {
@@ -51,21 +49,35 @@ describe('GradeSummary AssignmentApi', () => {
     const url = `/api/v1/courses/1201/assignments/2301/provisional_grades/publish`
 
     test('sends a request to release provisional grades', async () => {
-      server.for(url).respond({status: 200, body: {}})
+      server.use(
+        http.post(url, async ({request}) => {
+          capturedRequests.push({url: request.url, method: request.method})
+          return HttpResponse.json({})
+        }),
+      )
       await AssignmentApi.releaseGrades('1201', '2301')
-      const request = server.receivedRequests[0]
-      expect(pathFromRequest(request)).toBe(url)
+      const request = capturedRequests[0]
+      expect(new URL(request.url).pathname).toBe(url)
     })
 
     test('sends a POST request', async () => {
-      server.for(url).respond({status: 200, body: {}})
+      server.use(
+        http.post(url, async ({request}) => {
+          capturedRequests.push({url: request.url, method: request.method})
+          return HttpResponse.json({})
+        }),
+      )
       await AssignmentApi.releaseGrades('1201', '2301')
-      const request = server.receivedRequests[0]
+      const request = capturedRequests[0]
       expect(request.method).toBe('POST')
     })
 
     test('does not catch failures', async () => {
-      server.for(url).respond({status: 500, body: {error: 'server error'}})
+      server.use(
+        http.post(url, () => {
+          return HttpResponse.json({error: 'server error'}, {status: 500})
+        }),
+      )
       try {
         await AssignmentApi.releaseGrades('1201', '2301')
       } catch (e) {
@@ -78,28 +90,52 @@ describe('GradeSummary AssignmentApi', () => {
     const url = `/courses/1201/assignments/2301/mute`
 
     test('sends a request to unmute the assignment', async () => {
-      server.for(url).respond({status: 200, body: {}})
+      server.use(
+        http.put(url, async ({request}) => {
+          capturedRequests.push({url: request.url, method: request.method})
+          return HttpResponse.json({})
+        }),
+      )
       await AssignmentApi.unmuteAssignment('1201', '2301')
-      const request = server.receivedRequests[0]
-      expect(pathFromRequest(request)).toBe(url)
+      const request = capturedRequests[0]
+      expect(new URL(request.url).pathname).toBe(url)
     })
 
     test('sets muted status to false', async () => {
-      server.for(url).respond({status: 200, body: {}})
+      server.use(
+        http.put(url, async ({request}) => {
+          const requestUrl = new URL(request.url)
+          capturedRequests.push({
+            url: request.url,
+            method: request.method,
+            searchParams: requestUrl.searchParams,
+          })
+          return HttpResponse.json({})
+        }),
+      )
       await AssignmentApi.unmuteAssignment('1201', '2301')
-      const request = server.receivedRequests[0]
-      expect(paramsFromRequest(request).status).toBe('false')
+      const request = capturedRequests[0]
+      expect(request.searchParams.get('status')).toBe('false')
     })
 
     test('sends a PUT request', async () => {
-      server.for(url).respond({status: 200, body: {}})
+      server.use(
+        http.put(url, async ({request}) => {
+          capturedRequests.push({url: request.url, method: request.method})
+          return HttpResponse.json({})
+        }),
+      )
       await AssignmentApi.unmuteAssignment('1201', '2301')
-      const request = server.receivedRequests[0]
+      const request = capturedRequests[0]
       expect(request.method).toBe('PUT')
     })
 
     test('does not catch failures', async () => {
-      server.for(url).respond({status: 500, body: {error: 'server error'}})
+      server.use(
+        http.put(url, () => {
+          return HttpResponse.json({error: 'server error'}, {status: 500})
+        }),
+      )
       try {
         await AssignmentApi.unmuteAssignment('1201', '2301')
       } catch (e) {

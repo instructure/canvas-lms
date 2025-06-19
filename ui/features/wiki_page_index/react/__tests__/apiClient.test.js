@@ -17,10 +17,10 @@
  */
 
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import {deletePages} from '../apiClient'
 
-const server = mswServer([])
+const server = setupServer()
 
 beforeAll(() => {
   server.listen()

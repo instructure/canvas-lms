@@ -21,7 +21,7 @@ import ValidatedFormView from '../ValidatedFormView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 class MyForm extends ValidatedFormView {
@@ -43,11 +43,13 @@ class MyForm extends ValidatedFormView {
   }
 }
 
-const server = mswServer([
-  http.post('/fail', () => {
-    return new HttpResponse('', {status: 200})
-  }),
-])
+const server = setupServer(
+  ...[
+    http.post('/fail', () => {
+      return new HttpResponse('', {status: 200})
+    }),
+  ],
+)
 
 describe('ValidatedFormView', () => {
   let form

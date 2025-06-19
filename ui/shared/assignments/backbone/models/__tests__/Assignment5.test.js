@@ -17,13 +17,13 @@
  */
 
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import Assignment from '../Assignment'
 
-const server = mswServer([])
+const server = setupServer()
 
 beforeAll(() => {
   server.listen()

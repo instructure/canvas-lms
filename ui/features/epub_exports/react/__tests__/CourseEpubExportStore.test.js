@@ -17,10 +17,17 @@
  */
 
 import CourseStore from '../CourseStore'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('CourseEpubExportStore', () => {
   let courses
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     CourseStore.clearState()
@@ -38,53 +45,72 @@ describe('CourseEpubExportStore', () => {
       ],
     }
 
-    jest.spyOn($, 'getJSON').mockImplementation((url, callback) => {
-      callback(url.includes('courses/1/epub_exports/1') ? courses.courses[0] : courses)
-      return {fail: () => {}}
-    })
-
-    jest.spyOn($, 'post').mockImplementation((url, data, callback) => {
-      const course_id = url.match(/courses\/(\d+)/)[1]
-      const response = {
-        name: 'Creative Writing',
-        id: parseInt(course_id, 10),
-        epub_export: {
-          permissions: {},
-          workflow_state: 'created',
-        },
-      }
-      callback(response)
-      return {fail: () => {}}
-    })
+    server.use(
+      http.get('/api/v1/epub_exports', () => {
+        return HttpResponse.json(courses)
+      }),
+      http.get('/api/v1/courses/:courseId/epub_exports/:exportId', ({params}) => {
+        if (params.courseId === '1' && params.exportId === '1') {
+          return HttpResponse.json(courses.courses[0])
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+      http.post('/api/v1/courses/:courseId/epub_exports', ({params}) => {
+        const course_id = parseInt(params.courseId, 10)
+        const response = {
+          name: 'Creative Writing',
+          id: course_id,
+          epub_export: {
+            permissions: {},
+            workflow_state: 'created',
+          },
+        }
+        return HttpResponse.json(response)
+      }),
+    )
   })
 
   afterEach(() => {
     CourseStore.clearState()
-    jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
-  it('gets all courses', () => {
+  afterAll(() => {
+    server.close()
+  })
+
+  it('gets all courses', async () => {
     expect(CourseStore.getState()).toEqual({})
     CourseStore.getAll()
+
+    // Wait for the async request to complete
+    await new Promise(resolve => setTimeout(resolve, 10))
+
     const state = CourseStore.getState()
     courses.courses.forEach(course => {
       expect(state[course.id]).toEqual(course)
     })
-    expect($.getJSON).toHaveBeenCalledWith('/api/v1/epub_exports', expect.any(Function))
   })
 
-  it('gets a specific course', () => {
+  it('gets a specific course', async () => {
     expect(CourseStore.getState()).toEqual({})
     CourseStore.get(1, 1)
+
+    // Wait for the async request to complete
+    await new Promise(resolve => setTimeout(resolve, 10))
+
     const state = CourseStore.getState()
     expect(state[courses.courses[0].id]).toEqual(courses.courses[0])
-    expect($.getJSON).toHaveBeenCalledWith('/api/v1/courses/1/epub_exports/1', expect.any(Function))
   })
 
-  it('creates a new epub export', () => {
+  it('creates a new epub export', async () => {
     const course_id = 3
     expect(CourseStore.getState()[course_id]).toBeUndefined()
     CourseStore.create(course_id)
+
+    // Wait for the async request to complete
+    await new Promise(resolve => setTimeout(resolve, 10))
+
     const state = CourseStore.getState()
     expect(state[course_id]).toEqual({
       name: 'Creative Writing',
@@ -94,11 +120,5 @@ describe('CourseEpubExportStore', () => {
         workflow_state: 'created',
       },
     })
-    expect($.post).toHaveBeenCalledWith(
-      `/api/v1/courses/${course_id}/epub_exports`,
-      {},
-      expect.any(Function),
-      'json',
-    )
   })
 })

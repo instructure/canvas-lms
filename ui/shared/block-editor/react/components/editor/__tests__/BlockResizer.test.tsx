@@ -69,7 +69,9 @@ describe('BlockResizer', () => {
   })
 
   beforeEach(() => {
-    fakeENV.setup()
+    fakeENV.setup({
+      flashAlertTimeout: 5000,
+    })
     props = {width: 100, height: 125}
     maintainAspectRatio = false
   })

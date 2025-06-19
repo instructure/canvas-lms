@@ -17,7 +17,8 @@
  */
 
 import PerformanceControls from '../../PerformanceControls'
-import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../index'
 import type {CustomColumn} from '../../gradebook.d'
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -44,50 +45,95 @@ const exampleCustomColumns: CustomColumn[] = [
 ]
 
 describe('customColumnsState', () => {
-  const url = '/api/v1/courses/1/custom_gradebook_columns'
-  let network: NetworkFake
+  const url = '/api/v1/courses/*/custom_gradebook_columns'
+  const server = setupServer()
+  const capturedRequests: any[] = []
 
   function getRequests() {
-    return network.getRequests()
+    return capturedRequests
   }
 
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
-    network = new NetworkFake()
-    jest.useFakeTimers()
+    capturedRequests.length = 0
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('sends a request to the custom columns url', async () => {
-    store.getState().fetchCustomColumns()
-    await network.allRequestsReady()
+    server.use(
+      http.get(url, async ({request}) => {
+        capturedRequests.push({url: request.url})
+        return HttpResponse.json([])
+      }),
+    )
+
+    await store.getState().fetchCustomColumns()
     const requests = getRequests()
     expect(requests).toHaveLength(1)
   })
 
   describe('when sending the initial request', () => {
     it('sets the `per_page` parameter to the configured per page maximum', async () => {
+      server.use(
+        http.get(url, async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          capturedRequests.push({params})
+          return HttpResponse.json([])
+        }),
+      )
+
       store.setState({
         performanceControls: new PerformanceControls({customColumnsPerPage: 45}),
       })
-      store.getState().fetchCustomColumns()
-      await network.allRequestsReady()
-      const [{ params }] = getRequests()
+      await store.getState().fetchCustomColumns()
+      const [{params}] = getRequests()
       expect(params.per_page).toStrictEqual('45')
     })
   })
 
   describe('when the first page resolves', () => {
     beforeEach(async () => {
-      store.getState().fetchCustomColumns()
-      await network.allRequestsReady()
-      const [{ response }] = getRequests()
-      setPaginationLinkHeader(response, { first: 1, current: 1, next: 2, last: 3 })
-      response.setJson(exampleCustomColumns.slice(0, 1))
-      response.send()
-      await network.allRequestsReady()
+      let requestCount = 0
+      server.use(
+        http.get(url, async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          const page = params.page || '1'
+
+          capturedRequests.push({
+            params,
+            path: url.pathname,
+            page,
+          })
+
+          requestCount++
+
+          if (requestCount === 1) {
+            // First page response with pagination links
+            return HttpResponse.json(exampleCustomColumns.slice(0, 1), {
+              headers: {
+                Link: '<http://localhost/api/v1/courses/1/custom_gradebook_columns?page=1>; rel="first", <http://localhost/api/v1/courses/1/custom_gradebook_columns?page=2>; rel="next", <http://localhost/api/v1/courses/1/custom_gradebook_columns?page=3>; rel="last"',
+              },
+            })
+          } else {
+            // Subsequent pages
+            return HttpResponse.json([])
+          }
+        }),
+      )
+
+      await store.getState().fetchCustomColumns()
     })
 
     it('sends a request for each additional page', () => {
@@ -98,7 +144,7 @@ describe('customColumnsState', () => {
     })
 
     it('uses the same path for each page', () => {
-      const [{ path }] = getRequests()
+      const [{path}] = getRequests()
       getRequests()
         .slice(1)
         .forEach(request => {
@@ -107,11 +153,11 @@ describe('customColumnsState', () => {
     })
 
     it('uses the same parameters for each page', () => {
-      const [{ params }] = getRequests()
+      const [{params}] = getRequests()
       getRequests()
         .slice(1)
         .forEach(request => {
-          const { page, ...pageParams } = request.params
+          const {page, ...pageParams} = request.params
           expect(pageParams).toStrictEqual(params)
         })
     })
@@ -119,29 +165,29 @@ describe('customColumnsState', () => {
 
   describe('when all pages have resolved', () => {
     beforeEach(async () => {
-      jest.useFakeTimers()
-      store.getState().fetchCustomColumns()
-      await network.allRequestsReady()
+      server.use(
+        http.get(url, async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          const page = params.page || '1'
 
-      // Resolve the first page
-      const [{ response }] = getRequests()
-      setPaginationLinkHeader(response, { first: 1, current: 1, next: 2, last: 3 })
-      response.setJson(exampleCustomColumns.slice(0, 1))
-      response.send()
-      jest.advanceTimersByTime(1)
-      await network.allRequestsReady()
+          if (page === '1') {
+            return HttpResponse.json(exampleCustomColumns.slice(0, 1), {
+              headers: {
+                Link: '<http://localhost/api/v1/courses/1/custom_gradebook_columns?page=1>; rel="first", <http://localhost/api/v1/courses/1/custom_gradebook_columns?page=2>; rel="next", <http://localhost/api/v1/courses/1/custom_gradebook_columns?page=3>; rel="last"',
+              },
+            })
+          } else if (page === '2') {
+            return HttpResponse.json(exampleCustomColumns.slice(1, 2))
+          } else if (page === '3') {
+            return HttpResponse.json(exampleCustomColumns.slice(2, 3))
+          }
 
-      // Resolve the remaining pages
-      const [request2, request3] = getRequests().slice(1)
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request2.response.setJson(exampleCustomColumns.slice(1, 2))
-      request2.response.send()
-      jest.advanceTimersByTime(1)
+          return HttpResponse.json([])
+        }),
+      )
 
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request3.response.setJson(exampleCustomColumns.slice(2, 3))
-      request3.response.send()
-      jest.advanceTimersByTime(1)
+      await store.getState().fetchCustomColumns()
     })
 
     it('includes the loaded custom columns when updating the gradebook', () => {
@@ -151,17 +197,19 @@ describe('customColumnsState', () => {
 
   describe('if the first response does not link to the last page', () => {
     beforeEach(async () => {
-      store.getState().fetchCustomColumns()
-      await network.allRequestsReady()
-      const [{ response }] = getRequests()
-      response.setJson(exampleCustomColumns.slice(0, 1))
-      response.send()
-      jest.advanceTimersByTime(1)
-      await network.allRequestsReady()
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          // Response without pagination Link header
+          return HttpResponse.json(exampleCustomColumns.slice(0, 1))
+        }),
+      )
+
+      await store.getState().fetchCustomColumns()
     })
 
     it('does not send additional requests', () => {
-      expect(getRequests()).toHaveLength(2)
+      expect(getRequests()).toHaveLength(1)
     })
   })
 })

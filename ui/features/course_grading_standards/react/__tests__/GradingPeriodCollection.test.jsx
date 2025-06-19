@@ -154,11 +154,12 @@ describe('GradingPeriodCollection', () => {
     })
   })
 
-  it('shows loading state while fetching grading periods', () => {
+  it('shows loading state while fetching grading periods', async () => {
     // Use MSW to delay the response
     server.use(
       http.get('http://localhost/api/v1/courses/1/grading_periods', async () => {
-        await new Promise(() => {}) // Never resolves
+        await new Promise(resolve => setTimeout(resolve, 100))
+        return HttpResponse.json(defaultPeriods)
       }),
     )
 

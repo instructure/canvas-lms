@@ -22,13 +22,13 @@ import InvitationsView from '../InvitationsView'
 import RosterUser from '../../models/RosterUser'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const equal = x => expect(x).toEqual(true)
 const strictEqual = (x, y) => expect(x).toEqual(y)
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('InvitationsView', () => {
   beforeAll(() => {

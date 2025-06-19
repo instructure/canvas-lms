@@ -23,9 +23,9 @@ import {Group} from '../../../../graphql/Group'
 import HeaderInputs from '../HeaderInputs'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import React from 'react'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import {handlers} from '../../../../graphql/mswHandlers'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
+import {mswClient} from '@canvas/msw/mswClient'
 import {ApolloProvider} from '@apollo/client'
 
 jest.mock('../../../../util/utils', () => ({
@@ -34,7 +34,7 @@ jest.mock('../../../../util/utils', () => ({
 }))
 
 describe('HeaderInputs', () => {
-  const server = mswServer(handlers)
+  const server = setupServer(...handlers)
   const defaultProps = props => ({
     courses: {
       favoriteGroupsConnection: {
