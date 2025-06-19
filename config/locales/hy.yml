@@ -11093,6 +11093,7 @@ hy:
     grading_standard_type: "Գնահատման ստանդարտ"
     group_type: Խումբ
     learning_outcome_type: "Ուսուցման արդյունք"
+    module_item_type: "Մոդուլի տարր"
     module_type: Մոդուլ
     quiz_question_type: "Թեստի հարց"
     quiz_type: Թեստ
