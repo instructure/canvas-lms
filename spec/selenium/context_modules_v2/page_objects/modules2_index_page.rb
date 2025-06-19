@@ -26,6 +26,18 @@ module Modules2IndexPage
     "button[aria-label='Collapse All']"
   end
 
+  def copy_to_button_selector
+    "button:contains('Copy')"
+  end
+
+  def copy_to_tray_course_select_selector
+    "#direct-share-course-select"
+  end
+
+  def course_option_selector(option_list_id, course_name)
+    "#{option_list_options_selector(option_list_id)}:contains(#{course_name})"
+  end
+
   def edit_item_modal_selector
     "[data-testid='edit-item-modal']"
   end
@@ -66,6 +78,10 @@ module Modules2IndexPage
     "[data-testid='module-item-action-menu']"
   end
 
+  def option_list_options_selector(option_list_id)
+    "##{option_list_id} [role='option']"
+  end
+
   def page_body
     f("body")
   end
@@ -90,6 +106,14 @@ module Modules2IndexPage
 
   def collapse_all_modules_button
     f(collapse_all_modules_button_selector)
+  end
+
+  def copy_button
+    fj(copy_to_button_selector)
+  end
+
+  def copy_to_tray_course_select
+    f(copy_to_tray_course_select_selector)
   end
 
   def edit_item_modal
@@ -130,6 +154,14 @@ module Modules2IndexPage
 
   def module_item_titles
     ff(module_item_title_selector)
+  end
+
+  def option_list(option_list_id)
+    ff(option_list_options_selector(option_list_id))
+  end
+
+  def option_list_course_option(option_list_id, course_name)
+    fj(course_option_selector(option_list_id, course_name))
   end
 
   def send_to_form_selected_elements
