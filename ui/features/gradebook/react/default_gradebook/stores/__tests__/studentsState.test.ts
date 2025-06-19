@@ -20,8 +20,8 @@ import store from '../index'
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@canvas/util/xhr'
 import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../../PerformanceControls'
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
-import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {getUsers} from '../graphql/users/getUsers'
 import {
   getSubmissions,
@@ -157,40 +157,48 @@ const urls = {
 }
 
 describe('Gradebook > fetchStudentIds', () => {
-  const url = '/courses/0/gradebook/user_ids'
+  const url = '/courses/*/gradebook/user_ids'
+  const server = setupServer()
+  const capturedRequests: any[] = []
 
   let exampleData_: {studentIds: string[]}
-  let network: NetworkFake
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
+    capturedRequests.length = 0
     exampleData_ = {
       studentIds: ['1101', '1102', '1103'],
     }
   })
 
+  afterEach(() => {
+    server.resetHandlers()
+    store.setState(initialState, true)
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   describe('#fetchStudentIds()', () => {
-    beforeEach(() => {
-      network = new NetworkFake()
-    })
-
-    afterEach(() => {
-      network.restore()
-      store.setState(initialState, true)
-    })
-
-    function fetchStudentIds() {
-      store.getState().fetchStudentIds()
-      return network.allRequestsReady()
-    }
-
     function getRequestsForUserIds() {
-      return network.getRequests().filter(request => {
-        return request.url === url
+      return capturedRequests.filter(request => {
+        return request.url.includes('/user_ids')
       })
     }
 
     test('sends the request using the given course id', async () => {
-      await fetchStudentIds()
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json({user_ids: exampleData_.studentIds})
+        }),
+      )
+
+      await store.getState().fetchStudentIds()
       const requests = getRequestsForUserIds()
       expect(requests).toHaveLength(1)
     })
@@ -207,13 +215,20 @@ describe('Gradebook > fetchStudentIds', () => {
       })
 
       test('does not send a request for student ids', async () => {
-        await fetchStudentIds()
+        server.use(
+          http.get(url, async ({request}) => {
+            capturedRequests.push({url: request.url})
+            return HttpResponse.json({user_ids: exampleData_.studentIds})
+          }),
+        )
+
+        await store.getState().fetchStudentIds()
         const requests = getRequestsForUserIds()
         expect(requests).toHaveLength(0)
       })
 
       test('removes the prefetch request', async () => {
-        await fetchStudentIds()
+        await store.getState().fetchStudentIds()
         expect(typeof getPrefetchedXHR('user_ids')).toStrictEqual('undefined')
       })
     })
@@ -243,7 +258,11 @@ describe('#loadStudentData()', () => {
 })
 
 describe('#loadCompositeStudentData()', () => {
-  let server: FakeServer
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     const performanceControls = new PerformanceControls({
@@ -255,27 +274,42 @@ describe('#loadCompositeStudentData()', () => {
       activeRequestLimit: performanceControls.activeRequestLimit,
     })
 
-    store.setState({performanceControls, dispatch})
+    store.setState({performanceControls, dispatch, courseId: '0'})
 
-    server = new FakeServer()
-    server.for(urls.studentIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
-    server
-      .for(urls.students, {user_ids: exampleData.studentIds.slice(0, 2)})
-      .respond([{status: 200, body: exampleData.students.slice(0, 2)}])
-    server
-      .for(urls.students, {user_ids: exampleData.studentIds.slice(2, 3)})
-      .respond({status: 200, body: exampleData.students.slice(2, 3)})
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)})
-      .respond([{status: 200, body: exampleData.submissions.slice(0, 2)}])
-    server
-      .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
-      .respond([{status: 200, body: exampleData.submissions.slice(2, 3)}])
+    server.use(
+      http.get(urls.studentIds, () => {
+        return HttpResponse.json({user_ids: exampleData.studentIds})
+      }),
+      http.get(urls.students, ({request}) => {
+        const url = new URL(request.url)
+        const userIds = url.searchParams.getAll('user_ids[]').join(',')
+        if (userIds === exampleData.studentIds.slice(0, 2).join(',')) {
+          return HttpResponse.json(exampleData.students.slice(0, 2))
+        } else if (userIds === exampleData.studentIds.slice(2, 3).join(',')) {
+          return HttpResponse.json(exampleData.students.slice(2, 3))
+        }
+        return HttpResponse.json([])
+      }),
+      http.get(urls.submissions, ({request}) => {
+        const url = new URL(request.url)
+        const studentIds = url.searchParams.getAll('student_ids[]').join(',')
+        if (studentIds === exampleData.studentIds.slice(0, 2).join(',')) {
+          return HttpResponse.json(exampleData.submissions.slice(0, 2))
+        } else if (studentIds === exampleData.studentIds.slice(2, 3).join(',')) {
+          return HttpResponse.json(exampleData.submissions.slice(2, 3))
+        }
+        return HttpResponse.json([])
+      }),
+    )
   })
 
   afterEach(() => {
-    server.teardown()
+    server.resetHandlers()
     store.setState(initialState, true)
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   test('returns student and submission data', async () => {
@@ -285,8 +319,12 @@ describe('#loadCompositeStudentData()', () => {
 })
 
 describe('#loadGraphqlStudentData()', () => {
-  let server: FakeServer
+  const server = setupServer()
   const mockUsers = [{id: '1101'}, {id: '1102'}, {id: '1103'}]
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     ;(getUsers as jest.Mock).mockImplementation((params: {after?: string}) => {
@@ -349,16 +387,23 @@ describe('#loadGraphqlStudentData()', () => {
       activeRequestLimit: performanceControls.activeRequestLimit,
     })
 
-    store.setState({performanceControls, dispatch})
+    store.setState({performanceControls, dispatch, courseId: '0'})
 
-    server = new FakeServer()
-    server.for(urls.studentIds).respond({status: 200, body: {user_ids: exampleData.studentIds}})
+    server.use(
+      http.get(urls.studentIds, () => {
+        return HttpResponse.json({user_ids: exampleData.studentIds})
+      }),
+    )
   })
 
   afterEach(() => {
     jest.resetAllMocks()
-    server.teardown()
+    server.resetHandlers()
     store.setState(initialState, true)
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   test('returns student and submission data', async () => {

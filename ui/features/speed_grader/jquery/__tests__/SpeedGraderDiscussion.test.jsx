@@ -88,7 +88,7 @@ describe('SpeedGrader Discussion', () => {
         return HttpResponse.json({})
       }),
     )
-    jest.spyOn(window.$, 'getJSON').mockImplementation(() => Promise.resolve({}))
+    // No need to mock getJSON since we're already using MSW for all network requests
     jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
     $appendSpy = jest.spyOn(window.$.fn, 'append')
 

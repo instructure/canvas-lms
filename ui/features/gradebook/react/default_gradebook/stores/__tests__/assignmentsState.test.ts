@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {NetworkFake} from '@canvas/network/NetworkFake/index'
 import store from '../index'
 import {AssignmentLoaderParams, normalizeGradingPeriodId} from '../assignmentsState'
 import {RequestDispatch} from '@canvas/network'
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {clearPrefetchedXHRs, getPrefetchedXHR, setPrefetchedXHR} from '@canvas/util/xhr'
 import PerformanceControls from '../../PerformanceControls'
 import {maxAssignmentCount} from '../../Gradebook.utils'
@@ -123,10 +123,15 @@ describe('Gradebook', () => {
   })
 
   describe('fetchGradingPeriodAssignments', () => {
-    let network: NetworkFake
+    const server = setupServer()
+    const capturedRequests: any[] = []
+
+    beforeAll(() => {
+      server.listen()
+    })
 
     beforeEach(() => {
-      network = new NetworkFake()
+      capturedRequests.length = 0
       const performanceControls = new PerformanceControls()
 
       const dispatch = new RequestDispatch({
@@ -136,41 +141,48 @@ describe('Gradebook', () => {
     })
 
     afterEach(() => {
-      network.restore()
+      server.resetHandlers()
       jest.resetAllMocks()
       store.setState(initialState, true)
     })
 
+    afterAll(() => {
+      server.close()
+    })
+
     it('send the requests with the correct course id', async () => {
-      store.getState().fetchGradingPeriodAssignments()
-      await network.allRequestsReady()
+      server.use(
+        http.get(urls.gradingPeriodAssignmentsUrl, async ({request}) => {
+          const url = new URL(request.url)
+          capturedRequests.push({url: url.pathname})
+          return HttpResponse.json({
+            grading_period_assignments: exampleData.gradingPeriodAssignments,
+          })
+        }),
+      )
 
-      const requests = network.getRequests()
+      await store.getState().fetchGradingPeriodAssignments()
 
-      expect(requests).toHaveLength(1)
-      expect(requests[0].url).toBe(urls.gradingPeriodAssignmentsUrl)
+      expect(capturedRequests).toHaveLength(1)
+      expect(capturedRequests[0].url).toBe(urls.gradingPeriodAssignmentsUrl)
     })
 
     it('sets loading state immediately and updates after response', async () => {
+      server.use(
+        http.get(urls.gradingPeriodAssignmentsUrl, async ({request}) => {
+          return HttpResponse.json({
+            grading_period_assignments: exampleData.gradingPeriodAssignments,
+          })
+        }),
+      )
+
       // Initial state check
       expect(store.getState().gradingPeriodAssignments).toEqual({})
       expect(store.getState().isGradingPeriodAssignmentsLoading).toBe(false)
 
-      // Start the request
-      store.getState().fetchGradingPeriodAssignments()
-      const promise = network.allRequestsReady()
-
-      // Check loading state was set synchronously
+      // Start the request and check loading state was set synchronously
+      const promise = store.getState().fetchGradingPeriodAssignments()
       expect(store.getState().isGradingPeriodAssignmentsLoading).toBe(true)
-
-      const requests = network.getRequests()
-
-      // Get the request and respond with data
-      const [request] = requests
-      request.response.setJson({
-        grading_period_assignments: exampleData.gradingPeriodAssignments,
-      })
-      request.response.send()
 
       // Wait for promise to resolve
       await promise
@@ -183,28 +195,25 @@ describe('Gradebook', () => {
     })
 
     it('adds a flash message and clears loading state when the request fails', async () => {
+      server.use(
+        http.get(urls.gradingPeriodAssignmentsUrl, async () => {
+          return HttpResponse.json({error: 'Server error'}, {status: 500})
+        }),
+      )
+
       store.setState({flashMessages: [], isGradingPeriodAssignmentsLoading: false})
 
-      // Start the request
-      store.getState().fetchGradingPeriodAssignments()
-      const promise = network.allRequestsReady()
-
-      // Check loading state was set synchronously
+      // Start the request and check loading state was set synchronously
+      const promise = store.getState().fetchGradingPeriodAssignments()
       expect(store.getState().isGradingPeriodAssignmentsLoading).toBe(true)
-
-      const [request] = network.getRequests()
-
-      // Simulate a 500 server error
-      request.response.setStatus(500)
-      request.response.send()
 
       // Wait for promise to resolve
       await promise
 
-      // // Verify loading state is cleared
+      // Verify loading state is cleared
       expect(store.getState().isGradingPeriodAssignmentsLoading).toBe(false)
 
-      // // Verify flash message was added
+      // Verify flash message was added
       expect(store.getState().flashMessages).toHaveLength(1)
       expect(store.getState().flashMessages[0]).toMatchObject({
         key: 'grading-period-assignments-loading-error',
@@ -234,8 +243,15 @@ describe('Gradebook', () => {
       })
 
       it('does not send a request for student ids', async () => {
+        server.use(
+          http.get(urls.gradingPeriodAssignmentsUrl, async () => {
+            capturedRequests.push({type: 'unexpected_request'})
+            return HttpResponse.json({})
+          }),
+        )
+
         await store.getState().fetchGradingPeriodAssignments()
-        expect(network.getRequests()).toHaveLength(0)
+        expect(capturedRequests).toHaveLength(0)
       })
 
       it('removes the prefetch request', async () => {
@@ -251,20 +267,16 @@ describe('Gradebook', () => {
       })
 
       it('fetches data from the API when no prefetched data exists', async () => {
-        // Mock dispatch.getJSON to return the expected data
-        const dispatch = store.getState().dispatch
-        const mockGetJSON = jest.fn().mockResolvedValue({
-          grading_period_assignments: exampleData.gradingPeriodAssignments,
-        })
-
-        // Only modify the dispatch object
-        dispatch.getJSON = mockGetJSON
+        server.use(
+          http.get(urls.gradingPeriodAssignmentsUrl, () => {
+            return HttpResponse.json({
+              grading_period_assignments: exampleData.gradingPeriodAssignments,
+            })
+          }),
+        )
 
         // Call the function
         await store.getState().fetchGradingPeriodAssignments()
-
-        // Verify getJSON was called with the correct URL
-        expect(mockGetJSON).toHaveBeenCalledWith(urls.gradingPeriodAssignmentsUrl)
 
         // Verify state was updated correctly
         expect(store.getState().gradingPeriodAssignments).toEqual(
@@ -273,12 +285,11 @@ describe('Gradebook', () => {
       })
 
       it('handles network errors correctly with non-prefetched data', async () => {
-        // Mock dispatch.getJSON to simulate a network error
-        const dispatch = store.getState().dispatch
-        const mockGetJSON = jest.fn().mockRejectedValue(new Error('Network error'))
-
-        // Only modify the dispatch object
-        dispatch.getJSON = mockGetJSON
+        server.use(
+          http.get(urls.gradingPeriodAssignmentsUrl, () => {
+            return new HttpResponse(null, {status: 500})
+          }),
+        )
 
         store.setState({flashMessages: []})
 
@@ -300,7 +311,11 @@ describe('Gradebook', () => {
   })
 
   describe('loadAssignmentGroups', () => {
-    let server: FakeServer
+    const server = setupServer()
+
+    beforeAll(() => {
+      server.listen()
+    })
 
     beforeEach(() => {
       const performanceControls = new PerformanceControls({
@@ -320,16 +335,21 @@ describe('Gradebook', () => {
         gradingPeriodAssignments: exampleData.gradingPeriodAssignments,
       })
 
-      server = new FakeServer()
-      server
-        .for(urls.assignmentGroupsUrl)
-        .respond({status: 200, body: exampleData.assignmentGroups})
+      server.use(
+        http.get(urls.assignmentGroupsUrl, () => {
+          return HttpResponse.json(exampleData.assignmentGroups)
+        }),
+      )
     })
 
     afterEach(() => {
-      server.teardown()
+      server.resetHandlers()
       jest.resetAllMocks()
       store.setState(initialState, true)
+    })
+
+    afterAll(() => {
+      server.close()
     })
 
     it.each([false, true])('forwards useGraphQL parameter: %s', async value => {
@@ -517,7 +537,11 @@ describe('Gradebook', () => {
   })
 
   describe('loadAssignmentGroupsForGradingPeriods', () => {
-    let server: FakeServer
+    const server = setupServer()
+
+    beforeAll(() => {
+      server.listen()
+    })
 
     beforeEach(() => {
       const performanceControls = new PerformanceControls({
@@ -537,16 +561,21 @@ describe('Gradebook', () => {
         gradingPeriodAssignments: exampleData.gradingPeriodAssignments,
       })
 
-      server = new FakeServer()
-      server
-        .for(urls.assignmentGroupsUrl)
-        .respond({status: 200, body: exampleData.assignmentGroups})
+      server.use(
+        http.get(urls.assignmentGroupsUrl, () => {
+          return HttpResponse.json(exampleData.assignmentGroups)
+        }),
+      )
     })
 
     afterEach(() => {
       store.setState(initialState, true)
       jest.resetAllMocks()
-      server.teardown()
+      server.resetHandlers()
+    })
+
+    afterAll(() => {
+      server.close()
     })
 
     const createParams = (): AssignmentLoaderParams => ({

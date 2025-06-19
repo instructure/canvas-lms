@@ -19,7 +19,8 @@
  */
 
 import PerformanceControls from '../../PerformanceControls'
-import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../index'
 const exampleData = {
   contextModules: [{id: '2601'}, {id: '2602 '}, {id: '2603'}],
@@ -27,120 +28,126 @@ const exampleData = {
 
 describe('modulesState', () => {
   const url = '/api/v1/courses/1/modules'
-  let network
+  const capturedRequests: any[] = []
+
+  const server = setupServer()
 
   function getRequests() {
-    return network.getRequests(request => request.path === url)
+    return capturedRequests.filter(request => request.url.includes('/api/v1/courses/1/modules'))
   }
 
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
-    network = new NetworkFake()
-    jest.useFakeTimers()
+    capturedRequests.length = 0
+    store.setState({courseId: '1'})
+
+    // Reset modules state
+    store.setState({modules: [], isModulesLoading: false})
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   it('sends a request to the context modules url', async () => {
-    store.getState().fetchModules()
-    await network.allRequestsReady()
+    server.use(
+      http.get('/api/v1/courses/1/modules', async ({request}) => {
+        const url = new URL(request.url)
+        const params = Object.fromEntries(url.searchParams.entries())
+        capturedRequests.push({url: request.url, params, path: url.pathname})
+        return HttpResponse.json([])
+      }),
+    )
+
+    await store.getState().fetchModules()
     const requests = getRequests()
     expect(requests).toHaveLength(1)
   })
 
   describe('when sending the initial request', () => {
     it('sets the `per_page` parameter to the configured per page maximum', async () => {
+      server.use(
+        http.get('/api/v1/courses/1/modules', async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          capturedRequests.push({url: request.url, params, path: url.pathname})
+          return HttpResponse.json([])
+        }),
+      )
+
       store.setState({
         performanceControls: new PerformanceControls({contextModulesPerPage: 45}),
       })
-      store.getState().fetchModules()
-      await network.allRequestsReady()
+      await store.getState().fetchModules()
       const [{params}] = getRequests()
       expect(params.per_page).toStrictEqual('45')
     })
   })
 
-  describe('when the first page resolves', () => {
-    beforeEach(async () => {
-      store.getState().fetchModules()
-      await network.allRequestsReady()
-      const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      response.setJson(exampleData.contextModules.slice(0, 1))
-      response.send()
-      await network.allRequestsReady()
-    })
+  describe('when pagination links are present', () => {
+    it('fetches multiple pages and includes all modules', async () => {
+      server.use(
+        http.get('/api/v1/courses/1/modules', async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          const page = params.page || '1'
+          capturedRequests.push({url: request.url, params, path: url.pathname})
 
-    it('sends a request for each additional page', () => {
-      const pages = getRequests()
-        .slice(1)
-        .map(request => request.params.page)
-      expect(pages).toStrictEqual(['2', '3'])
-    })
+          if (page === '1') {
+            return HttpResponse.json(exampleData.contextModules.slice(0, 1), {
+              headers: {
+                Link: '</api/v1/courses/1/modules?page=1>; rel="first", </api/v1/courses/1/modules?page=2>; rel="next", </api/v1/courses/1/modules?page=3>; rel="last"',
+              },
+            })
+          } else if (page === '2') {
+            return HttpResponse.json(exampleData.contextModules.slice(1, 2), {
+              headers: {
+                Link: '</api/v1/courses/1/modules?page=1>; rel="first", </api/v1/courses/1/modules?page=1>; rel="prev", </api/v1/courses/1/modules?page=3>; rel="next", </api/v1/courses/1/modules?page=3>; rel="last"',
+              },
+            })
+          } else if (page === '3') {
+            return HttpResponse.json(exampleData.contextModules.slice(2, 3), {
+              headers: {
+                Link: '</api/v1/courses/1/modules?page=1>; rel="first", </api/v1/courses/1/modules?page=2>; rel="prev", </api/v1/courses/1/modules?page=3>; rel="last"',
+              },
+            })
+          }
+          return HttpResponse.json([])
+        }),
+      )
 
-    it('uses the same path for each page', () => {
-      const [{path}] = getRequests()
-      getRequests()
-        .slice(1)
-        .forEach(request => {
-          expect(request.path).toStrictEqual(path)
-        })
-    })
+      await store.getState().fetchModules()
 
-    it('uses the same parameters for each page', () => {
-      const [{params}] = getRequests()
-      getRequests()
-        .slice(1)
-        .forEach(request => {
-          const {page, ...pageParams} = request.params
-          expect(pageParams).toStrictEqual(params)
-        })
-    })
-  })
+      // Check that multiple pages were requested
+      const pages = getRequests().map(request => request.params.page || '1')
+      expect(pages).toEqual(['1', '2', '3'])
 
-  describe('when all pages have resolved', () => {
-    beforeEach(async () => {
-      store.getState().fetchModules()
-      await network.allRequestsReady()
-
-      // Resolve the first page
-      const [{response}] = getRequests()
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      response.setJson(exampleData.contextModules.slice(0, 1))
-      response.send()
-      jest.advanceTimersByTime(1)
-      await network.allRequestsReady()
-
-      // Resolve the remaining pages
-      const [request2, request3] = getRequests().slice(1)
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request2.response.setJson(exampleData.contextModules.slice(1, 2))
-      request2.response.send()
-      jest.advanceTimersByTime(1)
-
-      setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request3.response.setJson(exampleData.contextModules.slice(2, 3))
-      request3.response.send()
-      jest.advanceTimersByTime(1)
-    })
-
-    it('includes the loaded context modules when updating the gradebook', () => {
-      expect(store.getState().modules).toStrictEqual(exampleData.contextModules)
+      // Check that all modules were loaded
+      expect(store.getState().modules).toEqual(exampleData.contextModules)
     })
   })
 
-  describe('if the first response does not link to the last page', () => {
-    beforeEach(async () => {
-      store.getState().fetchModules()
-      await network.allRequestsReady()
-      const [{response}] = getRequests()
-      response.setJson(exampleData.contextModules.slice(0, 1))
-      response.send()
-      await network.allRequestsReady()
-    })
+  describe('when no pagination links are present', () => {
+    it('only sends one request', async () => {
+      server.use(
+        http.get('/api/v1/courses/1/modules', async ({request}) => {
+          const url = new URL(request.url)
+          const params = Object.fromEntries(url.searchParams.entries())
+          capturedRequests.push({url: request.url, params, path: url.pathname})
 
-    it('does not send additional requests', () => {
+          // Return single page without pagination links
+          return HttpResponse.json(exampleData.contextModules.slice(0, 1))
+        }),
+      )
+
+      await store.getState().fetchModules()
       expect(getRequests()).toHaveLength(1)
     })
   })

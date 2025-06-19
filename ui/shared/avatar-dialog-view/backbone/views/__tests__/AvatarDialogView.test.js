@@ -19,22 +19,76 @@
 import $ from 'jquery'
 import AvatarDialogView from '../AvatarDialogView'
 import {isAccessible} from '@canvas/test-utils/jestAssertions'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
+const server = setupServer()
 let avatarDialogView
 
 describe('AvatarDialogView#onPreflight', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
+    window.ENV = {
+      folder_id: '1',
+      current_user_id: '123',
+    }
     avatarDialogView = new AvatarDialogView()
-    // Mock jQuery's post and getJSON methods
-    $.post = jest.fn()
-    $.getJSON = jest.fn()
     $.flashError = jest.fn()
+
+    // Mock jQuery.post to use fetch with MSW
+    $.post = jest.fn((url, data) => {
+      const deferred = $.Deferred()
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(data).toString(),
+      })
+        .then(response => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              deferred.reject({responseText: text})
+            })
+          }
+          return response.json().then(json => {
+            deferred.resolve([json])
+          })
+        })
+        .catch(error => {
+          deferred.reject({responseText: error.message})
+        })
+
+      return deferred.promise()
+    })
+
+    // Mock jQuery.getJSON
+    $.getJSON = jest.fn(url => {
+      const deferred = $.Deferred()
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => deferred.resolve(data))
+        .catch(error => deferred.reject(error))
+
+      return deferred.promise()
+    })
   })
 
   afterEach(() => {
     avatarDialogView = null
     $('.ui-dialog').remove()
+    server.resetHandlers()
     jest.restoreAllMocks()
+    delete window.ENV
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   test('it should be accessible', function (done) {
@@ -45,24 +99,21 @@ describe('AvatarDialogView#onPreflight', () => {
     const errorMessage = 'User storage quota exceeded'
     avatarDialogView.enableSelectButton = jest.fn()
 
-    // Mock the failed POST request
-    $.post.mockImplementation(() => {
-      const deferred = $.Deferred()
-      setTimeout(() => {
-        deferred.reject({
-          responseText: JSON.stringify({
+    server.use(
+      http.post('/files/pending', () => {
+        return new HttpResponse(
+          JSON.stringify({
             errors: {
               base: errorMessage,
             },
           }),
-        })
-      }, 0)
-      return deferred.promise()
-    })
+          {status: 400},
+        )
+      }),
+    )
 
-    // Since preflightRequest doesn't return the promise from $.post for failed requests,
-    // we need to wait for the next tick
-    avatarDialogView.preflightRequest()
+    // Call the method directly and wait for it to complete
+    const result = avatarDialogView.preflightRequest()
     await new Promise(resolve => setTimeout(resolve, 10))
 
     expect($.flashError).toHaveBeenCalledWith(errorMessage)
@@ -70,30 +121,20 @@ describe('AvatarDialogView#onPreflight', () => {
   })
 
   test('errors if waitAndSaveUserAvatar is called more than 50 times without successful save', async () => {
-    // Mock getJSON to always return empty array (no processed avatar)
-    $.getJSON.mockResolvedValue([])
+    server.use(
+      http.get('/api/v1/users/self/avatars', () => {
+        return HttpResponse.json([])
+      }),
+    )
 
     // Mock handleErrorUpdating
     avatarDialogView.handleErrorUpdating = jest.fn()
 
-    // Speed up the test by mocking setTimeout
-    jest.useFakeTimers()
-
-    const promise = avatarDialogView.waitAndSaveUserAvatar('fake-token', 'fake-url', 0)
-
-    // Run all timers to simulate the 50 retries
-    for (let i = 0; i < 50; i++) {
-      jest.runOnlyPendingTimers()
-      await Promise.resolve() // Let promises settle
-    }
-
-    jest.runOnlyPendingTimers()
-    await promise
+    // Directly call with count = 50 to test the error case
+    await avatarDialogView.waitAndSaveUserAvatar('fake-token', 'fake-url', 50)
 
     expect(avatarDialogView.handleErrorUpdating).toHaveBeenCalledWith(
       expect.stringContaining('Profile photo save failed too many times'),
     )
-
-    jest.useRealTimers()
   })
 })

@@ -17,54 +17,84 @@
  */
 
 import * as jwt from '../jwt'
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('JWT', () => {
   describe('.refreshFn() returned function', () => {
     const token = 'example'
     const newToken = 'newToken'
     const url = '/api/v1/jwts/refresh'
+    const server = setupServer()
 
     let refreshFn
-    let server
+
+    beforeAll(() => server.listen())
+    afterEach(() => server.resetHandlers())
+    afterAll(() => server.close())
 
     beforeEach(() => {
-      server = new FakeServer()
       refreshFn = jwt.refreshFn(token)
 
-      server.for(url).respond([{status: 200, body: {token: newToken}}])
-    })
-
-    afterEach(() => {
-      server.teardown()
+      server.use(
+        http.post(url, () => {
+          return HttpResponse.json({token: newToken})
+        }),
+      )
     })
 
     test('sends an ajax request', async () => {
+      let requestReceived = false
+      server.use(
+        http.post(url, () => {
+          requestReceived = true
+          return HttpResponse.json({token: newToken})
+        }),
+      )
       await refreshFn()
-      expect(server.receivedRequests).toHaveLength(1)
+      expect(requestReceived).toBe(true)
     })
 
     test('sends the request to the "refresh JWT" endpoint', async () => {
+      let correctUrl = false
+      server.use(
+        http.post(url, ({request}) => {
+          correctUrl = request.url.includes(url)
+          return HttpResponse.json({token: newToken})
+        }),
+      )
       await refreshFn()
-      expect(server.findRequest(url)).toBeTruthy()
+      expect(correctUrl).toBe(true)
     })
 
     test('uses a POST request', async () => {
+      let requestMethod = null
+      server.use(
+        http.all(url, ({request}) => {
+          requestMethod = request.method
+          return HttpResponse.json({token: newToken})
+        }),
+      )
       await refreshFn()
-      const request = server.findRequest('/api/v1/jwts/refresh')
-      expect(request.method).toBe('POST')
+      expect(requestMethod).toBe('POST')
     })
 
     test('does not send multiple requests before receiving a response', async () => {
-      server.unsetResponses(url)
-      server
-        .for(url)
-        .beforeRespond(() => {
-          refreshFn()
-        })
-        .respond([{status: 200, body: {token: newToken}}])
+      let requestCount = 0
+      server.use(
+        http.post(url, async () => {
+          requestCount++
+          // Call refreshFn again while first request is in flight
+          if (requestCount === 1) {
+            refreshFn()
+          }
+          return HttpResponse.json({token: newToken})
+        }),
+      )
       await refreshFn()
-      expect(server.receivedRequests).toHaveLength(1)
+      // Give time for any second request to complete
+      await new Promise(resolve => setTimeout(resolve, 10))
+      expect(requestCount).toBe(1)
     })
 
     test('returns the refreshed token with the resolved promise', async () => {

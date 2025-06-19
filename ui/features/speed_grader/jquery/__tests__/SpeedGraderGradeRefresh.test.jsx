@@ -20,9 +20,17 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import SpeedGrader from '../speed_grader'
 
+const server = setupServer()
+
 describe('SpeedGrader Grade Refresh', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   const requiredDOMFixtures = `
     <div id="hide-assignment-grades-tray"></div>
     <div id="post-assignment-grades-tray"></div>
@@ -86,27 +94,26 @@ describe('SpeedGrader Grade Refresh', () => {
   })
 
   describe('#refreshGrades', () => {
-    let ajaxSpy
-    let ajaxPromise
-
     beforeEach(() => {
-      ajaxPromise = new Promise(resolve => {
-        ajaxSpy = jest.spyOn($, 'getJSON').mockImplementation((url, params, callback) => {
-          const newSubmission = {
-            id: '1',
-            user_id: '1',
-            assignment_id: '17',
-            grade: '95',
-          }
-          callback(newSubmission)
-        })
-      })
+      server.use(
+        http.get(
+          '/api/v1/courses/:courseId/assignments/:assignmentId/submissions/:studentId.json',
+          () => {
+            return HttpResponse.json({
+              id: '1',
+              user_id: '1',
+              assignment_id: '17',
+              grade: '95',
+            })
+          },
+        ),
+      )
     })
 
     it('fetches and updates submission data', async () => {
       const callbackSpy = jest.fn()
       SpeedGrader.EG.refreshGrades(callbackSpy)
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(callbackSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -127,7 +134,7 @@ describe('SpeedGrader Grade Refresh', () => {
           return retryCount < 2
         },
       )
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(retryCount).toBe(2)
     })
@@ -141,7 +148,7 @@ describe('SpeedGrader Grade Refresh', () => {
           return false
         },
       )
-      await new Promise(resolve => setTimeout(resolve, 0))
+      await new Promise(resolve => setTimeout(resolve, 10))
 
       expect(retryCount).toBe(1)
     })

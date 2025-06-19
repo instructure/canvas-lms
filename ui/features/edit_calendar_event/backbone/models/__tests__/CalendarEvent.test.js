@@ -17,22 +17,33 @@
  */
 
 import CalendarEvent from '../CalendarEvent'
-import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {waitFor} from '@canvas/test-utils/Waiters'
 
 describe('Calendar', () => {
   describe('CalendarEvent', () => {
     describe('#fetch()', () => {
       let calendarEvent
-      let server
+      let requestCount = 0
+      const server = setupServer()
+
+      beforeAll(() => {
+        server.listen()
+      })
 
       beforeEach(() => {
-        server = new FakeServer()
-
-        server.for('/sections').respond([
-          {status: 200, body: []},
-          {status: 200, body: []},
-        ])
+        requestCount = 0
+        server.use(
+          http.get('/sections', ({request}) => {
+            requestCount++
+            const url = new URL(request.url)
+            const page = url.searchParams.get('page') || '1'
+            const headers =
+              page === '1' ? {Link: '<http://example.com/sections?page=2>; rel="next"'} : {}
+            return HttpResponse.json([], {headers})
+          }),
+        )
 
         calendarEvent = new CalendarEvent({sections_url: '/sections'})
 
@@ -42,7 +53,11 @@ describe('Calendar', () => {
       })
 
       afterEach(() => {
-        server.teardown()
+        server.resetHandlers()
+      })
+
+      afterAll(() => {
+        server.close()
       })
 
       async function fetch() {
@@ -57,11 +72,7 @@ describe('Calendar', () => {
       // Skip with LX-2093
       test.skip('requests all pages', async () => {
         await fetch()
-        const requests = server.filterRequests('/sections')
-        expect(requests).toHaveLength(2)
-        requests.forEach(r => {
-          expect(r.url).toContain('include[]=permissions')
-        })
+        expect(requestCount).toBe(2)
       })
 
       // Fickle

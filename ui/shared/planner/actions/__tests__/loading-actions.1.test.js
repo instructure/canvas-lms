@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
@@ -57,7 +57,7 @@ const getBasicState = () => ({
   currentUser: {id: '1'},
 })
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('api actions', () => {
   beforeAll(() => {

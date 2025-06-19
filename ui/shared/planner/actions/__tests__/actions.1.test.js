@@ -19,10 +19,11 @@
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
-import {isPromise} from '@canvas/jest-moxios-utils'
 import * as SidebarActions from '../sidebar-actions'
 import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
+
+const isPromise = obj => obj && typeof obj.then === 'function'
 
 jest.mock('../../utilities/apiUtils', () => ({
   ...jest.requireActual('../../utilities/apiUtils'),

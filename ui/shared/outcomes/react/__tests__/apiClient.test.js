@@ -18,9 +18,9 @@
 
 import * as apiClient from '../apiClient'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('apiClient', () => {
   beforeAll(() => {

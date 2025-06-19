@@ -23,7 +23,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import {ConversationContext} from '../../../util/constants'
 import * as utils from '../../../util/utils'
@@ -40,7 +40,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('ComposeModalContainer', () => {
-  const server = mswServer(handlers.concat(inboxSettingsHandlers()))
+  const server = setupServer(...handlers.concat(inboxSettingsHandlers()))
 
   beforeAll(() => {
     // Ensure server is clean before starting
