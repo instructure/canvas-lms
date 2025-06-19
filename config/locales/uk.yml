@@ -11628,6 +11628,7 @@ uk:
     grading_standard_type: "Стандарт оцінювання"
     group_type: Група
     learning_outcome_type: "Вивчення результатів"
+    module_item_type: "Елемент модуля"
     module_type: Розділ
     quiz_question_type: "Питання контрольної роботи"
     quiz_type: "Контрольна робота"
