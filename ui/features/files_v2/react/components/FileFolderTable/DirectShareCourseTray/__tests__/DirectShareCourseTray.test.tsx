@@ -75,7 +75,9 @@ describe('DirectShareCourseTray', () => {
   it('shows the overwrite warning', () => {
     renderComponent()
     expect(
-      screen.getByText(/^Importing the same course content more than once/),
+      screen.getByText(
+        'Previously imported content from the same course will be replaced. Manually added content will remain.',
+      ),
     ).toBeInTheDocument()
   })
 
