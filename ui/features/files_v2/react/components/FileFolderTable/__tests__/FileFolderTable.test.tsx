@@ -366,6 +366,49 @@ describe('FileFolderTable', () => {
     })
   })
 
+  describe('Keyboard Shortcuts', () => {
+    describe('when Ctrl+A / Cmd+A are pressed', () => {
+      let user: UserEvent
+      let setSelectedRows: jest.Mock
+
+      beforeEach(() => {
+        user = userEvent.setup()
+        setSelectedRows = jest.fn()
+      })
+
+      const TEST_CASES = [
+        {condition: 'when no rows are selected', selectedRows: new Set()},
+        {
+          condition: 'when some rows are selected',
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
+        },
+        {
+          condition: 'when all rows are selected',
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+        },
+      ]
+
+      TEST_CASES.forEach(({condition, selectedRows}) => {
+        describe(condition, () => {
+          beforeEach(() => {
+            renderComponent({
+              rows: [FAKE_FILES[0], FAKE_FILES[1]],
+              selectedRows: selectedRows as Set<string>,
+              setSelectedRows,
+            })
+          })
+
+          it('calls setSelectedRows with the full set of rows', async () => {
+            await user.keyboard('{Control>}{a}')
+            expect(setSelectedRows).toHaveBeenCalledWith(
+              new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+            )
+          })
+        })
+      })
+    })
+  })
+
   describe('FileFolderTable - delete behavior', () => {
     // TODO: the scope of this test overextends unit test
     it.skip('opens delete modal when delete button is clicked', async () => {
