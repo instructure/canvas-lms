@@ -48,6 +48,11 @@ export default createReactClass({
     }
   },
 
+  componentWillMount() {
+    this.addToolRef = React.createRef()
+    this.addButtonRef = React.createRef()
+  },
+
   componentDidMount() {
     this.setState({_isMounted: true})
     const fields = {}
@@ -85,7 +90,7 @@ export default createReactClass({
 
     try {
       this.setState({fields}, this.validateConfig)
-      this.refs.addTool.focus()
+      this.addToolRef.current?.focus()
     } catch (err) {
       console.error(err)
     }
@@ -177,19 +182,20 @@ export default createReactClass({
     newTool.set('config_settings', this.configSettings())
 
     $(e.target).prop('disabled', true)
+    this.addButtonRef = e.target
 
     newTool.save()
   },
 
   onSaveSuccess(tool) {
-    $(this.addButtonRef).removeAttr('disabled')
+    $(this.addButtonRef.current).removeAttr('disabled')
     tool.off('sync', this.onSaveSuccess)
     this.setState({errorMessage: null})
     this.closeModal(this.props.handleToolInstalled)
   },
 
   onSaveFail(_tool) {
-    $(this.addButtonRef).removeAttr('disabled')
+    $(this.addButtonRef.current).removeAttr('disabled')
     this.setState({
       errorMessage: I18n.t('There was an error in processing your request'),
     })
@@ -225,7 +231,7 @@ export default createReactClass({
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
-          ref="addTool"
+          ref={this.addToolRef}
           className="btn btn-primary btn-block add_app icon-add"
           onClick={this.openModal}
         >

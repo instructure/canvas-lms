@@ -52,7 +52,7 @@ export default {
   },
 
   handleSkipClick() {
-    if (this.props.closeOnResolve) this.refs.canvasModal.closeModal()
+    if (this.props.closeOnResolve) this.canvasModalRef.current?.closeModal()
     return this.props.onNameConflictResolved({
       file: this.state.fileOptions.file,
       dup: 'skip',
@@ -64,7 +64,7 @@ export default {
   // pass back expandZip to preserve options that was possibly already made
   // in a previous modal
   handleReplaceClick() {
-    if (this.props.closeOnResolve) this.refs.canvasModal.closeModal()
+    if (this.props.closeOnResolve) this.canvasModalRef.current?.closeModal()
     return this.props.onNameConflictResolved({
       file: this.state.fileOptions.file,
       dup: 'overwrite',
@@ -76,11 +76,11 @@ export default {
   // pass back expandZip to preserve options that was possibly already made
   // in a previous modal
   handleChangeClick() {
-    if (this.props.closeOnResolve) this.refs.canvasModal.closeModal()
+    if (this.props.closeOnResolve) this.canvasModalRef.current?.closeModal()
     return this.props.onNameConflictResolved({
       file: this.state.fileOptions.file,
       dup: 'rename',
-      name: ReactDOM.findDOMNode(this.refs.newName).value,
+      name: ReactDOM.findDOMNode(this.newNameRef.current).value,
       expandZip: this.state.fileOptions.expandZip,
     })
   },
