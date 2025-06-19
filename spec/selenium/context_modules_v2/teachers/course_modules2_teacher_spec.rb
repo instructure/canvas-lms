@@ -152,6 +152,32 @@ describe "context modules", :ignore_js_errors do
         expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
       end
     end
+
+    context "copy to kebab form" do
+      before do
+        course = @course
+        @other_course = course_factory(course_name: "Other Course Eh")
+        course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
+        @course = course
+      end
+
+      it "module item is correctly copied" do
+        go_to_modules
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Copy To...").click
+
+        set_value(copy_to_tray_course_select, "course")
+        option_list_id = copy_to_tray_course_select.attribute("aria-controls")
+
+        expect(option_list(option_list_id).count).to eq 1
+
+        option_list_course_option(option_list_id, @other_course.name).click
+        copy_button.click
+
+        wait_for_ajaximations
+        expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["assignments"])
+      end
+    end
   end
 
   context "course home page" do
