@@ -18,7 +18,7 @@
 
 // Used to enable babel transformations for node_modules that use ecmascript module syntax directly
 // From https://github.com/nrwl/nx/issues/812
-const esModules = ['text-field-edit', '@instructure\\/ui-icons'].join('|')
+const esModules = ['text-field-edit', '@instructure\\/ui-icons', 'msw'].join('|')
 
 module.exports = {
   setupFiles: ['jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
@@ -43,6 +43,10 @@ module.exports = {
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/canvas'],
   transformIgnorePatterns: [`/node_modules/(?!${esModules})`],
   testEnvironment: 'jsdom',
+  testEnvironmentOptions: {
+    // https://github.com/mswjs/examples/blob/main/examples/with-jest/jest.config.ts#L20
+    customExportConditions: [''],
+  },
   moduleNameMapper: {
     // jest can't import css
     '\\.(css|less)$': '<rootDir>/src/rce/__mocks__/styleMock.js',

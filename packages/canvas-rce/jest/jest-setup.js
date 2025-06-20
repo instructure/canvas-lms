@@ -25,6 +25,30 @@ import {TextDecoder, TextEncoder} from 'util'
 global.TextEncoder = TextEncoder
 global.TextDecoder = TextDecoder
 
+// Add fetch polyfills for msw
+require('isomorphic-fetch')
+
+// Add BroadcastChannel polyfill for msw
+if (!globalThis.BroadcastChannel) {
+  globalThis.BroadcastChannel = class BroadcastChannel {
+    constructor() {}
+    postMessage() {}
+    close() {}
+    addEventListener() {}
+    removeEventListener() {}
+  }
+}
+
+// Add TransformStream polyfill for msw
+if (!globalThis.TransformStream) {
+  globalThis.TransformStream = class TransformStream {
+    constructor() {
+      this.readable = {}
+      this.writable = {}
+    }
+  }
+}
+
 /**
  * We want to ensure errors and warnings get appropriate eyes. If
  * you are seeing an exception from here, it probably means you
