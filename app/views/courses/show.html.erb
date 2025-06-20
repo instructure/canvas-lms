@@ -60,6 +60,9 @@
   <% js_bundle :announcements_on_home_page %>
 <% end %>
 <div id="course_home_content">
+  <% if @display_tag_converter_message %>
+    <div id="differentiation-tag-converter-message-root"></div>
+  <% end %>
   <% if @course_home_view == 'wiki' %>
     <div id="wiki_page_show"></div>
   <% elsif @course_home_view == 'modules' %>

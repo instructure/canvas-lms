@@ -210,6 +210,45 @@ describe DifferentiationTag::Converters::CheckpointedDiscussionOverrideConverter
       expect(student1_entry_override[:due_at]).to eq(entry_adhoc_override[:due_at])
     end
 
+    it "works with overrides that have no due dates" do
+      topic_dates = []
+      entry_dates = []
+
+      # Learning Level overrides
+      topic_dates.push({ type: "override", set_type: "Group", set_id: @honors_tag.id, due_at: nil })
+      entry_dates.push({ type: "override", set_type: "Group", set_id: @honors_tag.id, due_at: nil })
+      topic_dates.push({ type: "override", set_type: "Group", set_id: @standard_tag.id, due_at: nil })
+      entry_dates.push({ type: "override", set_type: "Group", set_id: @standard_tag.id, due_at: nil })
+
+      discussion = create_checkpointed_discussion(
+        title: "Checkpointed Discussion",
+        course: @course,
+        dates: { topic_dates:, entry_dates: },
+        points_possible: 5
+      )
+      reply_to_topic = discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC)
+      reply_to_entry = discussion.assignment.sub_assignments.find_by(sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY)
+
+      overrides = discussion.assignment.assignment_overrides.active
+      expect(overrides.count).to eq(2)
+
+      converter.convert_tags_to_adhoc_overrides(discussion.assignment, @course)
+
+      overrides = discussion.assignment.assignment_overrides.active
+      expect(overrides.count).to eq(2) # Should still have 2 overrides
+
+      # due dates should be nil for both topic and entry
+      student1_topic_override = find_adhoc_override_for_student(reply_to_topic, @student1.id)
+      student1_entry_override = find_adhoc_override_for_student(reply_to_entry, @student1.id)
+      expect(student1_topic_override[:due_at]).to be_nil
+      expect(student1_entry_override[:due_at]).to be_nil
+
+      student2_topic_override = find_adhoc_override_for_student(reply_to_topic, @student2.id)
+      student2_entry_override = find_adhoc_override_for_student(reply_to_entry, @student2.id)
+      expect(student2_topic_override[:due_at]).to be_nil
+      expect(student2_entry_override[:due_at]).to be_nil
+    end
+
     context "students in multiple tags" do
       before do
         @food_category = @course.group_categories.create!(name: "Favorite Food", non_collaborative: true)

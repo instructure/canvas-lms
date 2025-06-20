@@ -2340,6 +2340,19 @@ class CoursesController < ApplicationController
 
         return render_course_notification_settings if params[:view] == "notifications"
 
+        # Differentiation Tag Converter Message
+        if @context.is_a?(Course) && !@context.account.allow_assign_to_differentiation_tags? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+          tag_overrides = AssignmentOverride.active.joins(:group).where(groups: { context: @context, non_collaborative: true })
+          if tag_overrides.any?
+            @display_tag_converter_message = true
+
+            active_tag_conversion_job = @context.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG, workflow_state: ["queued", "running"]).first
+            if active_tag_conversion_job
+              js_env(ACTIVE_TAG_CONVERSION_JOB: true)
+            end
+          end
+        end
+
         @contexts = [@context]
         case @course_home_view
         when "wiki"
