@@ -17,8 +17,11 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
 import {map} from 'lodash'
+
+interface DisabledTokenInputProps {
+  tokens?: string[]
+}
 
 const styles = {
   list: {
@@ -28,15 +31,11 @@ const styles = {
     backgroundColor: 'white',
     borderRadius: '3px',
   },
-}
+} as const
 
-class DisabledTokenInput extends React.Component {
-  static propTypes = {
-    tokens: PropTypes.arrayOf(PropTypes.string),
-  }
-
-  renderTokens() {
-    return map(this.props.tokens, (token, index) => (
+const DisabledTokenInput: React.FC<DisabledTokenInputProps> = ({tokens}) => {
+  const renderTokens = () => {
+    return map(tokens, (token, index) => (
       <li key={`token-${index}`} className="ic-token inline-flex">
         <span className="ic-token-label" style={styles.label}>
           {token}
@@ -45,19 +44,17 @@ class DisabledTokenInput extends React.Component {
     ))
   }
 
-  render() {
-    return (
-      <ul
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-        tabIndex="0"
-        aria-labelledby="assign-to-label"
-        className="ic-tokens flex"
-        style={styles.list}
-      >
-        {this.renderTokens()}
-      </ul>
-    )
-  }
+  return (
+    <ul
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+      tabIndex={0}
+      aria-labelledby="assign-to-label"
+      className="ic-tokens flex"
+      style={styles.list}
+    >
+      {renderTokens()}
+    </ul>
+  )
 }
 
 export default DisabledTokenInput
