@@ -8334,6 +8334,13 @@ describe Submission do
       @course.root_account.enable_feature!(:discussion_checkpoints)
       @student = student_in_course(course: @course, active_all: true).user
       @topic = DiscussionTopic.create_graded_topic!(course: @course, title: "graded topic")
+      checkpoint = @topic.create_checkpoints(reply_to_topic_points: 4, reply_to_entry_points: 8)
+      @parent_assignment = checkpoint.parent_assignment
+      @checkpoints = checkpoint.parent_assignment.sub_assignments
+      @checkpoints.first.submit_homework(@student, submission_type: "discussion_topic")
+      @checkpoints.first.update(workflow_state: "deleted")
+      @checkpoints.last.update(workflow_state: "deleted")
+      @checkpoints.reload
       @topic.create_checkpoints(reply_to_topic_points: 3, reply_to_entry_points: 7)
     end
 

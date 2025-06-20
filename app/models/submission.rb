@@ -403,7 +403,7 @@ class Submission < ActiveRecord::Base
     return false unless assignment.checkpoints_parent?
 
     Submission.active.having_submission.where(user_id:)
-              .where(assignment_id: SubAssignment.select(:id).where(parent_assignment_id: assignment_id))
+              .where(assignment_id: SubAssignment.active.select(:id).where(parent_assignment_id: assignment_id))
               .find_each do |sub_assignment_submission|
       return true if sub_assignment_submission.needs_grading?
     end
