@@ -16,30 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor} from '@craftjs/core'
-import {ReactElement} from 'react'
+import {useCallback} from 'react'
 import {useGetRootNode} from './useGetRootNode'
-import {useHandleNodesCountChange} from './useHandleNodesCountChange'
+import {usePageEditorContext} from '../PageEditorContext'
 
-export const useAddNode = () => {
-  const {query, actions} = useEditor()
+export const useHandleNodesCountChange = () => {
   const getRootNode = useGetRootNode()
-  const handleNodesCountChange = useHandleNodesCountChange()
+  const {addBlock} = usePageEditorContext()
 
-  const getIndex = (afterNodeId?: string) => {
-    if (!afterNodeId) {
-      return 0
-    }
+  const handleNodesCountChange = useCallback(() => {
     const rootNode = getRootNode()
-    const siblings = rootNode.data.nodes
-    return siblings.indexOf(afterNodeId) + 1
-  }
+    const rootNodesCount = rootNode ? rootNode.data.nodes.length : 0
+    addBlock.setShouldShow(rootNodesCount === 0)
+  }, [getRootNode, addBlock])
 
-  const addNode = (node: ReactElement, afterNodeId?: string) => {
-    const nodeTree = query.parseReactElement(node).toNodeTree()
-    const index = getIndex(afterNodeId)
-    actions.addNodeTree(nodeTree, 'ROOT', index)
-    handleNodesCountChange()
-  }
-  return addNode
+  return handleNodesCountChange
 }

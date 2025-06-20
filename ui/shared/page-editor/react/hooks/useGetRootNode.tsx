@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEditor, useNode} from '@craftjs/core'
-import {useHandleNodesCountChange} from './useHandleNodesCountChange'
+import {useCallback} from 'react'
+import {useEditor} from '@craftjs/core'
 
-export const useDeleteNode = () => {
-  const {id} = useNode()
-  const {actions} = useEditor()
-  const handleNodesCountChange = useHandleNodesCountChange()
+export const useGetRootNode = () => {
+  const {query} = useEditor()
 
-  const deleteNode = () => {
-    actions.delete(id)
-    handleNodesCountChange()
-  }
+  const getRootNode = useCallback(() => {
+    return query.node('ROOT').get()
+  }, [query])
 
-  return deleteNode
+  return getRootNode
 }

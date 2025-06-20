@@ -29,7 +29,7 @@ export const PageEditor = (props: {
   data: SerializedNodes | null
 }) => {
   return (
-    <PageEditorContext>
+    <PageEditorContext data={props.data}>
       <PageEditorLayout
         toolbar={<Toolbar />}
         editor={
