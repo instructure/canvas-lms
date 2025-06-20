@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,12 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {friendlyTypeName, isSubmitted, totalAllowedAttempts, activeTypeMeetsCriteria} from '../SubmissionHelpers'
+import {
+  friendlyTypeName,
+  isSubmitted,
+  totalAllowedAttempts,
+  activeTypeMeetsCriteria,
+  getPointsValue,
+} from '../SubmissionHelpers'
 
 describe('totalAllowedAttempts', () => {
   it('returns null if allowedAttempts on the assignment is null', () => {
     const assignment = {allowedAttempts: null}
-    expect(totalAllowedAttempts({assignment})).toBeNull()
+    expect(totalAllowedAttempts(assignment)).toBeNull()
   })
 
   it('returns the allowed attempts on the assignment if no submission is provided', () => {
@@ -79,7 +85,7 @@ describe('activeTypeMeetsCriteria', () => {
       meetsUrlCriteria: false,
       meetsStudentAnnotationCriteria: true,
       meetsBasicLtiLaunchCriteria: false,
-    }
+    },
   }
 
   test('returns correct value for media_recording', () => {
@@ -106,11 +112,22 @@ describe('activeTypeMeetsCriteria', () => {
     expect(activeTypeMeetsCriteria('basic_lti_launch', submissionMock)).toBe(false)
   })
 
-  test('returns undefined for an unknown submission type', () => {
-    expect(activeTypeMeetsCriteria('invalid_type', submissionMock)).toBeUndefined()
-  })
-
   test('returns undefined if submissionDraft is missing', () => {
-    expect(activeTypeMeetsCriteria('media_recording', {})).toBeUndefined()
+    expect(activeTypeMeetsCriteria('media_recording')).toBeUndefined()
+  })
+})
+
+describe('getPointsValue', () => {
+  it('returns the number if points is a number', () => {
+    expect(getPointsValue(10)).toBe(10)
+  })
+  it('returns the value property if points is an object with a value property', () => {
+    expect(getPointsValue({value: 15})).toBe(15)
+  })
+  it('returns null if points is null', () => {
+    expect(getPointsValue(null)).toBeNull()
+  })
+  it('returns null if points is undefined', () => {
+    expect(getPointsValue()).toBeNull()
   })
 })

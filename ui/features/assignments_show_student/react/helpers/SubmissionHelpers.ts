@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,10 +17,11 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {Assignment, Submission, SubmissionType} from '../../assignments_show_student'
 
 const I18n = createI18nScope('assignments_2_submission_helpers')
 
-export function friendlyTypeName(type) {
+export function friendlyTypeName(type: SubmissionType): string {
   switch (type) {
     case 'basic_lti_launch':
       return I18n.t('External Tool')
@@ -39,11 +40,11 @@ export function friendlyTypeName(type) {
   }
 }
 
-export function isSubmitted({state, attempt}) {
+export function isSubmitted({state, attempt}: Pick<Submission, 'state' | 'attempt'>): boolean {
   return state === 'submitted' || (state === 'graded' && attempt !== 0)
 }
 
-export function multipleTypesDrafted(submission) {
+export function multipleTypesDrafted(submission: Submission) {
   const submissionDraft = submission?.submissionDraft
   const matchingCriteria = [
     submissionDraft?.meetsBasicLtiLaunchCriteria,
@@ -55,13 +56,19 @@ export function multipleTypesDrafted(submission) {
   return matchingCriteria.length > 1
 }
 
-export function totalAllowedAttempts(assignment, submission) {
+export function totalAllowedAttempts(
+  assignment: Pick<Assignment, 'allowedAttempts'>,
+  submission?: Pick<Submission, 'extraAttempts'>,
+): number | null {
   return assignment.allowedAttempts != null
     ? assignment.allowedAttempts + (submission?.extraAttempts || 0)
     : null
 }
 
-export const activeTypeMeetsCriteria = (activeSubmissionType, submission) => {
+export const activeTypeMeetsCriteria = (
+  activeSubmissionType: SubmissionType,
+  submission?: Pick<Submission, 'submissionDraft'>,
+) => {
   switch (activeSubmissionType) {
     case 'media_recording':
       return submission?.submissionDraft?.meetsMediaRecordingCriteria
@@ -76,4 +83,9 @@ export const activeTypeMeetsCriteria = (activeSubmissionType, submission) => {
     case 'basic_lti_launch':
       return submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
   }
+}
+
+export const getPointsValue = (points?: null | number | {value: number}) => {
+  if (typeof points === 'number') return points
+  return points?.value ?? null
 }
