@@ -18,9 +18,10 @@
 
 import * as AssignmentActions from '../AssignmentActions'
 import configureStore from '../../configureStore'
+import type {Store} from 'redux'
 
 describe('GradeSummary assignmentReducer()', () => {
-  let store
+  let store: Store
 
   beforeEach(() => {
     store = configureStore({
@@ -56,7 +57,7 @@ describe('GradeSummary assignmentReducer()', () => {
   })
 
   describe('when handling "SET_RELEASE_GRADES_STATUS"', () => {
-    function setReleaseGradesStatus(status) {
+    function setReleaseGradesStatus(status: string) {
       store.dispatch(AssignmentActions.setReleaseGradesStatus(status))
     }
 
@@ -96,7 +97,7 @@ describe('GradeSummary assignmentReducer()', () => {
   })
 
   describe('when handling "SET_UNMUTE_ASSIGNMENT_STATUS"', () => {
-    function setUnmuteAssignmentStatus(status) {
+    function setUnmuteAssignmentStatus(status: string) {
       store.dispatch(AssignmentActions.setUnmuteAssignmentStatus(status))
     }
 

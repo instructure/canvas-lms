@@ -21,7 +21,7 @@ import Backbone from '@canvas/backbone'
 import _ from 'lodash'
 
 describe('UniqueDropdownCollection', () => {
-  let records, coll
+  let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
     records = (() => {
@@ -45,17 +45,17 @@ describe('UniqueDropdownCollection', () => {
   })
 
   test('updates available/taken when models change', done => {
-    coll.availableValues.on('remove', model => {
+    coll.availableValues.on('remove', (model: any) => {
       expect(model.get('value')).toBe('4')
     })
-    coll.availableValues.on('add', model => {
+    coll.availableValues.on('add', (model: any) => {
       expect(model.get('value')).toBe('1')
     })
 
-    coll.takenValues.on('remove', model => {
+    coll.takenValues.on('remove', (model: any) => {
       expect(model.get('value')).toBe('1')
     })
-    coll.takenValues.on('add', model => {
+    coll.takenValues.on('add', (model: any) => {
       expect(model.get('value')).toBe('4')
       done()
     })
@@ -64,18 +64,20 @@ describe('UniqueDropdownCollection', () => {
   })
 
   test('removing a model updates the available/taken values', done => {
-    coll.availableValues.on('add', model => {
+    coll.availableValues.on('add', (model: any) => {
       expect(model.get('value')).toBe('1')
     })
-    coll.takenValues.on('remove', model => {
+    coll.takenValues.on('remove', (model: any) => {
       expect(model.get('value')).toBe('1')
       done()
     })
 
+    // @ts-expect-error - Backbone collection method
     coll.remove(coll.get(1))
   })
 
   test('overrides add to munge params with an available value', () => {
+    // @ts-expect-error - Backbone collection property
     coll.model = Backbone.Model
 
     coll.add({})
@@ -83,18 +85,21 @@ describe('UniqueDropdownCollection', () => {
     expect(coll.availableValues).toHaveLength(0)
     expect(coll.takenValues).toHaveLength(4)
     expect(coll.takenValues.get('4') instanceof Backbone.Model).toBe(true)
+    // @ts-expect-error - Backbone collection methods
     expect(coll.at(coll.length - 1).get('state')).toBe('4')
   })
 
   test('add should take the value from the front of the available values collection', done => {
+    // @ts-expect-error - Backbone collection methods
     coll.remove(coll.at(0))
 
     const first_avail = coll.availableValues.at(0).get('state')
-    coll.availableValues.on('remove', model => {
+    coll.availableValues.on('remove', (model: any) => {
       expect(model.get('state')).toBe(first_avail)
       done()
     })
 
+    // @ts-expect-error - Backbone collection property
     coll.model = Backbone.Model
 
     coll.add({})
@@ -102,7 +107,7 @@ describe('UniqueDropdownCollection', () => {
 })
 
 describe('UniqueDropdownCollection, lazy setup', () => {
-  let records, coll
+  let records: Backbone.Model[], coll: UniqueDropdownCollection
 
   beforeEach(() => {
     records = (() => {
@@ -120,6 +125,7 @@ describe('UniqueDropdownCollection, lazy setup', () => {
 
   test('reset of collection recalculates availableValues', () => {
     expect(coll.availableValues).toHaveLength(4)
+    // @ts-expect-error - Backbone collection method
     coll.reset(records)
     expect(coll.availableValues).toHaveLength(1)
   })

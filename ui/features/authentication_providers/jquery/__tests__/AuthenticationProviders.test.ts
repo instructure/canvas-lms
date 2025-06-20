@@ -18,8 +18,8 @@
 
 import AuthenticationProviders from '../index'
 
-const equal = (x, y) => expect(x).toBe(y)
-const strictEqual = (x, y) => expect(x).toStrictEqual(y)
+const equal = (x: unknown, y: unknown) => expect(x).toBe(y)
+const strictEqual = (x: unknown, y: unknown) => expect(x).toStrictEqual(y)
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -27,7 +27,7 @@ document.body.appendChild(container)
 
 describe('AuthenticationProviders', () => {
   describe('.changedAuthType()', () => {
-    let $container
+    let $container: HTMLDivElement
 
     beforeEach(() => {
       jest.useFakeTimers()
@@ -52,7 +52,7 @@ describe('AuthenticationProviders', () => {
     })
 
     function showAllForms() {
-      $container.querySelectorAll('form').forEach($form => {
+      $container.querySelectorAll<HTMLFormElement>('form').forEach($form => {
         $form.style.display = ''
       })
     }
@@ -60,14 +60,14 @@ describe('AuthenticationProviders', () => {
     test('hides the "no authentication providers" message when present', () => {
       $container.innerHTML = '<div id="no_auth">No Authentication Providers</div>'
       AuthenticationProviders.changedAuthType('ldap')
-      const $div = $container.querySelector('#no_auth')
-      equal($div.style.display, 'none')
+      const $div = $container.querySelector<HTMLDivElement>('#no_auth')
+      equal($div!.style.display, 'none')
     })
 
     test('hides all new auth forms', () => {
       showAllForms()
       AuthenticationProviders.changedAuthType('unrelated')
-      $container.querySelectorAll('form').forEach($form => {
+      $container.querySelectorAll<HTMLFormElement>('form').forEach($form => {
         equal($form.style.display, 'none')
       })
     })
@@ -75,22 +75,22 @@ describe('AuthenticationProviders', () => {
     // doesn't work in Jest due to lack of support for focusable in jQuery UI
     test.skip('shows the form for the matching auth type', () => {
       AuthenticationProviders.changedAuthType('facebook')
-      const $form = $container.querySelector('#facebook_form')
-      strictEqual($form.style.display, '')
+      const $form = $container.querySelector<HTMLFormElement>('#facebook_form')
+      strictEqual($form!.style.display, '')
     })
 
     // doesn't work in Jest due to lack of support for focusable in jQuery UI
     test.skip('does not show unrelated forms', () => {
       AuthenticationProviders.changedAuthType('facebook')
-      const $form = $container.querySelector('#google_form')
-      equal($form.style.display, 'none')
+      const $form = $container.querySelector<HTMLFormElement>('#google_form')
+      equal($form!.style.display, 'none')
     })
 
     // doesn't work in Jest due to lack of support for focusable in jQuery UI
     test.skip('sets focus on the first focusable element of the visible form', () => {
       AuthenticationProviders.changedAuthType('google')
       jest.advanceTimersByTime(100)
-      const $input = $container.querySelector('#google-auth-input')
+      const $input = $container.querySelector<HTMLInputElement>('#google-auth-input')
       strictEqual(document.activeElement, $input)
     })
   })
