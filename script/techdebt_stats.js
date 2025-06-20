@@ -93,7 +93,6 @@ Available sections:
   defaultprops    - DefaultProps usage
   handlebars      - Handlebars files
   jquery          - jQuery imports
-  sinon           - Sinon imports
   reactdom        - ReactDOM.render files
   class           - React class components
   javascript      - JavaScript files
@@ -251,56 +250,6 @@ async function showJqueryImportStats(verbose = false) {
       })
     } else {
       const examples = await getRandomJqueryImportFiles(verbose)
-      examples.forEach(file => {
-        console.log(colorize('gray', `  Example: ${file}`))
-      })
-    }
-  }
-}
-
-async function countSinonImports(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]sinon[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
-  } catch (error) {
-    console.error(colorize('red', `Error counting Sinon imports: ${error.message}`))
-    return 0
-  }
-}
-
-async function getRandomSinonImportFiles(verbose = false) {
-  try {
-    const cmd =
-      'git ls-files "ui/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "from [\'\\"]sinon[\'\\"]"'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
-  } catch (error) {
-    console.error(colorize('red', `Error finding Sinon import examples: ${error.message}`))
-  }
-  return []
-}
-
-async function showSinonImportStats(verbose = false) {
-  const count = await countSinonImports(verbose)
-  console.log(colorize('yellow', `- Files with Sinon imports: ${bold(count)}`))
-
-  if (count > 0) {
-    const files = await getGrepMatchingFiles(
-      '__tests__.*\\.(js|jsx|ts|tsx)$',
-      '\\bsinon\\b',
-      verbose,
-    )
-    if (verbose) {
-      files.sort().forEach(file => {
-        console.log(colorize('gray', `  ${file}`))
-      })
-    } else {
-      const examples = await getRandomSinonImportFiles(verbose)
       examples.forEach(file => {
         console.log(colorize('gray', `  Example: ${file}`))
       })
@@ -783,7 +732,6 @@ function getSectionTitle(section) {
     proptypes: ['PropTypes Usage', '(use TypeScript interfaces/types)'],
     reactCompiler: ['React Compiler Rule Violations', ''],
     reactdom: ['ReactDOM.render Files', '(convert to createRoot)'],
-    sinon: ['Sinon Imports', '(use Jest)'],
     skipped: ['Skipped Tests', '(fix or remove)'],
     typescript: ['TypeScript Suppressions', ''],
   }
@@ -806,12 +754,6 @@ async function printDashboard() {
 
     const selectedSections = options.sections
     const verbose = options.verbose
-
-    if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
-      console.log(getSectionTitle('sinon'))
-      await showSinonImportStats(verbose)
-      console.log()
-    }
 
     if (selectedSections.length === 0 || selectedSections.includes('skipped')) {
       console.log(getSectionTitle('skipped'))

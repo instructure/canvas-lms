@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
-import assertions from '@canvas/test-utils/assertionsSpec'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import ProgressingMigration from '../../models/ProgressingContentMigration'
 import SelectContentView from '../SelectContentView'
@@ -26,6 +25,7 @@ import '@canvas/jquery/jquery.simulate'
 import {waitFor} from '@testing-library/dom'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const SELECTIVE_DATA_URL = '/api/v1/courses/42/content_migrations/5/selective_data'
 
@@ -139,7 +139,7 @@ describe('SelectContentView: Integration Tests', () => {
 
   test('it should be accessible', async () => {
     await new Promise(resolve => setTimeout(resolve, 100))
-    await assertions.isAccessible(selectContentView, {a11yReport: true})
+    await isAccessible(selectContentView, {a11yReport: true})
   })
 
   test('render top level checkboxes when opened', async function () {

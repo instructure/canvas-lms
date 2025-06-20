@@ -32,9 +32,9 @@ import french from 'timezone/fr_FR'
 import I18nStubber from '@canvas/test-utils/I18nStubber'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 import {http, HttpResponse} from 'msw'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 // Mock globalUtils
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -236,7 +236,7 @@ describe('AssignmentListItemViewSpec', () => {
 
   test('should be accessible', async () => {
     const view = createView(assignment1(), {canManage: true})
-    await assertions.isAccessible(view, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('initializes child views if can manage', () => {

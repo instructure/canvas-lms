@@ -185,7 +185,6 @@
     "nyc": "^13",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
-    "sinon": "^20",
     "skin-deep": "^1",
     "source-map-support": "0.5.21",
     "ts-node": "^10.9.2",

@@ -224,11 +224,7 @@ module.exports = {
         // type only dependencies are not a problem as they don't end up in the
         // production code or are ignored by the runtime.
         dependencyTypesNot: ['type-only'],
-        pathNot: [
-          'node_modules/@types/',
-          'node_modules/sinon/',
-          'node_modules/@testing-library/jest-dom/',
-        ],
+        pathNot: ['node_modules/@types/', 'node_modules/@testing-library/jest-dom/'],
       },
     },
     {

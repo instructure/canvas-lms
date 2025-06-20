@@ -229,7 +229,4 @@ module.exports = [
 
   // Jest
   require('./eslint.config.jest'),
-
-  // QUnit
-  require('./eslint.config.qunit'),
 ]

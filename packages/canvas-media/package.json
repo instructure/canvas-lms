@@ -81,7 +81,6 @@
     "@types/react-dom": "*",
     "jsdom": "*",
     "shelljs": "^0.8.4",
-    "sinon": "^7",
     "vitest": "*"
   }
 }
