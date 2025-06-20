@@ -18,6 +18,11 @@
 
 import FocusManager from '../focusManager'
 
+interface FocusableNode {
+  focus: () => void
+  name?: string
+}
+
 describe('FocusManager', () => {
   test('allocateNext() returns the appropriate next index', () => {
     const manager = new FocusManager()
@@ -38,7 +43,7 @@ describe('FocusManager', () => {
   test('allocateNext() returns an appropriate register ref function', () => {
     const manager = new FocusManager()
     const nextNode = manager.allocateNext()
-    nextNode.ref({name: 'foo'})
+    nextNode.ref({name: 'foo'} as FocusableNode)
     expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
   })
@@ -54,7 +59,7 @@ describe('FocusManager', () => {
 
   test('registerItem() sets a node at an index', () => {
     const manager = new FocusManager()
-    manager.registerItem({name: 'foo'}, 0)
+    manager.registerItem({name: 'foo'} as FocusableNode, 0)
 
     expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
@@ -63,7 +68,7 @@ describe('FocusManager', () => {
   test('registerItemRef() returns a ref function that registers item at index', () => {
     const manager = new FocusManager()
     const ref = manager.registerItemRef(0)
-    ref({name: 'foo'})
+    ref({name: 'foo'} as FocusableNode)
 
     expect(manager.items).toHaveLength(1)
     expect(manager.items[0]).toEqual({name: 'foo'})
@@ -71,13 +76,13 @@ describe('FocusManager', () => {
 
   test('registerBeforeRef() registers the before ref', () => {
     const manager = new FocusManager()
-    manager.registerBeforeRef({name: 'foo'})
+    manager.registerBeforeRef({name: 'foo'} as FocusableNode)
     expect(manager.before).toEqual({name: 'foo'})
   })
 
   test('registerAfterRef() registers the after ref', () => {
     const manager = new FocusManager()
-    manager.registerAfterRef({name: 'foo'})
+    manager.registerAfterRef({name: 'foo'} as FocusableNode)
     expect(manager.after).toEqual({name: 'foo'})
   })
 

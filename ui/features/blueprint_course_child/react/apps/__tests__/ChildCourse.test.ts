@@ -20,12 +20,12 @@ import ChildCourse from '../ChildCourse'
 import select from '@canvas/obj-select'
 import getSampleData from '@canvas/blueprint-courses/getSampleData'
 
-const ok = x => expect(x).toBeTruthy()
-const notOk = x => expect(x).toBeFalsy()
-const equal = (x, y) => expect(x).toBe(y)
-const deepEqual = (x, y) => expect(x).toEqual(y)
+const ok = (x: unknown) => expect(x).toBeTruthy()
+const notOk = (x: unknown) => expect(x).toBeFalsy()
+const equal = (x: unknown, y: unknown) => expect(x).toBe(y)
+const deepEqual = (x: unknown, y: unknown) => expect(x).toEqual(y)
 
-let child = null
+let child: ChildCourse | null = null
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
@@ -60,10 +60,9 @@ describe('ChildCourse class', () => {
     child = new ChildCourse(container, defaultData())
     child.render()
     child.app.showChangeLog = jest.fn()
-    child.routes[0].onEnter(
-      {params: {blueprintType: 'template', templateId: '2', changeId: '3'}},
-      () => {},
-    )
+    child.routes[0].onEnter({
+      params: {blueprintType: 'template', templateId: '2', changeId: '3'},
+    } as any)
     expect(child.app.showChangeLog).toHaveBeenCalledTimes(1)
     expect(child.app.showChangeLog).toHaveBeenCalledWith({
       blueprintType: 'template',
@@ -72,7 +71,7 @@ describe('ChildCourse class', () => {
     })
 
     child.app.hideChangeLog = jest.fn()
-    child.routes[0].onExit({}, () => {})
+    child.routes[0].onExit()
     expect(child.app.hideChangeLog).toHaveBeenCalledTimes(1)
   })
 

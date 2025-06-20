@@ -21,8 +21,8 @@ import CalendarEventFilter from '../CalendarEventFilter'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const createTestEvents = (
-  can_edit,
-  child_events_count,
+  can_edit: boolean,
+  child_events_count: number,
   available_slots = 1,
   reserved = false,
   past_slot = false,

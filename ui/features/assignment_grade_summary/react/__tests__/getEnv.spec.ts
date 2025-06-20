@@ -87,15 +87,21 @@ describe('GradeSummary getEnv()', () => {
     })
 
     test('defaults .graderId to "FINAL_GRADER" when the user is the final grader', () => {
+      // @ts-expect-error - ENV properties for testing
       ENV.CURRENT_USER.id = '1105'
+      // @ts-expect-error - ENV properties for testing
       delete ENV.FINAL_GRADER.grader_id
+      // @ts-expect-error - ENV properties for testing
       delete ENV.CURRENT_USER.grader_id
       expect(getEnv().currentUser.graderId).toBe('FINAL_GRADER')
     })
 
     test('defaults .graderId to "CURRENT_USER" when the user is not the final grader', () => {
+      // @ts-expect-error - ENV properties for testing
       delete ENV.FINAL_GRADER.grader_id
+      // @ts-expect-error - ENV properties for testing
       delete ENV.CURRENT_USER.grader_id
+      // @ts-expect-error - ENV properties for testing
       ENV.CURRENT_USER.id = '1100'
       expect(getEnv().currentUser.graderId).toBe('CURRENT_USER')
     })
@@ -107,19 +113,21 @@ describe('GradeSummary getEnv()', () => {
 
   describe('.finalGrader', () => {
     test('camel-cases .graderId', () => {
-      expect(getEnv().finalGrader.graderId).toBe('teach')
+      expect(getEnv().finalGrader!.graderId).toBe('teach')
     })
 
     test('defaults .graderId to "FINAL_GRADER"', () => {
+      // @ts-expect-error - ENV properties for testing
       delete ENV.FINAL_GRADER.grader_id
-      expect(getEnv().finalGrader.graderId).toBe('FINAL_GRADER')
+      expect(getEnv().finalGrader!.graderId).toBe('FINAL_GRADER')
     })
 
     test('includes .id', () => {
-      expect(getEnv().finalGrader.id).toBe('1105')
+      expect(getEnv().finalGrader!.id).toBe('1105')
     })
 
     test('is null when there is no final grader', () => {
+      // @ts-expect-error - ENV properties for testing
       delete ENV.FINAL_GRADER
       expect(getEnv().finalGrader).toBeNull()
     })
@@ -133,41 +141,42 @@ describe('GradeSummary getEnv()', () => {
 
       test('includes .id', () => {
         const ids = getEnv()
-          .graders.map(grader => grader.id)
+          .graders.map((grader: any) => grader.id)
           .sort()
         expect(ids).toEqual(['4501', '4502', '4503'])
       })
 
       test('camel-cases .graderId on graders', () => {
         const graderIds = getEnv()
-          .graders.map(grader => grader.graderId)
+          .graders.map((grader: any) => grader.graderId)
           .sort()
         expect(graderIds).toEqual(['1101', '1102', '1103'])
       })
 
       test('sorts graders by .graderId', () => {
-        const graderIds = getEnv().graders.map(grader => grader.graderId)
+        const graderIds = getEnv().graders.map((grader: any) => grader.graderId)
         expect(graderIds).toEqual(['1101', '1102', '1103'])
       })
 
       test('camel-cases .graderName', () => {
-        const graderNames = getEnv().graders.map(grader => grader.graderName)
+        const graderNames = getEnv().graders.map((grader: any) => grader.graderName)
         expect(graderNames).toEqual(['Adam Jones', 'Betty Ford', 'Charlie Xi'])
       })
 
       test('includes .graderSelectable', () => {
         const graders = getEnv().graders
 
-        const deletedGrader = graders.find(grader => grader.graderName === 'Betty Ford')
-        expect(deletedGrader.graderSelectable).toBe(false)
+        const deletedGrader = graders.find((grader: any) => grader.graderName === 'Betty Ford')
+        expect(deletedGrader!.graderSelectable).toBe(false)
 
-        const activeGrader = graders.find(grader => grader.graderName === 'Adam Jones')
-        expect(activeGrader.graderSelectable).toBe(true)
+        const activeGrader = graders.find((grader: any) => grader.graderName === 'Adam Jones')
+        expect(activeGrader!.graderSelectable).toBe(true)
       })
     })
 
     describe('when graders are anonymous', () => {
       beforeEach(() => {
+        // @ts-expect-error - ENV properties for testing
         ENV.GRADERS = [
           {anonymous_id: 'h2asd', id: '4502'},
           {anonymous_id: 'abcde', id: '4503'},
@@ -181,25 +190,25 @@ describe('GradeSummary getEnv()', () => {
 
       test('includes .id', () => {
         const ids = getEnv()
-          .graders.map(grader => grader.id)
+          .graders.map((grader: any) => grader.id)
           .sort()
         expect(ids).toEqual(['4501', '4502', '4503'])
       })
 
       test('uses .anonymous_id as .graderId', () => {
         const graderIds = getEnv()
-          .graders.map(grader => grader.graderId)
+          .graders.map((grader: any) => grader.graderId)
           .sort()
         expect(graderIds).toEqual(['abcde', 'b01ng', 'h2asd'])
       })
 
       test('sorts graders by the anonymous .graderId', () => {
-        const graderIds = getEnv().graders.map(grader => grader.graderId)
+        const graderIds = getEnv().graders.map((grader: any) => grader.graderId)
         expect(graderIds).toEqual(['abcde', 'b01ng', 'h2asd'])
       })
 
       test('assigns enumerated names', () => {
-        const graderNames = getEnv().graders.map(grader => grader.graderName)
+        const graderNames = getEnv().graders.map((grader: any) => grader.graderName)
         expect(graderNames).toEqual(['Grader 1', 'Grader 2', 'Grader 3'])
       })
     })
