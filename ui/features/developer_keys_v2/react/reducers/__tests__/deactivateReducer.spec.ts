@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import actions from '../../actions/developerKeysActions'
-import reducer from '../deactivateReducer'
+import reducer, {DeactivateDeveloperKeyState} from '../deactivateReducer'
 
 describe('deactivateReducer', () => {
-  const defaults = reducer(undefined, {})
+  const defaults = reducer(undefined, {type: '' as any})
 
   test('there are defaults', () => {
     expect(defaults.deactivateDeveloperKeyPending).toBe(false)
@@ -28,13 +28,13 @@ describe('deactivateReducer', () => {
   })
 
   test('responds to deactivateDeveloperKeyStart', () => {
-    const state = {
+    const state: DeactivateDeveloperKeyState = {
       deactivateDeveloperKeyPending: false,
       deactivateDeveloperKeySuccessful: true,
       deactivateDeveloperKeyError: {},
     }
 
-    const action = actions.deactivateDeveloperKeyStart()
+    const action = actions.deactivateDeveloperKeyStart({})
     const newState = reducer(state, action)
 
     expect(newState.deactivateDeveloperKeyPending).toBe(true)
@@ -43,9 +43,10 @@ describe('deactivateReducer', () => {
   })
 
   test('responds to deactivateDeveloperKeySuccessful', () => {
-    const state = {
+    const state: DeactivateDeveloperKeyState = {
       deactivateDeveloperKeyPending: true,
       deactivateDeveloperKeySuccessful: false,
+      deactivateDeveloperKeyError: null,
     }
     const payload = {}
     const action = actions.deactivateDeveloperKeySuccessful(payload)
@@ -56,9 +57,10 @@ describe('deactivateReducer', () => {
   })
 
   test('responds to deactivateDeveloperKeyFailed', () => {
-    const state = {
+    const state: DeactivateDeveloperKeyState = {
       deactivateDeveloperKeyPending: true,
       deactivateDeveloperKeyError: null,
+      deactivateDeveloperKeySuccessful: false,
     }
     const error = {}
 

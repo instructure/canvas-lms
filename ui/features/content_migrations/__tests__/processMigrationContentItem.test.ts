@@ -18,13 +18,33 @@
 
 import $ from 'jquery'
 import processMigrationContentItem from '../processMigrationContentItem'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const oldEnv = window.ENV
+interface ContentItem {
+  type: string
+  expiresAt: string
+  url: string
+  title: string
+  text: string
+}
+
+interface EventData {
+  subject: string
+  msg: string
+  content_items: ContentItem[]
+  ltiEndpoint: string
+}
+
+interface EventOptions {
+  origin?: string
+  subject?: string
+  type?: string
+}
 
 beforeAll(() => {
-  window.ENV = {
+  fakeENV.setup({
     DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com',
-  }
+  })
 })
 
 beforeEach(() => {
@@ -33,10 +53,10 @@ beforeEach(() => {
 })
 
 afterAll(() => {
-  window.ENV = oldEnv
+  fakeENV.teardown()
 })
 
-function event(overrides) {
+function event(overrides: EventOptions = {}): MessageEvent {
   const opts = {
     origin: 'http://www.test.com',
     subject: 'LtiDeepLinkingResponse',
@@ -58,8 +78,8 @@ function event(overrides) {
         },
       ],
       ltiEndpoint: 'http://web.canvas-lms.docker/courses/11/external_tools/retrieve',
-    },
-  }
+    } as EventData,
+  } as MessageEvent
 }
 
 it('process the content item', () => {

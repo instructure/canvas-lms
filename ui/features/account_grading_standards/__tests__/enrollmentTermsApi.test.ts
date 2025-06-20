@@ -19,8 +19,31 @@
 import $ from 'jquery'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import api from '../enrollmentTermsApi'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const deserializedTerms = [
+interface DeserializedTerm {
+  id: string
+  name: string | null
+  startAt: Date | null
+  endAt: Date | null
+  createdAt: Date | null
+  gradingPeriodGroupId: string | null
+}
+
+interface SerializedTerm {
+  id: number
+  name: string | null
+  start_at: string | null
+  end_at: string | null
+  created_at: string | null
+  grading_period_group_id: number | null
+}
+
+interface SerializedTermGroup {
+  enrollment_terms: SerializedTerm[]
+}
+
+const deserializedTerms: DeserializedTerm[] = [
   {
     id: '1',
     name: 'Fall 2013 - Art',
@@ -47,7 +70,7 @@ const deserializedTerms = [
   },
 ]
 
-const serializedTerms = {
+const serializedTerms: SerializedTermGroup = {
   enrollment_terms: [
     {
       id: 1,
@@ -79,21 +102,23 @@ const serializedTerms = {
 jest.mock('@canvas/network/NaiveRequestDispatch/index')
 
 describe('enrollmentTermsApi', () => {
-  let mockDeferred
+  let mockDeferred: JQuery.Deferred<SerializedTermGroup[]>
 
   beforeEach(() => {
-    window.ENV = {
+    fakeENV.setup({
       ENROLLMENT_TERMS_URL: 'api/enrollment_terms',
-    }
-    mockDeferred = $.Deferred()
+    })
+    mockDeferred = $.Deferred<SerializedTermGroup[]>()
     const mockDispatch = {
       getDepaginated: jest.fn().mockReturnValue(mockDeferred),
     }
-    NaiveRequestDispatch.mockImplementation(() => mockDispatch)
+    ;(NaiveRequestDispatch as jest.MockedClass<typeof NaiveRequestDispatch>).mockImplementation(
+      () => mockDispatch as unknown as NaiveRequestDispatch,
+    )
   })
 
   afterEach(() => {
-    delete window.ENV
+    fakeENV.teardown()
     jest.resetAllMocks()
   })
 

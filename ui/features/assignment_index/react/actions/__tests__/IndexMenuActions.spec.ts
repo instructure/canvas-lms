@@ -18,6 +18,10 @@
 
 import Actions from '../IndexMenuActions'
 
+interface Tool {
+  foo: string
+}
+
 describe('AssignmentsIndexMenuActions', () => {
   test('setModalOpen returns the expected action', () => {
     const expectedAction1 = {
@@ -36,7 +40,7 @@ describe('AssignmentsIndexMenuActions', () => {
   })
 
   test('launchTool returns the expected action', () => {
-    const tool = {foo: 'bar'}
+    const tool: Tool = {foo: 'bar'}
     const expectedAction = {
       type: Actions.LAUNCH_TOOL,
       payload: tool,

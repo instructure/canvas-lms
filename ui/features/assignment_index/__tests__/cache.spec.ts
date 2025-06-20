@@ -18,8 +18,20 @@
 
 import cache from '../cache'
 
+type CacheKey = string | number | object | Array<unknown>
+
+interface CacheInstance {
+  prefix: string
+  store: Record<string, string> | Storage
+  use: (store: 'memory' | 'sessionStorage' | 'localStorage') => void
+  toKey: (...key: CacheKey[]) => string
+  get: (...key: CacheKey[]) => unknown
+  set: (...args: unknown[]) => CacheInstance
+  remove: (...key: CacheKey[]) => void
+}
+
 describe('class/cache', () => {
-  let cacheInstance
+  let cacheInstance: CacheInstance
 
   beforeEach(() => {
     // assuming the actual cache instance is stored under a cache property
@@ -57,7 +69,7 @@ describe('class/cache', () => {
   test('should accept a prefix', () => {
     cacheInstance.prefix = 'prefix-'
     cacheInstance.set('key', 'value')
-    expect(typeof cacheInstance.store['prefix-"key"']).toBe('string')
+    expect(typeof (cacheInstance.store as Record<string, string>)['prefix-"key"']).toBe('string')
   })
 
   test('should accept local and sessionStorage as stores', () => {

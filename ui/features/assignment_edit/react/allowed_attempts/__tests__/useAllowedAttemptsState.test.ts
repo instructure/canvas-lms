@@ -19,25 +19,38 @@
 import useAllowedAttemptsState from '../useAllowedAttemptsState'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
 
+interface AllowedAttemptsStateProps {
+  limited: boolean
+  attempts: number | null
+}
+
 it('allows numeric value for the number of attempts', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: 42}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: 42} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onAttemptsChange(3))
   expect(result.current.attempts).toBe(3)
 })
 
 it('allows attempts to be null (blank value)', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: 42}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: 42} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onAttemptsChange(null))
   expect(result.current.attempts).toBe(null)
 })
 
 it('accepts -1 as an initial value', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: -1}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: -1} as AllowedAttemptsStateProps),
+  )
   expect(result.current.attempts).toBe(-1)
 })
 
 it('only allows positive values for the number of attempts', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: 42}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: 42} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onAttemptsChange(0))
   expect(result.current.attempts).toBe(42)
   act(() => result.current.onAttemptsChange(-3))
@@ -45,35 +58,45 @@ it('only allows positive values for the number of attempts', () => {
 })
 
 it('sets limited to false and does not change attempts', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: 42}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: 42} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onLimitedChange(false))
   expect(result.current.limited).toBe(false)
   expect(result.current.attempts).toBe(42)
 })
 
 it('sets limited to true and does not change attempts if attempts is positive', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: false, attempts: 42}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: false, attempts: 42} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onLimitedChange(true))
   expect(result.current.limited).toBe(true)
   expect(result.current.attempts).toBe(42)
 })
 
 it('sets limited to true and sets -1 attempts to 1 ', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: false, attempts: -1}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: false, attempts: -1} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onLimitedChange(true))
   expect(result.current.limited).toBe(true)
   expect(result.current.attempts).toBe(1)
 })
 
 it('sets limited to true and sets null attempts to 1', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: false, attempts: null}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: false, attempts: null} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onLimitedChange(true))
   expect(result.current.limited).toBe(true)
   expect(result.current.attempts).toBe(1)
 })
 
 it('does not set attempts when limited does not change', () => {
-  const {result} = renderHook(() => useAllowedAttemptsState({limited: true, attempts: null}))
+  const {result} = renderHook(() =>
+    useAllowedAttemptsState({limited: true, attempts: null} as AllowedAttemptsStateProps),
+  )
   act(() => result.current.onLimitedChange(true))
   expect(result.current.limited).toBe(true)
   expect(result.current.attempts).toBe(null)
