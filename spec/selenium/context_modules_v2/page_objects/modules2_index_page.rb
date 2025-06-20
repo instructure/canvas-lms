@@ -148,6 +148,10 @@ module Modules2IndexPage
     f(teacher_modules_container_selector)
   end
 
+  def flash_alert
+    f(".flashalert-message")
+  end
+
   #------------------------------ Actions -------------------------------
 
   def set_rewrite_flag(rewrite_status: true)
