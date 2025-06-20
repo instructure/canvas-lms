@@ -9951,6 +9951,7 @@ el:
     grading_standard_type: "Πρότυπο Βαθμολόγησης"
     group_type: Ομάδα
     learning_outcome_type: "Αποτέλεσμα Εκμάθησης"
+    module_item_type: "Χαρακτηριστικό ενότητας"
     module_type: Ενότητα
     quiz_question_type: "Ερώτηση Κουίζ"
     quiz_type: Κουίζ
