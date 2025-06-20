@@ -133,7 +133,7 @@ class Attachment < ActiveRecord::Base
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
 
-  before_save :set_root_account
+  before_validation :set_root_account
   before_save :infer_display_name
   before_save :truncate_display_name
   before_save :default_values
