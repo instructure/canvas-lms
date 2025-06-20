@@ -2393,6 +2393,31 @@ describe CoursesController do
         expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
       end
     end
+
+    context "differentiation tag rollback" do
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+
+        @group_category = @course.group_categories.create!(name: "Test Category", non_collaborative: true)
+        @group = @group_category.groups.create!(context: @course, name: "Test Group", non_collaborative: true)
+        assignment = @course.assignments.create!(title: "Test Assignment")
+        assignment.assignment_overrides.create!(set_type: "Group", set: @group)
+
+        # Turn off differentiation tags for rollback
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        @course.account.save!
+      end
+
+      it "sets active running conversion job in ENV" do
+        Progress.create!(context: @course, tag: DifferentiationTag::DELAYED_JOB_TAG)
+        user_session(@teacher)
+        get "show", params: { id: @course.id }
+
+        expect(assigns[:js_env][:ACTIVE_TAG_CONVERSION_JOB]).to be_truthy
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
