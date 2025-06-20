@@ -407,6 +407,39 @@ describe('FileFolderTable', () => {
         })
       })
     })
+
+    describe("when Ctrl+Click or Cmd+Click is pressed on a row's non actionable column", () => {
+      let user: UserEvent
+      let setSelectedRows: jest.Mock
+
+      beforeEach(() => {
+        user = userEvent.setup()
+        setSelectedRows = jest.fn()
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
+          setSelectedRows,
+        })
+      })
+
+      it('toggles the selection of the unselected row', async () => {
+        const createdAtCells = await screen.findAllByTestId('table-cell-created_at')
+        await user.keyboard('{Control>}')
+        await user.click(createdAtCells[1])
+
+        expect(setSelectedRows).toHaveBeenCalledWith(
+          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+        )
+      })
+
+      it('toggles the selection of the selected row', async () => {
+        const sizeCells = await screen.findAllByTestId('table-cell-size')
+        await user.keyboard('{Control>}')
+        await user.click(sizeCells[0])
+
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set())
+      })
+    })
   })
 
   describe('FileFolderTable - delete behavior', () => {

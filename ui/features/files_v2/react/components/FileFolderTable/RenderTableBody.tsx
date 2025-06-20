@@ -23,7 +23,8 @@ import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
 import {getCheckboxLabel, getUniqueId} from '../../../utils/fileFolderUtils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {ModalOrTrayOptions} from '../../../interfaces/FileFolderTable'
-import {columnRenderers} from './FileFolderTableUtils'
+import {columnRenderers, type ColumnID} from './FileFolderTableUtils'
+
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 const renderTableBody = (
   rows: (File | Folder)[],
@@ -40,6 +41,18 @@ const renderTableBody = (
 ) => {
   return rows.map((row, index) => {
     const isSelected = selectedRows.has(getUniqueId(row))
+    const handleToggleClick = (event: React.MouseEvent, columnID: ColumnID) => {
+      const actionColumns: ColumnID[] = ['actions', 'blueprint', 'permissions', 'rights']
+      if (actionColumns.includes(columnID)) {
+        return // Skip if column's has default click behavior
+      }
+
+      if (columnID === 'modified_by' && 'user' in row) {
+        return
+      }
+
+      if (event.ctrlKey || event.metaKey) toggleRowSelection(getUniqueId(row))
+    }
     const rowHead = [
       <Table.RowHeader key="select">
         <Checkbox
@@ -52,7 +65,12 @@ const renderTableBody = (
         />
       </Table.RowHeader>,
       ...columnHeaders.map(column => (
-        <Table.Cell key={column.id} textAlign={isStacked ? undefined : column.textAlign}>
+        <Table.Cell
+          key={column.id}
+          data-testid={`table-cell-${column.id}`}
+          textAlign={isStacked ? undefined : column.textAlign}
+          onClick={e => handleToggleClick(e, column.id)}
+        >
           {columnRenderers[column.id]({
             row: row,
             rows: rows,

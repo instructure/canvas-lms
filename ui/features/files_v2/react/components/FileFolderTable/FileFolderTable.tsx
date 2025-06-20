@@ -39,6 +39,7 @@ import {
   getColumnHeaders,
   getSelectionScreenReaderText,
   setColumnWidths,
+  type ColumnID,
 } from './FileFolderTableUtils'
 import {DragAndDropWrapper} from './DragAndDropWrapper'
 
@@ -136,7 +137,7 @@ const FileFolderTable = ({
   }
 
   const handleColumnHeaderClick = useCallback(
-    (columnId: string) => {
+    (columnId: ColumnID) => {
       const newCol = columnId
       const newDirection =
         columnId === sort.by
