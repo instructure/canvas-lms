@@ -33,6 +33,17 @@ import {ModifiedByLink} from './ModifiedByLink'
 
 const I18n = createI18nScope('files_v2')
 
+export type ColumnID =
+  | 'name'
+  | 'created_at'
+  | 'updated_at'
+  | 'modified_by'
+  | 'size'
+  | 'rights'
+  | 'blueprint'
+  | 'permissions'
+  | 'actions'
+
 export const setColumnWidths = (headers: ColumnHeader[]) => {
   // Use a temporary div to calculate the width of each column
   const temp = document.createElement('div')
@@ -133,7 +144,7 @@ export const getColumnHeaders = (actionsTitle: string, currentSortId: string): C
 ]
 
 export const columnRenderers: {
-  [key: string]: ({
+  [K in ColumnID]: ({
     row,
     rows,
     isStacked,
