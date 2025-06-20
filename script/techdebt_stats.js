@@ -85,11 +85,10 @@ Usage: node techdebt_stats.js [options]
 Options:
   -h, --help                Show this help message
   -v, --verbose            Show all files instead of just examples
-  -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,string-refs)
+  -s, --section <n>     Show only specific section(s), comma-separated (e.g., skipped,proptypes)
 
 Available sections:
   skipped         - Skipped tests
-  string-refs     - React string refs
   proptypes       - PropTypes usage
   defaultprops    - DefaultProps usage
   handlebars      - Handlebars files
@@ -554,57 +553,6 @@ async function countReactClassComponentFiles(verbose = false) {
   }
 }
 
-async function countReactStringRefs(verbose = false) {
-  try {
-    // Use a more specific pattern that looks for ref=" but not href="
-    const cmd =
-      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "\\bref=\\"[^\\"]*\\""'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    return Number.parseInt(stdout.trim().split('\n').filter(Boolean).length, 10)
-  } catch (error) {
-    console.error(colorize('red', `Error counting React string refs: ${error.message}`))
-    return 0
-  }
-}
-
-async function getRandomReactStringRefFiles(verbose = false) {
-  try {
-    // Use same specific pattern as countReactStringRefs
-    const cmd =
-      'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-      'xargs grep -l "\\bref=\\"[^\\"]*\\""'
-    const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-    const files = stdout.trim().split('\n').filter(Boolean)
-    return getRandomExamples(files, 3)
-  } catch (error) {
-    console.error(colorize('red', `Error finding React string ref examples: ${error.message}`))
-  }
-  return []
-}
-
-async function showReactStringRefStats(verbose = false) {
-  const count = await countReactStringRefs(verbose)
-  console.log(colorize('yellow', `- Files with React string refs: ${bold(count)}`))
-  if (count > 0) {
-    if (verbose) {
-      const cmd =
-        'git ls-files "ui/" "packages/" | grep -E "\\.(js|jsx|ts|tsx)$" | ' +
-        'xargs grep -l "\\bref=\\"[^\\"]*\\""' // Fix the string-refs grep pattern
-      const {stdout} = await execAsync(cmd, {cwd: projectRoot})
-      const files = stdout.trim().split('\n').filter(Boolean)
-      files.sort().forEach(file => {
-        console.log(colorize('gray', `  ${file}`))
-      })
-    } else {
-      const examples = await getRandomReactStringRefFiles(verbose)
-      examples.forEach(file => {
-        console.log(colorize('gray', `  Example: ${file}`))
-      })
-    }
-  }
-}
-
 async function countPropTypesFiles(verbose = false) {
   try {
     const cmd =
@@ -826,7 +774,6 @@ async function showReactCompilerViolationStats(verbose = false) {
 
 function getSectionTitle(section) {
   const titles = {
-    'string-refs': ['React String Refs', '(use createRef/useRef/forwardRef/callbackRef)'],
     class: ['React Class Component Files', '(convert to function components)'],
     defaultprops: ['DefaultProps Usage', '(use default parameters/TypeScript defaults)'],
     handlebars: ['Handlebars Files', '(convert to React)'],
@@ -859,12 +806,6 @@ async function printDashboard() {
 
     const selectedSections = options.sections
     const verbose = options.verbose
-
-    if (selectedSections.length === 0 || selectedSections.includes('string-refs')) {
-      console.log(getSectionTitle('string-refs'))
-      await showReactStringRefStats(verbose)
-      console.log()
-    }
 
     if (selectedSections.length === 0 || selectedSections.includes('sinon')) {
       console.log(getSectionTitle('sinon'))
