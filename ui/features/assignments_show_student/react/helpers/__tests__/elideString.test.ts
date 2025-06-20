@@ -24,7 +24,7 @@ describe('elideString', () => {
   })
 
   it('does not elide filenames for files less than or equal to 21 characters', () => {
-    const filename = 'c'.repeat(21)
+    const filename: string = 'c'.repeat(21)
     expect(elideString(filename)).toMatch(filename)
   })
 })

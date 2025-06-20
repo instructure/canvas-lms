@@ -18,18 +18,26 @@
 
 import walk from '../array-walk'
 
+interface NamedItem {
+  name: string
+}
+
+interface TreeItem {
+  a?: TreeItem[]
+}
+
 describe('arr/walk', () => {
   test('walks a tree object', () => {
-    const arr = [{name: 'a'}, {name: 'b'}]
+    const arr: NamedItem[] = [{name: 'a'}, {name: 'b'}]
     const prop = 'none'
     let str = ''
-    walk(arr, prop, item => (str += item.name))
+    walk(arr, prop, (item: NamedItem) => (str += item.name))
     expect(str).toBe('ab')
 
-    let a = [{}]
-    walk(a, 'nuthin', (item, arr) => expect(arr).toBe(a))
+    const a: any[] = [{}]
+    walk(a, 'nuthin', (item: any, arr: any[]) => expect(arr).toBe(a))
 
-    a = [
+    const treeArray: TreeItem[] = [
       {
         a: [
           {
@@ -52,7 +60,7 @@ describe('arr/walk', () => {
     ]
 
     let c = 0
-    walk(a, 'a', () => c++)
+    walk(treeArray, 'a', () => c++)
     expect(c).toBe(11)
   })
 })
