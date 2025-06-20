@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
 import moment from 'moment-timezone'
 import {MOCK_CARDS, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
 
@@ -132,68 +132,71 @@ export const opportunities = [
 ]
 
 export function createPlannerMocks() {
-  moxios.stubRequest(/\/api\/v1\/dashboard\/dashboard_cards$/, {
-    status: 200,
-    response: MOCK_CARDS,
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: MOCK_PLANNER_ITEM,
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: [
-      {
-        context_name: 'Course2',
-        context_type: 'Course',
-        course_id: '1',
-        html_url: '/courses/2/announcements/12',
-        new_activity: false,
-        plannable: {
-          created_at: '2020-03-16T17:17:17Z',
-          id: '12',
-          title: 'Announcement 12',
-          updated_at: '2020-03-16T17:31:52Z',
-        },
-        plannable_date: moment().subtract(6, 'months').toISOString(),
-        plannable_id: '12',
-        plannable_type: 'announcement',
-        planner_override: null,
-        submissions: {},
-      },
-    ],
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?end_date=.*per_page=1/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: [
-      {
-        context_name: 'Course2',
-        context_type: 'Course',
-        course_id: '1',
-        html_url: '/courses/2/discussion_topics/8',
-        new_activity: false,
-        plannable: {
-          created_at: '2022-03-16T17:17:17Z',
-          id: '8',
-          title: 'Discussion 8',
-          updated_at: '2022-03-16T17:31:52Z',
-        },
-        plannable_date: moment().add(6, 'months').toISOString(),
-        plannable_id: '8',
-        plannable_type: 'discussion',
-        planner_override: null,
-        submissions: {},
-      },
-    ],
-  })
-  moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: opportunities,
-  })
+  return [
+    http.get('/api/v1/dashboard/dashboard_cards', () => HttpResponse.json(MOCK_CARDS)),
+    http.get('/api/v1/planner/items', ({request}) => {
+      const url = new URL(request.url)
+      const startDate = url.searchParams.get('start_date')
+      const endDate = url.searchParams.get('end_date')
+      const perPage = url.searchParams.get('per_page')
+
+      if (startDate && perPage === '1') {
+        return HttpResponse.json(
+          [
+            {
+              context_name: 'Course2',
+              context_type: 'Course',
+              course_id: '1',
+              html_url: '/courses/2/announcements/12',
+              new_activity: false,
+              plannable: {
+                created_at: '2020-03-16T17:17:17Z',
+                id: '12',
+                title: 'Announcement 12',
+                updated_at: '2020-03-16T17:31:52Z',
+              },
+              plannable_date: moment().subtract(6, 'months').toISOString(),
+              plannable_id: '12',
+              plannable_type: 'announcement',
+              planner_override: null,
+              submissions: {},
+            },
+          ],
+          {headers: {link: 'url; rel="current"'}},
+        )
+      } else if (endDate && perPage === '1') {
+        return HttpResponse.json(
+          [
+            {
+              context_name: 'Course2',
+              context_type: 'Course',
+              course_id: '1',
+              html_url: '/courses/2/discussion_topics/8',
+              new_activity: false,
+              plannable: {
+                created_at: '2022-03-16T17:17:17Z',
+                id: '8',
+                title: 'Discussion 8',
+                updated_at: '2022-03-16T17:31:52Z',
+              },
+              plannable_date: moment().add(6, 'months').toISOString(),
+              plannable_id: '8',
+              plannable_type: 'discussion',
+              planner_override: null,
+              submissions: {},
+            },
+          ],
+          {headers: {link: 'url; rel="current"'}},
+        )
+      } else if (startDate && endDate) {
+        return HttpResponse.json(MOCK_PLANNER_ITEM, {headers: {link: 'url; rel="current"'}})
+      }
+      return HttpResponse.json([])
+    }),
+    http.get('/api/v1/users/self/missing_submission*', () =>
+      HttpResponse.json(opportunities, {headers: {link: 'url; rel="current"'}}),
+    ),
+  ]
 }
 
 const currentUser = {

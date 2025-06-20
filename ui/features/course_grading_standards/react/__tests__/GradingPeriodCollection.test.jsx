@@ -20,6 +20,8 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GradingPeriodCollection from '../gradingPeriodCollection'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -42,6 +44,16 @@ describe('GradingPeriodCollection', () => {
     grading_periods_read_only: false,
   }
 
+  const server = setupServer(
+    http.get('http://localhost/api/v1/courses/1/grading_periods', () => {
+      return HttpResponse.json(defaultPeriods)
+    }),
+  )
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup({
       GRADING_PERIODS_URL: 'http://localhost/api/v1/courses/1/grading_periods',
@@ -50,28 +62,79 @@ describe('GradingPeriodCollection', () => {
       CONTEXT_ID: '1',
     })
 
-    // Mock jQuery AJAX
-    $.ajax = jest.fn(() => ({
-      success: callback => {
-        callback(defaultPeriods)
-        return {error: jest.fn()}
-      },
-      error: callback => {
-        callback()
-        return {success: jest.fn()}
-      },
-    }))
+    // Mock jQuery's getJSON to use native fetch which MSW intercepts
+    $.getJSON = jest.fn(url => {
+      const promise = {
+        success: function (callback) {
+          fetch(url)
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok')
+              return response.json()
+            })
+            .then(data => {
+              callback(data)
+            })
+            .catch(() => {})
+          return promise
+        },
+        error: function (callback) {
+          fetch(url)
+            .then(response => {
+              if (!response.ok) {
+                callback()
+              }
+            })
+            .catch(() => {
+              callback()
+            })
+          return promise
+        },
+      }
+      return promise
+    })
 
-    // Mock jQuery getJSON with proper promise-style chaining
-    $.getJSON = jest.fn(() => ({
-      success(successCallback) {
-        setTimeout(() => successCallback(defaultPeriods), 0)
-        return this
-      },
-      error(errorCallback) {
-        return this
-      },
-    }))
+    // Mock jQuery's ajax to use native fetch which MSW intercepts
+    $.ajax = jest.fn(options => {
+      const promise = {
+        success: function (callback) {
+          fetch(options.url, {
+            method: options.type || 'GET',
+            headers: {
+              'Content-Type': options.contentType || 'application/json',
+            },
+            body: options.data,
+          })
+            .then(response => {
+              if (!response.ok) throw new Error('Network response was not ok')
+              return response.json()
+            })
+            .then(data => {
+              callback.call(options.context || this, data)
+            })
+            .catch(() => {})
+          return promise
+        },
+        error: function (callback) {
+          fetch(options.url, {
+            method: options.type || 'GET',
+            headers: {
+              'Content-Type': options.contentType || 'application/json',
+            },
+            body: options.data,
+          })
+            .then(response => {
+              if (!response.ok) {
+                callback.call(options.context || this)
+              }
+            })
+            .catch(() => {
+              callback.call(options.context || this)
+            })
+          return promise
+        },
+      }
+      return promise
+    })
 
     // Mock jQuery plugins
     $.fn.confirmDelete = jest.fn(({success}) => success())
@@ -92,31 +155,24 @@ describe('GradingPeriodCollection', () => {
   })
 
   it('shows loading state while fetching grading periods', () => {
-    // Override the default mock to never resolve
-    $.getJSON.mockImplementationOnce(() => ({
-      success() {
-        return this
-      },
-      error() {
-        return this
-      },
-    }))
+    // Use MSW to delay the response
+    server.use(
+      http.get('http://localhost/api/v1/courses/1/grading_periods', async () => {
+        await new Promise(() => {}) // Never resolves
+      }),
+    )
 
     const {getByTestId} = render(<GradingPeriodCollection />)
     expect(getByTestId('grading-periods-loading')).toBeInTheDocument()
   })
 
   it('handles network errors', async () => {
-    // Override the default mock to trigger an error
-    $.getJSON.mockImplementationOnce(() => ({
-      success() {
-        return this
-      },
-      error(errorCallback) {
-        setTimeout(() => errorCallback(), 0)
-        return this
-      },
-    }))
+    server.use(
+      http.get(
+        'http://localhost/api/v1/courses/1/grading_periods',
+        () => new HttpResponse(null, {status: 500}),
+      ),
+    )
 
     render(<GradingPeriodCollection />)
     await waitFor(() => {
@@ -137,6 +193,12 @@ describe('GradingPeriodCollection', () => {
   })
 
   it('deletes a grading period', async () => {
+    server.use(
+      http.delete('http://localhost/api/v1/courses/1/grading_periods/1', () => {
+        return new HttpResponse(null, {status: 204})
+      }),
+    )
+
     const user = userEvent.setup()
     const {getByTestId} = render(<GradingPeriodCollection />)
 
@@ -148,7 +210,9 @@ describe('GradingPeriodCollection', () => {
     await user.click(deleteButton)
 
     expect($.fn.confirmDelete).toHaveBeenCalled()
-    expect($.flashMessage).toHaveBeenCalledWith('The grading period was deleted')
+    await waitFor(() => {
+      expect($.flashMessage).toHaveBeenCalledWith('The grading period was deleted')
+    })
   })
 
   it('validates overlapping dates', async () => {
@@ -172,15 +236,11 @@ describe('GradingPeriodCollection', () => {
       grading_periods_read_only: false,
     }
 
-    $.getJSON.mockImplementationOnce(() => ({
-      success(callback) {
-        setTimeout(() => callback(overlappingPeriods), 0)
-        return this
-      },
-      error() {
-        return this
-      },
-    }))
+    server.use(
+      http.get('http://localhost/api/v1/courses/1/grading_periods', () => {
+        return HttpResponse.json(overlappingPeriods)
+      }),
+    )
 
     const {getByTestId} = render(<GradingPeriodCollection />)
 

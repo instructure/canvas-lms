@@ -69,5 +69,30 @@ describe "files index page" do
       expect(content).not_to contain_css(create_folder_button_selector)
       expect(content).not_to contain_css(upload_button_selector)
     end
+
+    it "persists user preference for files across canvas" do
+      @teacher.set_preference(:files_ui_version, "v2")
+      get "/courses/#{@course.id}/files"
+      expect(switch_to_old_files_page_toggle).to be_displayed
+      all_my_files_button.click
+      expect(switch_to_old_files_page_toggle).to be_displayed
+      switch_to_old_files_page_toggle.click
+      expect(switch_to_new_files_page_toggle).to be_displayed
+      get "/courses/#{@course.id}/files"
+      expect(switch_to_new_files_page_toggle).to be_displayed
+    end
+
+    it "persists user preference after logout" do
+      @teacher.set_preference(:files_ui_version, "v1")
+      get "/courses/#{@course.id}/files"
+      expect(switch_to_new_files_page_toggle).to be_displayed
+      switch_to_new_files_page_toggle.click
+      expect(switch_to_old_files_page_toggle).to be_displayed
+      get "/logout"
+      f("#Button--logout-confirm").click
+      get "/login"
+      get "/courses/#{@course.id}/files"
+      expect(switch_to_old_files_page_toggle).to be_displayed
+    end
   end
 end

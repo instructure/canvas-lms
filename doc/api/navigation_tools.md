@@ -309,6 +309,10 @@ All of these settings are contained under "user_navigation"
 
   This specifies what types of users will see the link in the user navigation. "public" and "members" means anyone will see it, and "admins" means only account admins will see the link.
 
+- windowTarget: \_blank (optional)
+
+  When set to \_blank, the windowTarget property allows you to configure a launch to happen in a new tab instead of in an iframe. Omit this if you want to launch in frame.
+
 Top Navigation Placement <a name="top_navigation"></a>
 ==============
 

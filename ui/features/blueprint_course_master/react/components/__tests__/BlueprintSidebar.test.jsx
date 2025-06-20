@@ -17,13 +17,11 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {shallow} from 'enzyme'
 import BlueprintSidebar from '../BlueprintSidebar'
-describe('BlueprintSidebar', () => {
-  let wrapper
 
+describe('BlueprintSidebar', () => {
   beforeEach(() => {
     jest.useFakeTimers()
   })
@@ -33,27 +31,48 @@ describe('BlueprintSidebar', () => {
   })
 
   test('renders the BlueprintSidebar component', () => {
-    wrapper = shallow(<BlueprintSidebar />)
-    expect(wrapper.find('.bcs__wrapper').exists()).toBeTruthy()
+    const {container} = render(<BlueprintSidebar />)
+    expect(container.querySelector('.bcs__wrapper')).toBeInTheDocument()
   })
 
-  test('clicking open button sets isOpen to true', async () => {
-    const ref = React.createRef()
-    wrapper = render(<BlueprintSidebar ref={ref} />)
-    const button = wrapper.container.querySelectorAll('.bcs__trigger button')[0]
+  test('clicking open button opens the tray', async () => {
+    const {getByRole} = render(<BlueprintSidebar />)
+    const button = getByRole('button', {name: 'Open Blueprint Sidebar'})
     const user = userEvent.setup({delay: null})
+
     await user.click(button)
-    jest.advanceTimersByTime(500)
-    expect(ref.current.state.isOpen).toEqual(true)
+
+    // Run all timers to completion for the tray animation
+    jest.runAllTimers()
+
+    await waitFor(() => {
+      const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')
+      expect(tray).toBeInTheDocument()
+    })
   })
 
-  test('clicking close button sets isOpen to false', () => {
-    const ref = React.createRef()
-    wrapper = render(<BlueprintSidebar ref={ref} />)
-    ref.current.open()
-    jest.advanceTimersByTime(500)
-    ref.current.closeBtn.click()
-    jest.advanceTimersByTime(500)
-    expect(ref.current.state.isOpen).toEqual(false)
+  test('clicking close button closes the tray', async () => {
+    const {getByRole} = render(<BlueprintSidebar />)
+    const openButton = getByRole('button', {name: 'Open Blueprint Sidebar'})
+    const user = userEvent.setup({delay: null})
+
+    // Open the tray first
+    await user.click(openButton)
+    jest.runAllTimers()
+
+    await waitFor(() => {
+      const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')
+      expect(tray).toBeInTheDocument()
+    })
+
+    // Now close it
+    const closeButton = getByRole('button', {name: 'Close sidebar'})
+    await user.click(closeButton)
+    jest.runAllTimers()
+
+    await waitFor(() => {
+      const tray = document.querySelector('[role="dialog"][aria-label="Blueprint Settings"]')
+      expect(tray).not.toBeInTheDocument()
+    })
   })
 })

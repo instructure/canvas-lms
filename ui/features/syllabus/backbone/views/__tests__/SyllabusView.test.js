@@ -31,41 +31,46 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
 import tzInTest from '@instructure/moment-utils/specHelpers'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 const setupServerResponses = () => {
-  // Mock jQuery's ajax method
-  $.ajax = jest.fn().mockImplementation(({url, success}) => {
-    let response
-    const links = `<${url}>; rel="first"`
+  // Setup MSW handlers for different request types
+  server.use(
+    http.get('*', ({request}) => {
+      const url = new URL(request.url)
+      let response
+      const links = `<${url.href}>; rel="first"`
 
-    if (url.match(/.*\?.*\btype=assignment\b/)) {
-      response = SyllabusViewPrerendered.assignments
-    } else if (url.match(/.*\?.*\btype=sub_assignment\b/)) {
-      response = SyllabusViewPrerendered.sub_assignments
-    } else if (url.match(/.*\?.*\btype=event\b/)) {
-      response = SyllabusViewPrerendered.events
-    } else if (url.match(/\/api\/v1\/appointment_groups/)) {
-      response = SyllabusViewPrerendered.appointment_groups
-    } else if (url.match(/\/api\/v1\/planner\/items/)) {
-      response = SyllabusViewPrerendered.planner_items
-    }
+      if (url.search.includes('type=assignment')) {
+        response = SyllabusViewPrerendered.assignments
+      } else if (url.search.includes('type=sub_assignment')) {
+        response = SyllabusViewPrerendered.sub_assignments
+      } else if (url.search.includes('type=event')) {
+        response = SyllabusViewPrerendered.events
+      } else if (url.pathname.includes('/api/v1/appointment_groups')) {
+        response = SyllabusViewPrerendered.appointment_groups
+      } else if (url.pathname.includes('/api/v1/planner/items')) {
+        response = SyllabusViewPrerendered.planner_items
+      }
 
-    const xhr = {
-      getResponseHeader: header => {
-        if (header === 'Link') return links
-        return null
-      },
-    }
-
-    const deferred = $.Deferred()
-    success(response, 'success', xhr)
-    deferred.resolve(response, 'success', xhr)
-    return deferred
-  })
+      return HttpResponse.json(response, {
+        headers: {
+          Link: links,
+        },
+      })
+    }),
+  )
 }
 
 describe('SyllabusView', () => {
   let view
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
   let fixtures
   let jumpToToday
   let miniMonth

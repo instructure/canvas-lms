@@ -201,7 +201,9 @@ export const ItemAssignToTrayWrapper = () => {
       <AssignToContent
         onSync={onSync}
         overrides={overrides}
+        setOverrides={setOverrides}
         assignmentId={assignmentID}
+        discussionId={ENV.DISCUSSION_TOPIC.ATTRIBUTES.id}
         defaultGroupCategoryId={groupCategoryId}
         importantDates={importantDates}
         defaultSectionId={DEFAULT_SECTION_ID}

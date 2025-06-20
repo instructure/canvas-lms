@@ -400,6 +400,10 @@ describe "selective_release module item assign to tray" do
 
       context "differentiation tag rollback" do
         before do
+          # Enable Checkpoints for these tests
+          @course.account.enable_feature!(:discussion_checkpoints)
+          @course.account.save!
+
           @diff_tag_module = @course.context_modules.create!(name: "Diff Tag Rollback", workflow_state: "active")
           @diff_tag_assignment = @course.assignments.create!(title: "Assignment")
           @diff_tag_quiz = @course.quizzes.create!(title: "Quiz").publish!
@@ -407,11 +411,27 @@ describe "selective_release module item assign to tray" do
           @diff_tag_graded_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Graded Discussion")
           @diff_tag_wiki = @course.wiki_pages.create!(title: "Wiki Page", body: "Wiki Body")
 
+          # Checkpointed discussion
+          @diff_tag_checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "Checkpointed Discussion")
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @diff_tag_checkpointed_discussion,
+            checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+            dates: {},
+            points_possible: 10
+          )
+          Checkpoints::DiscussionCheckpointCreatorService.call(
+            discussion_topic: @diff_tag_checkpointed_discussion,
+            checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+            dates: {},
+            points_possible: 10
+          )
+
           # Add everything to module
           @diff_tag_module.add_item type: "assignment", id: @diff_tag_assignment.id
           @diff_tag_module.add_item type: "quiz", id: @diff_tag_quiz.id
           @diff_tag_module.add_item type: "discussion_topic", id: @diff_tag_discussion.id
           @diff_tag_module.add_item type: "discussion_topic", id: @diff_tag_graded_discussion.id
+          @diff_tag_module.add_item type: "discussion_topic", id: @diff_tag_checkpointed_discussion.id
           @diff_tag_module.add_item type: "wiki_page", id: @diff_tag_wiki.id
         end
 
@@ -548,6 +568,13 @@ describe "selective_release module item assign to tray" do
           it_behaves_like "Convertable in Assign To Tray" do
             let(:module_item) { ContentTag.find_by(context_id: @course.id, context_module_id: @diff_tag_module.id, content_type: "DiscussionTopic", content_id: @diff_tag_graded_discussion.id) }
             let(:date_label) { :due_at }
+          end
+        end
+
+        context "Checkpointed Discussion" do
+          it_behaves_like "Convertable in Assign To Tray" do
+            let(:module_item) { ContentTag.find_by(context_id: @course.id, context_module_id: @diff_tag_module.id, content_type: "DiscussionTopic", content_id: @diff_tag_checkpointed_discussion.id) }
+            let(:date_label) { :unlock_at }
           end
         end
 

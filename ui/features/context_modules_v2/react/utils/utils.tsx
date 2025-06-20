@@ -89,6 +89,8 @@ export const getItemTypeText = (content: ModuleItemContent) => {
       return I18n.t('External Url')
     case 'Page':
       return I18n.t('Page')
+    case 'ModuleExternalTool':
+      return I18n.t('External Tool')
     default:
       return I18n.t('Unknown')
   }

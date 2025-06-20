@@ -29,6 +29,9 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('differentiation_tags')
 
+export const CONVERT_DIFF_TAGS_BUTTON = 'convert-differentiation-tags-button'
+export const CONVERT_DIFF_TAGS_MESSAGE = 'convert-differentiation-tags-message'
+
 interface DifferentiationTagConverterMessageProps {
   courseId: string
   learningObjectType: string
@@ -109,20 +112,32 @@ const DifferentiationTagConverterMessage = ({
   }
 
   return (
-    <Alert variant="warning" hasShadow={false} margin="0 0 medium 0">
+    <Alert
+      variant="warning"
+      hasShadow={false}
+      margin="0 0 medium 0"
+      data-testid="differentiation-tag-converter-message"
+    >
       <Flex direction="column">
-        <Text>{message}</Text>
+        <Text id={CONVERT_DIFF_TAGS_MESSAGE}>{message}</Text>
         <View as="div">
           <Button
+            id={CONVERT_DIFF_TAGS_BUTTON}
             onClick={convertTagOverrides}
             color="primary"
             margin="small 0 0 0"
             disabled={isLoading}
-            data-testid="convert-differentiation-tags-button"
+            data-testid={CONVERT_DIFF_TAGS_BUTTON}
           >
             {I18n.t('Convert Differentiation Tags')}
           </Button>
-          {isLoading && <Spinner size="x-small" margin="small small 0 small" />}
+          {isLoading && (
+            <Spinner
+              renderTitle={I18n.t('Converting Tag Overrides')}
+              size="x-small"
+              margin="small small 0 small"
+            />
+          )}
         </View>
       </Flex>
     </Alert>

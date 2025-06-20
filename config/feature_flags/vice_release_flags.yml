@@ -26,7 +26,7 @@ bbb_avatar:
   applies_to: RootAccount
 
 react_discussions_post:
-  state: hidden
+  state: 'on'
   beta: true
   display_name: Discussions/Announcements Redesign
   description:
@@ -37,9 +37,6 @@ react_discussions_post:
       For full details, please see the *Discussions/Announcements Redesign user group*
       in the Canvas Community
   applies_to: Course
-  environments:
-    development:
-      state: allowed_on # default to on for local development
 
 discussions_reporting:
   state: hidden
@@ -199,3 +196,10 @@ discussion_ai_survey_link:
   display_name: Discussion AI survey link
   description: |-
     Displays a survey link for Discussion Translate and Discussion Insights
+
+disallow_threaded_replies_manage:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Manage Disallow Threaded Replies in Discussions
+  description: |-
+    This feature flag controls the visibility of the alert that allows teachers to manage threaded replies for each discussion topic on the Discussions Index page, this will override the Dissalow Threaded Replies Fix Alert.

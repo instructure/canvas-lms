@@ -1203,4 +1203,37 @@ describe Conversation do
       Conversation.batch_regenerate_private_hashes!(1)
     end
   end
+
+  describe "logging usage of #delete and #delete_all" do
+    before do
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+    end
+
+    it "increments 'conversation.delete' metric with caller tag in 'file.rb:method' format" do
+      conversation = Conversation.initiate([sender, recipient], true)
+
+      expect { conversation.delete }.to change { Conversation.exists?(conversation.id) }.from(true).to(false)
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "conversation.delete",
+        tags: hash_including(
+          caller: match(/\A\w+\.rb:\w+\z/)
+        )
+      )
+    end
+
+    it "increments 'conversation.delete_all' metric with caller tag in 'file.rb:method' format" do
+      ids = Array.new(2) { Conversation.create!.id }
+      convos = Conversation.where(id: ids)
+
+      expect { convos.delete_all }.to change { Conversation.where(id: ids).count }.from(2).to(0)
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "conversation.delete_all",
+        tags: hash_including(
+          caller: match(/\A\w+\.rb:\w+\z/)
+        )
+      )
+    end
+  end
 end

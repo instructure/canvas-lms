@@ -36,10 +36,10 @@ module DifferentiationTag
       private
 
       def get_converter(learning_object)
-        # We will add Checkpointed Discussions as their own converter in a future ticket
-        # https://instructure.atlassian.net/browse/EGG-1183
         if learning_object.is_a?(ContextModule)
           Converters::ContextModuleOverrideConverter
+        elsif learning_object.is_a?(Assignment) && learning_object.has_sub_assignments?
+          Converters::CheckpointedDiscussionOverrideConverter
         else
           Converters::GeneralAssignmentOverrideConverter
         end

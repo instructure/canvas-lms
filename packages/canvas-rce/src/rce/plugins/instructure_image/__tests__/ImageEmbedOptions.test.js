@@ -473,7 +473,15 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
         expect(getImageOptions().usePercentageUnits).toEqual(true)
       })
 
-      it('is false when no percentage width or height has been applied to the image', () => {
+      it('is true when no width or height has been applied to the image', () => {
+        $image.removeAttribute('width')
+        $image.removeAttribute('height')
+        expect(getImageOptions().usePercentageUnits).toEqual(true)
+      })
+
+      it('is false when only pixels have been applied to the image', () => {
+        $image.setAttribute('width', '50px')
+        $image.setAttribute('height', '30px')
         expect(getImageOptions().usePercentageUnits).toEqual(false)
       })
     })

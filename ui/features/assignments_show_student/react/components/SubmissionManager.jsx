@@ -38,6 +38,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {assignLocation} from '@canvas/util/globalUtils'
+import {clearAssetProcessorReports} from '../helpers/AssetProcessorHelper'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
@@ -59,7 +60,7 @@ import {
   isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts,
-  activeTypeMeetsCriteria
+  activeTypeMeetsCriteria,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
@@ -475,7 +476,9 @@ const SubmissionManager = ({
       allowChangesToSubmission &&
       !assignment.lockInfo.isLocked &&
       !shouldRenderNewAttempt() &&
-      lastSubmittedSubmission?.gradingStatus !== 'excused'
+      submission.gradingStatus !== 'excused' &&
+      (assignment.allowedAttempts == null || assignment.allowedAttempts >= submission.attempt) &&
+      submission.state === 'unsubmitted'
     )
   }
 
@@ -533,6 +536,10 @@ const SubmissionManager = ({
   const handleSubmitConfirmation = () => {
     submitAssignment()
     setDraftStatus(null)
+    // We clear the asset processor reports from ENV when a new attempt is submitted
+    // to ensure that the reports are not shown for the new attempt.
+    // User needs to reload the page to see the new reports.
+    clearAssetProcessorReports()
   }
 
   const handleSubmitButton = async () => {
@@ -843,7 +850,7 @@ const SubmissionManager = ({
               data-testid="new-attempt-button"
               color="primary"
               onClick={startNewAttemptAction}
-              elementRef={(element) => newAttemptButtonRef.current = element}
+              elementRef={element => (newAttemptButtonRef.current = element)}
             >
               {I18n.t('New Attempt')}
             </Button>
@@ -894,7 +901,7 @@ const SubmissionManager = ({
         disabled={draftStatus === 'saving' || isSubmitting}
         color="primary"
         onClick={() => handleSubmitButton()}
-        elementRef={(element) => submitButtonRef.current = element}
+        elementRef={element => (submitButtonRef.current = element)}
       >
         {I18n.t('Submit Assignment')}
       </Button>

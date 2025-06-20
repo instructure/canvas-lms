@@ -37,9 +37,9 @@ def get_question_hash(dir, name, delete_answer_ids: true, **)
   hash
 end
 
-def get_quiz_data(dir, name, **opts)
+def get_quiz_data(dir, name, **)
   File.open(File.join(dir, "%s.xml" % name), "r") do |file|
-    Qti.convert_xml(file.read, **opts)
+    Qti.convert_xml(file.read, **)
   end
 end
 

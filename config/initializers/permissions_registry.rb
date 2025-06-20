@@ -1387,6 +1387,11 @@ Rails.application.config.to_prepare do
           AccountAdmin
         ]
       },
+      new_quizzes_view_ip_address: {
+        label: -> { I18n.t("New Quizzes - view IP address") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin]
+      },
       post_to_forum: {
         label: -> { I18n.t("permissions.post_to_forum", "Post to discussions") },
         label_v2: -> { I18n.t("Discussions - post") },
@@ -1733,6 +1738,17 @@ Rails.application.config.to_prepare do
         available_to: %w[TeacherEnrollment DesignerEnrollment AccountAdmin AccountMembership],
         true_for: %w[AccountAdmin],
         account_allows: ->(a) { a.feature_enabled?(:block_editor) && a.feature_enabled?(:block_template_editor) }
+      },
+      new_quizzes_multiple_session_detection: {
+        label: -> { I18n.t("New Quizzes - view multi session information") },
+        available_to: %w[TeacherEnrollment AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin]
+      },
+      manage_users_in_bulk: {
+        label: -> { I18n.t("Bulk actions - people page") },
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:horizon_bulk_api_permission) },
       }
     }
   )

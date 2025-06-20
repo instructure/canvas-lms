@@ -401,6 +401,7 @@ describe "Default Account Reports" do
                   created_by_sis]
              end
     header << "pronouns" if @report.should_add_pronouns?
+    header << "uuid" if format == "provisioning"
     header
   end
 
@@ -441,6 +442,7 @@ describe "Default Account Reports" do
              pseudonym&.sis_batch_id?&.to_s]
           end
     row << user.pronouns if @report.should_add_pronouns?
+    row << user.uuid if format == "provisioning"
     row
   end
 

@@ -19,6 +19,8 @@ import $ from 'jquery'
 import {createCache} from '@canvas/apollo-v3'
 import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
@@ -33,8 +35,18 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('../components/AttemptSelect')
 
+const server = setupServer()
+
 describe('student view integration tests', () => {
   let user
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     user = userEvent.setup()
@@ -47,10 +59,9 @@ describe('student view integration tests', () => {
       PREREQS: {},
       current_user_roles: ['user', 'student'],
     })
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve([]),
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json([])
       }),
     )
   })
@@ -59,6 +70,7 @@ describe('student view integration tests', () => {
     fakeENV.teardown()
     jest.clearAllMocks()
     jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   describe('logged out user on a public assignment', () => {

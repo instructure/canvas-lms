@@ -40,13 +40,13 @@ interface AccessibilityIssuesModalProps {
   item: ContentItem
 }
 
+const I18n = createI18nScope('accessibility_checker')
+
 export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> = ({
   isOpen,
   onClose,
   item,
 }) => {
-  const I18n = createI18nScope('accessibility_checker')
-
   const [shallReload, setShallReload] = useState(false)
 
   const [solvedIssue, setSolvedIssue] = useState(
@@ -80,8 +80,8 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
     newState.set(issue.id, true)
     setApplying(newState)
     doFetchApi({
-      path: window.location.href + '/update',
-      method: 'POST',
+      path: window.location.href + '/issues',
+      method: 'PUT',
       body: JSON.stringify({
         content_type: item.type,
         content_id: item.id,

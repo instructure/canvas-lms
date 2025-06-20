@@ -168,7 +168,7 @@ class ModuleItemsLazyLoader {
       this.savePageNumber(moduleId, allPages, page)
       this.saveAllPage(moduleId, allPages)
       this.renderResult(moduleId, result.text, result.link)
-      this.callback(moduleId)
+      await this.callback(moduleId)
       return result
     } catch (e) {
       module.dataset.loadstate = 'error'

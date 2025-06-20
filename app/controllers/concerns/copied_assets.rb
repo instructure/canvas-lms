@@ -36,6 +36,10 @@ module CopiedAssets
     file: {
       association: :attachments,
       class_name: "Attachment"
+    },
+    module_item: {
+      association: :context_module_tags,
+      class_name: "ContentTag"
     }
   }.freeze
 

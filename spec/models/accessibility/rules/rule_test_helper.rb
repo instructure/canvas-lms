@@ -20,6 +20,8 @@
 require "spec_helper"
 
 module RuleTestHelper
+  include ::Accessibility::NokogiriMethods
+
   RULE_MAP = {
     adjacent_links: Accessibility::Rules::AdjacentLinksRule,
     headings_sequence: Accessibility::Rules::HeadingsSequenceRule,
@@ -258,7 +260,7 @@ module RuleTestHelper
     raise ArgumentError, "Unknown rule: #{rule_name}" unless rule_class
 
     document = Nokogiri::HTML::DocumentFragment.parse(html)
-    AccessibilityControllerHelper.extend_nokogiri_with_dom_adapter(document)
+    extend_nokogiri_with_dom_adapter(document)
     element = document.at_xpath(selector)
 
     if element

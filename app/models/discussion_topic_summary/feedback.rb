@@ -25,8 +25,6 @@ class DiscussionTopicSummary
 
     before_validation :set_root_account
 
-    self.ignored_columns += ["regenerated"]
-
     def set_root_account
       self.root_account ||= discussion_topic_summary.root_account
     end

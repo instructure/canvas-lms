@@ -17,11 +17,7 @@
  */
 
 import '@testing-library/jest-dom'
-import Adapter from 'enzyme-adapter-react-16'
-import Enzyme from 'enzyme'
 import {vi} from 'vitest'
-
-Enzyme.configure({adapter: new Adapter()})
 
 vi.stubGlobal('ENV', {
   FEATURES: {},

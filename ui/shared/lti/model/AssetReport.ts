@@ -61,3 +61,18 @@ export const ZLtiAssetReport = z.object({
   title: z.string().optional(),
 })
 export type LtiAssetReport = z.infer<typeof ZLtiAssetReport>
+
+export const ZLtiAssetReportsByProcessor = z.record(z.string(), z.array(ZLtiAssetReport))
+
+export type LtiAssetReportsByProcessor = z.infer<typeof ZLtiAssetReportsByProcessor>
+
+export type LtiAssetReportWithAsset = LtiAssetReport & {
+  asset_processor_id: number
+  asset: {
+    id: number
+    attachment_id: string | null
+    attachment_name: string | null
+    submission_id: string
+    submission_attempt: string | null
+  }
+}

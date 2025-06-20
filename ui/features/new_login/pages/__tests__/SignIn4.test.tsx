@@ -16,13 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-jest.mock('../../shared/LoginAlert', () => ({
-  __esModule: true,
-  default: () => (
-    <div data-testid="login-error-alert">Please verify your email or password and try again.</div>
-  ),
-}))
-
 import React from 'react'
 import '@testing-library/jest-dom'
 import {windowPathname} from '@canvas/util/globalUtils'
@@ -132,8 +125,10 @@ describe('SignIn', () => {
       })
     })
 
-    it('renders the LoginAlert component when login fails due to invalid credentials', async () => {
+    it('shows username error state and clears password when login fails due to invalid credentials', async () => {
+      // mock login request to simulate 400 Invalid Credentials error
       ;(performSignIn as jest.Mock).mockRejectedValueOnce({response: {status: 400}})
+      // initial context state before login attempt
       ;(useNewLogin as jest.Mock).mockReturnValue({
         isUiActionPending: false,
         setIsUiActionPending: jest.fn(),
@@ -148,10 +143,11 @@ describe('SignIn', () => {
       const usernameInput = screen.getByTestId('username-input')
       const passwordInput = screen.getByTestId('password-input')
       const loginButton = screen.getByTestId('login-button')
+      // simulate typing credentials and submitting the form
       await userEvent.type(usernameInput, 'user@example.com')
       await userEvent.type(passwordInput, 'wrongpassword')
       await userEvent.click(loginButton)
-
+      // ensure performSignIn was called with the expected values
       await waitFor(() => {
         expect(performSignIn).toHaveBeenCalledWith(
           'user@example.com',
@@ -160,6 +156,7 @@ describe('SignIn', () => {
           '/login/canvas',
         )
       })
+      // update context to simulate re-render with loginFailed=true
       ;(useNewLogin as jest.Mock).mockReturnValue({
         isUiActionPending: false,
         setIsUiActionPending: jest.fn(),
@@ -170,10 +167,13 @@ describe('SignIn', () => {
         loginFailed: true,
         setLoginFailed: jest.fn(),
       })
-
-      await waitFor(() => {
-        expect(screen.getByTestId('login-error-alert')).toBeInTheDocument()
-      })
+      // check form-field validation error states
+      const usernameError = await screen.findByText(
+        'Please verify your email and password and try again.',
+      )
+      expect(usernameError).toBeInTheDocument()
+      expect(usernameInput).toHaveAttribute('aria-invalid', 'true')
+      expect(passwordInput).not.toHaveAttribute('aria-invalid')
     })
   })
 

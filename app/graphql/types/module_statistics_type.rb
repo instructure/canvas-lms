@@ -22,13 +22,20 @@ module Types
   class ModuleStatisticsType < ApplicationObjectType
     graphql_name "ModuleStatistics"
 
-    # The object being passed is a hash with statistics data from the loader
+    alias_method :submissions, :object
 
     field :missing_assignment_count, Integer, null: false
     def missing_assignment_count
-      object[:missing_assignment_count] || 0
+      return 0 unless current_user
+
+      submissions.count(&:missing?)
     end
 
     field :latest_due_at, GraphQL::Types::ISO8601DateTime, null: true
+    def latest_due_at
+      return nil unless current_user
+
+      submissions.filter_map(&:cached_due_date).max
+    end
   end
 end

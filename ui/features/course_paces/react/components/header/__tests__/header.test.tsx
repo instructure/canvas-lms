@@ -17,6 +17,8 @@
  */
 
 import {waitFor} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {renderConnected} from '../../../__tests__/utils'
 import {
   PRIMARY_PACE,
@@ -44,16 +46,25 @@ const defaultProps: HeaderProps = {
   syncUnpublishedChanges: jest.fn(),
 }
 
+const server = setupServer()
+
 describe('Course paces header', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     fakeENV.setup()
-    // Clear any previous fetch mocks
-    global.fetch = jest.fn()
   })
 
   afterEach(() => {
     fakeENV.teardown()
     jest.resetAllMocks()
+    server.resetHandlers()
   })
 
   describe('new paces alert', () => {
@@ -64,29 +75,22 @@ describe('Course paces header', () => {
   })
 
   describe('with course paces redesign ON', () => {
-    const originalFetch = global.fetch
-
     beforeEach(() => {
       fakeENV.setup({
-        COURSE_ID: '30'
+        COURSE_ID: '30',
       })
 
       // Setup the fetch mock with proper headers
-      global.fetch = jest.fn(() =>
-        Promise.resolve({
-          ok: true,
-          headers: new Headers({
-            'Content-Type': 'application/json',
-            Link: '',
-          }),
-          json: () => Promise.resolve(HEADING_STATS_API_RESPONSE),
-          text: () => Promise.resolve(JSON.stringify(HEADING_STATS_API_RESPONSE)),
+      server.use(
+        http.get('*', () => {
+          return HttpResponse.json(HEADING_STATS_API_RESPONSE, {
+            headers: {
+              'Content-Type': 'application/json',
+              Link: '',
+            },
+          })
         }),
-      ) as jest.Mock
-    })
-
-    afterEach(() => {
-      global.fetch = originalFetch
+      )
     })
 
     it('renders metrics as table', async () => {

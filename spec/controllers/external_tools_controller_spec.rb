@@ -100,6 +100,179 @@ describe ExternalToolsController do
     end
   end
 
+  describe "GET 'index'" do
+    subject { get :index, params: { course_id: @course.id }, format: "json" }
+
+    before do
+      user_session(@teacher)
+    end
+
+    it "returns a list of tools" do
+      subject
+      expect(response).to be_successful
+      expect(response.parsed_body).to be_an(Array)
+    end
+
+    context "with tool availability controls" do
+      let(:registration) { lti_registration_with_tool(account: @course.root_account) }
+      let(:tool) { registration.new_external_tool(@course) }
+      let(:control) { tool.context_controls.first }
+      let(:lti1tool) { external_tool_model(context: @course) }
+
+      before do
+        lti1tool
+        tool
+      end
+
+      context "with the lti_registrations_next flag off" do
+        before do
+          @course.root_account.disable_feature!(:lti_registrations_next)
+        end
+
+        context "with unavailable ContextControl" do
+          before { control.update!(available: false) }
+
+          it "still includes the tool in the response" do
+            subject
+            expect(response.parsed_body.length).to eq 2
+            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+          end
+        end
+
+        context "with available ContextControl" do
+          it "includes the tool in the response" do
+            subject
+            expect(response.parsed_body.length).to eq 2
+            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+          end
+        end
+      end
+
+      context "with the lti_registrations_next flag on" do
+        before do
+          @course.root_account.enable_feature!(:lti_registrations_next)
+        end
+
+        context "with unavailable ContextControl" do
+          before { control.update!(available: false) }
+
+          it "does not include the tool in the response" do
+            subject
+            expect(response.parsed_body.length).to eq 1
+            expect(response.parsed_body.map { |t| t["id"] }).not_to include tool.id
+          end
+        end
+
+        context "with available ContextControl" do
+          it "includes the tool in the response" do
+            subject
+            expect(response.parsed_body.length).to eq 2
+            expect(response.parsed_body.map { |t| t["id"] }).to include tool.id
+          end
+        end
+      end
+    end
+
+    context "with include_parents: true" do
+      subject { get :index, params: { course_id: @course.id, include_parents: true }, format: "json" }
+
+      let(:parent_tool) { external_tool_model(context: @course.root_account) }
+
+      before do
+        parent_tool
+      end
+
+      it "includes tools from the parent account" do
+        subject
+        expect(response).to be_successful
+        expect(response.parsed_body.map { |t| t["id"] }).to include parent_tool.id
+      end
+    end
+
+    context "with include_parents: false" do
+      subject { get :index, params: { course_id: @course.id, include_parents: false }, format: "json" }
+
+      let(:parent_tool) { external_tool_model(context: @course.root_account) }
+
+      before do
+        parent_tool
+      end
+
+      it "does not include tools from the parent account" do
+        subject
+        expect(response).to be_successful
+        expect(response.parsed_body.map { |t| t["id"] }).not_to include parent_tool.id
+      end
+    end
+
+    context "with placements param" do
+      subject { get :index, params: { course_id: @course.id, placement: }, format: "json" }
+
+      let(:placement) { "course_navigation" }
+      let(:course_nav_tool) { external_tool_model(context: @course, placements: ["course_navigation"]) }
+      let(:editor_button_tool) { external_tool_model(context: @course, placements: ["editor_button"]) }
+
+      before do
+        course_nav_tool
+        editor_button_tool
+      end
+
+      it "only includes tools that are in the specified placements" do
+        subject
+        expect(response).to be_successful
+        expect(response.parsed_body.map { |t| t["id"] }).to include course_nav_tool.id
+        expect(response.parsed_body.map { |t| t["id"] }).not_to include editor_button_tool.id
+      end
+    end
+
+    context "with selectable: true" do
+      subject { get :index, params: { course_id: @course.id, selectable: true }, format: "json" }
+
+      let(:selectable_tool) { @course.context_external_tools.create!(name: "selectable_tool", consumer_key: "selectable_tool", shared_secret: "selectable_tool", url: "https://example.com/launch") }
+      let(:non_selectable_tool) { @course.context_external_tools.create!(name: "non_selectable_tool", consumer_key: "non_selectable_tool", shared_secret: "non_selectable_tool", url: "https://example.com/launch", not_selectable: true) }
+
+      before do
+        selectable_tool
+        non_selectable_tool
+      end
+
+      it "only includes tools that are selectable" do
+        subject
+        expect(response).to be_successful
+        expect(response.parsed_body.length).to eq 1
+        expect(response.parsed_body.map { |t| t["id"] }).to include selectable_tool.id
+      end
+    end
+
+    context "with search_term param" do
+      subject { get :index, params: { course_id: @course.id, search_term: }, format: "json" }
+
+      let(:search_term) { "bob" }
+
+      before do
+        @course.context_external_tools.create!(name: "bob", consumer_key: "bob", shared_secret: "bob", url: "https://example.com/launch")
+        @course.context_external_tools.create!(name: "alice", consumer_key: "alice", shared_secret: "alice", url: "https://example.com/launch")
+      end
+
+      it "returns tools matching the search term" do
+        subject
+        expect(response).to be_successful
+        expect(response.parsed_body.length).to eq 1
+        expect(response.parsed_body.first["name"]).to eq "bob"
+      end
+
+      context "when no tools match" do
+        let(:search_term) { "charlie" }
+
+        it "returns no tools if no matches found" do
+          subject
+          expect(response).to be_successful
+          expect(response.parsed_body).to be_empty
+        end
+      end
+    end
+  end
+
   describe "GET 'show'" do
     context "resource link request" do
       include_context "key_storage_helper"
@@ -974,25 +1147,31 @@ describe ExternalToolsController do
     end
 
     context "LTI 1.3" do
-      let(:developer_key) do
-        key = DeveloperKey.create!(account: @course.account)
-        key.generate_rsa_keypair!
-        key.developer_key_account_bindings.first.update!(
-          workflow_state: "on"
-        )
-        key.save!
-        key
+      let(:registration) do
+        lti_registration_with_tool(account: @course.account,
+                                   created_by: @teacher,
+                                   configuration_params:)
       end
 
       let(:lti_1_3_tool) do
-        tool = @course.context_external_tools.new(name: "test",
-                                                  consumer_key: "key",
-                                                  shared_secret: "secret")
-        tool.url = "http://www.example.com/launch"
-        tool.use_1_3 = true
-        tool.developer_key = developer_key
-        tool.save!
-        tool
+        registration.deployments.first
+      end
+      let(:configuration_params) do
+        {
+          "domain" => "www.example.com",
+          "oidc_initiation_url" => "http://www.example.com/launch",
+          "target_link_uri" => "http://www.example.com/launch",
+          "placements" => [
+            {
+              "placement" => "course_navigation",
+              "target_link_uri" => "http://www.example.com/launch"
+            },
+            {
+              "placement" => "account_navigation",
+              "target_link_uri" => "http://www.example.com/launch"
+            }
+          ]
+        }
       end
 
       let(:decoded_jwt) do

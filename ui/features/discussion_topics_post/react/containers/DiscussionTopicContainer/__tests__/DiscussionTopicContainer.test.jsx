@@ -227,6 +227,14 @@ describe('DiscussionTopicContainer', () => {
     expect(queryByTestId('delete')).toBeNull()
   })
 
+  it('renders Speed Grader button in the menu', () => {
+    const props = {discussionTopic: Discussion.mock()}
+    const {getByTestId, getByText} = setup(props)
+    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+    expect(getByText('Open in SpeedGrader')).toBeTruthy()
+  })
+
   it('Should be able to open SpeedGrader', async () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -583,6 +591,14 @@ describe('DiscussionTopicContainer', () => {
   })
 
   describe('Peer Reviews', () => {
+    it('renders Peer Reviews button in the menu', () => {
+      const props = {discussionTopic: Discussion.mock()}
+      const {getByTestId, getByText} = setup(props)
+      fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+
+      expect(getByText('Peer Reviews')).toBeTruthy()
+    })
+
     it('renders with a due date', () => {
       const props = {discussionTopic: Discussion.mock()}
       const {getByText} = setup(props)
@@ -681,27 +697,27 @@ describe('DiscussionTopicContainer', () => {
       ENV.user_can_summarize = true
       ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
       expect(queryByTestId('summarize-button')).toBeTruthy()
     })
 
-    it('should render discussion summary button with Turn Off Summary if summary is enabled', () => {
+    it('should render discussion summary button with Close Summary if summary is enabled', () => {
       ENV.user_can_summarize = true
       ENV.discussion_summary_enabled = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
-      expect(queryByTestId('summarize-button').textContent).toBe('Turn Off Summary')
+      expect(queryByTestId('summarize-button').textContent).toBe('Close Summary')
     })
 
     it('should not render the discussion summary button if user can not summarize', () => {
       ENV.user_can_summarize = false
       ENV.discussion_summary_enabled = false
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
 
       expect(queryByTestId('summarize-button')).toBeNull()
@@ -711,7 +727,7 @@ describe('DiscussionTopicContainer', () => {
       ENV.discussion_summary_enabled = true
       ENV.user_can_summarize = true
       const {queryByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
       expect(queryByTestId('summary-loading')).toBeTruthy()
     })
@@ -720,7 +736,7 @@ describe('DiscussionTopicContainer', () => {
       ENV.discussion_summary_enabled = false
       ENV.user_can_summarize = true
       const {queryAllByTestId} = setup({
-        discussionTopic: Discussion.mock()
+        discussionTopic: Discussion.mock(),
       })
       expect(queryAllByTestId(/summary-.*/)).toEqual([])
     })

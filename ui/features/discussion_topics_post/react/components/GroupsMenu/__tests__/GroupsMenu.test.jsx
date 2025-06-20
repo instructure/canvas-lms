@@ -54,19 +54,37 @@ describe('GroupsMenu', () => {
       expect(component).toBeTruthy()
     })
 
-    it('should find button', () => {
-      const {queryByTestId} = setup(defaultProps)
-      expect(queryByTestId('groups-menu-btn')).toBeTruthy()
+    describe('when childTopics has elements', () => {
+      it('should find button that is not disabled without a tooltip', () => {
+        const {queryByTestId, queryByText} = setup(defaultProps)
+        const button = queryByTestId('groups-menu-btn')
+        expect(button).toBeTruthy()
+        expect(button).not.toBeDisabled()
+        expect(queryByText('There are no groups in this group set')).toBeFalsy()
+      })
+
+      it('should find the group names, and corresponding unread counts', () => {
+        const {queryByText, queryAllByText, queryByTestId} = setup(defaultProps)
+        expect(queryAllByText('Group_Test_1')).toEqual([])
+        fireEvent.click(queryByTestId('groups-menu-btn'))
+        expect(queryAllByText('Group_Test_1')).toHaveLength(2)
+        expect(queryByText('0 Unread')).toBeTruthy()
+        expect(queryAllByText('Group_Test_2')).toHaveLength(2)
+        expect(queryByText('5 Unread')).toBeTruthy()
+      })
     })
 
-    it('should find the group names, and corresponding unread counts', () => {
-      const {queryByText, queryAllByText, queryByTestId} = setup(defaultProps)
-      expect(queryAllByText('Group_Test_1')).toEqual([])
-      fireEvent.click(queryByTestId('groups-menu-btn'))
-      expect(queryAllByText('Group_Test_1')).toHaveLength(2)
-      expect(queryByText('0 Unread')).toBeTruthy()
-      expect(queryAllByText('Group_Test_2')).toHaveLength(2)
-      expect(queryByText('5 Unread')).toBeTruthy()
+    describe('when childTopics is empty', () => {
+      it('should find button that is disabled with a tooltip', () => {
+        const {queryByTestId, queryByText} = setup({
+          ...defaultProps,
+          childTopics: [],
+        })
+        const button = queryByTestId('groups-menu-btn')
+        expect(button).toBeTruthy()
+        expect(button).toBeDisabled()
+        expect(queryByText('There are no groups in this group set')).toBeTruthy()
+      })
     })
   })
 })

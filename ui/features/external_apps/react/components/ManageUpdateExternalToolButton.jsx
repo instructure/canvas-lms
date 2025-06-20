@@ -29,8 +29,14 @@ export default class ManageUpdateExternalToolButton extends React.Component {
     returnFocus: PropTypes.func.isRequired,
   }
 
+  constructor(props) {
+    super(props)
+    this.reregModalRef = React.createRef()
+    this.updateButtonRef = React.createRef()
+  }
+
   openReregModal = e => {
-    this.refs.reregModal.openModal(e)
+    this.reregModalRef.current.openModal(e)
   }
 
   render() {
@@ -45,7 +51,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
         {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
-          ref="updateButton"
+          ref={this.updateButtonRef}
           tabIndex="-1"
           role="menuitem"
           aria-label={updateAriaLabel}
@@ -55,7 +61,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
           {I18n.t('Manage Update')}
         </a>
         <Lti2ReregistrationUpdateModal
-          ref="reregModal"
+          ref={this.reregModalRef}
           tool={this.props.tool}
           returnFocus={this.props.returnFocus}
         />

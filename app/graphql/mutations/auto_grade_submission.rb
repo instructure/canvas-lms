@@ -36,13 +36,15 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Auto-grading failed due to the following issue(s): #{errors.join(", ")}"
     end
 
-    raise "Submission not found" unless submission
+    if GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(submission.body)
+      raise GraphQL::ExecutionError, I18n.t("Submission contains a linked file uploaded via RCE.")
+    end
 
     course = submission.assignment&.course
     raise "Course not found" unless course
 
     unless course.feature_enabled?(:project_lhotse)
-      raise GraphQL::ExecutionError, "Project Lhotse is not enabled for this course"
+      raise GraphQL::ExecutionError, I18n.t("Project Lhotse is not enabled for this course.")
     end
 
     verify_authorized_action!(course, :manage_grades)
@@ -51,8 +53,11 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
     progress = service.auto_grade_in_background(submission:)
 
     { progress: }
+  rescue GraphQL::ExecutionError => e
+    Rails.logger.error("[AutoGradeSubmission GraphQL ExecutionError] #{e.message}")
+    raise e
   rescue => e
     Rails.logger.error("[AutoGradeSubmission ERROR] #{e.message}")
-    raise GraphQL::ExecutionError, "An unexpected error occurred while grading."
+    raise GraphQL::ExecutionError, I18n.t("An unexpected error occurred while grading.")
   end
 end

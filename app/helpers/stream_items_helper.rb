@@ -118,19 +118,7 @@ module StreamItemsHelper
                        id: Shard.short_id_for(item.data.context_id))
     when "AssessmentRequest"
       submission = item.data.asset
-      if submission.context&.feature_enabled?(:assignments_2_student)
-        student_peer_review_url_in_a2_for(
-          submission.context,
-          submission.assignment,
-          item.data
-        )
-      else
-        Submission::ShowPresenter.new(
-          submission:,
-          current_user: user,
-          assessment_request: item.data
-        ).submission_data_url
-      end
+      student_peer_review_url(submission.context, submission.assignment, item.data, user)
     end
   end
 

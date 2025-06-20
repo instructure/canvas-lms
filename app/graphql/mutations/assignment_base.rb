@@ -58,7 +58,10 @@ class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObj
   argument :assignment_group_id, ID, required: false
   argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false
-  argument :for_checkpoints, Boolean, required: false
+  argument :for_checkpoints,
+           Boolean,
+           "if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at",
+           required: false
   argument :grading_standard_id, ID, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false
   argument :group_category_id, ID, required: false
@@ -136,7 +139,10 @@ class Mutations::AssignmentBase::Mutation < Mutations::BaseMutation
   argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :description, String, required: false
   argument :due_at, Types::DateTimeType, required: false
-  argument :for_checkpoints, Boolean, required: false
+  argument :for_checkpoints,
+           Boolean,
+           "if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at",
+           required: false
   argument :grade_group_students_individually, Boolean, required: false
   argument :grading_standard_id, ID, required: false
   argument :grading_type, Types::AssignmentType::AssignmentGradingType, required: false

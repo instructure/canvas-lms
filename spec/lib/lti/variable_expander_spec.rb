@@ -922,6 +922,42 @@ module Lti
         expect(expand!("$Canvas.root_account.global_id")).to eq 10_054_321
       end
 
+      it "has substitution for $Canvas.account.decimal_separator when sub account has setting" do
+        account_settings = { decimal_separator: { value: "period" } }
+        root_settings = { decimal_separator: { value: "comma" } }
+        allow(account).to receive(:settings).and_return(account_settings)
+        allow(root_account).to receive(:settings).and_return(root_settings)
+        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+        expect(expand!("$Canvas.account.decimal_separator")).to eq "period"
+      end
+
+      it "has substitution for $Canvas.account.decimal_separator with fallback to root account setting" do
+        account_settings = {}
+        root_settings = { decimal_separator: { value: "comma" } }
+        allow(account).to receive(:settings).and_return(account_settings)
+        allow(root_account).to receive(:settings).and_return(root_settings)
+        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+        expect(expand!("$Canvas.account.decimal_separator")).to eq "comma"
+      end
+
+      it "has substitution for $Canvas.account.thousand_separator when sub account has setting" do
+        account_settings = { thousand_separator: { value: "period" } }
+        root_settings = { thousand_separator: { value: "comma" } }
+        allow(account).to receive(:settings).and_return(account_settings)
+        allow(root_account).to receive(:settings).and_return(root_settings)
+        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+        expect(expand!("$Canvas.account.thousand_separator")).to eq "period"
+      end
+
+      it "has substitution for $Canvas.account.thousand_separator with fallback to root account setting" do
+        account_settings = {}
+        root_settings = { thousand_separator: { value: "comma" } }
+        allow(account).to receive(:settings).and_return(account_settings)
+        allow(root_account).to receive(:settings).and_return(root_settings)
+        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+        expect(expand!("$Canvas.account.thousand_separator")).to eq "comma"
+      end
+
       it "has substitution for $Canvas.shard.id" do
         expect(expand!("$Canvas.shard.id")).to eq Shard.current.id
       end

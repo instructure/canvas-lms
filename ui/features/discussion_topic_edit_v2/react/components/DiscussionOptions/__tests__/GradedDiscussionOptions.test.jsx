@@ -51,6 +51,14 @@ const renderGradedDiscussionOptions = (props = {}) => {
   return render(<GradedDiscussionOptions {...defaultProps} {...props} />)
 }
 describe('GradedDiscussionOptions', () => {
+  beforeEach(() => {
+    ENV.DISCUSSION_TOPIC = {
+      ATTRIBUTES: {
+        id: '1',
+      },
+    }
+  })
+
   it('renders', () => {
     const {getAllByText, getByText} = renderGradedDiscussionOptions()
     expect(getByText('Points Possible')).toBeInTheDocument()

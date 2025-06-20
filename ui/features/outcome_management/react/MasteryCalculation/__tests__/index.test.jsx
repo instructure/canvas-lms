@@ -98,10 +98,7 @@ describe('MasteryCalculation', () => {
     )
   }
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('loads proficiency data for Account', async () => {
-    //  LX-2536 - ticket to unskip
-    // passes locally, but fails in Jenkins
+  it('loads proficiency data for Account', async () => {
     const {getByDisplayValue} = render(<MasteryCalculation />)
     await act(async () => jest.runAllTimers())
     expect(getByDisplayValue(/65/)).not.toEqual(null)

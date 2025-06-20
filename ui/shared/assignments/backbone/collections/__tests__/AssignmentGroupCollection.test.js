@@ -22,7 +22,8 @@ import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/
 import Course from '@canvas/courses/backbone/models/Course'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {saveObservedId} from '@canvas/observer-picker/ObserverGetObservee'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = x => expect(x).toBeTruthy()
 const equal = (x, y) => expect(x).toEqual(y)
@@ -31,15 +32,25 @@ const strictEqual = (x, y) => expect(x).toEqual(y)
 
 const COURSE_SUBMISSIONS_URL = '/courses/1/submissions'
 
-let server
 let assignments
 let group
 let collection
 
+const server = setupServer()
+
 describe('AssignmentGroupCollection', () => {
+  beforeAll(() => {
+    server.listen({
+      onUnhandledRequest: 'error',
+    })
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     fakeENV.setup()
-    server = sinon.fakeServer.create()
     assignments = [1, 2, 3, 4].map(id => new Assignment({id}))
     group = new AssignmentGroup({assignments})
     collection = new AssignmentGroupCollection([group], {
@@ -49,7 +60,7 @@ describe('AssignmentGroupCollection', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    server.restore()
+    server.resetHandlers()
   })
 
   test('::model is AssignmentGroup', () =>
@@ -74,7 +85,7 @@ describe('AssignmentGroupCollection', () => {
     strictEqual(collection_.course, course, 'assigns course to course')
   })
 
-  test('(#getGrades) loading grades from the server', function () {
+  test('(#getGrades) loading grades from the server', async function () {
     ENV.observed_student_ids = []
     ENV.PERMISSIONS.read_grades = true
     let triggeredChangeForAssignmentWithoutSubmission = false
@@ -83,18 +94,24 @@ describe('AssignmentGroupCollection', () => {
       assignment_id: id,
       grade: id,
     }))
-    server.respondWith('GET', `${COURSE_SUBMISSIONS_URL}?per_page=50`, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(submissions),
-    ])
+
+    server.use(
+      http.get(`${COURSE_SUBMISSIONS_URL}`, ({request}) => {
+        const url = new URL(request.url)
+        if (url.searchParams.get('per_page') === '50') {
+          return HttpResponse.json(submissions)
+        }
+      }),
+    )
+
     const lastAssignment = assignments[3]
     lastAssignment.on(
       'change:submission',
       () => (triggeredChangeForAssignmentWithoutSubmission = true),
     )
-    collection.getGrades()
-    server.respond()
+
+    await collection.getGrades()
+
     for (const assignment of assignments) {
       if (assignment.get('id') === 4) continue
       equal(

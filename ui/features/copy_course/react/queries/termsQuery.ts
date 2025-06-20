@@ -31,6 +31,7 @@ export const getTermsNextPage = (
   if (isResultEmpty) {
     return
   }
+  // @ts-expect-error
   return lastPage.link?.next
 }
 

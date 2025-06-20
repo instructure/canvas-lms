@@ -283,7 +283,7 @@ class ApplicationController < ActionController::Base
           },
           RAILS_ENVIRONMENT: Canvas.environment
         }
-        @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session)
+        @js_env[:use_dyslexic_font] = @current_user&.prefers_dyslexic_font? if @current_user&.can_see_dyslexic_font_feature_flag?(session) && !mobile_device?
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.is_a?(Course)
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
@@ -411,6 +411,7 @@ class ApplicationController < ActionController::Base
     discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
+    disallow_threaded_replies_manage
     horizon_course_setting
     new_quizzes_media_type
     validate_call_to_action
@@ -459,6 +460,7 @@ class ApplicationController < ActionController::Base
     course_pace_allow_bulk_pace_assign
     lti_apps_page_ai_translation
     ams_service
+    open_tools_in_new_tab
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

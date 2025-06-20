@@ -182,34 +182,11 @@ describe('DiscussionPostToolbar', () => {
       })
 
       it('should call updateUserDiscussionsSplitscreenView mutation when clicked', async () => {
-        // Create mocks with specific response
         const setUserSplitScreenPreferenceMock = jest.fn()
         const closeViewMock = jest.fn()
 
-        // Use the mock with a more explicit configuration
-        const mocks = [
-          {
-            request: {
-              query: updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})[0]
-                .request.query,
-              variables: {discussionsSplitscreenView: true},
-            },
-            result: {
-              data: {
-                updateUserDiscussionsSplitscreenView: {
-                  user: {
-                    discussionsSplitscreenView: true,
-                    __typename: 'User',
-                  },
-                  errors: null,
-                  __typename: 'updateUserDiscussionsSplitscreenViewPayload',
-                },
-              },
-            },
-          },
-        ]
+        const mocks = updateUserDiscussionsSplitscreenViewMock({discussionsSplitscreenView: true})
 
-        // Set up the component with our mocks
         const {getByTestId} = setup(
           {
             setUserSplitScreenPreference: setUserSplitScreenPreferenceMock,
@@ -219,33 +196,33 @@ describe('DiscussionPostToolbar', () => {
           mocks,
         )
 
-        // Trigger the button click
         const splitscreenButton = getByTestId('splitscreenButton')
         fireEvent.click(splitscreenButton)
 
-        // Wait for the mutation to complete and success callback to be called
-        await waitFor(
-          () => {
-            expect(onSuccessStub).toHaveBeenCalled()
-          },
-          {timeout: 2000},
-        )
+        await waitFor(() => {
+          expect(onSuccessStub).toHaveBeenCalledWith('Splitscreen preference updated!')
+        })
 
-        // Additional assertions to make the test more robust
-        expect(setUserSplitScreenPreferenceMock).toHaveBeenCalled()
+        expect(setUserSplitScreenPreferenceMock).toHaveBeenCalledWith(true)
       })
     })
   })
 
   describe('Search Field', () => {
-    it('should call onChange when typing occurs', () => {
+    it('should call onChange when typing occurs', async () => {
       const onSearchChangeMock = jest.fn()
       const {getByLabelText} = setup({onSearchChange: onSearchChangeMock})
       const searchInput = getByLabelText('Search entries or author...')
+
       fireEvent.change(searchInput, {target: {value: 'A'}})
-      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(1), 1500)
+      await waitFor(() => {
+        expect(onSearchChangeMock).toHaveBeenCalledTimes(1)
+      })
+
       fireEvent.change(searchInput, {target: {value: 'B'}})
-      window.setTimeout(() => expect(onSearchChangeMock.mock.calls).toHaveLength(2), 1500)
+      await waitFor(() => {
+        expect(onSearchChangeMock).toHaveBeenCalledTimes(2)
+      })
     })
   })
 
@@ -291,12 +268,21 @@ describe('DiscussionPostToolbar', () => {
   })
 
   describe('Groups Menu Button', () => {
-    it('should not render when there are no child topics and the user is an admin', () => {
+    it('should not render when the child topics is undefined', () => {
+      const container = setup({
+        childTopics: undefined,
+        isAdmin: true,
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeFalsy()
+    })
+
+    it('should render when there are no child topics and the user is an admin', () => {
       const container = setup({
         childTopics: [],
         isAdmin: true,
       })
-      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+
+      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
 
     it('should render when there are child topics and the user is an admin', () => {

@@ -22,8 +22,8 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
   argument :assessment_details, GraphQL::Types::JSON, required: true
   argument :graded_anonymously, Boolean, required: true
   argument :provisional, Boolean, required: false, default_value: false
-  argument :rubric_association_id, ID, required: true
   argument :rubric_assessment_id, ID, required: false
+  argument :rubric_association_id, ID, required: true
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Submission")
 
   field :rubric_assessment, Types::RubricAssessmentType, null: true

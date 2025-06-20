@@ -22,13 +22,15 @@ export const useSetEditMode = (ref: React.RefObject<Element>, setter: (value: bo
   useEffect(() => {
     const handleDocumentClick = (event: MouseEvent | TouchEvent) => {
       if (!ref.current) return
-      setter(ref.current.contains(event.target as Node))
+      if (ref.current.contains(event.target as Node)) {
+        setter(true)
+      }
     }
 
-    document.addEventListener('mousedown', handleDocumentClick)
+    document.addEventListener('click', handleDocumentClick)
     document.addEventListener('touchstart', handleDocumentClick)
     return () => {
-      document.removeEventListener('mousedown', handleDocumentClick)
+      document.removeEventListener('click', handleDocumentClick)
       document.removeEventListener('touchstart', handleDocumentClick)
     }
   }, [ref, setter])

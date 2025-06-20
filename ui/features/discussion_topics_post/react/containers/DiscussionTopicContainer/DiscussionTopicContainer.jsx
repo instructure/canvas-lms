@@ -29,7 +29,7 @@ import {
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE,
   UPDATE_DISCUSSION_TOPIC,
-  UPDATE_DISCUSSION_TOPIC_PARTICIPANT
+  UPDATE_DISCUSSION_TOPIC_PARTICIPANT,
 } from '../../../graphql/Mutations'
 import {DiscussionDetails} from '../../components/DiscussionDetails/DiscussionDetails'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
@@ -122,14 +122,20 @@ export const DiscussionTopicContainer = ({
     },
   })
 
-  const handleSummaryEnabled = async (summaryEnabled) => {
+  const handleSummaryEnabled = async summaryEnabled => {
     return updateDiscussionTopicParticipant({
       variables: {
-        discussionTopicId:  props.discussionTopic._id,
-        summaryEnabled: summaryEnabled
-      }
+        discussionTopicId: props.discussionTopic._id,
+        summaryEnabled: summaryEnabled,
+      },
     }).then(() => {
       setIsSummaryEnabled(summaryEnabled)
+    })
+  }
+
+  const userHasEntry = () => {
+    return props.discussionTopic.discussionEntriesConnection.nodes.some(entry => {
+      return entry.author?._id === ENV.current_user_id
     })
   }
 
@@ -388,7 +394,10 @@ export const DiscussionTopicContainer = ({
             getBreadCrumbSetter={handleBreadCrumbSetter}
             useStudentView={true}
           />
-          <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
+          <DiscussionTopicAlertManager
+            discussionTopic={props.discussionTopic}
+            userHasEntry={userHasEntry()}
+          />
           {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
@@ -432,6 +441,7 @@ export const DiscussionTopicContainer = ({
                                   assessmentRequest.user._id,
                                 )}
                                 workflowState={assessmentRequest.workflowState}
+                                disabled={!userHasEntry()}
                               />
                             ),
                           )}
@@ -574,30 +584,6 @@ export const DiscussionTopicContainer = ({
                                       </Button>
                                     </span>
                                   </Flex.Item>
-                                  {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
-                                    <Flex.Item
-                                      shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
-                                      shouldShrink={responsiveProps?.summaryButton?.shouldShrink}
-                                      overflowY="visible"
-                                    >
-                                        <SummarizeButton
-                                          onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
-                                          isEnabled={isSummaryEnabled}
-                                          isLoading={isFeedbackLoading}
-                                          isMobile={matches.includes('mobile')}
-                                        />
-                                    </Flex.Item>
-                                  )}
-                                  {ENV.user_can_access_insights && (
-                                    <Flex.Item overflowY="visible">
-                                      <DiscussionInsightsButton
-                                        isMobile={matches.includes('mobile')}
-                                        onClick={() => {
-                                          assignLocation(ENV.INSIGHTS_URL)
-                                        }}
-                                      />
-                                    </Flex.Item>
-                                  )}
                                   {podcast_url?.href && (
                                     <Flex.Item overflowY="visible">
                                       <PodcastFeed
@@ -606,6 +592,41 @@ export const DiscussionTopicContainer = ({
                                       />
                                     </Flex.Item>
                                   )}
+                                  <Flex.Item shouldGrow>
+                                    <Flex
+                                      direction="row"
+                                      wrap="wrap"
+                                      gap="small"
+                                      justifyItems="end"
+                                    >
+                                      {ENV.user_can_access_insights && (
+                                        <Flex.Item overflowY="visible">
+                                          <DiscussionInsightsButton
+                                            isMobile={matches.includes('mobile')}
+                                            onClick={() => {
+                                              assignLocation(ENV.INSIGHTS_URL)
+                                            }}
+                                          />
+                                        </Flex.Item>
+                                      )}
+                                      {ENV.user_can_summarize && !isSpeedGraderInTopUrl && (
+                                        <Flex.Item
+                                          shouldGrow={responsiveProps?.summaryButton?.shouldGrow}
+                                          shouldShrink={
+                                            responsiveProps?.summaryButton?.shouldShrink
+                                          }
+                                          overflowY="visible"
+                                        >
+                                          <SummarizeButton
+                                            onClick={() => handleSummaryEnabled(!isSummaryEnabled)}
+                                            isEnabled={isSummaryEnabled}
+                                            isLoading={isFeedbackLoading}
+                                            isMobile={matches.includes('mobile')}
+                                          />
+                                        </Flex.Item>
+                                      )}
+                                    </Flex>
+                                  </Flex.Item>
                                 </Flex>
                               </>
                             )}

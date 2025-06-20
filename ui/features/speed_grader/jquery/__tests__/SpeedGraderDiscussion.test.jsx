@@ -20,8 +20,15 @@ import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import SpeedGrader from '../speed_grader'
 import '@canvas/jquery/jquery.ajaxJSON'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('SpeedGrader Discussion', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
   const requiredDOMFixtures = `
     <div id="hide-assignment-grades-tray"></div>
     <div id="post-assignment-grades-tray"></div>
@@ -70,7 +77,17 @@ describe('SpeedGrader Discussion', () => {
       },
     })
 
-    jest.spyOn(window.$, 'ajaxJSON').mockImplementation(() => Promise.resolve({}))
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('*', () => {
+        return HttpResponse.json({})
+      }),
+      http.put('*', () => {
+        return HttpResponse.json({})
+      }),
+    )
     jest.spyOn(window.$, 'getJSON').mockImplementation(() => Promise.resolve({}))
     jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
     $appendSpy = jest.spyOn(window.$.fn, 'append')

@@ -75,7 +75,7 @@ describe Lti::AssetProcessorNotifier do
       expect(asset_report_service_url).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
       expect(submission_lti_id).to eq(submission.lti_attempt_id)
 
-      assets = assets.sort_by { _1[:display_name] }
+      assets = assets.sort_by { it[:display_name] }
       expect(assets.pluck(:title)).to eq([assignment.title, assignment.title])
       expect(assets.pluck(:filename)).to eq([attachment, attachment2].map(&:display_name))
       expect(assets.pluck(:sha256_checksum)).to eq([
@@ -130,7 +130,7 @@ describe Lti::AssetProcessorNotifier do
       expect(Lti::PlatformNotificationService).to have_received(:notify_tools).exactly(3).times
       notice_params = received_notifications.last
       builder_params = notice_params[:builders].first.instance_variable_get(:@params)
-      asset_filenames = builder_params[:assets].map { _1[:filename] }
+      asset_filenames = builder_params[:assets].map { it[:filename] }
       expect(asset_filenames).to eq([attachment.display_name])
     end
 

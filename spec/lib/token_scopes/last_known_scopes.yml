@@ -236,6 +236,8 @@
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
 - verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/context_search'
+- verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_groups'
@@ -793,6 +795,10 @@
   path: '/api/v1/courses/:course_id/content_migrations/migrators'
 - verb: GET
   path: '/api/v1/courses/:course_id/content_share_users'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/convert_tag_overrides'
+- verb: GET
+  path: '/api/v1/courses/:course_id/convert_tag_overrides/status'
 - verb: POST
   path: '/api/v1/courses/:course_id/course_copy'
 - verb: GET
@@ -911,6 +917,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/read_all'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/reorder'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/discussion_topics/update_discussion_types'
 - verb: GET
   path: '/api/v1/courses/:course_id/effective_due_dates'
 - verb: GET
@@ -1485,8 +1493,6 @@
   path: '/api/v1/files/:id'
 - verb: PUT
   path: '/api/v1/files/:id'
-- verb: GET
-  path: '/api/v1/files/:id/:uuid/status'
 - verb: GET
   path: '/api/v1/files/:id/create_success'
 - verb: OPTIONS

@@ -19,17 +19,25 @@
 import Backbone from '@canvas/backbone'
 import CourseFindSelectView from '../CourseFindSelectView'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
 import {isAccessible} from '@canvas/test-utils/assertions'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('CourseFindSelectView: #setSourceCourseId', () => {
-  let server
   let courses
-  const urlPattern = /\/users\/101\/manageable_courses/
+
+  const server = setupServer(
+    http.get('/users/101/manageable_courses', () => {
+      return HttpResponse.json(courses)
+    }),
+  )
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     fakeENV.setup()
-    server = sinon.fakeServer.create()
     courses = [
       {
         id: 5,
@@ -62,16 +70,10 @@ describe('CourseFindSelectView: #setSourceCourseId', () => {
         enrollment_start: '2016-10-01T09:00:00Z',
       },
     ]
-    server.respondWith('GET', urlPattern, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(courses),
-    ])
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    server.restore()
   })
 
   test('Triggers "course_changed" when course is found by its id', () => {
@@ -80,21 +82,20 @@ describe('CourseFindSelectView: #setSourceCourseId', () => {
     courseFindSelectView.courses = [course]
     courseFindSelectView.render()
 
-    const sinonSpy = sinon.spy(courseFindSelectView, 'trigger')
+    const triggerSpy = jest.spyOn(courseFindSelectView, 'trigger')
     courseFindSelectView.setSourceCourseId(42)
-    expect(sinonSpy.calledWith('course_changed', course)).toBe(true)
+    expect(triggerSpy).toHaveBeenCalledWith('course_changed', course)
   })
 
-  test('Sorts courses by most recent term to least, then alphabetically', () => {
+  test('Sorts courses by most recent term to least, then alphabetically', async () => {
     const courseFindSelectView = new CourseFindSelectView({
       model: new Backbone.Model(),
       current_user_id: 101,
       show_select: true,
     })
 
-    courseFindSelectView.courses = courses
-    courseFindSelectView.render()
-    server.respond()
+    // Wait for the render to complete which makes the AJAX call
+    await courseFindSelectView.render()
 
     const sortedCourses = courseFindSelectView.toJSON().terms
     const groupedIds = sortedCourses.map(item => item.courses.map(course => course.id))

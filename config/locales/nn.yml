@@ -17647,6 +17647,7 @@ nn:
     grading_standard_type: "Standard for karaktersetjing"
     group_type: Gruppe
     learning_outcome_type: Læringsmål
+    module_item_type: Modulelement
     module_type: Modul
     quiz_question_type: Quiz-spørsmål
     quiz_type: Quiz

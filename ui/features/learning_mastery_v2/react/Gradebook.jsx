@@ -23,21 +23,20 @@ import StudentCell from './StudentCell'
 import OutcomeHeader from './OutcomeHeader'
 import StudentHeader from './StudentHeader'
 import ScoresGrid from './ScoresGrid'
-import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
+import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
 import {
   COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   CELL_HEIGHT,
-} from './constants'
+} from './utils/constants'
 
 const Gradebook = ({
   courseId,
   students,
   outcomes,
   rollups,
-  visibleRatings,
   gradebookFilters,
   gradebookFilterHandler,
 }) => {
@@ -103,12 +102,7 @@ const Gradebook = ({
           elementRef={el => (gridRef.current = el)}
           width={outcomes.length * COLUMN_WIDTH}
         >
-          <ScoresGrid
-            students={students}
-            outcomes={outcomes}
-            rollups={rollups}
-            visibleRatings={visibleRatings}
-          />
+          <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
         </View>
       </View>
     </>
@@ -120,7 +114,6 @@ Gradebook.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
   rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
   gradebookFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
   gradebookFilterHandler: PropTypes.func.isRequired,
 }

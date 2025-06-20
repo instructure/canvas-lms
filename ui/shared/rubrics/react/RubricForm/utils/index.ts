@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {
+  Rubric,
+  RubricAssociation,
+  RubricCriterion,
+  RubricRating,
+} from '@canvas/rubrics/react/types/rubric'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {RubricFormProps} from '../types/RubricForm'
 
@@ -78,4 +83,36 @@ export const reorder = ({list, startIndex, endIndex}: ReorderProps) => {
 
 export const stripPTags = (htmlString: string) => {
   return htmlString?.replace(/^<p>(.*)<\/p>$/, '$1')
+}
+
+// This function was ported over from the legacy rubric editing code - ui/shared/rubrics/jquery/edit_rubric.jsx
+export const autoGeneratePoints = (ratings: RubricRating[], points: number) => {
+  const ratingList = [...ratings]
+  const oldMax = Math.max(...ratings.map(r => r.points), 0)
+  const newMax = points
+  let lastPts = points
+
+  // From left to right, scale points proportionally to new range.
+  // So if originally they were 3,2,1 and now we increased the
+  // total possible to 9, they'd be 9,6,3
+  for (let i = 0; i < ratingList.length; i++) {
+    const pts = ratingList[i].points
+    let newPts = (pts / oldMax) * newMax
+    // if an element between [1, length - 1]
+    // is adjusting up from 0, evenly divide it within the range
+    if (Number.isNaN(pts) || (pts === 0 && lastPts > 0 && i < ratingList.length - 1)) {
+      newPts = lastPts - Math.round(lastPts / (ratingList.length - i))
+    }
+    if (Number.isNaN(newPts)) {
+      newPts = 0
+    } else if (newPts > lastPts) {
+      newPts = lastPts - 1
+    }
+    newPts = Math.max(0, newPts)
+    lastPts = newPts
+
+    ratingList[i].points = newPts
+  }
+
+  return ratingList
 }

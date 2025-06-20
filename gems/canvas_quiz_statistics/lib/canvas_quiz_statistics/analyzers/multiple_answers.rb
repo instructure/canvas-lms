@@ -127,9 +127,9 @@ module CanvasQuizStatistics::Analyzers
       end
     end
 
-    def calculate_responses(responses, answers, *args)
+    def calculate_responses(responses, answers, *)
       responses.each do |response|
-        choices = extract_chosen_choices(response, answers, *args)
+        choices = extract_chosen_choices(response, answers, *)
 
         if choices.empty?
           choices = [generate_missing_answer(answers)]

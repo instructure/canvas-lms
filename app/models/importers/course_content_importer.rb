@@ -142,8 +142,10 @@ module Importers
           migration.update_import_progress(58)
           Importers::ContextExternalToolImporter.process_migration(data, migration)
           migration.update_import_progress(60)
-          Importers::ToolProfileImporter.process_migration(data, migration)
+          Importers::LtiContextControlImporter.process_migration(data, migration)
           migration.update_import_progress(61)
+          Importers::ToolProfileImporter.process_migration(data, migration)
+          migration.update_import_progress(62)
 
           Assignment.suspend_due_date_caching do
             Importers::QuizImporter.process_migration(data, migration, question_data)
@@ -172,6 +174,10 @@ module Importers
           Importers::CalendarEventImporter.process_migration(data, migration)
           Importers::LtiResourceLinkImporter.process_migration(data, migration)
           Importers::CoursePaceImporter.process_migration(data, migration)
+
+          if migration.context.try(:horizon_course?)
+            Importers::ContentTagImporter.process_migration(data, migration)
+          end
 
           everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
 

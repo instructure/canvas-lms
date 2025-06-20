@@ -1858,8 +1858,8 @@ describe SpeedGrader::Assignment do
                                   a_hash_including("id" => ap2.id.to_s, "title" => "ap 2", "tool_name" => ap2.context_external_tool.name)
                                 ])
 
-      sub1 = json["submissions"].find { _1["id"] == @submission1.id.to_s }
-      sub2 = json["submissions"].find { _1["id"] == @submission2.id.to_s }
+      sub1 = json["submissions"].find { it["id"] == @submission1.id.to_s }
+      sub2 = json["submissions"].find { it["id"] == @submission2.id.to_s }
       expect(sub1["lti_asset_reports"]).to eq({
                                                 "by_attachment" => { "123" => { ap1.id.to_s => [rep1] } }
                                               })

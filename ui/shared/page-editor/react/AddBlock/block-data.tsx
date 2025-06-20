@@ -17,18 +17,18 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {DummyBlock} from '../Blocks/DummyBlock'
+import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
+import {ImageBlock} from '../Blocks/ImageBlock'
 
 const I18n = createI18nScope('page_editor')
 
 type BlockFactory = {[key: string]: () => ReactElement}
 
 export const blockFactory = {
-  dummyBlock: () => <DummyBlock dummyValue="" />,
-  simpleText: () => <p>text</p>,
+  simpleText: () => <TextBlock title="" content="" />,
   imageText: () => <p>image_text</p>,
-  image: () => <p>image</p>,
+  image: () => <ImageBlock url="" altText="" />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -45,9 +45,8 @@ export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Text'),
     items: [
-      {itemName: I18n.t('Simple text block'), id: 'simpleText'},
+      {itemName: I18n.t('Text Block'), id: 'simpleText'},
       {itemName: I18n.t('Image + text'), id: 'imageText'},
-      {itemName: I18n.t('Dummy block'), id: 'dummyBlock'},
     ],
   },
   {

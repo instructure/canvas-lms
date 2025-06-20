@@ -129,7 +129,10 @@ class Login::OpenidConnectController < Login::OAuth2Controller
   end
 
   def additional_authorize_params
-    params.permit(:login_hint)
+    result = params.permit(:login_hint)
+    result[:prompt] = "login" if force_login_after_logout? || Canvas::Plugin.value_to_boolean(params[:force_login])
+
+    result
   end
 
   def auth_type

@@ -26,7 +26,7 @@ export const ZLtiDeployment = z.object({
   registration_id: ZLtiRegistrationId,
   deployment_id: z.string(),
   context_id: z.string(),
-  context_type: z.string(),
+  context_type: z.enum(['Course', 'Account']),
   context_name: z.string(),
   workflow_state: z.enum(['active', 'deleted']),
   context_controls: z.array(ZLtiContextControl),

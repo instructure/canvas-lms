@@ -16,22 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Flex} from '@instructure/ui-flex'
+import {confirm} from '@canvas/instui-bindings/react/Confirm'
+import {LinkInfo} from '@canvas/parse-link-header/parseLinkHeader'
+import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
-import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {useInfiniteQuery} from '@tanstack/react-query'
 import * as React from 'react'
-import {Link as RouterLink, useOutletContext} from 'react-router-dom'
-import {useApiResult} from '../../../../common/lib/apiResult/useApiResult'
+import {useOutletContext} from 'react-router-dom'
+import {RenderInfiniteApiResult} from '../../../../common/lib/apiResult/RenderInfiniteApiResult'
 import {fetchControlsByDeployment} from '../../../api/contextControls'
+import {createDeployment} from '../../../api/deployments'
 import {AccountId} from '../../../model/AccountId'
+import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ToolDetailsOutletContext} from '../ToolDetails'
-import {ApiResultErrorPage} from '../../../../common/lib/apiResult/ApiResultErrorPage'
-import {matchApiResultState} from '../../../../common/lib/apiResult/matchApiResultState'
+import {DeploymentAvailability} from './DeploymentAvailability'
+import {mergeDeployments} from './mergeDeployments'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -40,30 +45,59 @@ export type ToolAvailabilityProps = {
   accountId: AccountId
 }
 
+const ControlPageSize = 20
+
+/**
+ * Renders the availability of a tool across different deployments.
+ * @param props
+ * @returns
+ */
 export const ToolAvailability = (props: ToolAvailabilityProps) => {
   const {registration} = useOutletContext<ToolDetailsOutletContext>()
 
-  const {state} = useApiResult(
-    React.useCallback(
-      () =>
-        props.fetchControlsByDeployment({
-          registrationId: registration.id,
-        }),
-      [registration, props.fetchControlsByDeployment, registration.id],
-    ),
-  )
+  const [debug, setDebug] = React.useState(false)
+
+  // TODO: Remove this when debug mode is no longer needed
+  // Add keyboard shortcut for CMD+d to toggle debug mode
+  React.useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      // CMD+d (Mac) or CTRL+d (Windows/Linux)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'd') {
+        e.preventDefault()
+        setDebug(d => !d)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  const controlsQuery = useInfiniteQuery({
+    queryKey: ['fetchControlsByDeployment', registration.id] as [string, LtiRegistrationId],
+    queryFn: ({queryKey: [, registrationId], pageParam}) =>
+      props.fetchControlsByDeployment(
+        pageParam
+          ? {url: pageParam.url}
+          : {
+              registrationId: registrationId,
+              pageSize: ControlPageSize,
+            },
+      ),
+    getNextPageParam: lastPage => {
+      if ('links' in lastPage && lastPage.links !== undefined && 'next' in lastPage.links) {
+        return lastPage.links.next
+      } else {
+        return null
+      }
+    },
+    initialPageParam: null as LinkInfo | null,
+  })
+
   return (
-    <div>
-      {matchApiResultState(state)({
-        loading: () => (
-          <Flex direction="column" alignItems="center" padding="large 0">
-            <Spinner renderTitle="Loading" />
-          </Flex>
-        ),
-        error: error => (
-          <ApiResultErrorPage error={error} errorSubject={I18n.t('Error loading deployments')} />
-        ),
-        data: deployments => (
+    <RenderInfiniteApiResult
+      query={controlsQuery}
+      onSuccess={({pages, fetchingMore, hasNextPage}) => {
+        const deployments = pages.reduce((acc, ds) => ds.reduce(mergeDeployments, acc), [])
+        return (
           <>
             <View margin="0 0 medium 0" as="div">
               <Heading level="h4">
@@ -86,38 +120,14 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
               <List isUnstyled margin="0" itemSpacing="small">
                 {deployments.map(dep => (
                   <List.Item key={dep.id}>
-                    <View
-                      borderRadius="medium"
-                      borderColor="secondary"
-                      borderWidth="small"
-                      padding="medium"
-                      as="div"
-                    >
-                      <Heading level="h3">
-                        {I18n.t('Installed in %{context_name}', {
-                          context_name: dep.context_name,
-                        })}
-                      </Heading>
-                      <div>
-                        <Text>
-                          {I18n.t('Deployment ID: %{deployment_id}', {
-                            deployment_id: dep.deployment_id,
-                          })}
-                        </Text>
-                      </div>
-                      <div>
-                        <Text>
-                          <Link
-                            to={`/manage/${registration.id}/configuration#placements`}
-                            as={RouterLink}
-                          >
-                            {I18n.t('%{number_of_placements} placements', {
-                              number_of_placements: registration.configuration.placements.length,
-                            })}
-                          </Link>
-                        </Text>
-                      </div>
-                    </View>
+                    <DeploymentAvailability
+                      accountId={props.accountId}
+                      key={dep.id}
+                      deployment={dep}
+                      registration={registration}
+                      refetchControls={controlsQuery.refetch}
+                      debug={debug}
+                    />
                   </List.Item>
                 ))}
               </List>
@@ -126,9 +136,54 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                 {I18n.t('This tool has not been deployed to any sub-accounts or courses.')}
               </Text>
             )}
+            {hasNextPage && (
+              <Flex as="div" margin="medium 0 0 0" alignItems="center" justifyItems="center">
+                <Button
+                  disabled={fetchingMore}
+                  onClick={() => {
+                    controlsQuery.fetchNextPage()
+                  }}
+                >
+                  {I18n.t('Show More')}
+                </Button>
+              </Flex>
+            )}
+            {debug && (
+              <Button
+                onClick={() => {
+                  confirm({
+                    title: 'Create Deployment',
+                    message: 'Are you sure you want to create a deployment?',
+                    confirmButtonLabel: 'Create',
+                    cancelButtonLabel: 'Cancel',
+                  }).then(confirmed => {
+                    if (confirmed) {
+                      // Call the API to create a deployment
+                      createDeployment({
+                        registrationId: registration.id,
+                        accountId: registration.account_id,
+                      }).then(result => {
+                        if (result._type === 'Success') {
+                          // Handle success (e.g., show a success message or refresh the deployments)
+                          controlsQuery.refetch()
+                        } else {
+                          console.log(result)
+                          showFlashAlert({
+                            type: 'error',
+                            message: I18n.t('There was an error when creating the deployment.'),
+                          })
+                        }
+                      })
+                    }
+                  })
+                }}
+              >
+                Create Deployment
+              </Button>
+            )}
           </>
-        ),
-      })}
-    </div>
+        )
+      }}
+    />
   )
 }

@@ -923,22 +923,38 @@ describe Types::SubmissionType do
       @submission.save!
     end
 
-    it "returns turnitin_data" do
+    it "returns submission _id" do
       expect(
         submission_type.resolve("turnitinData { target { ...on Submission { _id } } }")
       ).to eq [@submission.id.to_s]
+    end
+
+    it "returns status" do
       expect(
         submission_type.resolve("turnitinData { status }")
       ).to eq [@tii_data[:status]]
+    end
+
+    it "returns score" do
       expect(
         submission_type.resolve("turnitinData { score }")
       ).to eq [@tii_data[:similarity_score]]
+    end
+
+    it "returns state" do
       expect(
         submission_type.resolve("turnitinData { state }")
       ).to eq [@tii_data[:state]]
+    end
+
+    it "returns reportUrl" do
       expect(
         submission_type.resolve("turnitinData { reportUrl }")
       ).to eq [@tii_data[:report_url]]
+    end
+
+    it "returns assetString" do
+      expect(submission_type.resolve("turnitinData { assetString }")).to eq [@submission.asset_string]
     end
   end
 
@@ -1167,6 +1183,51 @@ describe Types::SubmissionType do
           current_user: other_teacher
         )
       ).to be_empty
+    end
+  end
+
+  describe "lti_asset_reports_connection" do
+    let(:root_account) { @course.root_account }
+    let(:assignment) { @assignment }
+    let(:submission) { @submission }
+    let(:submission_type) { GraphQLTypeTester.new(submission, current_user:) }
+
+    before do
+      root_account.enable_feature!(:lti_asset_processor)
+      @lti_asset = lti_asset_model(submission:)
+      asset_processor = lti_asset_processor_model(assignment:)
+      @lti_asset_report = lti_asset_report_model(
+        lti_asset_processor_id: asset_processor.id,
+        asset: @lti_asset,
+        visible_to_owner: true
+      )
+    end
+
+    context "when the current user is a teacher" do
+      let(:current_user) { submission.assignment.context.instructors.first }
+
+      it "returns LTI asset reports" do
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to eq [@lti_asset_report.id.to_s]
+      end
+    end
+
+    context "when the current user is a student" do
+      let(:current_user) { @student }
+
+      it "does not returns LTI asset reports" do
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to be_nil
+      end
+    end
+
+    context "when the current user is nil" do
+      let(:current_user) { student_in_course(active_all: true).user }
+
+      it "returns nil when no user is provided" do
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to be_nil
+      end
     end
   end
 end

@@ -974,9 +974,133 @@ describe Types::DiscussionType do
     end
   end
 
+  context "submissions_connection" do
+    before(:once) do
+      course_with_teacher(active_all: true)
+
+      @student = student_in_course(active_all: true).user
+
+      @topic = discussion_topic_model(context: @course)
+      @assignment = assignment_model(course: @course)
+      @topic.assignment = @assignment
+      @topic.save!
+
+      @assignment.submissions.where(user_id: @student.id).delete_all
+      @submission = @assignment.submissions.create!(
+        user: @student,
+        submission_type: "online_text_entry",
+        body: "This is a test submission",
+        workflow_state: "submitted"
+      )
+
+      @teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher)
+      @student_type = GraphQLTypeTester.new(@topic, current_user: @student)
+    end
+
+    it "returns nil when user is not logged in" do
+      guest_type = GraphQLTypeTester.new(@topic, current_user: nil)
+      expect(guest_type.resolve("submissionsConnection { nodes { _id } }")).to be_nil
+    end
+
+    it "returns nil when topic has no assignment" do
+      topic_without_assignment = discussion_topic_model(context: @course)
+      student_type = GraphQLTypeTester.new(topic_without_assignment, current_user: @student)
+      expect(student_type.resolve("submissionsConnection { nodes { _id } }")).to be_nil
+    end
+
+    it "returns submissions for the teacher" do
+      submission_in_db = Submission.find_by(id: @submission.id)
+      expect(submission_in_db).not_to be_nil
+      expect(submission_in_db.user_id).to eq(@student.id)
+
+      submission_ids = @teacher_type.resolve("submissionsConnection { nodes { _id } }")
+      expect(submission_ids).to include(@submission.id.to_s)
+    end
+
+    it "returns the student's own submission" do
+      submission_ids = @student_type.resolve("submissionsConnection { nodes { _id } }")
+      expect(submission_ids).to include(@submission.id.to_s)
+    end
+
+    it "applies filters correctly" do
+      @submission.update!(score: 10, workflow_state: "graded")
+      filter_query = "submissionsConnection(filter: {states: [graded]}) { nodes { _id } }"
+      submission_ids = @teacher_type.resolve(filter_query)
+      expect(submission_ids).to include(@submission.id.to_s)
+    end
+  end
+
   context "checkpoints" do
     before do
       course_with_teacher(active_all: true)
+      @student = student_in_course(active_all: true).user
+    end
+
+    describe "checkpoints field" do
+      before(:once) do
+        @topic = discussion_topic_model(context: @course)
+        @assignment = assignment_model(course: @course)
+        @topic.assignment = @assignment
+        @topic.save!
+        @teacher_type = GraphQLTypeTester.new(@topic, current_user: @teacher)
+      end
+
+      it "returns nil when checkpoints are not enabled" do
+        allow_any_instance_of(Course).to receive(:discussion_checkpoints_enabled?).and_return(false)
+        expect(@teacher_type.resolve("checkpoints { name }")).to be_nil
+      end
+
+      it "returns checkpoints when enabled" do
+        allow_any_instance_of(Course).to receive(:discussion_checkpoints_enabled?).and_return(true)
+
+        # Set up assignment for sub-assignments
+        @assignment.update!(has_sub_assignments: true)
+
+        # Create sub-assignments using the association
+        @assignment.sub_assignments.create!(
+          context: @course,
+          title: "Reply to Topic",
+          points_possible: 5,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
+        )
+
+        @assignment.sub_assignments.create!(
+          context: @course,
+          title: "Reply to Entry",
+          points_possible: 10,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY
+        )
+
+        # Refresh the topic to ensure associations are loaded
+        @topic.reload
+        @assignment.reload
+
+        checkpoint_names = @teacher_type.resolve("checkpoints { name }")
+        expect(checkpoint_names).to include("Reply to Topic", "Reply to Entry")
+      end
+
+      it "returns correct checkpoint data including details" do
+        allow_any_instance_of(Course).to receive(:discussion_checkpoints_enabled?).and_return(true)
+
+        # Set up assignment for sub-assignments
+        @assignment.update!(has_sub_assignments: true)
+
+        # Create a single sub-assignment for detailed testing
+        @assignment.sub_assignments.create!(
+          context: @course,
+          title: "Reply to Topic",
+          points_possible: 5,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC
+        )
+
+        # Refresh from database
+        @topic.reload
+        @assignment.reload
+
+        expect(@teacher_type.resolve("checkpoints { name }")).to include("Reply to Topic")
+        expect(@teacher_type.resolve("checkpoints { pointsPossible }")).to include(5)
+        expect(@teacher_type.resolve("checkpoints { tag }")).to include("reply_to_topic")
+      end
     end
 
     it "returns the reply to entry required count" do

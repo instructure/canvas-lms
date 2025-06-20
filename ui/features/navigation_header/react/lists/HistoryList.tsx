@@ -41,12 +41,14 @@ const fetchHistory = async (context: QueryFunctionContext<string[], string>) => 
 export default function HistoryList() {
   const [lastItem, setLastItem] = useState<Element | null>(null)
 
-  const {data, fetchNextPage, isLoading, hasNextPage, error} = useInfiniteQuery({
-    queryKey: ['history'],
-    queryFn: fetchHistory,
-    getNextPageParam: lastPage => lastPage.nextPage || undefined,
-    initialPageParam: '/api/v1/users/self/history',
-  })
+  const {data, fetchNextPage, isLoading, hasNextPage, error, isFetchingNextPage} = useInfiniteQuery(
+    {
+      queryKey: ['history'],
+      queryFn: fetchHistory,
+      getNextPageParam: lastPage => lastPage.nextPage || undefined,
+      initialPageParam: '/api/v1/users/self/history',
+    },
+  )
 
   // @ts-expect-error
   const combineHistoryEntries = pages => {
@@ -103,16 +105,8 @@ export default function HistoryList() {
         <List isUnstyled={true} margin="small 0" itemSpacing="small">
           {/* @ts-expect-error */}
           {historyEntries.map((entry, index) => {
-            const isLast = index === historyEntries.length - 1
             return (
-              <List.Item
-                key={entry.asset_code}
-                elementRef={el => {
-                  if (isLast) {
-                    setLastItem(el)
-                  }
-                }}
-              >
+              <List.Item key={entry.asset_code}>
                 <Flex>
                   <Flex.Item align="start" padding="none x-small none none">
                     <i className={entry.asset_icon} aria-hidden="true" />
@@ -145,6 +139,13 @@ export default function HistoryList() {
             )
           })}
         </List>
+        {hasNextPage && !isFetchingNextPage && (
+          <div
+            ref={el => {
+              setLastItem(el)
+            }}
+          />
+        )}
       </>
     )
   }

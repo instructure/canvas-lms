@@ -18,10 +18,17 @@
 
 import Role from '../../models/Role'
 import RolesCollection from '../RolesCollection'
-import sinon from 'sinon'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('RolesCollection', () => {
   let account_id
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     account_id = 2
@@ -38,27 +45,27 @@ describe('RolesCollection', () => {
     expect(roles_collection.url()).toBe(`/api/v1/accounts/${account_id}/roles`)
   })
 
-  test('fetches a collection of roles', () => {
-    const server = sinon.fakeServer.create()
+  test('fetches a collection of roles', async () => {
     const role1 = new Role()
     const role2 = new Role()
     const roles_collection = new RolesCollection(null, {
       contextAssetString: `account_${account_id}`,
     })
 
-    roles_collection.fetch({
-      success: () => {
-        expect(roles_collection.size()).toBe(2)
-      },
+    server.use(
+      http.get(`/api/v1/accounts/${account_id}/roles`, () => {
+        return HttpResponse.json([role1, role2])
+      }),
+    )
+
+    await new Promise(resolve => {
+      roles_collection.fetch({
+        success: () => {
+          expect(roles_collection.size()).toBe(2)
+          resolve()
+        },
+      })
     })
-
-    server.respond('GET', roles_collection.url(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify([role1, role2]),
-    ])
-
-    server.restore()
   })
 
   test('keeps roles in order based on sort order then alphabetically', () => {

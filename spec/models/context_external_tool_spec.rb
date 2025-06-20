@@ -65,6 +65,65 @@ describe ContextExternalTool do
     end
   end
 
+  describe "available_in_context?" do
+    let_once(:account) { account_model }
+    let_once(:registration) do
+      lti_developer_key_model(account:).tap do |k|
+        lti_tool_configuration_model(account: k.account, developer_key: k, lti_registration: k.lti_registration)
+      end.lti_registration
+    end
+    let_once(:tool) { registration.new_external_tool(account) }
+
+    context "with the lti_registrations_next flag off" do
+      before do
+        account.disable_feature!(:lti_registrations_next)
+      end
+
+      it "returns true" do
+        expect(tool.available_in_context?(account)).to be true
+      end
+
+      it "returns true even if the tool is not set to available" do
+        tool.context_controls.first.update!(available: false)
+        expect(tool.available_in_context?(account)).to be true
+      end
+    end
+
+    it "returns true for 1.1 tools" do
+      lti_1_1_tool = external_tool_model(context: account)
+      expect(lti_1_1_tool.available_in_context?(account)).to be true
+    end
+
+    it "returns true if the tool is set to available" do
+      expect(tool.available_in_context?(account)).to be true
+    end
+
+    it "returns false if the tool is set to unavailable" do
+      tool.context_controls.first.update!(available: false)
+
+      expect(tool.available_in_context?(account)).to be false
+    end
+
+    it "ignores context controls associated with other tools from the same registration" do
+      duplicate_tool = registration.new_external_tool(account)
+      duplicate_tool.context_controls.first.update!(available: false)
+
+      expect(tool.available_in_context?(account)).to be true
+    end
+
+    it "sends an error to sentry if no context control is found" do
+      tool.context_controls.destroy_all
+
+      sentry_scope = double(Sentry::Scope)
+      expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
+      expect(sentry_scope).to receive(:set_tags).with(context_id: account.global_id)
+      expect(sentry_scope).to receive(:set_tags).with(lti_registration_id: tool.lti_registration.global_id)
+      expect(sentry_scope).to receive(:set_context).with("tool", tool.global_id)
+
+      expect(tool.available_in_context?(account)).to be true
+    end
+  end
+
   describe "#permission_given?" do
     subject { tool.permission_given?(launch_type, user, context) }
 
@@ -3254,7 +3313,7 @@ describe ContextExternalTool do
       end
     end
 
-    context "when the tool is already existing" do
+    context "when the tool already exists" do
       before do
         subject.save
         run_jobs
@@ -3309,6 +3368,49 @@ describe ContextExternalTool do
     end
   end
 
+  describe "#destroy" do
+    subject { deployment.destroy }
+
+    let_once(:registration) { lti_registration_with_tool(account:) }
+    let_once(:account) { account_model }
+    let_once(:deployment) do
+      registration.deployments.first
+    end
+
+    it "soft-deletes the tool and it's context controls" do
+      expect { subject }.to change { deployment.reload.workflow_state }.to("deleted")
+      expect(deployment.context_controls.reload.pluck(:workflow_state))
+        .to all(eq("deleted"))
+    end
+
+    context "when the tool has lots of controls" do
+      let_once(:subaccount1) { account_model(parent_account: account) }
+      let_once(:subaccount2) { account_model(parent_account: account) }
+      let_once(:subcourse) { course_model(account: subaccount1) }
+
+      before(:once) do
+        Lti::ContextControl.create!(account: subaccount1,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+        Lti::ContextControl.create!(account: subaccount2,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+        Lti::ContextControl.create!(course: subcourse,
+                                    registration:,
+                                    deployment:,
+                                    workflow_state: "active")
+      end
+
+      it "soft-deletes all controls" do
+        subject
+        expect(deployment.context_controls.reload.pluck(:workflow_state))
+          .to all(eq("deleted"))
+      end
+    end
+  end
+
   describe "#can_access_content_tag?" do
     it "returns true for a 1.1 content tag with the same tool" do
       tool = external_tool_model
@@ -3357,7 +3459,7 @@ describe ContextExternalTool do
     end
   end
 
-  describe "#eula_launch_url" do
+  describe "eula fields" do
     let(:tool) do
       ContextExternalTool.create!(
         context: @root_account,
@@ -3370,13 +3472,29 @@ describe ContextExternalTool do
     end
     let(:settings) { {} }
 
-    it "returns the extension eula_launch_url if present" do
-      settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
-      expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
+    describe "#eula_launch_url" do
+      it "returns the extension eula_launch_url if present" do
+        settings[:ActivityAssetProcessor] = { eula: { target_link_uri: "http://eula.example.com/launch" } }
+        expect(tool.eula_launch_url).to eq "http://eula.example.com/launch"
+      end
+
+      it "returns the launch_url if extension eula_launch_url is not present" do
+        expect(tool.eula_launch_url).to eq tool.launch_url
+      end
     end
 
-    it "returns the launch_url if extension eula_launch_url is not present" do
-      expect(tool.eula_launch_url).to eq tool.launch_url
+    describe "#eula_custom_fields" do
+      it "returns the fields if custom_fields is a hash" do
+        custom_fields = { "field1" => "value1", "field2" => "value2" }
+        settings[:ActivityAssetProcessor] = { eula: { custom_fields: } }
+
+        expected = { "field1" => "value1", "field2" => "value2" }
+        expect(tool.eula_custom_fields).to eq(expected)
+      end
+
+      it "returns {} if custom_fields is not given" do
+        expect(tool.eula_custom_fields).to eq({})
+      end
     end
   end
 end

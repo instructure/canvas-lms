@@ -19,8 +19,6 @@
 #
 
 class ExternalFeed < ActiveRecord::Base
-  self.ignored_columns += %w[author_email author_name author_url]
-
   belongs_to :user
   belongs_to :context, polymorphic: [:course, :group]
 

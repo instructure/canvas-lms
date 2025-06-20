@@ -113,3 +113,8 @@ new_quizzes_navigation_updates:
   description: If enabled, New Quizzes will launch in a display type that includes breadcrumbs and left-side menu
   state: hidden
   applies_to: SiteAdmin
+new_quizzes_separators:
+  display_name: New Quizzes Separators
+  description: If enabled, users can set decimal and thousands separators for New Quizzes
+  state: allowed
+  applies_to: SiteAdmin

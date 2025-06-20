@@ -5148,6 +5148,7 @@ fa:
   cancel_rename_aa60a881: "تغییر نام را لغو کنید"
   cancel_submitting_comment_2666e98b: "لغو ارسال نظر"
   cancel_updating_comment_6816d855: "لغو به‌روز رسانی نظر"
+  canceled_5a6e0ec8: "لغو شد"
   cannot_access_group_in_concluded_course_90a8db52: "امکان دسترسی به گروه در درس خاتمه یافته وجود ندارد"
   cannot_add_role_name_name_already_in_use_a523639c: "نمی توان نام نقش را اضافه کرد  به %{name}:  درحال استفاده است."
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "امکان افزودن بخش به بحث غیر خاص بخش وجود ندارد"
@@ -5228,6 +5229,9 @@ fa:
   canvas_alert_submission_user_name_assignment_title_4503ccf: "هشدار کانواس - ارسال: %{user_name}, %{assignment_title}"
   canvas_attribute_eaa7e31a: "ویژگی کانواس"
   canvas_by_instructure_1490381: "کانواس تهیه شده توسط شرکت Instructure"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "کانواس نمی تواند (ورود) را به سرور LDAP شما متصل کند"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "کانواس نمی تواند به سرور LDAP شما متصل شود"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "کانواس نمی تواند نمونه LDAP شما را جستجو کند"
   canvas_cartridge_description: "امکان تبدیل یک صدور کانواس به قالب واسط json را برای وارد شدن فراهم می کند"
   canvas_cartridge_display: " کارتریج رایج کانواس"
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
@@ -5254,6 +5258,7 @@ fa:
   canvas_guides_d65431: "راهنمای کانواس"
   canvas_id_f42f6ad: "شناسه کانواس"
   canvas_introduction_video_2d81f3ad: "فیلم معرفی کانواس"
+  canvas_is_connecting_to_ips_9af7da93: "کانواس درحال اتصال به %{ips} است"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "کانواس  برای دریافت ورودها  از %{issuer}  پیکربندی نشده است."
   canvas_lms_6ce68514: "سیستم مدیریت آموزش کانواس"
   canvas_login_failure_message_4c922f2f: "پیام خطای ورود به کانواس"
@@ -5356,6 +5361,7 @@ fa:
   check_to_add_a_user_for_loginid_6cd25597: "برای افزودن کاربر برای %{loginid}، انتخاب کنید"
   check_to_select_all_98e484f1: "برای انتخاب همه گزینه ها انتخاب کنید"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "برای پرش از اضافه کردن کاربر برای %{loginid} انتخاب کنید"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "تنظیمات دیواره آتش خود را بررسی کنید. آیا کل نشانی IP کانواس مجاز به دسترسی به سرور شماست؟"
   checked_883b93fd: "انتخاب شده"
   cheerful_panda_holding_a_map_17ba47ee: "پاندای شاد نقشه در دست دارد"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "درس فرعی باید متعلق به حساب ریشه‌ یکسانی با درس اصلی باشد"
@@ -9321,6 +9327,7 @@ fa:
   docviewer_strikeout_deleted_ddca34b0: "ابطال مستندساز حذف شد"
   docviewer_strikeout_updated_f06aec74: "ابطال مستندساز به هنگام سازی شد"
   does_not_meet_expectations_b0736d20: "مطابق با انتظارات نیست"
+  does_the_username_require_more_scoping_information_40d51df: "آیا نام کاربری به اطلاعات محدوده ای بیشتر (یعنی 'cn=Canvas,ou=people,dc=example,dc=com') نیاز دارد؟"
   domain_3b54c511: دامنه
   domain_69fe564b: "دامنه:"
   domain_is_required_1d4c8b25: "دامنه لازم است"
@@ -18294,6 +18301,7 @@ fa:
   prev_month_34bd934c: "ماه قبل"
   prevents_students_from_leaving_annotations_in_assi_cb188d2: "دانشجویان را از قراردادن حاشیه نویسی روی تکالیف منع می‌کند. برای تکالیف بازبینی شده به صورت گروهی عمل نمی‌کند."
   preview_53003fd2: پیش‌نمایش
+  preview_9cbd064e: "پیش نمایش"
   preview_a3f8f854: "پیش نمایش"
   preview_filename_f1b58572: "%{filename} پیش نمایش"
   preview_removal_998101a9: "حذف پیش نمایش"
@@ -23340,6 +23348,7 @@ fa:
   suggestions_b8b03b9d: "پیشنهادها:"
   sum_of_all_files_in_mb_2b705055: "مجموع همه فایل ها بر حسب مگابایت"
   summary_statistics_f74852a5: "آمار خلاصه"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "برای آزمایش ورود، یک نام کاربری/رمز عبور معتبر LDAP ارائه دهید:"
   support: 
     array: 
       last_word_connector: "، و"
@@ -23602,6 +23611,9 @@ fa:
   terms_of_service_bedefcaf: "شرایط استفاده از خدمات"
   terms_of_service_f183ff7f: "شرایط استفاده از خدمات"
   test_cluster_only_70e61c19: "تنها آزمون خوشه‌ای"
+  test_ldap_authentication_446cce4f: "آزمایش اعتبارسنجی LDAP"
+  test_ldap_settings_c387f136: "آزمون تنظیمات LDAP"
+  test_login_3dc3c119: "آزمایش ورود"
   testing_state_effd4a82: "وضعیت آزمایش"
   text_7f4593da: متن
   text_document_eacbcdb7: "سند متنی"
@@ -23642,6 +23654,7 @@ fa:
       در نشانی اینترنتی قابل دسترس است.
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "ابزار گفتگو باید توسط مدیر کانواس شما فعال شود."
   the_client_id_clientid_is_disabled_b4a02cb1: "شناسه مشتری %{clientId} غیرفعال است."
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "اتصال متوقف و یا رد شده است. چیزهایی که باید در نظر بگیرید:"
   the_content_security_policy_allows_you_to_restrict_197ca4ff: |-
       سیاست امنیت محتوا به شما امکان می دهد
       JavaScript سفارشی که در نمونه کانواس شما اجرا می شود را، محدود کنید. می توانید به صورت دستی
@@ -23756,6 +23769,7 @@ fa:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "نقش های نگه داشته شده توسط کاربر گزارش دهنده (دانشجو، استاد، مدیر و غیره)"
   the_salesforce_account_id_if_it_exists_e7949706: "شناسه حساب Salesforce (در صورت وجود)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "ابزار زمان بند به شما امکان می دهد بازه های زمانی تعیین کنید که دانشجویان (یا گروه های دانشجویی) بتوانند در آن ثبت نام کنند. برای شروع به کار، روی دکمه زیر کلیک کنید."
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "این جستجو یا انجام نشد  و یا 0 نتیجه در بر داشت. چیزهایی که باید در نظر بگیرید:"
   the_search_returned_no_results_c2e4d13c: "جستجو نتیجه ای نداشت."
   the_section_to_report_on_11e3757b: "بخشی که در آن گزارش میشود"
   the_selected_date_is_on_a_blackout_day_bedcc1b8: "تاریخ انتخاب شده در روز خاموشی است."
@@ -24100,6 +24114,7 @@ fa:
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "این کاربر در حال حاضر قادر به دسترسی به درس نیست"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "«کاربر در حال حاضر قادر به دسترسی به درس نیست»"
   this_user_will_be_created_in_3b2a2b52: "این کاربر در موارد زیر ایجاد خواهد شد:"
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "فقط یک آزمایش اتصال انجام شد. گواهی های SSL تأیید اعتبار نشدند."
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "این مورد روی هر سفارش دهنده تأثیر می گذارد. آیا اطمینان دارید؟"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "این امر به شما امکان می دهد تا کانواس را برای ارسال نمره ها به سامانه اطلاعات دانشجو اعتبارسنجی کنید."
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "این امر این زمینه را در کل حساب شما اعمال خواهد کرد. مایلید ادامه دهید؟"
@@ -25557,6 +25572,9 @@ fa:
   vericite_similarity_score_see_detailed_report_390ab687: "نمره تشابه VeriCite - جزئیات گزارش را ببینید"
   verification_code_5acd64ef: "رمز تأیید"
   verify_3dd8f159: تأیید
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "تأیید کنید که شیء کاربر موجود در LDAP دارای مجوزهای جستجو برای مبنای جستجوی ارائه شده باشد."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "رشته فیلتر ارائه شده  (یعنی '(sAMAccountName={{login}})') را تأیید کنید."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "مبنای جستجوی ارائه شده (یعنی 'ou=people,dc=example,dc=com') را تأیید کنید."
   version_5599c321: نسخه
   video_78335c71: ویدئو
   video_b9f27375: تصویر
@@ -26218,6 +26236,7 @@ fa:
       
       در اینجا می توانید آن را مشاهده کنید.
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "سرور LDAP شما تلاش برای اتصال را رد کرد. چیزهایی که باید در نظر بگیرید:"
   your_media_has_been_uploaded_and_will_appear_here__8546af57: "رسانه شما آپلود شده است و پس از پردازش در اینجا ظاهر می شود."
   your_message_has_been_sent_thank_you_e0284316: "پیام شما ارسال شده است. از شما سپاسگزاریم!"
   your_message_was_sent_977f6583: "پیام شما ارسال شد!"

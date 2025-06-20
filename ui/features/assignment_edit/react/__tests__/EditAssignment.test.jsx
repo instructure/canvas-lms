@@ -20,6 +20,7 @@ import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {http} from 'msw'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import {AnnotatedDocumentSelector} from '../EditAssignment'
 
 // Mock FlashAlert
@@ -50,6 +51,21 @@ const server = setupServer(
         name: 'Course files',
         context_id: 1,
         context_type: 'course',
+        can_upload: true,
+        locked_for_user: false,
+        parent_folder_id: null,
+      }),
+    )
+  }),
+  http.get('/api/v1/users/self/folders/root', (_req, res, ctx) => {
+    return res(
+      ctx.status(200),
+      ctx.set('link', 'url; rel="current"'),
+      ctx.json({
+        id: 3,
+        name: 'My files',
+        context_id: 2,
+        context_type: 'user',
         can_upload: true,
         locked_for_user: false,
         parent_folder_id: null,
@@ -161,14 +177,14 @@ describe('AnnotatedDocumentSelector', () => {
         onRemove() {},
       }
 
-      window.ENV = {context_asset_string: 'courses_1'}
+      fakeENV.setup({context_asset_string: 'courses_1'})
       server.listen()
     })
 
     afterEach(() => {
       server.resetHandlers()
       server.close()
-      window.ENV = {}
+      fakeENV.teardown()
     })
 
     describe('FileBrowser', () => {

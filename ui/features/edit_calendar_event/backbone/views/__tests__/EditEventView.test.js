@@ -24,6 +24,8 @@ import userEvent from '@testing-library/user-event'
 import CalendarEvent from '../../models/CalendarEvent'
 import EditEventView from '../EditEventView'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', () => ({
@@ -31,11 +33,18 @@ jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog', ()
 }))
 
 const defaultTZ = 'Asia/Tokyo'
+const server = setupServer()
 
 describe('EditEventView', () => {
   beforeAll(() => {
     moment.tz.setDefault(defaultTZ)
+    server.listen()
   })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     window.ENV = {FEATURES: {}, TIMEZONE: 'Asia/Tokyo'}
     document.body.innerHTML = '<div id="application"><form id="content"></form></div>'
@@ -44,6 +53,7 @@ describe('EditEventView', () => {
   afterEach(() => {
     window.ENV = null
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   function render(overrides = {}) {
@@ -308,12 +318,16 @@ describe('EditEventView', () => {
     })
 
     it('hides the frequency picker when section dates are enabled', async () => {
-      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
-        const sections = [{id: 1}]
-        return Promise.resolve(sections).then(() => {
-          successCB(sections, {getResponseHeader: () => ''})
-        })
-      })
+      const sections = [{id: 1}]
+      server.use(
+        http.get('*/api/v1/courses/21/sections', () => {
+          return HttpResponse.json(sections, {
+            headers: {
+              'X-Response-Header': '',
+            },
+          })
+        }),
+      )
 
       // jquery supplies this in the real app
       document.head.appendChild(document.createElement('style')).textContent =

@@ -61,6 +61,7 @@ module Types
     # Temporary fix for grahpql pagination
     field :attachments, [Types::FileType], null: true
     def attachments
+      context.scoped_set!(:asset_location, object.asset_string)
       load_association(:attachment_associations).then do |attachment_associations|
         Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load_many(attachment_associations)
       end

@@ -48,8 +48,10 @@ function DueDateOverrideView() {
   this.overridesContainDefault = this.overridesContainDefault.bind(this)
   this.setOnlyVisibleToOverrides = this.setOnlyVisibleToOverrides.bind(this)
   this.containsSectionsWithoutOverrides = this.containsSectionsWithoutOverrides.bind(this)
+  this.containsDiffTagOverrides = this.containsDiffTagOverrides.bind(this)
   this.getDefaultDueDate = this.getDefaultDueDate.bind(this)
   this.setNewOverridesCollection = this.setNewOverridesCollection.bind(this)
+  this.resetOverrides = this.resetOverrides.bind(this)
   this.showError = this.showError.bind(this)
   this.validateGroupOverrides = this.validateGroupOverrides.bind(this)
   this.validateTokenInput = this.validateTokenInput.bind(this)
@@ -83,66 +85,65 @@ DueDateOverrideView.prototype.render = function () {
   }
 
   const assignToSection = React.createElement(AssignToContent, {
-        onSync: this.setNewOverridesCollection,
-        defaultSectionId: this.model.defaultDueDateSectionId,
-        overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
-        assignmentId: this.model.assignment.get('id'),
-        getAssignmentName: () => {
-          const element =
-            document.getElementById('assignment_name') ?? document.getElementById('quiz_title')
-          return (
-            element?.value ??
-            this.model.assignment.get('name') ??
-            this.model.assignment.get('title')
-          )
-        },
-        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-        getPointsPossible: () => {
-          const elementValue =
-            document.querySelector('#assignment_points_possible')?.value ??
-            document.querySelector('#quiz_display_points_possible > .points_possible')?.innerHTML
-          return elementValue ?? this.model.assignment.get('points_possible')
-        },
-        getGroupCategoryId: () => {
-          const groupCategory = document.getElementById('assignment_group_category_id')
-          if (groupCategory?.value === undefined) {
-            return ENV.ASSIGNMENT?.group_category_id
-          } else if (document.getElementById('has_group_category')?.checked) {
-            if (groupCategory.value === 'blank') {
-              return null
-            }
-            return groupCategory.value
-          }
+    onSync: this.setNewOverridesCollection,
+    defaultSectionId: this.model.defaultDueDateSectionId,
+    overrides: this.model.overrides.models.map(model => model.toJSON().assignment_override),
+    setOverrides: this.resetOverrides,
+    assignmentId: this.model.assignment.get('id'),
+    getAssignmentName: () => {
+      const element =
+        document.getElementById('assignment_name') ?? document.getElementById('quiz_title')
+      return (
+        element?.value ?? this.model.assignment.get('name') ?? this.model.assignment.get('title')
+      )
+    },
+    isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
+    getPointsPossible: () => {
+      const elementValue =
+        document.querySelector('#assignment_points_possible')?.value ??
+        document.querySelector('#quiz_display_points_possible > .points_possible')?.innerHTML
+      return elementValue ?? this.model.assignment.get('points_possible')
+    },
+    getGroupCategoryId: () => {
+      const groupCategory = document.getElementById('assignment_group_category_id')
+      if (groupCategory?.value === undefined) {
+        return ENV.ASSIGNMENT?.group_category_id
+      } else if (document.getElementById('has_group_category')?.checked) {
+        if (groupCategory.value === 'blank') {
           return null
-        },
-        // eslint-disable-next-line no-dupe-keys
-        isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
-        type: this.model.assignment.objectType().toLowerCase(),
-        importantDates: this.model.assignment.get('important_dates'),
-        postToSIS: this.model.assignment.get('post_to_sis'),
-        onTrayOpen: () => {
-          const isGroupAssignment = document.getElementById('has_group_category')?.checked
-          if (!isGroupAssignment) {
-            this.trigger('tray:open')
-            return true
-          }
+        }
+        return groupCategory.value
+      }
+      return null
+    },
+    // eslint-disable-next-line no-dupe-keys
+    isOnlyVisibleToOverrides: this.model.assignment.isOnlyVisibleToOverrides(),
+    type: this.model.assignment.objectType().toLowerCase(),
+    importantDates: this.model.assignment.get('important_dates'),
+    postToSIS: this.model.assignment.get('post_to_sis'),
+    onTrayOpen: () => {
+      const isGroupAssignment = document.getElementById('has_group_category')?.checked
+      if (!isGroupAssignment) {
+        this.trigger('tray:open')
+        return true
+      }
 
-          const data = sanitizeData(this.$el.prevObject.toJSON())
-          const errors = this.options.groupCategorySelector.validateBeforeSave(data, {})
-          const selectors = this.options.groupCategorySelector.fieldSelectors
-          if (Object.keys(errors).length > 0) {
-            Object.keys(errors).forEach(errorKey => {
-              // show the first message associated to the input
-              this.showError($(selectors[errorKey]), errors[errorKey][0]?.message)
-            })
-            // block the tray opening
-            return false
-          }
-          this.trigger('tray:open')
-          return true
-        },
-        onTrayClose: () => this.trigger('tray:close'),
-      })
+      const data = sanitizeData(this.$el.prevObject.toJSON())
+      const errors = this.options.groupCategorySelector.validateBeforeSave(data, {})
+      const selectors = this.options.groupCategorySelector.fieldSelectors
+      if (Object.keys(errors).length > 0) {
+        Object.keys(errors).forEach(errorKey => {
+          // show the first message associated to the input
+          this.showError($(selectors[errorKey]), errors[errorKey][0]?.message)
+        })
+        // block the tray opening
+        return false
+      }
+      this.trigger('tray:open')
+      return true
+    },
+    onTrayClose: () => this.trigger('tray:close'),
+  })
 
   // eslint-disable-next-line react/no-render-return-value
   return ReactDOM.render(assignToSection, div, () => {
@@ -212,7 +213,6 @@ DueDateOverrideView.prototype.validateBeforeSave = function (data, errors) {
       }
     }
   }
-
   return errors
 }
 
@@ -375,12 +375,16 @@ DueDateOverrideView.prototype.showError = function (element, message) {
 // ==============================
 
 DueDateOverrideView.prototype.setNewOverridesCollection = function (newOverrides, importantDates) {
-  if (newOverrides !== undefined) {
-    this.model.overrides.reset(newOverrides)
+  this.resetOverrides(newOverrides)
+  return this.model.assignment.importantDates(importantDates)
+}
+
+DueDateOverrideView.prototype.resetOverrides = function (overrides) {
+  if (overrides !== undefined) {
+    this.model.overrides.reset(overrides)
     const onlyVisibleToOverrides = !this.model.overrides.containsDefaultDueDate()
     this.model.assignment.isOnlyVisibleToOverrides(onlyVisibleToOverrides)
   }
-  return this.model.assignment.importantDates(importantDates)
 }
 
 // =================
@@ -392,6 +396,12 @@ DueDateOverrideView.prototype.getDefaultDueDate = function () {
 
 DueDateOverrideView.prototype.containsSectionsWithoutOverrides = function () {
   return this.model.containsSectionsWithoutOverrides()
+}
+
+DueDateOverrideView.prototype.containsDiffTagOverrides = function () {
+  return this.getOverrides().some(
+    override => override.non_collaborative === true && override.group_id !== undefined,
+  )
 }
 
 DueDateOverrideView.prototype.overridesContainDefault = function () {

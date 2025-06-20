@@ -39,21 +39,26 @@ import MediaPlayer from './MediaPlayer'
 
 const I18n = createI18nScope('conversations_2')
 
-export const MessageDetailItem = ({...props}) => {
-  const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
-  const pronouns = props.conversationMessage?.author?.pronouns
+export const MessageDetailItem = ({
+  conversationMessage = {},
+  contextName,
+  onReply,
+  onReplyAll,
+  onDelete,
+  onForward,
+}) => {
+  const createdAt = DateHelper.formatDatetimeForDisplay(conversationMessage.createdAt)
+  const pronouns = conversationMessage?.author?.pronouns
   const {isSubmissionCommentsType} = useContext(ConversationContext)
-  const {
-    conversationMessage: {mediaComment} = {},
-  } = props
-  const isMessageHtml = containsHtmlTags(props.conversationMessage?.htmlBody)
+  const {mediaComment} = conversationMessage
+  const isMessageHtml = containsHtmlTags(conversationMessage?.htmlBody)
 
   const messageBody = isMessageHtml
-    ? sanitizeHtml(props.conversationMessage?.htmlBody)
-    : formatMessage(props.conversationMessage?.body)
+    ? sanitizeHtml(conversationMessage?.htmlBody)
+    : formatMessage(conversationMessage?.body)
 
   const elementId = mediaComment?._id
-    ? `media-player-${props.conversationMessage?._id}-${mediaComment._id}`
+    ? `media-player-${conversationMessage?._id}-${mediaComment._id}`
     : ''
 
   return (
@@ -90,8 +95,8 @@ export const MessageDetailItem = ({...props}) => {
               <Avatar
                 size={responsiveProps.avatar}
                 margin="small small small none"
-                name={props.conversationMessage?.author?.shortName}
-                src={props.conversationMessage?.author?.avatarUrl}
+                name={conversationMessage?.author?.shortName}
+                src={conversationMessage?.author?.avatarUrl}
               />
             </Flex.Item>
             <Flex.Item shouldShrink={true} shouldGrow={true}>
@@ -99,12 +104,12 @@ export const MessageDetailItem = ({...props}) => {
                 <Flex.Item>
                   <MessageDetailParticipants
                     participantsSize={responsiveProps.usernames}
-                    conversationMessage={props.conversationMessage}
+                    conversationMessage={conversationMessage}
                   />
                 </Flex.Item>
                 <Flex.Item>
                   <Text weight="normal" size={responsiveProps.courseNameDate} wrap="break-word">
-                    {props.contextName}
+                    {contextName}
                   </Text>
                 </Flex.Item>
                 {ENV?.SETTINGS?.can_add_pronouns && pronouns && (
@@ -124,13 +129,13 @@ export const MessageDetailItem = ({...props}) => {
             {!isSubmissionCommentsType && (
               <Flex.Item textAlign="end">
                 <MessageDetailActions
-                  onReply={props.onReply}
-                  onReplyAll={props.onReplyAll}
-                  onDelete={props.onDelete}
-                  onForward={props.onForward}
+                  onReply={onReply}
+                  onReplyAll={onReplyAll}
+                  onDelete={onDelete}
+                  onForward={onForward}
                   authorName={
-                    props.conversationMessage?.author?.name?.length > 0
-                      ? props.conversationMessage?.author?.name
+                    conversationMessage?.author?.name?.length > 0
+                      ? conversationMessage?.author?.name
                       : I18n.t('Unknown User')
                   }
                 />
@@ -142,9 +147,9 @@ export const MessageDetailItem = ({...props}) => {
             size={responsiveProps.messageBody}
             dangerouslySetInnerHTML={{__html: messageBody}}
           />
-          {props.conversationMessage.attachments?.length > 0 && (
+          {conversationMessage.attachments?.length > 0 && (
             <List isUnstyled={true} margin="medium auto small">
-              {props.conversationMessage.attachments.map(attachment => {
+              {conversationMessage.attachments.map(attachment => {
                 return (
                   <List.Item as="div" key={attachment.id}>
                     <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
@@ -185,8 +190,4 @@ MessageDetailItem.propTypes = {
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
   onForward: PropTypes.func,
-}
-
-MessageDetailItem.defaultProps = {
-  conversationMessage: {},
 }

@@ -33,7 +33,7 @@ const CanvasRce = React.lazy(
     ),
 )
 
-const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
+const OutcomesRceField = ({onChangeHandler, defaultContent = ''}) => {
   const [isLoadingRce, setIsLoadingRce] = useState(true)
   const rceRef = useRef(null)
   const spinner = (
@@ -72,10 +72,6 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
 OutcomesRceField.propTypes = {
   defaultContent: PropTypes.string,
   onChangeHandler: PropTypes.func.isRequired,
-}
-
-OutcomesRceField.defaultProps = {
-  defaultContent: '',
 }
 
 export default OutcomesRceField

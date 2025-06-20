@@ -24,6 +24,9 @@ class AnonymousSubmissionsController < SubmissionsBaseController
   before_action :require_context
 
   def show
+    # Lookup submissions views as this controller does not have own views
+    lookup_context.prefixes.append "submissions"
+
     @submission_for_show = Submissions::AnonymousSubmissionForShow.new(
       assignment_id: params.fetch(:assignment_id),
       anonymous_id: params.fetch(:anonymous_id),

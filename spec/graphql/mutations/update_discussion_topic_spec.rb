@@ -837,8 +837,9 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     it "successfully updates a discussion topic with checkpoints" do
       new_lock_at = 12.days.from_now
       new_unlock_at = 1.day.from_now
+      new_grading_type = "pass_fail"
 
-      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true }, checkpoints: [
+      result = run_mutation(id: @graded_topic.id, assignment: { forCheckpoints: true, gradingType: new_grading_type }, checkpoints: [
                               { checkpointLabel: CheckpointLabels::REPLY_TO_TOPIC, dates: [{ type: "everyone", dueAt: @due_at1.iso8601, lockAt: new_lock_at.iso8601, unlockAt: new_unlock_at.iso8601 }], pointsPossible: 6 },
                               { checkpointLabel: CheckpointLabels::REPLY_TO_ENTRY, dates: [{ type: "everyone", dueAt: @due_at2.iso8601, lockAt: new_lock_at.iso8601, unlockAt: new_unlock_at.iso8601 }], pointsPossible: 8, repliesRequired: 5 }
                             ])
@@ -850,10 +851,13 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       expect(Assignment.last.unlock_at).to be_within(1.second).of(new_unlock_at)
       expect(Assignment.last.lock_at).to be_within(1.second).of(new_lock_at)
+      expect(Assignment.last.grading_type).to eq(new_grading_type)
       expect(Assignment.last.sub_assignments.first.unlock_at).to be_within(1.second).of(new_unlock_at)
       expect(Assignment.last.sub_assignments.first.lock_at).to be_within(1.second).of(new_lock_at)
+      expect(Assignment.last.sub_assignments.first.grading_type).to eq(new_grading_type)
       expect(Assignment.last.sub_assignments.last.unlock_at).to be_within(1.second).of(new_unlock_at)
       expect(Assignment.last.sub_assignments.last.lock_at).to be_within(1.second).of(new_lock_at)
+      expect(Assignment.last.sub_assignments.last.grading_type).to eq(new_grading_type)
 
       aggregate_failures do
         expect(result["errors"]).to be_nil

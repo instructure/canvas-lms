@@ -19,6 +19,14 @@
 import $ from 'jquery'
 import store from '../ExternalAppsStore'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('ExternalApps.ExternalAppsStore', () => {
   const tools = [
@@ -70,44 +78,53 @@ describe('ExternalApps.ExternalAppsStore', () => {
   beforeEach(() => {
     fakeENV.setup({CONTEXT_BASE_URL: '/accounts/1'})
     store.reset()
-    jest.spyOn($, 'ajax')
-    jest.spyOn($, 'getJSON')
   })
 
   afterEach(() => {
     store.reset()
     fakeENV.teardown()
-    jest.restoreAllMocks()
   })
 
-  it('fetches external tools', async () => {
-    $.ajax.mockImplementation(({success}) => {
-      success(tools)
-      return {done: () => ({})}
-    })
+  it('fetches external tools', done => {
+    server.use(
+      http.get('/api/v1/accounts/1/lti_apps', () => {
+        return HttpResponse.json(tools)
+      }),
+    )
 
     store.fetch()
-    expect(store.getState().externalTools).toHaveLength(3)
+
+    // Wait for the async operation to complete
+    setTimeout(() => {
+      expect(store.getState().externalTools).toHaveLength(3)
+      done()
+    }, 100)
   })
 
-  it('handles resets and fetch responses interwoven', async () => {
-    $.ajax.mockImplementation(({success}) => {
-      success(tools)
-      return {done: () => ({})}
-    })
+  it('handles resets and fetch responses interwoven', done => {
+    server.use(
+      http.get('/api/v1/accounts/1/lti_apps', () => {
+        return HttpResponse.json(tools)
+      }),
+    )
 
     store.fetch()
     store.reset()
     store.fetch()
 
-    expect(store.getState().externalTools).toHaveLength(3)
+    // Wait for the async operation to complete
+    setTimeout(() => {
+      expect(store.getState().externalTools).toHaveLength(3)
+      done()
+    }, 100)
   })
 
   it('updates access token', async () => {
-    $.ajax.mockImplementation(({success}) => {
-      success(accountResponse, 'success')
-      return {done: () => ({})}
-    })
+    server.use(
+      http.put('/accounts/1', () => {
+        return HttpResponse.json(accountResponse)
+      }),
+    )
 
     return new Promise((resolve, reject) => {
       store.updateAccessToken(
@@ -126,7 +143,11 @@ describe('ExternalApps.ExternalAppsStore', () => {
 
   it('fetches details for ContextExternalTool', async () => {
     const responseData = {status: 'ok'}
-    $.getJSON.mockImplementation(() => Promise.resolve(responseData))
+    server.use(
+      http.get('/api/v1/courses/1/external_tools/1', () => {
+        return HttpResponse.json(responseData)
+      }),
+    )
 
     const tool = tools[0]
     const data = await store.fetchWithDetails(tool)
@@ -135,7 +156,11 @@ describe('ExternalApps.ExternalAppsStore', () => {
 
   it('fetches details for Lti::ToolProxy', async () => {
     const responseData = {status: 'ok'}
-    $.getJSON.mockImplementation(() => Promise.resolve(responseData))
+    server.use(
+      http.get('/api/v1/accounts/1/tool_proxies/2', () => {
+        return HttpResponse.json(responseData)
+      }),
+    )
 
     const tool = tools[1]
     const data = await store.fetchWithDetails(tool)
@@ -156,14 +181,15 @@ describe('ExternalApps.ExternalAppsStore', () => {
 
     it('saves external tool', async () => {
       const responseData = {status: 'ok'}
-      $.ajax.mockImplementation(({success}) => {
-        success(responseData, 'success')
-        return {done: () => ({})}
-      })
+      server.use(
+        http.post('/api/v1/accounts/1/external_tools', () => {
+          return HttpResponse.json(responseData)
+        }),
+      )
 
       return new Promise((resolve, reject) => {
         store.save(
-          'http://example.com',
+          '/api/v1/accounts/1/external_tools',
           {},
           (data, statusText) => {
             expect(statusText).toBe('success')

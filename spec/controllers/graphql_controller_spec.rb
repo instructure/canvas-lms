@@ -67,33 +67,67 @@ describe GraphQLController do
       expect(response.parsed_body["data"]).not_to be_blank
     end
 
-    it "logs a page view for CreateSubmission" do
-      Setting.set("enable_page_views", "db")
-      @course = course_factory(name: "course", active_course: true)
+    context "CreateSubmission" do
+      before do
+        Setting.set("enable_page_views", "db")
+        @course = course_factory(name: "course", active_course: true)
+        student_in_course(active_all: true, course: @course)
+        user_session(@student)
 
-      @assignment = @course.assignments.create!(
-        name: "assignment",
-        due_at: 5.days.ago,
-        points_possible: 10,
-        submission_types: "online_text_entry"
-      )
+        @assignment = @course.assignments.create!(
+          name: "assignment",
+          due_at: 5.days.ago,
+          points_possible: 10,
+          submission_types: "online_text_entry"
+        )
 
-      test_query = <<~GQL
-        mutation {
-          CreateSubmission(input: {assignmentId: $assignmentLid, submissionType: $type, body: $body})
-      GQL
+        @test_query = <<~GQL
+          mutation CreateSubmission($assignmentLid: ID!, $type: OnlineSubmissionType!, $body: String!) {
+            createSubmission(input: {
+              assignmentId: $assignmentLid
+              submissionType: $type
+              body: $body
+            }) {
+              submission {
+                _id
+                attempt
+              }
+              errors {
+                attribute
+                message
+              }
+            }
+          }
+        GQL
 
-      test_variables = {
-        assignmentLid: @assignment.id,
-        body: "<p>test</p>",
-        type: "online_text_entry"
-      }
-      # need this for the page view to be assigned a proper request_id
-      RequestContext::Generator.new(->(_env) { [200, {}, []] }).call({})
+        @test_variables = {
+          assignmentLid: @assignment.id,
+          body: "<p>test</p>",
+          type: "online_text_entry"
+        }
 
-      expect { post :execute, params: { query: test_query, operationName: "CreateSubmission", variables: test_variables }, format: :json }.to change { PageView.count }.by(1)
+        # need this for the page view to be assigned a proper request_id
+        RequestContext::Generator.new(->(_env) { [200, {}, []] }).call({})
+      end
 
-      expect(PageView.last.participated).to be(true)
+      it "logs a page view for CreateSubmission" do
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.to change { PageView.count }.by(1)
+
+        expect(PageView.last.participated).to be(true)
+      end
+
+      it "does not log a page view for CreateSubmission when graphql error (user has no permission)" do
+        usr = user_model
+        user_session(usr)
+
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.not_to change { PageView.count }
+      end
+
+      it "does not log a page view for CreateSubmission if generic graphql error" do
+        allow(GraphQLTuning).to receive(:max_complexity).and_return(1)
+
+        expect { post :execute, params: { query: @test_query, operationName: "CreateSubmission", variables: @test_variables }, format: :json }.not_to change { PageView.count }
+      end
     end
 
     context "discussions" do
@@ -318,6 +352,25 @@ describe GraphQLController do
         end
       end
     end
+
+    it "logs statsd metrics with correct complexity and operation name" do
+      allow(GraphQLTuning).to receive(:max_complexity).and_return(1)
+      allow(InstStatsd::Statsd).to receive(:distributed_increment)
+      allow(InstStatsd::Statsd).to receive(:gauge)
+      allow(controller).to receive(:operation_name).and_return("MyQuery")
+
+      post :execute, params: { query: '{ course(id: "1") { id, name } }' }, format: :json
+
+      expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
+        "graphql.errors.exceeds_max_complexity.count",
+        tags: { operation_name: "MyQuery" }
+      )
+      expect(InstStatsd::Statsd).to have_received(:gauge).with(
+        "graphql.errors.exceeds_max_complexity.compexity",
+        3,
+        tags: { operation_name: "MyQuery" }
+      )
+    end
   end
 
   context "with feature flag disable_graphql_authentication enabled" do
@@ -327,6 +380,44 @@ describe GraphQLController do
         post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
         expect(response.parsed_body["errors"]).to be_blank
         expect(response.parsed_body["data"]).not_to be_blank
+      end
+    end
+  end
+
+  describe "#execute error handling" do
+    before do
+      # Mock the schema execution to return custom error results
+      allow_any_instance_of(GraphQLController).to receive(:execute_on) { mocked_result }
+      user_session(@student)
+    end
+
+    context "when root errors are present" do
+      let(:mocked_result) { { "errors" => [{ "message" => "Root error" }] } }
+
+      it "returns root errors in the response" do
+        post :execute, params: { query: "{ dummy }" }, format: :json
+        expect(response.parsed_body["errors"]).to eq([{ "message" => "Root error" }])
+      end
+    end
+
+    context "when nested data errors are present and no root errors" do
+      let(:mocked_result) do
+        {
+          "data" => {
+            "foo" => { "errors" => [{ "message" => "Nested error" }] },
+            "bar" => { "errors" => [] },
+            "baz" => { "value" => 1 },
+            "qux" => "",
+            "quux" => nil,
+            "corge" => { "errors" => nil }
+          }
+        }
+      end
+
+      it "returns nested data errors in the response" do
+        post :execute, params: { query: "{ dummy }" }, format: :json
+        # The controller currently just renders the result, so errors will be in the data structure
+        expect(response.parsed_body["data"]["foo"]["errors"]).to eq([{ "message" => "Nested error" }])
       end
     end
   end

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import parseLinkHeader, {Links} from '@canvas/parse-link-header/parseLinkHeader'
 import type {ZodSchema, ZodTypeDef, ZodError} from 'zod'
 
 export type ApiResult<A> =
@@ -23,6 +24,7 @@ export type ApiResult<A> =
       /** Indicates that the backend response was parsed successfully */
       _type: 'Success'
       data: A
+      links?: Links
     }
   | {
       /** Indicates that the backend responded with a JSON value that could not be parsed */
@@ -54,9 +56,10 @@ export type ApiResult<A> =
 export type UnsuccessfulApiResult = Exclude<ApiResult<unknown>, {_type: 'Success'}>
 export type SuccessfulApiResult<A> = Extract<ApiResult<A>, {_type: 'Success'}>
 
-export const success = <A>(data: A): ApiResult<A> => ({
+export const success = <A>(data: A, links?: Links): ApiResult<A> => ({
   _type: 'Success',
   data,
+  links,
 })
 
 export const apiParseError = (error: ZodError, url: string): UnsuccessfulApiResult => ({
@@ -100,13 +103,14 @@ export const parseFetchResult =
     return result
       .then(response => {
         if (response.ok) {
+          const links = parseLinkHeader(response.headers.get('Link') ?? '') ?? {}
           return response
             .json()
             .then(json => [response, json] as const)
             .then(([resp, json]) => [resp, schema.safeParse(json)] as const)
             .then(([resp, parsedJson]) => {
               return parsedJson.success
-                ? success(parsedJson.data)
+                ? success(parsedJson.data, links)
                 : apiParseError(parsedJson.error, resp.url)
             })
             .catch(err => {
@@ -157,7 +161,7 @@ export const formatApiResultError = (error: UnsuccessfulApiResult): string => {
  */
 export const mapApiResult = <A, B>(result: ApiResult<A>, f: (a: A) => B): ApiResult<B> => {
   if (isSuccessful(result)) {
-    return success(f(result.data))
+    return success(f(result.data), result.links)
   } else {
     return result
   }
@@ -181,4 +185,27 @@ export const isUnsuccessful = (result: ApiResult<unknown>): result is Unsuccessf
  */
 export const isSuccessful = <A>(result: ApiResult<A>): result is SuccessfulApiResult<A> => {
   return result._type === 'Success'
+}
+
+export const combineApiResults = <A, B>(a: ApiResult<A>, b: ApiResult<B>): ApiResult<[A, B]> => {
+  if (isUnsuccessful(a)) {
+    return a
+  } else if (isUnsuccessful(b)) {
+    return b
+  } else {
+    return success([a.data, b.data], {...a.links, ...b.links})
+  }
+}
+
+export const combineAllApiResults = <T extends ApiResult<unknown>[]>(
+  results: T,
+): ApiResult<{[K in keyof T]: T[K] extends ApiResult<infer U> ? U : never}> => {
+  return results.reduce(
+    (acc: ApiResult<unknown[]>, curr) => {
+      return mapApiResult(combineApiResults(acc, curr), ([rest, currData]) => {
+        return [...rest, currData]
+      })
+    },
+    success([] as unknown[], {}),
+  ) as ApiResult<{[K in keyof T]: T[K] extends ApiResult<infer U> ? U : never}>
 }

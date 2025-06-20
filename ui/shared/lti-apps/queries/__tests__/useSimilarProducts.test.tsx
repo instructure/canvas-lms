@@ -22,10 +22,22 @@ import {waitFor} from '@testing-library/react'
 import useSimilarProducts from '../useSimilarProducts'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import type {Product} from '../../models/Product'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('Promise resolution', () => {
-  const originalFetch = global.fetch
   let mockedData: Product
+  let server: ReturnType<typeof setupServer>
+
+  beforeAll(() => {
+    server = setupServer()
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     mockedData = {
       id: '123',
@@ -73,14 +85,15 @@ describe('Promise resolution', () => {
       accessibility_badges: [],
     }
 
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue(mockedData),
-    })
+    server.use(
+      http.get('*/api/v1/accounts/*/learn_platform/products', () => {
+        return HttpResponse.json(mockedData)
+      }),
+    )
   })
 
   afterEach(() => {
-    global.fetch = originalFetch
+    server.resetHandlers()
   })
 
   it('Promise resolves successfully when provided a product', async () => {

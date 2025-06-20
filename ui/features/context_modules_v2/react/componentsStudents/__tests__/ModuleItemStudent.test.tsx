@@ -136,4 +136,29 @@ describe('ModuleItemStudent', () => {
     expect(container.queryByTestId('module-item-supplemental-info')).toBeNull()
     expect(container.queryByTestId('module-item-status-icon')).toBeNull()
   })
+
+  // add a test here to check the presence of module-discussion-checkpoint
+  it('renders module-discussion-checkpoint when content has checkpoints', () => {
+    const container = setUp(
+      buildDefaultProps({
+        content: {
+          id: '1',
+          _id: '1',
+          title: 'Test Item',
+          type: 'Discussion',
+          url: 'https://canvas.instructure.com/courses/1/assignments/1',
+          checkpoints: [
+            {
+              id: 'checkpoint-1',
+              name: 'Discussion Checkpoint',
+              tag: 'reply_to_topic',
+            },
+          ],
+        },
+      }),
+    )
+
+    const titleElement = container.getByTestId('module-discussion-checkpoint')
+    expect(titleElement).toBeInTheDocument()
+  })
 })

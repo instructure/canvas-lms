@@ -21,10 +21,10 @@ import {keyBy} from 'lodash'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import StudentOutcomeScore from './StudentOutcomeScore'
-import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
-import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './constants'
+import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
+import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './utils/constants'
 
-const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
+const ScoresGrid = ({students, outcomes, rollups}) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
@@ -43,6 +43,7 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
             <Flex.Item
               size={`${COLUMN_WIDTH + COLUMN_PADDING}px`}
               key={`${student.id}${outcome.id}${index}`}
+              data-testid={`student-outcome-score-${student.id}-${outcome.id}`}
             >
               <View
                 as="div"
@@ -54,7 +55,6 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
                 <StudentOutcomeScore
                   rollup={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]}
                   outcome={outcome}
-                  visibleRatings={visibleRatings}
                 />
               </View>
             </Flex.Item>
@@ -69,7 +69,6 @@ ScoresGrid.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
   rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
 }
 
 export default ScoresGrid

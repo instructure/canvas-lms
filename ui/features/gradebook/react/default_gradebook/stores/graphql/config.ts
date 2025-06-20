@@ -17,8 +17,18 @@
  */
 
 const GRADEBOOK_GRAPHQL_CONFIG = {
-  usersPageSize: 100, // Number of users to fetch per page in the gradebook
-  maxAssignmentRequestCount: 10, // Maximum number of assignments to request concurrently
+  // Number of users to fetch per page in the gradebook
+  usersPageSize: 100,
+  // Maximum number of assignments to request concurrently
+  maxAssignmentRequestCount: 10,
+  // Initial number of students to include as an alias when fetching submissions
+  // this will result responses with
+  // maxPageSize * initialNumberOfStudentsPerSubmissionRequest submissions
+  // There is a max on the number of aliases that can be used in a query,
+  // which is currently 20.
+  initialNumberOfStudentsPerSubmissionRequest: 20,
+  // Maximum number of assignments to request concurrently
+  maxSubmissionRequestCount: 10,
 }
 
 export default Object.freeze(GRADEBOOK_GRAPHQL_CONFIG)

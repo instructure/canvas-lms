@@ -20,7 +20,7 @@
 
 require_relative "../../../spec_helper"
 
-RSpec.describe Lti::Pns::NoticeBuilder, type: :model do
+RSpec.describe Lti::Pns::NoticeBuilder do
   let(:tool) do
     ContextExternalTool.new(
       name: "Test Tool",

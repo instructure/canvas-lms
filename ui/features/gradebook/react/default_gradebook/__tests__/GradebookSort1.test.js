@@ -17,7 +17,6 @@
  */
 
 import {createGradebook} from './GradebookSpecHelper'
-import sinon from 'sinon'
 
 describe('sortByStudentColumn', () => {
   let gradebook
@@ -172,44 +171,42 @@ describe('sortByCustomColumn', () => {
 
 describe('sortByAssignmentColumn', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
-    sandbox
-      .stub(gradebook, 'sortRowsBy')
-      .callsFake(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    sandbox.stub(gradebook, 'gradeSort')
-    sandbox.stub(gradebook, 'missingSort')
-    sandbox.stub(gradebook, 'lateSort')
+    jest
+      .spyOn(gradebook, 'sortRowsBy')
+      .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
+    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
+    jest.spyOn(gradebook, 'missingSort').mockImplementation()
+    jest.spyOn(gradebook, 'lateSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
-    expect(gradebook.sortRowsBy.callCount).toBe(1)
+    expect(gradebook.sortRowsBy).toHaveBeenCalledTimes(1)
   })
 
   test('sorts using gradeSort when the settingKey is "grade"', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
-    expect(gradebook.gradeSort.callCount).toBe(1)
+    expect(gradebook.gradeSort).toHaveBeenCalledTimes(1)
   })
 
   test('sorts by grade using the columnId', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
-    const field = gradebook.gradeSort.getCall(0).args[2]
+    const field = gradebook.gradeSort.mock.calls[0][2]
     expect(field).toBe('assignment_201')
   })
 
   test('optionally sorts by grade in ascending order', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'ascending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(true)
@@ -217,7 +214,7 @@ describe('sortByAssignmentColumn', () => {
 
   test('optionally sorts by grade in descending order', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'grade', 'descending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(false)
@@ -225,55 +222,53 @@ describe('sortByAssignmentColumn', () => {
 
   test('optionally sorts by missing in ascending order', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'missing', 'ascending')
-    const columnId = gradebook.missingSort.getCall(0).args[0]
+    const columnId = gradebook.missingSort.mock.calls[0][0]
     expect(columnId).toBe('assignment_201')
   })
 
   test('optionally sorts by late in ascending order', () => {
     gradebook.sortByAssignmentColumn('assignment_201', 'late', 'ascending')
-    const columnId = gradebook.lateSort.getCall(0).args[0]
+    const columnId = gradebook.lateSort.mock.calls[0][0]
     expect(columnId).toBe('assignment_201')
   })
 })
 
 describe('sortByAssignmentGroupColumn', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
-    sandbox
-      .stub(gradebook, 'sortRowsBy')
-      .callsFake(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    sandbox.stub(gradebook, 'gradeSort')
+    jest
+      .spyOn(gradebook, 'sortRowsBy')
+      .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
+    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {
     gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
-    expect(gradebook.sortRowsBy.callCount).toBe(1)
+    expect(gradebook.sortRowsBy).toHaveBeenCalledTimes(1)
   })
 
   test('sorts by grade using gradeSort', () => {
     gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
-    expect(gradebook.gradeSort.callCount).toBe(1)
+    expect(gradebook.gradeSort).toHaveBeenCalledTimes(1)
   })
 
   test('sorts by grade using the columnId', () => {
     gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
-    const field = gradebook.gradeSort.getCall(0).args[2]
+    const field = gradebook.gradeSort.mock.calls[0][2]
     expect(field).toBe('assignment_group_301')
   })
 
   test('optionally sorts by grade in ascending order', () => {
     gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'ascending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(true)
@@ -281,7 +276,7 @@ describe('sortByAssignmentGroupColumn', () => {
 
   test('optionally sorts by grade in descending order', () => {
     gradebook.sortByAssignmentGroupColumn('assignment_group_301', 'grade', 'descending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(false)
@@ -290,42 +285,40 @@ describe('sortByAssignmentGroupColumn', () => {
 
 describe('sortByTotalGradeColumn', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
-    sandbox
-      .stub(gradebook, 'sortRowsBy')
-      .callsFake(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
-    sandbox.stub(gradebook, 'gradeSort')
+    jest
+      .spyOn(gradebook, 'sortRowsBy')
+      .mockImplementation(sortFn => sortFn(gradebook.studentA, gradebook.studentB))
+    jest.spyOn(gradebook, 'gradeSort').mockImplementation()
     gradebook.studentA = {name: 'Adam Jones'}
     gradebook.studentB = {name: 'Betty Ford'}
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('sorts the gradebook rows', () => {
     gradebook.sortByTotalGradeColumn('ascending')
-    expect(gradebook.sortRowsBy.callCount).toBe(1)
+    expect(gradebook.sortRowsBy).toHaveBeenCalledTimes(1)
   })
 
   test('sorts by grade using gradeSort', () => {
     gradebook.sortByTotalGradeColumn('ascending')
-    expect(gradebook.gradeSort.callCount).toBe(1)
+    expect(gradebook.gradeSort).toHaveBeenCalledTimes(1)
   })
 
   test('sorts by "total_grade"', () => {
     gradebook.sortByTotalGradeColumn('ascending')
-    const field = gradebook.gradeSort.getCall(0).args[2]
+    const field = gradebook.gradeSort.mock.calls[0][2]
     expect(field).toBe('total_grade')
   })
 
   test('optionally sorts by grade in ascending order', () => {
     gradebook.sortByTotalGradeColumn('ascending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(true)
@@ -333,7 +326,7 @@ describe('sortByTotalGradeColumn', () => {
 
   test('optionally sorts by grade in descending order', () => {
     gradebook.sortByTotalGradeColumn('descending')
-    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.getCall(0).args
+    const [studentA, studentB, /* field */ , ascending] = gradebook.gradeSort.mock.calls[0]
     expect(studentA).toBe(gradebook.studentA)
     expect(studentB).toBe(gradebook.studentB)
     expect(ascending).toBe(false)

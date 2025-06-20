@@ -3294,6 +3294,7 @@ el:
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "Δεν γίνεται να απενεργοποιηθεί η δημοσίευση %{item_name} αν υπάρχουν υποβολές σπουδαστών"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "Δεν γίνεται να απενεργοποιηθεί η δημοσίευση %{name} αν υπάρχουν υποβολές σπουδαστών"
   cancel_caeb1e68: Ακύρωση
+  canceled_5a6e0ec8: Ακυρώθηκε
   cannot_be_blank_c4e30496: "Δεν πρέπει να παραμείνει κενό"
   cannot_be_nil_when_account_id_is_nil_be6d1d60: "δεν μπορεί να είναι μηδέν όταν το account_id είναι μηδέν"
   cannot_be_nil_when_course_id_is_nil_f539388: "δεν μπορεί να είναι μηδέν όταν το course_id είναι μηδέν"
@@ -3321,6 +3322,9 @@ el:
   canvas_alert_invited_course_as_role_type_ea825937: "Ειδοποίηση Canvas - Προσκλήθηκε: course ως %{role_type}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "<mrk mid=\"1742\" mtype=\"seg\">Ειδοποίηση Canvas - Εκπρόθεσμη Υποβολή:</mrk> <mrk mid=\"1743\" mtype=\"seg\">%{user_name}, %{assignment_name}</mrk>"
   canvas_by_instructure_1490381: "Canvas από την Instructure"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "To Canvas δεν μπορεί να συνδεθεί (login) στον LDAP διακομιστή σας"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "To Canvas δεν μπορεί να συνδεθεί στο LDAP διακομιστή σας."
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: "Το Canvas δεν μπορεί να ερευνήσει την LPAP σύνδεσή σας"
   canvas_cartridge_description: "Αυτή η επιλογή επιτρέπει τη μετατροπή εξαγωγής του canvas στην ενδιάμεση μορφή json για εισαγωγή"
   canvas_cartridge_display: "Common Cartridge του Canvas"
   canvas_cartridge_file_description: "Πακέτο Εξαγωγής Μαθήματος του Canvas"
@@ -3334,6 +3338,7 @@ el:
   canvas_error_report_ff678539: "Αναφορά Σφάλματος Canvas"
   canvas_id_f42f6ad: "Canvas ID"
   canvas_introduction_video_2d81f3ad: "Εισαγωγικό Βίντεο στο Canvas"
+  canvas_is_connecting_to_ips_9af7da93: "Το Canvas συνδέεται στο %{ips}"
   canvas_lms_6ce68514: "Σύστημα Διαχείρισης Εκπαιδευτικού Περιεχομένου Canvas"
   canvas_login_failure_message_4c922f2f: "Μήνυμα απο το Canvas σχετικά με την αποτυχία σύνδεσης"
   canvas_login_instructure_271b8d00: "Σύνδεση Στο Canvas"
@@ -3372,6 +3377,7 @@ el:
   change_dcaa253a: Αλλαγή
   change_ending_date_to_d2cebd54: "Αλλαγή ημερομηνίας λήξης"
   change_groups_4e2ab6c3: "Αλλαγή Ομάδων"
+  change_image_d56c695f: "Αλλαγή Εικόνας"
   change_name_c8cce76c: "Αλλαγή Ονόματος"
   change_name_to_568374c8: "Αλλαγή \"%{name}\" σε"
   change_points_possible_to_match_rubric_dialog: 
@@ -3382,6 +3388,7 @@ el:
   change_to_b757d327: "αλλαγή σε"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Οι αλλαγές θα εφαρμοστούν ακόμα και εάν φύγετε από αυτή τη σελίδα"
   chat_2153c6b7: "Συζήτηση (Chat)"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "Ελέγξτε τις ρυθμίσεις του τείχους προστασίας σας. Επιτρέπεται σε όλες τις διευθύνσεις IP του Canvas να έχουν πρόσβαση στο διακομιστή σας;"
   child_s_username_dde3aa9: "Όνομα Χρήστη Παιδιού"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Επιλέξτε ένα χρώμα ή υποκοριστικό μαθήματος για %{course}"
   choose_a_course_home_page_8059c7b: "Επιλογή Αρχικής Σελίδας Μαθήματος"
@@ -5878,6 +5885,7 @@ el:
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "<mrk mid=\"4631\" mtype=\"seg\">Καταμερισμός σε ίσες χρονοθυρίδες %{num_minutes} λεπτών.</mrk> <mrk mid=\"4632\" mtype=\"seg\">*Πηγαίνετε στο*</mrk>"
   do_nothing_9672b478: "Καμία δράση"
   does_not_meet_expectations_b0736d20: "Δεν Ικανοποιεί τις Προσδοκίες"
+  does_the_username_require_more_scoping_information_40d51df: "Πρέπει να υπάρξει για το όνομα χρήστη περισσότερη πληροφορία για οριοθέτηση; (π.χ. 'cn=Canvas,ou=people,dc=example,dc=com'). "
   domain_3b54c511: Domain
   domain_69fe564b: "Domain:"
   domain_is_required_1d4c8b25: "Απαιτείται domain"
@@ -11326,6 +11334,7 @@ el:
   press_the_esc_key_to_close_this_modal_14d10601: "Πατήστε το escape για να κλείσετε αυτή τη δυνατότητα"
   prev_f82cbc48: Προηγούμενο
   preview_53003fd2: Προεπισκόπηση
+  preview_9cbd064e: προεπισκόπηση
   preview_your_changes_373557d8: "Προεπισκόπηση των Αλλαγών σας"
   preview_your_submission_and_view_teacher_feedback__81a45279: "Κάντε προεπισκόπηση της υποβολής σας και δείτε την ανατροφοδότηση του καθηγητή αν υπάρχει"
   previous_bd2ac015: Προηγούμενο
@@ -14762,6 +14771,7 @@ el:
   successfully_moved_model_to_newgroup_f7b7aa5a: "Το %{model} μετακινήθηκε στην ομάδα %{newGroup} επιτυχώς"
   suggestions_b8b03b9d: Προτάσεις
   summary_statistics_f74852a5: "Ανακεφαλαιωτικά Στατιστικά"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "Καταχωρίστε ένα έγκυρο LDAP όνομα χρήστη/κωδικό για έλεγχο της σύνδεσης"
   support: 
     array: 
       last_word_connector: ", και"
@@ -14931,6 +14941,9 @@ el:
         unspecified: οποτεδήποτε
       timespan: "%{start_at} *έως* %{end_at}"
   terms_of_service_f183ff7f: "Όροι χρήσης της υπηρεσίας"
+  test_ldap_authentication_446cce4f: "Δοκιμή LDAP Αυθεντικοποίησης"
+  test_ldap_settings_c387f136: "Έλεγχος Ρυθμίσεων LDAP"
+  test_login_3dc3c119: "Δοκιμή εισόδου στο σύστημα"
   testing_state_effd4a82: "Έλεγχος κατάστασης"
   text_document_eacbcdb7: "Έγγραφο κειμένου"
   text_entry_e1808b2f: "Καταχώριση Κειμένου"
@@ -14945,6 +14958,7 @@ el:
   the_app_was_added_successfully_3f785a23: "Η εφαρμογή προστέθηκε επιτυχώς"
   the_app_was_deactivated_573520ab: "Η εφαρμογή απενεργοποιήθηκε"
   the_app_was_updated_successfully_3d71cd1b: "Η εφαρμογή ενημερώθηκε επιτυχώς"
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "Η σύνδεση είτε υπέρβει το χρονικό της όριο είτε απορρίφτηκε. Θέματα που μπορείτε να εξετάσετε:"
   the_end_date_for_submissions_66168efa: "Η καταληκτική ημερομηνία για υποβολές"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Τα ίχνη στοίβας για το σφάλμα, αν υπάρχουν"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "<mrk mid=\"1159\" mtype=\"seg\">Η ετικέτα Αρχεία είναι ο χώρος όπου μπορείτε να μοιραστείτε διαφάνειες από παραδόσεις, πρότυπα έγγραφα, βοηθήματα μελέτης, οτιδήποτε θα θέλουν να κατεβάσουν οι σπουδαστές.</mrk>  <mrk mid=\"1160\" mtype=\"seg\">Η μεταφόρτωση και η οργάνωση των αρχείων σας είναι εύκολη με το Canvas.</mrk>  <mrk mid=\"1161\" mtype=\"seg\">Θα σας δείξουμε πώς γίνεται.</mrk>"
@@ -14968,6 +14982,7 @@ el:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "οι ρόλοι που έχει αναλάβει ο χρήστης που αναφέρει το σφάλμα (σπουδαστής, καθηγητής, διαχειριστής, κ.λπ.)"
   the_salesforce_account_id_if_it_exists_e7949706: "ID του Λογαριασμού Salesforce (αν υπάρχει)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "<mrk mid=\"4689\" mtype=\"seg\">O μηχανισμός προγραμματισμού συναντήσεων σας επιτρέπει να δημιουργήσετε χρονοθυρίδες στις οποίες θα μπορούν να εγγραφούν οι σπουδαστές (ή οι ομάδες σπουδαστών).</mrk> <mrk mid=\"4690\" mtype=\"seg\">Για να ξεκινήσετε, κάντε κλικ στο κουμπί παρακάτω.</mrk>"
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "Η αναζήτηση είτε απέτυχε είτε επέστρεψε 0 αποτελέσματα. Ενέργειες που θα μπορούσατε να κάνετε:"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Σοβαρότητα του ζητήματος, όπως έχει επιλεγεί από τον χρήστη από το dropdown μενού."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "<mrk mid=\"4890\" mtype=\"seg\">Το εικονίδιο συντόμευσης για συσκευές iOS/Android.</mrk> <mrk mid=\"4891\" mtype=\"seg\">180x180 png</mrk>"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Ο συγκεκριμένος χρήστης δεν είναι σπουδαστής/ια σε αυτό το μάθημα"
@@ -15051,6 +15066,7 @@ el:
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "<mrk mid=\"1506\" mtype=\"seg\">Αυτός ο χρήστης έχει πολλαπλούς ρόλους σε αυτό το μάθημα.</mrk> <mrk mid=\"1507\" mtype=\"seg\">Αν αλλάξετε τον ρόλο του εδώ θα αντικατασταθούν όλες οι τρέχουσες εγγραφές του.</mrk>"
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Ο χρήστης δεν έχει ακόμη αποδεχθεί την πρόσκληση για το μάθημα"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Αυτός ο χρήστης δεν έχει, προς το παρόν, πρόσβαση στο μάθημα "
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: "Αυτός ήταν μόνο ένας έλεγχος σύνδεσης. Τα πιστοποιητικά SSL δεν είναι επικυρωμένα."
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Αυτό θα σας επιτρέψει να επαληθεύσετε το Canvas για τη δημοσίευση βαθμών στο SIS"
   ticketing_system_52205bff: "Σύστημα Υποβολής Ticket"
   ticketing_system_configurations_c4fecd96: "Ρυθμίσεις συστήματος υποβολής ticket"
@@ -15839,6 +15855,9 @@ el:
   vanity_url_76f93382: "Vanity URL"
   verification_code_5acd64ef: "Κωδικός Επιβεβαίωσης"
   verify_3dd8f159: Επιβεβαίωση
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "Επιβεβαιώστε ότι το αντικείμενο χρήστη LDAP έχει προνόμια αναζήτησης για την παρεχόμενη βάση αναζήτησης."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "Επιβεβαιώστε το αλφαριθμητικό φίλτρου που παρείχατε  (π.χ. '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "Επιβεβαιώστε τη βάση αναζήτησης που παρείχατε (π.χ. 'ou=people,dc=example,dc=com')."
   version_5599c321: Έκδοση
   video_b9f27375: "Αρχείο Βίντεο"
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Το περιεχόμενο του βίντεο δεν υποστηρίζεται από τη συσκευή ή την εφαρμογή σας."
@@ -16190,6 +16209,7 @@ el:
       
       <mrk mid="5568" mtype="seg">Μπορείτε να το δείτε εδώ:</mrk>
       <mrk mid="5569" mtype="seg">%{url}</mrk>
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "O LDAP διακομιστής σας απέρριψε την προσπάθεια σύνδεσης. Θέματα που μπορείτε να εξετάσετε:"
   your_message_has_been_sent_thank_you_e0284316: "Το μήνυμά σας έχει αποσταλεί. Ευχαριστούμε!"
   your_message_was_sent_977f6583: "Το μήνυμά σας έχει αποσταλεί!"
   your_name_7665e1d8: "Το όνομά σας"

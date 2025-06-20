@@ -49,9 +49,10 @@ describe('PeerReview', () => {
         reviewLinkUrl: '#',
         workflowState: 'assigned',
       }
-      const {getByText} = render(<PeerReview {...props} />)
+      const {getByText, container} = render(<PeerReview {...props} />)
 
       expect(getByText('Peer review for Morty Smith Due: Jan 26 11:49pm')).toBeTruthy()
+      expect(container.querySelector('a')).not.toHaveAttribute('aria-disabled')
     })
 
     it('omits the due date when there is not one', () => {
@@ -74,6 +75,18 @@ describe('PeerReview', () => {
 
       expect(getByText('You have completed a peer review for Rick Sanchez')).toBeTruthy()
     })
+
+    it('disables the link when the reviewer did not post yet', () => {
+      const props = {
+        revieweeName: 'Rick Sanchez',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned',
+        disabled: true,
+      }
+      const {container} = render(<PeerReview {...props} />)
+
+      expect(container.querySelector('a')).toHaveAttribute('aria-disabled', 'true')
+    })
   })
 
   describe('mobile', () => {
@@ -89,9 +102,10 @@ describe('PeerReview', () => {
         reviewLinkUrl: '#',
         workflowState: 'assigned',
       }
-      const {getByText} = render(<PeerReview {...props} />)
+      const {container, getByText} = render(<PeerReview {...props} />)
 
       expect(getByText('Peer review due Jul 4, 2021')).toBeTruthy()
+      expect(container.querySelector('a')).not.toHaveAttribute('aria-disabled')
     })
 
     it('omits the due date when there is not one', () => {
@@ -113,6 +127,18 @@ describe('PeerReview', () => {
       const {getByText} = render(<PeerReview {...props} />)
 
       expect(getByText('Completed')).toBeTruthy()
+    })
+
+    it('disables the link when the reviewer did not post yet', () => {
+      const props = {
+        revieweeName: 'Rick Sanchez',
+        reviewLinkUrl: '#',
+        workflowState: 'assigned',
+        disabled: true,
+      }
+      const {container} = render(<PeerReview {...props} />)
+
+      expect(container.querySelector('a')).toHaveAttribute('aria-disabled', 'true')
     })
   })
 })

@@ -60,6 +60,22 @@ describe "Account Reports API", type: :request do
       expect(report_csv["last_run"]["status"]).to eq @report.workflow_state
       expect(report_csv["last_run"]["progress"]).to eq @report.progress
     end
+
+    it "includes HTML descriptions and forms if requested" do
+      json = api_call(:get,
+                      "/api/v1/accounts/#{@admin.account.id}/reports?include[]=description_html&include[]=parameters_html",
+                      { controller: "account_reports",
+                        action: "available_reports",
+                        format: "json",
+                        account_id: @admin.account.id.to_s,
+                        include: ["description_html", "parameters_html"] })
+
+      report_with_description = json.find { |r| r["description_html"].present? }
+      expect(report_with_description["description_html"]).to include("<p>")
+
+      report_with_parameters = json.find { |r| r["parameters_html"].present? }
+      expect(report_with_parameters["parameters_html"]).to include("<form")
+    end
   end
 
   describe "create" do

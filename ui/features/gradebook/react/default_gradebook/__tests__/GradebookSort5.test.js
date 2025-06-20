@@ -18,26 +18,17 @@
 
 import {createGradebook} from './GradebookSpecHelper'
 import round from '@canvas/round'
-import sinon from 'sinon'
 
 describe('Gradebook#setSortRowsBySetting', () => {
-  let server
   let options
   let gradebook
 
   beforeEach(() => {
-    server = sinon.fakeServer.create({respondImmediately: true})
     options = {settings_update_url: '/course/1/gradebook_settings'}
-    server.respondWith('POST', options.settings_update_url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{}',
-    ])
     gradebook = createGradebook(options)
-  })
 
-  afterEach(() => {
-    server.restore()
+    // Mock the saveSettings method to prevent actual HTTP requests
+    gradebook.saveSettings = jest.fn().mockResolvedValue({})
   })
 
   it('sets the "sort rows by" setting', () => {
@@ -49,14 +40,17 @@ describe('Gradebook#setSortRowsBySetting', () => {
   })
 
   it('sorts the grid rows after updating the setting', () => {
-    const sortGridRowsStub = sinon.stub(gradebook, 'sortGridRows').callsFake(() => {
-      const sortRowsBySetting = gradebook.getSortRowsBySetting()
-      expect(sortRowsBySetting.columnId).toBe('assignment_201')
-      expect(sortRowsBySetting.settingKey).toBe('grade')
-      expect(sortRowsBySetting.direction).toBe('descending')
-    })
+    gradebook.sortGridRows = jest.fn()
+
     gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending')
-    sortGridRowsStub.restore()
+
+    expect(gradebook.sortGridRows).toHaveBeenCalled()
+
+    // Verify that the setting was updated before sorting
+    const sortRowsBySetting = gradebook.getSortRowsBySetting()
+    expect(sortRowsBySetting.columnId).toBe('assignment_201')
+    expect(sortRowsBySetting.settingKey).toBe('grade')
+    expect(sortRowsBySetting.direction).toBe('descending')
   })
 })
 

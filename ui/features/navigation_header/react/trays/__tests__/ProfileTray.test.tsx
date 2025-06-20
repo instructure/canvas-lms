@@ -44,6 +44,12 @@ const profileTabs = [
     label: 'Shared Content',
     html_url: '/shared',
   },
+  {
+    id: 'external_tool',
+    label: 'External Tool',
+    html_url: '/accounts/1/external_tools/1?display=borderless',
+    type: 'external',
+  },
 ]
 
 describe('ProfileTray', () => {
@@ -65,6 +71,20 @@ describe('ProfileTray', () => {
   it('renders the component', () => {
     const {getByText} = render(<ProfileTray />)
     getByText('Sample Student')
+  })
+
+  describe('when "open_tools_in_new_tab" FF is enabled', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.open_tools_in_new_tab = true
+    })
+
+    it('renders external tool tabs with correct target attributes', () => {
+      queryClient.setQueryData(['profile'], profileTabs)
+      const {getByText} = render(<ProfileTray />)
+      const toolLink = getByText('External Tool').closest('a')
+      expect(toolLink).toHaveAttribute('target', '_blank')
+    })
   })
 
   it('renders the avatar', () => {

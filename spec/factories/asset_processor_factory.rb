@@ -53,15 +53,16 @@ module Factories
     }.with_indifferent_access.merge(overrides).compact
 
     props[:asset_processor] ||=
-      props.delete(:lti_asset_processor_id)&.then { Lti::AssetProcessor.find(_1) } ||
+      props.delete(:lti_asset_processor_id)&.then { Lti::AssetProcessor.find(it) } ||
       lti_asset_processor_model
     props[:asset] ||=
-      props.delete(:lti_asset_id)&.then { Lti::Asset.find(_1) } ||
+      props.delete(:lti_asset_id)&.then { Lti::Asset.find(it) } ||
       lti_asset_model(
         submission: props.delete(:submission) || submission_model(
           user: props[:user],
           assignment: props[:asset_processor].assignment
-        )
+        ),
+        attachment: props.delete(:attachment)
       )
 
     Lti::AssetReport.create!(**props)
@@ -93,7 +94,7 @@ module Factories
     props[:submission] ||= submission_model
     if props[:submission].submission_type == "online_text_entry"
       props[:submission_attempt] ||= props[:submission].attempt
-    else
+    elsif props[:submission_attempt].blank?
       props[:attachment] ||= attachment_model
     end
     Lti::Asset.create!(**props)

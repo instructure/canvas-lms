@@ -1073,6 +1073,89 @@ describe "Common Cartridge exporting" do
       end
     end
 
+    context "with an LTI Context Control in the course" do
+      subject do
+        run_export
+        @manifest_doc
+      end
+
+      let_once(:account) { @course.root_account }
+      let_once(:course) { @course }
+      let_once(:registration) do
+        lti_developer_key_model(account:).tap do |k|
+          lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+        end.lti_registration
+      end
+      let_once(:tool) { registration.new_external_tool(course) }
+      let_once(:tool2) { registration.new_external_tool(course) }
+
+      it "includes the context control file in the manifest file" do
+        subject
+        expect(subject.at_css("file[href='course_settings/lti_context_controls.xml']")).to be_present
+      end
+
+      it "includes the context controls in the zip file" do
+        subject
+        doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+        expect(doc).to be_present
+
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_present
+        expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_present
+      end
+
+      context "selectively exporting the tool" do
+        before do
+          @ce.selected_content = {
+            "context_external_tools" => { mig_id(tool) => "1" },
+          }
+          @ce.save!
+        end
+
+        it "only exports the selected tool's context control" do
+          subject
+          doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+          expect(doc).to be_present
+
+          first_tool = doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")
+          expect(first_tool).to be_present
+          expect(first_tool.at_css("deployment_migration_id").text).to eq mig_id(tool)
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+        end
+      end
+
+      context "only exporting course settings" do
+        before do
+          @ce.selected_content = {
+            all_course_settings: "1"
+          }
+          @ce.save!
+        end
+
+        let_once(:account_level_tool) do
+          registration.new_external_tool(account)
+        end
+        let_once(:course_control) do
+          account_level_tool.context_controls.create!(
+            course:,
+            registration: account_level_tool.lti_registration,
+            available: true
+          )
+        end
+
+        it "only exports the control for the account-level tool" do
+          subject
+          doc = Nokogiri::XML(@zip_file.read("course_settings/lti_context_controls.xml"))
+          expect(doc).to be_present
+
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool.context_controls.first)}]")).to be_nil
+          expect(doc.at_css("lti_context_control[identifier=#{mig_id(tool2.context_controls.first)}]")).to be_nil
+          tool_node = doc.at_css("lti_context_control[identifier=#{mig_id(account_level_tool.context_controls.find_by(course:))}]")
+          expect(tool_node).to be_present
+          expect(tool_node.at_css("deployment_migration_id")).to be_nil
+        end
+      end
+    end
+
     context "similarity detection tool associations" do
       include_context "lti2_course_spec_helper"
 

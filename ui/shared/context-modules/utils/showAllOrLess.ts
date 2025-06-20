@@ -119,6 +119,12 @@ function addOrRemoveButton(module: HTMLElement) {
     button.textContent = I18n.t('Show Less')
     button.setAttribute('aria-label', I18n.t('Show Less'))
   }
+  if (button.dataset.refocus === 'true') {
+    requestAnimationFrame(() => {
+      button.focus()
+      delete button.dataset.refocus
+    })
+  }
 }
 
 function addShowAllOrLess(moduleId: ModuleId) {
@@ -128,19 +134,18 @@ function addShowAllOrLess(moduleId: ModuleId) {
 }
 
 function handleShowAllOrLessClick(event: Event) {
-  const moduleId: string | null = (event.target as HTMLElement).getAttribute('data-module-id')
+  const button = event.target as HTMLButtonElement
+  const moduleId = button.getAttribute('data-module-id')
   if (!moduleId) return
 
   const module = moduleFromId(moduleId)
   if (!module) return
 
-  const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
-  if (!button) return
-
   if (button.dataset.isLoading === 'true') return
   button.dataset.isLoading = 'true'
   button.setAttribute('disabled', 'true')
 
+  button.dataset.refocus = 'true'
   if (button.classList.contains('show-all')) {
     if (isModuleCollapsed(module)) {
       expandModuleAndLoadAll(moduleId)

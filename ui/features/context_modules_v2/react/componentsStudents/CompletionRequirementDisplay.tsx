@@ -39,7 +39,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
   switch (type) {
     case 'min_score':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed
               ? I18n.t('Scored at least %{score}', {score: minScore?.toFixed(1)})
@@ -58,7 +58,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
       )
     case 'min_percentage':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed
               ? I18n.t('Scored at least %{score}%', {score: minPercentage})
@@ -77,7 +77,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
       )
     case 'must_view':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed ? I18n.t('Viewed') : I18n.t('View')}
             <ScreenReaderContent>
@@ -90,7 +90,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
       )
     case 'must_mark_done':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed ? I18n.t('Marked done') : I18n.t('Mark done')}
             <ScreenReaderContent>
@@ -103,7 +103,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
       )
     case 'must_contribute':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed ? I18n.t('Contributed') : I18n.t('Contribute')}
             <ScreenReaderContent>
@@ -116,7 +116,7 @@ const CompletionRequirementDisplay: React.FC<CompletionRequirementDisplayProps> 
       )
     case 'must_submit':
       return (
-        <Flex.Item padding="0 0 0 small">
+        <Flex.Item padding="0">
           <Text weight="normal" size="x-small" color={completed ? 'success' : 'primary'}>
             {completed ? I18n.t('Submitted') : I18n.t('Submit')}
             <ScreenReaderContent>

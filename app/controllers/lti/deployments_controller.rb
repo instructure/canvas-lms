@@ -179,9 +179,10 @@ module Lti
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Lti::ContextControl, :id)
       control_collection = BookmarkedCollection.wrap(bookmark, deployment.context_controls.active)
       controls = Api.paginate(control_collection, self, api_v1_list_deployment_controls_path, per_page:)
+      calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       json = controls.map do |control|
-        lti_context_control_json(control, @current_user, session, @context, include_users: true)
+        lti_context_control_json(control, @current_user, session, @context, include_users: true, calculated_attrs: calculated_attrs[control.id])
       end
       render json:
     end

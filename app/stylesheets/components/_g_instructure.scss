@@ -363,10 +363,11 @@
         @include fontSize(16px);
         vertical-align: middle;
       }
+      margin: 4px;
       &:focus {
-        outline: 1px solid var(--ic-link-color-darkened-10);
-        outline-offset: -1px;
+        @include ic-focus-variant-inst;
         padding: 2px;
+        margin: 4px;
       }
     }
   }

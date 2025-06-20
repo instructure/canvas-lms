@@ -193,11 +193,11 @@ module SeleniumExtensions
     class << self
       attr_accessor :timeout
 
-      def wait_for(method:, timeout: self.timeout, ignore: nil, &block)
+      def wait_for(method:, timeout: self.timeout, ignore: nil, &)
         return yield if timeout == 0
 
         prevent_nested_waiting(method) do
-          Selenium::WebDriver::Wait.new(timeout:, ignore:).until(&block)
+          Selenium::WebDriver::Wait.new(timeout:, ignore:).until(&)
         end
       rescue Selenium::WebDriver::Error::TimeoutError
         false

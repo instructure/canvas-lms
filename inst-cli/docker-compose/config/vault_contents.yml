@@ -1,0 +1,57 @@
+# this config file is useful if you don't want to run vault
+# agents with canvas.  Local Development is the most common case
+# for this, but a small OSS deployment might have it make sense too.
+# Just provide the results data you want the Vault class to "read",
+# and it will return it when a call for vault data is issued. Data should be
+# shaped like the example below.  Each environment can get a hash,
+# there's a key for each read path, and a hash for the returned data
+development:
+  inst_fs:
+    app_host: "http://api.instfs.docker"
+    # this is just "super-sekret-value", base64-encoded:
+    secret: "c3VwZXItc2VrcmV0LXZhbHVlCg=="
+  'sts/testaccount/sts/canvas-shards-lookupper-dev':
+      access_key: 'fake-access-key'
+      secret_key: 'fake-secret-key'
+      security_token: 'fake-security-token'
+  'sts/testaccount/sts/canvas-release-notes':
+      access_key: 'fake-access-key'
+      secret_key: 'fake-secret-key'
+      security_token: 'fake-security-token'
+  'app-canvas/data/secrets':
+    data:
+      uuid_provisioner:
+        api_secret: <uuid-provisioner-api-secret>
+        outcomes_api_secret: fake-outcomes-secret
+      canvas_security:
+        encryption_secret: "astringthatisactually32byteslong"
+        signing_secret: "astringthatisactually32byteslong"
+      # These two keys are real RSA keys that were generated for ease of local development for New Quizzes rich content links
+      # They should NEVER be used in production!
+      # The encryption key is not the same keypair as the signature key
+      inst_access_signature:
+        private_key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBeHFFZThtV0oyaW5wZmhhR0lLd2hmeGdZOEM0TVhlMDR6clVPTHlZWThpT0xRTUYxCm5JUk15K20xZ29KRVNlUElmS3g3NjFFeXNnWCszVkhBdGpwVnk4cU5zVi9vdzRSUG5FKzR0WUhNZWRWSis2eE0Kb3VXd0kvNTVsbDlHc2VaOVdseVRrZmNwS2ZxM1ZuWVNtVGlrR0QvdW0rdDdwZURhKyszdFJIbVU2aUNqVVFDNwplaVFqdXJoRzloUmI0NXA3UitXTjE5MFpnMForVVZFZXRNVlJmNC9ncHEwZ0xrNzNpdllrZlJ0akNuWXluRWZOClNnNEV6UW45NXhzcG5JckV5UmpTa2FoRUJMU0oyTDAwMkxBcWhsQUR3UVFuM25KRU9GNlRkNS9LVlhYZW5wbjEKVUp0S3Q0Wk9YVHBSTGtIejkreXJjRGxFM25uSmhUWlh5SUpnWHdJREFRQUJBb0lCQUVOOXh0S3RYc2hpK21RdQpDaGc2OU16SEp0NGhmM0ZBNUU4VVpVUHZDWVhwUHUxYmJ2ZW1XcVBrL3hoZjVBMUpXVHZIcmZtWTV3Vm5sU0NsCm9Ub3FHekg2V3VmOHcwMy8vTDhMdGFMeS9rUWRqWngzQUxsUEcyazNsQi9jc3R4TENhZjFFZTJFa3BlaGliOVcKc2w0ZXlWODJCZ0V6NUJsS2pJNFMyODZyRTBiMEE5ZVcyZVQvSlk4dFJ4STRvWitNNUtKaWh6YVpRZFgyWFBOZApNNnJnRkJLaWR5SG0yWXF5WWtjSGlySW5FY0dJL0J2eUxqNzFsbXBkNnBRVnVsSW55aWVYSFdGaENWVFRwQnB1Ci96eHA3RytOK1oxeUpuZzBOK3dpakFKS3BObEljK2k1a0lDdGNiZjVWSmU2U3ZnSlpIZ1I2bnJZK2FiZUQ5dFEKak5maXFzVUNnWUVBNU51eFJucTM1NTVXTFJUUFYvSTNsWG1WdE02b215Nlk5QmZtUGo3SG5nNXJFN2R4aHo1VwpSNys3YkpuVUxuOCtBQkVYTU5lSlNXV2EvWnpEbWszR3ZES29OZ0prY2VuVjB4VDJrN0E0b0hNQmZQTnRHQUcvCjFySXpaUGd3WjVaYmVKcEtQN014ZnFEdUF1REVOU3lsZXZVNEdoNnJMRXVMMWM0emFBWUFTVVVDZ1lFQTNpK28KeHAyakI3YS9tSDlnMldIbDU1Y2hBd0E0b2dBaU1udlhDQWVLTUdzKzd3b0I0Rmc1YTlwbi82cStRK2EvbGJvTQozS2EyWnZkTUZwWkZIWTQyRTU2WDN2WUFHMFI0QWttSmdqOEdzS1ViUm5MMU5ielBmUWl4L29oSGtVaUw2Z1N2CmJ6dTFlS0l3NUk0MzVXNURGenlzOEg5R2dSa1JuYTkvOTBSNGsxTUNnWUFNL25CRlNTaHg3U3FGYXI0UEIwQ2kKcXdHVi8zblJQY2NQYk4vMHZzbkVycHJqeHJHYWRTNmU2a0x3K3BieWdPVDdTZjBnRjh6Q3J4TXF2U0RaL1BxQQpxdnVqL1dUSWx2YytBZDJ5S3ZvOEdldUd0YWVIQ21waS9VRXZ4V3V5SmZaUmxha0xqdGdMa1lXU0FrTUJwZVJMClkrcm9pTDg5UjVqTDdlWTdUTVB0WlFLQmdCejROOWhWdTJrSkVlZ3ZTNUJzYkU2SzdQbjRNR29tL0U1NnlTbTUKMmZIQU9mOXUzWm5EeHhEaDlFZG9tdEE5cU9NNzArdDlMVEUxczAwS29NNWV1WHhMWkYvazBWUzgwNnp3cTZZNAowNFY2c1ppNDZuSHNRVjE3SWNJZlFMMlhxTzZGVjk1MytZeFdFV3ZyZ3l3OStTOXhjTmNXc1RtcDdCc1VRK29ZCm1tUVRBb0dCQUlIMFFDcjcwd2I0eEN1UE9ZZElwaHhKb2I5aDM0MFA1UWlwM3AyY3NoNXhWOTBWOHZMa3ZwWnYKN0haWHlUQXBBQ3BZdlFEMmNkNGZYK3M2MUJIVXE0emZvU29MN2hNZk1HRGlUYWlrSFZ6OU9KaGxCdmpySkxZWQpqUEtLVEZqbkRGTllPYmw3T0dKMVJIS2lPOWFudUV6b0tRc20xVHR4VmlCN0xFTjA1OVZrCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg
+        encryption_public_key: LS0tLS1CRUdJTiBSU0EgUFVCTElDIEtFWS0tLS0tCk1JSUJDZ0tDQVFFQWs2VlhKbjVBNUZoM0QyNytDVW1GaXJFNjNsczFQTHBjLzd2RCtwWFNlRDZ1T09hZ09ZOXgKdEZReENXOC9zTjd5bHA1MWVsZG1lSllLWGwwUFNCTXFJRzd0YmVSdU56ejg5ZkU5aEU3YlFkS24wM3RxUHpQeApYSVpRRDZ3RXEybWxBVnNEZVlRenBEWUxyUFdMTExRRCt2NlJ6ZS9HWC9HajBMdWpMbHMrdFhKUUQyd1hpZWRwCkJTZk5LTGlKK1duUTYzRGVPQ1BWbk16ME15Z1p5L3NhSllVcTR4elhvaXFrM25nZ0ZnbmlMWG5yUFlLNFArOFAKZ1hONUhkdW9YbzJCN2N2SnZxT3hLMC9iTytCSWhQSThnZ0ozM0VQVG5sSDU2d29tOU9kbTNOQVUwNU1TQUQ4MAp6RTdXMVNmODhsVjBGWWc2bk84SlBGWnBqODFob2RLWmp3SURBUUFCCi0tLS0tRU5EIFJTQSBQVUJMSUMgS0VZLS0tLS0K
+        service_keys:
+          new-quizzes/main:
+            issuer: "quiz-api.instructure.com"
+            secret: astringthatisactually32byteslong
+            key_type: oct
+          new-quizzes/canvas_file_authorization:
+            issuer: "quiz-api.instructure.com"
+            secret: 6e4e7300bc30589203e95559e85bb823bfe71958edd7dc7dc28f0b78c0ce4eb4
+            key_type: oct
+#      google_docs_creds:
+#        secret_key: so-secret
+#      raven_dsn: garbage-dsn-here
+#      twilio_creds:
+#        account_sid: <sid>
+#        auth_token: <token>
+#      twitter_creds:
+#        api_key: <apikey>
+#        secret_key: <secretkey>
+test:
+  'sts/testaccount/sts/canvas-shards-lookupper-test':
+    access_key: 'fake-access-key'
+    secret_key: 'fake-secret-key'
+    security_token: 'fake-security-token'

@@ -29,13 +29,13 @@ describe Mutations::PostAssignmentGrades do
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: :active).user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: :active).user }
 
-  def mutation_str(assignment_id: nil, **options)
+  def mutation_str(assignment_id: nil, **)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
 
     <<~GQL
       mutation {
         postAssignmentGrades(input: {
-          #{gql_arguments(input_string, **options)}
+          #{gql_arguments(input_string, **)}
         }) {
           assignment {
             _id

@@ -117,5 +117,15 @@ describe('moduleHelpers', () => {
         expect(screen.queryByTestId('module-file-drop')).not.toBeInTheDocument()
       })
     })
+
+    it('does nothing if the user is a student', async () => {
+      const module = buildModule()
+      fakeENV.setup({
+        IS_STUDENT: true,
+      })
+      const spy = jest.spyOn(document, 'createElement')
+      updateModuleFileDrop(module)
+      expect(spy).not.toHaveBeenCalled()
+    })
   })
 })

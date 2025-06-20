@@ -253,6 +253,7 @@ class ToDoListPresenter
     attr_reader :assignment
 
     include ApplicationHelper
+    include AssignmentsHelper
     include Rails.application.routes.url_helpers
 
     def initialize(view, assessment_request, user)
@@ -271,11 +272,7 @@ class ToDoListPresenter
     end
 
     def submission_path
-      if @assignment.anonymous_peer_reviews?
-        context_url(context, :context_assignment_anonymous_submission_url, @assignment.id, @assessment_request.submission.anonymous_id)
-      else
-        @view.course_assignment_submission_path(@assignment.context_id, @assignment.id, @assessment_request.user_id)
-      end
+      student_peer_review_url(@assignment.context, @assignment, @assessment_request)
     end
 
     def ignore_url

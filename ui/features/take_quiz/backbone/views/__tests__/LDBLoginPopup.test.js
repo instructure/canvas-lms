@@ -17,11 +17,23 @@
  */
 
 import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import LDBLoginPopup from '../LDBLoginPopup'
+
+const server = setupServer()
 
 describe('LDBLoginPopup', () => {
   let popup
   let mockWindow
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     popup = new LDBLoginPopup({sticky: false})
@@ -43,6 +55,7 @@ describe('LDBLoginPopup', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   it('creates a popup window when executed', () => {
@@ -60,9 +73,12 @@ describe('LDBLoginPopup', () => {
   it('closes after a successful login', () => {
     jest.useFakeTimers()
     const onClose = jest.fn()
-    const mockResponse = {status: 200, body: 'OK'}
 
-    global.fetch = jest.fn().mockResolvedValue(mockResponse)
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.text('OK', {status: 200})
+      }),
+    )
 
     popup.on('close', onClose)
     popup.on('open', (e, document) => {
@@ -78,9 +94,12 @@ describe('LDBLoginPopup', () => {
   it('triggers login_success event after successful login', () => {
     jest.useFakeTimers()
     const onSuccess = jest.fn()
-    const mockResponse = {status: 200, body: 'OK'}
 
-    global.fetch = jest.fn().mockResolvedValue(mockResponse)
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.text('OK', {status: 200})
+      }),
+    )
 
     popup.on('login_success', onSuccess)
     popup.on('open', (e, document) => {

@@ -625,7 +625,10 @@ describe Rubric do
         )
         expect(Rubric).to receive(:ai_rubrics_enabled?).and_return(true)
 
-        association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+        association = nil
+        expect do
+          association = llm_rubric.update_with_association(teacher, rubric_params, course, association_params)
+        end.to change { LLMResponse.count }.by(1)
 
         expect(association).to be_present
         expect(llm_rubric.data[0][:description]).to eq "n1"

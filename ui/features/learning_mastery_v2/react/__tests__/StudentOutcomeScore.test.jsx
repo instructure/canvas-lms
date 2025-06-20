@@ -19,9 +19,9 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import StudentOutcomeScore from '../StudentOutcomeScore'
-import {svgUrl} from '../icons'
+import {svgUrl} from '../utils/icons'
 
-jest.mock('../icons', () => ({
+jest.mock('../utils/icons', () => ({
   svgUrl: jest.fn(() => 'http://test.com'),
 }))
 
@@ -47,7 +47,6 @@ describe('StudentOutcomeScore', () => {
           mastery: false,
         },
       },
-      visibleRatings: [true, true, true, true, true, true],
       ...props,
     }
   }
@@ -78,16 +77,5 @@ describe('StudentOutcomeScore', () => {
       />,
     )
     expect(getByText('Unassessed')).toBeInTheDocument()
-  })
-
-  it('does not render score if rating is not visible', () => {
-    const {queryByText} = render(
-      <StudentOutcomeScore
-        {...defaultProps({
-          visibleRatings: [true, true, true, true, false, true],
-        })}
-      />,
-    )
-    expect(queryByText('great!')).toBeNull()
   })
 })

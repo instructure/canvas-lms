@@ -88,10 +88,14 @@ module Canvas::LiveEvents
   end
 
   def self.course_created(course)
+    return if course.dummy?
+
     post_event_stringified("course_created", get_course_data(course))
   end
 
   def self.course_updated(course)
+    return if course.dummy?
+
     post_event_stringified("course_updated", get_course_data(course))
   end
 
@@ -171,10 +175,14 @@ module Canvas::LiveEvents
   end
 
   def self.account_created(account)
+    return if account.dummy? || account.shadow_record?
+
     post_event_stringified("account_created", get_account_data(account))
   end
 
   def self.account_updated(account)
+    return if account.dummy? || account.shadow_record?
+
     post_event_stringified("account_updated", get_account_data(account))
   end
 
@@ -473,10 +481,14 @@ module Canvas::LiveEvents
   end
 
   def self.user_created(user)
+    return if user.shadow_record?
+
     post_event_stringified("user_created", get_user_data(user))
   end
 
   def self.user_updated(user)
+    return if user.shadow_record?
+
     post_event_stringified("user_updated", get_user_data(user))
   end
 

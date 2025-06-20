@@ -62,21 +62,36 @@ module Lti
   #           "type": "string"
   #         },
   #         "display_path": {
-  #           "description": "A human-readable representation of the account hierarchy for the context that owns this object. Includes account and course names",
-  #           "example": ["Root Account", "Sub Account", "My Course"],
+  #           "description": "For UI display. Names of the accounts in the context's hierarchy. Excludes the root, and the current account if context is an account.",
+  #           "example": ["Sub Account", "Other Account"],
   #           "type": "array",
   #           "items": {
   #             "type": "string"
   #           }
   #         },
   #         "context_name": {
-  #           "description": "The name of the context this object is associated with",
+  #           "description": "For UI display. The name of the context this object is associated with",
   #           "example": "My Course",
   #           "type": "string"
   #         },
   #         "depth": {
-  #           "description": "The depth of ContextControls for this particular deployment account chain, which can be different from the number of accounts in the chain. Used for indentation in the Canvas UI.",
+  #           "description": "For UI display. The depth of ContextControls for this particular deployment account chain, which can be different from the number of accounts in the chain.",
   #           "example": 2,
+  #           "type": "integer"
+  #         },
+  #         "course_count": {
+  #           "description": "For UI display. The number of courses in this account and all nested subaccounts. 0 when context is a Course.",
+  #           "example": 402,
+  #           "type": "integer"
+  #         },
+  #         "child_control_count": {
+  #           "description": "For UI display. The number of controls for accounts below this one, including all nested subaccounts. 0 when context is a Course.",
+  #           "example": 42,
+  #           "type": "integer"
+  #         },
+  #         "subaccount_count": {
+  #           "description": "For UI display. The number of subaccounts for this account. Includes all nested subaccounts. 0 when context is a Course.",
+  #           "example": 42,
   #           "type": "integer"
   #         },
   #         "workflow_state": {
@@ -182,7 +197,8 @@ module Lti
         paginated
         .group_by(&:deployment)
         .map do |deployment, context_controls|
-          lti_deployment_json(deployment, @current_user, session, context, context_controls:)
+          context_controls_calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(context_controls)
+          lti_deployment_json(deployment, @current_user, session, context, context_controls:, context_controls_calculated_attrs:)
         end
       )
     rescue => e
@@ -347,9 +363,10 @@ module Lti
       end
 
       controls = Lti::ContextControl.where(id: ids).preload(:account, :course, :created_by, :updated_by).order(id: :asc)
+      calculated_attrs = Lti::ContextControlService.preload_calculated_attrs(controls)
 
       json = controls.map do |control|
-        lti_context_control_json(control, @current_user, session, context, include_users: true)
+        lti_context_control_json(control, @current_user, session, context, include_users: true, calculated_attrs: calculated_attrs[control.id])
       end
 
       render json:, status: :created

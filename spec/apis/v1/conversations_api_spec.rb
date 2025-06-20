@@ -1501,6 +1501,60 @@ describe ConversationsController, type: :request do
       end
     end
 
+    it "when file_association_access feature flag is enabled, it adds location tag to attachment url" do
+      attachment = @me.conversation_attachments_folder.attachments.create!(context: @me, filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("test"))
+      attachment.root_account.enable_feature!(:file_association_access)
+      conversation = conversation(@bob, context_type: "Course", context_id: @course.id)
+      media_object = MediaObject.new
+      media_object.media_id = "0_12345678"
+      media_object.media_type = "audio"
+      media_object.context = @me
+      media_object.user = @me
+      media_object.title = "test title"
+      media_object.save!
+      message_with_attachment = conversation.add_message("another", attachment_ids: [attachment.id], media_comment: media_object)
+
+      conversation.reload
+
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
+                      { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
+
+      attachment_url = json["messages"].first["attachments"].first["url"]
+      media_comment_url = json["messages"].first["media_comment"]["url"]
+
+      expect(attachment_url).to include("location=#{message_with_attachment.asset_string}")
+      expect(media_comment_url).to include("location=#{message_with_attachment.asset_string}")
+      expect(attachment_url).not_to include("verifier=#{attachment.uuid}")
+    end
+
+    it "when file_association_access feature flag is disabled, it adds verifier tag to attachment url" do
+      attachment = @me.conversation_attachments_folder.attachments.create!(context: @me, filename: "test.txt", display_name: "test.txt", uploaded_data: StringIO.new("test"))
+      attachment.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+      conversation = conversation(@bob, context_type: "Course", context_id: @course.id)
+      media_object = MediaObject.new
+      media_object.media_id = "0_12345678"
+      media_object.media_type = "audio"
+      media_object.context = @me
+      media_object.user = @me
+      media_object.title = "test title"
+      media_object.save!
+      message_with_attachment = conversation.add_message("another", attachment_ids: [attachment.id], media_comment: media_object)
+
+      conversation.reload
+
+      json = api_call(:get,
+                      "/api/v1/conversations/#{conversation.conversation_id}",
+                      { controller: "conversations", action: "show", id: conversation.conversation_id.to_s, format: "json" })
+
+      attachment_url = json["messages"].first["attachments"].first["url"]
+      media_comment_url = json["messages"].first["media_comment"]["url"]
+
+      expect(attachment_url).not_to include("location=#{message_with_attachment.asset_string}")
+      expect(media_comment_url).not_to include("location=#{message_with_attachment.asset_string}")
+      expect(attachment_url).to include("verifier=#{attachment.uuid}")
+    end
+
     it "indicates if conversation permissions for the context are missing" do
       @user = @billy
       conversation = conversation(@bob, sender: @billy, context_type: "Course", context_id: @course.id)

@@ -113,5 +113,19 @@ describe('LtiRegistration', () => {
       const result = ZLtiLegacyConfiguration.parse(legacyConfig)
       expect(result).toMatchObject(legacyConfig)
     })
+
+    it('allows placement-specific settings', () => {
+      const extraPlacement = {
+        placement: 'ActivityAssetProcessor',
+        eula: {
+          target_link_uri: 'https://example.com/123',
+          custom_fields: {foo: 'bar'},
+        },
+      }
+      const placements = [{}, extraPlacement]
+      const legacyConfig = _.merge(baseConfig, {extensions: [{settings: {placements}}]})
+      const result = ZLtiLegacyConfiguration.parse(legacyConfig)
+      expect(result).toMatchObject(legacyConfig)
+    })
   })
 })

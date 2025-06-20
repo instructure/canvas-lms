@@ -166,14 +166,14 @@ Rails.application.config.after_initialize do
       Setting.get("maintenance_window_weeks_of_month", "1,3").split(",").map(&:to_i).sort
     end
 
-    def self.send_in_each_region(klass, method, enqueue_args, *args, **kwargs)
+    def self.send_in_each_region(klass, method, enqueue_args, *, **)
       run_current_region_asynchronously = enqueue_args.delete(:run_current_region_asynchronously)
 
-      return klass.send(method, *args, **kwargs) if DatabaseServer.all.all? { |db| !db.config[:region] }
+      return klass.send(method, *, **) if DatabaseServer.all.all? { |db| !db.config[:region] }
 
       regions = Set.new
       unless run_current_region_asynchronously
-        klass.send(method, *args, **kwargs)
+        klass.send(method, *, **)
         regions << Shard.current.database_server.config[:region]
       end
 
@@ -183,13 +183,13 @@ Rails.application.config.after_initialize do
 
         regions << db.config[:region]
         db.shards.first.activate do
-          klass.delay(**enqueue_args).__send__(method, *args, **kwargs)
+          klass.delay(**enqueue_args).__send__(method, *, **)
         end
       end
     end
 
-    def self.send_in_region(region, klass, method, enqueue_args, *args, **kwargs)
-      return klass.delay(**enqueue_args).__send__(method, *args, **kwargs) if region.nil?
+    def self.send_in_region(region, klass, method, enqueue_args, *, **)
+      return klass.delay(**enqueue_args).__send__(method, *, **) if region.nil?
 
       shard = nil
       all.find { |db| db.config[:region] == region && (shard = db.shards.first) }
@@ -197,13 +197,13 @@ Rails.application.config.after_initialize do
       # the app server knows what region it's in, but the database servers don't?
       # just send locally
       if shard.nil? && all.all? { |db| db.config[:region].nil? }
-        return klass.delay(**enqueue_args).__send__(method, *args, **kwargs)
+        return klass.delay(**enqueue_args).__send__(method, *, **)
       end
 
       raise "Could not find a shard in region #{region}" unless shard
 
       shard.activate do
-        klass.delay(**enqueue_args).__send__(method, *args, **kwargs)
+        klass.delay(**enqueue_args).__send__(method, *, **)
       end
     end
   end

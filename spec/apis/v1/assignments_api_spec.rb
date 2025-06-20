@@ -6122,7 +6122,7 @@ describe AssignmentsApiController, type: :request do
             "http://www.example.com/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                                                  "attachments" => [],
                                                  "permissions" => { "attach" => true, "update" => true, "reply" => true, "delete" => true, "manage_assign_to" => true },
-                                                 "discussion_type" => "not_threaded",
+                                                 "discussion_type" => "threaded",
                                                  "group_category_id" => nil,
                                                  "can_group" => true,
                                                  "allow_rating" => false,
@@ -7184,7 +7184,7 @@ describe AssignmentsApiController, type: :request do
         "seconds_late" => 0,
         "sticker" => nil,
         "preview_url" =>
-         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.global_id}?preview=1&version=0",
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
         "extra_attempts" => nil,
         "custom_grade_status_id" => nil
       }]
@@ -7231,7 +7231,7 @@ describe AssignmentsApiController, type: :request do
         "seconds_late" => 0,
         "sticker" => nil,
         "preview_url" =>
-         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.global_id}?preview=1&version=0",
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
         "extra_attempts" => nil,
         "custom_grade_status_id" => nil
       }]

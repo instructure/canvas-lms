@@ -23,10 +23,46 @@ require_relative "../apis/api_spec_helper"
 describe WikiPagesApiController, type: :request do
   include Api
 
+  before :once do
+    course_with_teacher(active_all: true)
+  end
+
+  def update_wiki_page(user, page, wiki_params = {}, expected_status: 200)
+    url = "/api/v1/courses/#{@course.id}/pages/#{page.url}"
+    path = {
+      controller: "wiki_pages_api",
+      action: "update",
+      format: "json",
+      course_id: @course.id.to_s,
+      url_or_id: page.url
+    }
+    params = { wiki_page: wiki_params }
+    api_call_as_user(user, :put, url, path, params, {}, { expected_status: })
+  end
+
+  def create_wiki_page(user, wiki_params = {}, expected_status: 200)
+    url = "/api/v1/courses/#{@course.id}/pages"
+    path = {
+      controller: "wiki_pages_api",
+      action: "create",
+      format: "json",
+      course_id: @course.id.to_s
+    }
+    params = { wiki_page: wiki_params }
+    api_call_as_user(user, :post, url, path, params, {}, { expected_status: })
+  end
+
+  describe "POST #create" do
+    it "creates a new wiki page with attachments" do
+      attachment, html = AttachmentAssociationsSpecHelper.create_attachments_and_html(@course.account, @course)
+      response = create_wiki_page(@teacher, { title: "Pläcëhöldër", body: html }, expected_status: 200)
+      page = WikiPage.find(response["page_id"])
+      expect(AttachmentAssociation.find_by(context: page, attachment_id: attachment.id)).to be_present
+    end
+  end
+
   describe "PUT #update with context_module touching" do
     before :once do
-      course_with_teacher(active_all: true)
-
       wiki_page_model(title: "WikiPage Title")
       @wiki_page = @page
 
@@ -41,17 +77,12 @@ describe WikiPagesApiController, type: :request do
       )
     end
 
-    def update_wiki_page(user, page, wiki_params = {}, expected_status: 200)
-      url = "/api/v1/courses/#{@course.id}/pages/#{page.url}"
-      path = {
-        controller: "wiki_pages_api",
-        action: "update",
-        format: "json",
-        course_id: @course.id.to_s,
-        url_or_id: page.url
-      }
-      params = { wiki_page: wiki_params }
-      api_call_as_user(user, :put, url, path, params, {}, { expected_status: })
+    context "check creation of AA records for attachments" do
+      it "creates the records" do
+        attachment, html = AttachmentAssociationsSpecHelper.create_attachments_and_html(@course.account, @course)
+        update_wiki_page(@teacher, @wiki_page, { body: html })
+        expect(AttachmentAssociation.find_by(context: @wiki_page, attachment_id: attachment.id)).to be_present
+      end
     end
 
     context "when the wiki page is part of a context module" do

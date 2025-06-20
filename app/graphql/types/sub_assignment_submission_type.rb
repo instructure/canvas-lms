@@ -42,6 +42,10 @@ module Types
       protect_submission_grades(:published_score)
     end
 
+    field :late, Boolean, method: :late?
+    field :late_policy_status, LatePolicyStatusType, null: true
+    field :missing, Boolean, method: :missing?
+
     field :published_grade, String, null: true
     def published_grade
       protect_submission_grades(:published_grade)

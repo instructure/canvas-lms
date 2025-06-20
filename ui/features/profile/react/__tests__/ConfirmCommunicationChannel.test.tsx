@@ -19,20 +19,25 @@
 import React from 'react'
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import ConfirmCommunicationChannel, {
   type ConfirmCommunicationChannelProps,
 } from '../ConfirmCommunicationChannel'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashAlert: jest.fn(),
-  showFlashError: jest.fn(),
-  showFlashSuccess: jest.fn(),
-  destroyContainer: jest.fn(),
 }))
 
 describe('ConfirmCommunicationChannel', () => {
+  beforeEach(() => {
+    fakeENV.setup()
+  })
+
   afterEach(() => {
+    fakeENV.teardown()
+    fetchMock.restore()
     jest.clearAllMocks()
+    jest.restoreAllMocks()
   })
   const props: ConfirmCommunicationChannelProps = {
     phoneNumberOrEmail: '123-456-7890',
@@ -50,7 +55,7 @@ describe('ConfirmCommunicationChannel', () => {
     expect(embeddedPhoneNumber).toBeInTheDocument()
   })
 
-  it('should show an error is the verification code is empty', async () => {
+  it('should show an error if the verification code is empty', async () => {
     const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
     const confirm = getByLabelText('Confirm')
 
@@ -60,7 +65,7 @@ describe('ConfirmCommunicationChannel', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  it('should show an error is the verification code is too short', async () => {
+  it('should show an error if the verification code is too short', async () => {
     const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
     const confirm = getByLabelText('Confirm')
     const code = getByLabelText('Code')
@@ -72,7 +77,7 @@ describe('ConfirmCommunicationChannel', () => {
     expect(errorText).toBeInTheDocument()
   })
 
-  it('should show an error is the verification code is too long', async () => {
+  it('should show an error if the verification code is too long', async () => {
     const {getByLabelText, findByText} = render(<ConfirmCommunicationChannel {...props} />)
     const confirm = getByLabelText('Confirm')
     const code = getByLabelText('Code')

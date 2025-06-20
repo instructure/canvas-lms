@@ -43,7 +43,7 @@ module Schemas
 
       # Returns nil if no errors
       def simple_validation_errors(json_hash, error_format: :string)
-        validate(json_hash).to_a.presence&.map { simple_validation_error _1, error_format: }
+        validate(json_hash).to_a.presence&.map { simple_validation_error it, error_format: }
       end
 
       def validation_errors(json_hash, allow_nil: false)

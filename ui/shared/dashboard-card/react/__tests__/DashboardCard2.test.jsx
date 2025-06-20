@@ -19,7 +19,8 @@
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {act, render, waitFor} from '@testing-library/react'
 import axe from 'axe-core'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import CourseActivitySummaryStore from '../CourseActivitySummaryStore'
 import DashboardCard from '../DashboardCard'
@@ -53,16 +54,16 @@ describe('DashboardCard (Legacy Tests)', () => {
     connectDropTarget: c => c,
   }
 
-  beforeEach(() => {
-    moxios.install()
-    CourseActivitySummaryStore.getStateForCourse.mockReturnValue({})
-  })
+  const server = setupServer()
 
+  beforeAll(() => server.listen())
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
     localStorage.clear()
     jest.clearAllMocks()
+    CourseActivitySummaryStore.getStateForCourse.mockReturnValue({})
   })
+  afterAll(() => server.close())
 
   it('obtains new course activity when course activity is updated', async () => {
     const stream = {
@@ -133,16 +134,10 @@ describe('DashboardCard (Legacy Tests)', () => {
     act(() => {
       getByText('Unfavorite').click()
     })
+    server.use(http.delete('*/users/self/favorites/courses/*', () => HttpResponse.json([])))
+
     act(() => {
       getByText('Submit').click()
-    })
-
-    await waitFor(() => {
-      const request = moxios.requests.mostRecent()
-      request.respondWith({
-        status: 200,
-        response: [],
-      })
     })
 
     await waitFor(() => {
@@ -179,21 +174,16 @@ describe('DashboardCard (Legacy Tests)', () => {
 
     // Wait for confirmation dialog and click "Submit"
     const submitButton = await waitFor(() => getByRole('button', {name: 'Submit'}))
+
+    server.use(
+      http.delete(
+        '*/users/self/favorites/courses/*',
+        () => new HttpResponse(JSON.stringify({error: 'Unauthorized'}), {status: 403}),
+      ),
+    )
+
     await act(async () => {
       submitButton.click()
-    })
-
-    // Wait for moxios to catch the request
-    await new Promise(resolve => {
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 403,
-            response: {error: 'Unauthorized'},
-          })
-          .then(resolve)
-      })
     })
 
     // Wait for the error alert

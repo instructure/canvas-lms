@@ -43,7 +43,11 @@ const I18n = createI18nScope('OutcomeManagement')
 
 const FindOutcomesView = ({
   outcomesGroup,
-  collection,
+  collection = {
+    id: '0',
+    name: '',
+    isRootGroup: false,
+  },
   loading,
   loadMore,
   searchString,
@@ -51,11 +55,11 @@ const FindOutcomesView = ({
   onChangeHandler,
   onClearHandler,
   onAddAllHandler,
-  mobileScrollContainer,
-  importGroupStatus,
+  mobileScrollContainer = null,
+  importGroupStatus = IMPORT_NOT_STARTED,
   importOutcomesStatus,
   importOutcomeHandler,
-  shouldFocusAddAllBtn,
+  shouldFocusAddAllBtn = false,
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -277,17 +281,6 @@ const FindOutcomesView = ({
       </div>
     </View>
   )
-}
-
-FindOutcomesView.defaultProps = {
-  collection: {
-    id: '0',
-    name: '',
-    isRootGroup: false,
-  },
-  importGroupStatus: IMPORT_NOT_STARTED,
-  mobileScrollContainer: null,
-  shouldFocusAddAllBtn: false,
 }
 
 FindOutcomesView.propTypes = {

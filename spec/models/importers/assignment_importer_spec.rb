@@ -558,17 +558,10 @@ describe "Importing assignments" do
     context "and the tool uses LTI 1.3" do
       let(:tool_id) { tool.id }
       let(:tool_url) { tool.url }
+      let(:registration) { lti_registration_with_tool(account: course.root_account, created_by: user_model) }
       let(:dev_key) { DeveloperKey.create! }
       let(:tool) do
-        course.context_external_tools.create!(
-          consumer_key: "key",
-          shared_secret: "secret",
-          name: "test tool",
-          url: "http://www.tool.com/launch",
-          lti_version: "1.3",
-          workflow_state: "public",
-          developer_key: dev_key
-        )
+        registration.deployments.first
       end
       let(:assignment) do
         course.assignments.create!(

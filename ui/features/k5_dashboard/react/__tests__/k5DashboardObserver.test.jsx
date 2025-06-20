@@ -25,7 +25,8 @@ import {MockedQueryProvider} from '@canvas/test-utils/query'
 import {reloadWindow} from '@canvas/util/globalUtils'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {act, render as testingLibraryRender, waitFor} from '@testing-library/react'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import K5Dashboard from '../K5Dashboard'
 import {
@@ -56,7 +57,6 @@ const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
 describe('K5Dashboard Parent Support', () => {
   beforeEach(() => {
     document.cookie = `${observedUserCookieName}=4;path=/`
-    moxios.install()
     global.ENV = defaultEnv
     fetchShowK5Dashboard.mockImplementation(() =>
       Promise.resolve({show_k5_dashboard: true, use_classic_font: false}),
@@ -64,7 +64,6 @@ describe('K5Dashboard Parent Support', () => {
   })
 
   afterEach(() => {
-    moxios.uninstall()
     global.ENV = {}
     resetCardCache()
   })
@@ -97,13 +96,14 @@ describe('K5Dashboard Parent Support', () => {
 
   // LF-1141
   it.skip('prefetches dashboard cards with the correct url param', async () => {
-    moxios.stubRequest(
-      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4',
-      {
-        status: 200,
-        response: MOCK_CARDS,
-      },
+    let requestUrl = null
+    const server = setupServer(
+      http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
+        requestUrl = request.url
+        return HttpResponse.json(MOCK_CARDS)
+      }),
     )
+    server.listen()
 
     render(
       <K5Dashboard
@@ -116,26 +116,29 @@ describe('K5Dashboard Parent Support', () => {
     // let the dashboard execute all its queries and render
     await waitFor(
       () => {
-        expect(moxios.requests.mostRecent()).not.toBeNull()
+        expect(requestUrl).not.toBeNull()
       },
       {timeout: 5000},
     )
-    const preFetchedRequest = moxios.requests.mostRecent()
-    expect(preFetchedRequest.url).toBe(
-      window.location.origin + '/api/v1/dashboard/dashboard_cards?observed_user_id=4',
-    )
-    expect(moxios.requests.count()).toBe(1)
+    expect(requestUrl).toContain('observed_user_id=4')
+    server.close()
   })
 
   it.skip('does not make a request if the user has been already requested (flaky)', async () => {
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-      status: 200,
-      response: MOCK_CARDS,
-    })
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-      status: 200,
-      response: MOCK_CARDS_2,
-    })
+    const requestUrls = []
+    const server = setupServer(
+      http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
+        requestUrls.push(request.url)
+        const url = request.url
+        if (url.includes('observed_user_id=4')) {
+          return HttpResponse.json(MOCK_CARDS)
+        } else if (url.includes('observed_user_id=2')) {
+          return HttpResponse.json(MOCK_CARDS_2)
+        }
+      }),
+    )
+    server.listen()
+
     const {findByText, getByTestId, getByText, queryByText} = render(
       <K5Dashboard
         {...defaultProps}
@@ -148,49 +151,47 @@ describe('K5Dashboard Parent Support', () => {
     expect(queryByText('Economics 203')).not.toBeInTheDocument()
     const select = getByTestId('observed-student-dropdown')
     expect(select.value).toBe('Student 4')
-    expect(moxios.requests.mostRecent().url).toBe(
-      '/api/v1/dashboard/dashboard_cards?observed_user_id=4',
-    )
+    expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=4')
     act(() => select.click())
     act(() => getByText('Student 2').click())
     expect(await findByText('Economics 203')).toBeInTheDocument()
     expect(queryByText('Economics 101')).not.toBeInTheDocument()
-    expect(moxios.requests.mostRecent().url).toBe(
-      '/api/v1/dashboard/dashboard_cards?observed_user_id=2',
-    )
+    expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=2')
     act(() => select.click())
     act(() => getByText('Student 4').click())
     expect(await findByText('Economics 101')).toBeInTheDocument()
     expect(queryByText('Economics 203')).not.toBeInTheDocument()
     // Should not fetch student 4's cards again; they've been cached
-    expect(moxios.requests.mostRecent().url).toBe(
-      '/api/v1/dashboard/dashboard_cards?observed_user_id=2',
-    )
+    expect(requestUrls[requestUrls.length - 1]).toContain('observed_user_id=2')
     // 2 total requests - one for student 4, one for student 2
-    expect(moxios.requests.count()).toBe(2)
+    expect(requestUrls.length).toBe(2)
+    server.close()
   })
 
   it.skip('shows the observee missing items on dashboard cards (flaky)', async () => {
-    moxios.stubs.reset()
-    moxios.requests.reset()
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-      status: 200,
-      response: MOCK_CARDS,
-    })
-    moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-      status: 200,
-      response: MOCK_CARDS_2,
-    })
-    moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=4.*/, {
-      status: 200,
-      headers: {link: 'url; rel="current"'},
-      response: opportunities,
-    })
-    moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
-      status: 200,
-      headers: {link: 'url; rel="current"'},
-      response: opportunities2,
-    })
+    const server = setupServer(
+      http.get('/api/v1/dashboard/dashboard_cards', ({request}) => {
+        const url = request.url
+        if (url.includes('observed_user_id=4')) {
+          return HttpResponse.json(MOCK_CARDS)
+        } else if (url.includes('observed_user_id=2')) {
+          return HttpResponse.json(MOCK_CARDS_2)
+        }
+      }),
+      http.get('/api/v1/users/self/missing_submissions', ({request}) => {
+        const url = request.url
+        if (url.includes('observed_user_id=4')) {
+          return HttpResponse.json(opportunities, {
+            headers: {link: 'url; rel="current"'},
+          })
+        } else if (url.includes('observed_user_id=2')) {
+          return HttpResponse.json(opportunities2, {
+            headers: {link: 'url; rel="current"'},
+          })
+        }
+      }),
+    )
+    server.listen()
     createPlannerMocks()
 
     const {getByText, findByTestId, getByTestId} = render(
@@ -226,6 +227,7 @@ describe('K5Dashboard Parent Support', () => {
       )
     })
     expect(getByTestId('number-missing')).toBeInTheDocument()
+    server.close()
   })
 
   it('does not show options to disable k5 dashboard if student is selected', async () => {

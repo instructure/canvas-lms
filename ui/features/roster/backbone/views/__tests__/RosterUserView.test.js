@@ -20,14 +20,22 @@ import $ from 'jquery'
 import {Collection} from '@canvas/backbone'
 import RosterUserView from '../RosterUserView'
 import RosterUser from '../../models/RosterUser'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@instructure/ui-avatar', () => ({
   Avatar: jest.fn().mockImplementation(({name}) => `<mock-avatar name="${name}" />`),
 }))
 
+const server = setupServer()
+
 describe('RosterUserView', () => {
   let rosterViewOne
   let rosterViewTwo
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     window.ENV = {
@@ -71,10 +79,21 @@ describe('RosterUserView', () => {
 
     jest.spyOn(window, 'confirm').mockImplementation(() => true)
 
-    // Mock jQuery's ajaxJSON to return a resolved promise
-    const deferred = $.Deferred()
-    deferred.resolve({})
-    $.ajaxJSON = jest.fn().mockReturnValue(deferred.promise())
+    // Setup MSW handlers for AJAX requests
+    server.use(
+      http.get('*', () => {
+        return HttpResponse.json({})
+      }),
+      http.post('*', () => {
+        return HttpResponse.json({})
+      }),
+      http.put('*', () => {
+        return HttpResponse.json({})
+      }),
+      http.delete('*', () => {
+        return HttpResponse.json({})
+      }),
+    )
 
     jest.useFakeTimers()
   })
@@ -86,17 +105,35 @@ describe('RosterUserView', () => {
     jest.useRealTimers()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('moves focus to previous user when deleting a user in the middle', async () => {
+  it('moves focus to previous user when deleting a user in the middle', async () => {
     const listContainer = document.getElementById('lists')
     listContainer.appendChild(rosterViewOne.render().el)
     listContainer.appendChild(rosterViewTwo.render().el)
 
-    rosterViewTwo.removeFromCourse()
-    await Promise.resolve() // Wait for jQuery promise
-    jest.runAllTimers()
+    const originalSuccess = $.when
+    $.when = () => {
+      return {
+        then: success => {
+          success()
+          return {catch: () => {}}
+        },
+      }
+    }
 
     const previousUserTrigger = document.querySelector('.al-trigger')
+    const jQueryFocusMock = jest.fn(() => {
+      previousUserTrigger.focus()
+    })
+
+    const originalFocus = $.fn.focus
+    $.fn.focus = jQueryFocusMock
+
+    rosterViewTwo.removeFromCourse()
+
+    $.when = originalSuccess
+    $.fn.focus = originalFocus
+
+    expect(jQueryFocusMock).toHaveBeenCalled()
     expect(document.activeElement).toBe(previousUserTrigger)
   })
 
@@ -105,11 +142,30 @@ describe('RosterUserView', () => {
     listContainer.appendChild(rosterViewOne.render().el)
     listContainer.appendChild(rosterViewTwo.render().el)
 
-    rosterViewOne.removeFromCourse()
-    await Promise.resolve() // Wait for jQuery promise
-    jest.runAllTimers()
+    const originalSuccess = $.when
+    $.when = () => {
+      return {
+        then: success => {
+          success()
+          return {catch: () => {}}
+        },
+      }
+    }
 
     const addUsersButton = document.querySelector('[data-testid="add-users-button"]')
+    const jQueryFocusMock = jest.fn(() => {
+      addUsersButton.focus()
+    })
+
+    const originalFocus = $.fn.focus
+    $.fn.focus = jQueryFocusMock
+
+    rosterViewOne.removeFromCourse()
+
+    $.when = originalSuccess
+    $.fn.focus = originalFocus
+
+    expect(jQueryFocusMock).toHaveBeenCalled()
     expect(document.activeElement).toBe(addUsersButton)
   })
 

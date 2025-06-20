@@ -33,6 +33,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {assignLocation} from '@canvas/util/globalUtils'
+import {downloadZip} from '../../../../utils/downloadUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(),
@@ -40,6 +41,10 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
+}))
+
+jest.mock('../../../../utils/downloadUtils', () => ({
+  downloadZip: jest.fn(),
 }))
 
 const defaultProps: ActionMenuButtonProps = {
@@ -317,6 +322,20 @@ describe('ActionMenuButton', () => {
         expect(screen.getByText('Move To...')).toBeInTheDocument()
         expect(screen.getByText('Delete')).toBeInTheDocument()
       })
+    })
+
+    it('does call correct download API with correct parameters', async () => {
+      const user = userEvent.setup()
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      await user.click(button)
+
+      const downloadButton = await screen.findByText('Download')
+      await user.click(downloadButton)
+
+      const expectedArguments = new Set([`folder-${FAKE_FOLDERS[0].id}`])
+      expect(downloadZip).toHaveBeenCalledWith(expectedArguments)
     })
 
     it('opens the rename modal', async () => {

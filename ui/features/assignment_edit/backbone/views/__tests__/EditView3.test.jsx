@@ -30,8 +30,10 @@ import Section from '@canvas/sections/backbone/models/Section'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
 import EditView from '../EditView'
+import {setupServer} from 'msw/node'
 
 let fixtures
+let server
 
 jest.mock('@canvas/user-settings', () => ({
   contextGet: jest.fn(),
@@ -68,6 +70,15 @@ jest.mock('@canvas/due-dates/backbone/models/DueDateList', () => {
 })
 
 describe('EditView', () => {
+  beforeAll(() => {
+    server = setupServer()
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     fixtures = document.createElement('div')
     fixtures.id = 'fixtures'
@@ -91,6 +102,7 @@ describe('EditView', () => {
     fakeENV.teardown()
     fixtures.remove()
     jest.clearAllMocks()
+    server.resetHandlers()
   })
 
   const createEditView = (assignmentOpts = {}) => {
@@ -421,15 +433,10 @@ describe('EditView', () => {
       })
 
       $(document).on('submit', () => false)
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve([]),
-      })
     })
 
     afterEach(() => {
       $(document).off('submit')
-      global.fetch.mockRestore()
     })
 
     it('attaches conditional release editor', () => {
@@ -506,15 +513,6 @@ describe('EditView', () => {
         VALID_DATE_RANGE: {},
         COURSE_ID: 1,
       })
-
-      global.fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve([]),
-      })
-    })
-
-    afterEach(() => {
-      global.fetch.mockRestore()
     })
 
     it('only appears for group assignments', () => {

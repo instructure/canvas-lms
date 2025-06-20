@@ -766,24 +766,28 @@ describe AssignmentsController do
 
       let(:assignment) { assignment_model }
       let(:launch_url) { "https://www.my-tool.com/login" }
-      let(:key) do
-        DeveloperKey.create!(
-          scopes: [
-            TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
-            TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
-            TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
-            TokenScopes::LTI_AGS_SCORE_SCOPE
-          ]
-        )
-      end
       let(:external_tool) do
-        external_tool_1_3_model(
-          context: assignment.course,
-          opts: {
-            url: launch_url,
-            developer_key: key
+        lti_registration_with_tool(
+          account: assignment.root_account,
+          configuration_params: {
+            domain: "www.my-tool.com",
+            target_link_uri: launch_url,
+            oidc_initiation_url: launch_url,
+            placements: [
+              {
+                placement: "course_navigation"
+              }
+            ]
+          },
+          developer_key_params: {
+            scopes: [
+              TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
+              TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_SCORE_SCOPE
+            ]
           }
-        )
+        ).deployments.first
       end
 
       before do
@@ -1228,6 +1232,37 @@ describe AssignmentsController do
             get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
             expect(assigns[:js_env][:REVIEWER_SUBMISSION_ID]).to eq @student_submission_id
           end
+        end
+
+        it "sets ASSET_REPORTS js_env" do
+          user_session(@student)
+          student_submission = @assignment.submissions.find_by(user: @student)
+          allow_any_instance_of(AssignmentsController).to receive(:asset_reports)
+            .with(submission: student_submission)
+            .and_return([{ id: 1, name: "Report 1" }])
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          expect(assigns[:js_env][:ASSET_REPORTS]).to eq([{ id: 1, name: "Report 1" }])
+        end
+
+        it "sets ASSET_PROCESSING js_env" do
+          user_session(@student)
+          allow_any_instance_of(AssignmentsController).to receive(:asset_processors)
+            .with(assignment: @assignment)
+            .and_return([{ id: 50 }])
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          expect(assigns[:js_env][:ASSET_PROCESSORS]).to eq([{ id: 50 }])
+        end
+
+        it "sets ASSIGNMENT_NAME js_env" do
+          user_session(@student)
+
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+
+          expect(assigns[:js_env][:ASSIGNMENT_NAME]).to eq(@assignment.title)
         end
       end
 

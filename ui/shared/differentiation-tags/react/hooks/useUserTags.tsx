@@ -20,7 +20,9 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useQuery} from '@tanstack/react-query'
 import {UserTags} from '../types'
 
-export const useUserTags = (courseId: number, userId: number) => {
+// Default results per page are set to 40 (max number of tags that can be created in a course)
+// Update the default if GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE changes
+export const useUserTags = (courseId: number, userId: number, perPage: number = 40) => {
   const fetchUserTags = async () => {
     const response = await doFetchApi<
       Array<{id: number; name: string; group_category_name: string; is_single_tag: boolean}>
@@ -33,6 +35,7 @@ export const useUserTags = (courseId: number, userId: number) => {
       params: {
         collaboration_state: 'non_collaborative',
         user_id: userId,
+        per_page: perPage,
       },
     })
 

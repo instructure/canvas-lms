@@ -17,21 +17,22 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import axios from '@canvas/axios'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import ConfirmEndTutorialDialog from '../ConfirmEndTutorialDialog'
 
 describe('ConfirmEndTutorialDialog Spec', () => {
-  beforeEach(() => {
-    moxios.install()
-  })
+  const server = setupServer()
 
+  beforeAll(() => server.listen())
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
     jest.restoreAllMocks()
   })
+  afterAll(() => server.close())
 
   const defaultProps = {
     isOpen: true,
@@ -54,6 +55,12 @@ describe('ConfirmEndTutorialDialog Spec', () => {
 
   // fails in Jest, passes in QUnit
   test.skip('handleOkayButtonClick calls onSuccessFunc after calling the api', async () => {
+    server.use(
+      http.put('/api/v1/users/self/features/flags/new_user_tutorial_on_off', () => {
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
+
     const user = userEvent.setup()
     const onSuccessSpy = jest
       .spyOn(ConfirmEndTutorialDialog.prototype, 'onSuccess')
@@ -62,11 +69,8 @@ describe('ConfirmEndTutorialDialog Spec', () => {
     const okButton = getByRole('button', {name: /okay/i})
     await user.click(okButton)
 
-    await moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      return request.respondWith({status: 200})
+    await waitFor(() => {
+      expect(onSuccessSpy).toHaveBeenCalled()
     })
-
-    expect(onSuccessSpy).toHaveBeenCalled()
   })
 })

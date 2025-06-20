@@ -23,8 +23,9 @@ import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.simulate'
-import sinon from 'sinon'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import {setupServer} from 'msw/node'
+import {http} from 'msw'
 
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
@@ -140,23 +141,43 @@ describe('#getIconClass', () => {
 })
 
 describe('Sublevel Content Checkbox and Carrot Behaviors', () => {
-  let server
   const url = '/api/v1/courses/42/content_migrations/5/selective_data?type=assignments'
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     fakeENV.setup()
-    server = sinon.fakeServer.create()
-    server.respondWith('GET', url, CheckboxHelper.serverResponse())
+    server.use(
+      http.get(url, () => {
+        const [status, headers, body] = CheckboxHelper.serverResponse()
+        return new Response(body, {
+          status,
+          headers: new Headers(headers),
+        })
+      }),
+    )
     CheckboxHelper.renderView({sub_items_url: url})
     CheckboxHelper.checkboxView.$el.trigger('fetchCheckboxes')
-    server.respond()
-    CheckboxHelper.checkboxView.$el.find("[data-state='closed']").show()
+    // Wait for async request to complete
+    return new Promise(resolve => {
+      setTimeout(() => {
+        CheckboxHelper.checkboxView.$el.find("[data-state='closed']").show()
+        resolve()
+      }, 100)
+    })
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    server.restore()
     CheckboxHelper.teardown()
+    server.resetHandlers()
   })
 
   test('renders sublevel checkboxes', () => {

@@ -30,7 +30,7 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
   has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
-  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment, dependent: :destroy
+  has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
   has_one :estimated_duration, dependent: :destroy, inverse_of: :external_tool
 
@@ -82,6 +82,7 @@ class ContextExternalTool < ActiveRecord::Base
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
   before_save :infer_defaults, :add_identity_hash
+  after_destroy :soft_delete_associated_context_controls
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   after_commit :update_unified_tool_id, if: :update_unified_tool_id?
   validate :check_for_xml_error
@@ -119,6 +120,7 @@ class ContextExternalTool < ActiveRecord::Base
   CUSTOM_EXTENSION_KEYS = {
     file_menu: [:accept_media_types].freeze,
     editor_button: [:use_tray].freeze,
+    ActivityAssetProcessor: [:eula].freeze,
     submission_type_selection: [:description, :require_resource_selection].freeze,
   }.freeze
 
@@ -151,6 +153,29 @@ class ContextExternalTool < ActiveRecord::Base
 
   def related_account
     account || course&.account
+  end
+
+  def available_in_context?(context)
+    return true unless context.root_account.feature_enabled?(:lti_registrations_next)
+    return true unless lti_registration
+
+    control = Lti::ContextControl.nearest_control_for_registration(context, lti_registration, self)
+
+    # If we don't have a control, log to Sentry so that we can fix it.
+    # We expect there to be an automatically created control for each tool.
+    if control.nil?
+      Sentry.with_scope do |scope|
+        scope.set_tags(context_id: context.global_id)
+        scope.set_tags(lti_registration_id: lti_registration.global_id)
+        scope.set_context("tool", global_id)
+        Sentry.capture_message("ContextExternalTool#available_in_context", level: :warning)
+      end
+    end
+
+    # Given that we expect to have auto-created a control for each tool, which should
+    # have defaulted to "available," if we are missing a context control we assume that
+    # the tool is available.
+    control.nil? || control.available?
   end
 
   class << self
@@ -323,6 +348,7 @@ class ContextExternalTool < ActiveRecord::Base
 
   def extension_setting(type, property = nil)
     val = calculate_extension_setting(type, property)
+
     if property == :icon_url
       # make sure it's a valid url
       begin
@@ -1369,8 +1395,16 @@ class ContextExternalTool < ActiveRecord::Base
     ).delete_suffix("/deployment")
   end
 
+  def eula_settings
+    extension_setting(:ActivityAssetProcessor, :eula)
+  end
+
   def eula_launch_url
-    extension_setting(:ActivityAssetProcessor, :eula)&.dig("target_link_uri") || launch_url
+    eula_settings&.dig("target_link_uri")&.to_s || launch_url
+  end
+
+  def eula_custom_fields
+    eula_settings&.dig("custom_fields")&.transform_values(&:to_s) || {}
   end
 
   private
@@ -1424,5 +1458,9 @@ class ContextExternalTool < ActiveRecord::Base
 
     fields_for_utid = %w[tool_id name domain url settings]
     !!saved_changes.keys.intersect?(fields_for_utid)
+  end
+
+  def soft_delete_associated_context_controls
+    context_controls.active.in_batches.update_all(workflow_state: "deleted", updated_at: Time.current)
   end
 end

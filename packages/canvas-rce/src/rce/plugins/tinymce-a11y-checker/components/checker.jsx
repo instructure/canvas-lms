@@ -107,6 +107,7 @@ export default class Checker extends React.Component {
         errorIndex: 0,
       },
       () => {
+        window.webkit?.messageHandlers?.modalPresentation?.postMessage?.({open: true})
         if (typeof this.state.config.beforeCheck === 'function') {
           this.state.config.beforeCheck(this.props.editor, () => {
             this._check(() => {
@@ -309,7 +310,8 @@ export default class Checker extends React.Component {
     this.onLeaveError()
     clearIndicators(this.props.editor.dom.doc)
     this.setState({open: false}, () => {
-      this.props.onClose()
+      this.props?.onClose()
+      window.webkit?.messageHandlers?.modalPresentation?.postMessage?.({open: false})
     })
   }
 

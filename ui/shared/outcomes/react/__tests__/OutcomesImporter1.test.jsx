@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {render, cleanup, waitFor, act} from '@testing-library/react'
 import OutcomesImporter, {showOutcomesImporterIfInProgress} from '../OutcomesImporter'
 
@@ -51,8 +52,24 @@ const defaultProps = (props = {}) => ({
   ...props,
 })
 
+const server = setupServer(
+  http.post(getApiUrl(`/group/${learningOutcomeGroupId}`), ({request}) => {
+    const url = new URL(request.url)
+    if (url.searchParams.get('import_type') === 'instructure_csv') {
+      return HttpResponse.json({id: learningOutcomeGroupId})
+    }
+  }),
+  http.get(getApiUrl(`outcome_imports/${learningOutcomeGroupId}/created_group_ids`), () =>
+    HttpResponse.json([]),
+  ),
+  // Generic handler for dynamic outcome import IDs
+  http.get(/\/api\/v1\/accounts\/\d+\/outcome_imports\/\d+\/created_group_ids/, () =>
+    HttpResponse.json([]),
+  ),
+)
+
 // Helper function to render OutcomesImporter with optional mocks
-const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
+const renderOutcomesImporter = (props = {}) => {
   const activeProps = {
     ...defaultProps(),
     ...props,
@@ -62,20 +79,6 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
   document.body.appendChild(container)
 
   const wrapper = render(<OutcomesImporter {...activeProps} ref={ref} />, {container})
-
-  if (addMocksCallback) {
-    addMocksCallback()
-  } else {
-    // Default stubbed requests
-    moxios.stubRequest(getApiUrl(`/group/${learningOutcomeGroupId}?import_type=instructure_csv`), {
-      status: 200,
-      response: {id: learningOutcomeGroupId},
-    })
-    moxios.stubRequest(getApiUrl(`outcome_imports/${learningOutcomeGroupId}/created_group_ids`), {
-      status: 200,
-      response: [],
-    })
-  }
 
   return {
     wrapper,
@@ -89,16 +92,14 @@ const renderOutcomesImporter = (props = {}, addMocksCallback = () => {}) => {
 }
 
 describe('OutcomesImporter', () => {
-  beforeEach(() => {
-    moxios.install()
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    cleanup()
     jest.clearAllMocks()
     jest.clearAllTimers()
   })
-
-  afterEach(() => {
-    moxios.uninstall()
-    cleanup()
-  })
+  afterAll(() => server.close())
 
   it('renders the OutcomesImporter component', () => {
     const {wrapper, unmount} = renderOutcomesImporter()
@@ -113,15 +114,16 @@ describe('OutcomesImporter', () => {
     unmount()
   })
 
-  it('resets the Outcome Views when upload is complete', done => {
+  it('resets the Outcome Views when upload is complete', () => {
     const resetOutcomeViews = jest.fn()
-    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews, invokedImport: true}, () => {
-      // Stub any API calls that might be made during completeUpload
-      moxios.stubOnce('GET', new RegExp(`/api/v1${contextUrlRoot}/outcome_imports/.*`), {
-        status: 200,
-        response: [],
-      })
-    })
+
+    server.use(
+      http.get(new RegExp(`/api/v1${contextUrlRoot}/outcome_imports/.*`), () =>
+        HttpResponse.json([]),
+      ),
+    )
+
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews, invokedImport: true})
 
     // Use act to ensure state updates are processed
     act(() => {
@@ -130,7 +132,6 @@ describe('OutcomesImporter', () => {
 
     // Verify resetOutcomeViews was called synchronously
     expect(resetOutcomeViews).toHaveBeenCalled()
-    done()
     unmount()
   })
 
@@ -139,21 +140,19 @@ describe('OutcomesImporter', () => {
     const resetOutcomeViews = jest.fn()
     const onSuccessfulOutcomesImport = jest.fn()
 
-    // Use a more flexible URL pattern check
-    const createdGroupIdsPattern = new RegExp(
-      `/api/v1${contextUrlRoot}/outcome_imports/${id}/created_group_ids`,
+    let requestMade = false
+    server.use(
+      http.get(`/api/v1${contextUrlRoot}/outcome_imports/${id}/created_group_ids`, () => {
+        requestMade = true
+        return HttpResponse.json([])
+      }),
     )
 
-    // Setup the mock before rendering the component
-    moxios.stubRequest(createdGroupIdsPattern, {
-      status: 200,
-      response: [],
+    const {ref, unmount} = renderOutcomesImporter({
+      resetOutcomeViews,
+      onSuccessfulOutcomesImport,
+      invokedImport: true,
     })
-
-    const {ref, unmount} = renderOutcomesImporter(
-      {resetOutcomeViews, onSuccessfulOutcomesImport, invokedImport: true},
-      () => {},
-    )
 
     // Act - use act to ensure state updates are processed
     act(() => {
@@ -165,11 +164,8 @@ describe('OutcomesImporter', () => {
 
     // Wait for the API request to complete
     await waitFor(() => {
-      expect(moxios.requests.count()).toBeGreaterThan(0)
+      expect(requestMade).toBe(true)
     })
-
-    const request = moxios.requests.mostRecent()
-    expect(request.url).toContain(`/outcome_imports/${id}/created_group_ids`)
 
     // Clean up
     unmount()
@@ -204,26 +200,26 @@ describe('OutcomesImporter', () => {
     unmount()
   })
 
-  it('shows a flash alert when upload successfully completes but with warnings', done => {
+  it('shows a flash alert when upload successfully completes but with warnings', async () => {
     const resetOutcomeViews = jest.fn()
-    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews}, () => {
-      moxios.stubRequest(getApiUrl('null/created_group_ids'), {
-        status: 200,
-        response: [],
-      })
+
+    server.use(http.get(getApiUrl('null/created_group_ids'), () => HttpResponse.json([])))
+
+    const {ref, unmount} = renderOutcomesImporter({resetOutcomeViews})
+
+    act(() => {
+      ref.current.completeUpload(null, 10, true)
     })
 
-    ref.current.completeUpload(null, 10, true)
-
-    moxios.wait(() => {
+    await waitFor(() => {
       expect(alerts.showFlashAlert).toHaveBeenCalledWith({
         type: 'warning',
         message:
           'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.',
       })
-      expect(resetOutcomeViews).toHaveBeenCalled()
-      done()
-      unmount()
     })
+
+    expect(resetOutcomeViews).toHaveBeenCalled()
+    unmount()
   })
 })

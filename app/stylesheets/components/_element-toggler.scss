@@ -21,3 +21,8 @@
   cursor: pointer;
   &:focus { @include ic-focus-variant; }
 }
+
+.element_toggler_inst_focus_ring {
+  @extend .element_toggler;
+  &:focus { @include ic-focus-variant-inst; }
+}

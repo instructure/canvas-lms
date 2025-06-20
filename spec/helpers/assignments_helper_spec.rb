@@ -213,7 +213,7 @@ describe AssignmentsHelper do
     end
   end
 
-  describe "#student_peer_review_url_in_a2_for" do
+  describe "#student_peer_review_url" do
     let(:course) { Course.create! }
     let(:assignment) { course.assignments.create(peer_reviews: true, title: "hi") }
     let(:reviewer) { course.enroll_student(User.create!, active_all: true).user }
@@ -226,13 +226,13 @@ describe AssignmentsHelper do
 
     it "creates a URL containing the peer reviewee's user ID as reviewee_id when peer reviewing is not anonymous" do
       expect(self).to receive(:context_url).and_return("")
-      student_peer_review_url_in_a2_for(course, assignment, assessment)
+      student_peer_review_url(course, assignment, assessment)
     end
 
     it "creates a URL containing the peer reviewee's anonymous ID as anonymous_asset_id when peer reviewing is anonymous" do
       assignment.update!(anonymous_peer_reviews: true)
       expect(self).to receive(:context_url).and_return("")
-      student_peer_review_url_in_a2_for(course, assignment, assessment)
+      student_peer_review_url(course, assignment, assessment)
     end
   end
 end

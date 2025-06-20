@@ -21,7 +21,7 @@ import {Button} from '@instructure/ui-buttons'
 import FilterDropDown from '../FilterDropDown/FilterDropDown'
 import {Text} from '@instructure/ui-text'
 import InsightsSearchBar from '../InsightsSearchBar/InsightsSearchBar'
-import {IconAiLine} from '@instructure/ui-icons'
+import {IconAiSolid} from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('discussion_insights')
@@ -50,8 +50,8 @@ const InsightsActionBar: React.FC<InsightsActionBarProps> = ({
       <Flex.Item>
         <Button
           display="inline-block"
-          color="primary"
-          renderIcon={<IconAiLine />}
+          color="ai-primary"
+          renderIcon={<IconAiSolid />}
           onClick={onGenerateInsights}
           disabled={loading || entryCount === 0}
           data-testid="discussion-insights-generate-button"

@@ -42,6 +42,26 @@ const defaultProps = () => ({
 })
 
 describe('ErrorBoundary', () => {
+  let consoleErrorSpy: jest.SpyInstance
+  let originalError: typeof window.onerror
+
+  beforeEach(() => {
+    // Mock console.error to prevent error output in tests
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+
+    // Also suppress window.onerror to prevent JSDOM from logging errors
+    originalError = window.onerror
+    window.onerror = () => true
+  })
+
+  afterEach(() => {
+    // Restore console.error after each test
+    consoleErrorSpy.mockRestore()
+
+    // Restore window.onerror
+    window.onerror = originalError
+  })
+
   test('renders the component', () => {
     const {getByText} = render(
       <ErrorBoundary {...defaultProps()}>
@@ -52,7 +72,6 @@ describe('ErrorBoundary', () => {
   })
 
   test('renders the component when error is thrown', () => {
-    jest.spyOn(console, 'error') // In tests that you expect errors
     const {getByText} = render(
       <ErrorBoundary errorComponent={<div>Making sure this does not work</div>}>
         <div>
@@ -62,19 +81,18 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>,
     )
     expect(getByText('Making sure this does not work')).toBeInTheDocument()
+    expect(consoleErrorSpy).toHaveBeenCalled()
   })
 
   test('calls "beforeCapture" when provided', () => {
     const beforeCaptureMock = jest.fn()
     render(
-      <ErrorBoundary
-        errorComponent={<></>}
-        beforeCapture={beforeCaptureMock}
-      >
+      <ErrorBoundary errorComponent={<></>} beforeCapture={beforeCaptureMock}>
         <ThrowsErrorComponent />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     )
 
     expect(beforeCaptureMock).toHaveBeenCalled()
+    expect(consoleErrorSpy).toHaveBeenCalled()
   })
 })

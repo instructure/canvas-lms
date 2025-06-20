@@ -13125,6 +13125,7 @@ tr:
     grading_standard_type: "Notlandırma Standardı"
     group_type: Grup
     learning_outcome_type: "Öğrenme Çıktıları"
+    module_item_type: "Modül Öğesi"
     module_type: Modül
     quiz_question_type: "Kısa Sınav Sorusu"
     quiz_type: "Kısa Sınav"

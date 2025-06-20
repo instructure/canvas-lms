@@ -331,7 +331,7 @@ describe DiscussionTopicsController, type: :request do
       @topic = @course.discussion_topics.order(:id).last
       expect(@topic.title).to eq "test title"
       expect(@topic.message).to eq "test <b>message</b>"
-      expect(@topic.threaded?).to be_falsey
+      expect(@topic.threaded?).to be_truthy
       expect(@topic.published?).to be_falsey
       expect(@topic.post_delayed?).to be_falsey
       expect(@topic.podcast_enabled?).to be_falsey
@@ -754,7 +754,7 @@ describe DiscussionTopicsController, type: :request do
                               "media_entry_id" => @attachment.media_entry_id,
                               "category" => "uncategorized",
                               "visibility_level" => @attachment.visibility_level }],
-          "discussion_type" => "not_threaded",
+          "discussion_type" => "threaded",
           "locked" => false,
           "can_lock" => true,
           "comments_disabled" => false,
@@ -2396,7 +2396,7 @@ describe DiscussionTopicsController, type: :request do
           "root_topic_id" => nil,
           "topic_children" => [],
           "group_topic_children" => [],
-          "discussion_type" => "not_threaded",
+          "discussion_type" => "threaded",
           "permissions" => { "delete" => true, "attach" => true, "update" => true, "reply" => true, "manage_assign_to" => false },
           "locked" => false,
           "can_lock" => true,
@@ -2456,7 +2456,7 @@ describe DiscussionTopicsController, type: :request do
       "created_at" => announcement.created_at.iso8601,
       "delayed_post_at" => nil,
       "discussion_subentry_count" => 0,
-      "discussion_type" => "not_threaded",
+      "discussion_type" => "threaded",
       "group_category_id" => nil,
       "group_topic_children" => [],
       "html_url" => "http://www.example.com/groups/#{@group.id}/discussion_topics/#{announcement.id}",

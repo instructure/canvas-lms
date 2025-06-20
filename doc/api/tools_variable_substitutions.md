@@ -1698,3 +1698,25 @@ This is an alias of `Canvas.assignment.pointsPossible`.
 ```
 100
 ```
+## Canvas.account.decimal_separator
+Returns the decimal separator for the current context account.
+This is used to have custom formatting on numbers, independent from the account's locale.
+If the account does not have a decimal separator set, it will return "$Canvas.account.decimal_separator".
+
+**Availability**: *when launched in a course (or a Group within a course)*  
+
+
+```
+"comma"
+```
+## Canvas.account.thousand_separator
+Returns the thousand separator for the current context account.
+This is used to have custom formatting on numbers, independent from the account's locale.
+If the account does not have a thousand separator set, it will return "$Canvas.account.decimal_separator".
+
+**Availability**: *when launched in a course (or a Group within a course)*  
+
+
+```
+"period"
+```

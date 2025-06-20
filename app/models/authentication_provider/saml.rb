@@ -159,6 +159,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     return if metadata_uri.blank?
     return unless metadata_uri_changed? || idp_entity_id_changed?
 
+    effective_metadata_uri = metadata_uri
+
     Federation.descendants.each do |federation|
       # someone's trying to cheat; switch to our more efficient implementation
       self.metadata_uri = federation::URN if metadata_uri == federation.endpoint
@@ -168,6 +170,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       if idp_entity_id.blank?
         errors.add(:idp_entity_id, :blank)
         return
+      end
+
+      if federation::MDQ
+        effective_metadata_uri = federation.metadata_uri(idp_entity_id)
+        break
       end
 
       begin
@@ -187,7 +194,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
 
     begin
-      populate_from_metadata_url(metadata_uri)
+      populate_from_metadata_url(effective_metadata_uri)
     rescue => e
       ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
       errors.add(:metadata_uri, e.message)
@@ -400,7 +407,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def generate_authn_request_redirect(host: nil,
                                       parent_registration: false,
-                                      relay_state: nil)
+                                      relay_state: nil,
+                                      force_login: false)
     sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
     authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
                                                  idp_metadata.identity_providers.first,
@@ -411,7 +419,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       authn_request.requested_authn_context.class_ref = requested_authn_context
       authn_request.requested_authn_context.comparison = :exact
     end
-    authn_request.force_authn = true if parent_registration
+    authn_request.force_authn = true if parent_registration || force_login
     private_key = self.class.private_key
     private_key = nil if sig_alg.nil?
     forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request,

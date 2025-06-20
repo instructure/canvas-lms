@@ -52,6 +52,7 @@ import {AvailableToDateTimeInput} from './AvailableToDateTimeInput'
 import {Text} from '@instructure/ui-text'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import type {ItemType} from '../types'
+import AlertManager from '@canvas/alerts/react/AlertManager'
 
 const I18n = createI18nScope('differentiated_modules')
 
@@ -407,167 +408,169 @@ export default forwardRef(function ItemAssignToCard(
     dateValidator.isDateInClosedGradingPeriod(dueDate) && !dueAtHasChanged()
 
   return (
-    <View as="div" {...wrapperProps}>
-      <View
-        data-testid="item-assign-to-card"
-        as="div"
-        position="relative"
-        padding="medium small small small"
-        borderWidth="small"
-        borderColor="primary"
-        borderRadius="none medium medium none"
-      >
-        {highlightCard && <View height="100%" background="brand" width="1rem" />}
-        {typeof onDelete === 'function' && (
-          <div
-            style={{
-              position: 'absolute',
-              insetInlineEnd: '.75rem',
-              insetBlockStart: '.75rem',
-              zIndex: 2,
-            }}
-          >
-            <IconButton
-              data-testid="delete-card-button"
-              color="danger"
-              screenReaderLabel={cardActionLabels.removeCard}
-              size="small"
-              withBackground={false}
-              withBorder={false}
-              onClick={handleDelete}
-              elementRef={el => (deleteCardButtonRef.current = el)}
+    <AlertManager breakpoints={{}}>
+      <View as="div" {...wrapperProps}>
+        <View
+          data-testid="item-assign-to-card"
+          as="div"
+          position="relative"
+          padding="medium small small small"
+          borderWidth="small"
+          borderColor="primary"
+          borderRadius="none medium medium none"
+        >
+          {highlightCard && <View height="100%" background="brand" width="1rem" />}
+          {typeof onDelete === 'function' && (
+            <div
+              style={{
+                position: 'absolute',
+                insetInlineEnd: '.75rem',
+                insetBlockStart: '.75rem',
+                zIndex: 2,
+              }}
             >
-              <IconTrashLine />
-            </IconButton>
-          </div>
-        )}
-        <AssigneeSelector
-          onSelect={handleSelect}
-          selectedOptionIds={selectedAssigneeIds}
-          everyoneOption={everyoneOption}
-          courseId={courseId}
-          defaultValues={initialAssigneeOptions || []}
-          clearAllDisabled={true}
-          size="medium"
-          messages={showValidations ? error : []}
-          disabledOptionIds={disabledOptionIdsRef?.current}
-          // @ts-expect-error
-          disableFetch={!isOpenRef?.current ?? false}
-          customAllOptions={customAllOptions}
-          customIsLoading={customIsLoading}
-          customSetSearchTerm={customSetSearchTerm}
-          inputRef={el => (assigneeSelectorRef.current = el)}
-          onBlur={() => setShowValidations(true)}
-          disabledWithGradingPeriod={isInClosedGradingPeriod}
-          disabledOptionIdsRef={disabledOptionIdsRef}
-          itemType={itemType}
-        />
-        {/* @ts-expect-error */}
-        {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
-          <DueDateTimeInput
-            {...{
-              dueDate,
-              setDueDate,
-              validationErrors,
-              unparsedFieldKeys,
-              blueprintDateLocks,
-              dateInputRefs: dateInputRefs.current,
-              timeInputRefs: timeInputRefs.current,
-              handleBlur,
-              clearButtonAltLabel: cardActionLabels.clearDueAt,
-            }}
-            {...commonDateTimeInputProps}
-            handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
+              <IconButton
+                data-testid="delete-card-button"
+                color="danger"
+                screenReaderLabel={cardActionLabels.removeCard}
+                size="small"
+                withBackground={false}
+                withBorder={false}
+                onClick={handleDelete}
+                elementRef={el => (deleteCardButtonRef.current = el)}
+              >
+                <IconTrashLine />
+              </IconButton>
+            </div>
+          )}
+          <AssigneeSelector
+            onSelect={handleSelect}
+            selectedOptionIds={selectedAssigneeIds}
+            everyoneOption={everyoneOption}
+            courseId={courseId}
+            defaultValues={initialAssigneeOptions || []}
+            clearAllDisabled={true}
+            size="medium"
+            messages={showValidations ? error : []}
+            disabledOptionIds={disabledOptionIdsRef?.current}
+            // @ts-expect-error
+            disableFetch={!isOpenRef?.current ?? false}
+            customAllOptions={customAllOptions}
+            customIsLoading={customIsLoading}
+            customSetSearchTerm={customSetSearchTerm}
+            inputRef={el => (assigneeSelectorRef.current = el)}
+            onBlur={() => setShowValidations(true)}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
+            disabledOptionIdsRef={disabledOptionIdsRef}
+            itemType={itemType}
           />
-        )}
-        {/* @ts-expect-error */}
-        {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
-          <ReplyToTopicDueDateTimeInput
+          {/* @ts-expect-error */}
+          {!removeDueDateInput && (!isCheckpointed || !ENV.DISCUSSION_CHECKPOINTS_ENABLED) && (
+            <DueDateTimeInput
+              {...{
+                dueDate,
+                setDueDate,
+                validationErrors,
+                unparsedFieldKeys,
+                blueprintDateLocks,
+                dateInputRefs: dateInputRefs.current,
+                timeInputRefs: timeInputRefs.current,
+                handleBlur,
+                clearButtonAltLabel: cardActionLabels.clearDueAt,
+              }}
+              {...commonDateTimeInputProps}
+              handleDueDateChange={handleDueDateChange(timeInputRefs.current.due_at?.value || '')}
+              disabledWithGradingPeriod={isInClosedGradingPeriod}
+            />
+          )}
+          {/* @ts-expect-error */}
+          {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
+            <ReplyToTopicDueDateTimeInput
+              {...{
+                replyToTopicDueDate,
+                setReplyToTopicDueDate,
+                validationErrors,
+                unparsedFieldKeys,
+                blueprintDateLocks,
+                dateInputRefs: dateInputRefs.current,
+                timeInputRefs: timeInputRefs.current,
+                handleBlur,
+                clearButtonAltLabel: cardActionLabels.clearReplyToTopicDueAt,
+              }}
+              {...commonDateTimeInputProps}
+              handleReplyToTopicDueDateChange={handleReplyToTopicDueDateChange(
+                timeInputRefs.current.reply_to_topic_due_at?.value || '',
+              )}
+              disabledWithGradingPeriod={isInClosedGradingPeriod}
+            />
+          )}
+          {/* @ts-expect-error */}
+          {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
+            <RequiredRepliesDueDateTimeInput
+              {...{
+                requiredRepliesDueDate,
+                setRequiredRepliesDueDate,
+                validationErrors,
+                unparsedFieldKeys,
+                blueprintDateLocks,
+                dateInputRefs: dateInputRefs.current,
+                timeInputRefs: timeInputRefs.current,
+                handleBlur,
+                clearButtonAltLabel: cardActionLabels.clearRequiredRepliesDueAt,
+              }}
+              {...commonDateTimeInputProps}
+              handleRequiredRepliesDueDateChange={handleRequiredRepliesDueDateChange(
+                timeInputRefs.current.required_replies_due_at?.value || '',
+              )}
+              disabledWithGradingPeriod={isInClosedGradingPeriod}
+            />
+          )}
+          <AvailableFromDateTimeInput
             {...{
-              replyToTopicDueDate,
-              setReplyToTopicDueDate,
+              availableFromDate,
+              setAvailableFromDate,
               validationErrors,
               unparsedFieldKeys,
               blueprintDateLocks,
               dateInputRefs: dateInputRefs.current,
               timeInputRefs: timeInputRefs.current,
               handleBlur,
-              clearButtonAltLabel: cardActionLabels.clearReplyToTopicDueAt,
+              clearButtonAltLabel: cardActionLabels.clearAvailableFrom,
             }}
             {...commonDateTimeInputProps}
-            handleReplyToTopicDueDateChange={handleReplyToTopicDueDateChange(
-              timeInputRefs.current.reply_to_topic_due_at?.value || '',
+            handleAvailableFromDateChange={handleAvailableFromDateChange(
+              timeInputRefs.current.unlock_at?.value || '',
             )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
-        )}
-        {/* @ts-expect-error */}
-        {isCheckpointed && ENV.DISCUSSION_CHECKPOINTS_ENABLED && (
-          <RequiredRepliesDueDateTimeInput
+          <AvailableToDateTimeInput
             {...{
-              requiredRepliesDueDate,
-              setRequiredRepliesDueDate,
+              availableToDate,
+              setAvailableToDate,
               validationErrors,
               unparsedFieldKeys,
               blueprintDateLocks,
               dateInputRefs: dateInputRefs.current,
               timeInputRefs: timeInputRefs.current,
               handleBlur,
-              clearButtonAltLabel: cardActionLabels.clearRequiredRepliesDueAt,
+              clearButtonAltLabel: cardActionLabels.clearAvailableTo,
             }}
             {...commonDateTimeInputProps}
-            handleRequiredRepliesDueDateChange={handleRequiredRepliesDueDateChange(
-              timeInputRefs.current.required_replies_due_at?.value || '',
+            handleAvailableToDateChange={handleAvailableToDateChange(
+              timeInputRefs.current.lock_at?.value || '',
             )}
             disabledWithGradingPeriod={isInClosedGradingPeriod}
           />
-        )}
-        <AvailableFromDateTimeInput
-          {...{
-            availableFromDate,
-            setAvailableFromDate,
-            validationErrors,
-            unparsedFieldKeys,
-            blueprintDateLocks,
-            dateInputRefs: dateInputRefs.current,
-            timeInputRefs: timeInputRefs.current,
-            handleBlur,
-            clearButtonAltLabel: cardActionLabels.clearAvailableFrom,
-          }}
-          {...commonDateTimeInputProps}
-          handleAvailableFromDateChange={handleAvailableFromDateChange(
-            timeInputRefs.current.unlock_at?.value || '',
+          <ContextModuleLink
+            courseId={courseId}
+            contextModuleId={contextModuleId}
+            contextModuleName={contextModuleName}
+          />
+          {isInClosedGradingPeriod && (
+            <Text size="small">{I18n.t('Due date falls in a closed Grading Period.')}</Text>
           )}
-          disabledWithGradingPeriod={isInClosedGradingPeriod}
-        />
-        <AvailableToDateTimeInput
-          {...{
-            availableToDate,
-            setAvailableToDate,
-            validationErrors,
-            unparsedFieldKeys,
-            blueprintDateLocks,
-            dateInputRefs: dateInputRefs.current,
-            timeInputRefs: timeInputRefs.current,
-            handleBlur,
-            clearButtonAltLabel: cardActionLabels.clearAvailableTo,
-          }}
-          {...commonDateTimeInputProps}
-          handleAvailableToDateChange={handleAvailableToDateChange(
-            timeInputRefs.current.lock_at?.value || '',
-          )}
-          disabledWithGradingPeriod={isInClosedGradingPeriod}
-        />
-        <ContextModuleLink
-          courseId={courseId}
-          contextModuleId={contextModuleId}
-          contextModuleName={contextModuleName}
-        />
-        {isInClosedGradingPeriod && (
-          <Text size="small">{I18n.t('Due date falls in a closed Grading Period.')}</Text>
-        )}
+        </View>
       </View>
-    </View>
+    </AlertManager>
   )
 })

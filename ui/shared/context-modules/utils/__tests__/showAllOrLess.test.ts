@@ -356,6 +356,23 @@ describe('showAllOrLess', () => {
       expect(spy).not.toHaveBeenCalled()
       spy.mockRestore()
     })
+
+    it('should refocus the button after loading when data-refocus is set', async () => {
+      const module = makeModule()
+      module.dataset.loadstate = 'paginated'
+      addShowAllOrLess('1')
+
+      const button = module.querySelector('.show-all-or-less-button') as HTMLButtonElement
+      expect(button).toBeTruthy()
+
+      button.dataset.refocus = 'true'
+      button.blur()
+
+      addShowAllOrLess('1')
+
+      await new Promise(requestAnimationFrame)
+      expect(document.activeElement).toBe(button)
+    })
   })
 
   describe('decrementModuleItemsCount', () => {

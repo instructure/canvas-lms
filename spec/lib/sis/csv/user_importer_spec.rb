@@ -1758,6 +1758,19 @@ describe SIS::CSV::UserImporter do
     expect(user_2.pseudonym.sis_communication_channel).to eq user_2.email_channel
   end
 
+  it "clears deleted_at when restoring a pseudonym" do
+    user = user_with_pseudonym(active_all: 1, sis_user_id: "user_1", account: @account)
+    user.destroy
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,#{@pseudonym.unique_id},User,Uno,#{@pseudonym.unique_id},active",
+      { override_sis_stickiness: true }
+    )
+    ps = user.reload.pseudonyms.take
+    expect(ps.workflow_state).to eq "active"
+    expect(ps.deleted_at).to be_nil
+  end
+
   it "does not resurrect a non SIS user" do
     @non_sis_user = user_with_pseudonym(active_all: 1)
     @non_sis_user.remove_from_root_account(Account.default)

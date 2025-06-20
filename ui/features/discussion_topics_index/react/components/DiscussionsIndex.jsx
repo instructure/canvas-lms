@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
-import {func, bool, string, shape, arrayOf, oneOf} from 'prop-types'
+import {func, bool, string, shape, arrayOf, oneOf, object} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {DragDropContext} from 'react-dnd'
@@ -57,6 +57,7 @@ import {reorderDiscussionsURL} from '../utils'
 import {CONTENT_SHARE_TYPES} from '@canvas/content-sharing/react/proptypes/contentShare'
 import WithBreakpoints, {breakpointsShape} from '@canvas/with-breakpoints'
 import TopNavPortalWithDefaults from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
+import ManageThreadedReplies from './ManageThreadedReplies'
 
 const I18n = createI18nScope('discussions_v2')
 
@@ -85,6 +86,7 @@ export default class DiscussionsIndex extends Component {
     DIRECT_SHARE_ENABLED: bool.isRequired,
     COURSE_ID: string,
     breakpoints: breakpointsShape.isRequired,
+    allDiscussions: object,
   }
 
   state = {
@@ -324,29 +326,41 @@ export default class DiscussionsIndex extends Component {
             onDismiss={() => this.props.setSendToOpen(false)}
           />
         )}{' '}
-        { this.state.showAssignToTray &&
-          this.props.contextType === 'course' && (
-            <ItemAssignToManager
-              open={this.state.showAssignToTray}
-              onClose={this.closeAssignToTray}
-              onDismiss={this.closeAssignToTray}
-              courseId={ENV.COURSE_ID}
-              itemName={this.state.discussionDetails.title}
-              itemType="discussion"
-              iconType="discussion"
-              pointsPossible={this.state?.discussionDetails?.assignment?.points_possible || null}
-              itemContentId={this.state.discussionDetails.id}
-              locale={ENV.LOCALE || 'en'}
-              timezone={ENV.TIMEZONE || 'UTC'}
-              removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
-              isCheckpointed={this.state?.discussionDetails.is_checkpointed}
-            />
-          )}
+        {this.state.showAssignToTray && this.props.contextType === 'course' && (
+          <ItemAssignToManager
+            open={this.state.showAssignToTray}
+            onClose={this.closeAssignToTray}
+            onDismiss={this.closeAssignToTray}
+            courseId={ENV.COURSE_ID}
+            itemName={this.state.discussionDetails.title}
+            itemType="discussion"
+            iconType="discussion"
+            pointsPossible={this.state?.discussionDetails?.assignment?.points_possible || null}
+            itemContentId={this.state.discussionDetails.id}
+            locale={ENV.LOCALE || 'en'}
+            timezone={ENV.TIMEZONE || 'UTC'}
+            removeDueDateInput={!this.state?.discussionDetails?.assignment_id}
+            isCheckpointed={this.state?.discussionDetails.is_checkpointed}
+          />
+        )}
       </View>
     )
   }
 
   render() {
+    const sideCommentedDiscussions = ENV?.FEATURES?.disallow_threaded_replies_manage
+      ? Object.values(this.props.allDiscussions)
+          .filter(d => d?.discussion_type === 'side_comment')
+          .map(discussion => ({
+            id: discussion.id,
+            title: discussion.title,
+            isPublished: discussion.published,
+            isAssignment: discussion.assignment_id,
+            lastReplyAt:
+              discussion?.discussion_subentry_count > 0 ? discussion.last_reply_at : null,
+          }))
+      : []
+
     return (
       <>
         <TopNavPortalWithDefaults currentPageName={I18n.t('Discussions')} useStudentView={true} />
@@ -355,7 +369,20 @@ export default class DiscussionsIndex extends Component {
             <Heading level="h1">{I18n.t('Discussions')}</Heading>
           </ScreenReaderContent>
           <ConnectedIndexHeader breakpoints={this.props.breakpoints} />
-          {ENV?.FEATURES?.disallow_threaded_replies_fix_alert && <DisallowThreadedFixAlert />}
+
+          {ENV?.FEATURES?.disallow_threaded_replies_fix_alert &&
+            !ENV?.FEATURES?.disallow_threaded_replies_manage && <DisallowThreadedFixAlert />}
+
+          {!this.props.isLoadingDiscussions &&
+            ENV?.FEATURES?.disallow_threaded_replies_manage &&
+            ENV?.permissions?.moderate && (
+              <ManageThreadedReplies
+                courseId={ENV.COURSE_ID}
+                discussions={sideCommentedDiscussions}
+                mobileOnly={this.props.breakpoints.mobileOnly}
+              />
+            )}
+
           {this.props.isLoadingDiscussions
             ? this.renderSpinner(I18n.t('Loading Discussions'))
             : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
@@ -389,6 +416,7 @@ const connectState = (state, ownProps) => {
     sendToSelection: state.sendTo.selection,
     DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
     COURSE_ID: state.COURSE_ID,
+    allDiscussions,
   }
   return {...ownProps, ...fromPagination, ...fromState}
 }

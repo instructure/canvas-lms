@@ -76,3 +76,10 @@ horizon_skill_management:
   display_name: "Canvas Career: Skill Management"
   description: |-
     Enables Skill Management in Canvas Career.
+horizon_bulk_api_permission:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Manage Bulk API & Permission"
+  description: |-
+    Enables the ability to manage bulk API and permission settings in Canvas Career.

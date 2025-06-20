@@ -97,6 +97,18 @@ module Lti
           end
         end
 
+        context "when user has no manage_grade rights (aka student in course)" do
+          before do
+            @student = student_in_course(course: @course, active_all: true).user
+            user_session(@student)
+          end
+
+          it "returns unauthorized" do
+            subject
+            expect(response).to have_http_status :unauthorized
+          end
+        end
+
         context "without proper rights" do
           it "returns redirect" do
             subject
@@ -186,6 +198,58 @@ module Lti
           it "returns 400" do
             subject
             expect(response).to have_http_status :bad_request
+          end
+        end
+
+        context "when launched by the owner student" do
+          let(:student) { student_in_course(course: @course, active_all: true).user }
+          let(:submission) { submission_model(user: student, assignment: asset_processor.assignment) }
+          let(:asset) { lti_asset_model(submission:) }
+          let(:asset_report) do
+            lti_asset_report_model(
+              lti_asset_processor_id: asset_processor.id,
+              asset:,
+              visible_to_owner:
+            )
+          end
+
+          context "when report is visible to owner" do
+            let(:visible_to_owner) { true }
+
+            it "allows student to view their own report" do
+              user_session(student)
+              get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report.id }
+              expect(response).to have_http_status :ok
+            end
+          end
+
+          context "when report is not visible to owner" do
+            let(:visible_to_owner) { false }
+
+            it "prevents student from viewing the report" do
+              user_session(student)
+              get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report.id }
+              expect(response).to have_http_status :unauthorized
+            end
+          end
+        end
+
+        context "when launched by teacher with visible_to_owner false" do
+          let(:student) { student_in_course(course: @course, active_all: true).user }
+          let(:submission) { submission_model(user: student, assignment: asset_processor.assignment) }
+          let(:asset) { lti_asset_model(submission:) }
+          let(:asset_report) do
+            lti_asset_report_model(
+              lti_asset_processor_id: asset_processor.id,
+              asset:,
+              visible_to_owner: false
+            )
+          end
+
+          it "allows teacher to view the report regardless of visible_to_owner setting" do
+            user_session(@teacher)
+            get :launch_report, params: { asset_processor_id: asset_processor.id, report_id: asset_report.id }
+            expect(response).to have_http_status :ok
           end
         end
 

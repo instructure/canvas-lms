@@ -20,7 +20,7 @@
 
 require_relative "../../../spec_helper"
 
-RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder, type: :model do
+RSpec.describe Lti::Pns::LtiAssetProcessorSubmissionNoticeBuilder do
   let(:developer_key) do
     dk = DeveloperKey.new(
       scopes: ["https://purl.imsglobal.org/spec/lti/scope/noticehandlers", TokenScopes::LTI_AGS_LINE_ITEM_SCOPE],

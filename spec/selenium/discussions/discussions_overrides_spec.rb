@@ -19,11 +19,13 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../helpers/assignment_overrides"
+require_relative "../helpers/items_assign_to_tray"
 
 describe "discussions overrides" do
   include_context "in-process server selenium tests"
   include AssignmentOverridesSeleniumHelper
   include DiscussionsCommon
+  include ItemsAssignToTray
 
   before do
     course_with_teacher_logged_in
@@ -105,8 +107,81 @@ describe "discussions overrides" do
       it "lists the discussions in main dashboard page", priority: "2" do
         course_with_admin_logged_in(course: @course)
         get ""
-        expect(f(".coming_up .event a").text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates")
+        element = f(".coming_up .event a")
+        wait_for_ajaximations
+        keep_trying_until { expect(element.text).to eq("#{@discussion_topic.title}\n#{course_factory.short_name}\nMultiple Due Dates") }
       end
+    end
+  end
+
+  describe "Differentiation Tags" do
+    before do
+      Account.site_admin.enable_feature! :discussion_create
+      Account.site_admin.enable_feature! :react_discussions_post
+      course_with_teacher_logged_in
+      @course.account.enable_feature!(:assign_to_differentiation_tags)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        a.save!
+      end
+      @student1 = student_in_course(course: @course, active_all: true, name: "Student 1").user
+      @student2 = student_in_course(course: @course, active_all: true, name: "Student 2").user
+      @group_category = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      @group_category.create_groups(1)
+      @differentiation_tag_group_1 = @group_category.groups.first_or_create
+      @differentiation_tag_group_1.add_user(@student1)
+      @assignment = @course.assignments.create!(name: "assignment", assignment_group: @assignment_group)
+      @discussion_topic = @course.discussion_topics.create!(user: @teacher,
+                                                            title: "Discussion 1",
+                                                            message: "Discussion with multiple due dates",
+                                                            assignment: @assignment)
+      @assignment.assignment_overrides.create!(set: @differentiation_tag_group_1)
+      @assignment.update!(only_visible_to_overrides: true)
+    end
+
+    it "shows convert override message when diff tags setting disabled" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      expect(element_exists?(convert_override_alert_selector)).to be_truthy
+    end
+
+    it "clicking convert overrides button converts the override and refreshes the cards" do
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@differentiation_tag_group_1.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      expect(f(assignee_selected_option_selector).text).to include(@student1.name)
+    end
+
+    it "clicking convert overrides button converts overrides and refreshes the cards" do
+      gc = @course.group_categories.create!(name: "Diff Tag Group Set", non_collaborative: true)
+      gc.create_groups(1)
+      differentiation_tag_group_2 = gc.groups.first_or_create
+      differentiation_tag_group_2.add_user(@student2)
+      @assignment.assignment_overrides.create!(set: differentiation_tag_group_2)
+      @course.account.tap do |a|
+        a.settings[:allow_assign_to_differentiation_tags] = { value: false }
+        a.save!
+      end
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
+      wait_for_ajaximations
+      overrides = ff(assignee_selected_option_selector)
+      expect(overrides[0].text).to include(@differentiation_tag_group_1.name)
+      expect(overrides[1].text).to include(differentiation_tag_group_2.name)
+      f(convert_override_button_selector).click
+      wait_for_ajaximations
+      converted_overrides = ff(assignee_selected_option_selector)
+      expect(converted_overrides[0].text).to include(@student2.name)
+      expect(converted_overrides[1].text).to include(@student1.name)
     end
   end
 end

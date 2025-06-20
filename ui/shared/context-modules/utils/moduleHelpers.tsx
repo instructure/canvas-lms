@@ -179,6 +179,7 @@ export function removeEmptyModuleUI(module: HTMLElement) {
 
 export function updateModuleFileDrop(module: HTMLElement) {
   if (!module) return
+  if (ENV.IS_STUDENT) return
 
   if (itemCount(module) === 0) {
     addEmptyModuleUI(module)

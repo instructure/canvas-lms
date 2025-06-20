@@ -18,11 +18,15 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
-import {AddBlockModal} from '../AddBlockModal'
 
-jest.mock('../AddBlockModal', () => ({
+const openMock = jest.fn()
+jest.mock('../../PageEditorContext', () => ({
   __esModule: true,
-  AddBlockModal: jest.fn(() => <div data-testid="mock-modal" />),
+  usePageEditorContext: jest.fn(() => ({
+    addBlockModal: {
+      open: openMock,
+    },
+  })),
 }))
 
 jest.mock('../../hooks/useAddNode', () => ({
@@ -30,6 +34,10 @@ jest.mock('../../hooks/useAddNode', () => ({
 }))
 
 describe('AddBlock', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('renders', async () => {
     render(<AddBlock />)
     expect(await screen.findByTestId('add-block-heading')).toBeInTheDocument()
@@ -40,9 +48,6 @@ describe('AddBlock', () => {
     render(<AddBlock />)
     const button = await screen.findByTestId('add-block-button')
     button.click()
-    expect(AddBlockModal).toHaveBeenCalledWith(
-      expect.objectContaining({open: true}),
-      expect.anything(),
-    )
+    expect(openMock).toHaveBeenCalled()
   })
 })

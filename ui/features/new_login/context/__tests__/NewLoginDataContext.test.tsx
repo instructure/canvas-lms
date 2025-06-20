@@ -208,44 +208,9 @@ describe('NewLoginDataContext', () => {
   })
 
   it('throws an error if useNewLoginData is used outside NewLoginDataProvider', () => {
-    // Note: This test intentionally triggers a console error from React/JSDOM which is expected behavior
-    // when testing error boundaries. The error is properly caught and the test validates the correct error message.
-    console.error = jest.fn()
-
-    // Create an error boundary component to catch the error
-    class ErrorBoundary extends React.Component<
-      {children: React.ReactNode},
-      {hasError: boolean; error?: Error}
-    > {
-      constructor(props: {children: React.ReactNode}) {
-        super(props)
-        this.state = {hasError: false}
-      }
-
-      static getDerivedStateFromError(error: Error) {
-        return {hasError: true, error}
-      }
-
-      componentDidCatch() {
-        // Error is caught and handled by the boundary
-      }
-
-      render() {
-        if (this.state.hasError) {
-          return <div data-testid="error">{this.state.error?.message}</div>
-        }
-        return this.props.children
-      }
-    }
-
-    render(
-      <ErrorBoundary>
-        <TestComponent />
-      </ErrorBoundary>,
-    )
-
-    expect(screen.getByTestId('error')).toHaveTextContent(
-      'useNewLoginData must be used within a NewLoginDataProvider',
+    const {result} = renderHook(() => useNewLoginData())
+    expect(result.error).toEqual(
+      new Error('useNewLoginData must be used within a NewLoginDataProvider'),
     )
   })
 })

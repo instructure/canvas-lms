@@ -39,11 +39,16 @@ export function getBaseThemeVars() {
    * used as the `fontFamily` value in the `Text` component as well as the
    * `h1FontFamily` value in the `Heading` component.
    */
+  let userFont = typography.fontFamily
+  if (!ENV.USE_CLASSIC_FONT) {
+    userFont = `"Balsamiq Sans", ${typography.fontFamily}`
+  }
+  if (ENV.use_dyslexic_font) {
+    userFont = `OpenDyslexic, ${userFont}`
+  }
   const baseFont = {
     typography: {
-      fontFamily: ENV.USE_CLASSIC_FONT
-        ? typography.fontFamily
-        : `"Balsamiq Sans", ${typography.fontFamily}`,
+      fontFamily: userFont,
     },
   }
   const base = {
@@ -118,7 +123,7 @@ export const getPlannerTheme = () => {
   return {
     ToggleDetails: {
       iconColor: colors.contrasts.blue4570,
-      textColor: colors.contrasts.blue4570
+      textColor: colors.contrasts.blue4570,
     },
   }
 }

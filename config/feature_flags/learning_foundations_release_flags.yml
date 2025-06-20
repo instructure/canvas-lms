@@ -166,7 +166,7 @@ calendar_events_api_pagination_enhancements:
 
 modules_page_rewrite:
   state: hidden
-  display_name: Modules Page React Enhancement
+  display_name: Modules Page Rewrite Teacher View
   description: |-
     If enabled, the modules page will use the new modules page rewrite.
   applies_to: RootAccount

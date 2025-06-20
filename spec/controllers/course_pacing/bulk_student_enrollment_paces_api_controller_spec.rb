@@ -20,7 +20,7 @@
 
 require_relative "../../spec_helper"
 
-describe CoursePacing::BulkStudentEnrollmentPacesApiController, type: :controller do
+describe CoursePacing::BulkStudentEnrollmentPacesApiController do
   before :once do
     @course = course_factory(active_all: true)
     @course.enable_course_paces = true

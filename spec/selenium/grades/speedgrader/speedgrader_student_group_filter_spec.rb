@@ -25,11 +25,21 @@ require_relative "../pages/gradebook_cells_page"
 require_relative "../setup/gradebook_setup"
 require_relative "../../assignments/page_objects/assignment_page"
 
-describe "filter SpeedGrader by student group" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "filter SpeedGrader by student group" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookSetup
 
   before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+
     # course with student groups
     course_with_teacher(
       course_name: "Filter SpeedGrader Course",
@@ -120,4 +130,9 @@ describe "filter SpeedGrader by student group" do
       expect(Gradebook::GradeDetailTray.speedgrader_link).to be_disabled
     end
   end
+end
+
+describe "filter SpeedGrader by student group" do
+  it_behaves_like "filter SpeedGrader by student group", true
+  it_behaves_like "filter SpeedGrader by student group", false
 end

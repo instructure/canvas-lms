@@ -94,9 +94,9 @@ class EventStream::Stream
     timestamp.to_i - time_to_live.seconds.ago.to_i
   end
 
-  def run_callbacks(operation, *args)
+  def run_callbacks(operation, *)
     callbacks_for(operation).each do |callback|
-      instance_exec(*args, &callback)
+      instance_exec(*, &callback)
     end
   end
 

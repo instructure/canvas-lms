@@ -45,8 +45,6 @@ module DifferentiationTag
           @tag_overrides = differentiation_tag_overrides_for(@learning_object)
           return unless @tag_overrides.present?
 
-          @differentiation_tags = @tag_overrides.map(&:set)
-
           @prepared_overrides = build_overrides(@learning_object, @tag_overrides)
         end
 
@@ -86,7 +84,7 @@ module DifferentiationTag
         end
 
         def get_sort_key(learning_object)
-          if learning_object.is_a?(Assignment) || learning_object.is_a?(Quizzes::Quiz)
+          if learning_object.is_a?(Assignment) || learning_object.is_a?(SubAssignment) || learning_object.is_a?(Quizzes::Quiz)
             :due_at
           else
             :lock_at

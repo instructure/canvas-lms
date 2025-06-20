@@ -56,7 +56,10 @@ module Users
 
       if claims[:attachment_id].present?
         attachment_id = fields[:attachment_id] || fields[:file_id] || fields[:id]
-        raise InvalidVerifier unless attachment_id == Attachment.find_by(id: claims[:attachment_id])&.id&.to_s
+        verifier_attachment = Attachment.find_by(id: claims[:attachment_id])
+        raise InvalidVerifier unless attachment_id == verifier_attachment&.id&.to_s ||
+                                     attachment_id == verifier_attachment&.global_id&.to_s ||
+                                     (verifier_attachment&.global_id && attachment_id == Shard.short_id_for(verifier_attachment.global_id))
       end
 
       real_user = user = User.where(id: claims[:user_id]).first

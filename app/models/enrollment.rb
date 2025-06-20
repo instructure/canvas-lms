@@ -27,8 +27,6 @@ class Enrollment < ActiveRecord::Base
     "ObserverEnrollment" => "observer"
   }.freeze
 
-  self.ignored_columns += ["graded_at"]
-
   include Workflow
 
   belongs_to :course, inverse_of: :enrollments

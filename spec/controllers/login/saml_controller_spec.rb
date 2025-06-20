@@ -130,6 +130,43 @@ describe Login::SamlController do
     BASE64
   end
 
+  describe "#new" do
+    let(:account) { account_with_saml(saml_log_in_url: "https://example.com/saml/login") }
+
+    before do
+      controller.request.env["canvas.domain_root_account"] = account
+    end
+
+    it "includes ForceAuthn if force_login is set" do
+      get :new, params: { force_login: true }
+      expect(response).to be_redirect
+
+      authn_request, = SAML2::Bindings::HTTPRedirect.decode(response.location)
+
+      expect(authn_request).to be_a(SAML2::AuthnRequest)
+      expect(authn_request.force_authn?).to be true
+    end
+
+    it "includes ForceAuthn if recently logged out" do
+      session[:just_logged_out] = Time.now.utc
+      get :new
+      expect(response).to be_redirect
+
+      authn_request, = SAML2::Bindings::HTTPRedirect.decode(response.location)
+      expect(authn_request).to be_a(SAML2::AuthnRequest)
+      expect(authn_request.force_authn?).to be true
+    end
+
+    it "does not include ForceAuthn otherwise" do
+      get :new
+      expect(response).to be_redirect
+
+      authn_request, = SAML2::Bindings::HTTPRedirect.decode(response.location)
+      expect(authn_request).to be_a(SAML2::AuthnRequest)
+      expect(authn_request.force_authn?).to be_nil
+    end
+  end
+
   it "scopes logins to the correct domain root account" do
     unique_id = "foo@example.com"
 

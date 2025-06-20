@@ -139,12 +139,21 @@ describe OAuth2ProviderController do
       end
 
       context "if the user has no token" do
-        it "redirects to the confirm url if the user has no token" do
+        it "redirects to the confirm url" do
           get :auth,
               params: { client_id: key.id,
                         redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                         response_type: "code" }
           expect(response).to redirect_to(oauth2_auth_confirm_url)
+        end
+
+        it "redirects to login_url with ?force_login=1 if prompt is login" do
+          get :auth,
+              params: { client_id: key.id,
+                        redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                        response_type: "code",
+                        prompt: "login" }
+          expect(response).to redirect_to(login_url(force_login: true))
         end
 
         it "shows a confirm page that allows being embedded (as an iframe) by trusted tools" do
@@ -168,6 +177,15 @@ describe OAuth2ProviderController do
                       response_type: "code",
                       force_login: 1 }
         expect(response).to redirect_to(login_url(force_login: 1))
+      end
+
+      it "redirects to login_url with ?force_login=1 if prompt is login" do
+        get :auth,
+            params: { client_id: key.id,
+                      redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
+                      response_type: "code",
+                      prompt: "login" }
+        expect(response).to redirect_to(login_url(force_login: true))
       end
 
       it "redirects to login_url when oauth2 session is nil" do

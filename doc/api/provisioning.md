@@ -3,7 +3,7 @@ User Provisioning
 
 Many external tools will need to know which users are enrolled in a course and their roles. The approaches to this are varied depending on the version of LTI used and sometimes a single approach is not sufficient for all the use cases a tool might be interested in. Here, we outline several different approaches:
 
-- [LTI Advantage: Assignment and Grading Services](#lti-advantage)
+- [LTI Advantage: Names and Role Provisioning Service](#lti-advantage)
 - [Provisioning During Launch](#on-launch)
 - [Supplemental Provisioning via API](#supplemental-provisioning)
 

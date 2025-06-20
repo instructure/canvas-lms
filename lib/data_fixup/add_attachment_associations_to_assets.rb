@@ -28,20 +28,41 @@ module DataFixup::AddAttachmentAssociationsToAssets
 
       if active_record.is_a?(AssessmentQuestion) || active_record.is_a?(Quizzes::QuizQuestion)
         html = active_record.question_data.to_hash["question_text"]
-        UserContent.associate_attachments_to_rce_object(html, active_record, blank_user: true)
+        UserContent.associate_attachments_to_rce_object(
+          html,
+          active_record,
+          blank_user: true,
+          feature_enabled: true
+        )
       elsif active_record.is_a?(Quizzes::Quiz)
         active_record.quiz_data & map do |question|
           question_html = question["question_text"]
-          UserContent.associate_attachments_to_rce_object(question_html, active_record, blank_user: true)
+          UserContent.associate_attachments_to_rce_object(
+            question_html,
+            active_record,
+            blank_user: true,
+            feature_enabled: true
+          )
           next unless question["answers"]
 
           question["answers"] = question["answers"].map do |a|
             answer_html = a["text"]
-            UserContent.associate_attachments_to_rce_object(answer_html, active_record, blank_user: true)
+            UserContent.associate_attachments_to_rce_object(
+              answer_html,
+              active_record,
+              blank_user: true,
+              feature_enabled: true
+            )
           end
         end
       else
-        UserContent.associate_attachments_to_rce_object(active_record[field], active_record, ((field == :syllabus_body) ? "syllabus_body" : nil), blank_user: true)
+        UserContent.associate_attachments_to_rce_object(
+          active_record[field],
+          active_record,
+          context_field_name: ((field == :syllabus_body) ? "syllabus_body" : nil),
+          blank_user: true,
+          feature_enabled: true
+        )
       end
     end
   end

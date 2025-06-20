@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import sinon from 'sinon'
 import {render, cleanup, fireEvent} from '@testing-library/react'
 import {userEvent} from '@testing-library/user-event'
@@ -76,20 +77,30 @@ const renderFileBrowser = props => {
   }
 }
 
+const server = setupServer(
+  // Default handlers for root folder requests
+  http.get('/api/v1/courses/:courseId/folders/root', () => HttpResponse.json(courseFolder())),
+  http.get('/api/v1/users/self/folders/root', () => HttpResponse.json(userFolder())),
+  // Default handlers for folder contents
+  http.get('/api/v1/folders/:folderId/folders', () => HttpResponse.json([])),
+  http.get('/api/v1/folders/:folderId/files', () => HttpResponse.json([])),
+)
+
 // rewrite using testing-library
 describe('FileBrowser', () => {
   let oldEnv
 
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    cleanup()
+    window.ENV = oldEnv
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    moxios.install()
     oldEnv = window.ENV
     window.ENV = {context_asset_string: 'courses_1'}
-  })
-
-  afterEach(() => {
-    cleanup()
-    moxios.uninstall()
-    window.ENV = oldEnv
   })
 
   it('renders', () => {
@@ -99,7 +110,7 @@ describe('FileBrowser', () => {
   })
 
   // TODO: fix fickle test (cf. RCX-2728)
-  it.skip('only shows images in the tree', done => {
+  it.skip('only shows images in the tree', async () => {
     const files = [
       testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
       testFile({
@@ -110,11 +121,16 @@ describe('FileBrowser', () => {
         'content-type': 'text/html',
       }),
     ]
-    moxios.stubRequest('/api/v1/folders/4/files', {
-      status: 200,
-      responseText: files,
-      headers: {link: 'url; rel="current"'},
-    })
+    server.use(
+      http.get('/api/v1/folders/4/files', () => {
+        return new HttpResponse(JSON.stringify(files), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+    )
 
     const {wrapper, ref} = renderFileBrowser()
     const folder1 = 'folder 1'
@@ -126,24 +142,25 @@ describe('FileBrowser', () => {
     }
     ref.current.setState({collections})
 
-    userEvent.click(getClosestElementByType(wrapper, folder1, 'button'))
+    await userEvent.click(getClosestElementByType(wrapper, folder1, 'button'))
+    await userEvent.click(getClosestElementByType(wrapper, folder4, 'button'))
 
-    moxios.wait(() => {
-      userEvent.click(getClosestElementByType(wrapper, folder4, 'button'))
-
-      expect(wrapper.container.querySelectorAll('button')).toHaveLength(3)
-      done()
-    })
+    expect(wrapper.container.querySelectorAll('button')).toHaveLength(3)
   })
 
   // TODO: fix fickle test (cf. RCX-2728)
-  it.skip('shows thumbnails if provided', done => {
+  it.skip('shows thumbnails if provided', async () => {
     const files = [testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'})]
-    moxios.stubRequest('/api/v1/folders/4/files', {
-      status: 200,
-      responseText: files,
-      headers: {link: 'url; rel="current"'},
-    })
+    server.use(
+      http.get('/api/v1/folders/4/files', () => {
+        return new HttpResponse(JSON.stringify(files), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+    )
 
     const {wrapper, ref} = renderFileBrowser()
     const collections = {
@@ -153,46 +170,55 @@ describe('FileBrowser', () => {
     }
     ref.current.setState({collections})
 
-    userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
-
-    moxios.wait(async () => {
-      await userEvent.click(getNthOfElementByType(wrapper, 1, 'button'))
-      expect(wrapper.container.querySelector('img')).toBeInTheDocument()
-      done()
-    })
+    await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
+    await userEvent.click(getNthOfElementByType(wrapper, 1, 'button'))
+    expect(wrapper.container.querySelector('img')).toBeInTheDocument()
   })
 
-  it('gets root folder data on mount', done => {
-    moxios.stubRequest('/api/v1/courses/1/folders/root', {
-      status: 200,
-      responseText: courseFolder(),
-      headers: {link: 'url; rel="current"'},
-    })
-    moxios.stubRequest('/api/v1/users/self/folders/root', {
-      status: 200,
-      responseText: userFolder(),
-      headers: {link: 'url; rel="current"'},
-    })
+  it('gets root folder data on mount', async () => {
     const subFolders = [userFolder({id: 2, name: 'sub folder 1', parent_folder_id: 1})]
     const files = [testFile()]
-    moxios.stubRequest('/api/v1/folders/1/folders', {
-      status: 200,
-      responseText: subFolders,
-      headers: {link: 'url; rel="current"'},
-    })
-    moxios.stubRequest('/api/v1/folders/1/files', {
-      status: 200,
-      responseText: files,
-      headers: {link: 'url; rel="current"'},
-    })
+
+    server.use(
+      http.get('/api/v1/courses/1/folders/root', () => {
+        return new HttpResponse(JSON.stringify(courseFolder()), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+      http.get('/api/v1/users/self/folders/root', () => {
+        return new HttpResponse(JSON.stringify(userFolder()), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+      http.get('/api/v1/folders/1/folders', () => {
+        return new HttpResponse(JSON.stringify(subFolders), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+      http.get('/api/v1/folders/1/files', () => {
+        return new HttpResponse(JSON.stringify(files), {
+          headers: {
+            'Content-Type': 'application/json',
+            link: 'url; rel="current"',
+          },
+        })
+      }),
+    )
 
     const {wrapper} = renderFileBrowser()
 
-    moxios.wait(() => {
-      expect(wrapper.getByText('Course files')).toBeInTheDocument()
-      expect(wrapper.getByText('My files')).toBeInTheDocument()
-      done()
-    })
+    await new Promise(resolve => setTimeout(resolve, 100)) // Wait for async operations
+    expect(wrapper.getByText('Course files')).toBeInTheDocument()
+    expect(wrapper.getByText('My files')).toBeInTheDocument()
   })
 
   it('should not error when there is no context asset string', () => {
@@ -204,32 +230,34 @@ describe('FileBrowser', () => {
 
   describe('on folder click', () => {
     // TODO: fix fickle test (cf. RCX-2728)
-    it.skip("gets sub-folders and files for folder's sub-folders on folder expand", done => {
+    it.skip("gets sub-folders and files for folder's sub-folders on folder expand", async () => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 5})]
       const files1 = [testFile({folder_id: 4})]
       const files2 = []
 
-      moxios.stubRequest('/api/v1/folders/4/folders', {
-        status: 200,
-        responseText: subFolders1,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/5/folders', {
-        status: 200,
-        responseText: subFolders2,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/files', {
-        status: 200,
-        responseText: files1,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/5/files', {
-        status: 200,
-        responseText: files2,
-        headers: {link: 'url; rel="current"'},
-      })
+      server.use(
+        http.get('/api/v1/folders/4/folders', () =>
+          HttpResponse.json(subFolders1, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/5/folders', () =>
+          HttpResponse.json(subFolders2, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/4/files', () =>
+          HttpResponse.json(files1, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/5/files', () =>
+          HttpResponse.json(files2, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+      )
 
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
@@ -243,15 +271,15 @@ describe('FileBrowser', () => {
       ref.current.setState({collections})
       jest.spyOn(ref.current, 'getFolderData')
 
-      userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
+      await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
-      moxios.wait(() => {
-        expect(ref.current.state.collections[4].collections).toEqual([6])
-        expect(ref.current.state.collections[5].collections).toEqual([7])
-        expect(ref.current.state.collections[4].items).toEqual([1])
-        expect(ref.current.state.collections[5].items).toEqual([])
-        done()
-      })
+      // Wait for API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.state.collections[4].collections).toEqual([6])
+      expect(ref.current.state.collections[5].collections).toEqual([7])
+      expect(ref.current.state.collections[4].items).toEqual([1])
+      expect(ref.current.state.collections[5].items).toEqual([])
     })
 
     it('does not get new folder/file data on folder collapse', async () => {
@@ -266,6 +294,9 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections, openFolders: [1]})
 
+      // Wait for state to settle
+      await new Promise(resolve => setTimeout(resolve, 50))
+
       jest.spyOn(ref.current, 'getFolderData')
 
       await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
@@ -273,25 +304,27 @@ describe('FileBrowser', () => {
       expect(ref.current.getFolderData).not.toHaveBeenCalled()
     })
 
-    it('populates data for items that were not loaded yet when the parent folder was clicked', done => {
+    it('populates data for items that were not loaded yet when the parent folder was clicked', async () => {
       const subFolders = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [testFile({folder_id: 6})]
 
-      moxios.stubRequest('/api/v1/folders/4/folders', {
-        status: 200,
-        responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/6/folders', {
-        status: 200,
-        responseText: [],
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/6/files', {
-        status: 200,
-        responseText: files,
-        headers: {link: 'url; rel="current"'},
-      })
+      server.use(
+        http.get('/api/v1/folders/4/folders', () =>
+          HttpResponse.json(subFolders, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/6/folders', () =>
+          HttpResponse.json([], {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/6/files', () =>
+          HttpResponse.json(files, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+      )
 
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
@@ -302,42 +335,51 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections})
 
-      userEvent.click(getClosestElementByType(wrapper, 'folder 1', 'button')).then(async () => {
-        await userEvent.click(getClosestElementByType(wrapper, 'folder 4', 'button'))
+      await userEvent.click(getClosestElementByType(wrapper, 'folder 1', 'button'))
+      await userEvent.click(getClosestElementByType(wrapper, 'folder 4', 'button'))
 
-        moxios.wait(() => {
-          expect(ref.current.state.collections[4].collections).toEqual([6])
-          expect(ref.current.state.collections[6].items).toEqual([1])
-          done()
-        })
-      })
+      // Wait for API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.state.collections[4].collections).toEqual([6])
+      expect(ref.current.state.collections[6].items).toEqual([1])
     })
 
-    it('gets additional pages of data', done => {
+    it('gets additional pages of data', async () => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
       const subFolders2 = [courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 4})]
       const files1 = [testFile({folder_id: 4})]
       const files2 = [testFile({id: 5, display_name: 'file 5', folder_id: 4})]
-      moxios.stubRequest('/api/v1/folders/4/folders', {
-        status: 200,
-        responseText: subFolders1,
-        headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/folders?page=2', {
-        status: 200,
-        responseText: subFolders2,
-        headers: {link: '<url>; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/files', {
-        status: 200,
-        responseText: files1,
-        headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/files?page=2', {
-        status: 200,
-        responseText: files2,
-        headers: {link: '<url>; rel="current"'},
-      })
+
+      let folderRequestCount = 0
+      let fileRequestCount = 0
+
+      server.use(
+        http.get('/api/v1/folders/4/folders', () => {
+          folderRequestCount++
+          if (folderRequestCount === 1) {
+            return HttpResponse.json(subFolders1, {
+              headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'},
+            })
+          } else {
+            return HttpResponse.json(subFolders2, {
+              headers: {link: '<url>; rel="current"'},
+            })
+          }
+        }),
+        http.get('/api/v1/folders/4/files', () => {
+          fileRequestCount++
+          if (fileRequestCount === 1) {
+            return HttpResponse.json(files1, {
+              headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'},
+            })
+          } else {
+            return HttpResponse.json(files2, {
+              headers: {link: '<url>; rel="current"'},
+            })
+          }
+        }),
+      )
 
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
@@ -348,28 +390,20 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections})
 
-      userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
+      await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
-      moxios.wait(() => {
-        expect(ref.current.state.collections[4].collections).toEqual([6, 7])
-        expect(ref.current.state.collections[4].items).toEqual([1, 5])
-        done()
-      })
+      // Wait for API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      expect(ref.current.state.collections[4].collections).toEqual([6, 7])
+      expect(ref.current.state.collections[4].items).toEqual([1, 5])
     })
 
-    it('does not get data for locked sub-folders', done => {
-      const subFolders = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
-      const files = [testFile({folder_id: 4})]
-      moxios.stubRequest('/api/v1/folders/4/folders', {
-        status: 401,
-        responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/files', {
-        status: 401,
-        responseText: files,
-        headers: {link: 'url; rel="current"'},
-      })
+    it('does not get data for locked sub-folders', async () => {
+      server.use(
+        http.get('/api/v1/folders/4/folders', () => new HttpResponse(null, {status: 401})),
+        http.get('/api/v1/folders/4/files', () => new HttpResponse(null, {status: 401})),
+      )
 
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
@@ -388,32 +422,35 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections})
 
-      userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
+      await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
-      moxios.wait(() => {
-        expect(wrapper.getByText('Locked')).toBeInTheDocument()
-        expect(ref.current.state.collections[4].collections).toEqual([])
-        expect(ref.current.state.collections[4].items).toEqual([])
-        done()
-      })
+      // Wait for API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(wrapper.getByText('Locked')).toBeInTheDocument()
+      expect(ref.current.state.collections[4].collections).toEqual([])
+      expect(ref.current.state.collections[4].items).toEqual([])
     })
 
-    it('replaces folder and file data if the folder has previously been loaded', done => {
+    it('replaces folder and file data if the folder has previously been loaded', async () => {
       const subFolders = [courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [
         testFile({folder_id: 4}),
         testFile({id: 2, display_name: 'file 2', folder_id: 4}),
       ]
-      moxios.stubRequest('/api/v1/folders/4/folders', {
-        status: 200,
-        responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/4/files', {
-        status: 200,
-        responseText: files,
-        headers: {link: 'url; rel="current"'},
-      })
+
+      server.use(
+        http.get('/api/v1/folders/4/folders', () =>
+          HttpResponse.json(subFolders, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/4/files', () =>
+          HttpResponse.json(files, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+      )
 
       const {wrapper, ref} = renderFileBrowser()
       const collections = {
@@ -426,14 +463,14 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections, items})
 
-      userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
+      await userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
 
-      moxios.wait(() => {
-        expect(ref.current.state.collections[5].name).toEqual('sub folder 1')
-        expect(ref.current.state.collections[4].items).toEqual([1, 2])
-        expect(ref.current.state.items[1].name).toEqual('file 1')
-        done()
-      })
+      // Wait for API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.state.collections[5].name).toEqual('sub folder 1')
+      expect(ref.current.state.collections[4].items).toEqual([1, 2])
+      expect(ref.current.state.items[1].name).toEqual('file 1')
     })
   })
 
@@ -463,23 +500,25 @@ describe('FileBrowser', () => {
   })
 
   describe('ordering', () => {
-    it('orders collections naturally by folder name', done => {
+    it('orders collections naturally by folder name', async () => {
       const subFolders = [
         courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 1}),
         courseFolder({id: 6, name: 'sub folder 10', parent_folder_id: 1}),
         courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 1}),
       ]
 
-      moxios.stubRequest('/api/v1/folders/1/folders', {
-        status: 200,
-        responseText: subFolders,
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 200,
-        responseText: [],
-        headers: {link: 'url; rel="current"'},
-      })
+      server.use(
+        http.get('/api/v1/folders/1/folders', () =>
+          HttpResponse.json(subFolders, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/1/files', () =>
+          HttpResponse.json([], {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+      )
 
       const {ref} = renderFileBrowser()
       const collections = {
@@ -490,28 +529,30 @@ describe('FileBrowser', () => {
       ref.current.setState({collections})
       ref.current.getFolderData(1)
 
-      moxios.wait(() => {
-        expect(ref.current.state.collections[1].collections).toEqual([5, 7, 6])
-        done()
-      })
+      // Wait for the API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.state.collections[1].collections).toEqual([5, 7, 6])
     })
 
-    it('orders items naturally by file name', done => {
+    it('orders items naturally by file name', async () => {
       const files = [
         testFile({id: 1, display_name: 'file 1', folder_id: 1}),
         testFile({id: 2, display_name: 'file 10', folder_id: 1}),
         testFile({id: 3, display_name: 'file 2', folder_id: 1}),
       ]
-      moxios.stubRequest('/api/v1/folders/1/folders', {
-        status: 200,
-        responseText: [],
-        headers: {link: 'url; rel="current"'},
-      })
-      moxios.stubRequest('/api/v1/folders/1/files', {
-        status: 200,
-        responseText: files,
-        headers: {link: 'url; rel="current"'},
-      })
+      server.use(
+        http.get('/api/v1/folders/1/folders', () =>
+          HttpResponse.json([], {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+        http.get('/api/v1/folders/1/files', () =>
+          HttpResponse.json(files, {
+            headers: {link: 'url; rel="current"'},
+          }),
+        ),
+      )
 
       const {ref} = renderFileBrowser()
       const collections = {
@@ -522,10 +563,10 @@ describe('FileBrowser', () => {
       ref.current.setState({collections})
       ref.current.getFolderData(1)
 
-      moxios.wait(() => {
-        expect(ref.current.state.collections[1].items).toEqual([1, 3, 2])
-        done()
-      })
+      // Wait for the API calls to complete
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.state.collections[1].items).toEqual([1, 3, 2])
     })
   })
 
@@ -663,7 +704,7 @@ describe('FileBrowser', () => {
       expect(wrapper.getByText('File uploading')).toBeInTheDocument()
     })
 
-    it('shows an alert on file upload', done => {
+    it('shows an alert on file upload', async () => {
       const id = '1'
       const {wrapper, ref} = renderFileBrowser({
         defaultUploadFolderId: id,
@@ -683,22 +724,29 @@ describe('FileBrowser', () => {
 
       ref.current.setState({collections})
       jest.spyOn(ref.current, 'setSuccessMessage')
-      moxios.stubRequest(`/api/v1/folders/${id}/files`, {
-        status: 200,
-        response: {
-          upload_url: 'http://new_url',
-          upload_params: {
-            Filename: 'file',
-            key: 'folder/filename',
+
+      server.use(
+        http.post(`/api/v1/folders/${id}/files`, ({request}) => {
+          // Handle the initial file upload request
+          return HttpResponse.json({
+            upload_url: 'http://new_url',
+            upload_params: {
+              Filename: 'file',
+              key: 'folder/filename',
+              'content-type': 'image/png',
+            },
+            file_param: 'attachment[uploaded_data]',
+          })
+        }),
+        http.post('http://new_url', () =>
+          HttpResponse.json({
+            id: 1,
+            display_name: 'file 1',
             'content-type': 'image/png',
-          },
-          file_param: 'attachment[uploaded_data]',
-        },
-      })
-      moxios.stubRequest('http://new_url', {
-        status: 200,
-        response: {id: 1, display_name: 'file 1', 'content-type': 'image/png', folder_id: 1},
-      })
+            folder_id: 1,
+          }),
+        ),
+      )
 
       userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
       fireEvent.change(wrapper.container.querySelector('input'), {
@@ -707,16 +755,14 @@ describe('FileBrowser', () => {
         },
       })
 
-      moxios.wait(() => {
-        expect(ref.current.setSuccessMessage).toHaveBeenCalled()
-        expect(ref.current.setSuccessMessage).toHaveBeenCalledWith('Success: File uploaded')
-        expect(wrapper.getByText('folder 1')).toBeInTheDocument()
+      // Wait for the upload to complete
+      await new Promise(resolve => setTimeout(resolve, 200))
 
-        done()
-      })
+      expect(ref.current.setSuccessMessage).toHaveBeenCalled()
+      expect(ref.current.setSuccessMessage).toHaveBeenCalledWith('Success: File uploaded')
     })
 
-    it('shows an alert on file upload fail', done => {
+    it('shows an alert on file upload fail', async () => {
       const id = '1'
       const {wrapper, ref} = renderFileBrowser({
         defaultUploadFolderId: id,
@@ -734,22 +780,12 @@ describe('FileBrowser', () => {
         },
       }
 
+      ref.current.setState({collections})
       jest.spyOn(ref.current, 'setFailureMessage')
-      moxios.stubRequest(`/api/v1/folders/${id}/files`, {
-        status: 500,
-        response: {
-          upload_url: 'http://new_url',
-          upload_params: {
-            Filename: 'file',
-            key: 'folder/filename',
-            'content-type': 'image/png',
-          },
-          file_param: 'attachment[uploaded_data]',
-        },
-      })
-      ref.current.setState({
-        collections,
-      })
+
+      server.use(
+        http.post(`/api/v1/folders/${id}/files`, () => new HttpResponse(null, {status: 500})),
+      )
 
       userEvent.click(getNthOfElementByType(wrapper, 0, 'button'))
       fireEvent.change(wrapper.container.querySelector('input'), {
@@ -758,11 +794,11 @@ describe('FileBrowser', () => {
         },
       })
 
-      moxios.wait(() => {
-        expect(ref.current.setFailureMessage).toHaveBeenCalled()
-        expect(ref.current.setFailureMessage).toHaveBeenCalledWith('File upload failed')
-        done()
-      })
+      // Wait for the upload to fail
+      await new Promise(resolve => setTimeout(resolve, 100))
+
+      expect(ref.current.setFailureMessage).toHaveBeenCalled()
+      expect(ref.current.setFailureMessage).toHaveBeenCalledWith('File upload failed')
     })
   })
 

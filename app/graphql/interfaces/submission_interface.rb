@@ -86,13 +86,6 @@ module Types
     value "asc", value: :asc
     value "desc", value: :desc
   end
-end
-
-module Interfaces::SubmissionInterface
-  include Interfaces::BaseInterface
-  include GraphQLHelpers::AnonymousGrading
-
-  description "Types for submission or submission history"
 
   class LatePolicyStatusType < Types::BaseEnum
     graphql_name "LatePolicyStatusType"
@@ -101,6 +94,13 @@ module Interfaces::SubmissionInterface
     value "extended"
     value "none"
   end
+end
+
+module Interfaces::SubmissionInterface
+  include Interfaces::BaseInterface
+  include GraphQLHelpers::AnonymousGrading
+
+  description "Types for submission or submission history"
 
   def submission
     object
@@ -270,11 +270,18 @@ module Interfaces::SubmissionInterface
 
   field :sub_assignment_submissions, [Types::SubAssignmentSubmissionType], null: true
   def sub_assignment_submissions
-    Loaders::AssociationLoader.for(Submission, :assignment).then do
-      return nil unless object.assignment.checkpoints_parent?
+    # TODO: remove this antipattern as soon as EGG-1372 is resolved
+    # data should not be created while fetching
+    # Code to use after EGG-1372 is resolved:
+    # Loaders::SubmissionLoaders::SubAssignmentSubmissionsLoader.load(object)
 
-      Loaders::AssociationLoader.for(Assignment, :sub_assignment_submissions).then do
-        object.assignment.sub_assignment_submissions.where(user_id: object.user_id)
+    load_association(:assignment).then do
+      next nil unless object.assignment.checkpoints_parent?
+
+      Loaders::AssociationLoader.for(Assignment, :sub_assignments).load(object.assignment).then do |sub_assignments|
+        sub_assignments&.map do |sub_assignment|
+          sub_assignment.find_or_create_submission(submission.user)
+        end
       end
     end
   end
@@ -289,9 +296,9 @@ module Interfaces::SubmissionInterface
         Boolean,
         "was the grade given on the current submission (resubmission)",
         null: true
-  field :late, Boolean, method: :late?, null: true
-  field :late_policy_status, LatePolicyStatusType, null: true
-  field :missing, Boolean, method: :missing?, null: true
+  field :late, Boolean, method: :late?
+  field :late_policy_status, Types::LatePolicyStatusType, null: true
+  field :missing, Boolean, method: :missing?
   field :submission_type, Types::AssignmentSubmissionType, null: true
 
   field :attachment, Types::FileType, null: true
@@ -371,8 +378,56 @@ module Interfaces::SubmissionInterface
     Loaders::MediaObjectLoader.load(object.media_comment_id)
   end
 
+  field :has_originality_report, Boolean, null: false
+  def has_originality_report
+    if submission.submitted_at.nil?
+      []
+    else
+      load_association(:originality_reports).then do |originality_reports|
+        originality_reports.any? { |o| originality_report_matches_current_version?(o) }
+      end
+    end
+  end
+
+  field :vericite_data, [Types::VericiteDataType], null: true
+  def vericite_data
+    return nil unless object.vericite_data(false).present? &&
+                      object.grants_right?(current_user, :view_vericite_report) &&
+                      object.assignment.vericite_enabled
+
+    promises =
+      object.vericite_data
+            .except(
+              :provider,
+              :last_processed_attempt,
+              :webhook_info,
+              :eula_agreement_timestamp,
+              :assignment_error,
+              :student_error,
+              :status
+            )
+            .map do |asset_string, data|
+        Loaders::AssetStringLoader
+          .load(asset_string.to_s)
+          .then do |target|
+            next if target.nil?
+
+            {
+              target:,
+              asset_string:,
+              report_url: data[:report_url],
+              score: data[:similarity_score],
+              status: data[:status],
+              state: data[:state],
+            }
+          end
+      end
+    Promise.all(promises).then(&:compact)
+  end
+
   field :turnitin_data, [Types::TurnitinDataType], null: true
   def turnitin_data
+    return nil unless object.grants_right?(current_user, :view_turnitin_report)
     return nil if object.turnitin_data.empty?
 
     promises =
@@ -389,13 +444,14 @@ module Interfaces::SubmissionInterface
       )
       .map do |asset_string, data|
         Loaders::AssetStringLoader
-          .load(asset_string)
-          .then do |turnitin_context|
-            next if turnitin_context.nil?
+          .load(asset_string.to_s)
+          .then do |target|
+            next if target.nil?
 
             {
-              target: turnitin_context,
-              reportUrl: data[:report_url],
+              target:,
+              asset_string:,
+              report_url: data[:report_url],
               score: data[:similarity_score],
               status: data[:status],
               state: data[:state]

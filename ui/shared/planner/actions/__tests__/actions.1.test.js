@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
-import {isPromise, moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
+import {isPromise} from '@canvas/jest-moxios-utils'
 import * as SidebarActions from '../sidebar-actions'
 import * as Actions from '../index'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
@@ -73,9 +74,17 @@ const getBasicState = () => ({
   },
 })
 
+const server = setupServer()
+
 describe('api actions', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
+    server.resetHandlers()
+    SidebarActions.maybeUpdateTodoSidebar.reset()
+  })
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    moxios.install()
     expect.hasAssertions()
     alertInitialize({
       visualSuccessCallback() {},
@@ -84,46 +93,48 @@ describe('api actions', () => {
     })
   })
 
-  afterEach(() => {
-    moxios.uninstall()
-    SidebarActions.maybeUpdateTodoSidebar.reset()
-  })
-
   describe('getNextOpportunities', () => {
-    it('if no more pages dispatches addOpportunities with items and null url', () => {
-      const mockDispatch = jest.fn()
+    it('if no more pages dispatches addOpportunities with items and null url', async () => {
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(
+            JSON.stringify([
+              {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
+            ]),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: '</>; rel="current"',
+              },
+            },
+          )
+        }),
+      )
+
+      const mockDispatch = jest.fn(action => {
+        // If the action returns a promise, resolve it
+        if (isPromise(action)) {
+          return action
+        }
+      })
       const state = getBasicState()
       state.opportunities.nextUrl = '/'
       const getState = () => {
         return state
       }
-      Actions.getNextOpportunities()(mockDispatch, getState)
+      await Actions.getNextOpportunities()(mockDispatch, getState)
       expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
-      return moxiosWait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            headers: {
-              link: `</>; rel="current"`,
-            },
-            response: [
-              {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
-            ],
-          })
-          .then(() => {
-            expect(mockDispatch).toHaveBeenCalledWith({
-              type: 'ADD_OPPORTUNITIES',
-              payload: {
-                items: [
-                  {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
-                ],
-                nextUrl: null,
-              },
-            })
-          })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_OPPORTUNITIES',
+        payload: {
+          items: [
+            {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
+            {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
+          ],
+          nextUrl: null,
+        },
       })
     })
     it('if nextUrl not set show all opportunities loaded', () => {
@@ -140,168 +151,188 @@ describe('api actions', () => {
   })
 
   describe('getOpportunities', () => {
-    it('dispatches startLoading and initialOpportunities actions', () => {
-      const mockDispatch = jest.fn()
-      Actions.getInitialOpportunities()(mockDispatch, getBasicState)
-      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
-      return moxiosWait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            headers: {
-              link: `</>; rel="next"`,
-            },
-            response: [
+    it('dispatches startLoading and initialOpportunities actions', async () => {
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(
+            JSON.stringify([
               {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
               {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
-            ],
-          })
-          .then(() => {
-            expect(mockDispatch).toHaveBeenCalledWith({
-              type: 'ADD_OPPORTUNITIES',
-              payload: {
-                items: [
-                  {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
-                  {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
-                ],
-                nextUrl: '/',
+            ]),
+            {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: '</>; rel="next"',
               },
-            })
-          })
+            },
+          )
+        }),
+      )
+
+      const mockDispatch = jest.fn(action => {
+        // If the action returns a promise, resolve it
+        if (isPromise(action)) {
+          return action
+        }
+      })
+      await Actions.getInitialOpportunities()(mockDispatch, getBasicState)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'START_LOADING_OPPORTUNITIES'})
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'ADD_OPPORTUNITIES',
+        payload: {
+          items: [
+            {id: 1, firstName: 'Fred', lastName: 'Flintstone', dismissed: false},
+            {id: 2, firstName: 'Wilma', lastName: 'Flintstone', dismissed: false},
+          ],
+          nextUrl: '/',
+        },
       })
     })
 
-    it('dispatches startDismissingOpportunity and dismissedOpportunity actions', () => {
+    it('dispatches startDismissingOpportunity and dismissedOpportunity actions', async () => {
+      server.use(
+        http.put('/api/v1/planner/overrides/10', () => {
+          return HttpResponse.json(
+            [
+              {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+            ],
+            {status: 201},
+          )
+        }),
+      )
+
       const mockDispatch = jest.fn()
       const plannerOverride = {
         id: '10',
         plannable_type: 'assignment',
         dismissed: true,
       }
-      Actions.dismissOpportunity('6', plannerOverride)(mockDispatch, getBasicState)
+      await Actions.dismissOpportunity('6', plannerOverride)(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
         type: 'START_DISMISSING_OPPORTUNITY',
       })
-      return moxiosWait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 201,
-            response: [
-              {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
-            ],
-          })
-          .then(() => {
-            expect(mockDispatch).toHaveBeenCalledWith({
-              type: 'DISMISSED_OPPORTUNITY',
-              payload: [
-                {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
-              ],
-            })
-          })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'DISMISSED_OPPORTUNITY',
+        payload: [
+          {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
+          {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+        ],
       })
     })
 
-    it('dispatches startDismissingOpportunity and dismissedOpportunity actions when given override', () => {
+    it('dispatches startDismissingOpportunity and dismissedOpportunity actions when given override', async () => {
+      server.use(
+        http.put('/api/v1/planner/overrides/6', () => {
+          return HttpResponse.json(
+            [
+              {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
+              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+            ],
+            {status: 201},
+          )
+        }),
+      )
+
       const mockDispatch = jest.fn()
-      Actions.dismissOpportunity('6', {id: '6'})(mockDispatch, getBasicState)
+      await Actions.dismissOpportunity('6', {id: '6'})(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: '6',
         type: 'START_DISMISSING_OPPORTUNITY',
       })
-      return moxiosWait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 201,
-            response: [
-              {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-              {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
-            ],
-          })
-          .then(() => {
-            expect(mockDispatch).toHaveBeenCalledWith({
-              type: 'DISMISSED_OPPORTUNITY',
-              payload: [
-                {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
-                {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
-              ],
-            })
-          })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'DISMISSED_OPPORTUNITY',
+        payload: [
+          {id: 1, firstName: 'Fred', lastName: 'Flintstone'},
+          {id: 2, firstName: 'Wilma', lastName: 'Flintstone'},
+        ],
       })
     })
 
-    it('makes correct request for dismissedOpportunity for existing override', () => {
+    it('makes correct request for dismissedOpportunity for existing override', async () => {
+      let capturedRequest
+      server.use(
+        http.put('/api/v1/planner/overrides/10', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json([], {status: 201})
+        }),
+      )
+
       const plannerOverride = {
         id: '10',
         plannable_type: 'assignment',
         dismissed: true,
       }
-      Actions.dismissOpportunity('6', plannerOverride)(() => {})
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('put')
-        expect(request.url).toBe('/api/v1/planner/overrides/10')
-        expect(JSON.parse(request.config.data)).toMatchObject(plannerOverride)
-      })
+      await Actions.dismissOpportunity('6', plannerOverride)(() => {})
+      expect(capturedRequest.method).toBe('PUT')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner/overrides/10')
+      expect(capturedRequest.body).toMatchObject(plannerOverride)
     })
 
-    it('makes correct request for dismissedOpportunity for new override', () => {
+    it('makes correct request for dismissedOpportunity for new override', async () => {
+      let capturedRequest
+      server.use(
+        http.post('/api/v1/planner/overrides', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.json(),
+          }
+          return HttpResponse.json([], {status: 201})
+        }),
+      )
+
       const plannerOverride = {
         plannable_id: '10',
         dismissed: true,
         plannable_type: 'assignment',
       }
-      Actions.dismissOpportunity('10', plannerOverride)(() => {})
-      return moxiosWait(request => {
-        expect(request.config.method).toBe('post')
-        expect(request.url).toBe('/api/v1/planner/overrides')
-        expect(JSON.parse(request.config.data)).toMatchObject(plannerOverride)
-      })
+      await Actions.dismissOpportunity('10', plannerOverride)(() => {})
+      expect(capturedRequest.method).toBe('POST')
+      expect(capturedRequest.url).toBe('http://localhost/api/v1/planner/overrides')
+      expect(capturedRequest.body).toMatchObject(plannerOverride)
     })
 
-    it('calls the alert function when dismissing an opportunity fails', done => {
+    it('calls the alert function when dismissing an opportunity fails', async () => {
+      server.use(
+        http.put('/api/v1/planner/overrides/6', () => {
+          return new HttpResponse(null, {status: 400})
+        }),
+      )
+
       const fakeAlert = jest.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
-      Actions.dismissOpportunity('6', {id: '6'})(() => {})
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 400,
-          })
-          .then(() => {
-            expect(fakeAlert).toHaveBeenCalled()
-            // eslint-disable-next-line promise/no-callback-in-promise
-            done()
-          })
-      })
+      await Actions.dismissOpportunity('6', {id: '6'})(() => {})
+      expect(fakeAlert).toHaveBeenCalled()
     })
 
-    it('calls the alert function when a failure occurs', done => {
-      const mockDispatch = jest.fn()
+    it('calls the alert function when a failure occurs', async () => {
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
+
+      const mockDispatch = jest.fn(action => {
+        // If the action returns a promise, resolve it
+        if (isPromise(action)) {
+          return action
+        }
+      })
       const fakeAlert = jest.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
-      Actions.getInitialOpportunities()(mockDispatch, getBasicState)
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 500,
-          })
-          .then(() => {
-            expect(fakeAlert).toHaveBeenCalled()
-            // eslint-disable-next-line promise/no-callback-in-promise
-            done()
-          })
-      })
+      await Actions.getInitialOpportunities()(mockDispatch, getBasicState)
+      expect(fakeAlert).toHaveBeenCalled()
     })
   })
 })

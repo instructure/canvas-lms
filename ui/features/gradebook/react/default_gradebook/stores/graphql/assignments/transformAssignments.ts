@@ -107,6 +107,8 @@ export const transformAssignment = (it: Assignment): ApiAssignment => ({
   sis_assignment_id: undefined as any,
   submissions_download_url: undefined as any,
   unpublishable: undefined as any,
+  // Using default false since this property is required by the API type
+  suppress_assignment: false,
 })
 
 // NOTES:

@@ -21,7 +21,7 @@ import {GroupedSelect} from '../GroupedSelect'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
 
-describe('AddBlockModal', () => {
+describe('GroupedSelect', () => {
   let onChangeMock: jest.Mock
   const data: React.ComponentProps<typeof GroupedSelect>['data'] = [
     {

@@ -13,7 +13,13 @@
       <%= erb(:sidebar) %>
     </div>
 
-    <div id="content"><%= yieldall %></div>
+    <div id="content">
+      <div class="alert">
+        🚀 <strong>Heads up: Our API Docs Have Moved!</strong><br>
+        We have relocated to <a href="https://developerdocs.instructure.com/services/canvas" class="ic-link">Instructure Developer Documentation Portal</a>. 🎉 Please update your bookmarks. This page will automatically redirect after <strong>July 1, 2026</strong>.
+      </div>
+      <%= yieldall %>
+    </div>
 
     <%= erb(:footer) %>
   </body>

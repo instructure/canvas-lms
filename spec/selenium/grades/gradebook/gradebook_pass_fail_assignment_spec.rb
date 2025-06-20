@@ -21,9 +21,21 @@ require_relative "../../helpers/gradebook_common"
 require_relative "../pages/gradebook_cells_page"
 require_relative "../pages/gradebook_page"
 
-describe "Gradebook" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookCommon
+
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+  end
 
   context "pass/fail assignment grading" do
     before :once do
@@ -47,4 +59,9 @@ describe "Gradebook" do
       expect(Gradebook::Cells.get_grade(@students[0], @assignment)).to eq "Complete"
     end
   end
+end
+
+describe "Gradebook" do
+  it_behaves_like "Gradebook", true
+  it_behaves_like "Gradebook", false
 end

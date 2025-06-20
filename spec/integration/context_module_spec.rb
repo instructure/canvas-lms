@@ -183,6 +183,8 @@ describe ContextModule do
           expect(html.at_css("#file_content")["src"]).to match(/#{@test_url.split("?").first}/)
         elsif @is_wiki_page
           expect(html.css("#wiki_page_show").length).to eq 1
+        elsif @test_url.match?("discussion_topics")
+          expect(html.css("#test_content").length).to eq 0
         else
           expect(html.css("#test_content").length).to eq 1
         end

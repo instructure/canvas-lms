@@ -22,9 +22,22 @@ import {waitFor} from '@testing-library/react'
 import useProduct from '../useProduct'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import type {Product} from '../../models/Product'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('isError, isLoading, and product return as expected', () => {
   let mockedData: Product
+  let server: ReturnType<typeof setupServer>
+
+  beforeAll(() => {
+    server = setupServer()
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
     mockedData = {
       id: '123',
@@ -72,13 +85,15 @@ describe('isError, isLoading, and product return as expected', () => {
       integration_badges: [],
     }
 
-    global.fetch = jest.fn().mockResolvedValue({
-      // in the productsQuery.ts file, the fetchResponse function checks for response.ok to see if the fetch was successful
-      // so we need to mock the response.ok property to be true otherwise the function will throw an error
-      // TODO: a better solution when we write negative tests
-      ok: true,
-      json: jest.fn().mockResolvedValue(mockedData),
-    })
+    server.use(
+      http.get('*/api/v1/accounts/*/learn_platform/products/:productId', () => {
+        return HttpResponse.json(mockedData)
+      }),
+    )
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
   })
 
   it("Doesn't return an error when provided with productId", () => {
@@ -114,7 +129,7 @@ describe('isError, isLoading, and product return as expected', () => {
       ),
     })
     expect(result.current.isLoading).toEqual(true)
-    await waitFor(() => expect(result.current.product).toBe(mockedData))
+    await waitFor(() => expect(result.current.product).toEqual(mockedData))
     expect(result.current.isLoading).toEqual(false)
     expect(result.current.isError).toEqual(false)
   })

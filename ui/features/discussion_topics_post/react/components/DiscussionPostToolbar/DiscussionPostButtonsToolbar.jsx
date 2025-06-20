@@ -211,9 +211,16 @@ const DiscussionPostButtonsToolbar = props => {
 
   const createDrillDownOptions = () => {
     const options = []
-    if (props.childTopics?.length && props.isAdmin) {
+    const childTopicSize = props.childTopics?.length
+    if (childTopicSize >= 0 && props.isAdmin) {
       options.push(
-        <Drilldown.Option id="maingroup" key="maingroup" subPageId="Group" disabled={false}>
+        <Drilldown.Option
+          id="maingroup"
+          key="maingroup"
+          subPageId="Group"
+          disabled={!childTopicSize}
+          description={!childTopicSize ? 'There are no groups in this group set' : null}
+        >
           <Flex gap="small">
             <IconGroupLine />
             {I18n.t('Group')}

@@ -271,6 +271,50 @@ describe FilesController do
       expect(response.body).to include "<html><body>ohai</body></html>"
     end
 
+    it "works with long global ids" do
+      course_with_teacher_logged_in(active_all: true, user: @user)
+      host!("test.host")
+      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
+      location = response["Location"]
+      location.gsub!(%r{courses/\d+}, "courses/#{@course.global_id}")
+      location.gsub!(%r{files/\d+}, "files/#{a1.global_id}")
+
+      get location
+      second_location = response["Location"]
+      expect(second_location).to include "sf_token="
+      remove_user_session
+      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
+      reset!
+
+      get second_location
+      expect(response).to have_http_status :ok
+      expect(response.body).to include "<html><body>ohai</body></html>"
+    end
+
+    it "works with short global ids" do
+      course_with_teacher_logged_in(active_all: true, user: @user)
+      host!("test.host")
+      a1 = attachment_model(uploaded_data: stub_file_data("ohai.html", "<html><body>ohai</body></html>", "text/html"), content_type: "text/html", context: @course)
+      allow(HostUrl).to receive(:file_host_with_shard).and_return(["files-test.host", Shard.default])
+      get "http://test.host/courses/#{@course.id}/files/#{a1.id}/download", params: { inline: "1" }
+      location = response["Location"]
+      location.gsub!(%r{courses/\d+}, "courses/#{Shard.short_id_for(@course.global_id)}")
+      location.gsub!(%r{files/\d+}, "files/#{Shard.short_id_for(a1.global_id)}")
+
+      get location
+      second_location = response["Location"]
+      expect(second_location).to include "sf_token="
+      remove_user_session
+      # in the real world with 3rd party cookie protection enabled, we don't have a session or any any cookies here
+      reset!
+
+      get second_location
+      expect(response).to have_http_status :ok
+      expect(response.body).to include "<html><body>ohai</body></html>"
+    end
+
     it "cannot be re-used" do
       course_with_teacher_logged_in(active_all: true, user: @user)
       host!("test.host")

@@ -54,6 +54,7 @@ module CC
           if page.for_assignment?
             meta_fields[:assignment_identifier] = create_key(page.assignment)
             meta_fields[:only_visible_to_overrides] = page.assignment.only_visible_to_overrides
+            meta_fields[:assignment_overrides] = map_assignment_overrides(page.assignment)
           end
           meta_fields[:todo_date] = page.todo_date
           meta_fields[:publish_at] = page.publish_at
@@ -79,6 +80,22 @@ module CC
           add_error(I18n.t("course_exports.errors.wiki_page", "The wiki page \"%{title}\" failed to export", title: page.title), $!)
         end
       end
+    end
+
+    def map_assignment_overrides(assignment)
+      assignment_overrides = assignment&.assignment_overrides
+      active_overrides = assignment_overrides&.active
+      return [] if active_overrides.blank?
+
+      active_overrides.where(set_type: "Noop", quiz_id: nil).map do |o|
+        override_attrs = o.slice(:set_type, :set_id, :title)
+        AssignmentOverride.overridden_dates.each do |field|
+          next unless o.send(:"#{field}_overridden")
+
+          override_attrs["field"] = o[field]
+        end
+        override_attrs
+      end.to_json
     end
   end
 end

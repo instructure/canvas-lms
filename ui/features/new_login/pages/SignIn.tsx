@@ -27,8 +27,13 @@ import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
 import {ROUTES} from '../routes/routes'
 import {performSignIn} from '../services'
-import {ActionPrompt, ForgotPasswordLink, RememberMeCheckbox, SSOButtons} from '../shared'
-import LoginAlert from '../shared/LoginAlert'
+import {
+  ActionPrompt,
+  ForgotPasswordLink,
+  LoginTroubleLink,
+  RememberMeCheckbox,
+  SSOButtons,
+} from '../shared'
 import {createErrorMessage} from '../shared/helpers'
 import {SelfRegistrationType} from '../types'
 import OtpForm from './OtpForm'
@@ -36,16 +41,15 @@ import OtpForm from './OtpForm'
 const I18n = createI18nScope('new_login')
 
 const SignIn = () => {
-  const {isUiActionPending, setIsUiActionPending, otpRequired, setOtpRequired, rememberMe} =
+  const {isUiActionPending, otpRequired, rememberMe, setIsUiActionPending, setOtpRequired} =
     useNewLogin()
-  const {authProviders, invalidLoginFaqUrl, isPreviewMode, selfRegistrationType, loginHandleName} =
+  const {authProviders, invalidLoginFaqUrl, isPreviewMode, loginHandleName, selfRegistrationType} =
     useNewLoginData()
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [usernameError, setUsernameError] = useState('')
   const [passwordError, setPasswordError] = useState('')
-  const [loginFailed, setLoginFailed] = useState(false)
 
   const isRedirectingRef = useRef(false)
   const usernameInputRef = useRef<HTMLInputElement | null>(null)
@@ -59,6 +63,14 @@ const SignIn = () => {
     setUsernameError('')
     setPasswordError('')
   }, [otpRequired])
+
+  // focus input after isUiActionPending clears and error state is present
+  // this is cleaner than setTimeout()/requestAnimationFrame() workarounds
+  useEffect(() => {
+    if (!isUiActionPending && usernameError) {
+      usernameInputRef.current?.focus()
+    }
+  }, [isUiActionPending, usernameError])
 
   const validateForm = (): boolean => {
     let hasValidationError = false
@@ -89,8 +101,10 @@ const SignIn = () => {
   }
 
   const handleFailedLogin = () => {
+    setPasswordError('')
     setPassword('')
-    setLoginFailed(true)
+    setUsernameError(I18n.t('Please verify your email and password and try again.'))
+    // focus set in useEffect above …
   }
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -160,13 +174,6 @@ const SignIn = () => {
         )}
       </Flex>
 
-      {loginFailed && (
-        <LoginAlert
-          invalidLoginFaqUrl={invalidLoginFaqUrl ?? null}
-          loginHandleName={loginHandleName || ''}
-        />
-      )}
-
       <form onSubmit={handleLogin} noValidate={true}>
         <Flex direction="column" gap="large">
           <Flex direction="column" gap="mediumSmall">
@@ -217,6 +224,12 @@ const SignIn = () => {
             <Flex.Item align="center" overflowX="visible" overflowY="visible">
               <ForgotPasswordLink />
             </Flex.Item>
+
+            {invalidLoginFaqUrl && (
+              <Flex.Item align="center" overflowX="visible" overflowY="visible">
+                <LoginTroubleLink url={invalidLoginFaqUrl} />
+              </Flex.Item>
+            )}
           </Flex>
         </Flex>
       </form>

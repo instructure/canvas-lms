@@ -69,7 +69,10 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
       delete tagRefs.current[selectedTagId]
       tagRefs.current[userTagList[0].id]?.focus()
     }
-  }, [userTagList])
+  }, [userTagList]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const shouldLimitModalHeight = userTagList && userTagList.length >= 10
+
   return (
     <>
       <Modal
@@ -90,7 +93,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
             screenReaderLabel={I18n.t('Close the user tags modal')}
           />
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body data-testid="user-tags-scrollable-container">
           <Flex
             as="div"
             alignItems="start"
@@ -98,6 +101,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
             gap="none"
             direction="column"
             width="100%"
+            height={shouldLimitModalHeight ? '20rem' : 'auto'}
           >
             {isSuccess && (
               <Alert
@@ -138,52 +142,58 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
               <Flex.Item shouldGrow shouldShrink margin="medium">
                 <Spinner renderTitle={I18n.t('Removing user from tag...')} size="small" />
               </Flex.Item>
-            ) : userTagList.length === 0 ? (
+            ) : userTagList?.length === 0 ? (
               <Flex.Item shouldGrow shouldShrink margin="medium">
                 <Text>{I18n.t('No tags available for this user')}</Text>
               </Flex.Item>
             ) : (
-              userTagList.map(tag => (
-                <Flex.Item
-                  key={`tag-flex-${tag.id}`}
-                  margin="0"
-                  overflowY="hidden"
-                  overflowX="hidden"
-                  padding="xx-small"
-                >
-                  <Tag
-                    ref={el => el && (tagRefs.current[tag.id] = el)}
-                    data-testid={`user-tag-${tag.id}`}
-                    text={
-                      <AccessibleContent
-                        alt={I18n.t('Remove %{tag}', {
-                          tag: tag.isSingleTag
+              <Flex
+                direction="column"
+                padding={shouldLimitModalHeight ? 'none none medium none' : 'none'}
+                width="100%"
+              >
+                {(userTagList || []).map(tag => (
+                  <Flex.Item
+                    key={`tag-flex-${tag.id}`}
+                    margin="0"
+                    overflowY="hidden"
+                    overflowX="hidden"
+                    padding="xx-small"
+                  >
+                    <Tag
+                      ref={el => el && (tagRefs.current[tag.id] = el)}
+                      data-testid={`user-tag-${tag.id}`}
+                      text={
+                        <AccessibleContent
+                          alt={I18n.t('Remove %{tag}', {
+                            tag: tag.isSingleTag
+                              ? tag.groupCategoryName
+                              : `${tag.groupCategoryName} | ${tag.name}`,
+                          })}
+                        >
+                          {tag.isSingleTag
                             ? tag.groupCategoryName
-                            : `${tag.groupCategoryName} | ${tag.name}`,
-                        })}
-                      >
-                        {tag.isSingleTag
-                          ? tag.groupCategoryName
-                          : `${tag.groupCategoryName} | ${tag.name}`}
-                      </AccessibleContent>
-                    }
-                    dismissible={true}
-                    margin="auto"
-                    size="medium"
-                    onClick={function (e) {
-                      setSelectedTagId(tag.id)
-                      setIsWarningModalOpen(true)
-                    }}
-                    themeOverride={{
-                      maxWidth: '100%',
-                    }}
-                  />
-                </Flex.Item>
-              ))
+                            : `${tag.groupCategoryName} | ${tag.name}`}
+                        </AccessibleContent>
+                      }
+                      dismissible={true}
+                      margin="auto"
+                      size="medium"
+                      onClick={function () {
+                        setSelectedTagId(tag.id)
+                        setIsWarningModalOpen(true)
+                      }}
+                      themeOverride={{
+                        maxWidth: '100%',
+                      }}
+                    />
+                  </Flex.Item>
+                ))}
+              </Flex>
             )}
           </Flex>
         </Modal.Body>
-        <Modal.Footer></Modal.Footer>
+        <Modal.Footer />
       </Modal>
       <RemoveTagWarningModal
         open={isWarningModalOpen}
