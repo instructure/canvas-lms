@@ -61,6 +61,7 @@ import {
   multipleTypesDrafted,
   totalAllowedAttempts,
   activeTypeMeetsCriteria,
+  getPointsValue,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
@@ -980,11 +981,11 @@ const SubmissionManager = ({
   }
 
   const rubricAssessmentData = (selfAssessment?.data ?? []).map(data => {
-    const points = data.points
+    const points = getPointsValue(data.points)
     return {
       ...data,
       criterionId: data.criterion_id,
-      points: typeof points === 'number' ? points : points.value,
+      points: points,
     }
   })
 
