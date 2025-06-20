@@ -15944,6 +15944,7 @@ fa:
     grading_standard_type: "استاندارد نمره گذاری"
     group_type: گروه
     learning_outcome_type: "نتیجه یادگیری"
+    module_item_type: "مورد ماژول"
     module_type: ماژول
     quiz_question_type: "پرسش آزمون"
     quiz_type: آزمون
