@@ -923,33 +923,68 @@ describe('RubricForm Tests', () => {
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-rating-scoring-type-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-type-select')).toBeInTheDocument()
-      expect(getByTestId('hide-outcome-results-checkbox')).toBeInTheDocument()
-      expect(getByTestId('use-for-grading-checkbox')).toBeInTheDocument()
-      expect(getByTestId('hide-score-total-checkbox')).toBeInTheDocument()
     })
 
-    it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
+    it('does not display options when showAdditionalOptions is set to false', () => {
       queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
-      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
 
-      const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
-      fireEvent.click(scoringTypeSelect)
-      fireEvent.click(getByTestId('scoring_type_unscored'))
-
+      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
 
-    it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+    describe('assignment level options', () => {
+      it('should not be rendered when assignmentId is not provided', () => {
+        const {queryByTestId} = renderComponent()
 
-      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      })
 
-      const useForGradingCheckbox = getByTestId('use-for-grading-checkbox')
-      fireEvent.click(useForGradingCheckbox)
+      it('should be rendered when assignmentId is provided', () => {
+        const {getByTestId} = renderComponent({assignmentId: '1'})
 
-      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(getByTestId('use-for-grading-checkbox')).toBeInTheDocument()
+        expect(getByTestId('hide-score-total-checkbox')).toBeInTheDocument()
+        expect(getByTestId('hide-outcome-results-checkbox')).toBeInTheDocument()
+      })
+
+      it('should not be rendered when showAdditionalOptions is disabled', () => {
+        const {queryByTestId} = renderComponent({showAdditionalOptions: false})
+
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      })
+
+      it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent({rubricId: '1', assignmentId: '1'})
+
+        const useForGradingCheckbox = getByTestId('use-for-grading-checkbox')
+        fireEvent.click(useForGradingCheckbox)
+
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+      })
+
+      it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+        const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
+        fireEvent.click(scoringTypeSelect)
+        fireEvent.click(getByTestId('scoring_type_unscored'))
+
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+      })
     })
 
     it('hides points when scoring type is set to unscored', () => {
@@ -963,18 +998,6 @@ describe('RubricForm Tests', () => {
 
       expect(queryByTestId('rubric-points-possible-1')).not.toBeInTheDocument()
       expect(queryAllByTestId('rubric-criteria-row-points')).toHaveLength(0)
-    })
-
-    it('does not display options when showAdditionalOptions is set to false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
-
-      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
-
-      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
-      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
-      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
-      expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
-      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
   })
 

@@ -150,6 +150,8 @@ export const RubricForm = ({
   )
   const [showGenerateCriteriaHeader, setShowGenerateCriteriaHeader] = useState(false)
   const [currentProgress, setCurrentProgress] = useState<CanvasProgress>()
+  const showAssignmentSettings = assignmentId && assignmentId !== ''
+
   const criteriaRef = useRef(rubricForm.criteria)
 
   const header = rubricId || rubric?.id ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
@@ -543,7 +545,7 @@ export const RubricForm = ({
             )}
           </Flex>
 
-          {showAdditionalOptions && (
+          {showAdditionalOptions && showAssignmentSettings && (
             <Flex margin="medium 0 0" gap="medium">
               <Flex.Item>
                 <Checkbox
