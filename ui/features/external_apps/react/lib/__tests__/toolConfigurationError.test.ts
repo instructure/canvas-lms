@@ -19,21 +19,27 @@
 import $ from 'jquery'
 import toolConfigurationError from '../toolConfigurationError'
 
+interface ErrorWithStatus {
+  response: {
+    status: number
+  }
+}
+
 beforeAll(() => {
   $.flashError = jest.fn()
 })
 
 afterEach(() => {
-  $.flashError.mockClear()
+  ;($.flashError as jest.Mock).mockClear()
 })
 
 afterAll(() => {
-  $.flashError.mockRestore()
+  ;($.flashError as jest.Mock).mockRestore()
 })
 
 const clientId = '1000000009'
 
-const errorWithStatus = status => ({response: {status}})
+const errorWithStatus = (status: number): ErrorWithStatus => ({response: {status}})
 
 describe('toolConfigurationError', () => {
   describe('when error statuss is 404', () => {

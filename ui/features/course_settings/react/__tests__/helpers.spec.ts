@@ -18,6 +18,27 @@
 
 import Helpers from '../helpers'
 
+interface MockFile {
+  name?: string
+  type: string
+}
+
+interface ChangeEvent {
+  type: 'change'
+  target: {
+    files: MockFile[]
+  }
+}
+
+interface DragEvent {
+  type: 'drop'
+  dataTransfer: {
+    files: MockFile[]
+  }
+}
+
+type ExtractableEvent = ChangeEvent | DragEvent
+
 describe('Course Settings Helpers', () => {
   test('isValidImageType', () => {
     expect(Helpers.isValidImageType('image/jpeg')).toBe(true) // accepts jpeg
@@ -28,14 +49,14 @@ describe('Course Settings Helpers', () => {
   })
 
   test('extractInfoFromEvent', () => {
-    const changeEvent = {
+    const changeEvent: ChangeEvent = {
       type: 'change',
       target: {
         files: [{type: 'image/jpeg'}],
       },
     }
 
-    const dragEvent = {
+    const dragEvent: DragEvent = {
       type: 'drop',
       dataTransfer: {
         files: [
@@ -47,7 +68,7 @@ describe('Course Settings Helpers', () => {
       },
     }
 
-    const changeResults = Helpers.extractInfoFromEvent(changeEvent)
+    const changeResults = Helpers.extractInfoFromEvent(changeEvent as ExtractableEvent)
     const expectedChangeResults = {
       file: {
         type: 'image/jpeg',
@@ -55,7 +76,7 @@ describe('Course Settings Helpers', () => {
       type: 'image/jpeg',
     }
 
-    const dragResults = Helpers.extractInfoFromEvent(dragEvent)
+    const dragResults = Helpers.extractInfoFromEvent(dragEvent as ExtractableEvent)
     const expectedDragResults = {
       file: {
         name: 'test',

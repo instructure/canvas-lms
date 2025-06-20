@@ -17,10 +17,10 @@
  */
 
 import actions from '../../actions/developerKeysActions'
-import reducer from '../activateReducer'
+import reducer, {ActivateDeveloperKeyPendingState} from '../activateReducer'
 
 describe('activateReducer', () => {
-  const defaults = reducer(undefined, {})
+  const defaults = reducer(undefined, {type: '' as any})
 
   test('there are defaults', () => {
     expect(defaults.activateDeveloperKeyPending).toBe(false)
@@ -29,13 +29,13 @@ describe('activateReducer', () => {
   })
 
   test('responds to activateDeveloperKeyStart', () => {
-    const state = {
+    const state: ActivateDeveloperKeyPendingState = {
       activateDeveloperKeyPending: false,
       activateDeveloperKeySuccessful: true,
       activateDeveloperKeyError: {},
     }
 
-    const action = actions.activateDeveloperKeyStart()
+    const action = actions.activateDeveloperKeyStart({})
     const newState = reducer(state, action)
 
     expect(newState.activateDeveloperKeyPending).toBe(true)
@@ -44,9 +44,10 @@ describe('activateReducer', () => {
   })
 
   test('responds to activateDeveloperKeySuccessful', () => {
-    const state = {
+    const state: ActivateDeveloperKeyPendingState = {
       activateDeveloperKeyPending: true,
       activateDeveloperKeySuccessful: false,
+      activateDeveloperKeyError: null,
     }
     const payload = {}
     const action = actions.activateDeveloperKeySuccessful(payload)
@@ -57,9 +58,10 @@ describe('activateReducer', () => {
   })
 
   test('responds to activateDeveloperKeyFailed', () => {
-    const state = {
+    const state: ActivateDeveloperKeyPendingState = {
       activateDeveloperKeyPending: true,
       activateDeveloperKeyError: null,
+      activateDeveloperKeySuccessful: false,
     }
     const error = {}
 

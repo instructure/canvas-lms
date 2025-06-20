@@ -19,8 +19,24 @@
 import actions from '../actions'
 import reducer from '../reducer'
 
+interface Assignment {
+  name: string
+  type: string
+  points: number
+  due_date: string
+}
+
+interface Option {
+  assignments: Assignment[]
+}
+
+interface Action {
+  type: string
+  payload?: unknown
+}
+
 describe('Choose Mastery Path Reducer', () => {
-  const reduce = (action, state = {}) => reducer(state, action)
+  const reduce = (action: Action, state = {}) => reducer(state as any, action)
 
   test('sets error', () => {
     const newState = reduce(actions.setError('ERROR'))
@@ -28,7 +44,7 @@ describe('Choose Mastery Path Reducer', () => {
   })
 
   test('sets options', () => {
-    const options = [
+    const options: Option[] = [
       {
         assignments: [
           {
