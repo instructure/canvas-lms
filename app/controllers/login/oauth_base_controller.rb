@@ -83,16 +83,19 @@ class Login::OAuthBaseController < ApplicationController
       return
     end
 
+    # Apply any authentication-provider-specific validations on the found pseudonym. This validation needs to happen
+    # before we apply any federated attributes so that we do not update the user and pseudonym if the validation
+    # would fail. Since we don't have a pseudonym yet when jit provisioning a user, we can only run the validation
+    # after the user has been created.
+    #
+    # See AuthenticationProvider::OAuth2#validate_found_pseudonym!
     if pseudonym
+      @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
       @aac.apply_federated_attributes(pseudonym, provider_attributes)
     elsif @aac.jit_provisioning?
       pseudonym = @aac.provision_user(unique_ids, provider_attributes)
+      @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
     end
-
-    # Apply any authentication-provider-specific validations on the found pseudonym.
-    #
-    # See AuthenticationProvider::OAuth2#validate_found_pseudonym!
-    @aac.try(:validate_found_pseudonym!, pseudonym:, session:, token:, target_auth_provider: try(:target_auth_provider))
 
     if pseudonym && (user = pseudonym.login_assertions_for_user)
       # Successful login and we have a user
