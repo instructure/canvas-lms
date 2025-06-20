@@ -181,7 +181,7 @@
     "jest-mock-proxy": "3.1.2",
     "jest": "^28",
     "mathjax": "^3.2.0",
-    "moxios": "^0.4",
+    "msw": "^2.7",
     "nyc": "^13",
     "proxyquire": "1.7.4",
     "shelljs": "^0.8.3",
