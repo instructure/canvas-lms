@@ -27,7 +27,8 @@ import {render, waitFor, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries, screen} from '@testing-library/dom'
 import CanvasStudioPlayer, {formatTracksForMediaPlayer} from '../CanvasStudioPlayer'
 import {uniqueId} from 'lodash'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const defaultMediaObject = (overrides = {}) => ({
   bitrate: '12345',
@@ -43,6 +44,8 @@ const defaultMediaObject = (overrides = {}) => ({
 })
 
 function setPlayerSize(player, type, dimensions, container, resizeContainer = true) {}
+
+const server = setupServer()
 
 // TODO: The studio-player does not work with jest
 // revisit unit tests if they upgrade it to play nicer
@@ -65,12 +68,19 @@ describe.skip('CanvasStudioPlayer', () => {
       document.body.appendChild(d)
     })
 
+    beforeAll(() => server.listen())
+    afterAll(() => server.close())
+
     beforeEach(() => {
       // @ts-expect-error
       jest.useFakeTimers()
-      fetchMock.get(/\/media_objects\/\d+\/info/, {
-        media_sources: [defaultMediaObject()],
-      })
+      server.use(
+        http.get(/\/media_objects\/\d+\/info/, () => {
+          return HttpResponse.json({
+            media_sources: [defaultMediaObject()],
+          })
+        }),
+      )
     })
     afterEach(() => {
       act(() => {
@@ -78,6 +88,7 @@ describe.skip('CanvasStudioPlayer', () => {
       })
       jest.resetAllMocks()
       jest.useRealTimers()
+      server.resetHandlers()
     })
 
     it('renders the component', () => {

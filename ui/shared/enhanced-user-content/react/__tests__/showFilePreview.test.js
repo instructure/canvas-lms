@@ -17,7 +17,8 @@
  */
 
 import {findByLabelText, getByLabelText} from '@testing-library/dom'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {showFilePreview} from '../showFilePreview'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import $ from 'jquery'
@@ -34,19 +35,34 @@ $.flashError = jest.fn()
 const fauxFile =
   '{"id":"2282","uuid":"euqlFIGlaDneUO3hdN7n6NRkpRuImBhxSgy4Otev","folder_id":135,"display_name":"client-app-files.txt","filename":"client-app-files.txt","upload_status":"success","content-type":"text/plain","url":"http://localhost:3000/files/2282/download?download_frd=1","size":201105,"created_at":"2021-02-01T15:07:40Z","updated_at":"2021-02-01T15:07:43Z","unlock_at":null,"locked":false,"hidden":true,"lock_at":null,"hidden_for_user":false,"thumbnail_url":null,"modified_at":"2021-02-01T15:07:40Z","mime_class":"text","media_entry_id":null,"locked_for_user":false,"canvadoc_session_url":null,"crocodoc_session_url":null}'
 
+const server = setupServer()
+
 describe('showFilePreview', () => {
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     fakeENV.setup()
     document.body.innerHTML = ''
-    fetchMock.reset()
-    fetchMock.mock('/api/v1/files/2282?include[]=enhanced_preview_url&verifier=abc', fauxFile)
+    server.use(
+      http.get('/api/v1/files/2282', ({request}) => {
+        const url = new URL(request.url)
+        if (
+          url.searchParams.get('include[]') === 'enhanced_preview_url' &&
+          url.searchParams.get('verifier') === 'abc'
+        ) {
+          return HttpResponse.text(fauxFile)
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
     // Reset jQuery mock before each test
     $.flashError.mockClear()
   })
 
   afterEach(() => {
     fakeENV.teardown()
-    fetchMock.restore()
+    server.resetHandlers()
     document.body.innerHTML = ''
   })
 
@@ -63,9 +79,11 @@ describe('showFilePreview', () => {
 
   it('displays a flash error message if file is not found', async () => {
     // Mock the 404 response for this specific test
-    fetchMock.mock('/api/v1/files/2283?include[]=enhanced_preview_url&verifier=abc', 404, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get('/api/v1/files/2283', () => {
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
 
     // Call the function that should trigger the error
     await showFilePreview('2283', 'abc')
