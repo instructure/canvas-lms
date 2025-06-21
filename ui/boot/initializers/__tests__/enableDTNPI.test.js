@@ -18,11 +18,17 @@
 
 import {up as enableDTNPI, down as disableDTNPI} from '../enableDTNPI'
 import {log} from '@canvas/datetime-natural-parsing-instrument'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import $ from 'jquery'
+
+const server = setupServer()
 
 describe('enableDTNPI', () => {
   let consoleLog
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     consoleLog = jest.spyOn(console, 'log').mockImplementation(() => {})
@@ -34,6 +40,7 @@ describe('enableDTNPI', () => {
     consoleLog.mockReset()
     // Clean up the jQuery mock
     $.flashError.mockReset()
+    server.resetHandlers()
 
     await disableDTNPI()
   })
@@ -70,6 +77,8 @@ describe('enableDTNPI', () => {
 
   it('submits tracked events to the backend', async () => {
     const endpoint = 'https://blahblah/submit'
+    let requestMade = false
+    let capturedPayload = null
 
     localStorage.setItem(
       'dtnpi',
@@ -84,18 +93,21 @@ describe('enableDTNPI', () => {
       ]),
     )
 
-    fetchMock.put(endpoint, 200)
+    server.use(
+      http.put(endpoint, async ({request}) => {
+        requestMade = true
+        capturedPayload = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
+    )
 
-    expect(fetchMock.called()).toBeFalsy()
+    expect(requestMade).toBeFalsy()
 
     await enableDTNPI({endpoint})
 
-    expect(fetchMock.called()).toBeTruthy()
-    expect(fetchMock.lastCall()[0]).toEqual(endpoint)
+    expect(requestMade).toBeTruthy()
 
-    const payload = JSON.parse(fetchMock.lastCall()[1].body)
-
-    expect(payload).toHaveLength(1)
-    expect(payload.map(x => x.id)).toEqual(['a'])
+    expect(capturedPayload).toHaveLength(1)
+    expect(capturedPayload.map(x => x.id)).toEqual(['a'])
   })
 })
