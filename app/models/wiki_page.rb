@@ -695,10 +695,9 @@ class WikiPage < ActiveRecord::Base
     no_assignment_page_visibilities = without_assignment_in_course(opts[:course_id])
 
     visible_wiki_pages = WikiPageVisibility::WikiPageVisibilityService.wiki_pages_visible_to_students(course_ids: opts[:course_id], user_ids: opts[:user_id])
-    visible_wiki_page_ids = visible_wiki_pages.map { |visibility| [visibility.wiki_page_id, visibility.user_id] }
-    no_assignment_page_visibilities = no_assignment_page_visibilities
-                                      .where(id: visible_wiki_page_ids.map(&:first))
-                                      .pluck(:id).group_by { |id| visible_wiki_page_ids.find { |visibility| visibility.first == id }.last }
+    visible_wiki_pages = visible_wiki_pages.select { |v| no_assignment_page_visibilities.pluck(:id).include?(v.wiki_page_id) }
+    no_assignment_page_visibilities = visible_wiki_pages.group_by(&:user_id)
+                                                        .transform_values { |visibilities| visibilities.map(&:wiki_page_id) }
 
     opts[:user_id].index_with do |user_id|
       page_ids_with_assignment = (assignment_page_visibilities[user_id] || []).map { |page_id, _| page_id }
