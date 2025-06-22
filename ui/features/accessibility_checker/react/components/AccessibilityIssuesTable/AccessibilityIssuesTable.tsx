@@ -27,6 +27,7 @@ import {View} from '@instructure/ui-view'
 
 import {ContentItem} from '../../types'
 import {IssueCell} from './IssueCell'
+import {ContentTypeCell} from './ContentTypeCell'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -168,7 +169,9 @@ export const AccessibilityIssuesTable = ({
                 <Table.Cell textAlign="center">
                   <IssueCell item={item} onClick={handleRowClick} />
                 </Table.Cell>
-                <Table.Cell>{item.type}</Table.Cell>
+                <Table.Cell>
+                  <ContentTypeCell item={item} />
+                </Table.Cell>
                 <Table.Cell>
                   <Flex alignItems="center">
                     {item.published ? (
