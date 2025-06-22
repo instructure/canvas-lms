@@ -1363,6 +1363,14 @@ describe WikiPage do
       assert_visible(@student2, [@page1])
     end
 
+    it "visible_ids_by_user includes pages for all students" do
+      @page3 = @course1.wiki_pages.create!(title: "page3")
+      visible_ids_by_user = WikiPage.visible_ids_by_user({ user_id: [@student1.id, @student2.id], course_id: [@course1.id] })
+      pages_result = [@page1, @page3].map(&:id)
+      expect(visible_ids_by_user[@student1.id]).to contain_exactly(*pages_result)
+      expect(visible_ids_by_user[@student2.id]).to contain_exactly(*pages_result)
+    end
+
     it "includes pages with assignment if the user has an override" do
       override = @assignment.assignment_overrides.create!
       override.assignment_override_students.create!(user: @student1)
