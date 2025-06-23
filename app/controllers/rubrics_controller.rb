@@ -142,10 +142,6 @@ class RubricsController < ApplicationController
   #   or if it's to indicate the rubric should appear in its context
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
-  # @private TODO: document once feature is public: rubric[criteria_via_llm] [Boolean]
-  #   When true, +rubric[criteria]+ will be ignored (does not need to be included
-  #   at all). Instead, rubric criteria will be automatically generated from a
-  #   large language model (llm).
   def create
     update
   end
