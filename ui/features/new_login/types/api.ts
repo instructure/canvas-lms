@@ -34,7 +34,6 @@ export interface RegistrationResponse {
 export interface LoginResponse {
   location?: string
   otp_required?: boolean
-  pseudonym?: object
 }
 
 export interface OtpInitiationResponse {
