@@ -64,6 +64,7 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
     case 'Attachment':
       return <IconPaperclipLine color={color} data-testid="attachment-icon" />
     case 'ExternalUrl':
+    case 'ModuleExternalTool':
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
