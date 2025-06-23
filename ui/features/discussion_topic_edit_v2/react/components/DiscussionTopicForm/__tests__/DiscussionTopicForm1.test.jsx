@@ -73,6 +73,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {},
       PERMISSIONS: {},
+      SETTINGS: {},
       allow_student_anonymous_discussion_topics: false,
       USAGE_RIGHTS_REQUIRED: false,
       K5_HOMEROOM_COURSE: false,
@@ -115,6 +116,7 @@ describe('DiscussionTopicForm', () => {
       it('renders require initiator checkbox truth as default', () => {
         ENV = {
           FEATURES: {},
+          SETTINGS: {},
           STUDENT_PLANNER_ENABLED: true,
           DISCUSSION_TOPIC: {
             ATTRIBUTES: {
@@ -136,6 +138,7 @@ describe('DiscussionTopicForm', () => {
         it('renders require initiator checkbox truth as default', () => {
           ENV = {
             FEATURES: {},
+            SETTINGS: {},
             STUDENT_PLANNER_ENABLED: true,
             DISCUSSION_TOPIC: {
               ATTRIBUTES: {
@@ -159,6 +162,7 @@ describe('DiscussionTopicForm', () => {
       it('renders require initiator checkbox truth as default', () => {
         ENV = {
           FEATURES: {},
+          SETTINGS: {},
           STUDENT_PLANNER_ENABLED: true,
           DISCUSSION_TOPIC: {
             ATTRIBUTES: {

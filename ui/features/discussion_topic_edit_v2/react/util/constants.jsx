@@ -135,6 +135,8 @@ export const useShouldShowContent = (
   const shouldShowAllowParticipantsToCommentOption =
     !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
 
+  const shouldShowSuppressAssignmentOption = isGraded && ENV.SETTINGS.suppress_assignments
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -152,5 +154,6 @@ export const useShouldShowContent = (
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
+    shouldShowSuppressAssignmentOption,
   }
 }

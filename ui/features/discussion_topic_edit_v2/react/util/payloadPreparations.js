@@ -365,6 +365,7 @@ export const prepareAssignmentPayload = (
   importantDates,
   isCheckpoints,
   existingAssignment,
+  suppressedAssignment,
 ) => {
   /*
   Return null if the assignment is not graded and there is no existing assignment.
@@ -394,6 +395,7 @@ export const prepareAssignmentPayload = (
     onlyVisibleToOverrides: setOnlyVisibleToOverrides(assignedInfoList, everyoneOverride),
     gradingStandardId: gradingSchemeId || null,
     forCheckpoints: isCheckpoints,
+    suppressAssignment: suppressedAssignment,
   }
   if (abGuid) {
     payload = {
