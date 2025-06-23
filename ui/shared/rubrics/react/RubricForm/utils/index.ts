@@ -116,3 +116,22 @@ export const autoGeneratePoints = (ratings: RubricRating[], points: number) => {
 
   return ratingList
 }
+
+export const calcPointsPossible = (criteria: RubricCriterion[]): number =>
+  criteria.reduce((acc, c) => acc + (c.ignoreForScoring ? 0 : c.points), 0)
+
+export const defaultRubricForm: RubricFormProps = {
+  title: '',
+  hasRubricAssociations: false,
+  hidePoints: false,
+  criteria: [],
+  pointsPossible: 0,
+  buttonDisplay: 'numeric',
+  ratingOrder: 'descending',
+  unassessed: true,
+  workflowState: 'active',
+  freeFormCriterionComments: false,
+  hideOutcomeResults: false,
+  hideScoreTotal: false,
+  useForGrading: false,
+}

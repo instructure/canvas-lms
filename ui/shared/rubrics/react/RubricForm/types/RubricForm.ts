@@ -45,3 +45,8 @@ export type RubricFormProps = {
   useForGrading: boolean
   rubricAssociationId?: string
 }
+
+export type RubricFormFieldSetter = <K extends keyof RubricFormProps>(
+  key: K,
+  value: RubricFormProps[K],
+) => void
