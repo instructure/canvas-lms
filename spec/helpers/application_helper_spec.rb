@@ -1504,4 +1504,25 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "#thumbnail_image_url" do
+    let(:root_account) { double("Account") }
+    let(:attachment) { double("Attachment", root_account:, uuid: "abc123") }
+
+    context "when :file_association_access feature is enabled" do
+      before do
+        allow(root_account).to receive(:feature_enabled?).with(:file_association_access).and_return(true)
+      end
+
+      it "calls thumbnail_image_plain_url with the correct arguments" do
+        expect(helper).to receive(:thumbnail_image_plain_url).with(attachment, {}).and_return("plain_url")
+        expect(helper.thumbnail_image_url(attachment)).to eq("plain_url")
+      end
+
+      it "passes url_options to thumbnail_image_plain_url" do
+        expect(helper).to receive(:thumbnail_image_plain_url).with(attachment, { foo: "bar" }).and_return("plain_url")
+        expect(helper.thumbnail_image_url(attachment, nil, { foo: "bar" })).to eq("plain_url")
+      end
+    end
+  end
 end

@@ -1392,10 +1392,18 @@ module ApplicationHelper
   end
 
   def thumbnail_image_url(attachment, uuid = nil, url_options = {})
-    # this thumbnail url is a route that redirects to local/s3 appropriately.
-    # deferred redirect through route because it may be saved for later use
-    # after a direct link to attachment.thumbnail_url would have expired
-    super(attachment, uuid || attachment.uuid, url_options)
+    # thumbnail_image_url is used in a lot of the remaining ERBs and in the API, so rather than edit those large amount
+    # of places now, we'll shim in this call to the plain_url.  When we go to remove the old thumbnail_image_url when
+    # this feature is on, we can then update the method name to remove plain and we should be able to just remove this
+    # method (and update call sites that pass the uuid.)
+    if attachment.root_account.feature_enabled?(:file_association_access)
+      thumbnail_image_plain_url(attachment, url_options)
+    else
+      # this thumbnail url is a route that redirects to local/s3 appropriately.
+      # deferred redirect through route because it may be saved for later use
+      # after a direct link to attachment.thumbnail_url would have expired
+      super(attachment, uuid || attachment.uuid, url_options)
+    end
   end
 
   def prefetch_assignment_external_tools
