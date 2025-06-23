@@ -112,7 +112,9 @@ describe ContextExternalTool do
     end
 
     it "sends an error to sentry if no context control is found" do
-      tool.context_controls.destroy_all
+      tool.context_controls.each do |control|
+        control.suspend_callbacks { control.destroy_permanently! }
+      end
 
       sentry_scope = double(Sentry::Scope)
       expect(Sentry).to receive(:with_scope).and_yield(sentry_scope)
