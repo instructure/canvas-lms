@@ -85,7 +85,7 @@ const ProductDetail = (props: ProductDetailProps) => {
   const productDescription = stripHtmlTags(product?.description)
 
   useEffect(() => {
-    if (window.pendo && typeof window.pendo.track === 'function' && product) {
+    if (window.pendo && typeof window.pendo.track === 'function' && product?.id && product?.name) {
       window.pendo.track('Product', {
         productId: product.id,
         productName: product.name,
@@ -93,8 +93,7 @@ const ProductDetail = (props: ProductDetailProps) => {
         placement: 'standard',
       })
     }
-    // @ts-expect-error
-  }, [product.id, product.name])
+  }, [product?.id, product?.name])
 
   const {otherProductsByCompany} = useSimilarProducts({
     params: {
