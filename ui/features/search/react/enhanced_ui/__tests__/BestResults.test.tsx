@@ -18,10 +18,12 @@
 
 import {render} from '@testing-library/react'
 import BestResults from '../BestResults'
+import userEvent from '@testing-library/user-event'
 
 const props = {
   courseId: '1',
   searchTerm: 'writing outlines',
+  resetSearch: jest.fn(),
   results: [
     {
       content_id: '3',
@@ -48,20 +50,23 @@ const props = {
 }
 
 describe('BestResults', () => {
-  it('should render multiple results', () => {
+  it('renders multiple results', () => {
     const {getByText} = render(<BestResults {...props} />)
 
-    expect(getByText('Best Matches')).toBeInTheDocument()
+    expect(getByText('Best matches')).toBeInTheDocument()
     expect(getByText('2 results for "writing outlines"')).toBeInTheDocument()
     expect(getByText('Course Syllabus')).toBeInTheDocument()
     expect(getByText('Favorite Artist - Outline')).toBeInTheDocument()
   })
 
-  it('should show no result message when no results are found', () => {
+  it('shows no result message and resets search results', async () => {
+    const user = userEvent.setup()
     const {getByText} = render(<BestResults {...props} results={[]} />)
 
     expect(getByText('No best matches for "writing outlines"')).toBeInTheDocument()
-    expect(getByText('Try a similar result below or start over.')).toBeInTheDocument()
+    expect(getByText('Try a similar result below or')).toBeInTheDocument() // 'start over' is a separate element (link)
+    await user.click(getByText('start over'))
+    expect(props.resetSearch).toHaveBeenCalled()
   })
 
   it('renders Feedback component', () => {

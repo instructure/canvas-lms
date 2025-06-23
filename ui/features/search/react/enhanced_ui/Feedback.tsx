@@ -19,11 +19,12 @@
 import React, {useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {IconButton} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {IconLikeLine, IconLikeSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import PositiveFeedbackModal from './PositiveFeedbackModal'
 import NegativeFeedbackModal from './NegativeFeedbackModal'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -66,14 +67,13 @@ export default function Feedback(props: Props) {
           <Text size="descriptionSection">{I18n.t('Feedback')}&ensp;</Text>
         </Flex.Item>
         <Flex.Item>
-          <IconButton
+          <CondensedButton
             data-testid="positive-feedback"
             onClick={_ => {
               setFeedback('liked')
               sendFeedback('LIKE', props.courseId, props.searchTerm)
               setPosModalOpen(true)
             }}
-            screenReaderLabel={I18n.t('I like these results')}
             renderIcon={
               feedback === 'liked' ? (
                 <IconLikeSolid color="brand" />
@@ -81,19 +81,18 @@ export default function Feedback(props: Props) {
                 <IconLikeLine color="brand" />
               )
             }
-            withBackground={false}
-            withBorder={false}
-          />
+          >
+            <ScreenReaderContent>{I18n.t('I like these results')}</ScreenReaderContent>
+          </CondensedButton>
         </Flex.Item>
         <Flex.Item>
           <span style={{display: 'inline-block', transform: 'rotate(180deg)'}}>
-            <IconButton
+            <CondensedButton
               data-testid="negative-feedback"
               onClick={_ => {
                 setFeedback('disliked')
                 setNegModalOpen(true)
               }}
-              screenReaderLabel={I18n.t('I do not like these results')}
               renderIcon={
                 feedback === 'disliked' ? (
                   <IconLikeSolid color="brand" />
@@ -101,9 +100,9 @@ export default function Feedback(props: Props) {
                   <IconLikeLine color="brand" />
                 )
               }
-              withBackground={false}
-              withBorder={false}
-            />
+            >
+              <ScreenReaderContent>{I18n.t('I do not like these results')}</ScreenReaderContent>
+            </CondensedButton>
           </span>
         </Flex.Item>
       </Flex>

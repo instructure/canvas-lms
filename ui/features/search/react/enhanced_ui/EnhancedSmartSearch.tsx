@@ -27,7 +27,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import IndexingProgress from '../IndexingProgress'
 import {Alert} from '@instructure/ui-alerts'
 
-const RELEVANCE_THRESHOLD = 0.5
+const RELEVANCE_THRESHOLD = 50
 const MAX_NUMBER_OF_RESULTS = 25
 
 const I18n = createI18nScope('SmartSearch')
@@ -38,6 +38,7 @@ interface Props {
 
 export default function EnhancedSmartSearch(props: Props) {
   const previousSearch = useRef('')
+  const searchInput = useRef<HTMLInputElement | null>(null)
   const [searchResults, setSearchResults] = useState<Result[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -48,14 +49,18 @@ export default function EnhancedSmartSearch(props: Props) {
       return <Alert variant="error">{error}</Alert>
     } else if (isLoading) {
       return (
-        <Flex justifyItems="center">
+        <Flex justifyItems="center" alignItems="center" margin="space12 0 0">
           <Spinner renderTitle={I18n.t('Searching')} />
         </Flex>
       )
     } else if (searchResults == null) {
-      return <Alert variant="error">{I18n.t('Failed to execute search')}</Alert>
+      return (
+        <Alert variant="error" variantScreenReaderLabel={I18n.t('Error alert,')}>
+          {I18n.t('Failed to search')}
+        </Alert>
+      )
     } else if (indexingProgress !== null) {
-      return <IndexingProgress progress={indexingProgress?.progress} />
+      return <IndexingProgress progress={indexingProgress?.progress} isEnhanced={true} />
     } else if (previousSearch.current === '' && searchResults.length === 0) {
       // no search has been performed yet
       return null
@@ -73,6 +78,13 @@ export default function EnhancedSmartSearch(props: Props) {
             searchTerm={previousSearch.current}
             results={bestResults}
             courseId={props.courseId}
+            resetSearch={() => {
+              setSearchResults([])
+              previousSearch.current = ''
+              if (searchInput.current) {
+                searchInput.current.focus()
+              }
+            }}
           />
           <SimilarResults searchTerm={previousSearch.current} results={similarResults} />
         </>
@@ -81,8 +93,11 @@ export default function EnhancedSmartSearch(props: Props) {
   }
 
   return (
-    <Flex direction="column" gap="medium">
+    <Flex direction="column" gap="sections">
       <SmartSearchHeader
+        setSearchInputRef={(input: HTMLInputElement | null) => {
+          searchInput.current = input
+        }}
         onSearch={query => {
           previousSearch.current = query
           setIsLoading(true)

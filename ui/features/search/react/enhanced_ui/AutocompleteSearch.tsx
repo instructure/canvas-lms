@@ -171,6 +171,7 @@ export default function AutocompleteSearch(props: Props) {
           <IconButton
             withBorder={false}
             withBackground={false}
+            size="small"
             renderIcon={<IconTroubleLine />}
             onClick={() => handleInputChange('')}
             screenReaderLabel={I18n.t('Clear search')}

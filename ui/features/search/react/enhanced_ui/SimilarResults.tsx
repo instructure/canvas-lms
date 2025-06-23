@@ -35,9 +35,9 @@ export default function SimilarResults(props: Props) {
     return null
   }
   return (
-    <Flex gap="small" direction="column">
+    <Flex gap="sectionElements" direction="column" width="80%">
       <Flex.Item>
-        <Heading variant="titleSection">{I18n.t('Similar Results')}</Heading>
+        <Heading variant="titleSection">{I18n.t('Similar results')}</Heading>
         <Text>
           {I18n.t(
             'While not a direct match, these results could still provide useful information.',
