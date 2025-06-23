@@ -2913,7 +2913,7 @@ class CoursesController < ApplicationController
   # editable through this endpoint will be "syllabus_body"
   #
   # If an account has set prevent_course_availability_editing_by_teachers, a teacher cannot change
-  # course[start_at], course[conclude_at], or course[restrict_enrollments_to_course_dates] here.
+  # +course[start_at]+, +course[conclude_at]+, or +course[restrict_enrollments_to_course_dates]+ here.
   #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to move the course to.
