@@ -57,7 +57,7 @@ const results = [
     body: 'Apple pie is delicious.',
     html_url: '/courses/1/pages/syllabus',
     distance: 0.9,
-    relevance: 0.99,
+    relevance: 80,
     modules: modules1,
     published: false,
     due_date: null,
@@ -70,7 +70,7 @@ const results = [
     body: 'Trees need water and sunlight to grow.',
     html_url: '/courses/1/assignments/2',
     distance: 0.9,
-    relevance: 0.2,
+    relevance: 20,
     modules: modules2,
     published: true,
     due_date: '2025-05-09T05:00:00Z',
@@ -156,8 +156,8 @@ describe('EnhancedSmartSearch', () => {
       user.click(getByTestId('search-button'))
 
       await waitFor(() => {
-        expect(getByText('Similar Results')).toBeInTheDocument()
-        expect(getByText('Best Matches')).toBeInTheDocument()
+        expect(getByText('Similar results')).toBeInTheDocument()
+        expect(getByText('Best matches')).toBeInTheDocument()
         expect(getByText(results[0].title)).toBeInTheDocument()
         expect(getByText(results[1].title)).toBeInTheDocument()
       })
