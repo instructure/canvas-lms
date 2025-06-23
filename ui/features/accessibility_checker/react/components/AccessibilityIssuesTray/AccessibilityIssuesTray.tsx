@@ -34,16 +34,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import {IconPublishSolid} from '@instructure/ui-icons'
 import {Alert} from '@instructure/ui-alerts'
 
-interface AccessibilityIssuesModalProps {
-  isOpen: boolean
+interface AccessibilityIssuesTrayProps {
   onClose: (shallClose: boolean) => void
   item: ContentItem
 }
 
 const I18n = createI18nScope('accessibility_checker')
 
-export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> = ({
-  isOpen,
+export const AccessibilityIssuesTray: React.FC<AccessibilityIssuesTrayProps> = ({
   onClose,
   item,
 }) => {
@@ -188,13 +186,8 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
   }
 
   return (
-    <Modal
-      open={isOpen}
-      onDismiss={() => onClose(shallReload)}
-      size="medium"
-      label={`${item.title} - ${I18n.t('Accessibility Issues')}`}
-    >
-      <Modal.Header>
+    <View as="div" padding="medium">
+      <View>
         <CloseButton
           placement="end"
           onClick={() => onClose(shallReload)}
@@ -221,69 +214,67 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
             </Text>
           </Flex.Item>
         </Flex>
-      </Modal.Header>
+      </View>
 
-      <Modal.Body>
-        <View as="div" maxHeight="500px" overflowY="auto">
-          {item.issues && item.issues.length > 0 ? (
-            item.issues.map((issue, index) => {
-              return (
-                <View
-                  key={getIssueId(issue, index)}
-                  as="div"
-                  margin="0 0 medium 0"
-                  padding="small"
-                  borderWidth="0 0 0 medium"
-                  borderColor={solvedIssue.get(issue.id) ? 'success' : 'danger'}
-                  background="secondary"
-                >
-                  <Heading level="h3">{issue.message}</Heading>
-                  <Text as="p">{issue.why}</Text>
-                  {solvedIssue.get(issue.id) ? (
-                    <Flex direction="row" justifyItems="end">
-                      <Flex.Item margin="small">
-                        <IconPublishSolid color="success" />
-                      </Flex.Item>
-                      <Flex.Item>
-                        <Text>{I18n.t('Applied')}</Text>
-                      </Flex.Item>
-                    </Flex>
-                  ) : (
-                    createForm(issue.id, issue.form)
-                  )}
-                  {issue.issueUrl !== '' ? (
-                    <Link href={issue.issueUrl}>More information on this</Link>
+      <View>
+        {item.issues && item.issues.length > 0 ? (
+          item.issues.map((issue, index) => {
+            return (
+              <View
+                key={getIssueId(issue, index)}
+                as="div"
+                margin="0 0 medium 0"
+                padding="small"
+                borderWidth="0 0 0 medium"
+                borderColor={solvedIssue.get(issue.id) ? 'success' : 'danger'}
+                background="secondary"
+              >
+                <Heading level="h3">{issue.message}</Heading>
+                <Text as="p">{issue.why}</Text>
+                {solvedIssue.get(issue.id) ? (
+                  <Flex direction="row" justifyItems="end">
+                    <Flex.Item margin="small">
+                      <IconPublishSolid color="success" />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text>{I18n.t('Applied')}</Text>
+                    </Flex.Item>
+                  </Flex>
+                ) : (
+                  createForm(issue.id, issue.form)
+                )}
+                {issue.issueUrl !== '' ? (
+                  <Link href={issue.issueUrl}>More information on this</Link>
+                ) : (
+                  <></>
+                )}
+                <Flex direction="row" justifyItems="end">
+                  {applying.get(issue.id) === true ? (
+                    <Flex.Item>
+                      <Spinner renderTitle="Loading" size="x-small" />
+                    </Flex.Item>
                   ) : (
                     <></>
                   )}
-                  <Flex direction="row" justifyItems="end">
-                    {applying.get(issue.id) === true ? (
-                      <Flex.Item>
-                        <Spinner renderTitle="Loading" size="x-small" />
-                      </Flex.Item>
-                    ) : (
+                  <Flex.Item margin="0 small 0 0">
+                    {solvedIssue.get(issue.id) ? (
                       <></>
+                    ) : (
+                      <Button onClick={() => handleApplyClick(item, issue)}>
+                        {I18n.t('Apply Fix')}
+                      </Button>
                     )}
-                    <Flex.Item margin="0 small 0 0">
-                      {solvedIssue.get(issue.id) ? (
-                        <></>
-                      ) : (
-                        <Button onClick={() => handleApplyClick(item, issue)}>
-                          {I18n.t('Apply Fix')}
-                        </Button>
-                      )}
-                    </Flex.Item>
-                  </Flex>
-                </View>
-              )
-            })
-          ) : (
-            <Text as="p">{I18n.t('No issues found')}</Text>
-          )}
-        </View>
-      </Modal.Body>
+                  </Flex.Item>
+                </Flex>
+              </View>
+            )
+          })
+        ) : (
+          <Text as="p">{I18n.t('No issues found')}</Text>
+        )}
+      </View>
 
-      <Modal.Footer>
+      <View margin="0 medium">
         <Flex justifyItems="end">
           <Flex.Item margin="0 small 0 0">
             <Button onClick={() => onClose(shallReload)}>{I18n.t('Close')}</Button>
@@ -294,7 +285,7 @@ export const AccessibilityIssuesModal: React.FC<AccessibilityIssuesModalProps> =
             </Button>
           </Flex.Item>
         </Flex>
-      </Modal.Footer>
-    </Modal>
+      </View>
+    </View>
   )
 }
