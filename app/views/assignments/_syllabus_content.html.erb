@@ -17,7 +17,7 @@
 %>
 
 <% js_env :CAN_READ => can_do(@context, @current_user, :read) %>
-<% js_env :SYLLABUS_BODY => user_content(@syllabus_body || '') %>
+<% js_env :SYLLABUS_BODY => (@syllabus_body || '') %>
 <%
   show_summary = @context.syllabus_course_summary? && !@context.elementary_enabled? && !@context.horizon_course?
   if @context.elementary_enabled?
@@ -61,7 +61,7 @@ To add some comments, click the "Edit" link at the top.
 </div>
 
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content" data-resource-type="syllabus.body" data-resource-id="<%= @context.id %>">
-  <%= user_content(@syllabus_body) %>
+  <%= @syllabus_body %>
 </div>
 <div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
   <%= help_text %>
