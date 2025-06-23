@@ -110,7 +110,7 @@ export const ContextCard = ({
               </Heading>
               {typeof available !== 'undefined' ? (
                 <Pill color="primary" margin="0 0 0 small">
-                  {available ? I18n.t('Available') : I18n.t('Unavailable')}
+                  {available ? I18n.t('Available') : I18n.t('Not Available')}
                 </Pill>
               ) : null}
             </Flex>

@@ -150,7 +150,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               <Flex as="div">
                 <Flex.Item>
                   <Pill color="primary">
-                    {rootControl?.available ? I18n.t('Available') : I18n.t('Unavailable')}
+                    {rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')}
                   </Pill>
                 </Flex.Item>
               </Flex>

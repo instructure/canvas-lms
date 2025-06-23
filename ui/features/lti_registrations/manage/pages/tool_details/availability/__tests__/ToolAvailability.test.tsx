@@ -176,7 +176,7 @@ describe('ToolAvailability', () => {
   })
 
   describe('editing exceptions', () => {
-    it("let's users edit a sub-account level exception", async () => {
+    it('lets users edit a sub-account level exception', async () => {
       const mockEdit = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -230,7 +230,7 @@ describe('ToolAvailability', () => {
       ).toBeInTheDocument()
       expect(screen.getByText('Exception to be edited:')).toBeInTheDocument()
 
-      expect(screen.getByText('Not Available')).toBeInTheDocument()
+      expect(screen.getAllByText('Not Available')).toHaveLength(4)
 
       const selector = screen.getByRole('combobox')
       fireEvent.click(selector)
@@ -244,7 +244,7 @@ describe('ToolAvailability', () => {
       })
     })
 
-    it("let's users close the modal without saving changes", async () => {
+    it('lets users close the modal without saving changes', async () => {
       const mockEdit = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -300,7 +300,7 @@ describe('ToolAvailability', () => {
       expect(mockEdit).not.toHaveBeenCalled()
     })
 
-    it("let's users edit a course level exception", async () => {
+    it('lets users edit a course level exception', async () => {
       const mockEdit = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -362,7 +362,7 @@ describe('ToolAvailability', () => {
       })
     })
 
-    it("let's users edit the root level exception", async () => {
+    it('lets users edit the root level exception', async () => {
       const mockEdit = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -424,7 +424,7 @@ describe('ToolAvailability', () => {
   })
 
   describe('deleting exceptions', () => {
-    it("let's users delete a sub-account level exception", async () => {
+    it('lets users delete a sub-account level exception', async () => {
       const mockDelete = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -474,7 +474,7 @@ describe('ToolAvailability', () => {
 
       expect(await screen.findByText(/Exceptions to be deleted/i)).toBeInTheDocument()
 
-      expect(screen.getByText(/Not Available/i)).toBeInTheDocument()
+      expect(screen.getAllByText(/Not Available/i)).toHaveLength(2)
       expect(
         screen.getByText(
           /After this change, Test App will be for the cc-1-1 sub-account and its children/i,
@@ -490,7 +490,7 @@ describe('ToolAvailability', () => {
       })
     })
 
-    it("let's users cancel a sub-account level exception deletion", async () => {
+    it('lets users cancel a sub-account level exception deletion', async () => {
       const mockDelete = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -543,7 +543,7 @@ describe('ToolAvailability', () => {
       })
     })
 
-    it("let's users delete a course level exception", async () => {
+    it('lets users delete a course level exception', async () => {
       const mockDelete = jest.fn().mockResolvedValue(success({}))
 
       const reg = mockRegistrationWithAllInformation({
@@ -595,7 +595,7 @@ describe('ToolAvailability', () => {
       expect(
         screen.getByText(/After this change, Test App will be for the Test Course 101 course./i),
       ).toBeInTheDocument()
-      expect(screen.queryByText(/not available/i)).not.toBeInTheDocument()
+      expect(screen.getAllByText(/not available/i)).toHaveLength(3)
       expect(screen.getByText(/Available/i, {selector: 'strong'})).toBeInTheDocument()
 
       expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
