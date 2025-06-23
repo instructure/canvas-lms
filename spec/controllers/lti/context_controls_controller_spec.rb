@@ -857,40 +857,55 @@ describe Lti::ContextControlsController, type: :request do
     subject { delete "/api/v1/lti_registrations/#{registration_id}/controls/#{control_id}" }
 
     let(:deployment) { deployment_for(account) }
-    let(:control) { deployment.context_controls.first }
+    let(:course) { course_model(account:) }
+    let(:control) { deployment.context_controls.create!(course:, registration:) }
     let(:registration_id) { registration.id }
     let(:control_id) { control.id }
 
-    context "with the lti_registrations_next feature flag enabled" do
-      it "deletes and returns the context control" do
+    it "deletes and returns the context control" do
+      subject
+      expect(control.reload).to be_deleted
+      expect(response).to be_successful
+    end
+
+    context "with the deployment's primary control" do
+      let(:control) { deployment.context_controls.first }
+
+      it "returns a 422" do
         subject
-        expect(control.reload).to be_deleted
-        expect(response).to be_successful
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json["errors"]).to include("Cannot delete primary control for deployment")
       end
 
-      context "with a non-existent control" do
-        let(:control_id) { (Lti::ContextControl.last&.id || 1) + 1 }
-
-        it "returns a 404" do
-          subject
-          expect(response).to be_not_found
-        end
+      it "does not delete the control" do
+        control
+        expect { subject }.not_to change { Lti::ContextControl.active.count }
+        expect(control.reload).not_to be_deleted
       end
+    end
 
-      context "with a non-existent registration" do
-        let(:registration_id) { (Lti::Registration.last&.id || 1) + 1 }
+    context "with a non-existent control" do
+      let(:control_id) { (Lti::ContextControl.last&.id || 1) + 1 }
 
-        it "returns a 404" do
-          subject
-          expect(response).to be_not_found
-        end
-      end
-
-      it "returns a 403 if the user is not an admin" do
-        user_session(user_model)
+      it "returns a 404" do
         subject
-        expect(response).to be_forbidden
+        expect(response).to be_not_found
       end
+    end
+
+    context "with a non-existent registration" do
+      let(:registration_id) { (Lti::Registration.last&.id || 1) + 1 }
+
+      it "returns a 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it "returns a 403 if the user is not an admin" do
+      user_session(user_model)
+      subject
+      expect(response).to be_forbidden
     end
 
     context "with the lti_registration_next flag disabled" do
