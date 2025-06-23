@@ -69,6 +69,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {},
       PERMISSIONS: {},
+      SETTINGS: {},
       allow_student_anonymous_discussion_topics: false,
       USAGE_RIGHTS_REQUIRED: false,
       K5_HOMEROOM_COURSE: false,
@@ -116,6 +117,7 @@ describe('DiscussionTopicForm', () => {
     it('hides student ToDo, and ungraded options when Graded', () => {
       ENV = {
         FEATURES: {},
+        SETTINGS: {},
         STUDENT_PLANNER_ENABLED: true,
         DISCUSSION_TOPIC: {
           PERMISSIONS: {
@@ -252,6 +254,18 @@ describe('DiscussionTopicForm', () => {
       getByLabelText('Graded').click()
 
       expect(queryByTestId('checkpoints-checkbox')).toBeInTheDocument()
+    })
+
+    it('displays the suppress assignments checkbox whhen the Graded option is selected and suppress assignments setting is on', () => {
+      window.ENV.SETTINGS.suppress_assignments = true
+
+      const {queryByTestId, getByLabelText} = setup()
+
+      expect(queryByTestId('suppressed-assignment-checkbox')).not.toBeInTheDocument()
+
+      getByLabelText('Graded').click()
+
+      expect(queryByTestId('suppressed-assignment-checkbox')).toBeInTheDocument()
     })
 
     it('renders the cancel button', () => {

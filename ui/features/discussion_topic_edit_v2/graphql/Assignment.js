@@ -71,6 +71,7 @@ export const Assignment = {
         }
       }
       hasSubmittedSubmissions
+      suppressAssignment
     }
     ${AssignmentGroup.fragment}
     ${AssignmentOverride.fragment}

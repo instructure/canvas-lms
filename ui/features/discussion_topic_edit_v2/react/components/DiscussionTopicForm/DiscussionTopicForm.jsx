@@ -312,6 +312,12 @@ function DiscussionTopicForm({
 
   const [abGuid, setAbGuid] = useState(null)
 
+  // Suppressed assignment state
+  const [suppressedAssignment, setSuppressedAssignment] = useState(
+    (currentDiscussionTopic?.assignment?.suppressAssignment && ENV.SETTINGS.suppress_assignments) ||
+      false,
+  )
+
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     (currentDiscussionTopic?.assignment?.hasSubAssignments && ENV.DISCUSSION_CHECKPOINTS_ENABLED) ||
@@ -508,6 +514,7 @@ function DiscussionTopicForm({
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
+    shouldShowSuppressAssignmentOption,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -564,6 +571,7 @@ function DiscussionTopicForm({
         importantDates,
         isCheckpoints,
         currentDiscussionTopic?.assignment,
+        suppressedAssignment,
       ),
       checkpoints: prepareCheckpointsPayload(
         assignedInfoList,
@@ -966,6 +974,7 @@ function DiscussionTopicForm({
       setTodoDate(null)
     } else {
       setIsCheckpoints(false)
+      setSuppressedAssignment(false)
     }
   }
 
@@ -1226,6 +1235,24 @@ function DiscussionTopicForm({
                   </div>
                 </Tooltip>
               </>
+            )}
+            {shouldShowSuppressAssignmentOption && (
+              <View display="inline-block" padding="0 0 0 medium">
+                <Checkbox
+                  data-testid="suppressed-assignment-checkbox"
+                  data-pendo="suppressed-assignment-checkbox"
+                  data-action-state={
+                    suppressedAssignment ? 'suppressFromGradebook' : 'shownInGradebook'
+                  }
+                  label={I18n.t('Hide from gradebook view and student grades view')}
+                  value="suppress_from_gradebook"
+                  inline={true}
+                  checked={suppressedAssignment}
+                  onChange={() => {
+                    setSuppressedAssignment(!suppressedAssignment)
+                  }}
+                />
+              </View>
             )}
             {shouldShowLikingOption && (
               <>
