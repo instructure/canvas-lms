@@ -498,12 +498,53 @@ describe ConversationsController do
       expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
     end
 
-    it "allows Observers to message linked students" do
-      observer = user_with_pseudonym
-      add_linked_observer(@student, observer, root_account: @course.root_account)
-      user_session(observer)
-      post "create", params: { recipients: [@student.id.to_s], body: "Hello there", context_code: @course.asset_string }
-      expect(response).to be_successful
+    context "when the user is an observer and has an observed student" do
+      subject do
+        post "create", params: { recipients:, body: "Hello there", context_code: @course.asset_string }
+      end
+
+      let(:observer) { user_with_pseudonym }
+      let(:recipients) { [@student.id.to_s] }
+
+      before do
+        add_linked_observer(@student, observer, root_account: @course.root_account)
+        user_session(observer)
+      end
+
+      it "allows Observers to message linked students" do
+        subject
+        expect(response).to be_successful
+      end
+
+      context "when the observer has multiple recipients" do
+        context "when the other recipient is a not observed student" do
+          let(:other_student) do
+            new_user1 = User.create
+            enrollment1 = @course.enroll_student(new_user1)
+            enrollment1.workflow_state = "active"
+            enrollment1.save
+            new_user1
+          end
+
+          let(:recipients) { [@student.id.to_s, other_student.id.to_s] }
+
+          it "does not allow Observers to message non-linked students" do
+            subject
+            # "normalize_recipients" method does the magic filtering out of non-linked students
+            expect(response).to be_successful
+          end
+        end
+
+        context "when the other recipient is an instructor" do
+          let(:instructor) { @teacher }
+          let(:recipients) { [@student.id.to_s, instructor.id.to_s] }
+
+          it "allows Observers to message both recipients" do
+            subject
+            expect(response).to be_successful
+          end
+        end
+      end
     end
 
     context "group conversations" do
