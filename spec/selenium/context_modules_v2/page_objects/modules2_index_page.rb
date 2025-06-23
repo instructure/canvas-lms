@@ -22,6 +22,10 @@ require_relative "../../common"
 module Modules2IndexPage
   #------------------------------ Selectors -----------------------------
 
+  def assignments_due_button_selector
+    "[data-testid='assignment-due-this-week-button']"
+  end
+
   def collapse_all_modules_button_selector
     "button[aria-label='Collapse All']"
   end
@@ -103,6 +107,10 @@ module Modules2IndexPage
   end
 
   #------------------------------ Elements ------------------------------
+
+  def assignments_due_button
+    f(assignments_due_button_selector)
+  end
 
   def collapse_all_modules_button
     f(collapse_all_modules_button_selector)
@@ -194,6 +202,14 @@ module Modules2IndexPage
 
   #------------------------------ Actions -------------------------------
 
+  def assignments_due_button_exists?
+    element_exists?(assignments_due_button_selector)
+  end
+
+  def click_assignments_due_button
+    assignments_due_button.click
+  end
+
   def course_modules_setup(student_view: false)
     student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.quizzes.create!(title: "some quiz")
@@ -201,7 +217,6 @@ module Modules2IndexPage
     @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")
     @assignment2 = @course.assignments.create!(title: "assignment 2",
                                                submission_types: "online_text_entry",
-                                               due_at: 2.days.from_now,
                                                points_possible: 10)
     @assignment3 = @course.assignments.create!(title: "assignment 3", submission_types: "online_text_entry")
 

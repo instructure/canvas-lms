@@ -245,4 +245,118 @@ describe "context modules", :ignore_js_errors do
       expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
     end
   end
+
+  context "assignments due button" do
+    it "shows the number of assignments due this week if there are any" do
+      # Create assignments due this week.  Force a date so there are no boundary issues
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @due_assignment1 = @course.assignments.create!(title: "Due Assignment 1",
+                                                       submission_types: "online_text_entry",
+                                                       points_possible: 10,
+                                                       workflow_state: "published",
+                                                       due_at: 2.days.from_now)
+        @due_assignment2 = @course.assignments.create!(title: "Due Assignment 2",
+                                                       submission_types: "online_text_entry",
+                                                       points_possible: 10,
+                                                       workflow_state: "published",
+                                                       due_at: 3.days.from_now)
+        @module1.add_item(type: "assignment", id: @due_assignment1.id)
+        @module1.add_item(type: "assignment", id: @due_assignment2.id)
+
+        go_to_modules
+        expect(student_modules_container).to be_displayed
+        expect(assignments_due_button_exists?).to be_truthy
+
+        expect(assignments_due_button.text).to eq("2 Assignments Due This Week")
+      end
+    end
+
+    it "does not show the assignments due button if there are no assignments due this week" do
+      # Create assignment due next week
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @future_assignment = @course.assignments.create!(title: "Future Assignment",
+                                                         submission_types: "online_text_entry",
+                                                         points_possible: 10,
+                                                         workflow_state: "published",
+                                                         due_at: 2.weeks.from_now)
+        @module1.add_item(type: "assignment", id: @future_assignment.id)
+        go_to_modules
+        expect(student_modules_container).to be_displayed
+        expect(assignments_due_button_exists?).to be_falsey
+      end
+    end
+
+    it "navigates to the assignments index page when assignments due button is clicked" do
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @due_assignment = @course.assignments.create!(title: "Due Assignment",
+                                                      submission_types: "online_text_entry",
+                                                      points_possible: 10,
+                                                      workflow_state: "published",
+                                                      due_at: 1.day.from_now)
+        @module1.add_item(type: "assignment", id: @due_assignment.id)
+        go_to_modules
+        expect(student_modules_container).to be_displayed
+        expect(assignments_due_button_exists?).to be_truthy
+        click_assignments_due_button
+        expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
+      end
+    end
+
+    it "does not include assignments due after this week in the assignments due count" do
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @due_this_week = @course.assignments.create!(title: "Due This Week",
+                                                     submission_types: "online_text_entry",
+                                                     points_possible: 10,
+                                                     workflow_state: "published",
+                                                     due_at: 2.days.from_now)
+        @due_later = @course.assignments.create!(title: "Due Later",
+                                                 submission_types: "online_text_entry",
+                                                 points_possible: 10,
+                                                 workflow_state: "published",
+                                                 due_at: 2.weeks.from_now)
+        @module1.add_item(type: "assignment", id: @due_this_week.id)
+        @module1.add_item(type: "assignment", id: @due_later.id)
+        go_to_modules
+        expect(student_modules_container).to be_displayed
+        expect(assignments_due_button_exists?).to be_truthy
+        expect(assignments_due_button.text).to eq("1 Assignment Due This Week")
+      end
+    end
+
+    it "includes due assignments of all types of learning objects in the due assignments count" do
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @due_quiz = quiz_model(course: @course, title: "Due Quiz", workflow_state: "available")
+        @due_quiz.generate_quiz_data
+        @due_quiz.due_at = 2.days.from_now
+        @due_quiz.quiz_questions.create!(
+          question_data: {
+            name: "Quiz Questions",
+            question_type: "fill_in_multiple_blanks_question",
+            question_text: "[color1]",
+            answers: [{ text: "one", id: 1 }, { text: "two", id: 2 }, { text: "three", id: 3 }],
+            points_possible: 1
+          }
+        )
+        @due_quiz.save!
+        graded_assignment =
+          @course.assignments.create!(
+            title: "assignment",
+            points_possible: 10,
+            due_at: 2.days.from_now,
+            submission_types: "online_text_entry",
+            only_visible_to_overrides: false
+          )
+        @due_discussion = @course.discussion_topics.create!(title: "Graded Discussion", workflow_state: "active", assignment: graded_assignment)
+        @due_assignment = @course.assignments.create!(title: "Due Assignment", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.from_now)
+        @module1.add_item(type: "quiz", id: @due_quiz.id)
+        @module1.add_item(type: "discussion_topic", id: @due_discussion.id)
+        @module1.add_item(type: "assignment", id: @due_assignment.id)
+
+        go_to_modules
+        expect(student_modules_container).to be_displayed
+        expect(assignments_due_button_exists?).to be_truthy
+        expect(assignments_due_button.text).to eq("3 Assignments Due This Week")
+      end
+    end
+  end
 end
