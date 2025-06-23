@@ -209,4 +209,40 @@ describe "context modules", :ignore_js_errors do
       expect(f('[data-testid="modules-rewrite-student-container"]')).to be_displayed
     end
   end
+
+  context "missing assignment button" do
+    it "doesn't show the missing assignment button when there is no missing assignment" do
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      # missing assignment button should not be displayed
+      expect(missing_assignment_button_exists?).to be_falsey
+    end
+
+    it "shows the missing assignment button when there is a missing assignment" do
+      @missing_assignment = @course.assignments.create!(title: "Missing Assignment",
+                                                        submission_types: "online_text_entry",
+                                                        points_possible: 10,
+                                                        workflow_state: "published",
+                                                        due_at: 2.days.ago)
+      @missing_module_item = @module1.add_item(type: "assignment", id: @missing_assignment.id)
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      expect(missing_assignment_button_exists?).to be_truthy
+      expect(missing_assignment_button.text).to eq("1 Missing Assignment")
+    end
+
+    it "navigates to the assignments index page when clicked" do
+      @missing_assignment = @course.assignments.create!(title: "Missing Assignment",
+                                                        submission_types: "online_text_entry",
+                                                        points_possible: 10,
+                                                        workflow_state: "published",
+                                                        due_at: 2.days.ago)
+      @missing_module_item = @module1.add_item(type: "assignment", id: @missing_assignment.id)
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      expect(missing_assignment_button_exists?).to be_truthy
+      missing_assignment_button.click
+      expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
+    end
+  end
 end
