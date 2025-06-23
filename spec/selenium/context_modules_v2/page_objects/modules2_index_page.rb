@@ -42,6 +42,10 @@ module Modules2IndexPage
     "#context_module_item_#{module_item_id}"
   end
 
+  def missing_assignment_button_selector
+    "[data-testid='missing-assignment-button']"
+  end
+
   def module_action_menu_selector(module_id)
     "[data-testid='module-action-menu_#{module_id}']"
   end
@@ -104,6 +108,10 @@ module Modules2IndexPage
     f(manage_module_item_container_selector(module_item_id))
   end
 
+  def missing_assignment_button
+    f(missing_assignment_button_selector)
+  end
+
   def module_action_menu(module_id)
     f(module_action_menu_selector(module_id))
   end
@@ -154,24 +162,6 @@ module Modules2IndexPage
 
   #------------------------------ Actions -------------------------------
 
-  def set_rewrite_flag(rewrite_status: true)
-    rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite) : @course.root_account.disable_feature!(:modules_page_rewrite)
-  end
-
-  def set_rewrite_student_flag(rewrite_status: true)
-    rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite_student_view) : @course.root_account.disable_feature!(:modules_page_rewrite_student_view)
-  end
-
-  def modules2_teacher_setup
-    course_with_teacher(active_all: true)
-    course_modules_setup
-  end
-
-  def modules2_student_setup
-    course_with_student(active_all: true)
-    course_modules_setup(student_view: true)
-  end
-
   def course_modules_setup(student_view: false)
     student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.quizzes.create!(title: "some quiz")
@@ -191,6 +181,28 @@ module Modules2IndexPage
     @module_item4 = @module2.add_item({ id: @quiz.id, type: "quiz" })
 
     @course.reload
+  end
+
+  def missing_assignment_button_exists?
+    element_exists?(missing_assignment_button_selector)
+  end
+
+  def modules2_student_setup
+    course_with_student(active_all: true)
+    course_modules_setup(student_view: true)
+  end
+
+  def modules2_teacher_setup
+    course_with_teacher(active_all: true)
+    course_modules_setup
+  end
+
+  def set_rewrite_flag(rewrite_status: true)
+    rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite) : @course.root_account.disable_feature!(:modules_page_rewrite)
+  end
+
+  def set_rewrite_student_flag(rewrite_status: true)
+    rewrite_status ? @course.root_account.enable_feature!(:modules_page_rewrite_student_view) : @course.root_account.disable_feature!(:modules_page_rewrite_student_view)
   end
 
   def visit_course(course)
