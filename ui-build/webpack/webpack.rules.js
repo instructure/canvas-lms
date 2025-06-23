@@ -117,6 +117,8 @@ exports.swc = [
       // we can use rspack's builtin:swc-loader later when it supports SWC plugins
       loader: isCrystalballEnabled ? 'swc-loader' : 'builtin:swc-loader',
       options: {
+        // if isCrystalballEnabled is true, set parseMap to true
+        ...(isCrystalballEnabled ? {parseMap: true} : {}),
         sourceMaps: true,
         jsc: {
           externalHelpers: true,
@@ -145,6 +147,7 @@ exports.swc = [
       // we can use rspack's builtin:swc-loader later when it supports SWC plugins
       loader: isCrystalballEnabled ? 'swc-loader' : 'builtin:swc-loader',
       options: {
+        ...(isCrystalballEnabled ? {parseMap: true} : {}),
         sourceMaps: true,
         jsc: {
           externalHelpers: true,
