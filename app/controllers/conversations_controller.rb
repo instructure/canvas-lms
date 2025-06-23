@@ -401,9 +401,7 @@ class ConversationsController < ApplicationController
     if params[:context_code].present?
       context = Context.find_by_asset_string(params[:context_code])
 
-      recipients_are_instructors = all_recipients_are_instructors?(context, @recipients)
-
-      if context.is_a?(Course) && !recipients_are_instructors && !observer_to_linked_students(@recipients) && !context.grants_right?(@current_user, session, :send_messages)
+      if context.is_a?(Course) && missing_right_to_send_any_recipient(@recipients, context) && !context.grants_right?(@current_user, session, :send_messages)
         return render_error("Unable to send messages to users in #{context.name}", "")
       elsif !valid_context?(context)
         return render_error("context_code", "invalid")

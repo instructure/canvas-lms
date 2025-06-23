@@ -377,6 +377,43 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "Hello there"
   end
 
+  context "with multiple recipients as an observer" do
+    let(:observer) { user_with_pseudonym }
+    let(:teacher2) { teacher_in_course(active_all: true).user }
+    let(:student) { @student }
+
+    context "mixed with teachers and students" do
+      subject do
+        run_mutation(
+          { recipients: [student.id.to_s, teacher2.id.to_s], body: "Hello there", context_code: @course.asset_string },
+          observer
+        )
+      end
+
+      context "when sending to observed student" do
+        before do
+          add_linked_observer(student, observer, root_account: @course.root_account)
+        end
+
+        it "allows observer to send combined message to both" do
+          expect(
+            subject.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+          ).to eq "Hello there"
+        end
+      end
+
+      context "when sending to not observed student" do
+        it "does not allow observer to send message" do
+          result = subject
+          expect(result.dig("data", "createConversation", "conversations")).to be_nil
+          expect(
+            result.dig("data", "createConversation", "errors", 0, "message")
+          ).to eql "Invalid recipients"
+        end
+      end
+    end
+  end
+
   it "infers context tags" do
     course_with_teacher_logged_in(active_all: true)
     @course1 = @course
