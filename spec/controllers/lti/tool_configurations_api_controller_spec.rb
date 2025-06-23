@@ -506,6 +506,11 @@ RSpec.describe Lti::ToolConfigurationsApiController do
         expect(config_from_response.developer_key.redirect_uris).to eq(config_from_response.redirect_uris)
       end
     end
+
+    it "sets the right name on the Registration" do
+      subject
+      expect(config_from_response.lti_registration.name).to eq dev_key_params[:name]
+    end
   end
 
   describe "#update" do
@@ -527,6 +532,11 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "sets the privacy level" do
         subject
         expect(config_from_response.privacy_level).to eq "public"
+      end
+
+      it "sets the right name on the Registration" do
+        subject
+        expect(config_from_response.lti_registration.name).to eq dev_key_params[:name]
       end
     end
 

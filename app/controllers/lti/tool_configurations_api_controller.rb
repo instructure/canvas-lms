@@ -99,8 +99,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       account: @context,
       created_by: @current_user,
       registration_params: {
-        name: tool_configuration_params[:name] || "Unnamed tool",
-        admin_nickname: developer_key_params[:name],
+        name: developer_key_params[:name] || "Unnamed tool",
       },
       overlay_params: {
         disabled_placements: tool_configuration_params[:disabled_placements]
@@ -153,8 +152,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     update_params = {
       id: developer_key.lti_registration_id,
       registration_params: {
-        name: tool_configuration_params[:name] || "Unnamed tool",
-        admin_nickname: developer_key_params[:name],
+        name: developer_key_params[:name] || "Unnamed tool",
       },
       updated_by: @current_user,
       developer_key_params:,
