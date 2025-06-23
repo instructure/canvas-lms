@@ -87,6 +87,12 @@ describe('utils', () => {
       expect(container.getByTestId('url-icon')).toBeInTheDocument()
     })
 
+    it('should return the correct icon for an external tool', () => {
+      const container = render(getItemIcon({type: 'ModuleExternalTool', title: 'ExternalTool'}))
+      expect(container.container).toBeInTheDocument()
+      expect(container.getByTestId('url-icon')).toBeInTheDocument()
+    })
+
     it('should return the correct icon for a page', () => {
       const container = render(getItemIcon({type: 'Page', title: 'Page'}))
       expect(container.container).toBeInTheDocument()
