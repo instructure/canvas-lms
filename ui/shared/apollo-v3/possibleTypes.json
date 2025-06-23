@@ -73,6 +73,7 @@
     "PostPolicy",
     "ProficiencyRating",
     "Progress",
+    "ProvisionalGrade",
     "Quiz",
     "Rubric",
     "RubricAssessment",
