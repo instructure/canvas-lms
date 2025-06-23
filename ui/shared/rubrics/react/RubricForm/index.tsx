@@ -120,7 +120,7 @@ export const RubricForm = ({
   const header = rubricId || rubric?.id ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
   const queryKey = ['fetch-rubric', rubricId ?? '']
   const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
-  const showGeneratedCriteriaLoadingIndicator =
+  const criteriaBeingGenerated =
     generatedCriteriaIsPending ||
     (generatedCriteriaProgress &&
       !['failed', 'completed'].includes(generatedCriteriaProgress.workflow_state))
@@ -345,6 +345,7 @@ export const RubricForm = ({
               courseId={rubricForm.courseId}
               assignmentId={assignmentId}
               criterionUseRangeEnabled={criterionUseRangeEnabled}
+              criteriaBeingGenerated={!!criteriaBeingGenerated}
               criteriaRef={criteriaRef}
               handleInProgressUpdates={setGeneratedCriteriaIsPending}
               handleProgressUpdates={setGeneratedCriteriaProgress}
@@ -359,7 +360,7 @@ export const RubricForm = ({
           )}
         </Flex.Item>
 
-        {showGeneratedCriteriaLoadingIndicator && (
+        {criteriaBeingGenerated && (
           <Flex.Item shouldGrow={true}>
             <LoadingIndicator />
           </Flex.Item>

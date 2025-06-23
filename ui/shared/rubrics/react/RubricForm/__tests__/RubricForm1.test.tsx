@@ -895,6 +895,82 @@ describe('RubricForm Tests', () => {
 
       expect(getByTestId('give-feedback-link')).toHaveTextContent('Give Feedback')
     })
+
+    it('disables generate button when progress is running', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'running',
+            message: null,
+            completion: 50,
+            results: undefined,
+          })
+        },
+      )
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // Button should be disabled while progress is running
+      expect(generateButton).toBeDisabled()
+    })
+
+    it('enables generate button when progress fails', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'failed',
+            message: null,
+            completion: 100,
+            results: undefined,
+          })
+        },
+      )
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // Button should be enabled when progress fails
+      expect(generateButton).not.toBeDisabled()
+    })
   })
 
   describe('assessed rubrics', () => {
