@@ -509,7 +509,7 @@ RSpec.describe Lti::ToolConfigurationsApiController do
 
     it "sets the right name on the Registration" do
       subject
-      expect(config_from_response.lti_registration.name).to eq canvas_lti_configuration["title"]
+      expect(config_from_response.lti_registration.name).to eq dev_key_params[:name]
     end
   end
 
@@ -532,6 +532,11 @@ RSpec.describe Lti::ToolConfigurationsApiController do
       it "sets the privacy level" do
         subject
         expect(config_from_response.privacy_level).to eq "public"
+      end
+
+      it "sets the right name on the Registration" do
+        subject
+        expect(config_from_response.lti_registration.name).to eq dev_key_params[:name]
       end
     end
 
