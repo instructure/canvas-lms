@@ -25,19 +25,21 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback, useContext} from 'react'
 
 import {TypeToKeyMap} from '../../constants'
 import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
 import {calculateTotalIssuesCount, convertKeysToCamelCase} from '../../utils'
-import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {IssuesCounter} from './IssuesCounter'
+import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
 
 const I18n = createI18nScope('accessibility_checker')
 
 export const AccessibilityCheckerApp: React.FC = () => {
+  const context = useContext(AccessibilityCheckerContext)
+  const {setSelectedItem, setIsTrayOpen} = context
   const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
   const [loading, setLoading] = useState(true)
   const [tableSortState, setTableSortState] = useState<TableSortState>({})
@@ -55,9 +57,60 @@ export const AccessibilityCheckerApp: React.FC = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
-  const [showModal, setShowModal] = useState(false)
+  // const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
   const [tableData, setTableData] = useState<ContentItem[]>([])
+
+  const closeModal = useCallback(
+    (shallReload: boolean) => {
+      setSelectedItem(null)
+      setIsTrayOpen(false)
+      if (shallReload) {
+        window.location.reload()
+      }
+    },
+    [setSelectedItem, setIsTrayOpen],
+  )
+
+  const handleRowClick = useCallback(
+    (item: ContentItem) => {
+      const typeKey = TypeToKeyMap[item.type]
+
+      const contentItem = accessibilityIssues?.[typeKey]?.[item.id]
+        ? structuredClone(accessibilityIssues[typeKey]?.[item.id])
+        : undefined
+
+      setSelectedItem({
+        ...item,
+        issues: contentItem?.issues || [],
+      })
+      setIsTrayOpen(true)
+    },
+    [accessibilityIssues, setSelectedItem, setIsTrayOpen],
+  )
+
+  const handleReload = useCallback(() => {
+    window.location.reload()
+  }, [])
+
+  const handleSortRequest = useCallback(
+    (sortId?: string, sortDirection?: 'ascending' | 'descending' | 'none') => {
+      try {
+        setLoading(true)
+        console.log('Sort request:', sortId, sortDirection)
+        // TODO invoke backend API with the new values to sort the data
+        // Then update states accordingly
+        setTableSortState({
+          sortId,
+          sortDirection,
+        })
+      } catch {
+        // Showing an error alert on the page
+      } finally {
+        setLoading(false)
+      }
+    },
+    [],
+  )
 
   useEffect(() => {
     const processData = () => {
@@ -105,50 +158,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
     processData()
   }, [accessibilityIssues])
-
-  const handleRowClick = (item: ContentItem) => {
-    const typeKey = TypeToKeyMap[item.type]
-
-    const contentItem = accessibilityIssues?.[typeKey]?.[item.id]
-      ? structuredClone(accessibilityIssues[typeKey]?.[item.id])
-      : undefined
-    setSelectedItem({
-      ...item,
-      issues: contentItem?.issues || [],
-    })
-    setShowModal(true)
-  }
-
-  const handleReload = () => {
-    window.location.reload()
-  }
-
-  const handleSortRequest = (
-    sortId?: string,
-    sortDirection?: 'ascending' | 'descending' | 'none',
-  ) => {
-    try {
-      setLoading(true)
-      console.log('Sort request:', sortId, sortDirection)
-      // TODO invoke backend API with the new values to sort the data
-      // Then update states accordingly
-      setTableSortState({
-        sortId,
-        sortDirection,
-      })
-    } catch {
-      // Showing an error alert on the page
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const closeModal = (shallReload: boolean) => {
-    setShowModal(false)
-    if (shallReload) {
-      window.location.reload()
-    }
-  }
 
   if (loading)
     return (
@@ -231,10 +240,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
           tableData={tableData}
           tableSortState={tableSortState}
         />
-
-        {selectedItem && (
-          <AccessibilityIssuesModal isOpen={showModal} onClose={closeModal} item={selectedItem} />
-        )}
       </View>
     )
   }
