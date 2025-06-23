@@ -922,40 +922,86 @@ module Lti
         expect(expand!("$Canvas.root_account.global_id")).to eq 10_054_321
       end
 
-      it "has substitution for $Canvas.account.decimal_separator when sub account has setting" do
-        account_settings = { decimal_separator: { value: "period" } }
-        root_settings = { decimal_separator: { value: "comma" } }
-        allow(account).to receive(:settings).and_return(account_settings)
-        allow(root_account).to receive(:settings).and_return(root_settings)
-        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
-        expect(expand!("$Canvas.account.decimal_separator")).to eq "period"
+      context "when the new_quizzes_separators feature flag is enabled for decimal separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "has substitution for $Canvas.account.decimal_separator when sub account has setting" do
+          account_settings = { decimal_separator: { value: "period" } }
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.decimal_separator")).to eq "period"
+        end
+
+        it "has substitution for $Canvas.account.decimal_separator with fallback to root account setting" do
+          account_settings = {}
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.decimal_separator")).to eq "comma"
+        end
       end
 
-      it "has substitution for $Canvas.account.decimal_separator with fallback to root account setting" do
-        account_settings = {}
-        root_settings = { decimal_separator: { value: "comma" } }
-        allow(account).to receive(:settings).and_return(account_settings)
-        allow(root_account).to receive(:settings).and_return(root_settings)
-        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
-        expect(expand!("$Canvas.account.decimal_separator")).to eq "comma"
+      context "when the new_quizzes_separators feature flag is disabled for decimal separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "does not expand $Canvas.account.decimal_separator" do
+          account_settings = { decimal_separator: { value: "period" } }
+          root_settings = { decimal_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect_unexpanded!("$Canvas.account.decimal_separator")
+        end
       end
 
-      it "has substitution for $Canvas.account.thousand_separator when sub account has setting" do
-        account_settings = { thousand_separator: { value: "period" } }
-        root_settings = { thousand_separator: { value: "comma" } }
-        allow(account).to receive(:settings).and_return(account_settings)
-        allow(root_account).to receive(:settings).and_return(root_settings)
-        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
-        expect(expand!("$Canvas.account.thousand_separator")).to eq "period"
+      context "when the new_quizzes_separators feature flag is enabled for thousand separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(true)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "has substitution for $Canvas.account.thousand_separator when sub account has setting" do
+          account_settings = { thousand_separator: { value: "period" } }
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.thousand_separator")).to eq "period"
+        end
+
+        it "has substitution for $Canvas.account.thousand_separator with fallback to root account setting" do
+          account_settings = {}
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect(expand!("$Canvas.account.thousand_separator")).to eq "comma"
+        end
       end
 
-      it "has substitution for $Canvas.account.thousand_separator with fallback to root account setting" do
-        account_settings = {}
-        root_settings = { thousand_separator: { value: "comma" } }
-        allow(account).to receive(:settings).and_return(account_settings)
-        allow(root_account).to receive(:settings).and_return(root_settings)
-        allow(variable_expander.lti_helper).to receive_messages(account:, course:)
-        expect(expand!("$Canvas.account.thousand_separator")).to eq "comma"
+      context "when the new_quizzes_separators feature flag is disabled for thousand separators" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:new_quizzes_separators).and_return(false)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:disallow_null_custom_variables).and_return(true)
+        end
+
+        it "does not expand $Canvas.account.thousand_separator" do
+          account_settings = { thousand_separator: { value: "period" } }
+          root_settings = { thousand_separator: { value: "comma" } }
+          allow(account).to receive(:settings).and_return(account_settings)
+          allow(root_account).to receive(:settings).and_return(root_settings)
+          allow(variable_expander.lti_helper).to receive_messages(account:, course:)
+          expect_unexpanded!("$Canvas.account.thousand_separator")
+        end
       end
 
       it "has substitution for $Canvas.shard.id" do
