@@ -357,7 +357,7 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[publish_at] [Optional, DateTime]
   #   Schedule a future date/time to publish the page. This will have no effect unless the
   #   "Scheduled Page Publication" feature is enabled in the account. If a future date is
-  #   supplied, the page will be unpublished and wiki_page[published] will be ignored.
+  #   supplied, the page will be unpublished and +wiki_page[published]+ will be ignored.
   #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \

@@ -578,7 +578,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @argument enrollment[type] [Required, String, "StudentEnrollment"|"TeacherEnrollment"|"TaEnrollment"|"ObserverEnrollment"|"DesignerEnrollment"]
   #   Enroll the user as a student, teacher, TA, observer, or designer. If no
-  #   value is given, the type will be inferred by enrollment[role] if supplied,
+  #   value is given, the type will be inferred by +enrollment[role]+ if supplied,
   #   otherwise 'StudentEnrollment' will be used.
   #
   # @argument enrollment[role] [Deprecated, String]
