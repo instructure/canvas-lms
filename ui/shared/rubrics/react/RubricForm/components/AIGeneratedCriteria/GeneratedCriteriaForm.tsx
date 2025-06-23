@@ -51,6 +51,7 @@ type GeneratedCriteriaFormProps = {
   assignmentId?: string
   courseId?: string
   criterionUseRangeEnabled: boolean
+  criteriaBeingGenerated: boolean
   criteriaRef: React.MutableRefObject<RubricCriterion[]>
   handleInProgressUpdates: (isPending: boolean) => void
   handleProgressUpdates: (progress: CanvasProgress) => void
@@ -62,6 +63,7 @@ export const GeneratedCriteriaForm = ({
   courseId,
   assignmentId,
   criterionUseRangeEnabled,
+  criteriaBeingGenerated,
   criteriaRef,
   handleInProgressUpdates,
   handleProgressUpdates,
@@ -246,7 +248,9 @@ export const GeneratedCriteriaForm = ({
             data-testid="generate-criteria-button"
             color="ai-primary"
             renderIcon={<IconAiSolid />}
-            disabled={generateCriteriaForm.additionalPromptInfo.length > 1000}
+            disabled={
+              generateCriteriaForm.additionalPromptInfo.length > 1000 || criteriaBeingGenerated
+            }
           >
             {I18n.t('Generate Criteria')}
           </Button>
