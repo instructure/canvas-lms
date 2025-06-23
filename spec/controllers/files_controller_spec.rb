@@ -2203,7 +2203,10 @@ describe FilesController do
           folder.attachments.create!(
             context: course,
             user:,
-            file_state: "deleted"
+            file_state: "deleted",
+            workflow_state: "unattached",
+            filename: "test.txt",
+            content_type: "text"
           )
         end
 
@@ -2362,6 +2365,77 @@ describe FilesController do
     end
   end
 
+  describe "GET 'image_thumbnail_plain'" do
+    before :once do
+      @course.root_account.enable_feature!(:file_association_access)
+    end
+
+    context "without InstFS" do
+      let(:image) do
+        local_storage!
+        @teacher.attachments.create!(uploaded_data: stub_png_data)
+      end
+
+      it "returns a non-token url for local storage" do
+        local_storage!
+        user_session @teacher
+        location = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
+        expect(location).to match(%r{/images/thumbnails/show/#{image.thumbnail.id}$})
+      end
+    end
+
+    context "with InstFS enabled" do
+      let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
+
+      it "returns default 'no_pic' thumbnail if attachment not found" do
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id + 1 }
+        expect(response).to redirect_to("/images/no_pic.gif")
+      end
+
+      it "returns the same jwt if requested twice" do
+        enable_cache do
+          user_session @teacher
+          locations = Array.new(2) do
+            get("image_thumbnail_plain", params: { id: image.id }).location
+          end
+          expect(locations[0]).to eq(locations[1])
+        end
+      end
+
+      it "returns a proper jwt token" do
+        user_session @teacher
+        token = get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location.split("?token=")[1]
+        expect { Canvas::Security.decode_jwt(token, [InstFS.jwt_secret]) }.not_to raise_error
+      end
+
+      it "returns the different jwts if no_cache is passed" do
+        enable_cache do
+          user_session @teacher
+          locations = Array.new(2) do
+            get("image_thumbnail_plain", params: { id: image.id, no_cache: true }).location
+          end.map! { |l| l.split("?token=") }
+          # This confirms that the two base URLS are the same, but the tokens handed are different
+          expect([locations[0][0] == locations[1][0], locations[0][1] != locations[1][1]]).to all(be true)
+        end
+      end
+
+      it "redirects to default no_pic thumbnail if access_allowed returns false" do
+        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(false)
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id }
+        expect(response).to redirect_to("/images/no_pic.gif")
+      end
+
+      it "returns a 302 if access_allowed returns true" do
+        allow_any_instance_of(FilesController).to receive(:access_allowed).and_return(true)
+        user_session @teacher
+        get "image_thumbnail_plain", params: { id: image.id }
+        expect(response).to be_redirect
+      end
+    end
+  end
+
   describe "process_content_type_from_instfs" do
     it "fixes doc files" do
       expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.doc")).to eq "application/msword"
@@ -2385,6 +2459,31 @@ describe FilesController do
 
     it "leaves non-CFB types alone" do
       expect(controller.send(:process_content_type_from_instfs, "application/pdf", "file.pdf")).to eq "application/pdf"
+    end
+  end
+
+  describe "GET 'show_thumbnail'" do
+    let(:user) { user_factory }
+    let(:course) { course_factory }
+    let(:image) { @teacher.attachments.create!(uploaded_data: stub_png_data, instfs_uuid: "1234") }
+    let(:thumbnail) do
+      Thumbnail.create!(filename: "tmp/test_thumb.png", content_type: "image/png", attachment: image, size: "200x50")
+    end
+
+    it "sends the thumbnail file if authorized" do
+      local_storage!
+      user_session(@teacher)
+      expect_any_instance_of(FilesController).to receive(:safe_send_file)
+        .with(thumbnail.full_filename, content_type: thumbnail.content_type).and_return(nil)
+      get :show_thumbnail, params: { id: thumbnail.id }
+    end
+
+    it "returns unauthorized if not authorized" do
+      local_storage!
+      allow_any_instance_of(FilesController).to receive(:authorized_action).and_return(false)
+      user_session(user)
+      get :show_thumbnail, params: { id: thumbnail.id }
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

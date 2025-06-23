@@ -142,6 +142,7 @@ class FilesController < ApplicationController
     assessment_question_show
     image_thumbnail
     show_thumbnail
+    image_thumbnail_plain
     create_pending
     show
     api_create
@@ -1674,17 +1675,51 @@ class FilesController < ApplicationController
     end
   end
 
+  def image_thumbnail_plain
+    cancel_cache_buster
+
+    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
+
+    # include authenticator fingerprint so we don't redirect to an
+    # authenticated thumbnail url for the wrong user
+    cache_key = ["thumbnail_url3", params[:id], params[:size], file_authenticator.fingerprint].cache_key
+    url, instfs = Rails.cache.read(cache_key)
+    if !url || no_cache
+      attachment = Attachment.active.find_by(id: params[:id]) if params[:id].present?
+      # We assume that if you can see/download the attachment, you can see/download the thumbnail
+      unless attachment && access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true)
+        redirect_to("/images/no_pic.gif")
+        return
+      end
+
+      thumb_opts = params.slice(:size)
+      url = authenticated_thumbnail_url(attachment, thumb_opts)
+      if url
+        instfs = attachment.instfs_hosted?
+        # only cache for half the time because of use_consistent_iat
+        Rails.cache.write(cache_key, [url, instfs], expires_in: (attachment.url_ttl / 2))
+      end
+    end
+
+    if url && instfs && file_location_mode?
+      render_file_location(url)
+    else
+      redirect_to(url || "/images/no_pic.gif")
+    end
+  end
+
   # when using local storage, the image_thumbnail action redirects here rather
-  # than to a s3 url
+  # than to a s3 url.
   def show_thumbnail
     if Attachment.local_storage?
       cancel_cache_buster
-      thumbnail = Thumbnail.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
+      thumbnail = Thumbnail.find_by(id: params[:id]) if params[:id].present?
+
       raise ActiveRecord::RecordNotFound unless thumbnail
 
+      return render_unauthorized_action unless authorized_action(thumbnail, @current_user, :download)
+
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
-    else
-      image_thumbnail
     end
   end
 
