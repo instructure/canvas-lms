@@ -593,7 +593,7 @@ class AppointmentGroupsController < ApplicationController
       return render json: [] unless @group.participant_type == type
 
       render json: Api.paginate(
-        @group.possible_participants(registration_status: params[:registration_status]),
+        @group.possible_participants(registration_status: params[:registration_status], context_code: params[:context_code], current_user: @current_user),
         self,
         send(:"api_v1_appointment_group_#{params[:action]}_url", @group)
       ).map(&)
