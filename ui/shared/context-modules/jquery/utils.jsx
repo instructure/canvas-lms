@@ -268,7 +268,9 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
           $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
           $module.find('.footer .manage_module').css('display', '')
           $module.toggleClass('collapsed_module', !shouldExpand)
-          addShowAllOrLess($module.data('module-id'))
+          if (ENV.FEATURE_MODULES_PERF) {
+            addShowAllOrLess($module.data('module-id'))
+          }
         }
         $module.find('.content').slideToggle({
           queue: false,
