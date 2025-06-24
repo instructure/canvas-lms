@@ -242,7 +242,7 @@ const Columns: ReadonlyArray<Column> = [
               data-testid={`actions-menu-${r.id}`}
               withBackground={false}
               withBorder={false}
-              screenReaderLabel={I18n.t('More Registration Options')}
+              screenReaderLabel={I18n.t('More Registration Options for %{name}', {name: r.name})}
             >
               <IconMoreLine />
             </IconButton>
