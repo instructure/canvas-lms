@@ -63,25 +63,38 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
   const [currentPage, setCurrentPage] = useState(1)
   const prevState = useRef('')
 
-  const url = generateTableUrl({
-    searchTerm,
-    contextId: folder.context_id,
-    contextType: folder.context_type.toLowerCase(),
-    folderId: folder.id.toString(),
-    sortBy: sort.by,
-    sortDirection: sort.direction,
-    pageQueryParam: bookmarkByPage[currentPage],
-  })
+  const isSingleCharSearch = searchTerm?.trim().length === 1
+  const url = isSingleCharSearch
+    ? ''
+    : generateTableUrl({
+        searchTerm,
+        contextId: folder.context_id,
+        contextType: folder.context_type.toLowerCase(),
+        folderId: folder.id.toString(),
+        sortBy: sort.by,
+        sortDirection: sort.direction,
+        pageQueryParam: bookmarkByPage[currentPage],
+      })
 
   const query = useQuery({
     staleTime: 0,
     placeholderData: keepPreviousData,
     queryKey: [
       'files',
-      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage},
+      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch},
     ] as const,
     queryFn: async ({queryKey}) => {
-      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage}] = queryKey
+      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch}] =
+        queryKey
+
+      // Return empty results for single character searches
+      if (isSingleCharSearch) {
+        setBookmarkByPage({1: ''})
+        setCurrentPage(1)
+        onSettled([])
+        return []
+      }
+
       const state = JSON.stringify([folderId, searchTerm, sort])
       const {bookmarkState, pageState} =
         prevState.current !== state

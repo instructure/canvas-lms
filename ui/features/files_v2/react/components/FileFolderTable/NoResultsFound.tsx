@@ -58,7 +58,7 @@ export const NoResultsFound = ({searchTerm}: NoResultsFoundProps) => {
               <Text>{I18n.t('Try different keywords')}</Text>
             </List.Item>
             <List.Item>
-              <Text>{I18n.t('Enter at least 3 letters in the search box')}</Text>
+              <Text>{I18n.t('Enter at least 2 characters in the search box')}</Text>
             </List.Item>
           </List>
         </Flex.Item>
