@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AccessibilityData} from './types'
+import {AccessibilityData, ContentItem, ContentItemType} from './types'
 
-export function calculateTotalIssuesCount(data: AccessibilityData) {
+/**
+ * This method should be deprecated, once the API will be upgraded
+ * to support pagination.
+ */
+export const calculateTotalIssuesCount = (data?: AccessibilityData | null): number => {
   let total = 0
   ;['pages', 'assignments', 'attachments'].forEach(key => {
-    const items = data[key as keyof AccessibilityData]
+    const items = data?.[key as keyof AccessibilityData]
     if (items) {
       Object.values(items).forEach(item => {
         if (item.count) {
@@ -34,7 +38,55 @@ export function calculateTotalIssuesCount(data: AccessibilityData) {
   return total
 }
 
-export const snakeToCamel = function (str: string): string {
+/**
+ * This method flattens the accessibility data structure from the current API
+ * response data into a simple array of ContentItem objects.
+ * - Should be deprecated, once the API will be upgraded to support pagination.
+ */
+export const processAccessibilityData = (accessibilityIssues?: AccessibilityData | null) => {
+  const flatData: ContentItem[] = []
+
+  const processContentItems = (
+    items: Record<string, ContentItem> | undefined,
+    type: ContentItemType,
+    defaultTitle: string,
+  ) => {
+    if (!items) return
+
+    Object.entries(items).forEach(([id, itemData]) => {
+      if (itemData) {
+        flatData.push({
+          id: Number(id),
+          type,
+          title: itemData?.title || defaultTitle,
+          published: itemData?.published || false,
+          updatedAt: itemData?.updatedAt || '',
+          count: itemData?.count || 0,
+          url: itemData?.url,
+          editUrl: itemData?.editUrl,
+        })
+      }
+    })
+  }
+
+  processContentItems(accessibilityIssues?.pages, ContentItemType.WikiPage, 'Untitled Page')
+
+  processContentItems(
+    accessibilityIssues?.assignments,
+    ContentItemType.Assignment,
+    'Untitled Assignment',
+  )
+
+  processContentItems(
+    accessibilityIssues?.attachments,
+    ContentItemType.Attachment,
+    'Untitled Attachment',
+  )
+
+  return flatData
+}
+
+const snakeToCamel = function (str: string): string {
   return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
 }
 
