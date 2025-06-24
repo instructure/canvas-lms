@@ -143,7 +143,6 @@ class FilesController < ApplicationController
     image_thumbnail
     show_thumbnail
     create_pending
-    s3_success
     show
     api_create
     api_create_success
@@ -152,7 +151,6 @@ class FilesController < ApplicationController
     api_index
     destroy
     api_update
-    api_file_status
     public_url
     api_capture
     icon_metadata
@@ -173,7 +171,7 @@ class FilesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
-    api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
+    api_show api_create_success api_update destroy icon_metadata reset_verifier
   ]
   before_action :check_limited_access_contexts, only: %i[index]
   before_action :check_limited_access_for_students, only: %i[api_index]
