@@ -574,6 +574,11 @@ module Types
       comments
     end
 
+    field :comment_bank_items_count, Integer, null: true
+    def comment_bank_items_count
+      Loaders::AssociationCountLoader.for(User, :comment_bank_items).load(object)
+    end
+
     field :course_roles, [String], null: true do
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
       argument :course_id, String, required: false

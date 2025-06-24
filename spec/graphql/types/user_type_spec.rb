@@ -1599,6 +1599,26 @@ describe Types::UserType do
     end
   end
 
+  context "commentBankItemsCount" do
+    before do
+      @comment_bank_item_one = comment_bank_item_model(user: @teacher, context: @course, comment: "great comment!")
+      @comment_bank_item_two = comment_bank_item_model(user: @teacher, context: @course, comment: "another comment!")
+    end
+
+    let(:type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns the count of comment bank items" do
+      expect(type.resolve("commentBankItemsCount")).to eq 2
+    end
+  end
+
   context "courseBuiltInRoles" do
     before do
       @teacher_with_multiple_roles = user_factory(name: "blah")
