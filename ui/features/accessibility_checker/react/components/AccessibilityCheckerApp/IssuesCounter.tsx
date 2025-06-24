@@ -61,7 +61,7 @@ export const IssuesCounter: React.FC<IssuesCounterProps> = ({count}: IssuesCount
             color="primary"
             variant="titleSection"
           >
-            {count}
+            {count + ''}
           </Heading>
         </Flex.Item>
         <Flex.Item>
