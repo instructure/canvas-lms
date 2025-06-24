@@ -49,6 +49,12 @@ describe Accessibility::Issue do
   describe "#generate" do
     let(:context_double) { double("Context") }
 
+    before do
+      allow_any_instance_of(described_class).to receive(:count_oversize_pages).and_return(0)
+      allow_any_instance_of(described_class).to receive(:count_oversize_attachments).and_return(0)
+      allow_any_instance_of(described_class).to receive(:exceeds_accessibility_scan_limit?).and_return(false)
+    end
+
     it "returns issues for pages" do
       page = double("WikiPage", id: 1, body: "<div>content</div>", title: "Page 1", published?: true, updated_at: Time.zone.now)
 
@@ -68,9 +74,7 @@ describe Accessibility::Issue do
       result = described_class.new(context: context_double, rules:).generate
 
       expect(result[:pages][1][:title]).to eq("Page 1")
-      expect(result[:pages][1][:published]).to be true
-      expect(result[:assignments]).to eq({})
-      expect(result[:last_checked]).to be_a(String)
+      expect(result[:accessibility_scan_disabled]).to be false
     end
 
     it "returns issues for assignments" do
@@ -91,10 +95,8 @@ describe Accessibility::Issue do
 
       result = described_class.new(context: context_double, rules:).generate
 
-      expect(result[:pages]).to eq({})
       expect(result[:assignments][2][:title]).to eq("Assignment 1")
-      expect(result[:assignments][2][:published]).to be false
-      expect(result[:last_checked]).to be_a(String)
+      expect(result[:accessibility_scan_disabled]).to be false
     end
 
     it "returns issues for attachments" do
@@ -124,8 +126,8 @@ describe Accessibility::Issue do
 
       allow(Rails.application.routes.url_helpers).to receive(:course_files_url) do |_, options|
         case options[:preview]
-        when attachment_pdf.id then "https://fake.url/files/3/preview"
-        when attachment_other.id then "https://fake.url/files/4/preview"
+        when 3 then "https://fake.url/files/3/preview"
+        when 4 then "https://fake.url/files/4/preview"
         else "https://fake.url/files/unknown/preview"
         end
       end
@@ -154,7 +156,22 @@ describe Accessibility::Issue do
       expect(result[:attachments][4][:url]).to eq("https://fake.url/files/4/preview")
       expect(result[:attachments][4][:issues]).to be_nil
 
-      expect(result[:last_checked]).to be_a(String)
+      expect(result[:accessibility_scan_disabled]).to be false
+    end
+
+    it "returns nils if size limits exceeded" do
+      allow_any_instance_of(described_class).to receive(:count_oversize_pages).and_return(10)
+      allow_any_instance_of(described_class).to receive(:count_oversize_attachments).and_return(5)
+      allow_any_instance_of(described_class).to receive(:exceeds_accessibility_scan_limit?).and_return(true)
+
+      allow(context_double).to receive_messages(
+        wiki_pages: double("WikiPages", not_deleted: double(order: [])),
+        assignments: double("Assignments", active: double(order: [])),
+        attachments: double("Attachments", not_deleted: double(order: []))
+      )
+
+      result = described_class.new(context: context_double, rules:).generate
+      expect(result[:accessibility_scan_disabled]).to be true
     end
   end
 

@@ -20,22 +20,31 @@
 module Accessibility
   class Issue
     module AttachmentIssues
-      def generate_attachment_issues
-        context.attachments.not_deleted.order(updated_at: :desc).each_with_object({}) do |attachment, issues|
+      def generate_attachment_resources(skip_scan: false)
+        attachments = context.attachments.not_deleted.order(updated_at: :desc)
+        return attachments.map { |attachment| attachment_attributes(attachment) } if skip_scan
+
+        attachments.each_with_object({}) do |attachment, issues|
           result = if attachment.content_type == "application/pdf"
                      check_pdf_accessibility(attachment)
                    else
                      {}
                    end
 
-          issues[attachment.id] = result.merge(
-            title: attachment.title,
-            content_type: attachment.content_type,
-            published: attachment.published?,
-            updated_at: attachment.updated_at&.iso8601 || "",
-            url: course_files_url(context, preview: attachment.id)
-          )
+          issues[attachment.id] = result.merge(attachment_attributes(attachment))
         end
+      end
+
+      private
+
+      def attachment_attributes(attachment)
+        {
+          title: attachment.title,
+          content_type: attachment.content_type,
+          published: attachment.published?,
+          updated_at: attachment.updated_at&.iso8601 || "",
+          url: course_files_url(context, preview: attachment.id)
+        }
       end
     end
   end

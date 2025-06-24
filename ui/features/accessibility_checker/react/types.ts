@@ -54,6 +54,7 @@ export interface AccessibilityData {
   assignments?: Record<string, ContentItem>
   attachments?: Record<string, ContentItem>
   lastChecked?: string
+  accessibilityScanDisabled?: boolean
 }
 
 export interface ContentItem {

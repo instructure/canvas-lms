@@ -19,27 +19,26 @@
 
 module Accessibility
   class Issue
-    module AssignmentIssues
-      def generate_assignment_resources(skip_scan: false)
-        assignments = context.assignments.active.order(updated_at: :desc)
-        return assignments.map { |assignment| assignment_attributes(assignment) } if skip_scan
+    module WikiPageIssues
+      def generate_wiki_page_resources(skip_scan: false)
+        pages = context.wiki_pages.not_deleted.order(updated_at: :desc)
+        return pages.map { |page| wiki_page_attributes(page) } if skip_scan
 
-        assignments.each_with_object({}) do |assignment, issues|
-          result = check_content_accessibility(assignment.description)
-
-          issues[assignment.id] = result.merge(assignment_attributes(assignment))
+        pages.each_with_object({}) do |page, issues|
+          result = check_content_accessibility(page.body)
+          issues[page.id] = result.merge(wiki_page_attributes(page))
         end
       end
 
       private
 
-      def assignment_attributes(assignment)
+      def wiki_page_attributes(page)
         {
-          title: assignment.title,
-          published: assignment.published?,
-          updated_at: assignment.updated_at&.iso8601 || "",
-          url: polymorphic_path([context, assignment]),
-          edit_url: "#{polymorphic_path([context, assignment])}/edit"
+          title: page.title,
+          published: page.published?,
+          updated_at: page.updated_at&.iso8601 || "",
+          url: polymorphic_path([context, page]),
+          edit_url: "#{polymorphic_path([context, page])}/edit"
         }
       end
     end
