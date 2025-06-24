@@ -37,6 +37,7 @@ import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/Accessibilit
 import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {IssuesCounter} from './IssuesCounter'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
+import {IssuesByTypeChart} from '../IssuesByTypeChart/IssuesByTypeChart'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -151,7 +152,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </Flex.Item>
         )}
       </Flex>
-
       <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
         <Flex.Item>
           <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
@@ -159,16 +159,11 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </View>
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
-          <View
-            as="div"
-            padding="medium"
-            borderWidth="small"
-            borderRadius="medium"
-            height="100%"
-          ></View>
+          <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
+            <IssuesByTypeChart accessibilityIssues={accessibilityIssues} isLoading={loading} />
+          </View>
         </Flex.Item>
       </Flex>
-
       <AccessibilityIssuesTable
         isLoading={loading}
         error={error}
