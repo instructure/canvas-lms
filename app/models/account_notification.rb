@@ -19,6 +19,11 @@
 
 class AccountNotification < ActiveRecord::Base
   include Canvas::SoftDeletable
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[message]
+  end
 
   validates :start_at, :end_at, :subject, :message, :account_id, presence: true
   validate :validate_dates
@@ -26,6 +31,7 @@ class AccountNotification < ActiveRecord::Base
   belongs_to :account, touch: true
   belongs_to :user
   has_many :account_notification_roles, -> { active }, dependent: :destroy
+  has_many :attachment_associations, as: :context, inverse_of: :context
   validates :message, length: { maximum: maximum_text_length, allow_blank: false }
   validates :subject, length: { maximum: maximum_string_length }
   sanitize_field :message, CanvasSanitize::SANITIZE
@@ -40,6 +46,9 @@ class AccountNotification < ActiveRecord::Base
   validates :required_account_service, inclusion: { in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true }
 
   validates :months_in_display_cycle, inclusion: { in: 1..48, allow_nil: true }
+
+  delegate :root_account_id, to: :account
+  delegate :root_account, to: :account
 
   def validate_dates
     if start_at && end_at && end_at < start_at
