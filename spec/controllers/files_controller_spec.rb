@@ -488,8 +488,10 @@ describe FilesController do
           @course.save!
 
           course_file
-
-          AttachmentAssociation.update_associations(@course, [@file.id], @teacher, nil, "syllabus_body")
+          html = <<~HTML
+            <p><a href="/courses/#{@course.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
+          @course.associate_attachments_to_rce_object(html, @teacher, context_concern: "syllabus_body")
 
           @file.destroy
         end
@@ -498,7 +500,7 @@ describe FilesController do
 
         context "with disable_file_verifiers_in_public_syllabus enabled" do
           before do
-            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
           end
 
           it "denies access even with location" do
@@ -518,14 +520,18 @@ describe FilesController do
           user_session(@student)
           user_file
 
-          AttachmentAssociation.update_associations(@course, [@file.id], @student, nil, "syllabus_body")
+          html = <<~HTML
+            <p><a href="/users/#{@student.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          @course.associate_attachments_to_rce_object(html, @student, context_concern: "syllabus_body")
         end
 
         let(:params_with_location) { { user_id: @student.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
 
         context "with disable_file_verifiers_in_public_syllabus enabled" do
           before do
-            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
           end
 
           it "allows access for student/file owner" do
@@ -555,7 +561,7 @@ describe FilesController do
 
         context "with disable_file_verifiers_in_public_syllabus disabled" do
           before do
-            @course.account.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+            @course.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
           end
 
           it "allows access for student/file owner" do
@@ -591,15 +597,19 @@ describe FilesController do
           @course.save!
 
           course_file
+          html = <<~HTML
+            <p><a href="/courses/#{@course.id}/files/#{@file.id}/download">file 2</a></p>
+          HTML
 
-          AttachmentAssociation.update_associations(@course, [@file.id], @teacher, nil, "syllabus_body")
+          @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+          @course.associate_attachments_to_rce_object(html, @teacher, context_concern: "syllabus_body")
         end
 
         let(:params_with_location) { { course_id: @course.id, id: @file.id, download: 1, location: "course_syllabus_#{@course.id}" } }
 
         context "with disable_file_verifiers_in_public_syllabus enabled" do
           before do
-            @course.account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+            @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
           end
 
           it "allows access for student/file owner" do
@@ -634,7 +644,11 @@ describe FilesController do
                 user_factory(active_all: true)
                 @course.enroll_teacher(@user)
                 attachment_model(context: @user, filename: "shard1.txt")
-                AttachmentAssociation.update_associations(@course, [@attachment.id], @user, nil, "syllabus_body")
+                html = <<~HTML
+                  <p><a href="/courses/#{@course.id}/files/#{@attachment.id}/download">file 1</a>
+                HTML
+                @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+                @course.associate_attachments_to_rce_object(html, @user, context_concern: "syllabus_body")
               end
             end
 
@@ -653,7 +667,7 @@ describe FilesController do
 
         context "with disable_file_verifiers_in_public_syllabus disabled" do
           before do
-            @course.account.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
+            @course.root_account.disable_feature!(:disable_file_verifiers_in_public_syllabus)
           end
 
           it "allows access for student/file owner" do

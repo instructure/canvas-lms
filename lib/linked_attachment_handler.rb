@@ -30,10 +30,61 @@ module LinkedAttachmentHandler
     return unless attachment_associations_enabled?
 
     self.class.html_fields.each do |field|
-      next unless send("saved_change_to_#{field}?")
+      next unless saved_change_to_attribute?(field)
 
       context_concern = field if SPECIAL_CONCERN_FIELDS.include?(field)
-      UserContent.associate_attachments_to_rce_object(send(field), self, context_field_name: context_concern, user: saving_user, feature_enabled: attachment_associations_enabled?)
+      associate_attachments_to_rce_object(send(field), saving_user, context_concern:)
+    end
+  end
+
+  # NB: context_concern is a virtual subdivision of context.
+  # It is on purpose not a field name as it more denotes a sub-concern of
+  # the context model, not necessarily an exact field.
+  # Example: "terms_of_use" with an Account context denotes the custom
+  # "terms of use" HTML, which should be treated as a publicly viewable
+  # property of accounts, even for anonymous users, therefore any and all
+  # attachments to it should also be viewable without restrictions.
+  def associate_attachments_to_rce_object(html, user, context_concern: nil, session: nil, skip_user_verification: false)
+    attachment_ids = Api::Html::Content.collect_attachment_ids(html) if html.present?
+    attachment_ids = [] if attachment_ids.blank?
+
+    global_ids = attachment_ids.map { |id| Shard.global_id_for(id) }
+    currently_has = attachment_associations.where(context_concern:).pluck(:attachment_id).map { |id| Shard.global_id_for(id) }
+
+    to_delete = currently_has - global_ids
+    to_create = global_ids - currently_has
+
+    return if (to_create + to_delete).none?
+    return unless attachment_associations_enabled?
+    raise "User is required to update attachment links" if user.blank? && !skip_user_verification
+
+    if to_delete.any?
+      attachment_associations.where(context_concern:, attachment_id: to_delete).in_batches(of: 1000).destroy_all
+    end
+
+    if to_create.any?
+      to_create.each_slice(1000) do |att_ids|
+        all_attachment_associations = []
+
+        Attachment.where(id: att_ids).find_each do |attachment|
+          next if !(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update)
+
+          shard.activate do
+            all_attachment_associations << {
+              context_type: class_name,
+              context_id: id,
+              attachment_id: attachment.id,
+              user_id: user&.id,
+              context_concern:,
+              root_account_id:,
+            }
+          end
+        end
+
+        shard.activate do
+          AttachmentAssociation.insert_all(all_attachment_associations)
+        end
+      end
     end
   end
 

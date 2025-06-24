@@ -49,74 +49,6 @@ describe AttachmentAssociation do
     end
   end
 
-  describe "#update_associations" do
-    def fetch_list_with_field_name(context_concern)
-      AttachmentAssociation.where(context: course, context_concern:).pluck(:attachment_id)
-    end
-
-    def make_association_update(attachment_ids, context_concern, user = teacher)
-      AttachmentAssociation.update_associations(
-        course,
-        attachment_ids,
-        user,
-        nil,
-        context_concern
-      )
-    end
-
-    it "creates new associations" do
-      make_association_update([course_attachment.id, course_attachment2.id], nil)
-      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
-    end
-
-    it "updates existing associations (delete+create)" do
-      make_association_update([course_attachment.id, course_attachment2.id], nil)
-      make_association_update([course_attachment.id, course_attachment3.id], nil)
-      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment3.id])
-    end
-
-    it "removes all associations" do
-      make_association_update([course_attachment.id, course_attachment2.id], nil)
-      make_association_update([], nil)
-      expect(fetch_list_with_field_name(nil)).to be_empty
-    end
-
-    it "does not allow associations to files the editing user doesn't have access to" do
-      make_association_update([course_attachment.id, user_attachment.id], nil)
-      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id])
-    end
-
-    it "does not allow associations to files the editing user doesn't have update access to" do
-      make_association_update([course_attachment.id, user_attachment.id], nil, student)
-      expect(fetch_list_with_field_name(nil)).to be_empty
-    end
-
-    it "works with fields" do
-      make_association_update([course_attachment.id, course_attachment2.id], nil)
-      make_association_update([course_attachment3.id], "syllabus_body")
-      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
-      expect(fetch_list_with_field_name("syllabus_body")).to match_array([course_attachment3.id])
-    end
-
-    context "with sharding" do
-      specs_require_sharding
-
-      it "creates associations on the context's shard, not the attachment's" do
-        @shard1.activate do
-          account_model
-          course_model(account: @account)
-          @course.enroll_teacher(teacher)
-          attachment_model(context: @course, filename: "shard1.txt")
-          AttachmentAssociation.update_associations(course, [@attachment.id], teacher, nil, "syllabus_body")
-        end
-
-        aa = AttachmentAssociation.find_by(context: course, context_concern: "syllabus_body")
-        expect(aa.attachment_id).to eql @attachment.global_id
-        expect(aa.context_id).to eql course.local_id
-      end
-    end
-  end
-
   describe "#verify_access" do
     before do
       course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
@@ -124,19 +56,16 @@ describe AttachmentAssociation do
     end
 
     def make_associations
-      AttachmentAssociation.update_associations(
-        course,
-        [course_attachment.id, course_attachment2.id],
-        teacher,
-        nil
-      )
-      AttachmentAssociation.update_associations(
-        course,
-        [course_attachment3.id],
-        teacher,
-        nil,
-        "syllabus_body"
-      )
+      html = <<~HTML
+        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+          <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
+      HTML
+      html2 = <<~HTML
+        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+          <img id="3" src="/courses/#{course.id}/files/#{course_attachment3.id}/preview"></p>
+      HTML
+      course.associate_attachments_to_rce_object(html, teacher)
+      course.associate_attachments_to_rce_object(html2, teacher, context_concern: "syllabus_body")
     end
 
     it "returns false if the attachment is not associated with the context" do
