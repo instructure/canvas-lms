@@ -44,7 +44,7 @@ describe('AppsTableInner', () => {
       </BrowserRouter>,
     )
 
-    const kebabMenuIcon = await wrapper.findAllByText('More Registration Options')
+    const kebabMenuIcon = await wrapper.findAllByText('More Registration Options', {exact: false})
     fireEvent.click(kebabMenuIcon[0])
     const deleteButton = await wrapper.findByText('Delete App')
 
