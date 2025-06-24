@@ -277,6 +277,11 @@ class DiscussionTopic < ActiveRecord::Base
     d_type ||= context.feature_enabled?("react_discussions_post") ? DiscussionTypes::THREADED : DiscussionTypes::NOT_THREADED
     self.discussion_type = d_type
 
+    d_sort = self["sort_order"]
+    if d_sort.nil? || !SortOrder::TYPES.include?(d_sort)
+      self.sort_order = SortOrder::DEFAULT
+    end
+
     @content_changed = message_changed? || title_changed?
 
     default_submission_values
@@ -296,7 +301,6 @@ class DiscussionTopic < ActiveRecord::Base
       allow_rating
       only_graders_can_rate
       sort_by_rating
-      sort_order
       sort_order_locked
       expanded
       expanded_locked
