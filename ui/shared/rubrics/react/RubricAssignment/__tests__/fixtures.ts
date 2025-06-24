@@ -24,6 +24,9 @@ export const RUBRIC: AssignmentRubric = {
   criteriaCount: 1,
   pointsPossible: 10,
   title: 'Rubric 1',
+  buttonDisplay: 'numeric',
+  ratingOrder: 'ascending',
+  freeFormCriterionComments: false,
   criteria: [
     {
       id: '1',

@@ -77,12 +77,10 @@ export const renderEnhancedRubrics = () => {
     createOrUpdateRoot(
       'enhanced-rubric-assignment-edit-mount-point',
       <RubricAssignmentContainer
-        accountMasterScalesEnabled={ENV.ACCOUNT_LEVEL_MASTERY_SCALES}
         assignmentId={ENV.ASSIGNMENT_ID}
         assignmentRubric={assignmentRubric}
         assignmentRubricAssociation={assignmentRubricAssociation}
         canManageRubrics={ENV.PERMISSIONS?.manage_rubrics}
-        contextAssetString={ENV.context_asset_string}
         courseId={ENV.COURSE_ID}
         rubricSelfAssessmentFFEnabled={ENV.rubric_self_assessment_ff_enabled}
         aiRubricsEnabled={ENV.ai_rubrics_enabled}

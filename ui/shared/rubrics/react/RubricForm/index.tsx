@@ -34,6 +34,7 @@ import type {GroupOutcome} from '@canvas/global/env/EnvCommon'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {
   calcPointsPossible,
+  hasRubricChanged,
   defaultRubricForm,
   reorder,
   translateRubricData,
@@ -51,6 +52,7 @@ import {CriteriaBuilderHeader} from './components/CriteriaBuilderHeader'
 import {RubricAssignmentSettings} from './components/RubricAssignmentSettings'
 import {RubricFormSettings} from './components/RubricFormSettings'
 import {CanvasProgress} from '@canvas/progress/ProgressHelpers'
+import {EditConfirmModal} from '../RubricAssignment/components/EditConfirmModal'
 
 const I18n = createI18nScope('rubrics-form')
 
@@ -103,6 +105,7 @@ export const RubricForm = ({
   const [validationErrors, setValidationErrors] = useState<RubricFormValidationProps>({})
   const [selectedCriterion, setSelectedCriterion] = useState<RubricCriterion>()
   const [isCriterionModalOpen, setIsCriterionModalOpen] = useState(false)
+  const [isEditConfirmModalOpen, setIsEditConfirmModalOpen] = useState(false)
   const [isOutcomeCriterionModalOpen, setIsOutcomeCriterionModalOpen] = useState(false)
   const [isPreviewTrayOpen, setIsPreviewTrayOpen] = useState(false)
   const [savedRubricResponse, setSavedRubricResponse] = useState<SaveRubricResponse>()
@@ -113,10 +116,11 @@ export const RubricForm = ({
   const [showGenerateCriteriaHeader, setShowGenerateCriteriaHeader] = useState(false)
   const [generatedCriteriaProgress, setGeneratedCriteriaProgress] = useState<CanvasProgress>()
   const [generatedCriteriaIsPending, setGeneratedCriteriaIsPending] = useState(false)
+  const hasAssignment = !!assignmentId && assignmentId !== ''
+  const showAssignmentSettings = hasAssignment
 
   const criteriaRef = useRef(rubricForm.criteria)
 
-  const showAssignmentSettings = assignmentId && assignmentId !== ''
   const header = rubricId || rubric?.id ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
   const queryKey = ['fetch-rubric', rubricId ?? '']
   const formValid = !validationErrors.title?.message && rubricForm.criteria.length > 0
@@ -384,7 +388,13 @@ export const RubricForm = ({
         handleCancelButton={handleCancelButton}
         handlePreviewRubric={() => setIsPreviewTrayOpen(true)}
         handleSaveAsDraft={handleSaveAsDraft}
-        handleSave={handleSave}
+        handleSave={() => {
+          if (rubric && hasAssignment && hasRubricChanged(rubricForm, rubric)) {
+            setIsEditConfirmModalOpen(true)
+          } else {
+            handleSave()
+          }
+        }}
         formValid={formValid}
       />
 
@@ -415,6 +425,14 @@ export const RubricForm = ({
         rubric={rubricForm}
         rubricAssessmentData={[]}
         onDismiss={() => setIsPreviewTrayOpen(false)}
+      />
+      <EditConfirmModal
+        isOpen={isEditConfirmModalOpen}
+        onConfirm={() => {
+          setIsEditConfirmModalOpen(false)
+          handleSave()
+        }}
+        onDismiss={() => setIsEditConfirmModalOpen(false)}
       />
     </View>
   )
