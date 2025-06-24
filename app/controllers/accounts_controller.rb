@@ -317,6 +317,7 @@ class AccountsController < ApplicationController
   include CustomSidebarLinksHelper
   include DefaultDueTimeHelper
   include Api::V1::QuizIpFilter
+  include Api::V1::Progress
 
   INTEGER_REGEX = /\A[+-]?\d+\z/
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -1603,6 +1604,70 @@ class AccountsController < ApplicationController
     else
       render_unauthorized_action
     end
+  end
+
+  # @API Delete multiple users from the root account
+  #
+  # Delete multiple users from a Canvas root account. If a user is associated
+  # with multiple root accounts (in a multi-tenant instance of Canvas), this
+  # action will NOT remove them from the other accounts.
+  #
+  # WARNING: This API will allow a user to remove themselves from the account.
+  # If they do this, they won't be able to make API calls or log into Canvas at
+  # that account.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/accounts/3/users \
+  #       -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  #       -X DELETE
+  #       -d 'user_ids[]=1' \
+  #       -d 'user_ids[]=2'
+  #
+  # @returns Progress
+  def remove_users
+    return render_unauthorized_action unless @account.grants_right?(@current_user, :manage_users_in_bulk)
+
+    user_ids = params[:user_ids]
+    progress = Progress.create!(context: @context, user: @current_user, tag: :remove_users_from_account)
+    process_params = {
+      user_ids:
+    }
+
+    progress.process_job(Account::BulkUpdate.new(@account, @current_user), :remove_users, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)
+
+    render json: progress_json(progress, @current_user, session)
+  end
+
+  # @API Update multiple users
+  # Updates multiple users in bulk.
+  #
+  # @argument user_ids [Array<Integer>]
+  #   The IDs of the users to update.
+  # @argument user [Hash]
+  #   The attributes to update for each user.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/3/users/bulk_update \
+  #     -X PUT \
+  #     -H 'Authorization: Bearer <token>' \
+  #     -d 'user_ids[]=1' \
+  #     -d 'user_ids[]=2' \
+  #     -d 'user[event]=suspend'
+  #
+  # @returns Progress
+  def update_users
+    return render_unauthorized_action unless @account.grants_right?(@current_user, :manage_users_in_bulk)
+
+    allowed_attributes = [:event] # currently only used for suspend/unsuspend
+    user_ids = params[:user_ids]
+    user_params = (params[:user] || {}).permit(*allowed_attributes).to_h
+    progress = Progress.create!(context: @context, user: @current_user, tag: :update_multiple_users)
+    process_params = {
+      user_ids:,
+      user_params:,
+    }
+    progress.process_job(Account::BulkUpdate.new(@account, @current_user), :update_users, { run_at: Time.zone.now, priority: Delayed::NORMAL_PRIORITY }, **process_params)
+    render json: progress_json(progress, @current_user, session)
   end
 
   # @API Restore a deleted user from a root account
