@@ -143,11 +143,11 @@ export const OutcomeDescriptionModal: React.FC<OutcomeDescriptionModalProps> = (
     >
       <Modal.Body>
         {shouldDisplayEmptyModal ? (
-          <EmptyOutcomeModalBody contextURL={contextURL} />
+          <EmptyOutcomeModalBody contextURL={contextURL ?? ''} />
         ) : (
           <OutcomeModalBody
             outcome={outcome}
-            outcomesFriendlyDescriptionFF={outcomesFriendlyDescriptionFF}
+            outcomesFriendlyDescriptionFF={outcomesFriendlyDescriptionFF ?? false}
             missingFriendlyDescription={missingFriendlyDescription}
             calculationMethod={calculationMethod}
           />

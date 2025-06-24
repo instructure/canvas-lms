@@ -18,9 +18,27 @@
 
 import {createContext} from 'react'
 
-const LMGBContext = createContext({})
+interface OutcomeProficiency {
+  ratings: {
+    color: string
+    description: string
+    mastery: boolean
+    points: number
+  }[]
+}
 
-export const getLMGBContext = () => {
+export interface LMGBContextType {
+  env: {
+    contextURL?: string
+    outcomeProficiency?: OutcomeProficiency
+    accountLevelMasteryScalesFF?: boolean
+    outcomesFriendlyDescriptionFF?: boolean
+  }
+}
+
+const LMGBContext = createContext<LMGBContextType>({env: {}})
+
+export const getLMGBContext = (): LMGBContextType => {
   const gradebookOptions = ENV?.GRADEBOOK_OPTIONS
   const contextURL = gradebookOptions?.context_url
   const outcomeProficiency = gradebookOptions?.outcome_proficiency
