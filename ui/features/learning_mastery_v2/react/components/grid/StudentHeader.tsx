@@ -34,7 +34,7 @@ interface StudentHeaderProps {
   gradebookFilterHandler: (filter: GradebookFilter) => void
 }
 
-const StudentHeader: React.FC<StudentHeaderProps> = ({
+export const StudentHeader: React.FC<StudentHeaderProps> = ({
   gradebookFilters,
   gradebookFilterHandler,
 }) => {
@@ -91,5 +91,3 @@ const StudentHeader: React.FC<StudentHeaderProps> = ({
     </View>
   )
 }
-
-export default StudentHeader

@@ -16,23 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useRef, useEffect} from 'react'
-import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {StudentCell} from './components/grid/StudentCell'
-import {OutcomeHeader} from './components/grid/OutcomeHeader'
-import StudentHeader from './components/grid/StudentHeader'
-import {ScoresGrid} from './components/grid/ScoresGrid'
-import {studentShape, outcomeShape, studentRollupsShape} from './types/shapes'
+import {StudentCell} from './grid/StudentCell'
+import {OutcomeHeader} from './grid/OutcomeHeader'
+import {StudentHeader} from './grid/StudentHeader'
+import {ScoresGrid} from './grid/ScoresGrid'
 import {
   COLUMN_WIDTH,
   STUDENT_COLUMN_WIDTH,
   STUDENT_COLUMN_RIGHT_PADDING,
   COLUMN_PADDING,
   CELL_HEIGHT,
-} from './utils/constants'
+} from '../utils/constants'
+import {Student, Outcome, StudentRollupData} from '../types/rollup'
 
-const Gradebook = ({
+interface GradebookProps {
+  courseId: string
+  students: Student[]
+  outcomes: Outcome[]
+  rollups: StudentRollupData[]
+  gradebookFilters: string[]
+  gradebookFilterHandler: (filter: string) => void
+}
+
+export const Gradebook: React.FC<GradebookProps> = ({
   courseId,
   students,
   outcomes,
@@ -40,14 +48,20 @@ const Gradebook = ({
   gradebookFilters,
   gradebookFilterHandler,
 }) => {
-  const headerRow = useRef(null)
-  const gridRef = useRef(null)
+  const headerRow = useRef<HTMLElement | null>(null)
+  const gridRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
-    const handleGridScroll = e => (headerRow.current.scrollLeft = e.target.scrollLeft)
+    const handleGridScroll = (e: Event) => {
+      if (headerRow.current && e.target instanceof HTMLElement) {
+        headerRow.current.scrollLeft = e.target.scrollLeft
+      }
+    }
+
     if (gridRef.current) {
       gridRef.current.addEventListener('scroll', handleGridScroll)
     }
+
     return function cleanup() {
       if (gridRef.current) {
         gridRef.current.removeEventListener('scroll', handleGridScroll)
@@ -58,11 +72,13 @@ const Gradebook = ({
   return (
     <>
       <Flex padding="medium 0 0 0">
-        <Flex.Item borderWidth="large 0 medium 0">
-          <StudentHeader
-            gradebookFilters={gradebookFilters}
-            gradebookFilterHandler={gradebookFilterHandler}
-          />
+        <Flex.Item>
+          <View borderWidth="large 0 medium 0">
+            <StudentHeader
+              gradebookFilters={gradebookFilters}
+              gradebookFilterHandler={gradebookFilterHandler}
+            />
+          </View>
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />
         <View
@@ -70,7 +86,11 @@ const Gradebook = ({
           display="flex"
           id="outcomes-header"
           overflowX="hidden"
-          elementRef={el => (headerRow.current = el)}
+          elementRef={el => {
+            if (el instanceof HTMLElement) {
+              headerRow.current = el
+            }
+          }}
         >
           {outcomes.map((outcome, index) => (
             <Flex.Item size={`${COLUMN_WIDTH + COLUMN_PADDING}px`} key={`${outcome.id}.${index}`}>
@@ -99,7 +119,11 @@ const Gradebook = ({
           as="div"
           overflowX="auto"
           overflowY="auto"
-          elementRef={el => (gridRef.current = el)}
+          elementRef={el => {
+            if (el instanceof HTMLElement) {
+              gridRef.current = el
+            }
+          }}
           width={outcomes.length * COLUMN_WIDTH}
         >
           <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
@@ -108,14 +132,3 @@ const Gradebook = ({
     </>
   )
 }
-
-Gradebook.propTypes = {
-  courseId: PropTypes.string.isRequired,
-  students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
-  outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
-  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-  gradebookFilters: PropTypes.arrayOf(PropTypes.string).isRequired,
-  gradebookFilterHandler: PropTypes.func.isRequired,
-}
-
-export default Gradebook

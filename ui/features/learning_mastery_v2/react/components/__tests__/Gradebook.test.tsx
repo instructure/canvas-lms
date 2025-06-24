@@ -18,10 +18,20 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import Gradebook from '../Gradebook'
+import {Gradebook} from '../Gradebook'
+import type {Student, Outcome, StudentRollupData} from '../../types/rollup'
 
 describe('Gradebook', () => {
-  const defaultProps = (props = {}) => {
+  interface GradebookTestProps {
+    students?: Student[]
+    outcomes?: Outcome[]
+    rollups?: StudentRollupData[]
+    courseId?: string
+    gradebookFilters?: string[]
+    gradebookFilterHandler?: jest.Mock
+  }
+
+  const defaultProps = (props: GradebookTestProps = {}) => {
     return {
       students: [
         {
@@ -81,7 +91,8 @@ describe('Gradebook', () => {
   }
 
   beforeEach(() => {
-    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
+    window.ENV = window.ENV || {}
+    window.ENV.GRADEBOOK_OPTIONS = {ACCOUNT_LEVEL_MASTERY_SCALES: true}
   })
 
   it('renders each student', () => {
