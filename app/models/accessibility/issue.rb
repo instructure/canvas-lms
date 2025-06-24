@@ -20,10 +20,11 @@
 module Accessibility
   class Issue
     include ActiveModel::Model
-    include PageIssues
+    include WikiPageIssues
     include AssignmentIssues
     include AttachmentIssues
     include ContentChecker
+    include AccessibilityHelper
 
     attr_reader :context, :rules, :pdf_rules
 
@@ -34,11 +35,13 @@ module Accessibility
     end
 
     def generate
+      skip_scan = exceeds_accessibility_scan_limit?
       {
-        pages: generate_page_issues,
-        assignments: generate_assignment_issues,
-        attachments: generate_attachment_issues,
-        last_checked: Time.zone.now.strftime("%b %-d, %Y")
+        pages: generate_wiki_page_resources(skip_scan:),
+        assignments: generate_assignment_resources(skip_scan:),
+        attachments: generate_attachment_resources(skip_scan:),
+        last_checked: Time.zone.now.strftime("%b %-d, %Y"),
+        accessibility_scan_disabled: skip_scan
       }
     end
 

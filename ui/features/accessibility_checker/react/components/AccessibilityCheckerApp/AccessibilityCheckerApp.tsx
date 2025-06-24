@@ -22,6 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
@@ -41,6 +42,9 @@ import {IssuesByTypeChart} from '../IssuesByTypeChart/IssuesByTypeChart'
 
 const I18n = createI18nScope('accessibility_checker')
 const ISSUES_PER_PAGE = 10
+const LIMIT_EXCEEDED_MESSAGE = I18n.t(
+  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).',
+)
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
   const {setSelectedItem, setIsTrayOpen} = context
@@ -49,6 +53,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [tableData, setTableData] = useState<ContentItem[]>([])
   const [tableSortState, setTableSortState] = useState<TableSortState>({})
+  const [accessibilityScanDisabled, setAccessibilityScanDisabled] = useState(false)
 
   const doFetchAccessibilityIssues = useCallback(async () => {
     setLoading(true)
@@ -59,9 +64,10 @@ export const AccessibilityCheckerApp: React.FC = () => {
         method: 'POST',
       })
 
-      const accessibilityIssues: AccessibilityData = convertKeysToCamelCase(
-        data.json,
-      ) as AccessibilityData
+      const accessibilityIssues = convertKeysToCamelCase(data.json) as AccessibilityData
+      if (accessibilityIssues.accessibilityScanDisabled) {
+        setAccessibilityScanDisabled(true)
+      }
       setAccessibilityIssues(accessibilityIssues)
       setTableData(processAccessibilityData(accessibilityIssues))
     } catch (err: any) {
@@ -102,7 +108,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
     (sortId?: string, sortDirection?: 'ascending' | 'descending' | 'none') => {
       try {
         setLoading(true)
-        console.log('Sort request:', sortId, sortDirection)
         // TODO invoke backend API with the new values to sort the data
         // Then update states accordingly
         setTableSortState({
@@ -127,17 +132,48 @@ export const AccessibilityCheckerApp: React.FC = () => {
       }).format(new Date(accessibilityIssues.lastChecked))) ||
     I18n.t('Unknown')
 
+  const renderChartAndCounter = () => {
+    return (
+      <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
+        <Flex.Item>
+          <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
+            <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
+          </View>
+        </Flex.Item>
+        <Flex.Item shouldGrow shouldShrink>
+          <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
+            <IssuesByTypeChart accessibilityIssues={accessibilityIssues} isLoading={loading} />
+          </View>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
   return (
     <View as="div">
-      <Flex as="div" alignItems="start" direction="row">
-        <Flex.Item>
-          <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
-        </Flex.Item>
-        <Flex.Item margin="0 0 0 auto" padding="small 0">
-          <Button color="primary" onClick={handleReload}>
-            {I18n.t('Scan course')}
-          </Button>
-        </Flex.Item>
+      <Flex direction="column">
+        {accessibilityScanDisabled && (
+          <Alert
+            variant="info"
+            renderCloseButtonLabel="Close"
+            onDismiss={() => {}}
+            margin="small 0"
+          >
+            {LIMIT_EXCEEDED_MESSAGE}
+          </Alert>
+        )}
+        <Flex as="div" alignItems="start" direction="row">
+          <Flex.Item>
+            <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
+          </Flex.Item>
+          {!loading && !accessibilityScanDisabled && (
+            <Flex.Item margin="0 0 0 auto" padding="small 0">
+              <Button color="primary" onClick={handleReload} disabled={accessibilityScanDisabled}>
+                {I18n.t('Check Accessibility')}
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
       </Flex>
 
       <Flex as="div" alignItems="start" direction="row">
@@ -152,18 +188,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </Flex.Item>
         )}
       </Flex>
-      <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
-        <Flex.Item>
-          <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-            <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
-          </View>
-        </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink>
-          <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
-            <IssuesByTypeChart accessibilityIssues={accessibilityIssues} isLoading={loading} />
-          </View>
-        </Flex.Item>
-      </Flex>
+      {accessibilityScanDisabled || loading ? null : renderChartAndCounter()}
       <AccessibilityIssuesTablePaginated
         isLoading={loading}
         error={error}

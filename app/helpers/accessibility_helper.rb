@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2025 - present Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,23 +16,17 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+module AccessibilityHelper
+  MAX_RESOURCE_COUNT = 1000
 
-module Accessibility
-  class Issue
-    module PageIssues
-      def generate_page_issues
-        context.wiki_pages.not_deleted.order(updated_at: :desc).each_with_object({}) do |page, issues|
-          result = check_content_accessibility(page.body)
+  def exceeds_accessibility_scan_limit?
+    # TODO: add caching with proper invalidation
+    wiki_page_count = @context.wiki_pages.not_deleted.count
+    assignment_count = @context.assignments.active.count
+    attachment_count = @context.attachments.not_deleted.count
 
-          issues[page.id] = result.merge(
-            title: page.title,
-            published: page.published?,
-            updated_at: page.updated_at&.iso8601 || "",
-            url: polymorphic_path([context, page]),
-            edit_url: "#{polymorphic_path([context, page])}/edit"
-          )
-        end
-      end
-    end
+    total = wiki_page_count + assignment_count + attachment_count
+    total > MAX_RESOURCE_COUNT
   end
 end
