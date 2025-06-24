@@ -468,4 +468,65 @@ RSpec.describe GradeService do
       end
     end
   end
+
+  describe "#safe_parse_json_array" do
+    let(:service) { described_class.new(assignment: "Test", essay: "Test Essay", rubric: [], root_account_uuid: "mock-root") }
+
+    context "when response is a valid JSON array" do
+      it "returns the parsed array" do
+        json = [
+          { "rubric_category" => "Content", "criterion" => "Meets requirements", "reasoning" => "Clear" }
+        ].to_json
+
+        result = service.send(:safe_parse_json_array, json)
+        expect(result).to be_a(Array)
+        expect(result.first["rubric_category"]).to eq("Content")
+      end
+    end
+
+    context "when response is not valid JSON" do
+      it "raises CedarAIGraderError if JSON can't be parsed" do
+        expect do
+          service.send(:safe_parse_json_array, "not-json")
+        end.to raise_error(CedarAIGraderError, /Invalid JSON response/)
+      end
+    end
+
+    context "when response is not an array" do
+      it "returns empty array if parsed JSON is not an array" do
+        json = { foo: "bar" }.to_json
+        result = service.send(:safe_parse_json_array, json)
+        expect(result).to eq([])
+      end
+    end
+
+    context "when response contains extra text around a valid array" do
+      it "extracts and parses the array" do
+        response = "Here is the response: [{\"rubric_category\": \"Content\", \"criterion\": \"Meets requirements\", \"reasoning\": \"Clear\"}]"
+        result = service.send(:safe_parse_json_array, response)
+        expect(result).to be_a(Array)
+        expect(result.first["rubric_category"]).to eq("Content")
+      end
+    end
+
+    context "when response is blank" do
+      it "returns an empty array" do
+        result = service.send(:safe_parse_json_array, "")
+        expect(result).to eq([])
+      end
+    end
+
+    context "when extracted portion is not a JSON array" do
+      it "raises CedarAIGraderError if the extracted JSON is not an array" do
+        bad_response = <<~TEXT
+          Some output:
+          {"rubric_category": "Content", "criterion": "Meets requirements"}
+        TEXT
+
+        expect do
+          service.send(:safe_parse_json_array, bad_response)
+        end.to raise_error(CedarAIGraderError, /Invalid JSON response/)
+      end
+    end
+  end
 end
