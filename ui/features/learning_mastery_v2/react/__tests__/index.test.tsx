@@ -21,11 +21,12 @@ import {render, waitFor} from '@testing-library/react'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 
 jest.mock('../hooks/useRollups')
 
 describe('LearningMastery', () => {
-  const ratings = [
+  const ratings: Rating[] = [
     {
       color: 'blue',
       description: 'great!',
@@ -46,7 +47,7 @@ describe('LearningMastery', () => {
     },
   ]
 
-  const users = [
+  const users: Student[] = [
     {
       id: '1',
       name: 'Student 1',
@@ -55,7 +56,7 @@ describe('LearningMastery', () => {
     },
   ]
 
-  const outcomes = [
+  const outcomes: Outcome[] = [
     {
       id: '1',
       title: 'outcome 1',
@@ -68,7 +69,7 @@ describe('LearningMastery', () => {
     },
   ]
 
-  const rollups = [
+  const rollups: StudentRollupData[] = [
     {
       studentId: '1',
       outcomeRollups: [
@@ -85,12 +86,17 @@ describe('LearningMastery', () => {
     },
   ]
 
-  const defaultProps = (props = {}) => {
+  interface DefaultProps {
+    courseId?: string
+  }
+
+  const defaultProps = (props: DefaultProps = {}): {courseId: string} => {
     return {
       courseId: '1',
       ...props,
     }
   }
+
   beforeEach(() => {
     jest.useFakeTimers()
     fakeENV.setup({
@@ -101,7 +107,9 @@ describe('LearningMastery', () => {
       },
       FEATURES: {instui_nav: true},
     })
-    useRollups.mockReturnValue({
+
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue({
       isLoading: false,
       students: users,
       gradebookFilters: [],
@@ -112,7 +120,8 @@ describe('LearningMastery', () => {
   })
 
   afterEach(() => {
-    useRollups.mockClear()
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockClear()
     jest.clearAllMocks()
     jest.clearAllTimers()
     jest.useRealTimers()
@@ -120,7 +129,8 @@ describe('LearningMastery', () => {
   })
 
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
-    useRollups.mockReturnValue({isLoading: true})
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue({isLoading: true} as ReturnType<typeof useRollups>)
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByText('Loading')).toBeInTheDocument()
   })
@@ -142,11 +152,12 @@ describe('LearningMastery', () => {
   })
 
   it('calls useRollups with the provided courseId', () => {
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
     const props = defaultProps()
     render(<LearningMastery {...props} />)
-    expect(useRollups).toHaveBeenCalledWith({
+    expect(mockUseRollups).toHaveBeenCalledWith({
       courseId: props.courseId,
-      accountLevelMasteryScalesFF: true,
+      accountMasteryScalesEnabled: true,
     })
   })
 })

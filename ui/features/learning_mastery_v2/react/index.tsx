@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import PropTypes from 'prop-types'
+import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
@@ -29,7 +28,10 @@ import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {Flex} from '@instructure/ui-flex'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import {IconButton} from '@instructure/ui-buttons'
-import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBContext'
+import LMGBContext, {
+  getLMGBContext,
+  LMGBContextType,
+} from '@canvas/outcomes/react/contexts/LMGBContext'
 import ExportCSVButton from './ExportCSVButton'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
@@ -41,23 +43,27 @@ const componentOverrides = {
   },
 }
 
-const renderLoader = () => (
+const renderLoader = (): JSX.Element => (
   <View width="100%" display="block" textAlign="center">
     <Spinner size="large" renderTitle={I18n.t('Loading')} />
   </View>
 )
 
-const LearningMastery = ({courseId}) => {
-  const contextValues = getLMGBContext()
+interface LearningMasteryProps {
+  courseId: string
+}
+
+const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
+  const contextValues = getLMGBContext() as LMGBContextType
   const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
 
   const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} =
     useRollups({
       courseId,
-      accountLevelMasteryScalesFF,
+      accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
     })
 
-  const onGradebookFilterChange = filterItem => {
+  const onGradebookFilterChange = (filterItem: string) => {
     const filters = new Set(gradebookFilters)
 
     if (filters.has(filterItem)) {
@@ -86,7 +92,7 @@ const LearningMastery = ({courseId}) => {
             </Text>
             <View padding="xx-small">
               <GradebookMenu
-                courseUrl={contextURL}
+                courseUrl={contextURL ?? ''}
                 learningMasteryEnabled={true}
                 variant="DefaultGradebookLearningMastery"
                 customTrigger={
@@ -124,10 +130,6 @@ const LearningMastery = ({courseId}) => {
       )}
     </LMGBContext.Provider>
   )
-}
-
-LearningMastery.propTypes = {
-  courseId: PropTypes.string.isRequired,
 }
 
 export default LearningMastery
