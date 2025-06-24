@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
-import userEvent, { UserEvent } from '@testing-library/user-event'
+import userEvent, {UserEvent} from '@testing-library/user-event'
 import {MemoryRouter, Route, Routes} from 'react-router-dom'
 import SearchBar from '../SearchBar'
 
@@ -45,7 +45,6 @@ const getClearButton = () => screen.getByRole('button', {name: 'Clear search'})
 const getInput = () => screen.getByPlaceholderText('Search files...')
 
 describe('SearchBar', () => {
-
   const expectedSearchTerm = 'searchTerm'
   const onSearch = jest.fn<void, [string]>()
   let user: UserEvent
@@ -63,7 +62,7 @@ describe('SearchBar', () => {
     it('renders with initial value', () => {
       expect(getInput()).toHaveValue(expectedSearchTerm)
     })
-  
+
     it('clears the search value', async () => {
       await user.click(getClearButton())
       expect(getInput()).toHaveValue('')
@@ -81,15 +80,15 @@ describe('SearchBar', () => {
       renderComponent({initialValue: '', onSearch})
     })
 
-    it('does not search on button click', async () => {
+    it('searches on button click', async () => {
       await user.click(getSearchButton())
-      expect(onSearch).not.toHaveBeenCalled()
+      expect(onSearch).toHaveBeenCalled()
     })
 
-    it('does not search on enter press', async () => {
+    it('searches on enter press', async () => {
       await user.click(getInput())
       await user.keyboard('{enter}')
-      expect(onSearch).not.toHaveBeenCalled()
+      expect(onSearch).toHaveBeenCalled()
     })
   })
 
