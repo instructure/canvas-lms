@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import StudentHeader from '../StudentHeader'
+import {StudentHeader} from '../StudentHeader'
 
 describe('StudentHeader', () => {
   let gradebookFilterHandlerMock: jest.Mock
