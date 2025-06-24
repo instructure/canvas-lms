@@ -74,7 +74,8 @@ class GradeService
         feature_slug: "grading-assistance",
         root_account_uuid: @root_account_uuid
       )
-      body = JSON.parse(response)
+
+      body = safe_parse_json_array(response)
       parsed_result = filter_repeating_keys(body)
 
       map_criteria_ids_to_grades(parsed_result, @rubric)
@@ -153,7 +154,9 @@ class GradeService
       criterion_data = rubric_data.find { |c| c[:description] == rubric_category }
       next unless criterion_data
 
-      matched_rating = (criterion_data[:ratings] || []).find { |r| r[:long_description] == selected_description }
+      matched_rating = (criterion_data[:ratings] || []).find do |r|
+        normalize_quotes(r[:long_description].to_s.strip) == normalize_quotes(selected_description.to_s.strip)
+      end
       next unless matched_rating
 
       {
@@ -169,6 +172,10 @@ class GradeService
     end
   end
 
+  def normalize_quotes(str)
+    str.gsub(/[‘’]/, "'").gsub(/[“”]/, '"')
+  end
+
   def filter_repeating_keys(json_array)
     json_array.uniq { |item| item["rubric_category"] }
   end
@@ -178,5 +185,22 @@ class GradeService
       .gsub("{{assignment}}", @assignment.encode(xml: :text))
       .gsub("{{essay}}", @essay.encode(xml: :text))
       .gsub("{{rubric}}", @rubric_prompt_format.to_json)
+  end
+
+  def safe_parse_json_array(response)
+    return [] if response.blank?
+
+    begin
+      parsed = JSON.parse(response)
+      return parsed.is_a?(Array) ? parsed : []
+    rescue JSON::ParserError
+      if response.include?("[") && response.include?("]")
+        json_like = response[response.index("["), response.rindex("]") - response.index("[") + 1]
+        parsed = JSON.parse(json_like)
+        return parsed.is_a?(Array) ? parsed : []
+      end
+    end
+
+    raise CedarAIGraderError, "Invalid JSON response: could not extract valid JSON array"
   end
 end

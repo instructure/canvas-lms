@@ -191,6 +191,7 @@ class Submission < ActiveRecord::Base
            class_name: "Auditors::ActiveRecord::GradeChangeRecord",
            dependent: :destroy,
            inverse_of: :submission
+  has_many :submission_texts, dependent: :destroy
 
   serialize :turnitin_data, type: Hash
 
@@ -470,6 +471,7 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
+  after_save :extract_text_from_upload_later, if: -> { extract_text_from_upload? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
@@ -3254,6 +3256,18 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def attachment_text
+    read_or_calc_extracted_attachment[:text]
+  end
+
+  def attachment_contains_images
+    read_or_calc_extracted_attachment[:contains_images]
+  end
+
+  def extract_text_from_upload?
+    submission_type == "online_upload" && Account.site_admin.feature_enabled?(:grading_assistance_file_uploads) && attachments.any?
+  end
+
   def effective_checkpoint_submission(sub_assignment_tag)
     return self unless sub_assignment_tag.present?
     return self unless assignment.checkpoints_parent?
@@ -3487,5 +3501,63 @@ class Submission < ActiveRecord::Base
                              time,
                              Setting.get("submission_grading_timing_sample_rate", "1.0").to_f,
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
+  end
+
+  def extract_text_from_upload_later
+    return unless extract_text_from_upload?
+
+    delay(
+      n_strand: ["Submission#extract_text_from_upload", global_root_account_id],
+      singleton: "extract_text_from_upload#{global_id}-attempt#{attempt}"
+    ).extract_text_from_upload
+  end
+
+  def extract_text_from_upload
+    upsert_rows = []
+
+    attachments.find_each do |attachment|
+      result = FileTextExtractionService.new(attachment:).call
+
+      upsert_rows << {
+        submission_id: id,
+        attachment_id: attachment.id,
+        root_account_id: root_account.id,
+        text: result.text,
+        contains_images: result.contains_images,
+        attempt:,
+        updated_at: Time.current,
+        created_at: Time.current
+      }
+    end
+
+    SubmissionText.upsert_all(upsert_rows, unique_by: %i[submission_id attachment_id attempt]) if upsert_rows.any?
+  end
+
+  def read_or_calc_extracted_attachment
+    return unless extract_text_from_upload?
+
+    @read_or_calc_extracted_attachment ||= begin
+      result = read_extracted_attachment
+
+      if result[:text].blank? && !result[:contains_images]
+        extract_text_from_upload
+        result = read_extracted_attachment
+      end
+
+      result
+    end
+  end
+
+  def read_extracted_attachment
+    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+
+    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
+      result[:text] << "\n\n" unless result[:text].empty?
+      result[:text] << row_txt.to_s
+      result[:contains_images] ||= has_img
+    end
+  rescue => e
+    Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
+    { text: "", contains_images: false }
   end
 end
