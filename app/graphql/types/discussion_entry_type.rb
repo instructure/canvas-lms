@@ -91,7 +91,7 @@ module Types
         # we display deleted entries in discussions
         sort_order = topic.discussion_topic_participants.where(user_id: current_user).first&.sort_order || DiscussionTopic::SortOrder::DEFAULT
         if sort_order == DiscussionTopic::SortOrder::INHERIT
-          sort_order = topic.sort_order || DiscussionTopic::SortOrder::DEFAULT
+          sort_order = topic.sanitized_sort_order || DiscussionTopic::SortOrder::DEFAULT
         end
         topic_root_entries_ids = topic.discussion_entries.where(parent_id: nil).reorder("created_at #{sort_order}").map(&:id)
         entry_root_id = object.root_entry_id || object.id
