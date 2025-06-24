@@ -2216,12 +2216,20 @@ class DiscussionTopic < ActiveRecord::Base
     all_overrides
   end
 
+  def sanitized_sort_order
+    if DiscussionTopic::SortOrder::TYPES.include?(sort_order)
+      sort_order
+    else
+      DiscussionTopic::SortOrder::DEFAULT
+    end
+  end
+
   def sort_order_for_user(current_user = nil)
-    return sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort) && sort_order_locked
+    return sanitized_sort_order if Account.site_admin.feature_enabled?(:discussion_default_sort) && sort_order_locked
 
     current_user ||= self.current_user
     participant_sort_order = participant(current_user)&.sort_order
-    participant_sort_order = sort_order if participant_sort_order == DiscussionTopic::SortOrder::INHERIT
+    participant_sort_order = sanitized_sort_order if participant_sort_order == DiscussionTopic::SortOrder::INHERIT
     participant_sort_order || DiscussionTopic::SortOrder::DEFAULT
   end
 
