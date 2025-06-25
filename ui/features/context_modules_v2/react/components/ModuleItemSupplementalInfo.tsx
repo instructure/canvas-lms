@@ -70,7 +70,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
 
       {hasDueOrLockDate && (hasPointsPossible || hasCompletionRequirement) && (
         <Flex.Item>
-          <Text weight="normal" size="x-small">
+          <Text weight="normal" size="x-small" aria-hidden="true">
             |
           </Text>
         </Flex.Item>
@@ -86,7 +86,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
 
       {hasPointsPossible && hasCompletionRequirement && (
         <Flex.Item>
-          <Text weight="normal" size="x-small">
+          <Text weight="normal" size="x-small" aria-hidden="true">
             |
           </Text>
         </Flex.Item>
