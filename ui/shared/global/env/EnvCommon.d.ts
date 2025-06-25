@@ -318,6 +318,7 @@ export type RootAccountFeatureId =
   | 'lti_registrations_next'
   | 'lti_registrations_page'
   | 'lti_registrations_usage_data'
+  | 'lti_registrations_usage_tab'
   | 'mobile_offline_mode'
   | 'product_tours'
   | 'rce_transform_loaded_content'
