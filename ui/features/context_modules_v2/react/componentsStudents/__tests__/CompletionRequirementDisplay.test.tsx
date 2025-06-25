@@ -57,6 +57,21 @@ describe('CompletionRequirementDisplay', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders min_percentage requirement correctly when completed', () => {
+    const completionRequirement: CompletionRequirement = {
+      id: '1',
+      type: 'min_percentage',
+      minPercentage: 85,
+      completed: true,
+    }
+    render(<CompletionRequirementDisplay completionRequirement={completionRequirement} />)
+
+    expect(screen.getByText('Scored at least 85%')).toBeInTheDocument()
+    expect(
+      screen.getByText('Module item has been completed by scoring at least 85%'),
+    ).toBeInTheDocument()
+  })
+
   it('renders min_percentage requirement correctly when not completed', () => {
     const completionRequirement: CompletionRequirement = {
       id: '1',
@@ -84,6 +99,30 @@ describe('CompletionRequirementDisplay', () => {
     expect(screen.getByText('Module item has been viewed and is complete')).toBeInTheDocument()
   })
 
+  it('renders must_view requirement correctly when not completed', () => {
+    const completionRequirement: CompletionRequirement = {
+      id: '1',
+      type: 'must_view',
+      completed: false,
+    }
+    render(<CompletionRequirementDisplay completionRequirement={completionRequirement} />)
+
+    expect(screen.getByText('View')).toBeInTheDocument()
+    expect(screen.getByText('Must view in order to complete this module item')).toBeInTheDocument()
+  })
+
+  it('renders must_mark_done requirement correctly when completed', () => {
+    const completionRequirement: CompletionRequirement = {
+      id: '1',
+      type: 'must_mark_done',
+      completed: true,
+    }
+    render(<CompletionRequirementDisplay completionRequirement={completionRequirement} />)
+
+    expect(screen.getByText('Marked done')).toBeInTheDocument()
+    expect(screen.getByText('Module item marked as done and is complete')).toBeInTheDocument()
+  })
+
   it('renders must_mark_done requirement correctly when not completed', () => {
     const completionRequirement: CompletionRequirement = {
       id: '1',
@@ -98,7 +137,7 @@ describe('CompletionRequirementDisplay', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders must_contribute requirement correctly', () => {
+  it('renders must_contribute requirement correctly when not completed', () => {
     const completionRequirement: CompletionRequirement = {
       id: '1',
       type: 'must_contribute',
@@ -109,7 +148,19 @@ describe('CompletionRequirementDisplay', () => {
     expect(screen.getByText('Contribute')).toBeInTheDocument()
   })
 
-  it('renders must_submit requirement correctly', () => {
+  it('renders must_contribute requirement correctly when complete', () => {
+    const completionRequirement: CompletionRequirement = {
+      id: '1',
+      type: 'must_contribute',
+      completed: true,
+    }
+    render(<CompletionRequirementDisplay completionRequirement={completionRequirement} />)
+
+    expect(screen.getByText('Contributed')).toBeInTheDocument()
+    expect(screen.getByText('Contributed to this module item and is complete')).toBeInTheDocument()
+  })
+
+  it('renders must_submit requirement correctly when completed', () => {
     const completionRequirement: CompletionRequirement = {
       id: '1',
       type: 'must_submit',
@@ -119,6 +170,18 @@ describe('CompletionRequirementDisplay', () => {
 
     expect(screen.getByText('Submitted')).toBeInTheDocument()
     expect(screen.getByText('Module item submitted and is complete')).toBeInTheDocument()
+  })
+
+  it('renders must_submit requirement correctly when not completed', () => {
+    const completionRequirement: CompletionRequirement = {
+      id: '1',
+      type: 'must_submit',
+      completed: false,
+    }
+    render(<CompletionRequirementDisplay completionRequirement={completionRequirement} />)
+
+    expect(screen.getByText('Submit')).toBeInTheDocument()
+    expect(screen.getByText('Must submit this module item to complete it')).toBeInTheDocument()
   })
 
   it('renders nothing for unknown requirement types', () => {

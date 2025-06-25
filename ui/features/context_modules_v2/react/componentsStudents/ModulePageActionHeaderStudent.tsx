@@ -75,9 +75,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
       <View as="div">
         {data?.name && (
           <View as="div" margin="0 0 small 0">
-            <Heading level="h1">
-              {data?.name ? `${I18n.t('Welcome to ')} ${data.name}!` : I18n.t('Welcome!')}
-            </Heading>
+            <Heading level="h1">{`${I18n.t('Welcome to ')} ${data.name}!`}</Heading>
           </View>
         )}
         <View as="div" margin="0 0 medium 0">
