@@ -41,6 +41,20 @@ const inlineMediaComment = {
     return id
   },
 
+  getMediaAttachmentId($link) {
+    let attachmentId = $link.data('api-endpoint').split('/').pop()
+    if (!attachmentId || isNaN(attachmentId)) {
+      const href = $link.attr('href')
+      const regex = /\/files\/(\d+)/
+      const match = href.match(regex)
+
+      if (match) {
+        attachmentId = match[1]
+      }
+    }
+    return attachmentId
+  },
+
   collapseComment($holder) {
     __guard__($holder.find('video,audio').data('mediaelementplayer'), x => x.pause())
     $holder.remove()
@@ -87,6 +101,7 @@ $(document).on('click', 'a.instructure_inline_media_comment', function (event) {
 
   let mediaType = 'video'
   const id = inlineMediaComment.getMediaCommentId($link)
+  const attachmentId = inlineMediaComment.getMediaAttachmentId($link)
   const $holder = inlineMediaComment.buildCommentHolder($link)
 
   if (shouldResizeTd($link)) {
@@ -105,7 +120,13 @@ $(document).on('click', 'a.instructure_inline_media_comment', function (event) {
 
   $holder
     .children('div')
-    .mediaComment('show_inline', id, mediaType, $link.data('download') || $link.attr('href'))
+    .mediaComment(
+      'show_inline',
+      id,
+      mediaType,
+      $link.data('download') || $link.attr('href'),
+      attachmentId,
+    )
 
   const $minimizer = inlineMediaComment.buildMinimizerLink()
 
