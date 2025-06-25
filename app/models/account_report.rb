@@ -66,6 +66,7 @@ class AccountReport < ActiveRecord::Base
 
   scope :complete, -> { where(progress: 100) }
   scope :running, -> { where(workflow_state: %w[running compiling]) }
+  scope :created_or_running, -> { where(workflow_state: %w[created running compiling]) }
   scope :most_recent, -> { order(created_at: :desc).limit(1) }
   scope :active, -> { where.not(workflow_state: "deleted") }
 
