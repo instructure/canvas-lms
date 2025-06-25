@@ -203,7 +203,7 @@ describe('AppsTableInner', () => {
     )
 
     const link = wrapper.getByTestId('reg-link-1')
-    expect(link).toHaveAttribute('href', '/manage/1/configuration')
+    expect(link).toHaveAttribute('href', '/manage/1')
     window.ENV.FEATURES.lti_registrations_next = false
   })
 })
