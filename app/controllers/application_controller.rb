@@ -430,6 +430,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_next
     lti_registrations_page
     lti_registrations_usage_data
+    lti_registrations_usage_tab
     lti_asset_processor
     buttons_and_icons_root_account
     extended_submission_state

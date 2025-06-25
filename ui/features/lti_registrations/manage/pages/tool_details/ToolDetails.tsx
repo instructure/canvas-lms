@@ -342,7 +342,7 @@ export const ToolDetailsInner = ({
         >
           <Outlet context={outletContext} />
         </Tabs.Panel>
-        {window.ENV.FEATURES.lti_registrations_usage_data ? (
+        {window.ENV.FEATURES.lti_registrations_usage_tab ? (
           <Tabs.Panel
             isSelected={route === 'usage'}
             active={route === 'usage'}

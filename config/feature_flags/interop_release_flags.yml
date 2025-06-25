@@ -112,6 +112,17 @@ lti_target_link_uri_for_assignment_edit_view:
       state: allowed_on
     ci:
       state: allowed_on
+lti_apps_page_ai_translation:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: AI Translation for LTI Apps Discover Page
+  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_apps_page_instructors:
   state: hidden
   shadow: true
@@ -268,6 +279,17 @@ lti_registrations_usage_data:
       state: allowed_on
     ci:
       state: allowed_on
+lti_registrations_usage_tab:
+  state: hidden
+  shadow: false
+  applies_to: RootAccount
+  display_name: LTI Apps - Manage Usage
+  description: When enabled, the Usage tab will appear on an app's details page in Canvas Apps.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_resource_link_id_speedgrader_launches_reference_assignment:
   state: hidden
   applies_to: RootAccount
@@ -408,14 +430,3 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-lti_apps_page_ai_translation:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: AI Translation for LTI Apps Discover Page
-  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
