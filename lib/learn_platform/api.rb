@@ -24,15 +24,32 @@ module LearnPlatform
       @learnplatform = Canvas::Plugin.find(:learnplatform)
     end
 
+    def valid_basic_auth_params?
+      !learnplatform.settings["username"].empty? && !learnplatform.settings["password"].empty?
+    end
+
+    def valid_token_auth_params?
+      !learnplatform.settings["jwt_issuer"].empty? && !learnplatform.settings["jwt_secret"].empty?
+    end
+
     def valid_learnplatform?
-      learnplatform&.enabled? && !learnplatform.settings["username"].empty? && !learnplatform.settings["password"].empty?
+      learnplatform&.enabled? && (valid_basic_auth_params? || valid_token_auth_params?)
     end
 
     def fetch_learnplatform_response(endpoint, expires, params = {})
       base_url = learnplatform.settings["base_url"]
-      name = learnplatform.settings["username_dec"]
-      pass = learnplatform.settings["password_dec"]
-      authorization = "Basic #{Base64.encode64("#{name}:#{pass}")}"
+
+      if valid_token_auth_params?
+        jwt_issuer = learnplatform.settings["jwt_issuer_dec"]
+        secret = learnplatform.settings["jwt_secret_dec"]
+        payload = { iss: jwt_issuer, exp: Time.now.to_i + 3600 }
+        token = JWT.encode(payload, secret, "HS256")
+        authorization = "Bearer #{token}"
+      elsif valid_basic_auth_params?
+        name = learnplatform.settings["username_dec"]
+        pass = learnplatform.settings["password_dec"]
+        authorization = "Basic #{Base64.encode64("#{name}:#{pass}")}"
+      end
 
       begin
         cache_key = ["learnplatform", endpoint, authorization, params].cache_key

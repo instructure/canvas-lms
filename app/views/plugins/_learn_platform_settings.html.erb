@@ -43,5 +43,17 @@
         <%= f.password_field :password, autocomplete: false %>
       </td>
     </tr>
+        <tr>
+      <td><%= f.blabel :jwt_issuer, :en => "JWT Issuer" %></td>
+      <td>
+        <%= f.password_field :jwt_issuer, autocomplete: false %>
+      </td>
+    </tr>
+        <tr>
+      <td><%= f.blabel :jwt_secret, :en => "JWT Secret" %></td>
+      <td>
+        <%= f.password_field :jwt_secret, autocomplete: false %>
+      </td>
+    </tr>
   </table>
 <% end %>
