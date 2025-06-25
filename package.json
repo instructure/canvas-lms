@@ -170,6 +170,7 @@
     "re-resizable": "6.9.16",
     "react": "^18",
     "react-beautiful-dnd": "^13.1.1",
+    "react-chartjs-2": "^5.2.0",
     "react-confetti-explosion": "^2.1.2",
     "react-contenteditable": "^3.3.7",
     "react-dnd": "6.0",

@@ -236,8 +236,10 @@ export function setExpandAllButton() {
 
 export function setExpandAllButtonHandler(lazy_load_callback) {
   $('#expand_collapse_all').click(function () {
-    $('#expand_collapse_all').prop('disabled', true)
     const shouldExpand = $(this).data('expand')
+    if (shouldExpand) {
+      $('#expand_collapse_all').prop('disabled', true)
+    }
 
     if (ENV.FEATURES.instui_header) {
       $(this)
@@ -282,8 +284,8 @@ export function setExpandAllButtonHandler(lazy_load_callback) {
     const url = $(this).data('url')
     const collapse = shouldExpand ? '0' : '1'
     $.ajaxJSON(url, 'POST', {collapse}, _data => {
-      if (shouldExpand) {
-        lazy_load_callback?.()
+      if (shouldExpand && lazy_load_callback) {
+        lazy_load_callback(shouldExpand)
       } else {
         $(this).prop('disabled', false)
       }

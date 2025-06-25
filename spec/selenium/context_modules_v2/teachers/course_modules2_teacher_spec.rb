@@ -42,6 +42,12 @@ describe "context modules", :ignore_js_errors do
     expect(teacher_modules_container).to be_displayed
   end
 
+  it "creates a screenreader alert when all module items are loaded" do
+    go_to_modules
+    expand_all_modules_button.click if element_exists?(expand_all_modules_button_selector)
+    expect(screenreader_alert).to include_text("All module items loaded")
+  end
+
   context "modules action menu" do
     before do
       @item = @module1.content_tags[0]
@@ -103,6 +109,7 @@ describe "context modules", :ignore_js_errors do
 
         it "module is correctly sent" do
           go_to_modules
+
           module_action_menu(@module1.id).click
           module_item_action_menu_link("Send To...").click
 
@@ -151,7 +158,6 @@ describe "context modules", :ignore_js_errors do
         option_list_id = send_to_modal_input.attribute("aria-controls")
 
         expect(ff("##{option_list_id} [role='option']").count).to eq 1
-
         fj("##{option_list_id} [role='option']:contains(#{@first_user.first_name})").click
         selected_element = send_to_form_selected_elements.first
 

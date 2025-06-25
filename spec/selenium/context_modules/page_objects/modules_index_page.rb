@@ -460,12 +460,8 @@ module ModulesIndexPage
     f(show_less_button_selector(context_module))
   end
 
-  def flash_alert
-    f(".flashalert-message")
-  end
-
-  def flash_alert_close_button
-    fj(".flashalert-message button:contains('Close')")
+  def screenreader_alert
+    f("#flash_screenreader_holder")
   end
 
   #------------------------------ Actions ------------------------------

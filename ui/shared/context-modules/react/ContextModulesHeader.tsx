@@ -36,12 +36,7 @@ import {
 } from '@instructure/ui-responsive'
 
 import ContextModulesPublishMenu from './ContextModulesPublishMenu'
-import {
-  setExpandAllButton,
-  setExpandAllButtonHandler,
-  resetExpandAllButtonBindings,
-  openExternalTool,
-} from '../jquery/utils'
+import {openExternalTool} from '../jquery/utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('context_modules')
@@ -77,6 +72,11 @@ type OverridesProps = {
   hideTitle?: boolean
   publishMenu?: {
     onPublishComplete?: () => void
+  }
+  expandCollapseAll?: {
+    onExpandCollapseAll?: () => void
+    anyModuleExpanded?: boolean
+    disabled?: boolean
   }
   handleAddModule?: () => void
 }
@@ -165,11 +165,6 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
   const [publishMenu, setPublishMenu] = useState<PublishMenuProps>(props.publishMenu)
 
   useEffect(() => {
-    setExpandAllButton()
-    setExpandAllButtonHandler()
-  })
-
-  useEffect(() => {
     window.addEventListener('update-publish-menu-disabled-state', ((e: CustomEvent) => {
       setPublishMenu((prev: PublishMenuProps) => ({
         ...prev,
@@ -178,7 +173,8 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
     }) as EventListener)
   }, [])
 
-  resetExpandAllButtonBindings()
+  const expandCollapseAll = {...props.expandCollapseAll, ...props.overrides?.expandCollapseAll}
+
   return (
     <>
       <Flex
@@ -246,15 +242,16 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
 
             <Flex.Item overflowY="visible">
               <Button
-                onClick={props.expandCollapseAll.onExpandCollapseAll}
+                id="expand_collapse_all"
+                onClick={expandCollapseAll.onExpandCollapseAll}
                 aria-label={
-                  props.expandCollapseAll.anyModuleExpanded
+                  expandCollapseAll.anyModuleExpanded
                     ? I18n.t('Collapse All Modules')
                     : I18n.t('Expand All Modules')
                 }
-                interaction={props.expandCollapseAll.disabled ? 'disabled' : 'enabled'}
+                interaction={expandCollapseAll.disabled ? 'disabled' : 'enabled'}
               >
-                {props.expandCollapseAll.anyModuleExpanded
+                {expandCollapseAll.anyModuleExpanded
                   ? I18n.t('Collapse All')
                   : I18n.t('Expand All')}
               </Button>

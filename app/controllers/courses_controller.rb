@@ -2456,13 +2456,6 @@ class CoursesController < ApplicationController
                 disabled: @modules.empty?,
                 visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
               },
-              expandCollapseAll: {
-                label: t("Collapse All"),
-                dataUrl: context_url(@context, :context_url) + "/collapse_all_modules",
-                dataExpand: false,
-                ariaExpanded: false,
-                ariaLabel: t("Collapse All Modules"),
-              },
               addModule: {
                 label: t("Add Module"),
                 visible: @can_add,

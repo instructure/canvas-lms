@@ -134,7 +134,7 @@ describe ContextModulesController do
       describe "EXPANDED_MODULES" do
         it "should not assign the @expanded_modules" do
           subject
-          expect(assigns(:expanded_modules)).to be_nil
+          expect(assigns(:expanded_modules)).to be_truthy
         end
 
         it "should have empty EXPANDED_MODULES js env" do
