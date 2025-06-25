@@ -256,6 +256,8 @@ const Columns: ReadonlyArray<Column> = [
                   showFlashAlert({
                     type: 'info',
                     message: I18n.t('Client ID copied (%{id})', {id: developerKeyId}),
+                    dismissible: false,
+                    politeness: 'polite',
                   })
                 } catch {
                   showFlashAlert({
@@ -263,6 +265,8 @@ const Columns: ReadonlyArray<Column> = [
                     message: I18n.t('There was an issue copying the client ID (%{id})', {
                       id: developerKeyId,
                     }),
+                    dismissible: false,
+                    politeness: 'polite',
                   })
                 }
               }}

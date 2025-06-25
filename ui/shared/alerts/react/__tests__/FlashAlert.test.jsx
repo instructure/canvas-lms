@@ -51,4 +51,19 @@ describe('FlashAlert', () => {
     expect(screen.getAllByText('This is a test error message 234')[0]).toBeInTheDocument()
     expect(screen.queryByText('loading chunk', {exact: false})).toBeNull()
   })
+
+  it('renders without close button', () => {
+    render(
+      <FlashAlert
+        message="This is a test error message 345"
+        timeout={ENV.flashAlertTimeout}
+        error={new Error('This is a test error 543')}
+        variant="error"
+        onClose={() => {}}
+        screenReaderOnly={false}
+        dismissible={false}
+      />,
+    )
+    expect(screen.queryByRole('button', {name: 'Close'})).toBeNull()
+  })
 })

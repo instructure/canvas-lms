@@ -107,12 +107,14 @@ type FlashAlertProps = {
   timeout?: number
   screenReaderOnly?: boolean
   liveRegionPoliteness?: 'assertive' | 'polite'
+  dismissible?: boolean
 }
 export default class FlashAlert extends React.Component<FlashAlertProps> {
   static defaultProps = {
     variant: 'info',
     timeout,
     screenReaderOnly: false,
+    dismissible: true,
   }
 
   timerId: number = 0
@@ -196,7 +198,7 @@ export default class FlashAlert extends React.Component<FlashAlertProps> {
       <Transition transitionOnMount={true} in={this.state.isOpen} type="fade">
         <Alert
           variant={this.props.variant}
-          renderCloseButtonLabel={I18n.t('Close')}
+          renderCloseButtonLabel={this.props.dismissible ? I18n.t('Close') : undefined}
           onDismiss={this.closeAlert}
           margin="small auto"
           timeout={this.props.timeout}
@@ -221,10 +223,18 @@ type ShowFlashAlertArgs = {
   type?: 'info' | 'success' | 'warning' | 'error'
   srOnly?: boolean
   politeness?: 'assertive' | 'polite'
+  dismissible?: boolean
 }
 
 export function showFlashAlert(args: ShowFlashAlertArgs) {
-  const {message, err, type = err ? 'error' : 'info', srOnly = false, politeness} = args
+  const {
+    message,
+    err,
+    type = err ? 'error' : 'info',
+    srOnly = false,
+    politeness,
+    dismissible = true,
+  } = args
 
   function closeAlert(atNode: Element) {
     ReactDOM.unmountComponentAtNode(atNode)
@@ -256,6 +266,7 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
         onClose={closeAlert.bind(null, parent)}
         screenReaderOnly={srOnly}
         liveRegionPoliteness={politeness}
+        dismissible={dismissible}
       />,
       parent,
     )
