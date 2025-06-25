@@ -56,6 +56,7 @@ const buildDefaultProps = (overrides = {}) => {
     },
     completionRequirements: [],
     requirementCount: 0,
+    submissionStatistics: undefined,
   }
 
   return {...defaultProps, ...overrides}
@@ -85,6 +86,34 @@ describe('ModuleHeaderStudent', () => {
     }
     const {getByTestId} = setUp(buildDefaultProps({progression, completionRequirements: []}))
     expect(getByTestId('module-header-status-icon-lock')).toBeInTheDocument()
+  })
+
+  it('renders ModuleHeaderCompletionRequirement when completionRequirements is not empty', () => {
+    const {getByTestId} = setUp(
+      buildDefaultProps({
+        completionRequirements: [
+          {
+            id: '1',
+            type: 'min_percentage',
+            minPercentage: 85,
+            completed: true,
+          },
+        ],
+      }),
+    )
+    expect(getByTestId('module-completion-requirement')).toBeInTheDocument()
+  })
+
+  it('renders ModuleHeaderMissingCount when submissionStatistics is not empty', () => {
+    const {getByTestId} = setUp(
+      buildDefaultProps({
+        submissionStatistics: {
+          latestDueAt: '',
+          missingAssignmentCount: 5,
+        },
+      }),
+    )
+    expect(getByTestId('module-header-missing-count')).toBeInTheDocument()
   })
 
   describe('prerequisites', () => {

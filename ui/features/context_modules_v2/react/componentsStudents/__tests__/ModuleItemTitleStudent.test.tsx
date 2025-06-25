@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import ModuleItemTitleStudent, {ModuleItemTitleStudentProps} from '../ModuleItemTitleStudent'
 import {ModuleItemContent, ModuleProgression, CompletionRequirement} from '../../utils/types'
 
@@ -88,5 +88,10 @@ describe('ModuleItemTitleStudent', () => {
       }),
     )
     expect(container.getByTestId('subheader-title-text')).toBeInTheDocument()
+  })
+
+  it('renders an untitled item correctly', () => {
+    setUp(buildDefaultProps({content: {title: ''}}))
+    expect(screen.getByText('Untitled Item')).toBeInTheDocument()
   })
 })

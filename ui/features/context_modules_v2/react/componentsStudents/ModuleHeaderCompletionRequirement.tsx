@@ -48,6 +48,7 @@ export const ModuleHeaderCompletionRequirement = ({requirementCount, completed}:
   return (
     <Pill
       color={getPillColor(completed)}
+      data-testid="module-completion-requirement"
       renderIcon={
         completed ? <IconCheckLine data-testid="module-header-completion-requirement-icon" /> : null
       }
