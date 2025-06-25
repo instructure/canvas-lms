@@ -22,15 +22,15 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 import {ContextCard} from '../ContextCard'
-import {LtiContextControl} from '../../../../model/LtiContextControl'
+import type {LtiContextControl} from '../../../../model/LtiContextControl'
 import {toUndefined} from '../../../../../common/lib/toUndefined'
 import {List} from '@instructure/ui-list'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {deleteContextControl} from '../../../../api/contextControls'
-import {ReactNode, useState} from 'react'
+import type {deleteContextControl} from '../../../../api/contextControls'
+import {type ReactNode, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {ApiResult} from '../../../../../common/lib/apiResult/ApiResult'
+import type {ApiResult} from '../../../../../common/lib/apiResult/ApiResult'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -229,8 +229,8 @@ const AccountControlDeletionBody = ({
       <Flex.Item margin="0 0 small 0">
         <Heading variant="titleCardRegular">
           {childControls.length > 0
-            ? I18n.t('Exceptions to be deleted:')
-            : I18n.t('Exception to be deleted')}
+            ? I18n.t('exceptions_to_be_deleted', 'Exceptions to be deleted:')
+            : I18n.t('exception_to_be_deleted', 'Exception to be deleted')}
         </Heading>
       </Flex.Item>
       <Flex.Item margin="0 0 small 0">
@@ -280,11 +280,15 @@ const AccountControlDeletionBody = ({
       {nonRenderedChildControlCount > 0 && (
         <Flex.Item margin="small 0 0 0">
           <Text>
-            {nonRenderedChildControlCount > 1
-              ? I18n.t('%{count} additional exceptions not shown.', {
-                  count: nonRenderedChildControlCount,
-                })
-              : I18n.t('1 additional exception not shown.')}
+            {I18n.t(
+              {
+                one: '1 additional exception not shown.',
+                other: '%{count} additional exceptions not shown.',
+              },
+              {
+                count: nonRenderedChildControlCount,
+              },
+            )}
           </Text>
         </Flex.Item>
       )}

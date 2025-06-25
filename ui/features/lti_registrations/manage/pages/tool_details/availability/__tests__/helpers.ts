@@ -23,7 +23,10 @@ import {ZLtiRegistrationId} from '../../../../model/LtiRegistrationId'
 
 /**
  * Returns a mock LtiDeployment object with default values.
- * Any property can be overridden by passing it in the overrides parameter.
+ * Any property can be overridden by passing it in the overrides parameter. Make sure to
+ * create a proper root context control, otherwise most things will fail. Every LtiDeployment
+ * should have a root context control, which is the control that's associated with the same context
+ * as the deployment itself.
  */
 
 export function mockDeployment(overrides: Partial<LtiDeployment> = {}): LtiDeployment {
@@ -36,6 +39,7 @@ export function mockDeployment(overrides: Partial<LtiDeployment> = {}): LtiDeplo
     registration_id: ZLtiRegistrationId.parse('default-registration-id'),
     workflow_state: 'active',
     context_controls: [],
+    root_account_deployment: false,
     ...overrides,
   }
 } /**

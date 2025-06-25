@@ -39,7 +39,6 @@ import {
   DeleteContextControl,
   UpdateContextControl,
 } from '../../../api/contextControls'
-import {deleteDeployment} from '../../../api/deployments'
 import {AccountId, ZAccountId} from '../../../model/AccountId'
 import {ZCourseId} from '../../../model/CourseId'
 import {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
@@ -52,10 +51,14 @@ import {
   DeleteExceptionModal,
   DeleteExceptionModalOpenState,
 } from './exception_modal/DeleteExceptionModal'
-
+import {findRootContextControl} from './findRootContextControl'
 import {EditExceptionModal} from './exception_modal/EditExceptionModal'
 import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
 import {renderExceptionCounts} from './renderExceptionCounts'
+import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
+import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
+import type {DeleteDeployment} from '../../../api/deployments'
+
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
@@ -63,36 +66,32 @@ export type DeploymentAvailabilityProps = {
   deployment: LtiDeployment
   registration: LtiRegistrationWithAllInformation
   deleteControl: DeleteContextControl
+  deleteDeployment: DeleteDeployment
   editControl: UpdateContextControl
   refetchControls: () => void
   debug: boolean
 }
 
-const matchesDeploymentsContext = (deployment: LtiDeployment) => (cc: LtiContextControl) => {
-  return (
-    (deployment.context_type === 'Course' && deployment.context_id === cc.course_id) ||
-    (deployment.context_type === 'Account' && deployment.context_id === cc.account_id)
-  )
-}
-
 export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
-  const {registration, deployment, debug, refetchControls, deleteControl, editControl} = props
+  const {
+    registration,
+    deleteDeployment,
+    deployment,
+    debug,
+    refetchControls,
+    deleteControl,
+    editControl,
+  } = props
 
-  const controls_with_ids = deployment.context_controls.map(cc => {
-    if (cc.course_id) {
-      return {
-        path_id: `c${cc.course_id}`,
-        control: cc,
-      }
-    } else {
-      return {
-        path_id: `a${cc.account_id}`,
-        control: cc,
-      }
-    }
-  })
+  const controls_with_ids = React.useMemo(
+    () => buildControlsByPath(deployment.context_controls),
+    [deployment.context_controls],
+  )
 
-  const rootControl = deployment.context_controls.find(matchesDeploymentsContext(deployment))!
+  // Every deployment must have a root control.
+  const rootControl = React.useMemo(() => findRootContextControl(deployment)!, [deployment])
+
+  const [openDeleteDeploymentModal, setOpenDeleteDeploymentModal] = React.useState(false)
 
   const [deleteExceptionModalOpenProps, setDeleteExceptionModalOpenProps] =
     React.useState<DeleteExceptionModalOpenState>({
@@ -150,7 +149,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               <Flex as="div">
                 <Flex.Item>
                   <Pill color="primary">
-                    {rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')}
+                    {rootControl.available ? I18n.t('Available') : I18n.t('Not Available')}
                   </Pill>
                 </Flex.Item>
               </Flex>
@@ -160,10 +159,10 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             <Flex direction="row" gap="small" justifyItems="end" as="div">
               <Flex.Item>
                 <IconButton
-                  id={`edit-exception-${rootControl?.id}`}
+                  id={`edit-exception-${rootControl.id}`}
                   size="medium"
                   screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
-                    context_name: rootControl?.context_name,
+                    context_name: rootControl.context_name,
                   })}
                   renderIcon={IconEditLine}
                   onClick={() =>
@@ -171,6 +170,19 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                   }
                 />
               </Flex.Item>
+              {!deployment.root_account_deployment && (
+                <Flex.Item>
+                  <IconButton
+                    id={`delete-deployment-${deployment.id}`}
+                    size="medium"
+                    screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
+                      context_name: rootControl.context_name,
+                    })}
+                    renderIcon={IconTrashLine}
+                    onClick={() => setOpenDeleteDeploymentModal(true)}
+                  />
+                </Flex.Item>
+              )}
               <Flex.Item as="div">
                 <Button
                   onClick={() => {
@@ -245,26 +257,11 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
         </Text>
       </View>
       <List itemSpacing="small" isUnstyled margin="0">
-        {controls_with_ids
-          .filter(cc => !matchesDeploymentsContext(deployment)(cc.control))
-          .map(({control}) => {
-            /**
-             * This is a list of all controls that are considered ancestors of the current control,
-             * sorted from the root control down to the current control.
-             */
-            const controlPath = control.path
-              .split('.')
-              .filter(s => s.length > 0)
-              .flatMap(s => {
-                const matched = controls_with_ids.find(c => c.path_id === s)
-                if (matched) {
-                  return [matched]
-                } else {
-                  return []
-                }
-              })
-
-            const closestParent = controlPath[controlPath.length - 2]
+        {deployment.context_controls
+          .filter(cc => cc.id !== rootControl.id)
+          .map(control => {
+            // We know that we'll always find a parent control, because the root control is always present.
+            const closestParent = nearestParentControl(control, controls_with_ids)!
             return (
               <List.Item key={control.id} as="div">
                 <Flex direction="row" justifyItems="space-between" as="div">
@@ -283,9 +280,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                         subaccount_count: control.subaccount_count,
                       }}
                       path={control.path}
-                      inherit_note={
-                        closestParent && closestParent.control.available === control.available
-                      }
+                      inherit_note={closestParent.available === control.available}
                     />
                   </Flex.Item>
                   <Flex.Item>
@@ -301,7 +296,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                           onClick={() => {
                             setEditControlInfo({
                               control,
-                              availableInParentContext: closestParent.control.available,
+                              availableInParentContext: closestParent?.available ?? false,
                             })
                           }}
                         />
@@ -318,7 +313,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                             if ('course_id' in control && control.course_id) {
                               setDeleteExceptionModalOpenProps({
                                 open: true,
-                                availableInParentContext: closestParent?.control?.available,
+                                availableInParentContext: closestParent.available,
                                 toolName: registration.name,
                                 courseControl: control,
                               })
@@ -326,7 +321,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                               setDeleteExceptionModalOpenProps({
                                 ...props,
                                 open: true,
-                                availableInParentContext: closestParent?.control?.available,
+                                availableInParentContext: closestParent.available,
                                 toolName: registration.name,
                                 accountControl: control,
                                 childControls: deployment.context_controls.filter(
@@ -350,6 +345,21 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
           onClose={() => setEditControlInfo(null)}
           onSave={async (...args) => {
             const result = await editControl(...args)
+            if (isSuccessful(result)) {
+              refetchControls()
+            }
+            return result
+          }}
+        />
+      )}
+      {openDeleteDeploymentModal && (
+        <DeleteDeploymentModal
+          deployment={deployment}
+          registration={registration}
+          controlsByPath={controls_with_ids}
+          onClose={() => setOpenDeleteDeploymentModal(false)}
+          onDelete={async (...args) => {
+            const result = await deleteDeployment(...args)
             if (isSuccessful(result)) {
               refetchControls()
             }

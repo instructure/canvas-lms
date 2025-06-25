@@ -93,7 +93,7 @@ export const EditExceptionModal = ({
         <Heading>{I18n.t('Edit Exception')}</Heading>
       </Modal.Header>
       <Modal.Body padding="medium medium">
-        {updateMutation.isPending && updateMutation.submittedAt < Date.now() - 200 ? (
+        {updateMutation.isPending ? (
           <Flex justifyItems="center" alignItems="center" margin="small">
             <Flex.Item>
               <Spinner size="large" margin="0 small" renderTitle={I18n.t('Deleting exceptions')} />
