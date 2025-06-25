@@ -2641,6 +2641,7 @@ class AbstractAssignment < ActiveRecord::Base
               is_primary_student ? homework.broadcast_group_submission : homework.save_without_broadcasting!
             end
           else
+            homework.saving_user = original_student
             homework.save!
             annotation_context.update!(submission_attempt: homework.attempt) if annotation_context.present?
           end

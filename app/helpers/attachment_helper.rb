@@ -163,8 +163,7 @@ module AttachmentHelper
     attachment:,
     user:,
     access_type:,
-    no_error_on_failure: false,
-    check_submissions: true
+    no_error_on_failure: false
   )
     return true if jwt_resource_match(attachment) || access_via_location?(attachment, user, access_type)
 
@@ -173,11 +172,9 @@ module AttachmentHelper
       return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, @domain_root_account, session)
     end
 
-    if check_submissions
-      submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
-                              .filter_map(&:context)
-      return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
-    end
+    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context)
+                            .filter_map(&:context)
+    return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
 
     if access_type == :update && attachment.editing_restricted?(:content)
       return no_error_on_failure ? false : render_unauthorized_action

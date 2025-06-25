@@ -512,7 +512,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
-    if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download, check_submissions: false)
+    if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download)
       render json: { public_url: @attachment.public_url(secure: request.ssl?, user: @current_user) }
     end
   end
@@ -722,8 +722,7 @@ class FilesController < ApplicationController
             attachment: @attachment,
             user: @current_user,
             access_type: :download,
-            no_error_on_failure: true,
-            check_submissions: false
+            no_error_on_failure: true
           )
             disable_page_views if params[:preview]
             begin
@@ -798,8 +797,7 @@ class FilesController < ApplicationController
           attachment: @attachment,
           user: @current_user,
           access_type: :download,
-          no_error_on_failure: true,
-          check_submissions: false
+          no_error_on_failure: true
         )
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
