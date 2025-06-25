@@ -133,7 +133,7 @@ const Columns: ReadonlyArray<Column> = [
       return window.ENV.FEATURES.lti_registrations_next ? (
         <Link
           as={RouterLink}
-          to={`/manage/${r.id}/configuration`}
+          to={`/manage/${r.id}`}
           isWithinText={false}
           data-testid={`reg-link-${r.id}`}
         >
