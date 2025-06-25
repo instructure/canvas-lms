@@ -619,9 +619,15 @@ module SpeedGrader
     end
 
     def section_id_filter
-      current_user
-        .get_preference(:gradebook_settings, course.global_id)
-        &.dig("filter_rows_by", "section_id")
+      if Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+        current_user
+          .get_preference(:gradebook_settings, course.global_id)
+          &.dig("filter_rows_by", "section_ids")
+      else
+        current_user
+          .get_preference(:gradebook_settings, course.global_id)
+          &.dig("filter_rows_by", "section_id")
+      end
     end
 
     def merge_lti_asset_processor_data!(assignment:, response_hash:)
