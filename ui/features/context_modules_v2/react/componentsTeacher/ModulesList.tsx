@@ -93,14 +93,6 @@ const ModulesList: React.FC = () => {
     setTeacherViewValue(teacherId)
   }, [courseId, teacherViewEnabled, studentViewEnabled, courseStudentData])
 
-  const filteredModules = useMemo(() => {
-    const allModules = data?.pages?.flatMap(page => page.modules) ?? []
-
-    if (!teacherViewEnabled || teacherViewValue === ALL_MODULES) return allModules
-
-    return allModules.filter(module => module._id === teacherViewValue)
-  }, [data, teacherViewValue, teacherViewEnabled])
-
   const moduleOptions = useMemo(() => {
     if (!data) return {teacherView: [], studentView: []}
 
@@ -347,7 +339,7 @@ const ModulesList: React.FC = () => {
                 {...provided.droppableProps}
                 style={{minHeight: '100px'}}
               >
-                {(studentViewEnabled || teacherViewEnabled) && filteredModules.length ? (
+                {(studentViewEnabled || teacherViewEnabled) && data?.pages ? (
                   <ModuleFilterHeader
                     moduleOptions={moduleOptions}
                     handleTeacherChange={handleTeacherChange}
@@ -365,39 +357,47 @@ const ModulesList: React.FC = () => {
                       <Text>{I18n.t('No modules found')}</Text>
                     </View>
                   ) : (
-                    filteredModules.map((module, index) => (
-                      <Draggable key={module._id} draggableId={module._id} index={index}>
-                        {(dragProvided, snapshot) => (
-                          <div
-                            ref={dragProvided.innerRef}
-                            {...dragProvided.draggableProps}
-                            style={{
-                              ...dragProvided.draggableProps.style,
-                              margin: '0 0 8px 0',
-                              background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
-                              borderRadius: '4px',
-                            }}
-                          >
-                            <MemoizedModule
-                              id={module._id}
-                              name={module.name}
-                              published={module.published}
-                              prerequisites={module.prerequisites}
-                              completionRequirements={module.completionRequirements}
-                              requirementCount={module.requirementCount}
-                              expanded={!!expandedModules.get(module._id)}
-                              hasActiveOverrides={module.hasActiveOverrides}
-                              onToggleExpand={onToggleExpandRef}
-                              dragHandleProps={dragProvided.dragHandleProps}
-                              setModuleAction={setModuleAction}
-                              setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
-                              setSelectedModuleItem={setSelectedModuleItem}
-                              setSourceModule={setSourceModule}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
-                    ))
+                    data?.pages
+                      .flatMap(page => page.modules)
+                      .map((module, index) => (
+                        <Draggable key={module._id} draggableId={module._id} index={index}>
+                          {(dragProvided, snapshot) => (
+                            <div
+                              ref={dragProvided.innerRef}
+                              {...dragProvided.draggableProps}
+                              style={{
+                                ...dragProvided.draggableProps.style,
+                                margin: '0 0 8px 0',
+                                background: snapshot.isDragging ? '#F2F4F4' : 'transparent',
+                                borderRadius: '4px',
+                                display:
+                                  !teacherViewValue ||
+                                  module._id === teacherViewValue ||
+                                  teacherViewValue === ALL_MODULES
+                                    ? 'block'
+                                    : 'none',
+                              }}
+                            >
+                              <MemoizedModule
+                                id={module._id}
+                                name={module.name}
+                                published={module.published}
+                                prerequisites={module.prerequisites}
+                                completionRequirements={module.completionRequirements}
+                                requirementCount={module.requirementCount}
+                                expanded={!!expandedModules.get(module._id)}
+                                hasActiveOverrides={module.hasActiveOverrides}
+                                onToggleExpand={onToggleExpandRef}
+                                dragHandleProps={dragProvided.dragHandleProps}
+                                setModuleAction={setModuleAction}
+                                setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
+                                setSelectedModuleItem={setSelectedModuleItem}
+                                setSourceModule={setSourceModule}
+                              />
+                            </div>
+                          )}
+                        </Draggable>
+                      ))
                   )}
                 </Flex>
                 {provided.placeholder}
