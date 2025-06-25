@@ -2484,13 +2484,14 @@ class Account < ActiveRecord::Base
     Canvadocs.hijack_crocodoc_sessions?
   end
 
-  def update_terms_of_service(terms_params)
+  def update_terms_of_service(terms_params, saving_user = nil)
     terms = TermsOfService.ensure_terms_for_account(self)
     terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
     terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.key?(:passive)
 
     if terms.custom?
       TermsOfServiceContent.ensure_content_for_account(self)
+      terms_of_service_content.saving_user = saving_user
       terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
     end
 

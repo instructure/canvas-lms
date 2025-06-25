@@ -1253,7 +1253,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         if @account.root_account?
           terms_attrs = params[:account][:terms_of_service]
-          @account.update_terms_of_service(terms_attrs) if terms_attrs.present?
+          @account.update_terms_of_service(terms_attrs, @current_user) if terms_attrs.present?
           if @account.feature_enabled?(:slack_notifications)
             slack_api_key = params[:account].dig(:slack, :slack_api_key)
             if slack_api_key.present?
