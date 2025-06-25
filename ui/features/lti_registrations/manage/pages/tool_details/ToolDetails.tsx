@@ -160,11 +160,15 @@ export const ToolDetailsInner = ({
           showFlashAlert({
             type: 'info',
             message: I18n.t('Client ID copied (%{clientId})', {clientId}),
+            dismissible: false,
+            politeness: 'polite',
           })
         } catch {
           showFlashAlert({
             type: 'error',
             message: I18n.t('Unable to copy client ID to clipboard (%{clientId})', {clientId}),
+            dismissible: false,
+            politeness: 'polite',
           })
         }
       }
