@@ -198,10 +198,8 @@ export function useModuleItems(moduleId: string, enabled: boolean = false) {
     queryKey: ['moduleItems', moduleId],
     queryFn: getModuleItems,
     enabled,
-    // Don't refetch on window focus or reconnect if not enabled
-    refetchOnWindowFocus: enabled,
-    refetchOnReconnect: enabled,
-    // Stale time of 5 minutes
-    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: true,
+    // 15 minutes, will reload on refresh because there is no persistence
+    staleTime: 15 * 60 * 1000,
   })
 }
