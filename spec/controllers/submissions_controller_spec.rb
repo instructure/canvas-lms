@@ -247,6 +247,22 @@ describe SubmissionsController do
       expect(att_copy).to be_associated_with_submission
     end
 
+    it "copies a new attachment to the submissions folder if it is used in a submission" do
+      course_with_student_logged_in(active_all: true)
+      @course.account.enable_service(:avatars)
+      @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+      @assignment2 = @course.assignments.create!(title: "some assignment 2", submission_types: "online_upload")
+      att1 = attachment_model(context: @user, uploaded_data: stub_file_data("pikachu.txt", "asdf", "text/plain"))
+      att2 = attachment_model(context: @user, uploaded_data: stub_file_data("piplup.txt", "asdf", "text/plain"))
+      [att1, att2].each do |att|
+        post "create", params: { course_id: @course.id, assignment_id: @assignment.id, submission: { submission_type: "online_upload", attachment_ids: att.id }, attachments: { "0" => { uploaded_data: "" }, "-1" => { uploaded_data: "" } } }
+      end
+      post "create", params: { course_id: @course.id, assignment_id: @assignment2.id, submission: { submission_type: "online_upload", attachment_ids: att1.id }, attachments: { "0" => { uploaded_data: "" }, "-1" => { uploaded_data: "" } } }
+      submission1 = @assignment.submissions.find_by(user: @user).submission_history.first
+      submission2 = @assignment2.submissions.find_by(user: @user)
+      expect(submission1.attachment_ids).not_to eq(submission2.attachment_ids)
+    end
+
     it "rejects illegal file extensions from submission" do
       course_with_student_logged_in(active_all: true)
       @course.account.enable_service(:avatars)
