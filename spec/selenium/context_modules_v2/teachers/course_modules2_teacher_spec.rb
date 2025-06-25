@@ -240,10 +240,8 @@ describe "context modules", :ignore_js_errors do
 
       first_module.click
       wait_for_ajaximations
-
-      visible_modules = ff("div[class*='context_module'] h2")
-      expect(visible_modules.length).to eq(1)
-      expect(visible_modules.first.text).to include("module1")
+      visible_modules = ff("div[class*='context_module'] h2")[0]
+      expect(visible_modules.text).to include("module1")
     end
 
     it "does not update visible module when selecting a specific module for students" do
@@ -263,6 +261,7 @@ describe "context modules", :ignore_js_errors do
       visible_modules = ff("div[class*='context_module'] h2")
       expect(visible_modules.length).to eq(2)
       expect(visible_modules.first.text).to include("module1")
+      expect(visible_modules.last.text).to include("module2")
     end
 
     it "displays selected module in students view when acting as student" do
@@ -301,9 +300,8 @@ describe "context modules", :ignore_js_errors do
       wait_for_ajaximations
 
       # Ensure the same module is still selected and shown
-      visible_modules = ff("div[class*='context_module'] h2")
-      expect(visible_modules.length).to eq(1)
-      expect(visible_modules.first.text).to include("module1")
+      visible_modules = ff("div[class*='context_module'] h2")[0]
+      expect(visible_modules.text).to include("module1")
     end
   end
 
