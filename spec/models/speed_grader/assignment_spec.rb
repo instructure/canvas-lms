@@ -1004,6 +1004,14 @@ describe SpeedGrader::Assignment do
       expect(returned_student_ids).to contain_exactly(section1_student.id.to_s)
     end
 
+    it "reads from section_ids rather than section_id for filtering when multiselect is ON" do
+      Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+      teacher.preferences.deep_merge!(gradebook_settings: {
+                                        course.global_id => { "filter_rows_by" => { "section_ids" => [section1.id.to_s, section2.id.to_s], "section_id" => section1.id.to_s } }
+                                      })
+      expect(returned_student_ids).to contain_exactly(section1_student.id.to_s, section2_student.id.to_s)
+    end
+
     it "returns all eligible students if the user has not selected a section" do
       expect(returned_student_ids).to match_array(all_course_student_ids)
     end
@@ -1011,6 +1019,15 @@ describe SpeedGrader::Assignment do
     it "returns all eligible students if the selected section is set to nil" do
       teacher.preferences.deep_merge!(gradebook_settings: {
                                         course.global_id => { "filter_rows_by" => { "section_id" => nil } }
+                                      })
+      expect(returned_student_ids).to match_array(all_course_student_ids)
+    end
+
+    it "return all eligible students if the selected sections is nil and multiselect is ON" do
+      Account.site_admin.enable_feature!(:multiselect_gradebook_filters)
+      # This should ignore the section_id filter since the FF is enabled
+      teacher.preferences.deep_merge!(gradebook_settings: {
+                                        course.global_id => { "filter_rows_by" => { "section_ids" => nil, "section_id" => section1.id.to_s } }
                                       })
       expect(returned_student_ids).to match_array(all_course_student_ids)
     end

@@ -122,6 +122,9 @@ export interface EnvGradebookSpeedGrader {
   current_anonymous_id?: unknown
 
   selected_section_id: string
+  selected_section_ids: string[]
+
+  multiselect_filters_enabled: boolean
 
   new_gradebook_plagiarism_icons_enabled?: boolean
 

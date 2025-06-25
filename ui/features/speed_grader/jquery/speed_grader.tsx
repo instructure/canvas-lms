@@ -274,6 +274,7 @@ let originalRubric: JQuery
 let browserableCssClasses: RegExp
 let snapshotCache: Record<string, ScoringSnapshot | null>
 let sectionToShow: string
+let sectionsToShow: string[] | null
 let header: Header
 let studentLabel: string
 let groupLabel: string
@@ -360,6 +361,7 @@ function sectionSelectionOptions(
   courseSections: CourseSection[],
   groupGradingModeEnabled = false,
   selectedSectionId: null | string = null,
+  selectedSectionIds: null | string[] = null,
 ): SelectOptionDefinition[] {
   if (courseSections.length <= 1 || groupGradingModeEnabled) {
     return []
@@ -381,8 +383,14 @@ function sectionSelectionOptions(
   ]
 
   courseSections.forEach(section => {
-    if (section.id === selectedSectionId) {
-      selectedSectionName = section.name
+    if (ENV.multiselect_filters_enabled && selectedSectionIds) {
+      if (selectedSectionIds.includes(section.id.toString())) {
+        selectedSectionName = section.name
+      }
+    } else {
+      if (section.id === selectedSectionId) {
+        selectedSectionName = section.name
+      }
     }
 
     sectionOptions.push({
@@ -408,7 +416,6 @@ function sectionSelectionOptions(
 
 function mergeStudentsAndSubmission() {
   const jsonData = window.jsonData
-
   jsonData.studentsWithSubmissions = jsonData.context.students
   jsonData.studentMap = {}
   jsonData.studentEnrollmentMap = {}
@@ -462,16 +469,39 @@ function mergeStudentsAndSubmission() {
   // handle showing students only in a certain section.
   if (!jsonData.GROUP_GRADING_MODE) {
     sectionToShow = ENV.selected_section_id
+    sectionsToShow = ENV.selected_section_ids
   }
 
   // We have already have done the filtering by section on the server, so this
   // is redundant (but not the worst thing in the world since we still need to
   // send the user away if there are no students in the section).
-  if (sectionToShow) {
+  if (sectionToShow && !ENV.multiselect_filters_enabled) {
     sectionToShow = sectionToShow.toString()
 
     const studentsInSection = jsonData.studentsWithSubmissions.filter(
       (student: StudentWithSubmission) => student.section_ids.includes(sectionToShow),
+    )
+
+    if (
+      studentsInSection.length > 0 &&
+      !(studentsInSection.length === 1 && studentsInSection[0].fake_student)
+    ) {
+      jsonData.studentsWithSubmissions = studentsInSection
+    } else {
+      windowAlert(
+        I18n.t(
+          'alerts.no_students_in_section',
+          'Could not find any students in that section, falling back to showing all sections.',
+        ),
+      )
+      EG.changeToSection('all')
+    }
+  } else if (sectionsToShow && sectionsToShow.length > 0 && ENV.multiselect_filters_enabled) {
+    const sectionsToShowSet = new Set(sectionsToShow)
+
+    const studentsInSection = jsonData.studentsWithSubmissions.filter(
+      (student: StudentWithSubmission) =>
+        student.section_ids.some((sectionId: string) => sectionsToShowSet.has(sectionId)),
     )
 
     if (
@@ -605,6 +635,7 @@ export function initDropdown() {
     window.jsonData.context.active_course_sections,
     window.jsonData.GROUP_GRADING_MODE,
     sectionToShow,
+    sectionsToShow,
   )
 
   $selectmenu = new SpeedgraderSelectMenu(sectionSelectionOptionList.concat(optionsArray))
@@ -650,19 +681,43 @@ export function initDropdown() {
         EG.changeToSection($(this).data('section-id'))
       })
 
-    if (sectionToShow) {
-      const text = $.map(window.jsonData.context.active_course_sections, section => {
-        if (section.id == sectionToShow) {
-          return section.name
-        }
-      }).join(', ')
+    if (ENV.multiselect_filters_enabled) {
+      if (sectionsToShow && sectionsToShow.length > 0) {
+        const text = $.map(window.jsonData.context.active_course_sections, section => {
+          if (sectionsToShow?.includes(section.id)) {
+            return section.name
+          }
+        }).join(', ')
 
-      $('#section_currently_showing').text(text)
-      $menu
-        .find('ul li a')
-        .removeClass('selected')
-        .filter(`[data-section-id=${sectionToShow}]`)
-        .addClass('selected')
+        $('#section_currently_showing').text(
+          sectionsToShow.length > 1 ? I18n.t('Multiple Sections') : text,
+        )
+        $menu
+          .find('ul li a')
+          .removeClass('selected')
+          .filter((_, el) => {
+            const sectionId = $(el).data('section-id')?.toString()
+            return Array.isArray(sectionsToShow) && sectionId
+              ? sectionsToShow.includes(sectionId)
+              : false
+          })
+          .addClass('selected')
+      }
+    } else {
+      if (sectionToShow) {
+        const text = $.map(window.jsonData.context.active_course_sections, section => {
+          if (section.id == sectionToShow) {
+            return section.name
+          }
+        }).join(', ')
+
+        $('#section_currently_showing').text(text)
+        $menu
+          .find('ul li a')
+          .removeClass('selected')
+          .filter(`[data-section-id=${sectionToShow}]`)
+          .addClass('selected')
+      }
     }
 
     $selectmenu
@@ -1510,7 +1565,12 @@ EG = {
       // for a reload of the page, so don't show a second alert--but also don't
       // execute the else clause below this one since we don't want to set up
       // the rest of SpeedGrader
-      if (sectionToShow == null) {
+
+      const shouldAlert =
+        (ENV.multiselect_filters_enabled && (!sectionsToShow || sectionsToShow.length < 1)) ||
+        (!ENV.multiselect_filters_enabled && sectionToShow == null)
+
+      if (shouldAlert) {
         windowAlert(
           I18n.t(
             'alerts.no_active_students',
@@ -4620,12 +4680,22 @@ EG = {
   },
 
   changeToSection(sectionId: string) {
-    if (ENV.settings_url) {
-      $.post(ENV.settings_url, {selected_section_id: sectionId}, () => {
+    if (ENV.multiselect_filters_enabled) {
+      if (ENV.settings_url) {
+        $.post(ENV.settings_url, {selected_section_ids: sectionId}, () => {
+          SpeedgraderHelpers.reloadPage()
+        })
+      } else {
         SpeedgraderHelpers.reloadPage()
-      })
+      }
     } else {
-      SpeedgraderHelpers.reloadPage()
+      if (ENV.settings_url) {
+        $.post(ENV.settings_url, {selected_section_id: sectionId}, () => {
+          SpeedgraderHelpers.reloadPage()
+        })
+      } else {
+        SpeedgraderHelpers.reloadPage()
+      }
     }
   },
 }
