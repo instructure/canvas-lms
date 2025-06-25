@@ -54,6 +54,11 @@ const MODULES_QUERY = gql`
                 minScore
                 minPercentage
               }
+              progression {
+                id
+                _id
+                collapsed
+              }
             }
           }
           pageInfo {
