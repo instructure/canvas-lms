@@ -29,6 +29,7 @@ import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
 import {CompletionRequirement, Prerequisite, ModuleAction} from '../utils/types'
+import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -71,7 +72,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
 
   return (
     <View as="div" background="secondary" borderWidth="0 0 small 0">
-      <Flex padding="small" justifyItems="space-between" wrap="wrap">
+      <Flex padding="small" justifyItems="space-between" alignItems="center" wrap="wrap">
         <Flex.Item>
           <Flex gap="small" alignItems="center">
             <Flex.Item>
@@ -89,8 +90,12 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 onClick={onToggleExpandRef}
               />
             </Flex.Item>
-            <Flex.Item>
-              <Heading level="h3">{name}</Heading>
+            <Flex.Item padding="0 0 x-small 0">
+              <Heading level="h2">
+                <Text size="medium" weight="bold" wrap="break-word">
+                  {name}
+                </Text>
+              </Heading>
             </Flex.Item>
           </Flex>
         </Flex.Item>

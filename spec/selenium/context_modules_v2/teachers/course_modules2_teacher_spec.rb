@@ -229,7 +229,7 @@ describe "context modules", :ignore_js_errors do
       first_module.click
       wait_for_ajaximations
 
-      visible_modules = ff("div[class*='context_module'] h3")
+      visible_modules = ff("div[class*='context_module'] h2")
       expect(visible_modules.length).to eq(1)
       expect(visible_modules.first.text).to include("module1")
     end
@@ -248,7 +248,7 @@ describe "context modules", :ignore_js_errors do
       second_module.click
       wait_for_ajaximations
 
-      visible_modules = ff("div[class*='context_module'] h3")
+      visible_modules = ff("div[class*='context_module'] h2")
       expect(visible_modules.length).to eq(2)
       expect(visible_modules.first.text).to include("module1")
     end
@@ -289,7 +289,7 @@ describe "context modules", :ignore_js_errors do
       wait_for_ajaximations
 
       # Ensure the same module is still selected and shown
-      visible_modules = ff("div[class*='context_module'] h3")
+      visible_modules = ff("div[class*='context_module'] h2")
       expect(visible_modules.length).to eq(1)
       expect(visible_modules.first.text).to include("module1")
     end
