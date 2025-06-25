@@ -30,7 +30,7 @@ describe "Submissions API", type: :request do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end
 
-  def submit_homework(assignment, student, opts = { body: "test!" })
+  def submit_homework(assignment, student, opts = { body: "test!", submission_type: "online_upload" })
     @submit_homework_time ||= Time.zone.at(0)
     @submit_homework_time += 1.hour # each submission in a test is separated by an hour
     sub = assignment.find_or_create_submission(student)
@@ -1214,7 +1214,7 @@ describe "Submissions API", type: :request do
                           "redo_request" => false,
                           "attempt" => 1,
                           "url" => nil,
-                          "submission_type" => "online_text_entry",
+                          "submission_type" => "online_upload",
                           "user_id" => student1.id,
                           "custom_grade_status_id" => nil,
                           "submission_comments" =>
@@ -1404,7 +1404,10 @@ describe "Submissions API", type: :request do
       submit_homework(@a1, @student1)
       media_object(media_id: "54321", context: @student1, user: @student1)
       submit_homework(@a1, @student1, media_comment_id: "54321", media_comment_type: "video")
-      @sub1 = submit_homework(@a1, @student1) { |s| s.attachments = [attachment_model(context: @student1, folder: nil)] }
+
+      @attachment1 = attachment_model(context: @student1)
+      @attachment1.root_account.enable_feature!(:file_association_access)
+      @sub1 = submit_homework(@a1, @student1) { |s| s.attachments = [@attachment1] }
       @sub1.update!(sticker: "trophy")
 
       @sub2a1 = attachment_model(context: @student2, filename: "snapshot.png", content_type: "image/png")
@@ -1463,7 +1466,7 @@ describe "Submissions API", type: :request do
              "attachments" =>
              [
                { "content-type" => "application/unknown",
-                 "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                 "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1&location=#{@sub1.asset_string}#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
                  "filename" => "unknown.example",
                  "display_name" => "unknown.example",
                  "upload_status" => "success",
@@ -1501,7 +1504,7 @@ describe "Submissions API", type: :request do
                 "custom_grade_status_id" => nil,
                 "attempt" => 1,
                 "url" => nil,
-                "submission_type" => "online_text_entry",
+                "submission_type" => "online_upload",
                 "user_id" => @student1.id,
                 "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=1",
                 "redo_request" => false,
@@ -1529,7 +1532,7 @@ describe "Submissions API", type: :request do
                 { "media_type" => "video",
                   "media_id" => "54321",
                   "content-type" => "video/mp4",
-                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&location=#{@sub1.asset_string}&redirect=1&type=mp4",
                   "display_name" => nil },
                 "body" => "test!",
                 "submitted_at" => "1970-01-01T02:00:00Z",
@@ -1537,7 +1540,7 @@ describe "Submissions API", type: :request do
                 "custom_grade_status_id" => nil,
                 "attempt" => 2,
                 "url" => nil,
-                "submission_type" => "online_text_entry",
+                "submission_type" => "online_upload",
                 "user_id" => @student1.id,
                 "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=2",
                 "grade_matches_current_submission" => true,
@@ -1565,12 +1568,12 @@ describe "Submissions API", type: :request do
                 { "media_type" => "video",
                   "media_id" => "54321",
                   "content-type" => "video/mp4",
-                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&location=#{@sub1.asset_string}&redirect=1&type=mp4",
                   "display_name" => nil },
                 "attachments" =>
                 [
                   { "content-type" => "application/unknown",
-                    "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                    "url" => "http://www.example.com/files/#{@sub1.attachments.first.id}/download?download_frd=1&location=#{@sub1.asset_string}#{"&verifier=#{@sub1.attachments.first.uuid}" unless disable_adding_uuid_verifier_in_api}",
                     "filename" => "unknown.example",
                     "display_name" => "unknown.example",
                     "upload_status" => "success",
@@ -1598,7 +1601,7 @@ describe "Submissions API", type: :request do
                 "custom_grade_status_id" => nil,
                 "attempt" => 3,
                 "url" => nil,
-                "submission_type" => "online_text_entry",
+                "submission_type" => "online_upload",
                 "user_id" => @student1.id,
                 "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student1.id}?preview=1&version=3",
                 "grade_matches_current_submission" => true,
@@ -1615,7 +1618,7 @@ describe "Submissions API", type: :request do
                 "extra_attempts" => nil }],
              "attempt" => 3,
              "url" => nil,
-             "submission_type" => "online_text_entry",
+             "submission_type" => "online_upload",
              "user_id" => @student1.id,
              "submission_comments" =>
              [{ "comment" => "Well here's the thing...",
@@ -1624,7 +1627,7 @@ describe "Submissions API", type: :request do
                   "media_type" => "audio",
                   "media_id" => "3232",
                   "content-type" => "audio/mp4",
-                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&redirect=1&type=mp4",
+                  "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=3232&location=#{@sub1.all_submission_comments.last.asset_string}&redirect=1&type=mp4",
                   "display_name" => nil
                 },
                 "created_at" => comment.reload.created_at.as_json,
@@ -1644,7 +1647,7 @@ describe "Submissions API", type: :request do
              { "media_type" => "video",
                "media_id" => "54321",
                "content-type" => "video/mp4",
-               "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&redirect=1&type=mp4",
+               "url" => "http://www.example.com/users/#{@user.id}/media_download?entryId=54321&location=#{@sub1.asset_string}&redirect=1&type=mp4",
                "display_name" => nil },
              "score" => 13.5,
              "entered_score" => 13.5,
@@ -1697,7 +1700,7 @@ describe "Submissions API", type: :request do
                     "display_name" => "snapshot.png",
                     "filename" => "snapshot.png",
                     "upload_status" => "success",
-                    "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                    "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1&location=#{@sub2.asset_string}#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
                     "id" => @sub2a1.id,
                     "folder_id" => @sub2a1.folder_id,
                     "size" => @sub2a1.size,
@@ -1710,7 +1713,7 @@ describe "Submissions API", type: :request do
                     "created_at" => @sub2a1.created_at.as_json,
                     "updated_at" => @sub2a1.updated_at.as_json,
                     "preview_url" => nil,
-                    "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com"),
+                    "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com", location: @sub2.asset_string),
                     "modified_at" => @sub2a1.modified_at.as_json,
                     "mime_class" => @sub2a1.mime_class,
                     "media_entry_id" => @sub2a1.media_entry_id,
@@ -1736,7 +1739,7 @@ describe "Submissions API", type: :request do
                 "display_name" => "snapshot.png",
                 "filename" => "snapshot.png",
                 "upload_status" => "success",
-                "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
+                "url" => "http://www.example.com/files/#{@sub2a1.id}/download?download_frd=1&location=#{@sub2.asset_string}#{"&verifier=#{@sub2a1.uuid}" unless disable_adding_uuid_verifier_in_api}",
                 "id" => @sub2a1.id,
                 "folder_id" => @sub2a1.folder_id,
                 "size" => @sub2a1.size,
@@ -1749,7 +1752,7 @@ describe "Submissions API", type: :request do
                 "created_at" => @sub2a1.created_at.as_json,
                 "updated_at" => @sub2a1.updated_at.as_json,
                 "preview_url" => nil,
-                "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com"),
+                "thumbnail_url" => thumbnail_image_url(@sub2a1, @sub2a1.uuid, host: "www.example.com", location: @sub2.asset_string),
                 "modified_at" => @sub2a1.modified_at.as_json,
                 "mime_class" => @sub2a1.mime_class,
                 "media_entry_id" => @sub2a1.media_entry_id,

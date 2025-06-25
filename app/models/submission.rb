@@ -25,6 +25,7 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
+  include LinkedAttachmentHandler
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {
@@ -351,6 +352,10 @@ class Submission < ActiveRecord::Base
     'anonymous_id COLLATE "C"'
   end
 
+  def self.html_fields
+    %w[body]
+  end
+
   def self.submission_status_conditions
     <<~SQL.squish
       CASE
@@ -469,7 +474,6 @@ class Submission < ActiveRecord::Base
   after_save :clear_user_submissions_cache
   after_save :touch_graders
   after_save :update_assignment
-  after_save :update_attachment_associations
   after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
   after_save :aggregate_checkpoint_submissions, if: :checkpoint_changes?
@@ -1486,23 +1490,27 @@ class Submission < ActiveRecord::Base
   def update_attachment_associations
     return if @assignment_changed_not_sub
 
-    association_ids = attachment_associations.pluck(:attachment_id)
-    ids = (attachment_ids || "").split(",").map(&:to_i)
-    ids << attachment_id if attachment_id
-    ids.uniq!
-    associations_to_delete = association_ids - ids
-    attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
-    unassociated_ids = ids - association_ids
-    return if unassociated_ids.empty?
+    if submission_type == "online_text_entry"
+      super
+    else
+      association_ids = attachment_associations.pluck(:attachment_id)
+      ids = (attachment_ids || "").split(",").map(&:to_i)
+      ids << attachment_id if attachment_id
+      ids.uniq!
+      associations_to_delete = association_ids - ids
+      attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
+      unassociated_ids = ids - association_ids
+      return if unassociated_ids.empty?
 
-    attachments = Attachment.where(id: unassociated_ids)
-    attachments.each do |a|
-      next unless (a.context_type == "User" && a.context_id == user_id) ||
-                  (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
-                  (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
-                  attachment_fake_belongs_to_group(a)
+      attachments = Attachment.where(id: unassociated_ids)
+      attachments.each do |a|
+        next unless (a.context_type == "User" && a.context_id == user_id) ||
+                    (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
+                    (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
+                    attachment_fake_belongs_to_group(a)
 
-      attachment_associations.where(attachment: a).first_or_create
+        attachment_associations.where(attachment: a).first_or_create
+      end
     end
   end
 

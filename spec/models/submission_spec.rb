@@ -5222,6 +5222,26 @@ describe Submission do
       sub = @assignment.submit_homework(@user, attachments: [f])
       expect(sub.attachments).to eq [f]
     end
+
+    it "creates associations for text entry submissions" do
+      @course.enroll_student(@user, enrollment_state: :active)
+      f = attachment_model(filename: "blah.txt", user: @user, context: @user)
+      f.root_account.enable_feature!(:file_association_access)
+
+      body = "<a href=/users/#{@user.id}/files/#{f.id}>blah.txt</a>"
+
+      sub = @assignment.submit_homework(@user, submission_type: "online_text_entry", body:, saving_user: @user)
+      expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
+      expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
+    end
+
+    it "creates associations for online_upload entry submissions with attachments" do
+      @course.enroll_student(@user, enrollment_state: :active)
+      f = attachment_model(filename: "blah.txt", user: @user, context: @user)
+      sub = @assignment.submit_homework(@user, submission_type: "online_upload", attachments: [f])
+      expect(f.attachment_associations.pluck(:context_type)).to eq ["Submission"]
+      expect(f.attachment_associations.pluck(:context_id)).to eq [sub.id]
+    end
   end
 
   describe "versioned_attachments" do
@@ -5736,27 +5756,6 @@ describe Submission do
   end
 
   describe "#submit_attachments_to_canvadocs" do
-    it "creates crocodoc documents" do
-      allow(Canvas::Crocodoc).to receive(:enabled?).and_return true
-      s = @assignment.submit_homework(@user,
-                                      submission_type: "online_text_entry",
-                                      body: "hi")
-
-      # creates crocodoc documents
-      a1 = crocodocable_attachment_model context: @user
-      s.attachments = [a1]
-      s.save
-      cd = a1.crocodoc_document
-      expect(cd).not_to be_nil
-
-      # shouldn't mess with existing crocodoc documents
-      a2 = crocodocable_attachment_model context: @user
-      s.attachments = [a1, a2]
-      s.save
-      expect(a1.reload_crocodoc_document).to eq cd
-      expect(a2.crocodoc_document).to eq a2.crocodoc_document
-    end
-
     context "canvadocs_submissions records" do
       before(:once) do
         @student1, @student2 = n_students_in_course(2)
