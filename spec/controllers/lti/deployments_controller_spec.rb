@@ -300,6 +300,7 @@ RSpec.describe Lti::DeploymentsController do
           context_type: "Account",
           context_name: account.name,
           deployment_id: deployment.deployment_id,
+          root_account_deployment: true,
           registration_id: registration.id,
           workflow_state: "active",
         }.with_indifferent_access

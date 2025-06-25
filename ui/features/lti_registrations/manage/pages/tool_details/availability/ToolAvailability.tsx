@@ -34,7 +34,7 @@ import {
   FetchControlsByDeployment,
   UpdateContextControl,
 } from '../../../api/contextControls'
-import {createDeployment} from '../../../api/deployments'
+import {createDeployment, type DeleteDeployment} from '../../../api/deployments'
 import {AccountId} from '../../../model/AccountId'
 import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ToolDetailsOutletContext} from '../ToolDetails'
@@ -49,6 +49,7 @@ export type ToolAvailabilityProps = {
   deleteContextControl: DeleteContextControl
   editContextControl: UpdateContextControl
   accountId: AccountId
+  deleteDeployment: DeleteDeployment
 }
 
 const ControlPageSize = 20
@@ -134,6 +135,7 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                       refetchControls={controlsQuery.refetch}
                       deleteControl={props.deleteContextControl}
                       editControl={props.editContextControl}
+                      deleteDeployment={props.deleteDeployment}
                       debug={debug}
                     />
                   </List.Item>

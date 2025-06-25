@@ -57,6 +57,7 @@ import {
   fetchControlsByDeployment,
   updateContextControl,
 } from './manage/api/contextControls'
+import {deleteDeployment} from './manage/api/deployments'
 
 const accountId = ZAccountId.parse(window.ENV.ACCOUNT_ID)
 
@@ -118,6 +119,7 @@ const router = createBrowserRouter(
                   editContextControl={updateContextControl}
                   accountId={accountId}
                   deleteContextControl={deleteContextControl}
+                  deleteDeployment={deleteDeployment}
                 />
               ),
             },

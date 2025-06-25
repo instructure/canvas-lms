@@ -18,7 +18,7 @@
 
 import {fireEvent, screen, waitFor} from '@testing-library/react'
 import {success} from '../../../../../common/lib/apiResult/ApiResult'
-import {FetchControlsByDeployment} from '../../../../api/contextControls'
+import type {FetchControlsByDeployment} from '../../../../api/contextControls'
 import {ZAccountId} from '../../../../model/AccountId'
 import {ZCourseId} from '../../../../model/CourseId'
 import {ZLtiContextControlId} from '../../../../model/LtiContextControl'
@@ -29,31 +29,85 @@ import {renderAppWithRegistration} from '../../configuration/__tests__/helpers'
 import {ToolAvailability} from '../ToolAvailability'
 import {mockContextControl, mockDeployment} from './helpers'
 
+jest.mock('@canvas/alerts/react/FlashAlert', () => {
+  return {
+    ...jest.requireActual('@canvas/alerts/react/FlashAlert'),
+    showFlashAlert: jest.fn().mockReturnValue(jest.fn()),
+  }
+})
+
 const page1Deployments = [
   mockDeployment({
     id: ZLtiDeploymentId.parse('dep-1'),
+    context_id: '2',
+    context_type: 'Account',
     context_controls: [
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-1'), context_name: 'CC-1-1'}),
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-2'), context_name: 'CC-1-2'}),
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-3'), context_name: 'CC-1-3'}),
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-4'), context_name: 'CC-1-4'}),
+      // root control
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-1'),
+        context_name: 'CC-1-1',
+        account_id: ZAccountId.parse('2'),
+        path: 'a2.',
+      }),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-2'),
+        context_name: 'CC-1-2',
+        account_id: ZAccountId.parse('3'),
+        path: 'a2.a3.',
+      }),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-3'),
+        context_name: 'CC-1-3',
+        account_id: ZAccountId.parse('4'),
+        path: 'a2.a4.',
+      }),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-4'),
+        context_name: 'CC-1-4',
+        account_id: ZAccountId.parse('5'),
+        path: 'a2.a5.',
+      }),
     ],
   }),
 ]
 const page2Deployments = [
   mockDeployment({
     id: ZLtiDeploymentId.parse('dep-1'),
+    context_id: '2',
+    context_type: 'Account',
     context_controls: [
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-5'), context_name: 'CC-1-5'}),
-      mockContextControl({id: ZLtiContextControlId.parse('cc-1-6'), context_name: 'CC-1-6'}),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-5'),
+        context_name: 'CC-1-5',
+        account_id: ZAccountId.parse('12'),
+        path: 'a2.a12.',
+      }),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-1-6'),
+        context_name: 'CC-1-6',
+        account_id: ZAccountId.parse('13'),
+        path: 'a2.a13.',
+      }),
     ],
   }),
   mockDeployment({
     id: ZLtiDeploymentId.parse('dep-2'),
     deployment_id: ZLtiDeploymentId.parse('default-deployment-id-2'),
+    context_id: '2',
+    context_type: 'Account',
     context_controls: [
-      mockContextControl({id: ZLtiContextControlId.parse('cc-2-1'), context_name: 'CC-2-1'}),
-      mockContextControl({id: ZLtiContextControlId.parse('cc-2-2'), context_name: 'CC-2-2'}),
+      // root control
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-2-1'),
+        account_id: ZAccountId.parse('2'),
+        context_name: 'CC-2-1',
+        path: 'a2.a1.',
+      }),
+      mockContextControl({
+        id: ZLtiContextControlId.parse('cc-2-2'),
+        context_name: 'CC-2-2',
+        path: 'a2.a2.',
+      }),
     ],
   }),
 ]
@@ -68,6 +122,7 @@ describe('ToolAvailability', () => {
     const accountId = ZAccountId.parse('1')
     const screen = renderAppWithRegistration(reg)(
       <ToolAvailability
+        deleteDeployment={jest.fn()}
         editContextControl={jest.fn()}
         accountId={accountId}
         fetchControlsByDeployment={fetchControlsByDeployment}
@@ -90,17 +145,35 @@ describe('ToolAvailability', () => {
     const deployments = [
       mockDeployment({
         context_name: 'Test Account',
+        context_id: '1',
+        context_type: 'Account',
+        context_controls: [
+          mockContextControl({
+            account_id: ZAccountId.parse('1'),
+            path: 'a1.',
+          }),
+        ],
       }),
       mockDeployment({
         id: ZLtiDeploymentId.parse('2'),
         context_type: 'Course',
+        context_id: '10',
         context_name: 'Course 1',
         registration_id: ZLtiRegistrationId.parse('1'),
+        context_controls: [
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-course-1'),
+            context_name: 'Test Course 101',
+            course_id: ZCourseId.parse('10'),
+            path: 'a1.c10.',
+          }),
+        ],
       }),
     ]
 
     const screen = renderAppWithRegistration(reg)(
       <ToolAvailability
+        deleteDeployment={jest.fn()}
         editContextControl={jest.fn()}
         accountId={ZAccountId.parse('1')}
         fetchControlsByDeployment={jest.fn().mockResolvedValue(success(deployments))}
@@ -130,6 +203,7 @@ describe('ToolAvailability', () => {
       })
     const utils = renderAppWithRegistration(reg)(
       <ToolAvailability
+        deleteDeployment={jest.fn()}
         editContextControl={jest.fn()}
         accountId={ZAccountId.parse('1')}
         fetchControlsByDeployment={fetchControlsByDeployment}
@@ -146,7 +220,8 @@ describe('ToolAvailability', () => {
     )
 
     // Assert that context controls from page 1 are shown
-    expect(utils.getByText('CC-1-1')).toBeInTheDocument()
+    // The root control won't render it's context name.
+    expect(utils.queryByText('CC-1-1')).not.toBeInTheDocument()
     expect(utils.getByText('CC-1-2')).toBeInTheDocument()
     expect(utils.getByText('CC-1-3')).toBeInTheDocument()
     expect(utils.getByText('CC-1-4')).toBeInTheDocument()
@@ -163,9 +238,10 @@ describe('ToolAvailability', () => {
       )
 
       // Assert that context controls from page 2 are shown
+      // the root controls won't render their context name.
+      expect(utils.queryByText('CC-2-1')).not.toBeInTheDocument()
       expect(utils.getByText('CC-1-5')).toBeInTheDocument()
       expect(utils.getByText('CC-1-6')).toBeInTheDocument()
-      expect(utils.getByText('CC-2-1')).toBeInTheDocument()
       expect(utils.getByText('CC-2-2')).toBeInTheDocument()
 
       // Ensure no more "Show More" button is present
@@ -185,11 +261,13 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-1'),
             context_name: 'Account 2',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             available: false,
             child_control_count: 30,
@@ -197,7 +275,7 @@ describe('ToolAvailability', () => {
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-2'),
             context_name: 'CC-1-2',
-            path: 'a2.a3',
+            path: 'a2.a3.',
             account_id: ZAccountId.parse('3'),
             available: false,
             course_count: 15,
@@ -208,6 +286,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={mockEdit}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -230,7 +309,7 @@ describe('ToolAvailability', () => {
       ).toBeInTheDocument()
       expect(screen.getByText('Exception to be edited:')).toBeInTheDocument()
 
-      expect(screen.getAllByText('Not Available')).toHaveLength(4)
+      expect(screen.getAllByText('Not Available')).toHaveLength(3)
 
       const selector = screen.getByRole('combobox')
       fireEvent.click(selector)
@@ -253,6 +332,8 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-1'),
@@ -276,6 +357,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={mockEdit}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -309,18 +391,20 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-1'),
             context_name: 'Account 2',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             available: true,
           }),
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-course-1'),
             context_name: 'Test Course 101',
-            path: 'a2.c10',
+            path: 'a2.c10.',
             course_id: ZCourseId.parse('10'),
             available: false,
             child_control_count: 0,
@@ -330,6 +414,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={mockEdit}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -373,7 +458,7 @@ describe('ToolAvailability', () => {
       const rootControl = mockContextControl({
         id: ZLtiContextControlId.parse('cc-root'),
         context_name: 'Root Account',
-        path: 'a1',
+        path: 'a1.',
         account_id: ZAccountId.parse('1'),
         available: true,
         child_control_count: 50,
@@ -391,6 +476,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={mockEdit}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -433,26 +519,30 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-1'),
             context_name: 'CC-1-1',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             child_control_count: 400,
           }),
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-2'),
             context_name: 'CC-1-2',
-            path: 'a2.a3',
+            path: 'a2.a3.',
             account_id: ZAccountId.parse('3'),
             child_control_count: 399,
+            available: false,
           }),
         ],
       })
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={jest.fn()}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -460,24 +550,20 @@ describe('ToolAvailability', () => {
         />,
       )
 
-      // Now wait for the main content to appear
-      await waitFor(
-        () => {
-          expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
-        },
-        {timeout: 2000},
-      )
+      await waitFor(() => {
+        expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
 
-      const control = deployment.context_controls[0]
+      const control = deployment.context_controls[1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 
-      expect(await screen.findByText(/Exceptions to be deleted/i)).toBeInTheDocument()
+      expect(await screen.findByText(/Exception to be deleted/i)).toBeInTheDocument()
 
       expect(screen.getAllByText(/Not Available/i)).toHaveLength(2)
       expect(
         screen.getByText(
-          /After this change, Test App will be for the cc-1-1 sub-account and its children/i,
+          /After this change, Test App will be for the cc-1-2 sub-account and its children/i,
         ),
       ).toBeInTheDocument()
       expect(screen.getByText(/399 additional exceptions not shown/i)).toBeInTheDocument()
@@ -499,18 +585,20 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-1'),
             context_name: 'CC-1-1',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             child_control_count: 400,
           }),
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-2'),
             context_name: 'CC-1-2',
-            path: 'a2.a3',
+            path: 'a2.a3.',
             account_id: ZAccountId.parse('3'),
             child_control_count: 399,
           }),
@@ -519,6 +607,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={jest.fn()}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -530,16 +619,16 @@ describe('ToolAvailability', () => {
         expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument(),
       )
 
-      const control = deployment.context_controls[0]
+      const control = deployment.context_controls[1]
 
       fireEvent.click(document.getElementById(`delete-exception-${control.id}`)!)
 
-      expect(await screen.findByText(/Exceptions to be deleted/i)).toBeInTheDocument()
+      expect(await screen.findByText(/Exception to be deleted/i)).toBeInTheDocument()
 
       fireEvent.click(screen.getByRole('button', {name: 'Cancel'}))
 
       await waitFor(() => {
-        expect(screen.queryByText(/Exceptions to be deleted/i)).not.toBeInTheDocument()
+        expect(screen.queryByText(/Exception to be deleted/i)).not.toBeInTheDocument()
       })
     })
 
@@ -552,18 +641,20 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-2'),
             context_name: 'Account 2',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             available: true,
           }),
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-course-1'),
             context_name: 'Test Course 101',
-            path: 'a2.c10',
+            path: 'a2.c10.',
             course_id: ZCourseId.parse('10'),
             available: false,
             child_control_count: 0,
@@ -573,6 +664,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={jest.fn()}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -595,7 +687,7 @@ describe('ToolAvailability', () => {
       expect(
         screen.getByText(/After this change, Test App will be for the Test Course 101 course./i),
       ).toBeInTheDocument()
-      expect(screen.getAllByText(/not available/i)).toHaveLength(3)
+      expect(screen.getAllByText(/not available/i)).toHaveLength(2)
       expect(screen.getByText(/Available/i, {selector: 'strong'})).toBeInTheDocument()
 
       expect(screen.getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
@@ -618,18 +710,20 @@ describe('ToolAvailability', () => {
       })
       const deployment = mockDeployment({
         context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
         context_controls: [
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-1-2'),
             context_name: 'Account 2',
-            path: 'a2',
+            path: 'a2.',
             account_id: ZAccountId.parse('2'),
             available: true,
           }),
           mockContextControl({
             id: ZLtiContextControlId.parse('cc-course-1'),
             context_name: 'Test Course 101',
-            path: 'a2.c10',
+            path: 'a2.c10.',
             course_id: ZCourseId.parse('10'),
             available: false,
             child_control_count: 0,
@@ -639,6 +733,7 @@ describe('ToolAvailability', () => {
       const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
       renderAppWithRegistration(reg)(
         <ToolAvailability
+          deleteDeployment={jest.fn()}
           editContextControl={jest.fn()}
           accountId={ZAccountId.parse('1')}
           fetchControlsByDeployment={fetchControlsByDeployment}
@@ -666,6 +761,151 @@ describe('ToolAvailability', () => {
 
       await waitFor(() => {
         expect(screen.queryByText(/exception to be deleted/i)).not.toBeInTheDocument()
+      })
+    })
+  })
+
+  describe('deleting deployments', () => {
+    it('lets users delete a non-root account level deployment', async () => {
+      const mockDelete = jest.fn().mockResolvedValue(success({}))
+
+      const reg = mockRegistrationWithAllInformation({
+        n: 'Test App',
+        i: 1,
+      })
+      const deployment = mockDeployment({
+        id: ZLtiDeploymentId.parse('dep-1'),
+        context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
+        registration_id: ZLtiRegistrationId.parse(reg.id),
+        root_account_deployment: false,
+        context_controls: [
+          mockContextControl({
+            // root control
+            id: ZLtiContextControlId.parse('cc-1-1'),
+            account_id: ZAccountId.parse('2'),
+            context_name: 'CC-1-1',
+            path: 'a1.a2.',
+            available: true,
+            course_count: 1,
+            subaccount_count: 12,
+          }),
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-1-2'),
+            context_name: 'CC-1-2',
+            course_id: ZCourseId.parse('10'),
+            available: false,
+            path: 'a1.a2.c10.',
+          }),
+        ],
+      })
+      const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
+      renderAppWithRegistration(reg)(
+        <ToolAvailability
+          deleteDeployment={mockDelete}
+          editContextControl={jest.fn()}
+          accountId={reg.account_id}
+          fetchControlsByDeployment={fetchControlsByDeployment}
+          deleteContextControl={jest.fn()}
+        />,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
+
+      fireEvent.click(document.getElementById(`delete-deployment-${deployment.id}`)!)
+
+      expect(screen.getByText('Delete Deployment')).toBeInTheDocument()
+      expect(screen.getByText(/\(Deployment ID: default-deployment-id\)/i)).toBeInTheDocument()
+
+      const deleteButton = document.getElementById('delete-deployment-modal-button')
+      expect(deleteButton).toBeInTheDocument()
+
+      fireEvent.click(deleteButton!)
+      await waitFor(() => {
+        expect(mockDelete).toHaveBeenCalledWith({
+          registrationId: reg.id,
+          accountId: reg.account_id,
+          deploymentId: deployment.id,
+        })
+        expect(fetchControlsByDeployment).toHaveBeenCalledTimes(2)
+      })
+    })
+
+    it("doesn't let users delete a root account level deployment", async () => {
+      const mockDelete = jest.fn().mockResolvedValue(success({}))
+      const reg = mockRegistrationWithAllInformation({n: 'Test App', i: 1})
+      const deployment = mockDeployment({
+        id: ZLtiDeploymentId.parse('dep-root-1'),
+        context_name: 'Root Account',
+        context_id: reg.account_id,
+        context_type: 'Account',
+        registration_id: ZLtiRegistrationId.parse(reg.id),
+        root_account_deployment: true,
+        context_controls: [
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-root-1'),
+            account_id: reg.account_id,
+            context_name: 'Root Account',
+            path: `a${reg.account_id}.`,
+          }),
+        ],
+      })
+      const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
+      renderAppWithRegistration(reg)(
+        <ToolAvailability
+          deleteDeployment={mockDelete}
+          editContextControl={jest.fn()}
+          accountId={reg.account_id}
+          fetchControlsByDeployment={fetchControlsByDeployment}
+          deleteContextControl={jest.fn()}
+        />,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
+      expect(document.getElementById(`delete-deployment-${deployment.id}`)).not.toBeInTheDocument()
+    })
+
+    it('lets users cancel deleting a deployment', async () => {
+      const mockDelete = jest.fn().mockResolvedValue(success({}))
+      const reg = mockRegistrationWithAllInformation({n: 'Test App', i: 1})
+      const deployment = mockDeployment({
+        id: ZLtiDeploymentId.parse('dep-1'),
+        context_name: 'Test Account',
+        context_id: '2',
+        context_type: 'Account',
+        registration_id: ZLtiRegistrationId.parse(reg.id),
+        root_account_deployment: false,
+        context_controls: [
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-1-1'),
+            account_id: ZAccountId.parse('2'),
+            context_name: 'CC-1-1',
+            path: 'a1.a2.',
+          }),
+        ],
+      })
+      const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
+      renderAppWithRegistration(reg)(
+        <ToolAvailability
+          deleteDeployment={mockDelete}
+          editContextControl={jest.fn()}
+          accountId={reg.account_id}
+          fetchControlsByDeployment={fetchControlsByDeployment}
+          deleteContextControl={jest.fn()}
+        />,
+      )
+      await waitFor(() => {
+        expect(screen.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
+      fireEvent.click(document.getElementById('delete-deployment-dep-1')!)
+      expect(screen.getByText('Delete Deployment')).toBeInTheDocument()
+      fireEvent.click(screen.getByRole('button', {name: 'Cancel'}))
+      await waitFor(() => {
+        expect(screen.queryByText('Delete Deployment')).not.toBeInTheDocument()
       })
     })
   })
