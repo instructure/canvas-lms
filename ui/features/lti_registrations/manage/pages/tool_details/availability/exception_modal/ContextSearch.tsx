@@ -224,6 +224,13 @@ export const ContextSearch = (props: ContextSearchProps) => {
     [setSearchTextDebounced],
   )
 
+  const onRequestShowOptions = React.useCallback(() => {
+    setState(state => ({
+      ...state,
+      isShowingOptions: true,
+    }))
+  }, [setState])
+
   return (
     <View as="div">
       <Select
@@ -235,14 +242,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
         isShowingOptions={state.isShowingOptions}
         onBlur={handleBlur}
         onInputChange={handleInputChange}
-        onRequestShowOptions={React.useMemo(
-          () => () =>
-            setState(state => ({
-              ...state,
-              isShowingOptions: true,
-            })),
-          [],
-        )}
+        onRequestShowOptions={onRequestShowOptions}
         onRequestHideOptions={handleHideOptions}
         onRequestHighlightOption={handleHighlightOption}
         onRequestSelectOption={handleSelectOption}

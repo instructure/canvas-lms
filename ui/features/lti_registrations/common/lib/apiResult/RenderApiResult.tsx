@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {InfiniteData, UseInfiniteQueryResult} from '@tanstack/react-query'
+import {InfiniteData, UseInfiniteQueryResult, useQuery, UseQueryResult} from '@tanstack/react-query'
 import {
   ApiResult,
   combineAllApiResults,
@@ -32,15 +32,13 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 const I18n = createI18nScope('lti_registrations')
 
-export type RenderInfiniteApiResultProps<A> = {
-  query: UseInfiniteQueryResult<InfiniteData<ApiResult<A[]>>>
+export type RenderApiResultProps<A> = {
+  query: UseQueryResult<ApiResult<A>>
   onError?: (error: UnsuccessfulApiResult) => JSX.Element
   onInitialLoading?: () => JSX.Element
   onSuccess: (params: {
-    pages: A[][]
+    data: A
     refetching: boolean
-    fetchingMore: boolean
-    hasNextPage: boolean
   }) => JSX.Element
 }
 
@@ -55,19 +53,16 @@ const renderError = (
   }
 }
 
-export const RenderInfiniteApiResult = <A,>(props: RenderInfiniteApiResultProps<A>) => {
+export const RenderApiResult = <A,>(props: RenderApiResultProps<A>) => {
   if (props.query.isError) {
     // This was an exception not caught by the ApiResult function
     return renderError(exception(props.query.error), props.onError)
   } else if (props.query.data) {
-    const data = combineAllApiResults(props.query.data.pages)
-    return isUnsuccessful(data)
-      ? renderError(data, props.onError)
+    return isUnsuccessful(props.query.data)
+      ? renderError(props.query.data, props.onError)
       : props.onSuccess({
-          pages: data.data,
-          hasNextPage: props.query.hasNextPage,
+          data: props.query.data.data,
           refetching: props.query.isRefetching,
-          fetchingMore: props.query.isFetchingNextPage,
         })
   } else {
     return props.onInitialLoading ? (
