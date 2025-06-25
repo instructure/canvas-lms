@@ -88,6 +88,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 renderIcon={expanded ? IconMiniArrowDownLine : IconMiniArrowEndSolid}
                 withBackground={false}
                 onClick={onToggleExpandRef}
+                data-testid="module-header-expand-toggle"
               />
             </Flex.Item>
             <Flex.Item padding="0 0 x-small 0">

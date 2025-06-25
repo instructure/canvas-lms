@@ -48,6 +48,8 @@ describe "context modules", :ignore_js_errors do
     context "edit assignment kebab form" do
       it "edit item form is shown" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -56,6 +58,8 @@ describe "context modules", :ignore_js_errors do
 
       it "title field has the right value" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -67,6 +71,8 @@ describe "context modules", :ignore_js_errors do
 
       it "item is updated" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -125,6 +131,8 @@ describe "context modules", :ignore_js_errors do
 
       it "edit item form is shown" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Send To...").click
 
@@ -133,6 +141,8 @@ describe "context modules", :ignore_js_errors do
 
       it "module item is correctly sent" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Send To...").click
 
@@ -163,6 +173,8 @@ describe "context modules", :ignore_js_errors do
 
       it "module item is correctly copied" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Copy To...").click
 
