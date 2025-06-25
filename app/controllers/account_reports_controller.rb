@@ -415,7 +415,7 @@ class AccountReportsController < ApplicationController
   #
   def abort
     if authorized_action(@context, @current_user, :read_reports)
-      report = type_scope.running.find(params[:id])
+      report = type_scope.created_or_running.find(params[:id])
 
       if report.update(workflow_state: "aborted")
         render json: account_report_json(report, @current_user)
