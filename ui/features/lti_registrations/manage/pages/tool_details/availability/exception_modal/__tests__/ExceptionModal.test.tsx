@@ -273,4 +273,75 @@ describe('ExceptionModal', () => {
       ]),
     )
   })
+
+  it('allows adding exceptions via the browse popover for subaccount and course contexts', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    const onConfirm = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />,
+    )
+
+    // Open the browse popover
+    const browseBtn = screen.getByRole('button', {name: /browse sub-accounts or courses/i})
+    await userEvent.click(browseBtn)
+
+    // Wait for the popover to appear and search input to be present
+    const browseSearchInput = await screen.findByPlaceholderText(/search\.\.\./i)
+
+    // Filter for subaccount
+    browseSearchInput.focus()
+    await userEvent.paste('Subaccount')
+
+    // Wait for subaccount option to appear and click it to drill down
+    const subaccountOption = await screen.findByText('Subaccount 101')
+    await userEvent.click(subaccountOption)
+
+    // Now the "Select" link should appear for the subaccount
+    const selectSubaccount = await screen.findByText('Select')
+    await userEvent.click(selectSubaccount)
+
+    // The popover should close and the exception should be added
+    expect(screen.getByText('Subaccount 101')).toBeInTheDocument()
+
+    // Open the browse popover again
+    await userEvent.click(browseBtn)
+    // Filter for course
+    browseSearchInput.focus()
+    await userEvent.paste('Course')
+    // Wait for course option to appear
+    const courseOption = await screen.findByText('Course 201')
+    // Click the course row to add it
+    await userEvent.click(courseOption)
+
+    // The exception should be added
+    expect(screen.getByText('Course 201')).toBeInTheDocument()
+
+    // Click Done and assert onConfirm is called with both contexts
+    const doneBtn = screen.getByRole('button', {name: /done/i})
+    await userEvent.click(doneBtn)
+
+    expect(onConfirm).toHaveBeenCalledTimes(1)
+    const calledArgs = onConfirm.mock.calls[0][0]
+    expect(calledArgs).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          available: false,
+          account_id: expect.anything(),
+          deployment_id: openState.deployment.id,
+        }),
+        expect.objectContaining({
+          available: false,
+          course_id: expect.anything(),
+          deployment_id: openState.deployment.id,
+        }),
+      ]),
+    )
+  })
 })

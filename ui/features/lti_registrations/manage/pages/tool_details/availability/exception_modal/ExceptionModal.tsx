@@ -36,6 +36,7 @@ import {ContextOption} from './ContextOption'
 import {ContextSearch} from './ContextSearch'
 import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
+import {ContextBrowse} from './ContextBrowse'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -82,6 +83,20 @@ export const ExceptionModal = ({openState, onClose, accountId, onConfirm}: Excep
    */
   const disableView = !confirmHandler.isIdle
 
+  const onSelectContext = (context: ContextSearchOption) => {
+    // Handle context selection here
+    // Check if the context is already in the form
+    const existingControl = contextControlForm.find(
+      control => control.context.context.id === context.context.id,
+    )
+    if (!existingControl) {
+      setContextControlForm(prev => [...prev, {context, available: false}])
+    }
+    setBrowserOpen(false)
+  }
+
+  const [browserOpen, setBrowserOpen] = React.useState(false)
+
   return (
     <Modal open={openState.open} label={I18n.t('Add Availability and Exceptions')} size="medium">
       <Modal.Header>
@@ -90,22 +105,24 @@ export const ExceptionModal = ({openState, onClose, accountId, onConfirm}: Excep
       </Modal.Header>
       <Modal.Body>
         <View minHeight="20em" as="div">
-          <View margin="0 0 medium 0" as="div">
-            <ContextSearch
-              disabled={disableView}
-              accountId={accountId}
-              onSelectContext={context => {
-                // Handle context selection here
-                // Check if the context is already in the form
-                const existingControl = contextControlForm.find(
-                  control => control.context.context.id === context.context.id,
-                )
-                if (!existingControl) {
-                  setContextControlForm(prev => [...prev, {context, available: false}])
-                }
-              }}
-            />
-          </View>
+          <Flex gap="small" margin="0 0 medium 0">
+            <Flex.Item shouldGrow>
+              <ContextSearch
+                disabled={disableView}
+                accountId={accountId}
+                onSelectContext={onSelectContext}
+              />
+            </Flex.Item>
+            <Flex.Item>
+              <ContextBrowse
+                rootAccountId={accountId}
+                onSelectContext={onSelectContext}
+                selectedContexts={contextControlForm.map(control => control.context)}
+                browserOpen={browserOpen}
+                setBrowserOpen={setBrowserOpen}
+              />
+            </Flex.Item>
+          </Flex>
 
           {disableView ? (
             <Flex alignItems="center" justifyItems="center">
