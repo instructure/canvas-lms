@@ -1398,6 +1398,18 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= assignment_submissions.exists?
   end
 
+  def used_in_submission_history?(course)
+    return true if associated_with_submission?
+
+    att_user = context.is_a?(User) ? context : user
+    submission_histories = att_user.submissions.where(course_id: course.id).map(&:submission_history).flatten
+    submission_histories.any? do |s|
+      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+      attachment_ids << s.attachment_id if s.attachment_id
+      attachment_ids.include?(id)
+    end
+  end
+
   def can_read_through_assignment?(user, session)
     return false unless assignment
     return true if user && user.id == user_id
@@ -2455,7 +2467,7 @@ class Attachment < ActiveRecord::Base
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
     attachments.map do |attachment|
       if attachment.folder&.for_submissions? &&
-         !attachment.associated_with_submission?
+         !attachment.used_in_submission_history?(assignment_context)
         # if it's already in a submissions folder and has not been submitted previously, we can leave it there
         attachment
       elsif attachment.context.respond_to?(:submissions_folder)
