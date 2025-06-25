@@ -237,6 +237,7 @@ const mediaCommentActions = {
             root.render(
               <CanvasStudioPlayer
                 media_id={id}
+                attachment_id={attachmentId}
                 explicitSize={{width: width, height: height}}
                 hideUploadCaptions={!sourcesAndTracks.can_add_captions}
                 type={mediaType === 'audio' ? 'audio' : 'video'}
