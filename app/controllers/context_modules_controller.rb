@@ -77,12 +77,8 @@ class ContextModulesController < ApplicationController
       module_collapsed_base = ContextModuleProgression.for_user(@current_user)
                                                       .for_modules(@modules)
                                                       .pluck(:context_module_id, :collapsed)
-      if module_performance_improvement_is_enabled?(@context, @current_user)
-        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == true }.map(&:first)
-        @expanded_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == false }.map(&:first)
-      else
-        @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed }.map(&:first)
-      end
+      @collapsed_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == true }.map(&:first)
+      @expanded_modules = module_collapsed_base.select { |_cm_id, collapsed| collapsed == false }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 

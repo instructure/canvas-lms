@@ -36,7 +36,7 @@ import PublishButtonView from '@canvas/publish-button-view'
 import htmlEscape from '@instructure/html-escape'
 import get from 'lodash/get'
 import axios from '@canvas/axios'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {dateString, datetimeString} from '@canvas/datetime/date-functions'
 import {renderDatetimeField} from '@canvas/datetime/jquery/DatetimeField'
@@ -678,27 +678,26 @@ window.modules = (function () {
         return Promise.all([uadPromise, lmcdPromise, uedPromise])
       }
 
-      const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
-        ENV.COURSE_ID,
-        itemsCallback,
-        new ModuleItemsStore(ENV.COURSE_ID, ENV.current_user_id, ENV.ACCOUNT_ID),
-      )
-      moduleItemsLazyLoader
-        .fetchModuleItems(moduleIds, allPages)
-        .then(() => {
-          $('#expand_collapse_all').prop('disabled', false)
-        })
-        .then(() => {
-          let msg = I18n.t('Module items loaded')
-          if (moduleIds.length === 1) {
-            const module = moduleFromId(moduleIds[0])
-            const moduleName = module.getAttribute('aria-label')
-            if (moduleName) {
-              msg = I18n.t('"%{moduleName}" items loaded', {moduleName})
-            }
-          }
-          showFlashSuccess(msg)()
-        })
+      if (moduleIds.length > 0) {
+        const moduleItemsLazyLoader = new ModuleItemsLazyLoader(
+          ENV.COURSE_ID,
+          itemsCallback,
+          new ModuleItemsStore(ENV.COURSE_ID, ENV.current_user_id, ENV.ACCOUNT_ID),
+        )
+        return moduleItemsLazyLoader
+          .fetchModuleItems(moduleIds, allPages)
+          .then(() => {
+            $('#expand_collapse_all').prop('disabled', false)
+          })
+          .then(() => {
+            showFlashAlert({
+              message: I18n.t('All module items loaded'),
+              type: 'success',
+              srOnly: true,
+              politness: 'assertive',
+            })
+          })
+      }
     },
 
     evaluateItemCyoe($item, data) {
@@ -2338,7 +2337,7 @@ function initContextModules() {
 
   if (ENV.FEATURES.instui_header) {
     // render the new INSTUI header component
-    renderHeaderComponent()
+    renderHeaderComponent(ENV.EXPANDED_MODULES.length > 0)
   }
 
   let $currentElem = null
@@ -2536,27 +2535,73 @@ function initContextModules() {
 
   setExpandAllButton()
 
-  // NOTE: when instui_header flag is on, it's the ContextModulesHeader
-  //       that calls setExpandAllButtonHandler. For now, it does not
-  //       pass in the callback, so items won't get lazy loaded.
-  //       I plan on having the react module page out before this
-  //       flag is ever turned on.
   if (!ENV.FEATURES.instui_header) {
-    // set the click handler for the expand/collapse all button
-    // if the instui header is not enabled
-    setExpandAllButtonHandler(() => {
-      const moduleIds = Array.from(
-        document.querySelectorAll(
-          '.context_module:not(:has(.context_module_item)):not(#context_module_blank)',
-        ),
-      ).map(d => d.dataset.moduleId)
-      $('#expand_all_modules_link').prop('disabled', true)
-      if (ENV.FEATURE_MODULES_PERF && moduleIds.length) {
-        modules.lazyLoadItems(moduleIds)
-      } else {
-        $('#expand_collapse_all').prop('disabled', false)
+    setExpandAllButtonHandler(expandCollapseAllButtonHandler)
+  }
+
+  // this is the callback after the expand/collapse all button is clicked
+  // when the instui header is NOT enabled
+  async function expandCollapseAllButtonHandler(expanding) {
+    if (expanding && ENV.FEATURE_MODULES_PERF) {
+      const moduleSelector = '.context_module.collapsed_module:not(#context_module_blank)'
+      const moduleIds = Array.from(document.querySelectorAll(moduleSelector)).map(
+        d => d.dataset.moduleId,
+      )
+      await modules.lazyLoadItems(moduleIds)
+    }
+    $('#expand_collapse_all').prop('disabled', false)
+  }
+
+  // This is the onClick handler for the expand/collapse all button
+  // when the instui header is enabled
+  function expandCollapseAllButtonHandler_instui_header() {
+    const moduleCount = document.querySelectorAll(
+      '.context_module:not(#context_module_blank)',
+    ).length
+    const collapsedModuleCount = document.querySelectorAll(
+      '.context_module.collapsed_module:not(#context_module_blank)',
+    ).length
+    const shouldExpand = collapsedModuleCount === moduleCount
+    const moduleSelector = shouldExpand
+      ? '.context_module.collapsed_module:not(#context_module_blank)'
+      : '.context_module:not(#context_module_blank)'
+    const moduleIds = Array.from(document.querySelectorAll(moduleSelector)).map(
+      d => d.dataset.moduleId,
+    )
+
+    // logic copied from utils.jsx setExpandAllButtonHandler
+    moduleIds.forEach(moduleId => {
+      const $module = $(`#context_module_${moduleId}`)
+      if (
+        (shouldExpand && $module.find('.content:visible').length === 0) ||
+        (!shouldExpand && $module.find('.content:visible').length > 0)
+      ) {
+        const callback = function () {
+          $module
+            .find('.collapse_module_link')
+            .css('display', shouldExpand ? 'inline-block' : 'none')
+          $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
+          $module.find('.footer .manage_module').css('display', '')
+          $module.toggleClass('collapsed_module', !shouldExpand)
+          if (ENV.FEATURE_MODULES_PERF) {
+            addShowAllOrLess($module.data('module-id'))
+          }
+        }
+        $module.find('.content').slideToggle({
+          queue: false,
+          done: callback,
+        })
       }
     })
+
+    const url = `/courses/${ENV.COURSE_ID}/collapse_all_modules`
+    const collapse = shouldExpand ? '0' : '1'
+    $.ajaxJSON(url, 'POST', {collapse}, _data => {
+      if (shouldExpand && ENV.FEATURE_MODULES_PERF && moduleIds.length > 0) {
+        modules.lazyLoadItems(moduleIds)
+      }
+    })
+    renderHeaderComponent(shouldExpand) // this looks wrong, but shouldExpand is set before we do the work
   }
 
   if (!ENV.FEATURES.instui_header) {
@@ -2564,14 +2609,22 @@ function initContextModules() {
     $('.menu_tray_tool_link').click(openExternalTool)
   }
 
-  function renderHeaderComponent() {
+  function renderHeaderComponent(anyModuleExpanded) {
     const root = $('#context-modules-header-root')
     if (!root.length) return
     const mountPoint = root[0]
     if (!mountPoint.reactRoot) {
       mountPoint.reactRoot = createRoot(mountPoint)
     }
-    mountPoint.reactRoot.render(<ContextModulesHeader {...root.data('props')} />)
+    mountPoint.reactRoot.render(
+      <ContextModulesHeader
+        {...root.data('props')}
+        expandCollapseAll={{
+          onExpandCollapseAll: expandCollapseAllButtonHandler_instui_header,
+          anyModuleExpanded,
+        }}
+      />,
+    )
   }
 
   $(document).on('click', '.module_copy_to', event => {

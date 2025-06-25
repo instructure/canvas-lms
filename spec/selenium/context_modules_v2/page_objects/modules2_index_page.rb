@@ -380,8 +380,8 @@ module Modules2IndexPage
     f(teacher_modules_container_selector)
   end
 
-  def flash_alert
-    f(".flashalert-message")
+  def screenreader_alert
+    f("#flash_screenreader_holder")
   end
 
   #------------------------------ Actions -------------------------------

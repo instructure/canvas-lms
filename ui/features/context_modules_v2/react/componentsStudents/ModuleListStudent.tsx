@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback, useRef, memo} from 'react'
+import React, {useState, useEffect, useCallback, memo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -32,7 +32,7 @@ import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useTog
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -88,18 +88,21 @@ const ModulesListStudent: React.FC = () => {
   }, [data?.pages])
 
   useEffect(() => {
-    if (moduleFetchingCount > 0) {
-      setExpandCollapseButtonDisabled(true)
-    } else {
-      setExpandCollapseButtonDisabled(false)
-    }
+    setExpandCollapseButtonDisabled(moduleFetchingCount > 0)
+  }, [moduleFetchingCount])
 
-    if (fetchComplete) {
-      if (maxFetchingCount > 1) {
-        showFlashSuccess('Module items loaded')()
-      }
+  useEffect(() => {
+    if (fetchComplete && maxFetchingCount > 1) {
+      requestAnimationFrame(() => {
+        showFlashAlert({
+          message: 'All module items loaded',
+          type: 'success',
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      })
     }
-  }, [moduleFetchingCount, isLoading, maxFetchingCount, fetchComplete])
+  }, [moduleFetchingCount, maxFetchingCount, fetchComplete])
 
   const toggleCollapseMutation = useToggleCollapse(courseId)
 

@@ -43,6 +43,8 @@ import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../u
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements} from '../utils/utils'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -53,7 +55,10 @@ const ModulesList: React.FC = () => {
   const {teacherViewEnabled, studentViewEnabled, courseId} = useContextModule()
   const reorderItemsMutation = useReorderModuleItems()
   const reorderModulesMutation = useReorderModules()
-  const {data, isLoading, isFetching, error} = useModules(courseId || '')
+  const {data, isLoading, error} = useModules(courseId || '')
+  const {moduleFetchingCount, maxFetchingCount, fetchComplete} =
+    useHowManyModulesAreFetchingItems(true)
+
   const toggleCollapseMutation = useToggleCollapse(courseId || '')
   const toggleAllCollapse = useToggleAllCollapse(courseId || '')
 
@@ -73,8 +78,8 @@ const ModulesList: React.FC = () => {
   const [isDisabled, setIsDisabled] = useState(true)
 
   useEffect(() => {
-    setIsDisabled(isFetching)
-  }, [isFetching])
+    setIsDisabled(moduleFetchingCount > 0)
+  }, [moduleFetchingCount])
 
   useEffect(() => {
     if ((!teacherViewEnabled && !studentViewEnabled) || !courseStudentData) return
@@ -150,6 +155,19 @@ const ModulesList: React.FC = () => {
       })
     }
   }, [data?.pages])
+
+  useEffect(() => {
+    if (fetchComplete && maxFetchingCount > 1) {
+      requestAnimationFrame(() => {
+        showFlashAlert({
+          message: 'All module items loaded',
+          type: 'success',
+          srOnly: true,
+          politeness: 'assertive',
+        })
+      })
+    }
+  }, [maxFetchingCount, fetchComplete])
 
   const handleMoveItem = (
     dragIndex: number,
@@ -315,6 +333,7 @@ const ModulesList: React.FC = () => {
           onCollapseAll={handleCollapseAllRef}
           onExpandAll={handleExpandAllRef}
           anyModuleExpanded={Array.from(expandedModules.values()).some(expanded => expanded)}
+          disabled={isDisabled}
         />
         {isLoading && !data ? (
           <View as="div" textAlign="center" padding="large">

@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef} from 'react'
+import React, {useEffect, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
-import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
 import {
   CompletionRequirement,
   ModuleProgression,
@@ -61,8 +59,6 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItemsStudent(id, !!isExpanded)
-  const {maxFetchingCount} = useHowManyModulesAreFetchingItems()
-  const prevIsLoading = useRef(false)
 
   const toggleExpanded = (moduleId: string) => {
     const newExpandedState = !isExpanded
@@ -77,13 +73,6 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
       setIsExpanded(propExpanded)
     }
   }, [propExpanded])
-
-  useEffect(() => {
-    if (!isLoading && prevIsLoading.current && maxFetchingCount === 1) {
-      showFlashSuccess(I18n.t('"%{moduleName}" items loaded', {moduleName: name}))()
-    }
-    prevIsLoading.current = isLoading
-  }, [isLoading, maxFetchingCount, name])
 
   return (
     <Responsive
