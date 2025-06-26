@@ -18,6 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 
 import {captureException} from '@sentry/browser'
 import {Spinner} from '@instructure/ui-spinner'
@@ -43,7 +44,8 @@ ready(() => {
   body.style.margin = '0'
   body.style.padding = '0'
 
-  ReactDOM.render(
+  const root = createRoot(mountPoint)
+  root.render(
     <div
       style={{
         position: 'fixed',
@@ -58,7 +60,6 @@ ready(() => {
     >
       <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />
     </div>,
-    mountPoint,
   )
 
   let bundles = []
@@ -76,20 +77,19 @@ ready(() => {
 
   Promise.all(bundles)
     .then(([{mount}, {setupEnvContext}]) => {
-      mount(mountPoint, setupEnvContext())
+      mount(mountPoint, setupEnvContext(), window.REMOTES.canvas_career_config)
     })
     .catch(error => {
-      console.error('Failed to load CanvasCareer', error)
+      console.error('Failed to load Canvas Career', error)
       captureException(error)
 
-      ReactDOM.render(
+      root.render(
         <GenericErrorPage
           imageUrl={errorShipUrl}
           errorMessage={error.message}
-          errorSubject={I18n.t('CanvasCareer loading error')}
-          errorCategory={I18n.t('CanvasCareer Error Page')}
+          errorSubject={I18n.t('Canvas Career loading error')}
+          errorCategory={I18n.t('Canvas Career Error Page')}
         />,
-        mountPoint,
       )
     })
 })
