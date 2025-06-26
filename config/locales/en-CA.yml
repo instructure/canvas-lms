@@ -28556,7 +28556,7 @@ en-CA:
       grade: "(grade: %{grade})"
       see_all_quiz_attempts: "See all quiz attempts"
       submission_to_view: "Submission to view:"
-      submitted: "*Submitted:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Submitted:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Submit
     titles: 
       click_to_record: "Speech to Text"
