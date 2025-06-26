@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// hard redirect entry point; resolves to the correct branded login
+export const LOGIN_ENTRY_URL = '/login'
+
 export const ROUTES = {
   FORGOT_PASSWORD: '/login/canvas/forgot-password',
   LDAP: '/login/ldap',
@@ -23,5 +26,6 @@ export const ROUTES = {
   REGISTER_PARENT: '/login/canvas/register/parent',
   REGISTER_STUDENT: '/login/canvas/register/student',
   REGISTER_TEACHER: '/login/canvas/register/teacher',
+  // spa react-controlled entry point
   SIGN_IN: '/login/canvas',
 }

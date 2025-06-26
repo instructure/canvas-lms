@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 - present Instructure, Inc.
+ * Copyright (C) 2024 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,21 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+import React from 'react'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {assignLocation} from '@canvas/util/globalUtils'
+import type {ViewOwnProps} from '@instructure/ui-view'
 import {LOGIN_ENTRY_URL} from '../routes/routes'
 
-export function useSafeBackNavigation() {
-  const navigate = useNavigate()
-  const navigationType = useNavigationType()
-  const location = useLocation()
+const I18n = createI18nScope('new_login')
 
-  return () => {
-    if (navigationType === 'PUSH' && location.key !== 'default') {
-      navigate(-1)
-    } else {
-      // if no meaningful history then redirect to branded login entry point
-      assignLocation(LOGIN_ENTRY_URL)
-    }
+const SignInPrompt = () => {
+  const handleClick = (event: React.MouseEvent<ViewOwnProps>) => {
+    event.preventDefault()
+    assignLocation(LOGIN_ENTRY_URL)
   }
+
+  return (
+    <Text>
+      {I18n.t('Already have an account?')}{' '}
+      <Link data-testid="log-in-link" href={LOGIN_ENTRY_URL} onClick={handleClick}>
+        {I18n.t('Log in')}
+      </Link>
+    </Text>
+  )
 }
+
+export default SignInPrompt

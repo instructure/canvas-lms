@@ -26,7 +26,7 @@ import React from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useNewLogin} from '../../context'
 import {ROUTES} from '../../routes/routes'
-import {ActionPrompt, Card} from '../../shared'
+import {Card, SignInPrompt} from '../../shared'
 
 import iconParent from '../../assets/images/parent.svg'
 import iconStudent from '../../assets/images/student.svg'
@@ -108,7 +108,7 @@ const Landing = () => {
         </Heading>
 
         <Flex.Item overflowX="visible" overflowY="visible">
-          <ActionPrompt variant="signIn" />
+          <SignInPrompt />
         </Flex.Item>
       </Flex>
 

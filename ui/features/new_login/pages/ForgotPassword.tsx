@@ -26,10 +26,10 @@ import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
 import React, {useEffect, useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../context'
-import {useSafeBackNavigation} from '../hooks'
-import {ROUTES} from '../routes/routes'
 import {forgotPassword} from '../services'
 import {createErrorMessage, EMAIL_REGEX} from '../shared/helpers'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {LOGIN_ENTRY_URL} from '../routes/routes'
 
 const I18n = createI18nScope('new_login')
 
@@ -96,7 +96,7 @@ const ForgotPassword = () => {
     setEmail(value.trim())
   }
 
-  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
+  const handleCancel = () => assignLocation(LOGIN_ENTRY_URL)
 
   const passwordRecoveryForm = (
     <>
