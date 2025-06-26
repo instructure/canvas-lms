@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {assignLocation} from '@canvas/util/globalUtils'
 import {renderHook} from '@testing-library/react-hooks'
 import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 import {useSafeBackNavigation} from '../useSafeBackNavigation'
+import {waitFor} from '@testing-library/react'
 
 jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
   useNavigationType: jest.fn(),
   useLocation: jest.fn(),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
 }))
 
 const mockNavigate = jest.fn()
@@ -40,25 +46,29 @@ describe('useSafeBackNavigation', () => {
   it('navigates back when navigationType is PUSH and location key is not "default"', () => {
     mockedUseNavigationType.mockReturnValue('PUSH')
     mockedUseLocation.mockReturnValue({key: 'abc123'})
-    const {result} = renderHook(() => useSafeBackNavigation('/login/canvas'))
+    const {result} = renderHook(() => useSafeBackNavigation())
     // invoke the logic of handleCancel()
     result.current()
     expect(mockNavigate).toHaveBeenCalledWith(-1)
   })
 
-  it('navigates to fallback when navigationType is not PUSH', () => {
+  it('navigates to fallback when navigationType is not PUSH', async () => {
     mockedUseNavigationType.mockReturnValue('POP')
     mockedUseLocation.mockReturnValue({key: 'abc123'})
-    const {result} = renderHook(() => useSafeBackNavigation('/login/canvas'))
+    const {result} = renderHook(() => useSafeBackNavigation())
     result.current()
-    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+    await waitFor(() => {
+      expect(assignLocation).toHaveBeenCalledWith('/login')
+    })
   })
 
-  it('navigates to fallback when location key is "default"', () => {
+  it('navigates to fallback when location key is "default"', async () => {
     mockedUseNavigationType.mockReturnValue('PUSH')
     mockedUseLocation.mockReturnValue({key: 'default'})
-    const {result} = renderHook(() => useSafeBackNavigation('/login/canvas'))
+    const {result} = renderHook(() => useSafeBackNavigation())
     result.current()
-    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+    await waitFor(() => {
+      expect(assignLocation).toHaveBeenCalledWith('/login')
+    })
   })
 })

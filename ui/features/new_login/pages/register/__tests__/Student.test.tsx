@@ -20,17 +20,10 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../../context'
 import {createStudentAccount} from '../../../services'
 import Student from '../Student'
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
-  useNavigationType: jest.fn(),
-  useLocation: jest.fn(),
-}))
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -62,13 +55,6 @@ describe('Student', () => {
       </MemoryRouter>,
     )
   }
-
-  const mockNavigate = jest.fn()
-  const mockNavigationType = useNavigationType as jest.Mock
-  const mockLocation = useLocation as jest.Mock
-  beforeAll(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -346,38 +332,12 @@ describe('Student', () => {
     })
   })
 
-  describe('navigation behavior', () => {
-    describe('when the cancel button is clicked', () => {
-      it('navigates to login when there is no previous history', async () => {
-        mockNavigationType.mockReturnValue('POP')
-        mockLocation.mockReturnValue({key: 'default'})
-        setup()
-        const backButton = screen.getByTestId('back-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('navigates back to the previous page when history exists', async () => {
-        mockNavigationType.mockReturnValue('PUSH')
-        mockLocation.mockReturnValue({key: 'abc123'}) // non-default key
-        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-        setup()
-        const backButton = screen.getByTestId('back-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith(-1)
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('navigates to fallback when navigationType is POP or key is default', async () => {
-        mockNavigationType.mockReturnValue('POP')
-        mockLocation.mockReturnValue({key: 'default'})
-        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-        setup()
-        const backButton = screen.getByTestId('back-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
-      })
+  it('navigates to login when the cancel button is clicked', async () => {
+    setup()
+    const backButton = screen.getByTestId('back-button')
+    await userEvent.click(backButton)
+    await waitFor(() => {
+      expect(assignLocation).toHaveBeenCalledWith('/login')
     })
   })
 })

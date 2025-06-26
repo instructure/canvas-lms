@@ -51,23 +51,6 @@ describe('ActionPrompt', () => {
     )
   })
 
-  it('renders the correct text and link for "signIn" variant', () => {
-    render(
-      <MemoryRouter>
-        <NewLoginProvider>
-          <NewLoginDataProvider>
-            <ActionPrompt variant="signIn" />
-          </NewLoginDataProvider>
-        </NewLoginProvider>
-      </MemoryRouter>,
-    )
-    expect(screen.getByText('Already have an account?')).toBeInTheDocument()
-    const link = screen.getByText('Log in')
-    expect(link).toBeInTheDocument()
-    expect(link).toHaveAttribute('href', '/login/canvas')
-    expect(screen.queryByText('Log in or')).not.toBeInTheDocument()
-  })
-
   it('renders the correct text and link for "createAccount" variant', () => {
     render(
       <MemoryRouter>
@@ -121,14 +104,14 @@ describe('ActionPrompt', () => {
       <MemoryRouter>
         <NewLoginProvider>
           <NewLoginDataProvider>
-            <ActionPrompt variant="signIn" />
+            <ActionPrompt variant="createAccount" />
           </NewLoginDataProvider>
         </NewLoginProvider>
       </MemoryRouter>,
     )
-    const link = screen.getByText('Log in')
+    const link = screen.getByText('create an account.')
     await userEvent.click(link)
-    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+    expect(mockNavigate).toHaveBeenCalledWith('/login/canvas/register')
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 })

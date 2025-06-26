@@ -25,9 +25,8 @@ import {TextInput} from '@instructure/ui-text-input'
 import React, {useRef, useState} from 'react'
 import {useNewLogin, useNewLoginData} from '../../context'
 import {useSafeBackNavigation, useServerErrorsMap} from '../../hooks'
-import {ROUTES} from '../../routes/routes'
 import {createTeacherAccount} from '../../services'
-import {ActionPrompt, TermsAndPolicyCheckbox} from '../../shared'
+import {SignInPrompt, TermsAndPolicyCheckbox} from '../../shared'
 import {createErrorMessage, EMAIL_REGEX, handleRegistrationRedirect} from '../../shared/helpers'
 import {ReCaptchaSection, ReCaptchaSectionRef} from '../../shared/recaptcha'
 
@@ -211,7 +210,7 @@ const Teacher = () => {
     setTermsAccepted(checked)
   }
 
-  const handleCancel = useSafeBackNavigation(ROUTES.SIGN_IN)
+  const handleCancel = useSafeBackNavigation()
 
   const handleReCaptchaVerify = (token: string | null) => {
     if (!token) console.error('Failed to get a valid reCAPTCHA token')
@@ -226,7 +225,7 @@ const Teacher = () => {
         </Heading>
 
         <Flex.Item overflowX="visible" overflowY="visible">
-          <ActionPrompt variant="signIn" />
+          <SignInPrompt />
         </Flex.Item>
       </Flex>
 
