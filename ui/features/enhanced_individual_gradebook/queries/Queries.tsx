@@ -158,10 +158,14 @@ export const GRADEBOOK_QUERY = gql`
   }
 `
 
+// TODO: paginate usersConnection instead of just getting the first 100.
+// TODO: paginate submissionsConnection instead of just getting the first 100.
+// TODO: make enrollments a Connection type and then paginate it, so we don't fetch all enrollments at once.
 export const GRADEBOOK_STUDENT_QUERY = gql`
   query GradebookStudentQuery($courseId: ID!, $userIds: [ID!]) {
     course(id: $courseId) {
       usersConnection(
+        first: 100
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
           enrollmentStates: [active, invited, completed]
@@ -188,6 +192,7 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
         }
       }
       submissionsConnection(
+        first: 100
         studentIds: $userIds
         filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
       ) {
@@ -231,10 +236,11 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
   }
 `
 
+// TODO: paginate commentsConnection instead of just getting the first 100.
 export const GRADEBOOK_SUBMISSION_COMMENTS = gql`
   query GradebookSubmissionCommentsQuery($courseId: ID!, $submissionId: ID!) {
     submission(id: $submissionId) {
-      commentsConnection {
+      commentsConnection(first: 100) {
         nodes {
           id: _id
           htmlComment
