@@ -28490,7 +28490,7 @@ it:
       grade: "(voto: %{grade})"
       see_all_quiz_attempts: "Visualizza tutti i tentativi dei quiz"
       submission_to_view: "Consegna da visualizzare:"
-      submitted: "*Inviato:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Inviato:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Invia
     titles: 
       click_to_record: "Riconoscimento vocale"
