@@ -28653,7 +28653,7 @@ cy:
       grade: "(gradd: %{grade})"
       see_all_quiz_attempts: "Gweld pob ymgais cwis"
       submission_to_view: "Cyflwyniad i weld:"
-      submitted: "*Wedi Cyflwyno:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Wedi Cyflwyno:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Cyflwyno
     titles: 
       click_to_record: "Llais i Destun"
