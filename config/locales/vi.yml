@@ -24660,7 +24660,7 @@ vi:
       grade: "(điểm: %{grade})"
       see_all_quiz_attempts: "Xem tất cả các lần thử kiểm tra"
       submission_to_view: "Nộp để xem:"
-      submitted: "*Đã Nộp:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Đã Nộp:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Nộp
     titles: 
       click_to_record: "Giọng Nói thành Văn Bản"

@@ -31016,7 +31016,7 @@ de:
       loud_late: VERSPÄTET
       see_all_quiz_attempts: "Alle Quizversuche anzeigen"
       submission_to_view: "Anzuzeigende Abgabe :"
-      submitted: "*Abgegeben:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Abgegeben:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Abgeben
     titles: 
       click_to_record: "Sprache als Text"
