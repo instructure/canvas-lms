@@ -377,9 +377,14 @@ export const Events = {
                 .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
-              removeCloseListener = onLtiClosePostMessage(placement_type, () => {
-                $('#resource_selection_dialog').dialog('close')
-              })
+              removeCloseListener = onLtiClosePostMessage(
+                () =>
+                  $dialog.find('iframe#resource_selection_iframe')[0] as
+                    | HTMLIFrameElement
+                    | null
+                    | undefined,
+                () => $('#resource_selection_dialog').dialog('close'),
+              )
               $dialog.parent().find('.ui-dialog-titlebar-close').focus()
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
