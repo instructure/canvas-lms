@@ -100,6 +100,10 @@ export const STUDENT_VIEW_QUERY = gql`
       rubric {
         ...Rubric
       }
+      rubricAssociation {
+        _id
+        hidePoints
+      }
     }
     submission(id: $submissionID) {
       ...Submission
@@ -116,6 +120,10 @@ export const STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION = gql`
       ...Assignment
       rubric {
         ...Rubric
+      }
+      rubricAssociation {
+        _id
+        hidePoints
       }
     }
     submission(id: $submissionID) {

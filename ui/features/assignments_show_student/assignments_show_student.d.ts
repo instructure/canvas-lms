@@ -39,7 +39,7 @@ export type Points = {
 
 export type AssessmentData = {
   artifactAttempt: number
-  comments: string | null
+  comments: string
   comments_html: string | null
   criterion_id: string
   description: string

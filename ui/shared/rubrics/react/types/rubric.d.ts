@@ -79,7 +79,7 @@ export type RubricAssessmentData = {
   criterionId: string
   learningOutcomeId?: string
   comments: string
-  commentsEnabled: boolean
+  commentsEnabled?: boolean
   description: string
   ignoreForScoring?: boolean
   rubricSavedComments?: string[]
@@ -124,4 +124,16 @@ export type RubricImport = {
 export type RubricSubmissionUser = {
   name?: string
   avatarUrl?: string
+}
+
+export type RubricSelfAssessmentData = {
+  score: number
+  data: (Omit<RubricAssessmentData, 'points'> & {
+    criterion_id: string
+    points: {
+      text: string | undefined
+      valid: boolean
+      value: number | undefined
+    }
+  })[]
 }

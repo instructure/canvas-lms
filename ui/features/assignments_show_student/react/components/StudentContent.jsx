@@ -35,7 +35,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import StudentFooter from './StudentFooter'
 import {Text} from '@instructure/ui-text'
-import {totalAllowedAttempts} from '../helpers/SubmissionHelpers'
+import {shouldRenderSelfAssessment} from '../helpers/RubricHelpers'
+import {totalAllowedAttempts, isSubmitted} from '../helpers/SubmissionHelpers'
 import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import UnavailablePeerReview from '../UnavailablePeerReview'
@@ -45,6 +46,9 @@ import {arrayOf, func, bool} from 'prop-types'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {LtiToolIframe} from './LtiToolIframe'
 import DocumentProcessorsSection from './DocumentProcessorsSection'
+import {SelfAssessmentButton} from './RubricSelfAssessment/SelfAssessmentButton'
+import {SelfAssessmentTrayClient} from './RubricSelfAssessment/SelfAssessmentTrayClient'
+import useStore from './stores/index'
 
 const I18n = createI18nScope('assignments_2_student_content')
 
@@ -82,11 +86,14 @@ function EnrollmentConcludedNotice({hasActiveEnrollment}) {
   )
 }
 
-function SubmissionlessFooter({onMarkAsDoneError}) {
+function SubmissionlessFooter({assignment, submission, onMarkAsDoneError}) {
   // If this assignment has digital submissions, the SubmissionManager
   // component will handle rendering the footer.  If not, we still need to show
   // the "Mark as Done" button for assignments that belong to modules.
   const moduleItem = window.ENV.CONTEXT_MODULE_ITEM
+  const {allowChangesToSubmission} = useContext(StudentViewContext)
+  const [isSelfAssessmentOpen, setIsSelfAssessmentOpen] = useState(false)
+  const selfAssessment = useStore(state => state.selfAssessment)
 
   const buttons = []
   if (moduleItem != null) {
@@ -103,8 +110,43 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
     })
   }
 
+  const renderSelfAssessment = shouldRenderSelfAssessment({
+    assignment,
+    submission,
+    allowChangesToSubmission,
+  })
+  if (renderSelfAssessment) {
+    buttons.push({
+      key: 'submit-self-assessment',
+      element: (
+        <SelfAssessmentButton
+          isEnabled={isSubmitted(submission)}
+          onOpenSelfAssessmentTrigger={() => setIsSelfAssessmentOpen(true)}
+        />
+      ),
+    })
+  }
+
   return (
-    <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+    <>
+      {renderSelfAssessment && (
+        <SelfAssessmentTrayClient
+          hidePoints={assignment?.rubricAssociation?.hidePoints}
+          isOpen={isSelfAssessmentOpen}
+          isPreviewMode={!!selfAssessment}
+          onDismiss={() => setIsSelfAssessmentOpen(false)}
+          rubric={assignment.rubric}
+          rubricAssociationId={assignment?.rubricAssociation?._id}
+          handleOnSubmitting={(isSubmitting, assessment) => {
+            if (isSubmitting) {
+              useStore.setState({selfAssessment: assessment})
+            }
+          }}
+          handleOnSuccess={() => setIsSelfAssessmentOpen(false)}
+        />
+      )}
+      <StudentFooter assignmentID={ENV.ASSIGNMENT_ID} buttons={buttons} courseID={ENV.COURSE_ID} />
+    </>
   )
 }
 
@@ -218,7 +260,11 @@ function renderContentBaseOnAvailability(
             onSuccessfulPeerReview={onSuccessfulPeerReview}
           />
         ) : (
-          <SubmissionlessFooter onMarkAsDoneError={onMarkAsDoneError} />
+          <SubmissionlessFooter
+            onMarkAsDoneError={onMarkAsDoneError}
+            assignment={assignment}
+            submission={submission}
+          />
         )}
         <LtiToolIframe assignment={assignment} submission={submission} />
         {(ENV.enrollment_state === 'completed' || !ENV.can_submit_assignment_from_section) && (
