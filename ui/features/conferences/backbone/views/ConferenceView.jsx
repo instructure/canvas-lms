@@ -52,7 +52,6 @@ ConferenceView.prototype.events = {
   'click .delete_conference_link': 'delete',
   'click .close_conference_link': 'close',
   'click .start-button': 'start',
-  'click .external_url': 'external',
   'click .delete_recording_link': 'deleteRecording',
 }
 
@@ -223,66 +222,6 @@ ConferenceView.prototype.start = function (e) {
       return window.location.reload(true)
     }
   }, 100))
-}
-
-ConferenceView.prototype.external = function (e) {
-  e.preventDefault()
-  const loading_text = I18n.t('loading_urls_message', 'Loading, please wait...')
-  const $self = $(e.currentTarget)
-  const link_text = $self.text()
-  if (link_text === loading_text) {
-    return
-  }
-  $self.text(loading_text)
-  return $.ajaxJSON($self.attr('href'), 'GET', {}, function (data) {
-    let $a, $box, datum, j, len
-    $self.text(link_text)
-    if (data.length === 0) {
-      return $.flashError(
-        I18n.t(
-          'no_urls_error',
-          "Sorry, it looks like there aren't any %{type} pages for this conference yet.",
-          {
-            type: $self.attr('name'),
-          },
-        ),
-      )
-    } else if (data.length > 1) {
-      $box = $(document.createElement('DIV'))
-      $box.append(
-        $('<p />').text(
-          I18n.t(
-            'multiple_urls_message',
-            'There are multiple %{type} pages available for this conference. Please select one:',
-            {
-              type: $self.attr('name'),
-            },
-          ),
-        ),
-      )
-      for (j = 0, len = data.length; j < len; j++) {
-        datum = data[j]
-        $a = $('<a />', {
-          href: datum.url || $self.attr('href') + '&url_id=' + datum.id,
-          target: '_blank',
-        })
-        $a.text(datum.name)
-        $box.append($a).append('<br>')
-      }
-      return $box.dialog({
-        width: 425,
-        minWidth: 425,
-        minHeight: 215,
-        resizable: true,
-        height: 'auto',
-        title: $self.text(),
-        modal: true,
-        zIndex: 1000,
-      })
-    } else {
-      return window.open(data[0].url)
-    }
-  })
 }
 
 ConferenceView.prototype.deleteRecording = function (e) {
