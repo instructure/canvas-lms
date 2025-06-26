@@ -17,7 +17,7 @@
  */
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Assignment, Submission, SubmissionType} from '../../assignments_show_student'
+import {Assignment, Points, Submission, SubmissionType} from '../../assignments_show_student'
 
 const I18n = createI18nScope('assignments_2_submission_helpers')
 
@@ -85,7 +85,7 @@ export const activeTypeMeetsCriteria = (
   }
 }
 
-export const getPointsValue = (points?: null | number | {value: number}) => {
+export const getPointsValue = (points?: null | number | Points) => {
   if (typeof points === 'number') return points
-  return points?.value ?? null
+  return points?.value ?? undefined
 }

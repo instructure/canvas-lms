@@ -122,12 +122,12 @@ describe('getPointsValue', () => {
     expect(getPointsValue(10)).toBe(10)
   })
   it('returns the value property if points is an object with a value property', () => {
-    expect(getPointsValue({value: 15})).toBe(15)
+    expect(getPointsValue({value: 15, text: '15', valid: true})).toBe(15)
   })
-  it('returns null if points is null', () => {
-    expect(getPointsValue(null)).toBeNull()
+  it('returns undefined if points is null', () => {
+    expect(getPointsValue(null)).toBeUndefined()
   })
-  it('returns null if points is undefined', () => {
-    expect(getPointsValue()).toBeNull()
+  it('returns undefined if points is undefined', () => {
+    expect(getPointsValue()).toBeUndefined()
   })
 })

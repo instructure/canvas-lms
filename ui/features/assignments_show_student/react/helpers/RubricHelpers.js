@@ -79,3 +79,48 @@ export function transformRubricAssessmentData(rubricAssessment) {
 
   return assessmentCopy
 }
+
+export function shouldRenderSelfAssessment({assignment, submission, allowChangesToSubmission}) {
+  if (!assignment || !submission || !allowChangesToSubmission) {
+    return false
+  }
+
+  return (
+    !assignment.env.peerReviewModeEnabled &&
+    ENV.enhanced_rubrics_enabled &&
+    assignment.rubric &&
+    assignment.rubricSelfAssessmentEnabled &&
+    allowChangesToSubmission &&
+    !assignment.lockInfo.isLocked &&
+    submission.gradingStatus !== 'excused'
+  )
+}
+
+export function isRubricComplete(assessment) {
+  return (
+    assessment?.data.every(criterion => {
+      const points = criterion.points
+      const hasPoints = points?.value !== undefined
+      const hasComments = !!criterion.comments?.length
+      return (hasPoints || hasComments) && points?.valid
+    }) || false
+  )
+}
+
+export const parseCriterion = (data, rubric) => {
+  const key = `criterion_${data.criterion_id}`
+  const criterion = rubric.criteria.find(criterion => criterion.id === data.criterion_id)
+  const rating = criterion.ratings.find(
+    criterionRatings => criterionRatings.points === data.points?.value,
+  )
+
+  return {
+    [key]: {
+      rating_id: rating?.id,
+      points: data.points?.value,
+      description: data.description,
+      comments: data.comments,
+      save_comment: 1,
+    },
+  }
+}
