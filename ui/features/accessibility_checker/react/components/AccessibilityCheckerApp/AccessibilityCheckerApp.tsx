@@ -33,14 +33,14 @@ import {
   processAccessibilityData,
 } from '../../utils'
 
-import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {IssuesCounter} from './IssuesCounter'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
+import AccessibilityIssuesTablePaginated from '../AccessibilityIssuesTable/AccessibilityIssuesTablePaginated'
 import {IssuesByTypeChart} from '../IssuesByTypeChart/IssuesByTypeChart'
 
 const I18n = createI18nScope('accessibility_checker')
-
+const ISSUES_PER_PAGE = 10
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
   const {setSelectedItem, setIsTrayOpen} = context
@@ -164,13 +164,14 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </View>
         </Flex.Item>
       </Flex>
-      <AccessibilityIssuesTable
+      <AccessibilityIssuesTablePaginated
         isLoading={loading}
         error={error}
         onRowClick={handleRowClick}
         onSortRequest={handleSortRequest}
         tableData={tableData}
         tableSortState={tableSortState}
+        perPage={ISSUES_PER_PAGE}
       />
     </View>
   )
