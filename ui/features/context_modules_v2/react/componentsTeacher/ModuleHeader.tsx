@@ -89,6 +89,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                 withBackground={false}
                 onClick={onToggleExpandRef}
                 data-testid="module-header-expand-toggle"
+                aria-expanded={expanded}
               />
             </Flex.Item>
             <Flex.Item padding="0 0 x-small 0">

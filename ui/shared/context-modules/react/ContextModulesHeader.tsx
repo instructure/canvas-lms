@@ -42,6 +42,9 @@ import {
   resetExpandAllButtonBindings,
   openExternalTool,
 } from '../jquery/utils'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('context_modules')
 
 type MenuToolsProps = {
   items: [
@@ -72,14 +75,6 @@ type PublishMenuProps = {
 
 type OverridesProps = {
   hideTitle?: boolean
-  expandCollapseAll?: {
-    renderComponent: (props: {
-      display: string
-      ariaExpanded: boolean
-      dataExpand: boolean
-      ariaLabel: string
-    }) => React.ReactNode
-  }
   publishMenu?: {
     onPublishComplete?: () => void
   }
@@ -96,11 +91,9 @@ type Props = {
     visible: boolean
   }
   expandCollapseAll: {
-    label: string
-    dataUrl: string
-    dataExpand: boolean
-    ariaExpanded: boolean
-    ariaLabel: string
+    onExpandCollapseAll: () => void
+    anyModuleExpanded: boolean
+    disabled: boolean
   }
   addModule: {
     label: string
@@ -252,23 +245,19 @@ const ContextModulesHeaderContent = ({responsive, ...props}: ContentProps) => {
             )}
 
             <Flex.Item overflowY="visible">
-              {props.overrides?.expandCollapseAll?.renderComponent({
-                display: 'block',
-                ariaExpanded: props.expandCollapseAll.ariaExpanded,
-                dataExpand: props.expandCollapseAll.dataExpand,
-                ariaLabel: props.expandCollapseAll.ariaLabel,
-              }) || (
-                <Button
-                  id="expand_collapse_all"
-                  display="block"
-                  aria-expanded={props.expandCollapseAll.ariaExpanded}
-                  data-expand={props.expandCollapseAll.dataExpand}
-                  data-url={props.expandCollapseAll.dataUrl}
-                  aria-label={props.expandCollapseAll.ariaLabel}
-                >
-                  {props.expandCollapseAll.label}
-                </Button>
-              )}
+              <Button
+                onClick={props.expandCollapseAll.onExpandCollapseAll}
+                aria-label={
+                  props.expandCollapseAll.anyModuleExpanded
+                    ? I18n.t('Collapse All Modules')
+                    : I18n.t('Expand All Modules')
+                }
+                interaction={props.expandCollapseAll.disabled ? 'disabled' : 'enabled'}
+              >
+                {props.expandCollapseAll.anyModuleExpanded
+                  ? I18n.t('Collapse All')
+                  : I18n.t('Expand All')}
+              </Button>
             </Flex.Item>
 
             {props.viewProgress.visible && (

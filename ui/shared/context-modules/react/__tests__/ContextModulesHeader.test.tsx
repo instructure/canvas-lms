@@ -35,11 +35,8 @@ const defaultProps = {
     visible: true,
   },
   expandCollapseAll: {
-    label: 'Collapse All',
-    dataUrl: '/courses/1/modules/expand_collapse_all',
-    dataExpand: false,
-    ariaExpanded: false,
-    ariaLabel: 'Collapse All',
+    onExpandCollapseAll: jest.fn(),
+    anyModuleExpanded: true,
   },
   addModule: {
     label: 'Add Module',
@@ -140,10 +137,25 @@ describe('ContextModulesHeader', () => {
       expect(() => getByText(defaultProps.viewProgress.label)).toThrow(/Unable to find an element/)
     })
 
-    it('"Expand / Collapse All" is visible', () => {
+    it('"Expand All" is visible', () => {
+      const {getByText} = render(
+        // @ts-expect-error
+        <ContextModulesHeader
+          {...defaultProps}
+          expandCollapseAll={{
+            ...defaultProps.expandCollapseAll,
+            anyModuleExpanded: false,
+            disabled: false,
+          }}
+        />,
+      )
+      expect(getByText('Expand All')).toBeInTheDocument()
+    })
+
+    it('"Collapse All" is visible', () => {
       // @ts-expect-error
       const {getByText} = render(<ContextModulesHeader {...defaultProps} />)
-      expect(getByText('Expand All')).toBeInTheDocument()
+      expect(getByText('Collapse All')).toBeInTheDocument()
     })
 
     it('"Add Module" is visible', () => {
@@ -221,7 +233,9 @@ describe('ContextModulesHeader', () => {
       const {getByRole} = render(<ContextModulesHeader {...props} />)
       const button = getByRole('button', {name: 'More'})
       await userEvent.click(button)
-      expect(getByRole('menuitem', {name: defaultProps.moreMenu.exportCourseContent.label})).toBeInTheDocument()
+      expect(
+        getByRole('menuitem', {name: defaultProps.moreMenu.exportCourseContent.label}),
+      ).toBeInTheDocument()
     })
 
     it('"Export Course Content" is not visible inside "More Menu"', async () => {
@@ -243,7 +257,9 @@ describe('ContextModulesHeader', () => {
       const {getByRole, queryByRole} = render(<ContextModulesHeader {...props} />)
       const button = getByRole('button', {name: 'More'})
       await userEvent.click(button)
-      expect(queryByRole('menuitem', {name: defaultProps.moreMenu.exportCourseContent.label})).not.toBeInTheDocument()
+      expect(
+        queryByRole('menuitem', {name: defaultProps.moreMenu.exportCourseContent.label}),
+      ).not.toBeInTheDocument()
     })
 
     it('"Tools menu" is visible inside "More Menu"', async () => {
@@ -265,7 +281,9 @@ describe('ContextModulesHeader', () => {
       const {getByRole} = render(<ContextModulesHeader {...props} />)
       const button = getByRole('button', {name: 'More'})
       await userEvent.click(button)
-      expect(getByRole('menuitem', {name: defaultProps.moreMenu.menuTools.items[0].title})).toBeInTheDocument()
+      expect(
+        getByRole('menuitem', {name: defaultProps.moreMenu.menuTools.items[0].title}),
+      ).toBeInTheDocument()
     })
 
     it('"Export Course Content" is visible outside "More Menu"', () => {

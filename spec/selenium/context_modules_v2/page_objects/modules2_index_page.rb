@@ -27,7 +27,7 @@ module Modules2IndexPage
   end
 
   def collapse_all_modules_button_selector
-    "button[aria-label='Collapse All']"
+    "button[aria-label='Collapse All Modules']"
   end
 
   def copy_to_button_selector
@@ -47,7 +47,7 @@ module Modules2IndexPage
   end
 
   def expand_all_modules_button_selector
-    "button[aria-label='Expand All']"
+    "button[aria-label='Expand All Modules']"
   end
 
   def get_student_views_assignment(course_id, assignment_id)
@@ -182,7 +182,31 @@ module Modules2IndexPage
     "[data-testid='modules-rewrite-container']"
   end
 
+  def context_module_selector(module_id)
+    "[data-module-id='#{module_id}']"
+  end
+
+  def context_module_expand_toggle_selector(module_id)
+    "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='false']"
+  end
+
+  def context_module_collapse_toggle_selector(module_id)
+    "#{context_module_selector(module_id)} [data-testid='module-header-expand-toggle'][aria-expanded='true']"
+  end
+
   #------------------------------ Elements ------------------------------
+
+  def context_module(module_id)
+    f(context_module_selector(module_id))
+  end
+
+  def context_module_expand_toggle(module_id)
+    f(context_module_expand_toggle_selector(module_id))
+  end
+
+  def context_module_collapse_toggle(module_id)
+    f(context_module_collapse_toggle_selector(module_id))
+  end
 
   def assignments_due_button
     f(assignments_due_button_selector)
