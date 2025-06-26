@@ -54,22 +54,6 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
     }
   }, [anyModuleExpanded, onCollapseAll, onExpandAll])
 
-  const renderExpandCollapseAll = useCallback(() => {
-    const labelText = anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')
-    return (
-      <Button
-        onClick={handleCollapseExpandClick}
-        disabled={disabled}
-        display="block"
-        aria-expanded={anyModuleExpanded}
-        data-expand={anyModuleExpanded}
-        aria-label={labelText}
-      >
-        {labelText}
-      </Button>
-    )
-  }, [anyModuleExpanded, disabled, handleCollapseExpandClick])
-
   return (
     !isLoading && (
       <View as="div">
@@ -137,12 +121,14 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
         {/* @ts-expect-error */}
         {ENV.CONTEXT_MODULES_HEADER_PROPS && (
           <ContextModulesHeader
+            expandCollapseAll={{
+              onExpandCollapseAll: handleCollapseExpandClick,
+              anyModuleExpanded,
+              disabled,
+            }}
             // @ts-expect-error
             {...ENV.CONTEXT_MODULES_HEADER_PROPS}
             overrides={{
-              expandCollapseAll: {
-                renderComponent: renderExpandCollapseAll,
-              },
               hideTitle: true,
             }}
           />

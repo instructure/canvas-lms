@@ -37,13 +37,6 @@ const contextModuleHeaderDefaultProps = {
     url: '/courses/1/modules/progress',
     visible: true,
   },
-  expandCollapseAll: {
-    label: 'Collapse All',
-    dataUrl: '/courses/1/modules/expand_collapse_all',
-    dataExpand: false,
-    ariaExpanded: false,
-    ariaLabel: 'Collapse All',
-  },
   addModule: {
     label: 'Add Module',
     visible: true,
@@ -215,9 +208,9 @@ describe('ModulePageActionHeaderStudent', () => {
 
   it('calls onCollapseAll when anyModuleExpanded is true and button is clicked', async () => {
     const props = buildDefaultProps({anyModuleExpanded: true})
-    const {getByLabelText} = setupTest(props)
+    const {getAllByText} = setupTest(props)
 
-    const button = getByLabelText('Collapse All')
+    const button = getAllByText('Collapse All')[0].closest('button') as HTMLButtonElement
     await userEvent.click(button)
 
     expect(props.onCollapseAll).toHaveBeenCalled()
@@ -226,9 +219,9 @@ describe('ModulePageActionHeaderStudent', () => {
 
   it('calls onExpandAll when anyModuleExpanded is false and button is clicked', async () => {
     const props = buildDefaultProps({anyModuleExpanded: false})
-    const {getByLabelText} = setupTest(props)
+    const {getAllByText} = setupTest(props)
 
-    const button = getByLabelText('Expand All')
+    const button = getAllByText('Expand All')[0].closest('button') as HTMLButtonElement
     await userEvent.click(button)
 
     expect(props.onExpandAll).toHaveBeenCalled()
@@ -237,9 +230,9 @@ describe('ModulePageActionHeaderStudent', () => {
 
   it('does not call expand/collapse callbacks when button is disabled', async () => {
     const props = buildDefaultProps({disabled: true, anyModuleExpanded: true})
-    const {getByLabelText} = setupTest(props)
+    const {getAllByText} = setupTest(props)
 
-    const button = getByLabelText('Collapse All')
+    const button = getAllByText('Collapse All')[0].closest('button') as HTMLButtonElement
     expect(button).toBeDisabled()
 
     await userEvent.click(button)

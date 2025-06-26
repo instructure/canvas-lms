@@ -17,15 +17,11 @@
  */
 
 import React, {useCallback} from 'react'
-import {Button} from '@instructure/ui-buttons'
-import {useScope as createI18nScope} from '@canvas/i18n'
 import {queryClient} from '@canvas/query'
 import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandlers'
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
-
-const I18n = createI18nScope('context_modules_v2')
 
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
@@ -59,34 +55,15 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
     handleOpeningModuleUpdateTray(data, courseId, undefined)
   }, [data, courseId])
 
-  const renderExpandCollapseAll = useCallback(
-    (displayOptions?: {
-      display: 'block' | 'inline-block' | undefined
-      ariaExpanded: boolean
-      dataExpand: boolean
-      ariaLabel: string
-    }) => {
-      return (
-        <Button
-          onClick={handleCollapseExpandClick}
-          display={displayOptions?.display}
-          aria-expanded={displayOptions?.ariaExpanded}
-          data-expand={displayOptions?.dataExpand}
-          aria-label={displayOptions?.ariaLabel}
-        >
-          {anyModuleExpanded ? I18n.t('Collapse All') : I18n.t('Expand All')}
-        </Button>
-      )
-    },
-    [anyModuleExpanded, handleCollapseExpandClick],
-  )
-
   return (
     <ContextModulesHeader
+      expandCollapseAll={{
+        onExpandCollapseAll: handleCollapseExpandClick,
+        anyModuleExpanded,
+      }}
       // @ts-expect-error
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
-        expandCollapseAll: {renderComponent: renderExpandCollapseAll},
         publishMenu: {
           onPublishComplete: handlePublishComplete,
         },
