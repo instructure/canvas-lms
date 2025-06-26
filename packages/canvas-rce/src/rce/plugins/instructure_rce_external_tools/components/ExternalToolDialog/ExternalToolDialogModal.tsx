@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect} from 'react'
+import {useEffect, useRef} from 'react'
 import {Text} from '@instructure/ui-text'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -176,6 +176,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
   const toolName = placement?.title || tool.name
   const width = placement?.selection_width || '800px'
   const height = placement?.selection_height || '400px'
+  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(
     () =>
@@ -196,8 +197,8 @@ function AssetProcessorsAddModalBodyToolLaunch(
   )
 
   useEffect(() => {
-    return onLtiClosePostMessage('ActivityAssetProcessor', close)
-  }, [])
+    return onLtiClosePostMessage(() => iframeRef.current, close)
+  }, [close])
 
   return (
     <>
@@ -214,6 +215,7 @@ function AssetProcessorsAddModalBodyToolLaunch(
           }
           style={{width, height, border: '0', display: 'block'}}
           title={I18n.t('Configure new document processing app')}
+          ref={iframeRef}
         />
       </div>
     </>

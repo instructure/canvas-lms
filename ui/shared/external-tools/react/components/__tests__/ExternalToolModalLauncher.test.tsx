@@ -36,8 +36,8 @@ function generateProps(overrides = {}) {
 
 describe('ExternalToolModalLauncher', () => {
   const origin = 'http://example.com'
-  const sendPostMessage = (data: any) =>
-    fireEvent(window, new MessageEvent('message', {data, origin, source: window}))
+  const sendPostMessage = (data: any, source?: Window | null) =>
+    fireEvent(window, new MessageEvent('message', {data, origin, source: source || window}))
 
   beforeEach(() => {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
@@ -145,13 +145,14 @@ describe('ExternalToolModalLauncher', () => {
       monitorLtiMessages()
 
       const onRequestCloseMock = jest.fn()
-      render(
+      const {getByTitle} = render(
         <ExternalToolModalLauncher
           {...generateProps({onRequestClose: onRequestCloseMock, isOpen: true})}
         />,
       )
 
-      sendPostMessage({subject: 'lti.close'})
+      const iframe = getByTitle('Modal Title') as HTMLIFrameElement
+      sendPostMessage({subject: 'lti.close'}, iframe.contentWindow)
 
       await waitFor(() => {
         expect(onRequestCloseMock).toHaveBeenCalled()

@@ -190,10 +190,15 @@ describe('SelectContentDialog', () => {
     monitorLtiMessages()
     callOnContextExternalToolSelect()
 
-    const closeEvent = {
-      subject: 'lti.close',
-    }
-    fireEvent(window, new MessageEvent('message', {data: closeEvent, origin, source: window}))
+    const $dialog = $('#resource_selection_dialog')
+    const iframe = $dialog.find('#resource_selection_iframe')[0] as HTMLIFrameElement
+    const source = iframe.contentWindow!
+
+    // If we don't overwrite postMessage we get some strange internal error in jsdom's postMessage
+    jest.spyOn(source, 'postMessage').mockImplementation(() => {})
+
+    const closeEvent = {subject: 'lti.close'}
+    fireEvent(window, new MessageEvent('message', {data: closeEvent, origin, source}))
 
     await waitFor(() => {
       expect(window.confirm).toHaveBeenCalledTimes(1)

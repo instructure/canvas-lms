@@ -21,13 +21,24 @@
 import {handler, init} from '../../../../public/javascripts/lti_post_message_forwarding'
 
 describe('lti_post_message_forwarding', () => {
+  let source: MessageEventSource
+  beforeEach(() => {
+    source = {
+      postMessage: jest.fn(),
+    } as unknown as Window
+    // for indexInTopFrames
+    jest
+      .spyOn(window.top, 'frames', 'get')
+      .mockReturnValue({'0': {}, '1': source, '2': {}, length: 3})
+  })
+  afterEach(() => jest.restoreAllMocks())
+
   describe('handler', () => {
     let message: string | object
     let origin: string
     let parentDomain: string
     let windowReferences: Array<Window | undefined>
 
-    let source: MessageEventSource
     let parentWindow: Window
     let includeRCESignal: boolean
 
@@ -56,9 +67,6 @@ describe('lti_post_message_forwarding', () => {
         parentDomain = 'https://parent.domain.com'
         windowReferences = []
         includeRCESignal = false
-        source = {
-          postMessage: jest.fn(),
-        } as unknown as Window
         parentWindow = {
           postMessage: jest.fn(),
         } as unknown as Window
@@ -69,10 +77,10 @@ describe('lti_post_message_forwarding', () => {
         expect(parentWindow.postMessage).toHaveBeenCalled()
       })
 
-      it('attaches origin and windowId to message', () => {
+      it('attaches origin, windowId, and indexInTopFrames to message', () => {
         subject()
         expect(parentWindow.postMessage).toHaveBeenCalledWith(
-          {...(message as object), sourceToolInfo: {origin, windowId: 0}},
+          {...(message as object), sourceToolInfo: {origin, windowId: 0, indexInTopFrames: 1}},
           expect.anything(),
         )
       })
@@ -164,8 +172,6 @@ describe('lti_post_message_forwarding', () => {
   })
 
   describe('init', () => {
-    afterEach(() => jest.restoreAllMocks())
-
     it('sets up an event handler for postMessage when the DOM loads', () => {
       jest.spyOn(document, 'readyState', 'get').mockReturnValue('loading')
       jest.spyOn(document, 'addEventListener').mockImplementation(() => {})

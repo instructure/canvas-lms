@@ -100,7 +100,9 @@ describe('ContentTypeExternalToolDrawer', () => {
     const origin = 'http://example.com'
     beforeAll(() => (window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = origin))
     afterAll(() => (window.ENV = origEnv))
-    const sendPostMessage = data => fireEvent(window, new MessageEvent('message', {data, origin}))
+    const sendPostMessage = (data, source = undefined) => {
+      fireEvent(window, new MessageEvent('message', {data, origin, source}))
+    }
 
     it('calls onExternalContentReady when it receives an externalContentReady postMessage', () => {
       renderTray()
@@ -110,8 +112,9 @@ describe('ContentTypeExternalToolDrawer', () => {
 
     it('calls onDismiss when it receives an lti.close message from the tool', async () => {
       monitorLtiMessages()
-      renderTray()
-      sendPostMessage({subject: 'lti.close'})
+      const {findByTestId} = renderTray()
+      const {contentWindow} = await findByTestId('ltiIframe')
+      sendPostMessage({subject: 'lti.close'}, contentWindow)
       await waitFor(() => {
         expect(onDismiss).toHaveBeenCalledTimes(1)
       })
