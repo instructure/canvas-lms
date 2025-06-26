@@ -23,6 +23,7 @@ import {IconDownloadSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import ReportStatusPill from './ReportStatusPill'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -38,6 +39,8 @@ type Props = {
 export default function ReportRun({reportRun}: Props) {
   const messageText = reportRun.message || reportRun.parameters?.extra_text
 
+  const formatDate = useDateTimeFormat('time.formats.medium')
+
   return (
     <View
       data-testid={`report_history_${reportRun.id}`}
@@ -48,7 +51,7 @@ export default function ReportRun({reportRun}: Props) {
     >
       <Flex alignItems="start" justifyItems="space-between">
         <Flex.Item>
-          <Text>{new Date(reportRun.created_at).toLocaleString()}</Text>
+          <Text>{formatDate(reportRun.created_at)}</Text>
         </Flex.Item>
         <Flex.Item>
           {reportRun.file_url && (

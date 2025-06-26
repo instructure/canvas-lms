@@ -24,6 +24,7 @@ import {IconDownloadLine, IconCalendarClockLine, IconQuestionLine} from '@instru
 import {Text} from '@instructure/ui-text'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'
 import ReportDescription from '@canvas/account_reports/react/ReportDescription'
@@ -49,6 +50,8 @@ export default function ReportsTable({accountId, reports}: Props) {
       [report.report]: report,
     }))
   }
+
+  const formatDate = useDateTimeFormat('time.formats.medium')
 
   return (
     <>
@@ -95,7 +98,7 @@ export default function ReportsTable({accountId, reports}: Props) {
                 <Table.Cell>
                   {lastRun ? (
                     <>
-                      {new Date(lastRun.created_at).toLocaleString()}
+                      {formatDate(lastRun.created_at)}
                       {lastRun.parameters?.extra_text && (
                         <Text>&nbsp;({lastRun.parameters.extra_text})</Text>
                       )}
