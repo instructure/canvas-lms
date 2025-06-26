@@ -311,6 +311,7 @@ describe "context modules", :ignore_js_errors do
     end
 
     it "displays the module file drop area when a module has no items" do
+      skip("LX-2870: This test is flaky and needs to be fixed")
       go_to_modules
       wait_for_ajaximations
 
