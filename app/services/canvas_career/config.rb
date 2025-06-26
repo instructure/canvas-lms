@@ -39,5 +39,18 @@ module CanvasCareer
     def learner_app_redirect_url(path)
       @root_account.horizon_redirect_url(path)
     end
+
+    # These values are passed to the frontend; they should not contain any secrets!
+    def public_app_config(request)
+      config["public_app_config"].tap do |c|
+        c["hosts"]["canvas"] = request.base_url
+      end
+    end
+
+    private
+
+    def config
+      @_config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["canvas_career.yml", failsafe: nil] || "{}")
+    end
   end
 end

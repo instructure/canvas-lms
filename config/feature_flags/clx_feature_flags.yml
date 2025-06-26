@@ -37,6 +37,13 @@ horizon_learner_app:
   display_name: "Canvas Career: Learner App"
   description: |-
     Enables the Learner app in Canvas Career on all routes.
+horizon_injected_config:
+  applies_to: RootAccount
+  state: hidden
+  shadow: true
+  display_name: "Canvas Career: Injected Config"
+  description: |-
+    Injects config into the microfrontend at load time instead of fetching from the server.
 
 # Feature flags read by Horizon app
 horizon_crm_integration:
