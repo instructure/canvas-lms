@@ -23539,7 +23539,7 @@ hi:
       grade: "(ग्रेड: %{grade})"
       see_all_quiz_attempts: "सभी प्रश्नोत्तरी प्रयास देखें"
       submission_to_view: "देखने के लिए सबमिशन:"
-      submitted: "*सबमिट किया गया:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*सबमिट किया गया:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: "सबमिट करें"
     titles: 
       click_to_record: "आवाज़ से पाठ"
