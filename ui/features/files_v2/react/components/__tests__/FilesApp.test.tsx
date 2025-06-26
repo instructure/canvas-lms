@@ -54,7 +54,7 @@ describe('FilesApp', () => {
       overwriteRoutes: true,
     })
     fetchMock.get(/.*\/files\/quota/, {quota_used: 500, quota: 1000}, {overwriteRoutes: true})
-    fetchMock.get(/.*\/files\?search_term.*/, [], {overwriteRoutes: true})
+    fetchMock.get(/.*\/folders_and_files\?search_term.*/, [], {overwriteRoutes: true})
 
     flashElements = document.createElement('div')
     flashElements.setAttribute('id', 'flash_screenreader_holder')
@@ -121,75 +121,6 @@ describe('FilesApp', () => {
       expect(uploadButton).not.toBeInTheDocument()
       expect(createFolderButton).not.toBeInTheDocument()
     })
-  })
-
-  // fickle
-  it.skip('renders next page button when pagination headers are present', async () => {
-    fetchMock.get(
-      /.*\/all.*/,
-      {
-        body: FAKE_FOLDERS,
-        headers: {
-          Link: '</api/v1/folders/1/files?page=2>; rel="next"',
-          'X-Total-Pages': '2',
-        },
-      },
-      {
-        overwriteRoutes: true,
-      },
-    )
-
-    renderComponent(['/all'])
-
-    await screen.findByRole('button', {name: /all my files/i})
-
-    await screen.findByTestId('pagination-announcement')
-
-    const pagination = await screen.findByTestId('files-pagination')
-    expect(pagination).toBeInTheDocument()
-
-    const nextPageButton = await screen.findByRole('button', {name: '2'})
-    expect(nextPageButton).toBeInTheDocument()
-  })
-
-  it('verifies fetch is called with correct pagination headers', async () => {
-    const mockResponse = {
-      body: FAKE_FOLDERS,
-      headers: {
-        Link: '</api/v1/folders/1/files?page=2>; rel="next"',
-        'X-Total-Pages': '2',
-      },
-    }
-
-    fetchMock.get(/.*\/all.*/, mockResponse, {overwriteRoutes: true})
-
-    renderComponent(['/all'])
-
-    await screen.findByRole('button', {name: /all my files/i})
-
-    expect(fetchMock.called(/.*\/all.*/)).toBe(true)
-
-    const calls = fetchMock.calls(/.*\/all.*/)
-    expect(calls.length).toBeGreaterThan(0)
-
-    const lastCallResponse = fetchMock.lastResponse(/.*\/all.*/)
-    expect(lastCallResponse).not.toBeUndefined()
-
-    if (lastCallResponse) {
-      expect(lastCallResponse.headers.get('Link')).toContain('rel="next"')
-      expect(lastCallResponse.headers.get('X-Total-Pages')).toBe('2')
-    }
-  })
-
-  it('does not render pagination when only one page exists', async () => {
-    fetchMock.get(/.*\/all.*/, FAKE_FOLDERS, {overwriteRoutes: true})
-
-    renderComponent(['/all'])
-
-    await screen.findByRole('button', {name: /all my files/i})
-
-    const pagination = screen.queryByTestId('files-pagination')
-    expect(pagination).not.toBeInTheDocument()
   })
 
   it('renders Upload File and Create Folder buttons when user has permission', async () => {

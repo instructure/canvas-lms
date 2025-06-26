@@ -27,6 +27,8 @@ import {
 } from '../../utils/apiUtils'
 import {useSearchTerm} from './useSearchTerm'
 
+export const PER_PAGE = 25
+
 const fetchFilesAndFolders = async (url: string) => {
   const response = await fetch(url)
   if (response.status === 401) {
@@ -36,8 +38,9 @@ const fetchFilesAndFolders = async (url: string) => {
     throw new Error()
   }
   const links = parseLinkHeader(response.headers.get('Link'))
+  const totalItems = Number(response.headers.get('X-Total-Items')) || 0
   const rows = (await response.json()) as (File | Folder)[]
-  return {rows, links}
+  return {rows, links, totalItems}
 }
 
 type BookmarkByPage = {[key: number]: string}
@@ -58,7 +61,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
     by: 'name',
     direction: 'asc',
   })
-
+  const [totalItems, setTotalItems] = useState(0)
   const [bookmarkByPage, setBookmarkByPage] = useState<BookmarkByPage>({1: ''})
   const [currentPage, setCurrentPage] = useState(1)
   const prevState = useRef('')
@@ -74,6 +77,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
         sortBy: sort.by,
         sortDirection: sort.direction,
         pageQueryParam: bookmarkByPage[currentPage],
+        perPage: PER_PAGE,
       })
 
   const query = useQuery({
@@ -104,7 +108,8 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
       setBookmarkByPage(bookmarkState)
       setCurrentPage(pageState)
 
-      const {rows, links} = await fetchFilesAndFolders(url)
+      const {rows, links, totalItems} = await fetchFilesAndFolders(url)
+      setTotalItems(totalItems)
       const bookmark = parseBookmarkFromUrl(links.next)
       if (bookmark && !bookmarkState[pageState + 1]) {
         setBookmarkByPage({
@@ -122,8 +127,10 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
     ...query,
     page: {
       current: currentPage,
-      total: Object.keys(bookmarkByPage).length,
-      set: setCurrentPage,
+      totalItems,
+      totalPages: Math.ceil(totalItems / PER_PAGE),
+      next: () => setCurrentPage(prev => prev + 1),
+      prev: () => setCurrentPage(prev => Math.max(prev - 1, 1)),
     },
     search: {
       term: searchTerm,

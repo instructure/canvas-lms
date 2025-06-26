@@ -156,7 +156,8 @@ class FoldersController < ApplicationController
     @folder = Folder.find(params[:id])
     return unless authorized_action(@folder, @current_user, :read_contents)
 
-    items, opts = paginated_folders_and_files(api_v1_list_folders_and_files_url)
+    items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
+    headers["X-Total-Items"] = all_item_count.to_s
     render json: folders_or_files_json(items, @current_user, session, opts)
   end
 
@@ -166,7 +167,8 @@ class FoldersController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_files)
 
     base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
-    items, opts = paginated_folders_and_files(base_url)
+    items, opts, all_item_count = paginated_folders_and_files(base_url)
+    headers["X-Total-Items"] = all_item_count.to_s
     render json: folders_or_files_json(items, @current_user, session, opts)
   end
 
@@ -185,6 +187,33 @@ class FoldersController < ApplicationController
   def paginated_folders_and_files(base_url)
     opts = lock_options(@folder ? @folder.context : @context, @current_user, session)
     opts = opts.merge(include: params[:include]) if params[:include].present?
+
+    folder_scope = folder_index_scope(opts[:can_view_hidden_files]).preload(:active_file_attachments, :active_sub_folders)
+    file_scope = file_index_scope(@folder || @context, @current_user, params).preload(:attachment_upload_statuses, :root_attachment)
+
+    collections = paginated_folders_and_files_collection(folder_scope, file_scope)
+
+    per_page = Api.per_page_for(self, default: 25)
+
+    combined = Api.paginate(
+      BookmarkedCollection.concat(*collections),
+      self,
+      base_url,
+      { per_page: }
+    )
+
+    if opts[:can_view_hidden_files] && opts[:context]
+      opts[:master_course_status] = setup_master_course_restrictions(combined, opts[:context])
+    end
+
+    all_item_count = folder_scope.count + file_scope.count
+    [combined, opts, all_item_count]
+  end
+
+  def paginated_folders_and_files_collection(folder_scope, file_scope)
+    # Make copies of the scopes to avoid modifying the original ones
+    folder_scope_copy = folder_scope
+    file_scope_copy = file_scope
 
     folder_column_map = {
       "name" => Folder.best_unicode_collation_key("folders.name"),
@@ -206,41 +235,23 @@ class FoldersController < ApplicationController
     file_sort = file_column_map[params[:sort]] || "display_name"
     file_desc = params[:order] == "desc"
 
-    folder_scope = folder_index_scope(opts[:can_view_hidden_files]).preload(:active_file_attachments, :active_sub_folders)
-    file_scope = file_index_scope(@folder || @context, @current_user, params).preload(:attachment_upload_statuses, :root_attachment)
-
     # Explicit LEFT JOIN for sorting by modified_by and rights
     if params[:sort] == "modified_by"
-      file_scope = file_scope.left_outer_joins(:user).select("attachments.*, users.sortable_name AS sortable_name")
+      file_scope_copy = file_scope_copy.left_outer_joins(:user).select("attachments.*, users.sortable_name AS sortable_name")
     elsif params[:sort] == "rights"
-      file_scope = file_scope.left_outer_joins(:usage_rights).select("attachments.*, usage_rights.use_justification AS use_justification")
+      file_scope_copy = file_scope_copy.left_outer_joins(:usage_rights).select("attachments.*, usage_rights.use_justification AS use_justification")
     end
 
     folder_bookmarker = Plannable::Bookmarker.new(Folder, folder_desc, folder_sort, :id)
-    folders_collection = BookmarkedCollection.wrap(folder_bookmarker, folder_scope)
+    folders_collection = BookmarkedCollection.wrap(folder_bookmarker, folder_scope_copy)
 
     file_bookmarker = Plannable::Bookmarker.new(Attachment, file_desc, file_sort, :id)
-    files_collection = BookmarkedCollection.wrap(file_bookmarker, file_scope)
+    files_collection = BookmarkedCollection.wrap(file_bookmarker, file_scope_copy)
 
-    collections = [
+    [
       ["folders", folders_collection],
       ["files", files_collection]
     ]
-
-    per_page = Api.per_page_for(self, default: 25)
-
-    combined = Api.paginate(
-      BookmarkedCollection.concat(*collections),
-      self,
-      base_url,
-      { per_page: }
-    )
-
-    if opts[:can_view_hidden_files] && opts[:context]
-      opts[:master_course_status] = setup_master_course_restrictions(combined, opts[:context])
-    end
-
-    [combined, opts]
   end
 
   def folder_index_scope(can_view_hidden_files)
