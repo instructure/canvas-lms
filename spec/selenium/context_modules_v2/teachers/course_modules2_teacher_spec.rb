@@ -311,13 +311,35 @@ describe "context modules", :ignore_js_errors do
     end
 
     it "displays the module file drop area when a module has no items" do
-      skip("LX-2870: This test is flaky and needs to be fixed")
       go_to_modules
       wait_for_ajaximations
 
-      empty_module_el = f("[data-module-id='#{@empty_module.id}']")
-      expect(empty_module_el).to be_displayed
-      expect(empty_module_el.text).to include("Drop files here to upload")
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+
+      expect(module_file_drop_element_exists?(@empty_module.id)).to be true
+
+      drop_area = module_file_drop_element(@empty_module.id)
+      expect(drop_area).to be_displayed
+      expect(drop_area.text).to include("Drop files here to upload")
+    end
+
+    it "hides the module file drop area after adding a file item" do
+      @assignment = @course.assignments.create!(
+        title: "File 1",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days.from_now
+      )
+      @empty_module.add_item(type: "assignment", id: @assignment.id)
+
+      go_to_modules
+      wait_for_ajaximations
+
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+      expect(module_file_drop_element_exists?(@empty_module.id)).to be false
     end
   end
 end

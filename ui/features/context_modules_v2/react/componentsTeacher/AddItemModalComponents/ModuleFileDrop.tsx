@@ -73,7 +73,7 @@ export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
   )
 
   return (
-    <View as="form" padding="small" display="block">
+    <View as="form" padding="small" display="block" data-testid="module-file-drop">
       {itemType === 'file' && (
         <FileDrop
           height={FILE_DROP_HEIGHT}

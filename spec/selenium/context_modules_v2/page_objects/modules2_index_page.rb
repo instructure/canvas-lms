@@ -66,6 +66,10 @@ module Modules2IndexPage
     "[data-testid='module-action-menu_#{module_id}']"
   end
 
+  def module_file_drop_selector(module_id)
+    "[data-module-id='#{module_id}'] [data-testid='module-file-drop']"
+  end
+
   def module_header_expand_toggle_selector
     "[data-testid='module-header-expand-toggle']"
   end
@@ -178,6 +182,14 @@ module Modules2IndexPage
 
   def module_action_menu(module_id)
     f(module_action_menu_selector(module_id))
+  end
+
+  def module_file_drop_element(module_id)
+    f(module_file_drop_selector(module_id))
+  end
+
+  def module_file_drop_element_exists?(module_id)
+    element_exists?(module_file_drop_selector(module_id))
   end
 
   def module_header_complete_all_pill(module_id)
