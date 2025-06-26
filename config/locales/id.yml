@@ -23596,7 +23596,7 @@ id:
       grade: "(nilai: %{grade})"
       see_all_quiz_attempts: "Lihat semua upaya kuis"
       submission_to_view: "Penyerahan untuk dilihat:"
-      submitted: "*Menyerahkan:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Menyerahkan:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Serahkan
     titles: 
       click_to_record: "Ucapan ke Teks"
