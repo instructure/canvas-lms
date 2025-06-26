@@ -111,9 +111,9 @@ class CourseReportsController < ApplicationController
   #
   # @argument report_type [String] The type of report to generate.
   #
-  # @argument parameters [Hash<String => Object>] The parameters will vary for each report.
-  #   Note that the example parameters provided below may not be valid for
-  #   every report.
+  # @argument parameters[] [Hash] The parameters will vary for each report.
+  #   A few example parameters have been provided below.
+  #   Note: the example parameters provided below may not be valid for every report.
   #
   # @argument parameters[section_ids[]] [Integer] The sections of the course to report on.
   #   Note: this parameter has been listed to serve as an example and may not be
