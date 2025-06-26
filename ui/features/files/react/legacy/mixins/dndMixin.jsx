@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DragFeedback from '../../components/DragFeedback'
+import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import moveStuff from '../util/moveStuff'
 import $ from 'jquery'
 import {isArray} from 'lodash'
