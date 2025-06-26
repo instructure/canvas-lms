@@ -291,7 +291,7 @@ class AccountReportsController < ApplicationController
   # not those parameters are required), see
   # {api:AccountReportsController#available_reports List Available Reports}.
   #
-  # @argument parameters The parameters will vary for each report. To fetch a list
+  # @argument parameters [Hash<String => Object] The parameters will vary for each report. To fetch a list
   #   of available parameters for each report, see {api:AccountReportsController#available_reports List Available Reports}.
   #   A few example parameters have been provided below. Note that the example
   #   parameters provided below may not be valid for every report.
