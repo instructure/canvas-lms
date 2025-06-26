@@ -359,4 +359,107 @@ describe "context modules", :ignore_js_errors do
       end
     end
   end
+
+  context "module header icons and progress" do
+    it "shows Completed All Items if it has complete all items requirements" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" } }
+      @module1.save!
+      go_to_modules
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete All Items")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      go_to_modules
+
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed All Items")
+    end
+
+    it "shows Completed One Item if it has complete one item requirement" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
+      @module1.requirement_count = 1
+      @module1.save!
+      go_to_modules
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete One Item")
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      go_to_modules
+
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed One Item")
+    end
+
+    it "includes Missing assignments icon with one missing assignment" do
+      @missing_assignment = @course.assignments.create!(title: "Missing Assignment", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.ago)
+      @module1.add_item(type: "assignment", id: @missing_assignment.id)
+      go_to_modules
+      expect(module_header_missing_pill(@module1.id).text).to include("1 Missing Assignment")
+    end
+
+    it "includes Missing assignments icon with more than one missing assignment" do
+      @missing_assignment1 = @course.assignments.create!(title: "Missing Assignment 1", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.ago)
+      @missing_assignment2 = @course.assignments.create!(title: "Missing Assignment 2", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.ago)
+
+      @module1.add_item(type: "assignment", id: @missing_assignment1.id)
+      @module1.add_item(type: "assignment", id: @missing_assignment2.id)
+      go_to_modules
+      expect(module_header_missing_pill(@module1.id).text).to include("2 Missing Assignments")
+    end
+
+    it "includes Module Pre-requisites in the header" do
+      @prereq_module = @course.context_modules.create!(name: "prereq module")
+      @prereq_module.update!(prerequisites: [{ id: @module1.id, type: "context_module", name: @module1.name }])
+      go_to_modules
+      expect(module_header_prerequisites(@prereq_module.id).text).to include("Prerequisite: #{@module1.name}")
+    end
+
+    it "includes more than one Module Pre-requisite in the header" do
+      @prereq_module = @course.context_modules.create!(name: "prereq module")
+      @prereq_module.update!(prerequisites: [{ id: @module1.id, type: "context_module", name: @module1.name }, { id: @module2.id, type: "context_module", name: @module2.name }])
+      go_to_modules
+      expect(module_header_prerequisites(@prereq_module.id).text).to include("Prerequisites: #{@module1.name}, #{@module2.name}")
+    end
+
+    it "includes a Required Items progress bar if there are Complete All items" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" } }
+      @module1.save!
+      go_to_modules
+      expect(module_progression_status_bar(@module1.id)).to be_displayed
+      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+    end
+
+    it "includes a Required Items progress bar if there are Complete One items" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
+      @module1.requirement_count = 1
+      @module1.save!
+      go_to_modules
+      expect(module_progression_status_bar(@module1.id)).to be_displayed
+      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+    end
+
+    it "shows locked icon if it has a pre-requisite on a previous module" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" } }
+      @module1.save!
+      @module2.update!(prerequisites: [{ id: @module1.id, type: "context_module", name: @module1.name }])
+      go_to_modules
+      expect(module_header_locked_icon(@module2.id)).to be_displayed
+    end
+
+    it "shows a due date of the latest learning object due date when there is one" do
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @assignment.due_at = 2.days.from_now
+        @assignment.save!
+        @assignment2.due_at = 5.days.from_now
+        @assignment2.save!
+        go_to_modules
+        expect(module_header_due_date(@module1.id).text).to include(@assignment2.due_at.strftime("%b %-d"))
+      end
+    end
+
+    it "shows no due date in header when there are none assigned to learning objects in the module" do
+      Timecop.freeze(Time.zone.local(2025, 6, 16, 10, 5, 0)) do
+        @assignment.due_at = nil
+        @assignment.save!
+        @assignment2.due_at = nil
+        @assignment2.save!
+        go_to_modules
+        expect(module_header_due_date_exists?(@module1.id)).to be_falsey
+      end
+    end
+  end
 end
