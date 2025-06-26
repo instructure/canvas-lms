@@ -67,6 +67,7 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
       borderWidth="small"
     >
       <ProgressBar
+        data-testid="module-progression-status-bar"
         screenReaderLabel={completionText}
         valueNow={completionPercentage}
         valueMax={100}

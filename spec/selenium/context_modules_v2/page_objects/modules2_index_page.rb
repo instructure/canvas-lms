@@ -70,6 +70,30 @@ module Modules2IndexPage
     "[data-testid='module-header-expand-toggle']"
   end
 
+  def module_header_due_date_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='friendly-date-time']"
+  end
+
+  def module_header_complete_all_pill_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-completion-requirement']"
+  end
+
+  def module_header_locked_icon_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-header-status-icon-lock']"
+  end
+
+  def module_header_missing_pill_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-header-missing-count']"
+  end
+
+  def module_header_prerequisites_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-header-prerequisites']"
+  end
+
+  def module_header_selector(module_id)
+    "#context_module_#{module_id}"
+  end
+
   def module_item_action_menu_link_selector(tool_text)
     "[role=menuitem]:contains('#{tool_text}')"
   end
@@ -80,6 +104,14 @@ module Modules2IndexPage
 
   def module_item_action_menu_selector
     "[data-testid='module-item-action-menu']"
+  end
+
+  def module_progression_status_bar_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-progression-status-bar']"
+  end
+
+  def module_progression_info_selector(module_id)
+    "#{module_header_selector(module_id)} progress"
   end
 
   def option_list_options_selector(option_list_id)
@@ -148,8 +180,28 @@ module Modules2IndexPage
     f(module_action_menu_selector(module_id))
   end
 
+  def module_header_complete_all_pill(module_id)
+    f(module_header_complete_all_pill_selector(module_id))
+  end
+
+  def module_header_due_date(module_id)
+    f(module_header_due_date_selector(module_id))
+  end
+
   def module_header_expand_toggles
     ff(module_header_expand_toggle_selector)
+  end
+
+  def module_header_locked_icon(module_id)
+    f(module_header_locked_icon_selector(module_id))
+  end
+
+  def module_header_missing_pill(module_id)
+    f(module_header_missing_pill_selector(module_id))
+  end
+
+  def module_header_prerequisites(module_id)
+    f(module_header_prerequisites_selector(module_id))
   end
 
   def module_item_action_menu
@@ -162,6 +214,14 @@ module Modules2IndexPage
 
   def module_item_titles
     ff(module_item_title_selector)
+  end
+
+  def module_progression_status_bar(module_id)
+    f(module_progression_status_bar_selector(module_id))
+  end
+
+  def module_progression_info(module_id)
+    f(module_progression_info_selector(module_id))
   end
 
   def option_list(option_list_id)
@@ -234,6 +294,10 @@ module Modules2IndexPage
     element_exists?(missing_assignment_button_selector)
   end
 
+  def module_header_due_date_exists?(module_id)
+    element_exists?(module_header_due_date_selector(module_id))
+  end
+
   def modules2_student_setup
     course_with_student(active_all: true)
     course_modules_setup(student_view: true)
@@ -242,6 +306,10 @@ module Modules2IndexPage
   def modules2_teacher_setup
     course_with_teacher(active_all: true)
     course_modules_setup
+  end
+
+  def module_progression_info_text(module_id)
+    element_value_for_attr(module_progression_info(module_id), "aria-valuetext")
   end
 
   def set_rewrite_flag(rewrite_status: true)
