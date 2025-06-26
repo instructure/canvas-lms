@@ -128,6 +128,7 @@ describe('generateTableUrl', () => {
       sortBy: 'name',
       sortDirection: 'asc',
       pageQueryParam: 'bookmark:foobarbaz',
+      perPage: 25,
     })
     expect(url).toBe(
       `/api/v1/courses/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
@@ -143,6 +144,7 @@ describe('generateTableUrl', () => {
       sortBy: 'name',
       sortDirection: 'desc',
       pageQueryParam: 'bookmark:foobarbaz',
+      perPage: 25,
     })
     expect(url).toBe(
       `/api/v1/users/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
@@ -158,6 +160,7 @@ describe('generateTableUrl', () => {
       sortBy: 'name',
       sortDirection: 'asc',
       pageQueryParam: 'bookmark:foobarbaz',
+      perPage: 25,
     })
     expect(url).toBe(
       `/api/v1/groups/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
@@ -172,6 +175,7 @@ describe('generateTableUrl', () => {
       folderId: '2',
       sortBy: 'name',
       sortDirection: 'desc',
+      perPage: 25,
     })
     expect(url).toBe(
       `/api/v1/courses/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc`,
@@ -187,6 +191,7 @@ describe('generateTableUrl', () => {
       sortBy: 'name',
       sortDirection: 'asc',
       pageQueryParam: 'bookmark:foobarbaz',
+      perPage: 25,
     })
     expect(url).toBe(
       `/api/v1/folders/2/all?${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
@@ -201,6 +206,7 @@ describe('generateTableUrl', () => {
       folderId: '2',
       sortBy: 'name',
       sortDirection: 'desc',
+      perPage: 25,
     })
     expect(url).toBe(`/api/v1/folders/2/all?${QUERY_PARAMS}&sort=name&order=desc`)
   })

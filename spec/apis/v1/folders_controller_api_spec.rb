@@ -1322,6 +1322,11 @@ describe "Folders API", type: :request do
       api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
     end
 
+    it "returns X-Total-Items header with correct count" do
+      api_call(:get, @folders_files_path, @folders_files_path_options, {})
+      expect(response.headers["X-Total-Items"]).to eq("5")
+    end
+
     it "lists folders first, followed by files" do
       json = api_call(:get, @folders_files_path, @folders_files_path_options, {})
       result_names = json.map do |item|
@@ -1584,6 +1589,11 @@ describe "Folders API", type: :request do
       Account.site_admin.disable_feature!(:files_a11y_rewrite)
 
       api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
+    end
+
+    it "returns X-Total-Items header with correct count" do
+      api_call(:get, @folders_files_path, @folders_files_path_options, {})
+      expect(response.headers["X-Total-Items"]).to eq("6")
     end
 
     it "lists all folders first, followed by all files" do
