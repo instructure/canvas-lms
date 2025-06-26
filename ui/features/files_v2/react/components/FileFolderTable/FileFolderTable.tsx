@@ -28,7 +28,7 @@ import {getUniqueId, pluralizeContextTypeString} from '../../../utils/fileFolder
 import {useHandleKbdShortcuts} from '../../hooks/useHandleKbdShortcuts'
 import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
-import renderTableBody from './RenderTableBody'
+import TableBody from './TableBody'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
@@ -231,19 +231,19 @@ const FileFolderTable = ({
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {renderTableBody(
-                rows,
-                filteredColumns,
-                selectedRows,
-                size,
-                isStacked,
-                toggleRowSelection,
-                userCanEditFilesForContext,
-                userCanDeleteFilesForContext,
-                userCanRestrictFilesForContext,
-                usageRightsRequiredForContext,
-                setModalOrTrayOptions,
-              )}
+              <TableBody
+                rows={rows}
+                columnHeaders={filteredColumns}
+                selectedRows={selectedRows}
+                size={size}
+                isStacked={isStacked}
+                toggleRowSelection={toggleRowSelection}
+                userCanEditFilesForContext={userCanEditFilesForContext}
+                userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+                userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+                usageRightsRequiredForContext={usageRightsRequiredForContext}
+                setModalOrTrayOptions={setModalOrTrayOptions}
+              />
             </Table.Body>
           </Table>
         </DragAndDropWrapper>
