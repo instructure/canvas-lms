@@ -50,6 +50,37 @@ const innerHtml3 = `<form>
   </table>
   </form>`
 
+const innerHtml3a = `<form>
+  <table>
+    <tr>
+      <td>
+        Updated after:
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="text" name="parameters[updated_after]" class="datetime_field" />
+      </td>
+    </tr>
+  </table>
+  </form>`
+
+const innerHtml3b = `<form>
+  <table>
+    <tr>
+      <td>
+        Number of monkeys:
+        <input type="text" name="parameters[monkey_count]" />
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <input type="text" name="parameters[updated_after]" class="datetime_field" />
+      </td>
+    </tr>
+  </table>
+  </form>`
+
 const innerHtml4 = `<form>
   <table>
     <tr>
@@ -180,6 +211,11 @@ describe('RunReportForm', () => {
 
     const dateInput = getByTestId('parameters[updated_after]')
     expect(dateInput).toBeInTheDocument()
+
+    const fieldset = dateInput.closest('fieldset')
+    const legend = fieldset?.querySelector('legend')
+    expect(legend?.textContent).toContain('Updated after:')
+
     fireEvent.input(dateInput, {target: {value: 'May 1, 2025'}})
     fireEvent.blur(dateInput)
 
@@ -194,6 +230,31 @@ describe('RunReportForm', () => {
       expect(request?.method).toBe('POST')
       expect(formData.get('parameters[updated_after]')).toBe('2025-05-01T07:00:00.000Z')
     })
+  })
+
+  it('finds a date/time label in the previous table row', async () => {
+    const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml3a} />)
+
+    const dateInput = getByTestId('parameters[updated_after]')
+    expect(dateInput).toBeInTheDocument()
+
+    const fieldset = dateInput.closest('fieldset')
+    const legend = fieldset?.querySelector('legend')
+    expect(legend?.textContent).toContain('Updated after:')
+  })
+
+  it("doesn't steal the label of another input from the previous row", async () => {
+    const {getByTestId} = render(<RunReportForm {...props} formHTML={innerHtml3b} />)
+
+    const dateInput = getByTestId('parameters[updated_after]')
+    expect(dateInput).toBeInTheDocument()
+    const dateInputFieldset = dateInput.closest('fieldset')
+    const dateInputLegend = dateInputFieldset?.querySelector('legend')
+    expect(dateInputLegend?.textContent).toBe('')
+
+    const monkeyInput = document.querySelector('input[name="parameters[monkey_count]"]')
+    const monkeyInputTd = monkeyInput?.closest('td')
+    expect(monkeyInputTd?.textContent).toContain('Number of monkeys:')
   })
 
   it('shows error message when api call fails', async () => {

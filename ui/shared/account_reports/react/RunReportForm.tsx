@@ -95,22 +95,47 @@ export default function ConfigureReportForm(props: Props) {
 
   useEffect(() => {
     if (formRef.current) {
-      const $form = $(formRef.current)
+      const form = formRef.current
       const record = dateRefs
 
-      // Find all datetime inputs and remove the closest <tr>
-      $form.find('input.datetime_field').each(function () {
-        const closestTd = $(this).closest('td')[0]
-        // delete html content but store label
-        const inputLabel = closestTd.innerText
-        closestTd.innerHTML = ''
+      // need full width for date inputs
+      const table = form.querySelector('table')
+      if (table) {
+        // Apply styles
+        table.style.width = '100%'
+      }
 
-        const name = getParameterName($(this).attr('name') ?? '')
-        record[name] = [inputLabel, closestTd]
+      // Find all datetime inputs and extract their labels from the <td>
+      form.querySelectorAll<HTMLInputElement>('input.datetime_field').forEach(input => {
+        const closestTd = input.closest('td')
+        if (closestTd) {
+          // delete html content but store label
+          let inputLabel = closestTd.innerText
+
+          // sometimes the label is in the previous <tr>
+          if (inputLabel.trim() === '') {
+            const prevTr = input.closest('tr')?.previousElementSibling
+            if (
+              prevTr?.tagName === 'TR' &&
+              prevTr.children.length === 1 &&
+              prevTr.children[0].tagName === 'TD' &&
+              prevTr.children[0].childNodes.length === 1 &&
+              prevTr.children[0].childNodes[0].nodeType === Node.TEXT_NODE
+            ) {
+              const prevTd = prevTr.children[0] as HTMLTableCellElement
+              inputLabel = prevTd.innerText
+              prevTd.innerHTML = ''
+            }
+          }
+
+          const name = getParameterName(input.name)
+          closestTd.innerHTML = ''
+          record[name] = [inputLabel, closestTd]
+        }
       })
       setDateRefs({...record})
 
-      const script = $form.find('script')
+      const script = $(form).find('script')
       if (script) {
         // there's only one script tag in each form
         const scriptElem = script.get(0)
@@ -213,7 +238,11 @@ export default function ConfigureReportForm(props: Props) {
     )
   }
   return (
-    <Modal label={I18n.t('Configure Report')} open>
+    <Modal
+      label={I18n.t('Configure Report')}
+      size={Object.entries(dateRefs).length > 0 ? 'medium' : 'small'}
+      open
+    >
       <Modal.Header>
         <Heading>{I18n.t('Configure Report')}</Heading>
         <CloseButton
