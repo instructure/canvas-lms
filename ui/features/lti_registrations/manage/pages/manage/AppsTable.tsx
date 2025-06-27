@@ -312,15 +312,75 @@ const Columns: ReadonlyArray<Column> = [
   },
 ]
 
-const renderHeaderRow = (props: {
-  sort: AppsSortProperty
-  dir: AppsSortDirection
-  updateSearchParams: (
-    params: Partial<Record<keyof ManageSearchParams, string | undefined>>,
-  ) => void
-}) => (
+const CondensedColumns: ReadonlyArray<Column> = [
+  {
+    id: 'name',
+    header: I18n.t('App Name'),
+    width: '42%',
+    sortable: true,
+    render: r => {
+      const appName = (
+        <Flex>
+          <ToolIconOrDefault
+            iconUrl={r.icon_url}
+            toolId={r.id}
+            toolName={r.name}
+            size={27}
+            marginRight={12}
+            hideFromScreenReader={true}
+          />
+          {r.name}
+        </Flex>
+      )
+      return (
+        <Link
+          as={RouterLink}
+          to={`/manage/${r.id}`}
+          isWithinText={false}
+          data-testid={`reg-link-${r.id}`}
+        >
+          {appName}
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'nickname',
+    header: I18n.t('Nickname'),
+    width: '40%',
+    sortable: true,
+    render: r => (r.admin_nickname ? r.admin_nickname : null),
+  },
+  {
+    id: 'lti_version',
+    sortable: true,
+    header: I18n.t('Version'),
+    width: '8%',
+    render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
+  },
+  {
+    id: 'on',
+    header: I18n.t('On/Off'),
+    width: '10%',
+    sortable: true,
+    render: r => (
+      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
+    ),
+  },
+]
+
+const renderHeaderRow = (
+  props: {
+    sort: AppsSortProperty
+    dir: AppsSortDirection
+    updateSearchParams: (
+      params: Partial<Record<keyof ManageSearchParams, string | undefined>>,
+    ) => void
+  },
+  columns: ReadonlyArray<Column>,
+) => (
   <Table.Row>
-    {Columns.map(({id, header, width, textAlign, sortable}) => (
+    {columns.map(({id, header, width, textAlign, sortable}) => (
       <Table.ColHeader
         key={id}
         id={id}
@@ -409,10 +469,11 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const [, setManageSearchParams] = useManageSearchParams()
   const responsiveProps = props.responsiveProps
   const {page, apps} = props.tableProps
+  const columns = window.ENV.FEATURES.lti_registrations_next ? CondensedColumns : Columns
   const rows = React.useMemo(() => {
     return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
-        {Columns.map(({id, render, textAlign}) => (
+        {columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
             {render(row, {deleteApp: props.tableProps.deleteApp})}
           </Table.Cell>
@@ -427,7 +488,7 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
     <>
       <Table {...props.responsiveProps} caption={I18n.t('Installed Apps')} layout={layout}>
         <Table.Head renderSortLabel={I18n.t('Sort by')}>
-          {renderHeaderRow(props.tableProps)}
+          {renderHeaderRow(props.tableProps, columns)}
         </Table.Head>
         <Table.Body>{rows}</Table.Body>
       </Table>
