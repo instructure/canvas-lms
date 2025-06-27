@@ -40,6 +40,7 @@ export function ExternalToolDialogModal(
       onOpen={props.onOpen}
       onClose={props.onClose}
       mountNode={props.mountNode}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
         <Heading>{props.name}</Heading>
