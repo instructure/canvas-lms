@@ -84,14 +84,12 @@ describe('useGetPaginatedFiles', () => {
       setSearchTerm: mockSetSearchTerm,
     }))
 
-    const {result} = renderHook(
+    const {result, waitForNextUpdate} = renderHook(
       () => useGetPaginatedFiles({folder: mockFolder as any, onSettled: mockOnSettled}),
       {wrapper},
     )
+    await waitForNextUpdate()
 
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
     expect(fetchMock.called()).toBe(true)
     expect(mockOnSettled).toHaveBeenCalled()
     expect(result.current.data).toBeTruthy()
@@ -103,14 +101,12 @@ describe('useGetPaginatedFiles', () => {
       setSearchTerm: mockSetSearchTerm,
     }))
 
-    const {result} = renderHook(
+    const {result, waitForNextUpdate} = renderHook(
       () => useGetPaginatedFiles({folder: mockFolder as any, onSettled: mockOnSettled}),
       {wrapper},
     )
+    await waitForNextUpdate()
 
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
     expect(result.current.search.term).toBe('a')
     expect(mockOnSettled).toHaveBeenCalledWith([])
     expect(fetchMock.called()).toBe(false)
@@ -123,13 +119,12 @@ describe('useGetPaginatedFiles', () => {
       setSearchTerm: mockSetSearchTerm,
     }))
 
-    const {result} = renderHook(
+    const {result, waitForNextUpdate} = renderHook(
       () => useGetPaginatedFiles({folder: mockFolder as any, onSettled: mockOnSettled}),
       {wrapper},
     )
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
+    await waitForNextUpdate()
+
     expect(mockGenerateTableUrl).toHaveBeenCalled()
     expect(fetchMock.called()).toBe(true)
     expect(mockOnSettled).toHaveBeenCalled()
@@ -143,13 +138,11 @@ describe('useGetPaginatedFiles', () => {
       setSearchTerm: mockSetSearchTerm,
     }))
 
-    const {result} = renderHook(
+    const {result, waitForNextUpdate} = renderHook(
       () => useGetPaginatedFiles({folder: mockFolder as any, onSettled: mockOnSettled}),
       {wrapper},
     )
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0))
-    })
+    await waitForNextUpdate()
 
     expect(fetchMock.called()).toBe(false)
     expect(mockOnSettled).toHaveBeenCalledWith([])
