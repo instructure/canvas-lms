@@ -27,6 +27,15 @@ class DiscussionEntry < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
   include Api
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[message]
+  end
+
+  def actual_saving_user
+    user
+  end
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry
@@ -51,6 +60,7 @@ class DiscussionEntry < ActiveRecord::Base
   belongs_to :editor, class_name: "User"
   belongs_to :root_account, class_name: "Account"
   has_one :external_feed_entry, as: :asset
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   before_save :set_edited_at
   before_create :infer_root_entry_id

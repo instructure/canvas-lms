@@ -109,7 +109,7 @@ RSpec.describe ApplicationController do
         it "adds location tag to attachment urls" do
           @course.root_account.enable_feature!(:file_association_access)
           attachment = @course.attachments.create!(uploaded_data: stub_png_data("my-pic.png"))
-          discussion_topic = discussion_topic_model(message: "<img src='/courses/#{@course.id}/files/#{attachment.id}' />")
+          discussion_topic = discussion_topic_model(message: "<img src='/courses/#{@course.id}/files/#{attachment.id}' />", user: @teacher)
           expect(controller.send(:user_content, @course.discussion_topics.first.message, location: discussion_topic.asset_string.to_s)).to include("location=#{discussion_topic.asset_string}")
         end
       end

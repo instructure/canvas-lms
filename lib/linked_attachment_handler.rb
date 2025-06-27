@@ -33,7 +33,7 @@ module LinkedAttachmentHandler
       next unless saved_change_to_attribute?(field)
 
       context_concern = field if SPECIAL_CONCERN_FIELDS.include?(field)
-      associate_attachments_to_rce_object(send(field), saving_user, context_concern:)
+      associate_attachments_to_rce_object(send(field), actual_saving_user, context_concern:)
     end
   end
 
@@ -118,9 +118,17 @@ module LinkedAttachmentHandler
     root_account.feature_enabled?(:file_association_access)
   end
 
+  def actual_saving_user
+    saving_user
+  end
+
   module ClassMethods
     def html_fields
       raise NotImplementedError
+    end
+
+    def actual_saving_user_attr
+      :saving_user
     end
   end
 end

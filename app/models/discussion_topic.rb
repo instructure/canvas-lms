@@ -32,6 +32,15 @@ class DiscussionTopic < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
   include DatesOverridable
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[message]
+  end
+
+  def actual_saving_user
+    user
+  end
 
   REQUIRED_CHECKPOINT_COUNT = 2
 
@@ -116,6 +125,7 @@ class DiscussionTopic < ActiveRecord::Base
   has_many :insights, class_name: "DiscussionTopicInsight"
   has_many :insight_entries, class_name: "DiscussionTopicInsight::Entry"
   has_one :estimated_duration, dependent: :destroy, inverse_of: :discussion_topic
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   validates_with HorizonValidators::DiscussionsValidator, if: -> { context.is_a?(Course) && context.horizon_course? }
   validates_associated :discussion_topic_section_visibilities
