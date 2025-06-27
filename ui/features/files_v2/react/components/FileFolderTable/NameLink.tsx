@@ -71,7 +71,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    navigate('/', {replace: true})
+    navigate(location.pathname, {replace: true})
   }
 
   const isFile = 'display_name' in item
