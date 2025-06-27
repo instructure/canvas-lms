@@ -848,6 +848,9 @@ class CoursesController < ApplicationController
   # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
   #
+  # @argument copied [Boolean]
+  #   Set to true to indicate the course is a copy of other.
+  #
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
   #   * 'feed' Recent Activity Dashboard
@@ -965,7 +968,15 @@ class CoursesController < ApplicationController
       changes = changed_settings(@course.changes, @course.settings)
 
       respond_to do |format|
-        if @course.save
+        success = if params[:copied].to_s == "true"
+                    Course.suspend_callbacks(:copy_from_course_template) do
+                      @course.save
+                    end
+                  else
+                    @course.save
+                  end
+
+        if success
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
           @course.require_assignment_group
