@@ -7395,6 +7395,7 @@ ko:
   language_6b3e2c7c: 언어
   last_error_a3832668: "마지막 오류"
   last_modified_by_ca4bb5e1: "마지막 수정한 사람"
+  last_run_c6eedd69: "마지막 실행"
   last_used_17553fed: "최종 사용일"
   late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
   late_bd436902: 지연
