@@ -1455,8 +1455,11 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :read_as_admin and can :delete and can :read and can :attach
 
+    given { |user, session| !root_topic_id && context.grants_all_rights?(user, session, :read_forum, :view_group_pages) }
+    can :view_group_pages
+
     given { |user, session| root_topic&.grants_right?(user, session, :read_as_admin) }
-    can :read_as_admin
+    can :read_as_admin and can :view_group_pages
 
     given { |user, session| root_topic&.grants_right?(user, session, :delete) }
     can :delete
