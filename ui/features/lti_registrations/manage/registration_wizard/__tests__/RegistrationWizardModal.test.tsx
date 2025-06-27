@@ -72,6 +72,8 @@ describe('RegistrationWizardModal', () => {
         dynamicRegistrationUrl: '',
         unifiedToolId: undefined,
         lti_version: '1p3',
+        isInstructureTool: undefined,
+        showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: false,
         exitOnCancel: false,
@@ -135,6 +137,8 @@ describe('RegistrationWizardModal', () => {
         dynamicRegistrationUrl: '',
         unifiedToolId: undefined,
         lti_version: '1p3',
+        isInstructureTool: undefined,
+        showBlankConfigurationMessage: undefined,
         method: 'json_url',
         registering: false,
         exitOnCancel: false,
@@ -255,6 +259,8 @@ describe('RegistrationWizardModal', () => {
         dynamicRegistrationUrl: '',
         unifiedToolId: undefined,
         lti_version: '1p3',
+        isInstructureTool: undefined,
+        showBlankConfigurationMessage: undefined,
         method: 'json',
         registering: false,
         exitOnCancel: false,
@@ -371,6 +377,8 @@ describe('RegistrationWizardModal', () => {
         dynamicRegistrationUrl: '',
         unifiedToolId: undefined,
         lti_version: '1p3',
+        isInstructureTool: undefined,
+        showBlankConfigurationMessage: undefined,
         method: 'manual',
         registering: false,
         exitOnCancel: false,
@@ -426,6 +434,80 @@ describe('RegistrationWizardModal', () => {
         expect(screen.getByText(/LTI 1.3 Registration/i)).toBeInTheDocument()
       })
     })
+
+    it('should not show the alert with info about contacting someone for install info', async () => {
+      const accountId = ZAccountId.parse('123')
+
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />,
+      )
+
+      const alert = screen.queryByText('A configuration is not available', {exact: false})
+      expect(alert).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when opened without having configuration info available', () => {
+    it('shows an alert', async () => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        unifiedToolId: undefined,
+        lti_version: '1p3',
+        isInstructureTool: true,
+        showBlankConfigurationMessage: true,
+        method: 'manual',
+        registering: false,
+        exitOnCancel: false,
+        jsonUrl: '',
+        jsonCode: '',
+        onSuccessfulInstallation: jest.fn(),
+        jsonFetch: {_tag: 'initial'},
+      })
+
+      const accountId = ZAccountId.parse('123')
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />,
+      )
+      const alert = screen.getByText('reach out to your CSM', {exact: false})
+      expect(alert).toBeInTheDocument()
+    })
+
+    it('shows an alert saying to contact the tool provider', () => {
+      openRegistrationWizard({
+        dynamicRegistrationUrl: '',
+        unifiedToolId: undefined,
+        lti_version: '1p3',
+        isInstructureTool: false,
+        showBlankConfigurationMessage: true,
+        method: 'manual',
+        registering: false,
+        exitOnCancel: false,
+        jsonUrl: '',
+        jsonCode: '',
+        onSuccessfulInstallation: jest.fn(),
+        jsonFetch: {_tag: 'initial'},
+      })
+
+      const accountId = ZAccountId.parse('123')
+      const screen = render(
+        <RegistrationWizardModal
+          accountId={accountId}
+          {...emptyServices}
+          jsonUrlWizardService={mockJsonUrlWizardService()}
+        />,
+      )
+
+      const alert = screen.getByText('reach out to the tool', {exact: false})
+      expect(alert).toBeInTheDocument()
+    })
   })
 
   describe('when pre-opened with dynamic registration', () => {
@@ -434,6 +516,8 @@ describe('RegistrationWizardModal', () => {
         dynamicRegistrationUrl: 'http://example.com',
         unifiedToolId: ZUnifiedToolId.parse('asdf'),
         lti_version: '1p3',
+        isInstructureTool: undefined,
+        showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: true,
         exitOnCancel: true,
