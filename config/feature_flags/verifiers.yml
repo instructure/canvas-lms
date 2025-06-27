@@ -38,7 +38,7 @@ disable_verified_content_export_links:
 enable_file_access_with_api_tokens:
   state: hidden
   shadow: true
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: Enable File Access with API Tokens
   description: Allow file authorization with API tokens.  This will allow API users to download files without a file verifier.
   environments:
