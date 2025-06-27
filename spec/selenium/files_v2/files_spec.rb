@@ -272,6 +272,17 @@ describe "files index page" do
           expect(preview_file_header).to include_text(a_txt_file_name)
         end
 
+        it "returns to current folder on close" do
+          sub_folder = Folder.root_folders(@course).first.sub_folders.create!(name: "Sub", context: @course)
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"), @course, a_txt_file_name, sub_folder)
+          get "/courses/#{@course.id}/files/folder/Sub"
+
+          get_item_files_table(1, 1).click
+          expect(preview_file_header).to include_text(a_txt_file_name)
+          preview_close_button.click
+          expect(breadcrumb).to contain_css("li", text: "Sub")
+        end
+
         context "with media file" do
           before do
             stub_kaltura
