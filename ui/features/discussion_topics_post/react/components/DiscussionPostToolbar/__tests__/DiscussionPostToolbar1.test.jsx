@@ -243,34 +243,57 @@ describe('DiscussionPostToolbar', () => {
     it('should not render when the child topics is undefined', () => {
       const container = setup({
         childTopics: undefined,
-        isAdmin: true,
+        canViewGroupPages: true,
       })
       expect(container.queryByTestId('groups-menu-button')).toBeFalsy()
     })
 
-    it('should render when there are no child topics and the user is an admin', () => {
-      const container = setup({
-        childTopics: [],
-        isAdmin: true,
+    describe('when the user has student role', () => {
+      it('should not render even if user has permission', () => {
+        const container = setup({
+          childTopics: [ChildTopic.mock()],
+          canViewGroupPages: false,
+        })
+        expect(container.queryByTestId('groups-menu-button')).toBeNull()
       })
-
-      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
 
-    it('should render when there are child topics and the user is an admin', () => {
-      const container = setup({
-        childTopics: [ChildTopic.mock()],
-        isAdmin: true,
-      })
-      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
-    })
+    describe('when the user does not have student role', () => {
+      let originalRoles
 
-    it('should not render when the user is not an admin', () => {
-      const container = setup({
-        childTopics: [ChildTopic.mock()],
-        isAdmin: false,
+      beforeEach(() => {
+        originalRoles = [...ENV.current_user_roles]
+        ENV.current_user_roles = ENV.current_user_roles.filter(role => role !== 'student')
       })
-      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+
+      afterEach(() => {
+        ENV.current_user_roles = originalRoles
+      })
+
+      it('should render when there are no child topics and the user has permission', () => {
+        const container = setup({
+          childTopics: [],
+          canViewGroupPages: true,
+        })
+
+        expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
+      })
+
+      it('should render when there are child topics and user the user has permission', () => {
+        const container = setup({
+          childTopics: [ChildTopic.mock()],
+          canViewGroupPages: true,
+        })
+        expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
+      })
+
+      it('should not render when the user does not have permission', () => {
+        const container = setup({
+          childTopics: [ChildTopic.mock()],
+          canViewGroupPages: false,
+        })
+        expect(container.queryByTestId('groups-menu-button')).toBeNull()
+      })
     })
   })
 })

@@ -74,7 +74,8 @@ const DiscussionPostButtonsToolbar = props => {
 
   const renderGroup = () =>
     props.childTopics?.length &&
-    props.isAdmin && (
+    props.canViewGroupPages &&
+    !ENV.current_user_roles?.includes('student') && (
       <span className="discussions-post-toolbar-groupsMenu">
         <GroupsMenu width="10px" childTopics={props.childTopics} />
       </span>
@@ -332,7 +333,7 @@ const DiscussionPostButtonsToolbar = props => {
 }
 
 DiscussionPostButtonsToolbar.propTypes = {
-  isAdmin: PropTypes.bool,
+  canViewGroupPages: PropTypes.bool,
   canEdit: PropTypes.bool,
   isGraded: PropTypes.bool,
   childTopics: PropTypes.arrayOf(ChildTopic.shape),

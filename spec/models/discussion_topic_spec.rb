@@ -355,18 +355,18 @@ describe DiscussionTopic do
 
     it "does grant create permission with create_forum but no moderate_forum" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply create duplicate attach student_reporting create_assign_to]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply create duplicate attach student_reporting view_group_pages create_assign_to]
     end
 
     it "does grant create permission with moderate_forum but no create_forum" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply update delete create duplicate attach student_reporting read_as_admin moderate_forum manage_assign_to]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply update delete create duplicate attach student_reporting read_as_admin view_group_pages moderate_forum manage_assign_to]
     end
 
     it "does not grant create permission without moderate_forum and create_forum" do
       @course.account.role_overrides.create!(role: teacher_role, permission: "create_forum", enabled: false)
       @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply attach student_reporting]
+      expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply attach student_reporting view_group_pages]
     end
 
     it "does not grant moderate permissions without read permissions" do
@@ -453,6 +453,23 @@ describe DiscussionTopic do
           account_admin = account_admin_user(account: @course.root_account)
           expect(@topic.grants_right?(account_admin, :manage_assign_to)).to be true
         end
+      end
+    end
+
+    describe "view_group_pages" do
+      it "does grant permission with read_forum and view_group_pages but no moderate_forum" do
+        @course.account.role_overrides.create!(role: teacher_role, permission: "moderate_forum", enabled: false)
+        expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply create duplicate attach student_reporting view_group_pages create_assign_to]
+      end
+
+      it "does not grant permission with moderate_forum but no view_group_pages" do
+        @course.account.role_overrides.create!(role: teacher_role, permission: "view_group_pages", enabled: false)
+        expect(@topic.reload.check_policy(@teacher2)).to eql %i[read read_replies reply update delete create duplicate attach student_reporting read_as_admin moderate_forum manage_assign_to create_assign_to]
+      end
+
+      it "is granted to account admins" do
+        account_admin = account_admin_user(account: @course.root_account)
+        expect(@topic.grants_right?(account_admin, :view_group_pages)).to be true
       end
     end
   end
