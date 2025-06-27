@@ -54,5 +54,19 @@ module Loaders
         end
       end
     end
+
+    class OrderedModerationGradersWithSlotTakenLoader < GraphQL::Batch::Loader
+      def perform(assignment_ids)
+        moderation_graders_by_assignment = ModerationGrader
+                                           .where(assignment_id: assignment_ids)
+                                           .with_slot_taken
+                                           .order(:anonymous_id)
+                                           .group_by(&:assignment_id)
+
+        assignment_ids.each do |id|
+          fulfill(id, moderation_graders_by_assignment.fetch(id, []))
+        end
+      end
+    end
   end
 end

@@ -38,6 +38,7 @@ class AbstractAssignment < ActiveRecord::Base
   include LockedFor
   include Lti::Migratable
   include LinkedAttachmentHandler
+  include Assignments::GraderIdentities
 
   ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
@@ -4005,16 +4006,6 @@ class AbstractAssignment < ActiveRecord::Base
     ).merge(moderation_graders.with_slot_taken)
   end
 
-  def anonymous_grader_identities_by_user_id
-    # Response looks like: { user_id => { id: anonymous_id, name: anonymous_name } }
-    @anonymous_grader_identities_by_user_id ||= anonymous_grader_identities(index_by: :user_id)
-  end
-
-  def anonymous_grader_identities_by_anonymous_id
-    # Response looks like: { anonymous_id => { id: anonymous_id, name: anonymous_name } }
-    @anonymous_grader_identities_by_anonymous_id ||= anonymous_grader_identities(index_by: :anonymous_id)
-  end
-
   def instructor_selectable_states_by_provisional_grade_id
     @instructor_selectable_states_by_provisional_grade_id ||= instructor_selectable_states
   end
@@ -4371,17 +4362,6 @@ class AbstractAssignment < ActiveRecord::Base
 
   def set_muted
     self.muted = true
-  end
-
-  def anonymous_grader_identities(index_by:)
-    return {} unless moderated_grading?
-
-    ordered_moderation_graders_with_slot_taken.each_with_object({}).with_index(1) do |(moderation_grader, anonymous_identities), grader_number|
-      anonymous_identities[moderation_grader.public_send(index_by)] = {
-        name: I18n.t("Grader %{grader_number}", { grader_number: }),
-        id: moderation_grader.anonymous_id
-      }
-    end
   end
 
   def ensure_moderation_grader_slot_available(user)

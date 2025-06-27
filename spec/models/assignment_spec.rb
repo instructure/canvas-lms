@@ -798,65 +798,61 @@ describe Assignment do
     end
   end
 
-  describe "#anonymous_grader_identities_by_user_id" do
+  describe "#grader_identities" do
     before(:once) do
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: :active)
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
     end
 
-    it "includes users that have taken a grader slot" do
+    it "returns an empty array when moderated_grading? is false" do
+      @assignment.update!(moderated_grading: false)
+      expect(@assignment.grader_identities).to eq []
+    end
+
+    it "includes real user names" do
       @assignment.create_moderation_grader(@teacher, occupy_slot: true)
-      expect(@assignment.anonymous_grader_identities_by_user_id).to have_key @teacher.id
+      identities = @assignment.grader_identities
+      expect(identities.length).to eq 1
+      expect(identities.first[:name]).to eq @teacher.name
+      expect(identities.first[:user_id]).to eq @teacher.id
     end
 
-    it "assigns grader names based on the ordered anonymous IDs" do
-      second_teacher = User.create!
+    it "includes all graders who have taken slots in position order" do
+      second_teacher = User.create!(name: "Second Teacher")
+      third_teacher = User.create!(name: "Third Teacher")
       @course.enroll_teacher(second_teacher, enrollment_state: :active)
-      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "bbbbb", slot_taken: true)
-      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "aaaaa", slot_taken: true)
-      anonymous_name = @assignment.anonymous_grader_identities_by_user_id.dig(second_teacher.id, :name)
-      expect(anonymous_name).to eq "Grader 1"
-    end
+      @course.enroll_teacher(third_teacher, enrollment_state: :active)
 
-    it "excludes users that have not taken a grader slot" do
-      @assignment.create_moderation_grader(@teacher, occupy_slot: false)
-      expect(@assignment.anonymous_grader_identities_by_user_id).not_to have_key @teacher.id
-    end
+      # Create in non-sequential order to verify sorting
+      @assignment.moderation_graders.create!(user: third_teacher, anonymous_id: "anon3", slot_taken: true)
+      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "anon1", slot_taken: true)
+      @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "anon2", slot_taken: true)
 
-    it "excludes users that do not have a moderation grader record for the assignment" do
-      expect(@assignment.anonymous_grader_identities_by_user_id).not_to have_key @teacher.id
+      identities = @assignment.grader_identities
+      expect(identities.length).to eq 3
+      expect(identities.map { |i| i[:user_id] }).to eq [@teacher.id, second_teacher.id, third_teacher.id]
     end
   end
 
-  describe "#anonymous_grader_identities_by_anonymous_id" do
+  describe "anonymous grader identity methods" do
     before(:once) do
       @teacher = User.create!
       @course.enroll_teacher(@teacher, enrollment_state: :active)
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 2, final_grader: @teacher)
+      @grader = @assignment.create_moderation_grader(@teacher, occupy_slot: true)
     end
 
-    it "includes users that have taken a grader slot" do
-      grader = @assignment.create_moderation_grader(@teacher, occupy_slot: true)
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).to have_key grader.anonymous_id
+    it "#anonymous_grader_identities_by_user_id integrates properly with the Assignment model and ModerationGrader" do
+      identities = @assignment.anonymous_grader_identities_by_user_id
+      expect(identities[@teacher.id][:id]).to eq @grader.anonymous_id
+      expect(identities[@teacher.id][:name]).to eq "Grader 1"
     end
 
-    it "assigns grader names based on the ordered anonymous IDs" do
-      second_teacher = User.create!
-      @course.enroll_teacher(second_teacher, enrollment_state: :active)
-      @assignment.moderation_graders.create!(user: @teacher, anonymous_id: "bbbbb", slot_taken: true)
-      grader = @assignment.moderation_graders.create!(user: second_teacher, anonymous_id: "aaaaa", slot_taken: true)
-      anonymous_name = @assignment.anonymous_grader_identities_by_anonymous_id.dig(grader.anonymous_id, :name)
-      expect(anonymous_name).to eq "Grader 1"
-    end
-
-    it "excludes users that have not taken a grader slot" do
-      grader = @assignment.create_moderation_grader(@teacher, occupy_slot: false)
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key grader.anonymous_id
-    end
-
-    it "excludes users that do not have a moderation grader record for the assignment" do
-      expect(@assignment.anonymous_grader_identities_by_anonymous_id).not_to have_key @teacher.id
+    it "#anonymous_grader_identities_by_anonymous_id integrates properly with the Assignment model and ModerationGrader" do
+      identities = @assignment.anonymous_grader_identities_by_anonymous_id
+      expect(identities[@grader.anonymous_id][:id]).to eq @grader.anonymous_id
+      expect(identities[@grader.anonymous_id][:name]).to eq "Grader 1"
     end
   end
 
