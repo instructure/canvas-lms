@@ -21,6 +21,8 @@ import {
   getItemIcon,
   validateModuleStudentRenderRequirements,
   validateModuleItemStudentRenderRequirements,
+  validateModuleItemTeacherRenderRequirements,
+  validateModuleTeacherRenderRequirements,
   getIconColor,
   getItemTypeText,
   filterRequirementsMet,
@@ -301,6 +303,232 @@ describe('utils', () => {
         },
       }
       expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+  })
+
+  describe('validateModuleTeacherRenderRequirements', () => {
+    const defaultLockAt = new Date(Date.now())
+    const defaultProps = {
+      id: '1',
+      name: 'Module',
+      published: true,
+      hasActiveOverrides: false,
+      prerequisites: [],
+      completionRequirements: [],
+      requirementCount: 0,
+      lockAt: defaultLockAt.toISOString(),
+    }
+
+    it('should return true when the props are the same', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when the props are different - id', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        id: '2',
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - name', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        name: 'Module 2',
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - published', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        published: false,
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - hasActiveOverrides', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        hasActiveOverrides: true,
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - prerequisites', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        prerequisites: ['1'],
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - completionRequirements', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: ['1'],
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - requirementCount', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        requirementCount: 1,
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - lockAt', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        lockAt: '2025-06-27T12:52:56-06:00',
+      }
+      expect(validateModuleTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+  })
+
+  describe('validateModuleItemTeacherRenderRequirements', () => {
+    const defaultDueAt = new Date(Date.now())
+    const defaultProps = {
+      id: '1',
+      moduleId: '1',
+      published: true,
+      index: 0,
+      content: {
+        id: '1',
+        type: 'Assignment',
+        title: 'Assignment',
+        unlockAt: new Date(defaultDueAt.getTime() + 24 * 60 * 60 * 1000), // plus 1 day
+        dueAt: new Date(defaultDueAt.getTime() + 2 * 24 * 60 * 60 * 1000), // plus 2 day
+        lockAt: new Date(defaultDueAt.getTime() + 3 * 24 * 60 * 60 * 1000), // plus 3 day
+      },
+    }
+
+    it('should return true when the props are the same', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when the props are different - id', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        id: '2',
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - moduleId', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        moduleId: '2',
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - published', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        published: false,
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - index', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        index: 1,
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - content - dueAt', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        content: {
+          ...defaultProps.content,
+          dueAt: new Date(defaultDueAt.getTime() + 6 * 24 * 60 * 60 * 1000), // plus 6 day
+        },
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - content - lockAt', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        content: {
+          ...defaultProps.content,
+          lockAt: new Date(defaultDueAt.getTime() + 5 * 24 * 60 * 60 * 1000), // plus 5 day
+        },
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when the props are different - content - unlockAt', () => {
+      const prevProps = {
+        ...defaultProps,
+      }
+      const nextProps = {
+        ...defaultProps,
+        content: {
+          ...defaultProps.content,
+          unlockAt: new Date(defaultDueAt.getTime() + 4 * 24 * 60 * 60 * 1000), // plus 4 day
+        },
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
     })
   })
 

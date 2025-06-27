@@ -42,18 +42,11 @@ import {ModuleAction} from '../utils/types'
 import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
+import {validateModuleTeacherRenderRequirements} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
-const MemoizedModule = memo(Module, (prevProps, nextProps) => {
-  return (
-    prevProps.id === nextProps.id &&
-    prevProps.expanded === nextProps.expanded &&
-    prevProps.published === nextProps.published &&
-    prevProps.name === nextProps.name &&
-    prevProps.hasActiveOverrides === nextProps.hasActiveOverrides
-  )
-})
+const MemoizedModule = memo(Module, validateModuleTeacherRenderRequirements)
 
 const ALL_MODULES = 'all'
 const ModulesList: React.FC = () => {
