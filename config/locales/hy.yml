@@ -8847,6 +8847,7 @@ hy:
   last_item_79583712: "Վերջին տարրը՝"
   last_login_54565109: "Վերջին մուտք"
   last_modified_by_ca4bb5e1: "Ում կողմից է փոփոխվել վերջին անգամ"
+  last_run_c6eedd69: "Վերջին գործարկումը"
   last_used_17553fed: "Վերջին անգամ օգտագործվել է"
   last_user_access_title: "Օգտատիրոջ վերջին մուտքը համակարգ"
   late_assignment_user_name_assignment_name_2df32e01: "Ուշացված հանձնարարություն՝ %{user_name}, %{assignment_name}"
