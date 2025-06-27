@@ -141,6 +141,54 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
   )
 }
 
+export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
+  const basicPropsEqual =
+    prevProps.id === nextProps.id &&
+    prevProps.moduleId === nextProps.moduleId &&
+    prevProps.published === nextProps.published &&
+    prevProps.index === nextProps.index &&
+    prevProps.content?.title === nextProps.content?.title &&
+    prevProps.indent === nextProps.indent &&
+    prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
+    prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
+    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
+
+  if (!basicPropsEqual) return false
+
+  const prevOverrides = prevProps.content?.assignmentOverrides
+  const nextOverrides = nextProps.content?.assignmentOverrides
+
+  if (!!prevOverrides !== !!nextOverrides) return false
+
+  if (!prevOverrides && !nextOverrides) return true
+
+  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
+  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
+  if (prevEdgesCount !== nextEdgesCount) return false
+
+  if (prevEdgesCount > 0) {
+    const prevOverridesStr = JSON.stringify(prevOverrides)
+    const nextOverridesStr = JSON.stringify(nextOverrides)
+    return prevOverridesStr === nextOverridesStr
+  }
+
+  return true
+}
+
+export const validateModuleTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
+  return (
+    prevProps.id === nextProps.id &&
+    prevProps.expanded === nextProps.expanded &&
+    prevProps.published === nextProps.published &&
+    prevProps.name === nextProps.name &&
+    prevProps.hasActiveOverrides === nextProps.hasActiveOverrides &&
+    prevProps.prerequisites === nextProps.prerequisites &&
+    prevProps.completionRequirements === nextProps.completionRequirements &&
+    prevProps.requirementCount === nextProps.requirementCount &&
+    prevProps.lockAt === nextProps.lockAt
+  )
+}
+
 export const filterRequirementsMet = (
   requirementsMet: ModuleRequirement[],
   completionRequirements: CompletionRequirement[],
