@@ -277,7 +277,6 @@ module AssignmentVisibility
             AND g.workflow_state <> 'deleted'
             AND ao.workflow_state = 'active'
             AND o.workflow_state NOT IN ('deleted','unpublished')
-            AND o.only_visible_to_overrides = 'true'
           SQL
         end
 
