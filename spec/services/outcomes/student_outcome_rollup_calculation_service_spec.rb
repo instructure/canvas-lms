@@ -108,4 +108,30 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end.not_to raise_error
     end
   end
+
+  describe "#fetch_canvas_results" do
+    let(:outcome) { outcome_model(context: course) }
+    let(:alignment) { outcome.align(assignment_model(context: course), course) }
+
+    it "returns an empty array when no results exist" do
+      results = subject.send(:fetch_canvas_results)
+      expect(results).to eq([])
+    end
+
+    it "returns a learning outcome result associated to the user" do
+      user2 = user_model
+
+      [student, user2].each do |user|
+        LearningOutcomeResult.create!(
+          learning_outcome: outcome,
+          user:,
+          context: course,
+          alignment:
+        )
+      end
+
+      results = subject.send(:fetch_canvas_results)
+      expect(results.count).to eq(1)
+    end
+  end
 end

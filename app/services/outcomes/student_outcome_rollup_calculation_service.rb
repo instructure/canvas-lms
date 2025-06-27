@@ -86,8 +86,11 @@ module Outcomes
 
     # @return [Array<LearningOutcomeResult>]
     def fetch_canvas_results
-      # TODO: fetch results from Canvas
-      []
+      LearningOutcomeResult.where(
+        context_type: "Course",
+        context_id: @course.id,
+        user_id: @student.id
+      )
     end
 
     # @return [Array<LearningOutcomeResult>]
