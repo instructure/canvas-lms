@@ -65,7 +65,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   }
 
   return (
-    <Flex gap="xx-small">
+    <Flex gap="xx-small" padding="0 0 0 xx-small">
       <DueDateLabel content={content} contentTagId={contentTagId} />
 
       {hasDueOrLockDate && (hasPointsPossible || hasCompletionRequirement) && (
