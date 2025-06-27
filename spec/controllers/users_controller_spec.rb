@@ -215,9 +215,6 @@ describe UsersController do
 
       before do
         allow(SecureRandom).to receive(:hex).and_return(verifier)
-        # tool.use_1_3 = true
-        # tool.developer_key = developer_key
-        # tool.save!
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
 
@@ -257,9 +254,6 @@ describe UsersController do
         before do
           user.account.root_account.disable_feature!(:lti_deployment_id_in_login_request)
           allow(SecureRandom).to receive(:hex).and_return(verifier)
-          # tool.use_1_3 = true
-          # tool.developer_key = developer_key
-          # tool.save!
           get :external_tool, params: { id: tool.id, user_id: user.id }
         end
 
@@ -288,7 +282,6 @@ describe UsersController do
       end
 
       it "does not use the oidc_initiation_url as the resource_url" do
-        # HERE
         expect(assigns[:lti_launch].resource_url).to eq tool.url
       end
 
