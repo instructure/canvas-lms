@@ -14835,6 +14835,7 @@ nn:
   last_pushed_update_last_export_at_9f634f7c: "Sist oppdatert: %{last_export_at}"
   last_reply_lastreplyatdisplay_7a4af30: "Siste svar %{lastReplyAtDisplay}"
   last_reply_lastreplyatdisplaytext_f3d8ee3a: "Siste svar %{lastReplyAtDisplayText}"
+  last_run_c6eedd69: "Siste køyring"
   last_submission_activity_64ada9d0: "Siste innleveringsaktivitet"
   last_sync_5aac1ff1: "Siste synkronisering:"
   last_synced_datetime_1c3e0295: "Sist synkronisert: %{datetime}"
