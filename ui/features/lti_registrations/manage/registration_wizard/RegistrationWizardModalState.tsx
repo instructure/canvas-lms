@@ -49,6 +49,18 @@ export type RegistrationWizardModalState = {
   lti_version: '1p3' | '1p1'
   method: InstallMethod
   dynamicRegistrationUrl: string
+  isInstructureTool: boolean
+  /**
+   * True if we want to show a message telling the user that they
+   * should contact either the tool provider or their CSM for info
+   * about how to install the tool, since we don't have known
+   * configuration info for the tool from LearnPlatform.
+   *
+   * This should not be true if they're just opening the registration
+   * wizard for the dynamic registration process. This is only for
+   * when they've clicked something from LP on the Discover tab.
+   */
+  showBlankConfigurationMessage: boolean
   /**
    * Contains the state of the URL input for the JSON Url method
    */
@@ -112,6 +124,8 @@ export const useRegistrationModalWizardState = create<
   unifiedToolId: undefined,
   registering: false,
   exitOnCancel: false,
+  isInstructureTool: false,
+  showBlankConfigurationMessage: false,
   jsonFetch: {_tag: 'initial'},
   updateLtiVersion: version => set({lti_version: version}),
   updateMethod: method => set({method, jsonFetch: {_tag: 'initial'}}),

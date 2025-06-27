@@ -126,6 +126,8 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
       unifiedToolId: undefined,
       dynamicRegistrationUrl: '',
       lti_version: findLtiVersion(product.tool_integration_configurations),
+      isInstructureTool: product?.company?.name === 'Instructure',
+      showBlankConfigurationMessage: (product?.canvas_lti_configurations?.length || 0) === 0,
       method: 'manual',
       registering: false,
       exitOnCancel: false,
