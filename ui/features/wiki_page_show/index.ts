@@ -16,31 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import '@canvas/jquery/jquery.ajaxJSON'
 import ready from '@instructure/ready'
+import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/context-modules'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageView from './backbone/views/WikiPageView'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import '@canvas/module-sequence-footer'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
-$('body').addClass('show')
+interface WikiPageShowEnv {
+  MODULES_PATH: string
+  WIKI_PAGES_PATH: string
+  WIKI_PAGE_EDIT_PATH: string
+  WIKI_PAGE_HISTORY_PATH: string
+  WIKI_PAGE_REVISION: string
+  WIKI_RIGHTS: {[key: string]: boolean}
+  PAGE_RIGHTS: {[key: string]: boolean}
+  COURSE_HOME: string
+  COURSE_TITLE: string
+  DISPLAY_SHOW_ALL_LINK: boolean
+}
+declare const ENV: GlobalEnv & WikiPageShowEnv
+
+document.body.classList.add('show')
 
 ready(() => {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'wiki_page', page: 'show'})
 
-  $('#content').on('click', '#mark-as-done-checkbox', function () {
-    MarkAsDone.toggle(this)
+  const content = document.getElementById('content')
+  if (content === null) throw new Error('Content element not found')
+  content.addEventListener('click', e => {
+    const checkbox = (e.target as HTMLElement).closest('#mark-as-done-checkbox')
+    if (checkbox) MarkAsDone.toggle(checkbox)
   })
 
+  // @ts-expect-error
   const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
     revision: ENV.WIKI_PAGE_REVISION,
     contextAssetString: ENV.context_asset_string,
   })
 
+  // @ts-expect-error
   const wikiPageView = new WikiPageView({
     el: '#wiki_page_show',
     model: wikiPage,
@@ -58,7 +77,3 @@ ready(() => {
 
   wikiPageView.render()
 })
-
-export function Component() {
-  return null
-}
