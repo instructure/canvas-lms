@@ -339,6 +339,18 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.require_initial_post?).to be_falsey
     end
 
+    it "creates attachment associations when a file is attached" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      api_call(:post,
+               "/api/v1/courses/#{@course.id}/discussion_topics",
+               { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
+               { title: "test title", message: aa_test_data.base_html })
+      @topic = @course.discussion_topics.order(:id).last
+      aas = AttachmentAssociation.where(context_type: "DiscussionTopic", context_id: @topic.id)
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
     it "will not create an announcement with sections if context is a group" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
@@ -1582,6 +1594,38 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.require_initial_post?).to be true
       end
 
+      it "updates attachment associations when a new file is attached" do
+        aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { message: aa_test_data.base_html })
+        @topic.reload
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { message: aa_test_data.added_html })
+        aas = AttachmentAssociation.where(context_type: "DiscussionTopic", context_id: @topic.id)
+        expect(aas.count).to eq 2
+        attachment_ids = aas.pluck(:attachment_id)
+        expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+      end
+
+      it "updates attachment associations when no file is attached" do
+        aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { message: aa_test_data.base_html })
+        @topic.reload
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                 { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
+                 { message: aa_test_data.removed_html })
+        aas = AttachmentAssociation.where(context_type: "DiscussionTopic", context_id: @topic.id)
+        expect(aas.count).to eq 0
+      end
+
       it "returns section count if section specific" do
         post_at = 1.month.from_now
         lock_at = 2.months.from_now
@@ -2631,6 +2675,25 @@ describe DiscussionTopicsController, type: :request do
       expect(@entry.message).to eq @message
     end
 
+    it "creates attachment associations for an entry is a file is attached" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+      json = api_call(
+        :post,
+        "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
+        { controller: "discussion_topics_api",
+          action: "add_entry",
+          format: "json",
+          course_id: @course.id.to_s,
+          topic_id: @topic.id.to_s },
+        { message: aa_test_data.base_html }
+      )
+      expect(json).not_to be_nil
+      expect(json["id"]).not_to be_nil
+      aas = AttachmentAssociation.where(context_type: "DiscussionEntry", context_id: json["id"])
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
     it "does not allow students to create an entry under a topic that is closed for comments" do
       @topic.lock!
       student_in_course(course: @course, active_all: true)
@@ -3270,6 +3333,30 @@ describe DiscussionTopicsController, type: :request do
                { controller: "discussion_entries", action: "update", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, id: @entry.id.to_s },
                { message: "<p>i had a spleling error</p>" })
       expect(@entry.reload.message).to eq "<p>i had a spleling error</p>"
+    end
+
+    it "updates attachment associations if the entry message has changed" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+      api_call(:put,
+               "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { controller: "discussion_entries", action: "update", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, id: @entry.id.to_s },
+               { message: aa_test_data.added_html })
+
+      aas = AttachmentAssociation.where(context_type: "DiscussionEntry", context_id: @entry.id)
+      expect(aas.count).to eq 2
+      attachment_ids = aas.pluck(:attachment_id)
+      expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+    end
+
+    it "removes attachment associations if the entry message has changed" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@user.account, @user)
+      api_call(:put,
+               "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
+               { controller: "discussion_entries", action: "update", format: "json", course_id: @course.id.to_s, topic_id: @topic.id.to_s, id: @entry.id.to_s },
+               { message: aa_test_data.removed_html })
+
+      aas = AttachmentAssociation.where(context_type: "DiscussionEntry", context_id: @entry.id)
+      expect(aas.count).to eq 0
     end
 
     it "allows passing an plaintext message (undocumented)" do
