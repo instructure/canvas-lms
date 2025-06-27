@@ -13597,6 +13597,7 @@ hu:
   last_post_at_date_bf77652f: "Utolsó bejegyzés ideje %{date}"
   last_pushed_update_last_export_at_9f634f7c: "Utolsó ráküldött frissítés: %{last_export_at}"
   last_reply_lastreplyatdisplay_7a4af30: "Utolsó válasz %{lastReplyAtDisplay}"
+  last_run_c6eedd69: "Utolsó futtatás"
   last_submission_activity_64ada9d0: "Utolsó Beadási tevékenység"
   last_sync_5aac1ff1: "Utolsó szinkronizálás:"
   last_synced_datetime_1c3e0295: "Utoljára szinkronizálva:%{datetime}"
