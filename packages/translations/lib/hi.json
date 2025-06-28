@@ -521,6 +521,9 @@
     "decrease_indent_d9cf469d": {
         "message": "इंडेंट घटाएं"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "रिच कॉन्टेंट एरिया घटाएं"
+    },
     "deep_purple_bb3e2907": {
         "message": "गहरा बैंगनी"
     },
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "इंडेंट बढ़ाएं"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "रिच कॉन्टेंट एरिया बढ़ाएं"
     },
     "indefinite_integral_6623307e": {
         "message": "अनिश्चित अभिन्न"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "किसी पेज पर पहली हेडिंग H2 होनी चाहिए।"
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "रिच कॉन्टेंट एरिया की ऊंचाई घट गई है।"
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "रिच कॉन्टेंट एरिया की ऊंचाई बढ़ गई है।"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "यह सामग्री सार्वजनिक डोमेन में है"

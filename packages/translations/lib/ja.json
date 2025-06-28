@@ -521,6 +521,9 @@
     "decrease_indent_d9cf469d": {
         "message": "インデントを減らす"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "リッチコンテンツ領域の高さを縮小する"
+    },
     "deep_purple_bb3e2907": {
         "message": "ディープパープル"
     },
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "インデントを増やす"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "リッチコンテンツ領域の高さを拡大する"
     },
     "indefinite_integral_6623307e": {
         "message": "不定積分"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "ページの最初のヘッダーはH2であるべきです。"
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "リッチコンテンツ領域の高さが縮小されました。"
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "リッチコンテンツ領域の高さが拡大されました。"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "この資料はパブリック ドメインです"
