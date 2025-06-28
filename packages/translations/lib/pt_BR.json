@@ -521,6 +521,9 @@
     "decrease_indent_d9cf469d": {
         "message": "Diminuir Recuo"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Diminuir a área de conteúdo avançado"
+    },
     "deep_purple_bb3e2907": {
         "message": "Roxo Profundo"
     },
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "Aumentar recuo"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "Aumentar a área de conteúdo avançado"
     },
     "indefinite_integral_6623307e": {
         "message": "Integral indefinida"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "O primeiro cabeçalho em uma página deve ser um H2."
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "A altura da área de conteúdo avançado é reduzida."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "A altura da área de conteúdo avançado é aumentada."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "O material está no domínio público"

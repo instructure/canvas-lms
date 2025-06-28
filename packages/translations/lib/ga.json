@@ -168,7 +168,7 @@
         "message": "Seinnteoir fuaime le haghaidh { title }"
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
-        "message": "Tá ábhar uathshábháilte ann. Ar mhaith leat an ábhar uathsábháilte a lódáil ina ionad sin?"
+        "message": "Is ann d’ábhar uathshábháilte. Ar mhaith leat an t-ábhar sin a lódáil nó é a scriosadh?"
     },
     "available_folders_694d0436": {
         "message": "Fillteáin atá ar fáil"
@@ -429,7 +429,7 @@
         "message": "Áireamh"
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
-        "message": "{ count, plural,\n     =0 {0 focal}\n    one {1 focal}\n  other {An líon seo focail: #}\n}"
+        "message": "{ count, plural,\n     =0 {Líon Focal: 0}\n    one {Líon Focal: 1}\n  other {Líon Focal: #}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# mír lódáite}\n  other {# míreanna lódáilte}\n}"
@@ -520,6 +520,9 @@
     },
     "decrease_indent_d9cf469d": {
         "message": "Laghdaigh Eang"
+    },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Laghdaigh Limistéar Ábhar Saibhir"
     },
     "deep_purple_bb3e2907": {
         "message": "Dúchorcra"
@@ -897,7 +900,7 @@
         "message": "Slais Ar aghaidh"
     },
     "found_auto_saved_content_3f6e4ca5": {
-        "message": "Aimsíodh ábhar uath-shábháilte"
+        "message": "Aimsíodh ábhar uathshábháilte"
     },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Aimsíodh { count, plural,\n     =0 {# torthaí}\n    one {# toradh}\n  other {# torthaí}\n}"
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "Méadaigh Eang"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "Méadaigh an Limistéar Ábhar Saibhir"
     },
     "indefinite_integral_6623307e": {
         "message": "Slánuimhreach Éiginnte"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Ba chóir gur H2 an chéad cheannteideal ar leathanach."
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Tá airde an Limistéir Ábhar Saibhir laghdaithe."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Tá airde an Limistéir Ábhar Saibhir méadaithe."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Tá an t-ábhar sa fhearann poiblí"
