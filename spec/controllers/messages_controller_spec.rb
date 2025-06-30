@@ -63,8 +63,21 @@ describe MessagesController do
     end
 
     context "with unsafe HTML input" do
-      let(:html_body) { '<div>Safe</div><script>alert("XSS")</script>' }
       let(:message) { Message.create!(user: @user, subject: "Test", html_body:, sent_at: Time.zone.now) }
+      let(:html_body) do
+        <<~HTML
+          <div>Safe</div>
+          <script>alert("XSS")</script>
+          <p>Paragraph</p>
+          <img src="x" onerror="alert('XSS')">
+          <svg/onload=alert(1)>
+          <body onload=alert(1)>
+          "><input onfocus=alert(1) autofocus>Hello
+          <a href="javascript:alert(1)">Click</a>
+          <meta http-equiv="refresh" content="0;url=javascript:alert(1)">
+          <sCrIpT>alert(1)</ScRiPt>
+        HTML
+      end
 
       it "does not allow unsanitized HTML" do
         get :html_message, params: { user_id: @user.to_param, message_id: message.id }
@@ -73,6 +86,8 @@ describe MessagesController do
         expect(response.body).not_to include("<script>")
         expect(response.body).not_to include("alert(")
         expect(response.body).to include("<div>Safe</div>")
+        expect(response.body).to include("Click")
+        expect(response.body).to include("Hello")
       end
     end
 
