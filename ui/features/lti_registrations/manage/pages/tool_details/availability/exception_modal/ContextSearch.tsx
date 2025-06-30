@@ -194,6 +194,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
         showingOptions: false,
         isShowingOptions: false,
       }))
+      setSearchText('')
       if (props.onSelectContext) {
         props.onSelectContext(
           option.type === 'course'
@@ -208,7 +209,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
         )
       }
     },
-    [getOptionById, props.onSelectContext],
+    [getOptionById, props.onSelectContext, setSearchTextDebounced, setState],
   )
 
   const handleInputChange = React.useCallback(
