@@ -73,7 +73,7 @@ const renderLoading = () => {
   return (
     <Flex direction="column" alignItems="center" margin="small 0">
       <Flex.Item shouldGrow>
-        <Spinner renderTitle="Loading accessibility issues" size="large" margin="0 0 0 medium" />
+        <Spinner renderTitle="Loading accessibility issues" size="large" margin="none" />
       </Flex.Item>
       <Flex.Item>
         <PresentationContent>{I18n.t('Loading accessibility issues')}</PresentationContent>
@@ -189,7 +189,7 @@ export const AccessibilityIssuesTable = ({
             </Table.Row>
           )}
           {isLoading && (
-            <Table.Row data-testid="no-issues-row">
+            <Table.Row data-testid="loading-row">
               <Table.Cell colSpan={5} textAlign="center">
                 {renderLoading()}
               </Table.Cell>

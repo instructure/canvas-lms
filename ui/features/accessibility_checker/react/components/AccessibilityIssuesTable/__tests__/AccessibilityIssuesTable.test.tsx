@@ -45,14 +45,35 @@ describe('AccessibilityIssuesTable', () => {
     },
   ]
 
-  it('renders without crashing', () => {
-    render(<AccessibilityIssuesTable tableData={[]} />)
+  it('renders empty table without crashing', () => {
+    const {rerender} = render(<AccessibilityIssuesTable isLoading={true} tableData={undefined} />)
     expect(screen.getByTestId('accessibility-issues-table')).toBeInTheDocument()
+    rerender(<AccessibilityIssuesTable isLoading={false} tableData={[]} />)
+    expect(screen.getByTestId(/^no-issues-row/)).toBeInTheDocument()
   })
 
-  it('displays the correct number of rows', () => {
+  it('renders the loading state correctly', () => {
+    const {rerender} = render(<AccessibilityIssuesTable isLoading={true} tableData={undefined} />)
+    expect(screen.getByTestId('loading-row')).toBeInTheDocument()
+    rerender(<AccessibilityIssuesTable isLoading={false} tableData={testData} />)
+    expect(screen.queryByTestId('loading-row')).not.toBeInTheDocument()
+  })
+
+  it('renders the correct number of rows', () => {
     render(<AccessibilityIssuesTable tableData={testData} />)
     expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(testData.length)
+  })
+
+  it('renders the error state correctly', () => {
+    const errorMessage = 'An error occurred while fetching data'
+    const {rerender} = render(
+      <AccessibilityIssuesTable error={errorMessage} isLoading={false} tableData={undefined} />,
+    )
+    expect(screen.getByTestId('error-row')).toBeInTheDocument()
+    expect(screen.getByText(errorMessage)).toBeInTheDocument()
+    rerender(<AccessibilityIssuesTable error={undefined} isLoading={false} tableData={testData} />)
+    expect(screen.queryByTestId('error-row')).not.toBeInTheDocument()
+    expect(screen.queryByText(errorMessage)).not.toBeInTheDocument()
   })
 
   it('calls onSortRequest with the proper arguments when a column header is clicked', () => {
