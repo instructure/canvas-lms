@@ -365,4 +365,30 @@ describe('ExceptionModal', () => {
     expect(onConfirm).not.toHaveBeenCalled()
     expect(onClose).toHaveBeenCalled()
   })
+
+  it('clears the search filter after a context is selected', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    renderWithQueryClient(
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={jest.fn()}
+        onConfirm={jest.fn()}
+      />,
+    )
+
+    const input = screen.getByPlaceholderText(/search by sub-accounts or courses/i)
+    input.focus()
+    await userEvent.paste('Subaccount')
+    await screen.findByText('Subaccount 101')
+
+    await userEvent.click(screen.getByText('Subaccount 101'))
+
+    expect(input).toHaveValue('')
+
+    await userEvent.click(input) // Refocus the input
+    // Subaccount 102 should be in the list since we cleared the filter
+    expect(await screen.findByText('Subaccount 102')).toBeInTheDocument()
+  })
 })
