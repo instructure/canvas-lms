@@ -189,7 +189,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
       if (!option) return // prevent selecting of empty option
       setState(state => ({
         ...state,
-        selectedOptionId: data.id,
+        selectedOptionId: undefined,
         inputValue: '',
         showingOptions: false,
         isShowingOptions: false,
