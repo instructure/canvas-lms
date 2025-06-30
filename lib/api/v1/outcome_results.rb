@@ -139,8 +139,7 @@ module Api::V1::OutcomeResults
   def outcome_results_include_alignments_json(alignments)
     alignments.map do |alignment|
       hash = { id: alignment.asset_string, name: alignment.title }
-      html_url = alignment.is_a?(LiveAssessments::Assessment) ? "" : polymorphic_url([alignment.context, alignment])
-      hash[:html_url] = html_url if html_url
+      hash[:html_url] = outcome_alignment_html_url(alignment)
       hash
     end
   end
@@ -150,9 +149,19 @@ module Api::V1::OutcomeResults
       {
         id: a.asset_string,
         name: a.title,
-        html_url: a.is_a?(LiveAssessments::Assessment) ? "" : polymorphic_url([a.context, a]),
+        html_url: outcome_alignment_html_url(a),
         submission_types: a.try(:submission_types) || "magic_marker"
       }
+    end
+  end
+
+  def outcome_alignment_html_url(alignment)
+    if alignment.nil? || alignment.is_a?(LiveAssessments::Assessment)
+      ""
+    elsif alignment.is_a?(AssessmentQuestionBank)
+      course_question_bank_url(course_id: alignment.context.id, id: alignment.id)
+    else
+      polymorphic_url([alignment.context, alignment])
     end
   end
 
