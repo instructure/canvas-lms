@@ -1405,16 +1405,16 @@ describe CoursesController do
       assert_unauthorized
     end
 
-    it "includes analytics 2 link if installed" do
-      tool = analytics_2_tool_factory
-      Account.default.enable_feature!(:analytics_2)
+    it "includes admin analytics link if installed" do
+      tool = admin_analytics_tool_factory(context: @course)
+      @course.enable_feature!(:analytics_2)
 
       get "show", params: { id: @course.id }
       expect(controller.course_custom_links).to include({
-                                                          text: "Analytics 2",
+                                                          text: "Admin Analytics",
                                                           url: "http://test.host/courses/#{@course.id}/external_tools/#{tool.id}?launch_type=course_navigation",
                                                           icon_class: "icon-analytics",
-                                                          tool_id: ContextExternalTool::ANALYTICS_2
+                                                          tool_id: ContextExternalTool::ADMIN_ANALYTICS
                                                         })
     end
 

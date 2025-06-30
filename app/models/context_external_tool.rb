@@ -126,7 +126,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   DISABLED_STATE = "disabled"
   QUIZ_LTI = "Quizzes 2"
-  ANALYTICS_2 = "fd75124a-140e-470f-944c-114d2d93bb40"
   ADMIN_ANALYTICS = "admin-analytics"
   PREFERRED_LTI_VERSION = "1_3"
 
@@ -1208,12 +1207,9 @@ class ContextExternalTool < ActiveRecord::Base
 
   def feature_flag_enabled?(context = nil)
     context ||= self.context
-
-    if tool_id == ANALYTICS_2
-      context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
-    elsif tool_id == ADMIN_ANALYTICS
+    if tool_id == ADMIN_ANALYTICS
       if context.is_a?(Course)
-        context.feature_enabled?(:analytics_2_lti_13_enabled) && context.feature_enabled?(:analytics_2)
+        context.feature_enabled?(:analytics_2)
       else
         context.feature_enabled?(:admin_analytics)
       end

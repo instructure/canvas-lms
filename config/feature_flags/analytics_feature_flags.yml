@@ -10,24 +10,6 @@ analytics_2:
       to ON.
   after_state_change_proc: analytics_2_after_state_change_hook
   beta: false
-analytics_2_attendance_config_v2:
-  state: hidden
-  applies_to: Account
-  display_name: New Analytics - Attendance Config V2
-  description:
-    analytics_2_attendance_config_v2_description: Use dynamo for attendance config - course analytics
-  root_opt_in: true
-  beta: true
-  shadow: true
-analytics_2_lti_13_enabled:
-  state: hidden
-  applies_to: Course
-  display_name: New Analytics - LTI 1.3 Enabled
-  description:
-    analytics_2_lti_1p3_enabled_description: Enables the LTI 1.3 New Analytics implementation.
-  beta: true
-  shadow: true
-  after_state_change_proc: analytics_2_after_state_change_hook
 hide_legacy_course_analytics:
   state: hidden
   applies_to: Course
@@ -114,15 +96,6 @@ k20_students_in_need_of_attention:
   display_name: Intelligent Insights - Students in Need of Attention
   description:
     k20_students_in_need_of_attention: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission.
-  root_opt_in: true
-  beta: true
-  shadow: true
-k20_lti_usage:
-  state: hidden
-  applies_to: Account
-  display_name: Intelligent Insights - LTI Usage Dashboard
-  description:
-    k20_lti_usage:  Enables the LTI Usage Dashboard and accompanying permission.
   root_opt_in: true
   beta: true
   shadow: true
