@@ -1008,6 +1008,9 @@ class Course < ActiveRecord::Base
     types = types.map { |type| "#{type.capitalize}Enrollment" }
     where(Enrollment.active.where("enrollments.course_id=courses.id").where(type: types).arel.exists)
   }
+  scope :with_enrollment_workflow_states, lambda { |states|
+    where(Enrollment.where("enrollments.course_id=courses.id").where(workflow_state: states).arel.exists)
+  }
   scope :without_enrollments, lambda {
     where.not(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
   }

@@ -26,6 +26,7 @@ class Enrollment < ActiveRecord::Base
     "StudentEnrollment" => "student",
     "ObserverEnrollment" => "observer"
   }.freeze
+  WORKFLOW_STATES = %w[active completed deleted invited pending creation_pending rejected inactive"].freeze
 
   include Workflow
 

@@ -106,7 +106,10 @@ describe('CoursesToolbar', () => {
 
       expect(props.draftFilters.enrollment_type).toBe(null)
       enrollCheck.click()
-      expect(props.onUpdateFilters).toHaveBeenCalledWith({enrollment_type: ['student']})
+      expect(props.onUpdateFilters).toHaveBeenCalledWith({
+        enrollment_type: ['student'],
+        enrollment_workflow_state: ['active', 'invited', 'pending'],
+      })
     })
 
     it('onUpdateFilter is called when public courses checkbox is clicked', () => {

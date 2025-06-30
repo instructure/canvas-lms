@@ -685,6 +685,10 @@ class AccountsController < ApplicationController
   #   If set, only return courses that have at least one user enrolled in
   #   in the course with one of the specified enrollment types.
   #
+  # @argument enrollment_workflow_state[] [String, "active"|"completed"|"deleted"|"invited"|"pending"|"creation_pending"|"rejected"|"inactive"]
+  #   If set, only return courses that have at least one user enrolled in
+  #   in the course with one of the specified enrollment workflow states.
+  #
   # @argument published [Boolean]
   #   If true, include only published courses.  If false, exclude published
   #   courses.  If not present, do not filter on published status.
@@ -821,6 +825,16 @@ class AccountsController < ApplicationController
       @courses = @courses.with_enrollment_types(params[:enrollment_type])
     end
 
+    if params.key?(:enrollment_workflow_state)
+      workflow_states = params[:enrollment_workflow_state]
+
+      if (Array(workflow_states) - Enrollment::WORKFLOW_STATES).empty?
+        @courses = @courses.with_enrollment_workflow_states(workflow_states)
+      else
+        return render json: { message: "Invalid value provided to 'enrollment_workflow_state'" }, status: :bad_request
+      end
+    end
+
     if value_to_boolean(params[:completed])
       @courses = @courses.completed
     elsif !params[:completed].nil? && !value_to_boolean(params[:completed])
@@ -891,8 +905,8 @@ class AccountsController < ApplicationController
           @courses.where(
             TeacherEnrollment.active.joins(:user).where(
               ActiveRecord::Base.wildcard("users.name", params[:search_term])
-            ).where(
-              "enrollments.workflow_state NOT IN ('rejected', 'inactive', 'completed', 'deleted') AND enrollments.course_id=courses.id"
+            ).active_or_pending.where(
+              "enrollments.course_id=courses.id"
             ).arel.exists
           )
       else
@@ -941,7 +955,7 @@ class AccountsController < ApplicationController
       ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
-        student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+        student_counts = StudentEnrollment.shard(@account.shard).not_fake.active_or_pending
                                           .where(course_id: @courses).group(:course_id).distinct.count(:user_id)
         @courses.each { |c| c.student_count = student_counts[c.id] || 0 }
       end
