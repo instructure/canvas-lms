@@ -344,4 +344,25 @@ describe('ExceptionModal', () => {
       ]),
     )
   })
+
+  it('does not call onConfirm when Done is clicked with no selected exceptions, but does call onClose', async () => {
+    const accountId = ZAccountId.parse('1')
+    const openState = {open: true, deployment: mockDeployment({})}
+    const onClose = jest.fn()
+    const onConfirm = jest.fn()
+    renderWithQueryClient(
+      <ExceptionModal
+        accountId={accountId}
+        openState={openState}
+        onClose={onClose}
+        onConfirm={onConfirm}
+      />,
+    )
+
+    const doneBtn = screen.getByRole('button', {name: /done/i})
+    await userEvent.click(doneBtn)
+
+    expect(onConfirm).not.toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
+  })
 })

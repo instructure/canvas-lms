@@ -205,12 +205,14 @@ export const ExceptionModal = ({openState, onClose, accountId, onConfirm}: Excep
           type="submit"
           disabled={disableView}
           onClick={() => {
-            if (openState.open === true) {
+            if (openState.open === true && contextControlForm.length > 0) {
               confirmHandler
                 .mutateAsync(
                   contextControlForm.map(convertToContextControl(openState.deployment.id)),
                 )
                 .finally(close)
+            } else {
+              close()
             }
           }}
         >
