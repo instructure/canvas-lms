@@ -288,11 +288,12 @@ class SectionsController < ApplicationController
   #
   # @returns Section
   def uncrosslist
+    source = api_request? ? :api : :manual
     @new_course = @section.nonxlist_course
     return render(json: { message: "section is not cross-listed" }, status: :bad_request) if @new_course.nil?
 
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
-      @section.uncrosslist(updating_user: @current_user) if !params[:override_sis_stickiness] || value_to_boolean(params[:override_sis_stickiness])
+      @section.uncrosslist(updating_user: @current_user, source:) if !params[:override_sis_stickiness] || value_to_boolean(params[:override_sis_stickiness])
       respond_to do |format|
         flash[:notice] = t("section_decrosslisted", "Section successfully de-cross-listed!")
         format.html { redirect_to named_context_url(@new_course, :context_section_url, @section.id) }
