@@ -56,7 +56,7 @@ export const RenameModal = ({
   const [errorMessages, setErrorMessages] = useState<FormMessage[]>()
   const [isRequestInFlight, setIsRequestInFlight] = useState(false)
   const inputRef = useRef<TextInput>(null)
-  const {currentRows, setCurrentRows} = useRows()
+  const {currentRows, setCurrentRows, setSessionExpired} = useRows()
 
   const handleSave = () => {
     const trimmedNewItemName = newItemName.trim()
@@ -96,7 +96,7 @@ export const RenameModal = ({
       })
       .catch(err => {
         if (err instanceof UnauthorizedError) {
-          window.location.href = '/login'
+          setSessionExpired(true)
           return
         }
         if (err?.response?.status == 409) {

@@ -24,8 +24,10 @@ import {queryClient} from '@canvas/query'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 
 const defaultProps = {
   isOpen: true,
@@ -37,7 +39,9 @@ const renderComponent = (props = {}) => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <MockedQueryClientProvider client={queryClient}>
-        <CreateFolderModal {...defaultProps} {...props} />
+        <RowsProvider value={mockRowsContext}>
+          <CreateFolderModal {...defaultProps} {...props} />
+        </RowsProvider>
       </MockedQueryClientProvider>
     </FileManagementProvider>,
   )

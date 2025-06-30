@@ -44,6 +44,7 @@ import BulkActionButtons from './FileFolderTable/BulkActionButtons'
 import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
+import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
 
 const I18n = createI18nScope('files_v2')
 
@@ -60,6 +61,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const [currentRows, setCurrentRows] = useState<(File | Folder)[]>([])
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const [rowToFocus, setRowToFocus] = useState<number | SELECT_ALL_FOCUS_STRING | null>(null)
+  const [sessionExpired, setSessionExpired] = useState(false)
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
   const fileDropRef = useRef<HTMLInputElement | null>(null)
   const selectAllRef = useRef<Checkbox | null>(null)
@@ -174,7 +176,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       }}
     >
       <RowFocusProvider value={{setRowToFocus, handleActionButtonRef}}>
-        <RowsProvider value={{setCurrentRows, currentRows}}>
+        <RowsProvider value={{setCurrentRows, currentRows, setSessionExpired}}>
           <FilesLayout
             size={size}
             title={I18n.t('Files')}
@@ -248,6 +250,10 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 )}
               </>
             }
+          />
+          <FilesGenericSessionExpired
+            isOpen={sessionExpired}
+            onClose={() => setSessionExpired(false)}
           />
         </RowsProvider>
       </RowFocusProvider>

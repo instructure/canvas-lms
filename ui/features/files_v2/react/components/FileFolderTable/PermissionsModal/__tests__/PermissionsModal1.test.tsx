@@ -26,6 +26,7 @@ import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import PermissionsModal from '../PermissionsModal'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -38,7 +39,7 @@ const defaultProps = {
 const renderComponent = (props?: any) =>
   render(
     <FileManagementProvider value={createMockFileManagementContext()}>
-      <RowsProvider value={{currentRows: FAKE_FOLDERS_AND_FILES, setCurrentRows: jest.fn()}}>
+      <RowsProvider value={mockRowsContext}>
         <PermissionsModal {...defaultProps} {...props} />
       </RowsProvider>
     </FileManagementProvider>,
@@ -200,7 +201,7 @@ describe('PermissionsModal', () => {
       it('when is not a course context', async () => {
         render(
           <FileManagementProvider value={createMockFileManagementContext({contextType: 'user'})}>
-            <RowsProvider value={{currentRows: FAKE_FOLDERS_AND_FILES, setCurrentRows: jest.fn()}}>
+            <RowsProvider value={mockRowsContext}>
               <PermissionsModal {...defaultProps} />
             </RowsProvider>
           </FileManagementProvider>,

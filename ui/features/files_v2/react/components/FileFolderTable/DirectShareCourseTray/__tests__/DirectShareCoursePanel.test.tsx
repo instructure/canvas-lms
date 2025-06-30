@@ -23,7 +23,9 @@ import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useM
 import useModuleCourseSearchApi, {
   useCourseModuleItemApi,
 } from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
+import {RowsProvider} from '../../../../contexts/RowsContext'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
@@ -37,7 +39,11 @@ const defaultProps = {
 }
 
 const renderComponent = (props = {}) =>
-  render(<DirectShareCoursePanel {...defaultProps} {...props} />)
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <DirectShareCoursePanel {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 
 describe('DirectShareCoursePanel', () => {
   let ariaLive: HTMLElement
