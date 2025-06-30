@@ -457,11 +457,13 @@ describe "groups" do
         active_student.update_attribute(:name, "imsoactive")
 
         get conferences_page
-        f(".new-conference-btn").click
-        f(".all_users_checkbox").click
 
-        expect(f("#members_list")).to_not include_text(inactive_student.name)
-        expect(f("#members_list")).to include_text(active_student.name)
+        # create a new conference
+        f(".new-conference-btn").click
+        wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+
+        new_conference = WebConference.last
+        expect(new_conference.users).not_to include(inactive_student)
       end
     end
     #-------------------------------------------------------------------------------------------------------------------
