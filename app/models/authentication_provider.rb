@@ -315,6 +315,7 @@ class AuthenticationProvider < ActiveRecord::Base
       pseudonym.unique_ids = unique_ids
       pseudonym.save!
       apply_federated_attributes(pseudonym, provider_attributes, purpose: :provisioning)
+      try(:post_provision_user, pseudonym:, provider_attributes:)
       pseudonym
     end
   rescue ActiveRecord::RecordNotUnique
@@ -410,6 +411,7 @@ class AuthenticationProvider < ActiveRecord::Base
       if user.changed? && !user.save
         Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
       end
+      try(:post_federated_attribute_application, pseudonym:, provider_attributes:)
     end
   end
 
