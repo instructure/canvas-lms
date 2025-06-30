@@ -46,69 +46,98 @@ export default class QuizArrowApplicator {
       .find(
         '.short_answer_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper, #questions.show_correct_answers:not(.survey_results):not(.survey_quiz) .equation_combinations_holder_holder.calculated_question_answers',
       )
-    this.unansweredQ = $('.question.unanswered')
+
+    this.shortAnswers = this.$questions
+      .filter(':not(.survey_results)')
+      .find(
+        '#questions:not(.survey_results):not(.survey_quiz) .numerical_question .answers_wrapper',
+      )
+
+    this.unansweredQ = $('#questions:not(.question_editing) .question.unanswered')
+    this.answeredCorrectQ = $('#questions:not(.survey_results) .question.correct')
+    this.answeredIncorrectQ = $(
+      '#questions:not(.survey_results) .question.incorrect:not(.unanswered)',
+    )
+
+    this.supressAnswers = $('#questions.suppress_correct_answers:not(.survey_results)').length > 0
     this.creditPartial = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit .header .question_name',
+      '#questions.suppress_correct_answers:not(.survey_results) .question.partial_credit',
     )
     this.creditFull = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.correct .header .question_name',
+      '#questions.suppress_correct_answers:not(.survey_results) .question.correct',
     )
     this.creditNone = $(
-      '#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered) .header .question_name',
+      '#questions.suppress_correct_answers:not(.survey_results) .question.incorrect:not(.unanswered)',
     )
-    this.surveyAnswers = $('#questions.survey_results .selected_answer')
+
     this.rightTpl = $('<span />', {class: 'answer_arrow correct'})
     this.wrongTpl = $('<span />', {class: 'answer_arrow incorrect'})
     this.correctTpl = $('<span />', {class: 'answer_arrow info'})
-    this.shortTpl = $('<span />', {class: 'answer_arrow info'})
-    this.unansweredTpl = $('<span />', {class: 'answer_indicator incorrect'})
-    this.creditFullTpl = $('<span />', {class: 'answer_arrow correct'})
-    this.creditPartialTpl = $('<span />', {class: 'answer_arrow incorrect'})
-    this.creditNoneTpl = $('<span />', {class: 'answer_arrow incorrect'})
-    this.surveyAnswerTpl = $('<span />', {class: 'answer_arrow info'})
-  }
 
-  applyCSS() {
-    $.each(
-      [this.rightTpl, this.wrongTpl, this.correctTpl, this.shortTpl, this.surveyAnswerTpl],
-      function () {
-        this.css({[direction('left')]: -128, top: 5})
-      },
-    )
-    $.each([this.creditFullTpl, this.creditNoneTpl, this.creditPartialTpl], function () {
-      this.css({[direction('left')]: -108, top: 9})
-    })
+    this.shortTpl = $('<span />', {class: 'answer_arrow info'})
+
+    this.creditFullTpl = $('<span />', {class: 'answer_indicator correct'})
+    this.creditPartialTpl = $('<span />', {class: 'answer_indicator incorrect'})
+    this.creditNoneTpl = $('<span />', {class: 'answer_indicator incorrect'})
+
+    this.unansweredTpl = $('<span />', {class: 'answer_indicator incorrect'})
+    this.answeredCorrectTpl = $('<span />', {class: 'answer_indicator correct'})
+    this.answeredIncorrectTpl = $('<span />', {class: 'answer_indicator incorrect'})
+
+    this.surveyAnswerTpl = $('<span />', {class: 'answer_arrow info'})
+    this.surveyAnswers = $('#questions.survey_results .selected_answer')
   }
 
   applyCorrectAndIncorrectArrows() {
-    this.rightTpl.text(I18n.t('answers.correct', 'Correct!'))
-    this.wrongTpl.text(I18n.t('answers.you_answered', 'You Answered'))
-    this.correctTpl.text(I18n.t('answers.right', 'Correct Answer'))
-    this.shortTpl.text(I18n.t('answers.correct_answers', 'Correct Answers'))
-    this.creditFullTpl.text(I18n.t('answers.correct', 'Correct!'))
-    this.creditPartialTpl.text(I18n.t('answers.partial', 'Partial'))
-    this.creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'))
+    this.rightTpl.attr('aria-label', I18n.t('answers.correct', 'Correct!'))
+    this.wrongTpl.attr('aria-label', I18n.t('answers.you_answered', 'You Answered'))
+    this.correctTpl.attr('aria-label', I18n.t('answers.right', 'Correct Answer'))
 
     this.rightAnswers.prepend(this.rightTpl)
     this.wrongAnswers.prepend(this.wrongTpl)
     this.correctAnswers.prepend(this.correctTpl)
+
+    this.shortTpl.text(I18n.t('answers.correct_answers', 'Correct Answers'))
+
     // without .clone(), last correctTpl instance (in correctAnswers)
     //   will be moved to editableMatches/readOnlyMatches(if any)
     this.editableMatches.parent().before(this.correctTpl.clone())
     this.readOnlyMatches.prepend(this.correctTpl.clone())
     this.shortAnswers.prepend(this.shortTpl)
-    this.creditPartial.prepend(this.creditPartialTpl)
-    this.creditFull.prepend(this.creditFullTpl)
-    this.creditNone.prepend(this.creditNoneTpl)
   }
 
   applyAnsweredAndUnansweredArrows() {
     this.unansweredTpl.text(I18n.t('answers.unanswered', 'Unanswered'))
-    this.surveyAnswerTpl.text(I18n.t('answers.you_answered', 'You Answered'))
     this.unansweredQ.prepend(this.unansweredTpl)
-    this.surveyAnswers.prepend(this.surveyAnswerTpl)
-
     this.unansweredQ.addClass('bordered')
+
+    this.answeredCorrectTpl.text(I18n.t('answers.answered_correct', 'Correct answer'))
+    this.answeredIncorrectTpl.text(I18n.t('answers.answered_incorrect', 'Wrong answer'))
+
+    this.creditFullTpl.text(I18n.t('answers.correct', 'Correct!'))
+    this.creditPartialTpl.text(I18n.t('answers.partial', 'Partial'))
+    this.creditNoneTpl.text(I18n.t('answers.incorrect', 'Incorrect'))
+
+    if (ENV.IS_SURVEY) {
+      this.surveyAnswerTpl.attr('aria-label', I18n.t('answers.you_answered', 'You Answered'))
+      this.surveyAnswers.prepend(this.surveyAnswerTpl)
+    } else {
+      if (this.supressAnswers) {
+        this.creditFull.prepend(this.creditFullTpl)
+        this.creditPartial.prepend(this.creditPartialTpl)
+        this.creditNone.prepend(this.creditNoneTpl)
+
+        this.creditFull.addClass('bordered')
+        this.creditPartial.addClass('bordered')
+        this.creditNone.addClass('bordered')
+      } else {
+        this.answeredCorrectQ.prepend(this.answeredCorrectTpl)
+        this.answeredIncorrectQ.prepend(this.answeredIncorrectTpl)
+
+        this.answeredCorrectQ.addClass('bordered')
+        this.answeredIncorrectQ.addClass('bordered')
+      }
+    }
   }
 
   makeArrowsAccessible() {
@@ -171,7 +200,6 @@ export default class QuizArrowApplicator {
   }
 
   applyArrows() {
-    this.applyCSS()
     if (!ENV.IS_SURVEY) this.applyCorrectAndIncorrectArrows()
     this.applyAnsweredAndUnansweredArrows()
     this.makeArrowsAccessible()
