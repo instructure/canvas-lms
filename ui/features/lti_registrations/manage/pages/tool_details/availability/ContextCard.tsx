@@ -28,6 +28,7 @@ import {renderExceptionCounts} from './renderExceptionCounts'
 import {CourseId} from '../../../model/CourseId'
 import {AccountId} from '../../../model/AccountId'
 import {ContextPath} from './ContextPath'
+import {Tag} from '@instructure/ui-tag'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -100,13 +101,11 @@ export const ContextCard = ({
           </Flex.Item>
           <Flex.Item as="div" shouldShrink>
             <Flex as="div" margin="0" alignItems="center">
-              <Heading level="h4" margin="0 small 0 0">
+              <Heading level="h4" margin="0 xx-small 0 0">
                 <Text weight="bold">{context_name}</Text>
               </Heading>
               {typeof available !== 'undefined' ? (
-                <Pill color="primary" margin="0 0 0 small">
-                  {available ? I18n.t('Available') : I18n.t('Not Available')}
-                </Pill>
+                <Tag text={available ? I18n.t('Available') : I18n.t('Not Available')} />
               ) : null}
             </Flex>
             <Flex.Item shouldGrow>

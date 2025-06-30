@@ -25,7 +25,6 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Modal} from '@instructure/ui-modal'
-import {Pill} from '@instructure/ui-pill'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation} from '@tanstack/react-query'
@@ -35,6 +34,7 @@ import {toUndefined} from '../../../../../common/lib/toUndefined'
 import {UpdateContextControl} from '../../../../api/contextControls'
 import {LtiContextControl} from '../../../../model/LtiContextControl'
 import {ContextCard} from '../ContextCard'
+import {Tag} from '@instructure/ui-tag'
 
 const listFormatter = Intl.ListFormat
   ? new Intl.ListFormat(ENV.LOCALE || navigator.language)
@@ -126,7 +126,7 @@ export const EditExceptionModal = ({
             <List.Item>
               <Flex direction="row" gap="small" margin="0 0 0 medium">
                 <Flex.Item shouldShrink>
-                  <Pill>{control.available ? I18n.t('Available') : I18n.t('Not Available')}</Pill>
+                  <Tag text={control.available ? I18n.t('Available') : I18n.t('Not Available')} />
                 </Flex.Item>
                 <Flex.Item>→</Flex.Item>
                 <Flex.Item shouldShrink shouldGrow={false}>
