@@ -98,43 +98,42 @@ export const DeleteExceptionModal = ({onClose, onDelete, ...props}: DeleteExcept
   }
 
   return (
-    <Modal open={props.open} label={I18n.t('Delete Exception')} size="medium">
+    <Modal open={props.open} label={I18n.t('Delete Exception')} size="medium" onDismiss={onClose}>
       <Modal.Header>
         <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
         <Heading>{I18n.t('Delete Exception')}</Heading>
       </Modal.Header>
       {body}
-      {props.open && (
-        <Modal.Footer>
-          <Button margin="0 small 0 0" onClick={onClose}>
-            {I18n.t('Cancel')}
-          </Button>
-          <Button
-            id="delete-exception-modal-button"
-            color="danger"
-            interaction={deletingControl ? 'disabled' : 'enabled'}
-            onClick={async () => {
-              setDeletingControl(true)
-              let result: ApiResult<unknown>
-              if ('accountControl' in props) {
-                result = await onDelete(
-                  props.accountControl.registration_id,
-                  props.accountControl.id,
-                )
-              } else {
-                result = await onDelete(props.courseControl.registration_id, props.courseControl.id)
-              }
 
-              if (result._type === 'Success') {
-                onClose()
-              }
-              setDeletingControl(false)
-            }}
-          >
-            {I18n.t('Delete')}
-          </Button>
-        </Modal.Footer>
-      )}
+      <Modal.Footer>
+        <Button margin="0 small 0 0" onClick={onClose}>
+          {I18n.t('Cancel')}
+        </Button>
+        <Button
+          id="delete-exception-modal-button"
+          color="danger"
+          interaction={deletingControl ? 'disabled' : 'enabled'}
+          onClick={async () => {
+            setDeletingControl(true)
+            let result: ApiResult<unknown>
+            if (props.open === false) {
+              return
+            }
+            if ('accountControl' in props) {
+              result = await onDelete(props.accountControl.registration_id, props.accountControl.id)
+            } else {
+              result = await onDelete(props.courseControl.registration_id, props.courseControl.id)
+            }
+
+            if (result._type === 'Success') {
+              onClose()
+            }
+            setDeletingControl(false)
+          }}
+        >
+          {I18n.t('Delete')}
+        </Button>
+      </Modal.Footer>
     </Modal>
   )
 }
