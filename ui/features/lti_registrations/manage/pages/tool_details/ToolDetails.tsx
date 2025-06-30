@@ -325,7 +325,7 @@ export const ToolDetailsInner = ({
           href="/"
           renderTitle={
             <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Availability & Exceptions')}
+              {I18n.t('Availability and Exceptions')}
             </Text>
           }
           themeOverride={OverflowThemeOverride}

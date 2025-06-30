@@ -24,7 +24,6 @@ import {Heading} from '@instructure/ui-heading'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
-import {Pill} from '@instructure/ui-pill'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import * as React from 'react'
@@ -59,6 +58,8 @@ import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
 import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
 import type {DeleteDeployment} from '../../../api/deployments'
 
+import {Tag} from '@instructure/ui-tag'
+import {Grid} from '@instructure/ui-grid'
 const I18n = createI18nScope('lti_registrations')
 
 export type DeploymentAvailabilityProps = {
@@ -137,98 +138,94 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       padding="medium"
       as="div"
     >
-      <Heading level="h3">
-        <Flex alignItems="center" justifyItems="space-between" as="div">
-          <Flex.Item as="div" shouldGrow shouldShrink>
-            <Flex alignItems="center" as="div">
-              <Flex.Item padding="0 xx-small 0 0" as="div">
+      <Grid
+        startAt="large"
+        // visualDebug
+        vAlign="middle"
+        hAlign="start"
+        colSpacing="small"
+        rowSpacing="small"
+      >
+        <Grid.Row>
+          <Grid.Col>
+            <Flex direction="row" gap="small" alignItems="center">
+              <Heading level="h3">
                 {I18n.t('Installed in %{context_name}', {
                   context_name: deployment.context_name,
                 })}
-              </Flex.Item>
-              <Flex as="div">
-                <Flex.Item>
-                  <Pill color="primary">
-                    {rootControl.available ? I18n.t('Available') : I18n.t('Not Available')}
-                  </Pill>
-                </Flex.Item>
-              </Flex>
+              </Heading>
+              <Tag text={rootControl?.available ? I18n.t('Available') : I18n.t('Not Available')} />
             </Flex>
-          </Flex.Item>
-          <Flex.Item as="div">
-            <Flex direction="row" gap="small" justifyItems="end" as="div">
-              <Flex.Item>
+          </Grid.Col>
+
+          <Grid.Col width="auto">
+            <Flex direction="row" gap="small">
+              <IconButton
+                id={`edit-exception-${rootControl.id}`}
+                size="medium"
+                screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
+                  context_name: rootControl.context_name,
+                })}
+                renderIcon={IconEditLine}
+                onClick={() =>
+                  setEditControlInfo({control: rootControl, availableInParentContext: null})
+                }
+              />
+              {!deployment.root_account_deployment && (
                 <IconButton
-                  id={`edit-exception-${rootControl.id}`}
+                  id={`delete-deployment-${deployment.id}`}
                   size="medium"
-                  screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
+                  screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
                     context_name: rootControl.context_name,
                   })}
-                  renderIcon={IconEditLine}
-                  onClick={() =>
-                    setEditControlInfo({control: rootControl, availableInParentContext: null})
-                  }
+                  renderIcon={IconTrashLine}
+                  onClick={() => setOpenDeleteDeploymentModal(true)}
                 />
-              </Flex.Item>
-              {!deployment.root_account_deployment && (
-                <Flex.Item>
-                  <IconButton
-                    id={`delete-deployment-${deployment.id}`}
-                    size="medium"
-                    screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
-                      context_name: rootControl.context_name,
-                    })}
-                    renderIcon={IconTrashLine}
-                    onClick={() => setOpenDeleteDeploymentModal(true)}
-                  />
-                </Flex.Item>
               )}
-              <Flex.Item as="div">
-                <Button
-                  onClick={() => {
-                    setExceptionModalOpenState({
-                      open: true,
-                      deployment,
-                    })
-                  }}
-                  color="primary"
-                >
-                  {I18n.t('Add Exception')}
-                </Button>
-              </Flex.Item>
+              <Button
+                onClick={() => {
+                  setExceptionModalOpenState({
+                    open: true,
+                    deployment,
+                  })
+                }}
+                color="primary"
+              >
+                {I18n.t('Add Exception')}
+              </Button>
             </Flex>
-          </Flex.Item>
-          <ExceptionModal
-            accountId={props.accountId}
-            openState={exceptionModalOpenState}
-            onClose={() => setExceptionModalOpenState({open: false})}
-            onConfirm={contextControls => {
-              const onError = showFlashError(
-                I18n.t('There was an error adding the exceptions. Please try again later.'),
-              )
-              return createContextControls({
-                registrationId: deployment.registration_id,
-                contextControls,
-              })
-                .then(result => {
-                  if (result._type === 'Success') {
-                    showFlashSuccess(
-                      I18n.t('%{count} exception(s) were successfully added.', {
-                        count: contextControls.length,
-                      }),
-                    )()
-                    refetchControls()
-                  } else {
-                    // handle error
-                    console.error(formatApiResultError(result))
-                    onError()
-                  }
-                })
-                .catch(onError)
-            }}
-          />
-        </Flex>
-      </Heading>
+          </Grid.Col>
+        </Grid.Row>
+      </Grid>
+      <ExceptionModal
+        accountId={props.accountId}
+        openState={exceptionModalOpenState}
+        onClose={() => setExceptionModalOpenState({open: false})}
+        onConfirm={contextControls => {
+          const onError = showFlashError(
+            I18n.t('There was an error adding the exceptions. Please try again later.'),
+          )
+          return createContextControls({
+            registrationId: deployment.registration_id,
+            contextControls,
+          })
+            .then(result => {
+              if (result._type === 'Success') {
+                showFlashSuccess(
+                  I18n.t('%{count} exception(s) were successfully added.', {
+                    count: contextControls.length,
+                  }),
+                )()
+                refetchControls()
+              } else {
+                // handle error
+                console.error(formatApiResultError(result))
+                onError()
+              }
+            })
+            .catch(onError)
+        }}
+      />
       <div>
         <Text size="small">
           {I18n.t('Deployment ID: %{deployment_id}', {
