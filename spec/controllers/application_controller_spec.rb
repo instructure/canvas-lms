@@ -2740,6 +2740,59 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "show_career_switch? helper" do
+    let(:available_apps) { [] }
+    let(:resolver_double) { instance_double(CanvasCareer::ExperienceResolver, available_apps:) }
+
+    before do
+      @root_account = Account.default
+      controller.instance_variable_set(:@domain_root_account, @root_account)
+      controller.instance_variable_set(:@context, nil)
+      allow(CanvasCareer::ExperienceResolver).to receive(:new).and_return(resolver_double)
+    end
+
+    context "when current user is nil" do
+      it "returns false" do
+        controller.instance_variable_set(:@current_user, nil)
+        expect(controller.show_career_switch?).to be false
+      end
+    end
+
+    context "when feature flags are disabled" do
+      before do
+        @root_account.disable_feature!(:horizon_learner_app)
+        @root_account.disable_feature!(:horizon_learning_provider_app_on_contextless_routes)
+      end
+
+      let(:available_apps) { [CanvasCareer::Constants::App::CAREER_LEARNER] }
+
+      it "returns false even if resolver includes career apps" do
+        controller.instance_variable_set(:@current_user, user_factory)
+        expect(controller.show_career_switch?).to be false
+      end
+    end
+
+    context "when available_apps has a career option" do
+      let(:available_apps) { [CanvasCareer::Constants::App::CAREER_LEARNER] }
+
+      it "returns true" do
+        @root_account.enable_feature!(:horizon_learner_app)
+        controller.instance_variable_set(:@current_user, user_factory)
+        expect(controller.show_career_switch?).to be true
+      end
+    end
+
+    context "when available_apps lacks career option" do
+      let(:available_apps) { [CanvasCareer::Constants::App::ACADEMIC] }
+
+      it "returns false" do
+        @root_account.enable_feature!(:horizon_learner_app)
+        controller.instance_variable_set(:@current_user, user_factory)
+        expect(controller.show_career_switch?).to be false
+      end
+    end
+  end
+
   describe "k5 helpers" do
     before do
       controller.instance_variable_set(:@current_user, @user)

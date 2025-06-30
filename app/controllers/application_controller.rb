@@ -376,6 +376,24 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  # Determines whether the Canvas Career switch button should be displayed in the
+  # global navigation header.
+  def show_career_switch?
+    return false unless @current_user
+
+    return false unless @domain_root_account&.feature_enabled?(:horizon_learner_app) ||
+                        @domain_root_account&.feature_enabled?(:horizon_learning_provider_app_on_contextless_routes)
+
+    career_apps = [
+      CanvasCareer::Constants::App::CAREER_LEARNER,
+      CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
+    ]
+
+    resolver = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session)
+    resolver.available_apps.intersect?(career_apps)
+  end
+  helper_method :show_career_switch?
+
   def group_information
     if @context.is_a?(Group) &&
        can_do(@context, @current_user, :manage) &&
@@ -460,6 +478,8 @@ class ApplicationController < ActionController::Base
     lti_apps_page_ai_translation
     ams_service
     open_tools_in_new_tab
+    horizon_learner_app
+    horizon_learning_provider_app_on_contextless_routes
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

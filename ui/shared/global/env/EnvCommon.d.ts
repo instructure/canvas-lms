@@ -343,6 +343,8 @@ export type RootAccountFeatureId =
   | 'ams_service'
   | 'lti_apps_page_ai_translation'
   | 'open_tools_in_new_tab'
+  | 'horizon_learner_app'
+  | 'horizon_learning_provider_app_on_contextless_routes'
 
 /**
  * From ApplicationController#JS_ENV_ROOT_ACCOUNT_SERVICES
