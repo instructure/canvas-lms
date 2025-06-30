@@ -223,7 +223,7 @@ describe "quizzes" do
     it "always highlights incorrect answers", priority: "1" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-      expect(ff(".incorrect.answer_arrow").length).to be > 0
+      expect(ff(".incorrect.answer_indicator").length).to be > 0
     end
   end
 

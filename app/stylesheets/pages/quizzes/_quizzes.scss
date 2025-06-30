@@ -401,16 +401,12 @@ input[type]:required:invalid {
           opacity: 0.5;
         }
         &.correct_answer {
-          background: none;
           opacity: 1;
         }
         &.selected_answer {
           opacity: 1;
         }
         &.wrong_answer {
-          border-radius: 6px;
-          border: 2px solid red;
-          padding-bottom: 8px;
           opacity: 1;
           .ui-selectmenu-status {
             color: red;
@@ -447,14 +443,17 @@ input[type]:required:invalid {
   }
   &.suppress_correct_answers, &.survey_results {
     .question .answers .answer.wrong_answer {
+      opacity: 1;
+      .ui-selectmenu-status {
+        color: inherit;
+      }
+    }
+    .question .answers .answer.correct_answer {
       border: none;
       border-top: 1px solid #DDD;
       border-radius: 0;
       padding-bottom: 0;
       opacity: 1;
-      .ui-selectmenu-status {
-        color: inherit;
-      }
     }
   }
   &.survey_results {
@@ -1899,86 +1898,66 @@ ul#quiz_versions {
 // styles for the correct/incorrect arrows on the quiz
 // review page.
 .answer_arrow {
-  background-image: $answersSprite;
-  background-repeat: repeat-x;
-  display: inline-block;
-  @include fontSize($ic-font-size--xsmall);
-  font-weight: bold;
-  line-height: 27px;
-  min-width: 96px;
-  padding: 0 8px;
+  line-height: 20px;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
   position: absolute;
   text-align: center;
-  text-shadow: 0 -1px 0 rgba(#000, 0.5);
-  &.correct:before, &.correct:after,
-  &.incorrect:before, &.incorrect:after,
-  &.info:before, &.info:after {
-    background-image: $answersSprite;
-
-    // flip the arrow in RTL
-    @if $direction == 'rtl' { transform: scale(-1, 1) }
-
-    background-repeat: no-repeat;
-    content: " ";
-    height: 27px;
-    position: absolute;
-    top: 0;
+  left: -2px;
+  top: 11px;
+  border-radius: 50%;
+  
+  &.correct:before {
+    content: "\2714";
   }
-  &.correct:before, &.incorrect:before, &.info:before {
-    #{direction(left)}: -3px;
-    width: 3px;
+  &.incorrect:before {
+    content: "\2715";
   }
-  &.correct:after, &.incorrect:after, &.info:after {
-    #{direction(right)}: -11px;
-    width: 11px;
+  &.info:before {
+    content: "\2794";
   }
+  
   &.correct {
-    background-position: left -34px;
-    color: #fff;
-    &:before {
-      background-position: top left;
-    }
-    &:after {
-      background-position: (-12px) top;
-    }
+    color: white;
+    background-color: green;
   }
   &.incorrect {
-    background-position: left -62px;
-    color: #fff;
-    &:before {
-      background-position: (-4px) top;
-    }
-    &:after {
-      background-position: (-24px) top;
-    }
+    color: white;
+    background-color: red;
   }
   &.info {
-    background-position: left -90px;
-    color: #333;
-    text-shadow: 0 -1px 0 rgba(#fff, 0.5);
-    &:before {
-      background-position: (-8px) top;
-    }
-    &:after {
-      background-position: (-36px) top;
-    }
+    color: #000;
+    background-color: #c7c7c7;
   }
 }
 
-.answer_indicator.incorrect {
-  background-color: #E62429;
+.answer_indicator {
   color: white;
   padding: 4px 8px;
   border-top-left-radius: 0.225rem;
   border-top-right-radius: 0.225rem;
   position: absolute;
-  margin-top: -33px;
+  margin-top: -2rem;
   margin-left: -1px;
 }
 
-.question.unanswered.bordered {
+.answer_indicator.incorrect {
+  background-color: #E62429;
+}
+
+.answer_indicator.correct {
+  background-color: green;
+}
+
+.question.incorrect.bordered, .question.unanswered.bordered {
   border-color: #E62429;
-  margin-top: 45px !important;
+  margin-top: 2.5rem !important;
+}
+
+.question.correct.bordered {
+  border-color: green;
+  margin-top: 2.5rem !important;
 }
 
 // styles for teacher comments on quiz answers (comment bubbles).
