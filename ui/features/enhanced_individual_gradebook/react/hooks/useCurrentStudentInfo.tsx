@@ -19,11 +19,13 @@
 import {useCallback, useEffect, useState} from 'react'
 import type {
   GradebookStudentDetails,
+  GradebookStudentQueryResponse,
   GradebookUserSubmissionDetails,
   SubmissionGradeChange,
 } from '../../types'
-import {fetchStudentSubmission} from '../../queries/Queries'
-import {useQuery} from '@tanstack/react-query'
+import {fetchStudentSubmission, getNextStudentSubmissionPage} from '../../queries/Queries'
+import type {InfiniteData} from '@tanstack/react-query'
+import {useAllPages} from '@canvas/query'
 
 type Response = {
   currentStudent?: GradebookStudentDetails
@@ -42,9 +44,16 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
     userId ?? '',
   ]
 
-  const {data, error, isLoading} = useQuery({
+  const {data, error, hasNextPage, isLoading} = useAllPages<
+    GradebookStudentQueryResponse,
+    Error,
+    InfiniteData<GradebookStudentQueryResponse>,
+    [string, string, string]
+  >({
     queryKey,
     queryFn: fetchStudentSubmission,
+    getNextPageParam: getNextStudentSubmissionPage,
+    initialPageParam: null,
     enabled: !!userId,
   })
 
@@ -60,11 +69,19 @@ export const useCurrentStudentInfo = (courseId: string, userId?: string | null):
       // TODO: handle error
     }
 
-    if (data?.course) {
-      setCurrentStudent(data.course.usersConnection.nodes[0])
-      setStudentSubmissions(data.course.submissionsConnection.nodes)
+    const firstPage = data?.pages[0]
+    if (firstPage) {
+      setCurrentStudent(firstPage.course.usersConnection.nodes[0])
+
+      // The consuming components do not handle rendering partially loaded submissions
+      // (e.g. Assignment Group Grade and Final Grade calculations assume all submissions are loaded)
+      // so we only populate the student submissions when we have all of them.
+      const submissions = hasNextPage
+        ? []
+        : data.pages.flatMap(page => page.course.submissionsConnection.nodes)
+      setStudentSubmissions(submissions)
     }
-  }, [data, error])
+  }, [currentStudent, data, error, hasNextPage])
 
   const updateSubmissionDetails = useCallback(
     (newSubmission: SubmissionGradeChange) => {
