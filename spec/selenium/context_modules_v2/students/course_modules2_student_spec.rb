@@ -366,7 +366,7 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_header_complete_all_pill(@module1.id).text).to include("Complete All Items")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
       expect(module_header_complete_all_pill(@module1.id).text).to include("Completed All Items")
@@ -378,10 +378,207 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_header_complete_all_pill(@module1.id).text).to include("Complete One Item")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
       expect(module_header_complete_all_pill(@module1.id).text).to include("Completed One Item")
+    end
+
+    it "shows to be completed circle items if item is part of requirements list" do
+      @module1.completion_requirements = {
+        @module_item1.id => { type: "must_view" },
+        @module_item2.id => { type: "must_submit" }
+      }
+      @module1.save!
+      go_to_modules
+      module_header_expand_toggles[0].click
+      expect(module_item_status_icon(@module_item1.id)).to be_displayed
+      expect(module_item_status_icon(@module_item2.id)).to be_displayed
+    end
+
+    it "shows Completed icon if item is complete" do
+      @module1.completion_requirements = {
+        @module_item1.id => { type: "must_view" }
+      }
+      @module1.save!
+      go_to_modules
+      module_header_expand_toggles[0].click
+      get_student_views_assignment(@course.id, @assignment.id)
+      go_to_modules
+      expect(module_item_status_icon(@module_item1.id).text).to eq("Complete")
+    end
+
+    it "shows Missing icon if item is Missing" do
+      @missing_assignment = @course.assignments.create!(
+        title: "Overdue Assignment",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days.ago
+      )
+
+      @missing_module_item = @module1.add_item(type: "assignment", id: @missing_assignment.id)
+      go_to_modules
+      module_header_expand_toggles[0].click
+      expect(module_item_status_icon(@missing_module_item.id).text).to eq("Missing")
+    end
+
+    it "shows Assignment icon and the text 'Assignment' if assignment" do
+      @assignment = @course.assignments.create!(
+        title: "Assignment",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days
+      )
+      go_to_modules
+      module_header_expand_toggles[0].click
+      @module_item = @module1.add_item(type: "assignment", id: @assignment.id)
+      go_to_modules
+      assignment_item = module_item_by_id(@module_item.id)
+      expect(assignment_item.text).to include("Assignment")
+
+      assignment_icon = module_item_assignment_icon(@module_item.id)
+      expect(assignment_icon).to be_displayed
+    end
+
+    it 'shows Quiz icon and the text "Quiz" if a classic quiz' do
+      classic_quiz = quiz_model(course: @course, title: "Classic Quiz", workflow_state: "available")
+      classic_quiz.generate_quiz_data
+      classic_quiz.quiz_questions.create!(
+        question_data: {
+          name: "Classic Q",
+          question_type: "true_false_question",
+          question_text: "Is this classic?",
+          answers: [{ text: "true" }, { text: "false" }],
+          points_possible: 1
+        }
+      )
+      classic_quiz.save!
+      classic_module_item = @module1.add_item(type: "quiz", id: classic_quiz.id)
+      go_to_modules
+      module_header_expand_toggles[0].click
+      quiz_item = module_item_by_id(classic_module_item.id)
+      expect(quiz_item.text).to include("Quiz")
+
+      quiz_icon = module_item_quiz_icon(classic_module_item.id)
+      expect(quiz_icon).to be_displayed
+    end
+
+    it 'shows Quiz icon and the text "Quiz" if a new quiz' do
+      new_quiz = @course.quizzes.create!(title: "New Quiz", due_at: 1.week.from_now, quiz_type: "survey", workflow_state: "available")
+      new_quiz_module_item = @module1.add_item(type: "quiz", id: new_quiz.id)
+      go_to_modules
+      module_header_expand_toggles[0].click
+      new_quiz_item = module_item_by_id(new_quiz_module_item.id)
+      expect(new_quiz_item.text).to include("New Quiz")
+
+      quiz_icon = module_item_quiz_icon(new_quiz_module_item.id)
+      expect(quiz_icon).to be_displayed
+    end
+
+    it 'shows Page icon and the text "Page" if a wiki page' do
+      wiki_page = @course.wiki_pages.create!(
+        title: "Test Page",
+        body: "Content here"
+      )
+      page_module_item = @module1.add_item(type: "wiki_page", id: wiki_page.id)
+      go_to_modules
+      module_header_expand_toggles[0].click
+      page_item = module_item_by_id(page_module_item.id)
+      expect(page_item.text).to include("Page")
+
+      page_icon = module_item_page_icon(page_module_item.id)
+      expect(page_icon).to be_displayed
+    end
+
+    it 'shows Discussion icon and the text "Discussion" if a discussion' do
+      discussion = @course.discussion_topics.create!(
+        title: "Test Discussion",
+        workflow_state: "active",
+        assignment: @course.assignments.create!(
+          title: "Graded Discussion",
+          points_possible: 10,
+          submission_types: "discussion_topic",
+          workflow_state: "published"
+        )
+      )
+      discussion_module_item = @module1.add_item(type: "discussion_topic", id: discussion.id)
+      go_to_modules
+      module_header_expand_toggles[0].click
+      discussion_item = module_item_by_id(discussion_module_item.id)
+      expect(discussion_item.text).to include("Discussion")
+
+      discussion_icon = module_item_discussion_icon(discussion_module_item.id)
+      expect(discussion_icon).to be_displayed
+    end
+
+    it "shows a header if it is a header" do
+      header_module_item = @module1.add_item(
+        type: "context_module_sub_header",
+        title: "This is a header"
+      )
+      header_module_item.workflow_state = "active"
+      header_module_item.save!
+      @module1.save!
+      go_to_modules
+      module_header_expand_toggles[0].click
+      header_item = module_item_by_id(header_module_item.id)
+
+      expect(header_item.text).to include("This is a header")
+    end
+
+    it 'shows the external URL icon and text "External Url" if that item type' do
+      external_url_item = @module1.add_item(
+        type: "external_url",
+        url: "http://example.com",
+        title: "example"
+      )
+      external_url_item.workflow_state = "active"
+      external_url_item.save!
+      go_to_modules
+      module_header_expand_toggles[0].click
+      url_item = module_item_by_id(external_url_item.id)
+      expect(url_item.text).to include("External Url")
+
+      url_icon = module_item_url_icon(external_url_item.id)
+      expect(url_icon).to be_displayed
+    end
+
+    it 'shows the external Tools icon and the text "External Tool" if that item type' do
+      external_tool_assignment = @course.assignments.create!(
+        title: "LTI Tool",
+        submission_types: "external_tool",
+        workflow_state: "published"
+      )
+      external_tool_module_item = @module1.add_item(
+        type: "assignment",
+        id: external_tool_assignment.id
+      )
+      go_to_modules
+      module_header_expand_toggles[0].click
+      tool_item = module_item_by_id(external_tool_module_item.id)
+      expect(tool_item.text).to include("LTI Tool")
+    end
+
+    it "validates that item is indented when it has a non-zero indent" do
+      indented_module_item = @module1.add_item(
+        type: "assignment",
+        id: @assignment.id,
+        indent: 2 # Indent level 2 = 40px
+      )
+      go_to_modules
+      module_header_expand_toggles[0].click
+      item_indent = module_item_indent(indented_module_item.id)
+      expect(item_indent).to match("padding: 0px 0px 0px 40px;")
+    end
+
+    it "shows locked icon if locked due to availability date" do
+      unlock_time = 2.days.from_now.change(min: 0, sec: 0)
+      @module1.update!(unlock_at: unlock_time)
+      go_to_modules
+      expect(module_header_locked_icon(@module1.id)).to be_displayed
+      expect(module_header_locked_icon(@module1.id).text).to include("Locked")
     end
 
     it "includes Missing assignments icon with one missing assignment" do
@@ -394,7 +591,6 @@ describe "context modules", :ignore_js_errors do
     it "includes Missing assignments icon with more than one missing assignment" do
       @missing_assignment1 = @course.assignments.create!(title: "Missing Assignment 1", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.ago)
       @missing_assignment2 = @course.assignments.create!(title: "Missing Assignment 2", submission_types: "online_text_entry", points_possible: 10, workflow_state: "published", due_at: 2.days.ago)
-
       @module1.add_item(type: "assignment", id: @missing_assignment1.id)
       @module1.add_item(type: "assignment", id: @missing_assignment2.id)
       go_to_modules
