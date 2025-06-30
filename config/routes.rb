@@ -1132,13 +1132,16 @@ CanvasRails::Application.routes.draw do
 
   scope(controller: :career) do
     # Routes for course/account are explicit so that get_context works (relies on :course_id and :account_id params)
-    get "career/courses", action: :show
     get "career/courses/:course_id", action: :show
     get "career/courses/:course_id/*path", action: :show
     get "career/accounts/:account_id", action: :show
     get "career/accounts/:account_id/*path", action: :show
     get "career", action: :show, as: :canvas_career
     get "career/*path", action: :show, as: :canvas_career_path
+  end
+
+  scope(controller: :career_experience) do
+    post "career/switch_experience", action: :switch_experience
   end
 
   scope(controller: :smart_search) do

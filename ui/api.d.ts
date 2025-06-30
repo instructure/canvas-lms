@@ -759,3 +759,12 @@ export type SisImport = {
   diff_row_count_threshold: number
   user: User
 }
+
+export type ExperienceSummary = {
+  current_app: string
+  available_apps: string[]
+}
+
+export type SwitchExperienceResponse = {
+  experience: string
+}
