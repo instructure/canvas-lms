@@ -6185,6 +6185,14 @@ describe Course do
           expect(@account.courses.without_enrollments.where(name: "A")).to eq [@course2a]
         end
       end
+
+      describe "#with_enrollment_workflow_states" do
+        it "includes courses with enrollments in the specified workflow states" do
+          @course1c = course_with_student(account: @account, course_name: "C", active_enrollment: true).course
+
+          expect(@account.courses.with_enrollment_workflow_states("active").sort_by(&:id)).to eq [@course1c]
+        end
+      end
     end
 
     context "completion" do
