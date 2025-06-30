@@ -50,6 +50,10 @@ module Modules2IndexPage
     "button[aria-label='Expand All']"
   end
 
+  def get_student_views_assignment(course_id, assignment_id)
+    get "/courses/#{course_id}/assignments/#{assignment_id}"
+  end
+
   def manage_module_item_button_selector(module_item_id)
     "[data-testid='module-item-action-menu_#{module_item_id}']"
   end
@@ -102,12 +106,48 @@ module Modules2IndexPage
     "[role=menuitem]:contains('#{tool_text}')"
   end
 
+  def module_item_action_menu_selector
+    "[data-testid='module-item-action-menu']"
+  end
+
+  def module_item_assignment_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='assignment-icon']"
+  end
+
+  def module_item_by_id_selector(module_item_id)
+    "[data-item-id='#{module_item_id}']"
+  end
+
+  def module_item_discussion_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='discussion-icon']"
+  end
+
+  def module_item_header_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='subheader-titl-text']"
+  end
+
+  def module_item_indent_selector(module_item_id)
+    "[data-item-id='#{module_item_id}'] div[style*='padding']"
+  end
+
+  def module_item_page_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='page-icon']"
+  end
+
+  def module_item_quiz_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='quiz-icon']"
+  end
+
+  def module_item_status_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='module-item-status-icon']"
+  end
+
   def module_item_title_selector
     "[data-testid='module-item-title']"
   end
 
-  def module_item_action_menu_selector
-    "[data-testid='module-item-action-menu']"
+  def module_item_url_icon_selector(module_item_id)
+    "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
 
   def module_progression_status_bar_selector(module_id)
@@ -224,16 +264,56 @@ module Modules2IndexPage
     fj(module_item_action_menu_link_selector(tool_text))
   end
 
+  def module_item_assignment_icon(module_item_id)
+    f(module_item_assignment_icon_selector(module_item_id))
+  end
+
+  def module_item_by_id(module_item_id)
+    f(module_item_by_id_selector(module_item_id))
+  end
+
+  def module_item_discussion_icon(module_item_id)
+    f(module_item_discussion_icon_selector(module_item_id))
+  end
+
+  def module_item_header(module_item_id)
+    f(module_item_header_selector(module_item_id))
+  end
+
+  def module_item_indent(module_item_id)
+    f(module_item_indent_selector(module_item_id))[:style]
+  end
+
+  def module_item_mission_pill(module_item_id)
+    f(module_item_mission_pill_selector(module_item_id))
+  end
+
+  def module_item_page_icon(module_item_id)
+    f(module_item_page_icon_selector(module_item_id))
+  end
+
+  def module_item_quiz_icon(module_item_id)
+    f(module_item_quiz_icon_selector(module_item_id))
+  end
+
+  def module_item_status_icon(module_item_id)
+    f(module_item_status_icon_selector(module_item_id))
+  end
+
   def module_item_titles
     ff(module_item_title_selector)
   end
 
-  def module_progression_status_bar(module_id)
-    f(module_progression_status_bar_selector(module_id))
+  def module_item_url_icon(module_item_id)
+    f(module_item_url_icon_selector(module_item_id))
   end
 
   def module_progression_info(module_id)
     f(module_progression_info_selector(module_id))
+  end
+
+  def module_progression_status_bar(module_id)
+    f(module_progression_status_bar_selector(module_id))
   end
 
   def option_list(option_list_id)
