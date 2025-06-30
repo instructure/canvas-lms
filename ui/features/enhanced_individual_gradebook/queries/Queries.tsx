@@ -158,18 +158,16 @@ export const GRADEBOOK_QUERY = gql`
   }
 `
 
-// TODO: paginate usersConnection instead of just getting the first 100.
-// TODO: paginate submissionsConnection instead of just getting the first 100.
 // TODO: make enrollments a Connection type and then paginate it, so we don't fetch all enrollments at once.
 export const GRADEBOOK_STUDENT_QUERY = gql`
-  query GradebookStudentQuery($courseId: ID!, $userIds: [ID!]) {
+  query GradebookStudentQuery($courseId: ID!, $userId: ID!, $cursor: String) {
     course(id: $courseId) {
       usersConnection(
-        first: 100
+        first: 1
         filter: {
           enrollmentTypes: [StudentEnrollment, StudentViewEnrollment]
           enrollmentStates: [active, invited, completed]
-          userIds: $userIds
+          userIds: [$userId]
         }
       ) {
         nodes {
@@ -193,7 +191,8 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
       }
       submissionsConnection(
         first: 100
-        studentIds: $userIds
+        after: $cursor
+        studentIds: [$userId]
         filter: {states: [graded, pending_review, submitted, ungraded, unsubmitted]}
       ) {
         nodes {
@@ -230,6 +229,10 @@ export const GRADEBOOK_STUDENT_QUERY = gql`
             enteredScore
             excused
           }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
         }
       }
     }
@@ -612,16 +615,20 @@ export const getNextSubmissionsPage = (lastPage: FetchSubmissionsResponse) => {
   return pageInfo.hasNextPage ? pageInfo.endCursor : null
 }
 
-export const fetchStudentSubmission = async ({
-  queryKey,
-}: QueryFunctionContext<
-  [string, string, string],
-  never
->): Promise<GradebookStudentQueryResponse> => {
+export const fetchStudentSubmission = async (
+  context: QueryFunctionContext<[string, string, string], never>,
+): Promise<GradebookStudentQueryResponse> => {
+  const {pageParam, queryKey} = context
   return executeQuery<GradebookStudentQueryResponse>(GRADEBOOK_STUDENT_QUERY, {
     courseId: queryKey[1],
-    userIds: queryKey[2] ? [queryKey[2]] : [],
+    userId: queryKey[2],
+    cursor: pageParam,
   })
+}
+
+export const getNextStudentSubmissionPage = (lastPage: GradebookStudentQueryResponse) => {
+  const {pageInfo} = lastPage.course.submissionsConnection
+  return pageInfo.hasNextPage ? pageInfo.endCursor : null
 }
 
 export const fetchStudentSubmissionComments = async ({

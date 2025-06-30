@@ -231,6 +231,7 @@ export type GradebookStudentQueryResponse = {
     }
     submissionsConnection: {
       nodes: GradebookUserSubmissionDetails[]
+      pageInfo: PageInfo
     }
   }
 }
