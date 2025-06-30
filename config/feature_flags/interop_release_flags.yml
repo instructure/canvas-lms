@@ -147,6 +147,20 @@ lti_asset_processor:
       state: allowed_on
     ci:
       state: allowed_on
+lti_asset_processor_discussions:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Document Processing in Discussions
+  description: |-
+    This enables support for document processing using the LTI Asset Processor specification within graded Discussions.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_before_assignment_results:
   state: hidden
   display_name: Display LTI placement before assignment description after submitting.
