@@ -18,7 +18,6 @@
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getFilesEnv} from '../../../../utils/filesEnvUtils'
 import {Modal} from '@instructure/ui-modal'
@@ -26,6 +25,7 @@ import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {useFileManagement} from '../../../contexts/FileManagementContext'
 import {useRows} from '../../../contexts/RowsContext'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {PermissionsModalHeader} from './PermissionsModalHeader'
 import {PermissionsModalBody} from './PermissionsModalBody'
@@ -90,7 +90,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   )
   const [error, setError] = useState<string | null>()
 
-  const {currentRows, setCurrentRows} = useRows()
+  const {currentRows, setCurrentRows, setSessionExpired} = useRows()
 
   const resetState = useCallback(() => {
     setIsRequestInFlight(false)
@@ -132,7 +132,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
 
     return Promise.all(
       items.map(item =>
-        doFetchApi<File | Folder>({
+        doFetchApiWithAuthCheck<File | Folder>({
           method: 'PUT',
           path: `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}`,
           body: opts,
@@ -239,7 +239,11 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
         })
         setCurrentRows(newRows)
       })
-      .catch(() => {
+      .catch(err => {
+        if (err instanceof UnauthorizedError) {
+          setSessionExpired(true)
+          return
+        }
         showFlashError(I18n.t('An error occurred while setting permissions. Please try again.'))()
       })
       .finally(() => setIsRequestInFlight(false))
@@ -256,6 +260,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     currentRows,
     setCurrentRows,
     isValidByDateRange,
+    setSessionExpired,
   ])
 
   const handleChangeAvailabilityOption = useCallback(

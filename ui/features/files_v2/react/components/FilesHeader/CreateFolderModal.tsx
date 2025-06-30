@@ -24,6 +24,7 @@ import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import {queryClient} from '@canvas/query'
 import {useFileManagement} from '../../contexts/FileManagementContext'
+import {useRows} from '../../contexts/RowsContext'
 import {generateFolderPostUrl, UnauthorizedError} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -48,6 +49,7 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
   const [errorMessage, setErrorMessage] = useState<FormMessage>()
   const textInputRef = useRef<TextInput>(null)
   const {folderId: parentFolderId} = useFileManagement()
+  const {setSessionExpired} = useRows()
 
   const createFolderMutation = useMutation({
     mutationFn: async (name: string) => {
@@ -75,7 +77,7 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
     },
     onError: error => {
       if (error instanceof UnauthorizedError) {
-        window.location.href = '/login'
+        setSessionExpired(true)
         return
       }
       showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(

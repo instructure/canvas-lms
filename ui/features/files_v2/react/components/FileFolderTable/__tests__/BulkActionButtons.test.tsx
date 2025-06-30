@@ -22,7 +22,7 @@ import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-import {mockRowFocusContext} from './testUtils'
+import {mockRowFocusContext, mockRowsContext} from './testUtils'
 import BulkActionButtons, {BulkActionButtonsProps} from '../BulkActionButtons'
 import {type File, Folder} from '../../../../interfaces/File'
 
@@ -41,7 +41,7 @@ const renderComponent = (props: BulkActionButtonsProps = {...defaultProps}) => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <RowFocusProvider value={mockRowFocusContext}>
-        <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: props.rows}}>
+        <RowsProvider value={mockRowsContext}>
           <BulkActionButtons {...defaultProps} {...props} />
         </RowsProvider>
       </RowFocusProvider>

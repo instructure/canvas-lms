@@ -24,6 +24,8 @@ import {queryClient} from '@canvas/query'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
+import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 import fetchMock from 'fetch-mock'
 import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
@@ -35,7 +37,9 @@ const renderComponent = () => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <MockedQueryClientProvider client={queryClient}>
-        <CreateFolderButton buttonDisplay="block" />
+        <RowsProvider value={mockRowsContext}>
+          <CreateFolderButton buttonDisplay="block" />
+        </RowsProvider>
       </MockedQueryClientProvider>
     </FileManagementProvider>,
   )

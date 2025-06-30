@@ -28,7 +28,7 @@ import {
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-import {mockRowFocusContext} from './testUtils'
+import {mockRowFocusContext, mockRowsContext} from './testUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -65,7 +65,7 @@ const renderComponent = (
     <Router>
       <FileManagementProvider value={createMockFileManagementContext(context)}>
         <RowFocusProvider value={mockRowFocusContext}>
-          <RowsProvider value={{currentRows: [props.row], setCurrentRows: jest.fn()}}>
+          <RowsProvider value={mockRowsContext}>
             <ActionMenuButton {...defaultProps} {...props} />
           </RowsProvider>
         </RowFocusProvider>

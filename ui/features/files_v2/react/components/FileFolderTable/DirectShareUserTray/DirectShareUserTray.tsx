@@ -31,6 +31,7 @@ import FileFolderTray from '../../shared/TrayWrapper'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {getName} from '../../../../utils/fileFolderUtils'
+import {useRows} from '../../../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -127,7 +128,7 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
     createRef<ContentShareUserSearchSelectorRef>()
   const [selectedUsers, setSelectedUsers] = useState<BasicUser[]>([])
   const [requestInFlight, setRequestInFlight] = useState<boolean>(false)
-
+  const {setSessionExpired} = useRows()
   const resetState = useCallback(() => {
     setSelectedUsers([])
     setRequestInFlight(false)
@@ -177,13 +178,13 @@ const DirectShareUserTray = ({open, onDismiss, courseId, file}: DirectShareUserT
       .then(sendSuccessful)
       .catch(error => {
         if (error instanceof UnauthorizedError) {
-          window.location.href = '/login'
+          setSessionExpired(true)
           return
         }
         showFlashError(I18n.t('Error starting content share.'))(error)
       })
       .finally(() => setRequestInFlight(false))
-  }, [selectorRef, sendSuccessful, startSendOperation])
+  }, [selectorRef, sendSuccessful, startSendOperation, setSessionExpired])
 
   // Reset the state when the open prop changes so we don't carry over state
   // from the previously opened tray

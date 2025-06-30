@@ -20,12 +20,13 @@ import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../../contexts/RowFocusContext'
+import {RowsProvider} from '../../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../../__tests__/createMockContext'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../../fixtures/fakeData'
 import {DeleteModal} from '../DeleteModal'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
-import {mockRowFocusContext} from '../../__tests__/testUtils'
+import {mockRowFocusContext, mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -44,7 +45,9 @@ const renderComponent = (props?: any) =>
   render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <RowFocusProvider value={mockRowFocusContext}>
-        <DeleteModal {...defaultProps} {...props} />
+        <RowsProvider value={mockRowsContext}>
+          <DeleteModal {...defaultProps} {...props} />
+        </RowsProvider>
       </RowFocusProvider>
     </FileManagementProvider>,
   )

@@ -50,6 +50,12 @@ export const mockRowFocusContext = {
   handleActionButtonRef: jest.fn(),
 }
 
+export const mockRowsContext = {
+  currentRows: [],
+  setCurrentRows: jest.fn(),
+  setSessionExpired: jest.fn(),
+}
+
 export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
   const queryClient = new QueryClient()
   return render(
@@ -57,7 +63,7 @@ export const renderComponent = (props?: Partial<FileFolderTableProps>) => {
       <MockedQueryClientProvider client={queryClient}>
         <FileManagementProvider value={createMockFileManagementContext()}>
           <RowFocusProvider value={mockRowFocusContext}>
-            <RowsProvider value={{currentRows: props?.rows ?? [], setCurrentRows: jest.fn()}}>
+            <RowsProvider value={mockRowsContext}>
               <FileFolderTable {...defaultProps} {...props} />
             </RowsProvider>
           </RowFocusProvider>

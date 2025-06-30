@@ -32,6 +32,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import FileFolderInfo from '../../shared/FileFolderInfo'
 import {useRowFocus, SELECT_ALL_FOCUS_STRING} from '../../../contexts/RowFocusContext'
+import {useRows} from '../../../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -47,6 +48,7 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
   const isDeletingOrLoading = isDeleting || items.length === 0
   const isMultiple = items.length > 1
   const {setRowToFocus} = useRowFocus()
+  const {setSessionExpired} = useRows()
 
   const handleConfirmDelete = useCallback(async () => {
     setIsDeleting(true)
@@ -84,7 +86,7 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     } catch (error) {
       if (error instanceof UnauthorizedError) {
-        window.location.href = '/login'
+        setSessionExpired(true)
         return
       }
       const errorMessage = I18n.t('Failed to delete items. Please try again.')
