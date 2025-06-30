@@ -4980,7 +4980,7 @@ describe Course do
     end
 
     it "hides tabs for feature flagged external tools" do
-      tool = analytics_2_tool_factory
+      tool = admin_analytics_tool_factory(context: @course)
 
       tabs = @course.external_tool_tabs({}, User.new)
       expect(tabs.pluck(:id)).not_to include(tool.asset_string)
