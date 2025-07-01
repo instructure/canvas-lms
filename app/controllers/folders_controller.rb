@@ -188,7 +188,7 @@ class FoldersController < ApplicationController
     file_desc = params[:order] == "desc"
 
     folder_scope = folder_index_scope(opts[:can_view_hidden_files]).preload(:active_file_attachments, :active_sub_folders)
-    file_scope = file_index_scope(@folder, @current_user, session).preload(:attachment_upload_statuses, :root_attachment)
+    file_scope = file_index_scope(@folder, @current_user, params).preload(:attachment_upload_statuses, :root_attachment)
 
     # Explicit LEFT JOIN for sorting by modified_by and rights
     if params[:sort] == "modified_by"
@@ -239,6 +239,7 @@ class FoldersController < ApplicationController
   def folder_index_scope(can_view_hidden_files)
     scope = @folder.active_sub_folders
     scope = scope.not_hidden.not_locked unless can_view_hidden_files
+    scope = Folder.search_by_attribute(scope, :name, params[:search_term], normalize_unicode: true) if params[:search_term].present?
     scope
   end
 

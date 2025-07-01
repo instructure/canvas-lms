@@ -294,7 +294,7 @@ module AttachmentHelper
     scope = scope.preload(:user) if params[:include].include?("user") && params[:sort] != "user"
     scope = scope.preload(:usage_rights) if params[:include].include?("usage_rights")
 
-    scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term], normalize_unicode: true)
+    scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term], normalize_unicode: true) if params[:search_term].present?
     scope = scope.by_content_types(Array(params[:content_types])) if params[:content_types].present?
     scope = scope.by_exclude_content_types(Array(params[:exclude_content_types])) if params[:exclude_content_types].present?
     scope = scope.for_category(params[:category]) if params[:category].present?

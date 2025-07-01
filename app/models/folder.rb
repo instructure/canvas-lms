@@ -24,6 +24,7 @@ class Folder < ActiveRecord::Base
     best_unicode_collation_key(col)
   end
   include Workflow
+  include SearchTermHelper
 
   ICON_MAKER_UNIQUE_TYPE = "icon maker icons"
   ROOT_FOLDER_NAME = "course files"
