@@ -83,25 +83,25 @@ describe('AccessibilityIssuesTable', () => {
       <AccessibilityIssuesTable onSortRequest={mockOnSortRequest} tableData={testData} />,
     )
 
-    screen.getByText('Content Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('content-type-header', 'ascending')
+    screen.getByText('Artifact Type').click()
+    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'ascending')
     rerender(
       <AccessibilityIssuesTable
         onSortRequest={mockOnSortRequest}
         tableData={testData}
-        tableSortState={{sortId: 'content-type-header', sortDirection: 'ascending'}}
+        tableSortState={{sortId: 'artifact-type-header', sortDirection: 'ascending'}}
       />,
     )
-    screen.getByText('Content Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('content-type-header', 'descending')
+    screen.getByText('Artifact Type').click()
+    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'descending')
     rerender(
       <AccessibilityIssuesTable
         onSortRequest={mockOnSortRequest}
         tableData={testData}
-        tableSortState={{sortId: 'content-type-header', sortDirection: 'descending'}}
+        tableSortState={{sortId: 'artifact-type-header', sortDirection: 'descending'}}
       />,
     )
-    screen.getByText('Content Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('content-type-header', 'none')
+    screen.getByText('Artifact Type').click()
+    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'none')
   })
 })
