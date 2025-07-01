@@ -5232,6 +5232,138 @@ describe Submission do
       @another_submission.update!(cached_quiz_lti: false)
       expect(@another_submission).to be_missing
     end
+
+    context "checkpointed discussions" do
+      before :once do
+        @course.root_account.enable_feature!(:discussion_checkpoints)
+        @checkpointed_assignment = assignment_model(
+          course: @course,
+          submission_types: "discussion_topic",
+          due_at: 1.day.ago,
+          has_sub_assignments: true
+        )
+        @discussion = discussion_topic_model(assignment: @checkpointed_assignment)
+
+        # Create sub-assignments (checkpoints)
+        @reply_to_topic_checkpoint = @checkpointed_assignment.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_TOPIC,
+          due_at: 1.day.ago,
+          title: "Reply to Topic",
+          submission_types: "discussion_topic"
+        )
+        @reply_to_entry_checkpoint = @checkpointed_assignment.sub_assignments.create!(
+          context: @course,
+          sub_assignment_tag: CheckpointLabels::REPLY_TO_ENTRY,
+          due_at: 1.day.ago,
+          title: "Reply to Entry",
+          submission_types: "discussion_topic"
+        )
+
+        @parent_submission = @checkpointed_assignment.submissions.find_by(user: @student)
+        @topic_submission = @reply_to_topic_checkpoint.submissions.find_by(user: @student)
+        @entry_submission = @reply_to_entry_checkpoint.submissions.find_by(user: @student)
+      end
+
+      context "parent assignment submissions" do
+        it "returns true when any child submission is missing" do
+          # Set one child as missing
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(submitted_at: 2.days.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns true when both child submissions are missing" do
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(late_policy_status: "missing")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns true when user has submitted to neither checkpoint" do
+          # Both submissions are unsubmitted and past due (default state)
+          expect(@topic_submission.workflow_state).to eq("unsubmitted")
+          expect(@entry_submission.workflow_state).to eq("unsubmitted")
+          expect(@topic_submission.submitted_at).to be_nil
+          expect(@entry_submission.submitted_at).to be_nil
+          expect(@topic_submission.past_due?).to be true
+          expect(@entry_submission.past_due?).to be true
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).to be_missing
+        end
+
+        it "returns false when no child submissions are missing" do
+          @topic_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+          @entry_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+
+        it "returns false when parent submission is excused" do
+          @topic_submission.update!(late_policy_status: "missing")
+          @entry_submission.update!(excused: true)
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+
+        it "returns false when parent has custom grade status even with missing children" do
+          admin = account_admin_user(account: @course.root_account)
+          custom_grade_status = @course.root_account.custom_grade_statuses.create!(
+            name: "Custom Status",
+            color: "#ABC",
+            created_by: admin
+          )
+          @topic_submission.update!(late_policy_status: "missing")
+          @parent_submission.update!(custom_grade_status:)
+
+          # Call the aggregator service to set the parent submission's late_policy_status
+          Checkpoints::SubmissionAggregatorService.call(assignment: @checkpointed_assignment, student: @student)
+
+          expect(@parent_submission.reload).not_to be_missing
+        end
+      end
+
+      context "sub-assignment submissions" do
+        it "returns true when sub-assignment submission is missing and past due" do
+          @topic_submission.update!(late_policy_status: "missing")
+          expect(@topic_submission.reload).to be_missing
+        end
+
+        it "returns false when sub-assignment submission is submitted" do
+          @topic_submission.update!(submitted_at: 1.hour.ago, workflow_state: "submitted", submission_type: "discussion_topic")
+          expect(@topic_submission.reload).not_to be_missing
+        end
+
+        it "returns false when sub-assignment submission is excused" do
+          @topic_submission.update!(excused: true)
+          expect(@topic_submission.reload).not_to be_missing
+        end
+
+        it "returns true when sub-assignment is past due and not submitted" do
+          # Ensure submission expects submission and is past due
+          expect(@reply_to_topic_checkpoint.expects_submission?).to be true
+          expect(@topic_submission.past_due?).to be true
+          expect(@topic_submission.submitted_at).to be_nil
+          expect(@topic_submission.reload).to be_missing
+        end
+      end
+    end
   end
 
   describe "update_attachment_associations" do
