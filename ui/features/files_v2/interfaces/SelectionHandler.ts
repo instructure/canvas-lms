@@ -16,21 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-
-interface UpdatedAtDateProps {
-  updatedAt: string
-  isStacked: boolean
-}
-
-export const UpdatedAtDate = ({updatedAt, isStacked}: UpdatedAtDateProps) => {
-  if (isStacked) {
-    return <FriendlyDatetime dateTime={updatedAt} includeScreenReaderContent={false} />
-  } else {
-    return (
-      <div style={{padding: '0 0.5em'}}>
-        <FriendlyDatetime dateTime={updatedAt} includeScreenReaderContent={false} />
-      </div>
-    )
-  }
+export interface SelectionHandler {
+  selectAll: () => void
+  deselectAll: () => void
+  toggleSelectAll: () => void
+  toggleSelection: (id: string) => void
+  selectRange: (id: string) => void
 }

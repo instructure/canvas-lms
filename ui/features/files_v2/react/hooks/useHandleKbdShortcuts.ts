@@ -30,7 +30,10 @@ const shouldBeIgnored = (target: EventTarget | null): boolean => {
   return false
 }
 
-export const useHandleKbdShortcuts = (selectAllHandler: () => void) => {
+export const useHandleKbdShortcuts = (
+  selectAllHandler: () => void,
+  deselectAllHandler: () => void,
+) => {
   const handleCtrlPlusA = useCallback(
     (event: KeyboardEvent) => {
       if (shouldBeIgnored(event.target)) {
@@ -39,10 +42,14 @@ export const useHandleKbdShortcuts = (selectAllHandler: () => void) => {
 
       if (event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey)) {
         event.preventDefault()
-        selectAllHandler()
+        if (event.shiftKey) {
+          deselectAllHandler()
+        } else {
+          selectAllHandler()
+        }
       }
     },
-    [selectAllHandler],
+    [selectAllHandler, deselectAllHandler],
   )
 
   useEffect(() => {

@@ -42,7 +42,13 @@ export const defaultProps: FileFolderTableProps = {
   },
   searchString: '',
   selectedRows: new Set<string>(),
-  setSelectedRows: jest.fn(),
+  selectionHandler: {
+    selectAll: jest.fn(),
+    deselectAll: jest.fn(),
+    toggleSelectAll: jest.fn(),
+    toggleSelection: jest.fn(),
+    selectRange: jest.fn(),
+  },
 }
 
 export const mockRowFocusContext = {

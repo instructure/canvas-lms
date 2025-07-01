@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
 import {Responsive} from '@instructure/ui-responsive'
@@ -34,7 +34,9 @@ import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
 import {NotFoundError, UnauthorizedError} from '../../utils/apiUtils'
+import {getUniqueId} from '../../utils/fileFolderUtils'
 import {useGetFolders} from '../hooks/useGetFolders'
+import {useHandleSelections} from '../hooks/useHandleSelections'
 import {File, Folder} from '../../interfaces/File'
 import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
@@ -157,10 +159,13 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
   const fileMenuTools = filesEnv.contextFor({contextType, contextId})?.file_menu_tools || []
 
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  useEffect(() => {
-    setSelectedRows(new Set())
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
+
+  const rowIds = useMemo(() => {
+    return rows ? rows.map(row => getUniqueId(row)) : []
   }, [rows])
+
+  const {selectedIds, selectionHandlers} = useHandleSelections(rowIds, setSelectionAnnouncement)
 
   return (
     <FileManagementProvider
@@ -192,7 +197,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             bulkActions={
               <BulkActionButtons
                 size={size}
-                selectedRows={selectedRows}
+                selectedRows={selectedIds}
                 rows={currentRows ?? []}
                 totalRows={currentRows?.length ?? 0}
                 userCanEditFilesForContext={userCanEditFilesForContext}
@@ -219,8 +224,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 onSortChange={sort.set}
                 sort={sort}
                 searchString={search.term}
-                selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
+                selectedRows={selectedIds}
+                selectionHandler={selectionHandlers}
                 handleFileDropRef={handleFileDropRef}
                 selectAllRef={selectAllRef}
               />
@@ -257,6 +262,15 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
           />
         </RowsProvider>
       </RowFocusProvider>
+      {selectionAnnouncement && (
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="polite"
+          screenReaderOnly
+        >
+          {selectionAnnouncement}
+        </Alert>
+      )}
     </FileManagementProvider>
   )
 }
