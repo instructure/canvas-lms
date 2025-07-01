@@ -4476,7 +4476,7 @@ ca:
       headers: 
         date: Data
         details: Detalls
-        due: "Data de lliurament"
+        due: "Hora de lliurament"
       instructions: 
         syllabus: |-
             La pàgina del temari mostra una vista del programa de l'assignatura orientada per a taules, i els elements bàsics de
@@ -26403,7 +26403,7 @@ ca:
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: "Els estudiants podran veure que les notes d'aquesta activitat estan amagades."
   students_with_no_submissions_title: "Estudiants amb cap entrega"
   students_without_assessments_eb100e60: "Estudiants sense activitats"
-  studio_capture_a88ec4e: "Studio Capture"
+  studio_capture_a88ec4e: "Captura d'estudi"
   studio_media_options_in_rce_1118428b: "Opcions d’elements multimèdia de Studio a l’RCE"
   style_f6881133: Estil
   sub_account_daeadd0: "Compte secundari"
