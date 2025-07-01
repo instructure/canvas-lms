@@ -130,7 +130,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/courses/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+      `/api/v1/courses/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -145,7 +145,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/users/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
+      `/api/v1/users/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -160,7 +160,7 @@ describe('generateTableUrl', () => {
       pageQueryParam: 'bookmark:foobarbaz',
     })
     expect(url).toBe(
-      `/api/v1/groups/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
+      `/api/v1/groups/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=asc&page=bookmark:foobarbaz`,
     )
   })
 
@@ -174,7 +174,7 @@ describe('generateTableUrl', () => {
       sortDirection: 'desc',
     })
     expect(url).toBe(
-      `/api/v1/courses/1/files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc`,
+      `/api/v1/courses/1/folders_and_files?search_term=search&${QUERY_PARAMS}&sort=name&order=desc`,
     )
   })
 

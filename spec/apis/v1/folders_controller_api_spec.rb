@@ -1529,4 +1529,77 @@ describe "Folders API", type: :request do
       end
     end
   end
+
+  describe "#list_all_folders_and_files" do
+    before do
+      Account.site_admin.enable_feature!(:files_a11y_rewrite)
+    end
+
+    before(:once) do
+      course_with_teacher(active_all: true, user: user_with_pseudonym)
+      @root = Folder.root_folders(@course).first
+      @folders_files_path = "/api/v1/courses/#{@course.id}/folders_and_files"
+      @folders_files_path_options = { controller: "folders", action: "list_all_folders_and_files", format: "json", course_id: @course.id }
+
+      now = Time.now.utc
+      now -= 10.minutes
+      Timecop.freeze(now) do
+        @folder1 = @root.sub_folders.create!(name: "folder1", context: @course, position: 1)
+        Timecop.travel(now + 1.minute)
+        @folder2 = @folder1.sub_folders.create!(name: "folder2", context: @course, position: 1)
+        Timecop.travel(now + 2.minutes)
+        @file1 = Attachment.create!(
+          filename: "file1.txt",
+          display_name: "file1.txt",
+          uploaded_data: StringIO.new("existing file with more content"),
+          folder: @root,
+          context: @course,
+          user: @user,
+          usage_rights: UsageRights.create!(context: @course, use_justification: "used_by_permission")
+        )
+        Timecop.travel(now + 3.minutes)
+        @file2 = Attachment.create!(
+          filename: "file2.txt",
+          display_name: "file2.txt",
+          uploaded_data: StringIO.new("existing file"),
+          folder: @folder1,
+          context: @course,
+          user_id: User.create!(name: "User"),
+          usage_rights: UsageRights.create!(context: @course, use_justification: "own_copyright")
+        )
+        Timecop.travel(now + 4.minutes)
+        @file3 = Attachment.create!(
+          filename: "file3.txt",
+          display_name: "file3.txt",
+          uploaded_data: StringIO.new("another existing file"),
+          folder: @folder2,
+          context: @course,
+          user: @user,
+          usage_rights: UsageRights.create!(context: @course, use_justification: "fair_use")
+        )
+      end
+    end
+
+    it "returns unauthorized if feature is disabled" do
+      Account.site_admin.disable_feature!(:files_a11y_rewrite)
+
+      api_call(:get, @folders_files_path, @folders_files_path_options, {}, {}, expected_status: 403)
+    end
+
+    it "lists all folders first, followed by all files" do
+      json = api_call(:get, @folders_files_path, @folders_files_path_options, {})
+      result_names = json.map do |item|
+        item["name"] || item["display_name"] || item["filename"]
+      end
+      expect(result_names).to eq ["course files", "folder1", "folder2", "file1.txt", "file2.txt", "file3.txt"]
+    end
+
+    it "uses search_term to filter folders and files" do
+      json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(search_term: "file"))
+      result_names = json.map do |item|
+        item["name"] || item["display_name"] || item["filename"]
+      end
+      expect(result_names).to eq ["course files", "file1.txt", "file2.txt", "file3.txt"]
+    end
+  end
 end

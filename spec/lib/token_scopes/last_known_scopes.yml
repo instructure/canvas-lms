@@ -1010,6 +1010,8 @@
 - verb: GET
   path: '/api/v1/courses/:course_id/folders/media'
 - verb: GET
+  path: '/api/v1/courses/:course_id/folders_and_files'
+- verb: GET
   path: '/api/v1/courses/:course_id/front_page'
 - verb: PUT
   path: '/api/v1/courses/:course_id/front_page'
@@ -1743,6 +1745,8 @@
   path: '/api/v1/groups/:group_id/folders/by_path/*full_path'
 - verb: GET
   path: '/api/v1/groups/:group_id/folders/media'
+- verb: GET
+  path: '/api/v1/groups/:group_id/folders_and_files'
 - verb: DELETE
   path: '/api/v1/groups/:group_id/followers/self'
 - verb: PUT
@@ -2263,6 +2267,8 @@
   path: '/api/v1/users/:user_id/folders/by_path'
 - verb: GET
   path: '/api/v1/users/:user_id/folders/by_path/*full_path'
+- verb: GET
+  path: '/api/v1/users/:user_id/folders_and_files'
 - verb: DELETE
   path: '/api/v1/users/:user_id/followers/self'
 - verb: PUT
