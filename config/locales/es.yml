@@ -12561,7 +12561,7 @@ es:
   due_at_9053f658: "Vence a las"
   due_at_time_fa41cf6c: "Se vence a las: %{time}"
   due_available_and_until_dates_f90713da: "Fechas límite, disponible y hasta"
-  due_by_c263dc10: "fecha de entrega: "
+  due_by_c263dc10: "Vence: "
   due_date_2c6e4cfb: "Vence el %{date}"
   due_date_5d0a953c: "Fecha de entrega:"
   due_date_6a281fe3: "Fecha de entrega: %{date}"
