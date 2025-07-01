@@ -127,5 +127,25 @@ describe('LtiRegistration', () => {
       const result = ZLtiLegacyConfiguration.parse(legacyConfig)
       expect(result).toMatchObject(legacyConfig)
     })
+
+    it('accepts the string "true" for the enabled attribute', () => {
+      const usingString = _.merge(baseConfig, {
+        extensions: [
+          {
+            settings: {
+              placements: [
+                {
+                  placement: 'global_navigation',
+                  enabled: 'true',
+                },
+              ],
+            },
+          },
+        ],
+      })
+
+      const result = ZLtiLegacyConfiguration.parse(usingString)
+      expect(result).toMatchObject(usingString)
+    })
   })
 })

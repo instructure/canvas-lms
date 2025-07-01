@@ -22,7 +22,11 @@ export interface LtiPlacementConfig extends z.infer<typeof ZPlacementConfig> {}
 
 export const ZPlacementConfig = z.object({
   placement: ZLtiPlacement,
-  enabled: z.boolean().optional().nullable(),
+  // TODO: make this just a boolean along with INTEROP-8921
+  enabled: z
+    .union([z.literal('true'), z.literal('false'), z.boolean()])
+    .optional()
+    .nullable(),
   message_type: z.string(),
   target_link_uri: z.string().optional().nullable(),
   text: z.string().optional().nullable(),
