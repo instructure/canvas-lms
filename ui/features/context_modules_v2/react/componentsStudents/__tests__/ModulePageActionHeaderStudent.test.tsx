@@ -116,16 +116,7 @@ const setupTest = (
   // Render the component with context provider
   return render(
     <QueryClientProvider client={queryClient}>
-      <ContextModuleProvider
-        courseId={courseId}
-        isMasterCourse={false}
-        isChildCourse={false}
-        permissions={contextModuleDefaultProps.permissions}
-        NEW_QUIZZES_BY_DEFAULT={false}
-        DEFAULT_POST_TO_SIS={false}
-        teacherViewEnabled={false}
-        studentViewEnabled={true}
-      >
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId={courseId} externalTools={[]}>
         <ModulePageActionHeaderStudent {...props} />
       </ContextModuleProvider>
     </QueryClientProvider>,
@@ -250,14 +241,9 @@ describe('ModulePageActionHeaderStudent', () => {
     const {container} = render(
       <QueryClientProvider client={queryClient}>
         <ContextModuleProvider
+          {...contextModuleDefaultProps}
           courseId="1"
-          isMasterCourse={false}
-          isChildCourse={false}
           permissions={contextModuleDefaultProps.permissions}
-          NEW_QUIZZES_BY_DEFAULT={false}
-          DEFAULT_POST_TO_SIS={false}
-          teacherViewEnabled={false}
-          studentViewEnabled={true}
         >
           <ModulePageActionHeaderStudent {...props} />
         </ContextModuleProvider>

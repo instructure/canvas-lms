@@ -253,7 +253,12 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
         {['external_url', 'external_tool'].includes(itemType) && (
           <ExternalItemForm
             onChange={(field, value) => {
-              if (field === 'url' || field === 'name' || field === 'newTab') {
+              if (
+                field === 'url' ||
+                field === 'name' ||
+                field === 'newTab' ||
+                field === 'selectedToolId'
+              ) {
                 dispatch({
                   type: 'SET_EXTERNAL',
                   field,
@@ -264,6 +269,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             externalUrlValue={state.external.url}
             externalUrlName={state.external.name}
             newTab={state.external.newTab}
+            itemType={itemType}
           />
         )}
         <IndentSelector

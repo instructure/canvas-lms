@@ -17,6 +17,7 @@
  */
 
 import {createContext, useContext, useState} from 'react'
+import {ExternalTool} from '../componentsTeacher/AddItemModalComponents/ExternalToolSelector'
 
 const ContextModule = createContext<{
   courseId: string
@@ -27,6 +28,7 @@ const ContextModule = createContext<{
   DEFAULT_POST_TO_SIS: boolean
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
+  externalTools: ExternalTool[]
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 }>(
@@ -39,6 +41,7 @@ const ContextModule = createContext<{
     DEFAULT_POST_TO_SIS: boolean
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
+    externalTools: ExternalTool[]
     state: Record<string, any>
     setState: (state: Record<string, any>) => void
   },
@@ -54,6 +57,7 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS,
   teacherViewEnabled,
   studentViewEnabled,
+  externalTools,
 }: {
   children: React.ReactNode
   courseId: string
@@ -73,6 +77,7 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS: boolean | undefined
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
+  externalTools: ExternalTool[]
 }) => {
   const [state, setState] = useState({})
 
@@ -87,6 +92,7 @@ export const ContextModuleProvider = ({
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         teacherViewEnabled,
         studentViewEnabled,
+        externalTools,
         state,
         setState,
       }}
@@ -116,6 +122,7 @@ export const contextModuleDefaultProps = {
   DEFAULT_POST_TO_SIS: false,
   teacherViewEnabled: false,
   studentViewEnabled: false,
+  externalTools: [],
   state: {},
   setState: () => {},
 }
