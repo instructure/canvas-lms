@@ -40,17 +40,6 @@ admin_analytics:
   after_state_change_proc: analytics_2_after_state_change_hook
   root_opt_in: true
   beta: false
-admin_analytics_hide_courses_with_no_enrollments:
-  state: hidden
-  applies_to: Account
-  display_name: Admin Analytics - hide courses with no enrollments
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/Admin-Analytics-Hub/gh-p/admin_analytics">\1</a>
-    admin_analytics_hide_courses_with_no_enrollments_description: When enabled, Admin Analytics + Intelligent Insights
-      will hide courses with no enrollments from all data charts by default. There will be an option in the app
-      to show these courses.
-  root_opt_in: true
-  beta: false
 
 
 # Intelligent Insights - Provided through K20 LTI App
