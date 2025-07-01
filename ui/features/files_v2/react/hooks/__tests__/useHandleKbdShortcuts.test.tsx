@@ -20,9 +20,9 @@ import {render} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {useHandleKbdShortcuts} from '../useHandleKbdShortcuts'
 
-const renderDummyComponent = (handler: () => void) => {
+const renderDummyComponent = (selectAllHandler: () => void, deselectAllHandler: () => void) => {
   const DummyComponent = () => {
-    useHandleKbdShortcuts(handler)
+    useHandleKbdShortcuts(selectAllHandler, deselectAllHandler)
     return (
       <div>
         <textarea name="dummy" id="dummy-textarea"></textarea>
@@ -39,45 +39,75 @@ const renderDummyComponent = (handler: () => void) => {
 
 describe('useHandleKbdShortcuts', () => {
   let user: UserEvent
-  let handler: jest.Mock
+  let selectAllHandler: jest.Mock
+  let deselectAllHandler: jest.Mock
 
   beforeEach(() => {
-    handler = jest.fn()
+    selectAllHandler = jest.fn()
+    deselectAllHandler = jest.fn()
     user = userEvent.setup()
-    renderDummyComponent(handler)
+    renderDummyComponent(selectAllHandler, deselectAllHandler)
   })
 
   describe('when Ctrl+A or Cmd+A is pressed', () => {
     it('should call the select all handler when Ctrl+A is pressed', async () => {
       await user.keyboard('{Control>}{a}')
-      expect(handler).toHaveBeenCalled()
+      expect(selectAllHandler).toHaveBeenCalled()
     })
 
     it('should not call the handler when Ctrl+A is pressed in an input or textarea', async () => {
       const textarea = document.getElementById('dummy-textarea') as HTMLTextAreaElement
       await user.click(textarea)
       await user.keyboard('{Control>}{a}')
-      expect(handler).not.toHaveBeenCalled()
+      expect(selectAllHandler).not.toHaveBeenCalled()
     })
 
     it('should not call the handler when Ctrl+A is pressed in a text input', async () => {
       const input = document.getElementById('dummy-input') as HTMLInputElement
       await user.click(input)
       await user.keyboard('{Control>}{a}')
-      expect(handler).not.toHaveBeenCalled()
+      expect(selectAllHandler).not.toHaveBeenCalled()
     })
 
     it('should not call the handler when Ctrl+A is pressed in a dialog', async () => {
       const dialogItem = document.getElementById('dialog-item') as HTMLInputElement
       await user.click(dialogItem)
       await user.keyboard('{Control>}{a}')
-      expect(handler).not.toHaveBeenCalled()
+      expect(selectAllHandler).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when Ctrl+Shift+A or Cmd+Shift+A is pressed', () => {
+    it('should call the deselect all handler when Ctrl+Shift+A is pressed', async () => {
+      await user.keyboard('{Control>}{Shift>}{a}')
+      expect(deselectAllHandler).toHaveBeenCalled()
+    })
+
+    it('should not call the handler when Ctrl+Shift+A is pressed in an input or textarea', async () => {
+      const textarea = document.getElementById('dummy-textarea') as HTMLTextAreaElement
+      await user.click(textarea)
+      await user.keyboard('{Control>}{Shift>}{a}')
+      expect(selectAllHandler).not.toHaveBeenCalled()
+    })
+
+    it('should not call the handler when Ctrl+Shift+A is pressed in a text input', async () => {
+      const input = document.getElementById('dummy-input') as HTMLInputElement
+      await user.click(input)
+      await user.keyboard('{Control>}{Shift>}{a}')
+      expect(selectAllHandler).not.toHaveBeenCalled()
+    })
+
+    it('should not call the handler when Ctrl+Shift+A is pressed in a dialog', async () => {
+      const dialogItem = document.getElementById('dialog-item') as HTMLInputElement
+      await user.click(dialogItem)
+      await user.keyboard('{Control>}{Shift>}{a}')
+      expect(selectAllHandler).not.toHaveBeenCalled()
     })
   })
 
   describe('when nothing is pressed', () => {
     it('should not call the select all handler', async () => {
-      expect(handler).not.toHaveBeenCalled()
+      expect(selectAllHandler).not.toHaveBeenCalled()
     })
   })
 })
