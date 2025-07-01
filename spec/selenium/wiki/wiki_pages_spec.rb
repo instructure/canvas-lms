@@ -381,6 +381,22 @@ describe "Wiki Pages" do
 
       expect(f("#content")).not_to contain_css(".view_all_pages")
     end
+
+    it "displays To-Do Date in user's time zone" do
+      @user.time_zone = "Alaska"
+      @user.save!
+      Time.use_zone("UTC") do
+        todo_date = Time.zone.now + 1
+        @course.wiki_pages.create!(title: "todo", todo_date:)
+        get "/courses/#{@course.id}/pages/todo"
+        Time.use_zone("Alaska") do
+          expected_date = datetime_string(todo_date)
+          elm = find_by_test_id("friendly-date-time")
+          # expect text in the form of "To-Do Date: Jul 1 at 1:53pm"
+          expect(elm).to include_text "To-Do Date: #{expected_date}"
+        end
+      end
+    end
   end
 
   context "Permissions" do

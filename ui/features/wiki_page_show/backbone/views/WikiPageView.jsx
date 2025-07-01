@@ -17,6 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import $ from 'jquery'
 import 'jquery-scroll-to-visible'
 import * as tz from '@instructure/moment-utils'
@@ -38,6 +39,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {renderFrontPagePill} from '@canvas/wiki/react/renderFrontPagePill'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
+import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 
 const I18n = createI18nScope('pages')
 
@@ -183,6 +185,7 @@ export default class WikiPageView extends Backbone.View {
     }
     if (this.$sequenceFooter) this.$sequenceFooter.appendTo($('#module_navigation_target'))
 
+    this.renderToDoDate()
     this.maybeRenderBlockEditorContent()
   }
 
@@ -364,6 +367,24 @@ export default class WikiPageView extends Backbone.View {
       />,
       mountPoint,
     )
+  }
+
+  renderToDoDate() {
+    const todo_date = this.model.get('todo_date')
+    if (todo_date) {
+      const mountPoint = document.getElementById('todo-date-mount-point')
+      const root = createRoot(mountPoint)
+      root.render(
+        <b>
+          <FriendlyDatetime
+            data-testid="wiki-page-todo-date"
+            prefix={I18n.t('To-Do Date:')}
+            format={I18n.t('#date.formats.date_at_time')}
+            dateTime={todo_date}
+          />
+        </b>,
+      )
+    }
   }
 
   toJSON() {

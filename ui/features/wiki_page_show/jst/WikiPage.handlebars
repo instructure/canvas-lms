@@ -102,9 +102,7 @@
   {{else}}
     <h1 class="page-title">{{title}}</h1>
   {{/if}}
-  {{#if todo_date}}
-    <b>{{#t "wiki.todo_date"}}To-Do Date:{{/t}} {{tDateToString todo_date "date_at_time"}}</b>
-  {{/if}}
+  <div id="todo-date-mount-point"></div>
   {{#if locked_for_user}}
     <div class="spinner"></div>
     <div class="lock_explanation"></div>
