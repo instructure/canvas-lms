@@ -366,10 +366,10 @@ describe Types::AssignmentType do
     end
 
     it "tags attachments with location when file_association_access is enabled" do
-      assignment_type =  GraphQLTypeTester.new(assignment, current_user: student, domain_root_account: course.root_account)
+      assignment_type =  GraphQLTypeTester.new(assignment, current_user: teacher, domain_root_account: course.root_account)
       course.root_account.enable_feature!(:file_association_access)
       attachment = attachment_model(context: course)
-      assignment.update(description: "<img src='/courses/#{course.id}/files/#{attachment.id}/download'>")
+      assignment.update(description: "<img src='/courses/#{course.id}/files/#{attachment.id}/download'>", saving_user: teacher)
       expect(
         assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
       ).to include "http://test.host/courses/#{course.id}/files/#{attachment.id}/download?location=#{assignment.asset_string}"

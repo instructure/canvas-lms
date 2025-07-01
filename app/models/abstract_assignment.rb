@@ -37,6 +37,7 @@ class AbstractAssignment < ActiveRecord::Base
   include DuplicatingObjects
   include LockedFor
   include Lti::Migratable
+  include LinkedAttachmentHandler
 
   ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].to_set.freeze
   POINTED_GRADING_TYPES = %w[points percent letter_grade gpa_scale].to_set.freeze
@@ -105,6 +106,7 @@ class AbstractAssignment < ActiveRecord::Base
   has_many :provisional_grades, through: :submissions
   belongs_to :annotatable_attachment, class_name: "Attachment"
   has_many :attachments, as: :context, inverse_of: :context, dependent: :destroy
+  has_many :attachment_associations, as: :context, inverse_of: :context
   has_one :quiz, class_name: "Quizzes::Quiz", inverse_of: :assignment, foreign_key: :assignment_id
   belongs_to :assignment_group
   has_one :discussion_topic, -> { where(root_topic_id: nil).order(:created_at) }, inverse_of: :assignment, foreign_key: :assignment_id
@@ -266,6 +268,10 @@ class AbstractAssignment < ActiveRecord::Base
     self.rubric_association = nil
     self.submission_types = "online_text_entry" unless (submission_types_array - HORIZON_SUBMISSION_TYPES).empty?
     self.workflow_state = "unpublished" if context_module_tags.none? { |t| t.tag_type == "context_module" && t.context_module&.published? }
+  end
+
+  def self.html_fields
+    %w[description]
   end
 
   def queue_conditional_release_grade_change_handler?

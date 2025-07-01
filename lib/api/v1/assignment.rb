@@ -934,6 +934,7 @@ module Api::V1::Assignment
     # TODO: allow rubric creation
 
     if update_params.key?("description")
+      assignment.saving_user = user
       update_params["description"] = process_incoming_html_content(update_params["description"])
     end
 
