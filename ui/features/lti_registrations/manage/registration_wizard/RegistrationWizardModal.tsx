@@ -267,7 +267,7 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
             name="LTI Version"
             defaultValue={props.state.lti_version || '1p3'}
           >
-            <RadioInput value="1p3" label="1.3" />
+            <RadioInput value="1p3" label="1.3" data-pendo="lti-registration-1p3-install" />
             <RadioInput value="1p1" label="1.1" data-pendo="lti-registration-1p1-interest" />
           </RadioInputGroup>
         </View>
@@ -275,6 +275,7 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
           <>
             <View display="block" margin="medium 0">
               <SimpleSelect
+                id="lti-registration-install-method-selector"
                 renderLabel={I18n.t('Install Method')}
                 assistiveText="Use arrow keys to navigate options."
                 value={props.state.method}
