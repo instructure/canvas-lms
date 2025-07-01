@@ -26,6 +26,7 @@ type ExternalUrl = {
   url: string
   name: string
   newTab: boolean
+  selectedToolId?: string
 }
 
 type NewItem = {
@@ -47,7 +48,7 @@ type FormState = {
 const initialState: FormState = {
   indentation: 0,
   textHeader: '',
-  external: {url: '', name: '', newTab: false},
+  external: {url: '', name: '', newTab: false, selectedToolId: ''},
   newItem: {name: '', assignmentGroup: '', file: null, folder: ''},
   tabIndex: 0,
   isLoading: false,
