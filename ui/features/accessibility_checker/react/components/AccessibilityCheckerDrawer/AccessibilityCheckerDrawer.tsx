@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import {AccessibilityIssuesTray} from '../AccessibilityIssuesTray/AccessibilityIssuesTray'
+import AccessibilityIssuesDrawerContent from '../AccessibilityIssuesDrawerContent/AccessibilityIssuesDrawerContent'
 import {ContentItem} from '../../types'
 import {AccessibilityChecker} from '../..'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
@@ -93,7 +93,7 @@ export default function AccessibilityCheckerDrawer({
           >
             <View width="30em" height="100%" display="flex">
               {selectedItem ? (
-                <AccessibilityIssuesTray item={selectedItem} onClose={onDismiss} />
+                <AccessibilityIssuesDrawerContent item={selectedItem} onClose={onDismiss} />
               ) : (
                 <View margin="auto">
                   <Spinner renderTitle={I18n.t('Loading accessibility issues...')} />
