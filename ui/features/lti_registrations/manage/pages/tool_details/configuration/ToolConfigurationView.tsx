@@ -18,8 +18,8 @@
 
 import * as React from 'react'
 import {useOutletContext, Link as RouterLink} from 'react-router-dom'
-import {ToolDetailsOutletContext} from '../ToolDetails'
-import {View, ViewProps} from '@instructure/ui-view'
+import type {ToolDetailsOutletContext} from '../ToolDetails'
+import {View, type ViewProps} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconRefreshLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {Spacing} from '@instructure/emotion'
+import type {Spacing} from '@instructure/emotion'
 import {i18nLtiScope} from '@canvas/lti/model/i18nLtiScope'
 import {i18nLtiPrivacyLevel} from '../../../model/i18nLtiPrivacyLevel'
 import {i18nLtiPlacement} from '../../../model/i18nLtiPlacement'
@@ -384,6 +384,7 @@ export const ToolConfigurationView = () => {
                   }}
                 >
                   <Button
+                    data-pendo="lti-registrations-restore-default"
                     color="primary-inverse"
                     interaction={canRestoreDefault ? 'enabled' : 'disabled'}
                     renderIcon={<IconRefreshLine />}
@@ -410,6 +411,7 @@ export const ToolConfigurationView = () => {
           </Flex.Item>
           <Flex.Item>
             <Button
+              data-pendo="lti-registrations-edit-config"
               color="primary"
               as={RouterLink}
               to={`/manage/${registration.id}/configuration/edit`}

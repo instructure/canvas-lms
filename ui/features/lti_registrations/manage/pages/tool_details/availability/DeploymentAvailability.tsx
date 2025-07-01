@@ -35,24 +35,24 @@ import {
 } from '../../../../common/lib/apiResult/ApiResult'
 import {
   createContextControls,
-  DeleteContextControl,
-  UpdateContextControl,
+  type DeleteContextControl,
+  type UpdateContextControl,
 } from '../../../api/contextControls'
-import {AccountId, ZAccountId} from '../../../model/AccountId'
+import {type AccountId, ZAccountId} from '../../../model/AccountId'
 import {ZCourseId} from '../../../model/CourseId'
-import {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
-import {LtiDeployment} from '../../../model/LtiDeployment'
-import {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
-import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
+import type {LtiContextControl, LtiContextControlId} from '../../../model/LtiContextControl'
+import type {LtiDeployment} from '../../../model/LtiDeployment'
+import type {LtiRegistrationWithAllInformation} from '../../../model/LtiRegistration'
+import type {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {askForContextControl} from './AskForContextControl'
 import {ContextCard} from './ContextCard'
 import {
   DeleteExceptionModal,
-  DeleteExceptionModalOpenState,
+  type DeleteExceptionModalOpenState,
 } from './exception_modal/DeleteExceptionModal'
 import {findRootContextControl} from './findRootContextControl'
 import {EditExceptionModal} from './exception_modal/EditExceptionModal'
-import {ExceptionModal, ExceptionModalOpenState} from './exception_modal/ExceptionModal'
+import {ExceptionModal, type ExceptionModalOpenState} from './exception_modal/ExceptionModal'
 import {renderExceptionCounts} from './renderExceptionCounts'
 import {buildControlsByPath, nearestParentControl} from './nearestParentControl'
 import {DeleteDeploymentModal} from './deployment_modal/DeleteDeploymentModal'
@@ -162,6 +162,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
             <Flex direction="row" gap="small">
               <IconButton
                 id={`edit-exception-${rootControl.id}`}
+                data-pendo="lti-registrations-edit-root-control-availability"
                 size="medium"
                 screenReaderLabel={I18n.t('Modify availability for %{context_name}', {
                   context_name: rootControl.context_name,
@@ -174,6 +175,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
               {!deployment.root_account_deployment && (
                 <IconButton
                   id={`delete-deployment-${deployment.id}`}
+                  data-pendo="lti-registrations-delete-deployment"
                   size="medium"
                   screenReaderLabel={I18n.t('Delete Deployment for %{context_name}', {
                     context_name: rootControl.context_name,
@@ -238,7 +240,11 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       </div>
       <View as="div" margin="0 0 small">
         <Text>
-          <Link to={`/manage/${registration.id}/configuration#placements`} as={RouterLink}>
+          <Link
+            to={`/manage/${registration.id}/configuration#placements`}
+            as={RouterLink}
+            data-pendo="lti-registrations-placements-link"
+          >
             {I18n.t(
               {
                 one: '1 placement',
@@ -285,6 +291,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                       <Flex.Item>
                         <IconButton
                           id={`edit-exception-${control.id}`}
+                          data-pendo="lti-registrations-edit-exception"
                           size="medium"
                           renderIcon={IconEditLine}
                           screenReaderLabel={I18n.t('Edit Exception for %{contextName}', {
@@ -301,6 +308,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
                       <Flex.Item>
                         <IconButton
                           id={`delete-exception-${control.id}`}
+                          data-pendo="lti-registrations-delete-exception"
                           size="medium"
                           screenReaderLabel={I18n.t('Delete Exception for %{contextName}', {
                             contextName: control.context_name,

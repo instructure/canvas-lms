@@ -136,6 +136,7 @@ const Columns: ReadonlyArray<Column> = [
           to={`/manage/${r.id}`}
           isWithinText={false}
           data-testid={`reg-link-${r.id}`}
+          data-pendo="lti-registrations-app-link"
         >
           {appName}
         </Link>

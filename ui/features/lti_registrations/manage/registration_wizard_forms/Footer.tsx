@@ -61,6 +61,7 @@ export const Footer = ({
         color="primary"
         margin="0 0 0 xx-small"
         interaction={disableNextButton ? 'disabled' : 'enabled'}
+        id={onLastScreen ? 'lti-registration-install-tool-button' : undefined}
       >
         {nextButtonLabel}
       </Button>

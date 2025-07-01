@@ -109,7 +109,7 @@ export const LtiAppsLayout = React.memo(() => {
         </Flex.Item>
         {isManage ? (
           <Flex.Item>
-            <Button color="primary" onClick={open}>
+            <Button color="primary" onClick={open} id="install-new-lti-app">
               {I18n.t('Install a New App')}
             </Button>
           </Flex.Item>
