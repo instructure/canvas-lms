@@ -23,7 +23,6 @@ import {IconSearchLine, IconTroubleLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('files_v2')

@@ -1204,6 +1204,7 @@ CanvasRails::Application.routes.draw do
       get  "courses/:course_id/files", controller: :files, action: :api_index, as: "course_files"
       post "courses/:course_id/files", action: :create_file, as: "course_create_file"
       get "courses/:course_id/folders", controller: :folders, action: :list_all_folders, as: "course_folders"
+      get "courses/:course_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "course_folders_and_files"
       post "courses/:course_id/folders", controller: :folders, action: :create
       get "courses/:course_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "courses/:course_id/folders/by_path", controller: :folders, action: :resolve_path
@@ -1700,6 +1701,7 @@ CanvasRails::Application.routes.draw do
       post "users/:user_id/files", action: :create_file
       get  "users/:user_id/files", controller: :files, action: :api_index, as: "user_files"
       get "users/:user_id/folders", controller: :folders, action: :list_all_folders, as: "user_folders"
+      get "users/:user_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "user_folders_and_files"
       post "users/:user_id/folders", controller: :folders, action: :create
       get "users/:user_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "users/:user_id/folders/by_path", controller: :folders, action: :resolve_path
@@ -2002,6 +2004,7 @@ CanvasRails::Application.routes.draw do
 
       get "groups/:group_id/files", controller: :files, action: :api_index, as: "group_files"
       get "groups/:group_id/folders", controller: :folders, action: :list_all_folders, as: "group_folders"
+      get "groups/:group_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "group_folders_and_files"
       post "groups/:group_id/folders", controller: :folders, action: :create
       get "groups/:group_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "groups/:group_id/folders/by_path", controller: :folders, action: :resolve_path
