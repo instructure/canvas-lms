@@ -1355,6 +1355,23 @@ describe "Folders API", type: :request do
       expect(result_names).to eq %w[extra_file_0.txt extra_file_1.txt extra_file_2.txt file1.txt file2.txt]
     end
 
+    it "uses search_term to filter folders and files" do
+      @root.sub_folders.create!(name: "searchable_folder", context: @course)
+      Attachment.create!(
+        filename: "searchable_file.txt",
+        display_name: "searchable_file.txt",
+        uploaded_data: StringIO.new("existing"),
+        folder: @root,
+        context: @course
+      )
+
+      json = api_call(:get, @folders_files_path, @folders_files_path_options.merge(search_term: "searchable"), {})
+      result_names = json.map do |item|
+        item["name"] || item["display_name"] || item["filename"]
+      end
+      expect(result_names).to eq %w[searchable_folder searchable_file.txt]
+    end
+
     it "respects default 25 per_page when listing folders and files correctly" do
       25.times { |i| @root.sub_folders.create!(name: "extra_folder_#{i}", context: @course) }
       25.times do |i|
