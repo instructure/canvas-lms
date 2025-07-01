@@ -4156,7 +4156,7 @@ es-ES:
       headers: 
         date: Fecha
         details: Detalles
-        due: "Fecha de entrega"
+        due: "Hora de entrega"
       instructions: 
         syllabus: |-
             La página del programa de la asignatura muestra una vista de tabla del programa de la asignatura y lo básico
@@ -9986,7 +9986,7 @@ es-ES:
   due_at_9053f658: "Vence a las"
   due_at_time_fa41cf6c: "Vence a las: %{time}"
   due_available_and_until_dates_f90713da: "Fechas de entrega, de disponibilidad y límite"
-  due_by_c263dc10: "fecha de entrega"
+  due_by_c263dc10: "Vence: "
   due_date_2c6e4cfb: "Fecha de entrega %{date}"
   due_date_6a281fe3: "Fecha de entrega: %{date}"
   due_date_822625d8: "Fecha de entrega"
