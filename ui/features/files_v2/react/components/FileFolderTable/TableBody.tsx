@@ -47,6 +47,7 @@ interface TableBodyProps {
   size: 'small' | 'medium' | 'large'
   isStacked: boolean
   toggleRowSelection: (id: string) => void
+  selectRange: (id: string) => void
   userCanEditFilesForContext: boolean
   userCanDeleteFilesForContext: boolean
   userCanRestrictFilesForContext: boolean
@@ -61,6 +62,7 @@ const TableBody: React.FC<TableBodyProps> = ({
   size,
   isStacked,
   toggleRowSelection,
+  selectRange,
   userCanEditFilesForContext,
   userCanDeleteFilesForContext,
   userCanRestrictFilesForContext,
@@ -235,8 +237,14 @@ const TableBody: React.FC<TableBodyProps> = ({
     <>
       {rows.map((row, index) => {
         const isSelected = selectedRows.has(getUniqueId(row))
-        const handleToggleClick = (event: React.MouseEvent, columnID: ColumnID) => {
-          const actionColumns: ColumnID[] = ['actions', 'blueprint', 'permissions', 'rights']
+        const handleClick = (event: React.MouseEvent, columnID: ColumnID) => {
+          const actionColumns: ColumnID[] = [
+            'name',
+            'actions',
+            'blueprint',
+            'permissions',
+            'rights',
+          ]
           if (actionColumns.includes(columnID)) {
             return // Skip if column's has default click behavior
           }
@@ -245,7 +253,14 @@ const TableBody: React.FC<TableBodyProps> = ({
             return
           }
 
-          if (event.ctrlKey || event.metaKey) toggleRowSelection(getUniqueId(row))
+          if (event.ctrlKey || event.metaKey) {
+            toggleRowSelection(getUniqueId(row))
+            return
+          }
+          if (event.shiftKey) {
+            selectRange(getUniqueId(row))
+            return
+          }
         }
         const rowHead = [
           <Table.RowHeader key="select">
@@ -263,7 +278,7 @@ const TableBody: React.FC<TableBodyProps> = ({
               key={column.id}
               data-testid={`table-cell-${column.id}`}
               textAlign={isStacked ? undefined : column.textAlign}
-              onClick={e => handleToggleClick(e, column.id)}
+              onClick={e => handleClick(e, column.id)}
             >
               {columnRenderers[column.id]({
                 row: row,
