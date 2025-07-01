@@ -25,12 +25,12 @@ describe('IssueCell', () => {
   describe('renders pill', () => {
     it('with correct number', () => {
       render(<IssueCell item={{count: 5} as ContentItem} />)
-      expect(screen.getByTestId('issue-count-tag')).toHaveTextContent('5')
+      expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('5')
     })
 
     it('with correct number if exceeds limit', () => {
       render(<IssueCell item={{count: 2000} as ContentItem} />)
-      expect(screen.getByTestId('issue-count-tag')).toHaveTextContent('999+')
+      expect(screen.getByTestId('issue-count-badge')).toHaveTextContent('99+')
     })
 
     describe('and button', () => {

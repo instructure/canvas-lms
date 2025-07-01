@@ -18,11 +18,11 @@
 
 import React, {useCallback} from 'react'
 
+import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-content'
+import {Badge, BadgeProps} from '@instructure/ui-badge'
 import {Button} from '@instructure/ui-buttons'
 import {IconEditLine, IconPublishSolid, IconQuestionLine} from '@instructure/ui-icons'
-import {AccessibleContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Spinner} from '@instructure/ui-spinner'
-import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -30,45 +30,53 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ContentItem} from '../../types'
 import {Flex} from '@instructure/ui-flex'
 
+const I18n = createI18nScope('accessibility_checker')
+
 interface IssueCellProps {
   item: ContentItem
   onClick?: (item: ContentItem) => void
 }
 
-const MAX_COUNT = 999
+const MAX_COUNT = 100
+const ISSUES_COUNT_OFFSET = '2.75rem'
 
-const I18n = createI18nScope('accessibility_checker')
+const badgeThemeOverride: BadgeProps['themeOverride'] = (_componentTheme, currentTheme) => ({
+  colorDanger: currentTheme.colors.primitives.orange45,
+  fontWeight: 700,
+  padding: '0.5rem',
+  fontSize: '1rem',
+  size: '1.375rem',
+})
 
 const IssuePillAndButton = ({item, onClick}: IssueCellProps) => {
   const handleClick = useCallback(() => onClick?.(item), [item, onClick])
+
   return (
     <Flex gap="x-small">
-      <Flex.Item>
-        <Tag
-          data-testid="issue-count-tag"
-          text={
-            <AccessibleContent
-              alt={I18n.t(
-                {
-                  one: '1 Issue',
-                  other: '%{count} Issues',
-                  zero: 'No Issues',
-                },
-                {count: item.count},
-              )}
-            >
-              {item.count > MAX_COUNT ? `${MAX_COUNT}+` : item.count}
-            </AccessibleContent>
-          }
-          themeOverride={(_componentTheme, currentTheme) => ({
-            defaultBackground: currentTheme.colors.primitives.orange57,
-            defaultBorderColor: currentTheme.colors.primitives.orange57,
-            defaultColor: currentTheme.colors.primitives.white,
-          })}
+      <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
+        <Badge
+          standalone
+          variant="danger"
+          countUntil={MAX_COUNT}
+          themeOverride={badgeThemeOverride}
+          count={item.count}
+          formatOverflowText={(_count: number, countUntil: number) => `${countUntil - 1}+`}
+          formatOutput={formattedCount => {
+            const altText =
+              formattedCount === '1'
+                ? I18n.t('1 Issue')
+                : I18n.t('%{count} Issues', {count: formattedCount})
+
+            return (
+              <AccessibleContent alt={altText} data-testid="issue-count-badge">
+                {formattedCount}
+              </AccessibleContent>
+            )
+          }}
         />
       </Flex.Item>
       {onClick && (
-        <Flex.Item>
+        <Flex.Item textAlign="start">
           <Button
             data-testid="issue-remediation-button"
             size="small"
@@ -83,43 +91,34 @@ const IssuePillAndButton = ({item, onClick}: IssueCellProps) => {
   )
 }
 
+interface NonFixableCellProps {
+  icon: React.ReactNode
+  text: any
+}
+
+const NonFixableCell = ({icon, text}: NonFixableCellProps) => {
+  return (
+    <Flex gap="x-small">
+      <Flex.Item textAlign="end" size={ISSUES_COUNT_OFFSET}>
+        <PresentationContent>{icon}</PresentationContent>
+      </Flex.Item>
+      <Flex.Item textAlign="start">
+        <Text>{text}</Text>
+      </Flex.Item>
+    </Flex>
+  )
+}
+
 const NoIssuesText = () => (
-  <Flex gap="x-small">
-    <Flex.Item>
-      <PresentationContent>
-        <IconPublishSolid color="success" />
-      </PresentationContent>
-    </Flex.Item>
-    <Flex.Item>
-      <Text>{I18n.t('No issues')}</Text>
-    </Flex.Item>
-  </Flex>
+  <NonFixableCell icon={<IconPublishSolid color="success" />} text={I18n.t('No issues')} />
 )
 
 const UnknownIssuesText = () => (
-  <Flex gap="x-small">
-    <Flex.Item>
-      <PresentationContent>
-        <IconQuestionLine color="secondary" />
-      </PresentationContent>
-    </Flex.Item>
-    <Flex.Item>
-      <Text>{I18n.t('Unknown')}</Text>
-    </Flex.Item>
-  </Flex>
+  <NonFixableCell icon={<IconQuestionLine color="secondary" />} text={I18n.t('Unknown')} />
 )
 
 const LoadingIssuesText = () => (
-  <Flex gap="x-small">
-    <Flex.Item>
-      <PresentationContent>
-        <Spinner size="x-small" />
-      </PresentationContent>
-    </Flex.Item>
-    <Flex.Item>
-      <Text>{I18n.t('Checking...')}</Text>
-    </Flex.Item>
-  </Flex>
+  <NonFixableCell icon={<Spinner size="x-small" />} text={I18n.t('Checking...')} />
 )
 
 export const IssueCell: React.FC<IssueCellProps> = (props: IssueCellProps) => {

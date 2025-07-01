@@ -45,6 +45,13 @@ type Props = {
   tableSortState?: TableSortState
 }
 
+const headerThemeOverride: TableColHeaderProps['themeOverride'] = (
+  _componentTheme,
+  currentTheme,
+) => ({
+  padding: '0.875rem 0.75rem', // Make column header height 3rem
+})
+
 const renderTableData = (
   tableData?: ContentItem[],
   error?: string | null,
@@ -138,44 +145,48 @@ export const AccessibilityIssuesTable = ({
         >
           <Table.Row>
             <Table.ColHeader
-              id="name-header"
+              id="artifact-name-header"
               onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('name-header')}
+              sortDirection={getCurrentSortDirection('artifact-name-header')}
+              themeOverride={headerThemeOverride}
             >
-              <Text weight="bold">{I18n.t('Content Name')}</Text>
+              <Text weight="bold">{I18n.t('Artifact Name')}</Text>
             </Table.ColHeader>
 
             <Table.ColHeader
               id="issues-header"
-              textAlign="center"
               onRequestSort={handleSort}
               sortDirection={getCurrentSortDirection('issues-header')}
+              themeOverride={headerThemeOverride}
             >
               <Text weight="bold">{I18n.t('Issues')}</Text>
             </Table.ColHeader>
 
             <Table.ColHeader
-              id="content-type-header"
+              id="artifact-type-header"
               onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('content-type-header')}
+              sortDirection={getCurrentSortDirection('artifact-type-header')}
+              themeOverride={headerThemeOverride}
             >
-              <Text weight="bold">{I18n.t('Content Type')}</Text>
+              <Text weight="bold">{I18n.t('Artifact Type')}</Text>
             </Table.ColHeader>
 
             <Table.ColHeader
               id="state-header"
               onRequestSort={handleSort}
               sortDirection={getCurrentSortDirection('state-header')}
+              themeOverride={headerThemeOverride}
             >
               <Text weight="bold">{I18n.t('State')}</Text>
             </Table.ColHeader>
 
             <Table.ColHeader
-              id="updated-header"
+              id="last-edited-header"
               onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('updated-header')}
+              sortDirection={getCurrentSortDirection('last-edited-header')}
+              themeOverride={headerThemeOverride}
             >
-              <Text weight="bold">{I18n.t('Last updated')}</Text>
+              <Text weight="bold">{I18n.t('Last edited')}</Text>
             </Table.ColHeader>
           </Table.Row>
         </Table.Head>
