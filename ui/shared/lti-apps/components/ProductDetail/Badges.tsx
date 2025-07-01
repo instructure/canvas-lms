@@ -19,10 +19,10 @@
 import TruncateWithTooltip from '../common/TruncateWithTooltip'
 import useBreakpoints from '../../hooks/useBreakpoints'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
-import {Img} from '@instructure/ui-img'
 import type {Badges} from '../../models/Product'
 
 interface BadgesProps {
@@ -48,15 +48,14 @@ const Badges = (props: BadgesProps) => {
       {badges && (
         <Flex direction="row">
           <Flex.Item margin="0 small 0 0" align="start">
-            <Img src={badges.image_url} height={50} width={'100%'} />
+            <Img src={badges.image_url} height={50} width={50} constrain="cover" alt="" />
           </Flex.Item>
 
           <Flex direction="column">
             <Flex.Item margin="0 0 x-small 0">
               <Link href={badges.link} isWithinText={false} target="_blank">
                 <Text weight="bold">
-                  {badges.name}{' '}
-                  <IconExternalLinkLine />
+                  {badges.name} <IconExternalLinkLine />
                 </Text>
               </Link>
             </Flex.Item>
