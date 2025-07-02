@@ -22,9 +22,6 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useAddItemInline} from '../../hooks/mutations/useAddItemInline'
 import ModuleFileDrop from './ModuleFileDrop'
-import {RocketSVG} from '@instructure/canvas-media'
-import {useCourseFolders} from '../../hooks/queries/useCourseFolders'
-import {useContextModule} from '../../hooks/useModuleContext'
 const I18n = createI18nScope('context_modules_v2')
 
 interface AddItemInlineProps {
@@ -33,9 +30,7 @@ interface AddItemInlineProps {
 }
 
 const AddItemInline: React.FC<AddItemInlineProps> = ({moduleId, itemCount}) => {
-  const {courseId} = useContextModule()
-  const {folders} = useCourseFolders(courseId)
-  const {setSelectedFolder, handleSubmit, isLoading} = useAddItemInline({
+  const {handleSubmit, isLoading} = useAddItemInline({
     moduleId,
     itemCount,
   })
@@ -50,12 +45,9 @@ const AddItemInline: React.FC<AddItemInlineProps> = ({moduleId, itemCount}) => {
       onChange={(field, value) => {
         const handlers = {
           file: handleSubmit,
-          folder: setSelectedFolder,
         }
         handlers[field as keyof typeof handlers]?.(value)
       }}
-      icon={<RocketSVG width="3em" height="3em" />}
-      folders={folders}
     />
   )
 }

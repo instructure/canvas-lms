@@ -24,6 +24,7 @@ import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {sharedHandleFileDrop} from '../../handlers/addItemHandlers'
+import {RocketSVG} from '@instructure/canvas-media'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -33,34 +34,15 @@ export interface ModuleFileDropProps {
   itemType: 'file' | 'folder' | string
   onChange: (field: string, value: any) => void
   setFile?: (file: File | null) => void
-  icon?: React.ReactElement | ((size: string) => React.ReactElement)
-  folders?: Array<{
-    _id: string
-  }>
   shouldAllowMultiple?: boolean
-  selectedFolder?: string
-  setSelectedFolder?: (folder: string) => void
 }
 
 export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
   itemType,
   onChange,
   setFile,
-  icon,
-  folders,
   shouldAllowMultiple = true,
-  selectedFolder,
-  setSelectedFolder,
 }) => {
-  const defaultFolder = folders?.[0]?._id
-
-  useEffect(() => {
-    if (defaultFolder && selectedFolder !== defaultFolder) {
-      setSelectedFolder?.(defaultFolder)
-      onChange('folder', defaultFolder)
-    }
-  }, [defaultFolder, selectedFolder, onChange, setSelectedFolder])
-
   const handleDrop = useCallback(
     (
       accepted: ArrayLike<File | DataTransferItem>,
@@ -83,7 +65,7 @@ export const ModuleFileDrop: React.FC<ModuleFileDropProps> = ({
             <Flex direction="column" height="100%" alignItems="center" justifyItems="center">
               <Billboard
                 size="small"
-                hero={icon}
+                hero={<RocketSVG width="3em" height="3em" />}
                 as="div"
                 headingAs="span"
                 headingLevel="h2"
