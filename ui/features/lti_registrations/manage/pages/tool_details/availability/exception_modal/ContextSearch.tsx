@@ -37,6 +37,8 @@ import {AccountId} from '../../../../model/AccountId'
 import {CourseId} from '../../../../model/CourseId'
 import {ContextOption} from './ContextOption'
 import {ContextSearchOption} from './ContextSearchOption'
+import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {LtiDeploymentId} from '../../../../model/LtiDeploymentId'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -45,13 +47,17 @@ const mkAccountOptionId = (accountId: AccountId): OptionId => `account-${account
 const mkCourseOptionId = (courseId: CourseId): OptionId => `course-${courseId}`
 
 type ContextSearchProps = {
-  accountId: AccountId
+  rootAccountId: AccountId
+  registrationId: LtiRegistrationId
+  deploymentId: LtiDeploymentId
   disabled: boolean
   onSelectContext?: (context: ContextSearchOption) => void
 }
 
 export const ContextSearch = (props: ContextSearchProps) => {
   const [searchText, setSearchText] = React.useState('')
+
+  const {rootAccountId, registrationId, deploymentId} = props
 
   const [state, setState] = React.useState<{
     inputValue: string
@@ -68,7 +74,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
   const setSearchTextDebounced = useDebouncedCallback(setSearchText, 1000)
 
   const searchContextsQuery = useQuery({
-    queryKey: ['searchableContexts', props.accountId, searchText],
+    queryKey: ['searchableContexts', rootAccountId, registrationId, deploymentId, searchText],
     queryFn: queryify(fetchContextSearch),
   })
 

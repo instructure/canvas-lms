@@ -27,6 +27,7 @@ import userEvent from '@testing-library/user-event'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {SearchableContexts} from '../../../../../model/SearchableContext'
 import {ZCourseId} from '../../../../../model/CourseId'
+import {ZLtiRegistrationId} from '../../../../../model/LtiRegistrationId'
 
 const mockContexts: SearchableContexts = {
   accounts: [
@@ -56,11 +57,14 @@ const mockContexts: SearchableContexts = {
 }
 
 const server = setupServer(
-  http.get('/api/v1/accounts/:accountId/lti_registrations/context_search', () => {
-    const accounts = mockContexts.accounts
-    const courses = mockContexts.courses
-    return HttpResponse.json({accounts, courses})
-  }),
+  http.get(
+    '/api/v1/accounts/:accountId/lti_registrations/:registrationId/deployments/:deploymentId/context_search',
+    () => {
+      const accounts = mockContexts.accounts
+      const courses = mockContexts.courses
+      return HttpResponse.json({accounts, courses})
+    },
+  ),
 )
 
 beforeAll(() => server.listen())
@@ -78,6 +82,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={ZAccountId.parse('1')}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={{open: false}}
         onClose={jest.fn()}
         onConfirm={jest.fn()}
@@ -90,6 +95,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={ZAccountId.parse('1')}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={{open: true, deployment: mockDeployment({})}}
         onClose={jest.fn()}
         onConfirm={jest.fn()}
@@ -109,6 +115,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={ZAccountId.parse('1')}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={{open: true, deployment: mockDeployment({})}}
         onClose={onClose}
         onConfirm={jest.fn()}
@@ -126,6 +133,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={jest.fn()}
@@ -172,6 +180,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={jest.fn()}
@@ -202,6 +211,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={jest.fn()}
@@ -243,6 +253,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={onConfirm}
@@ -282,6 +293,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={onConfirm}
@@ -353,6 +365,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={onClose}
         onConfirm={onConfirm}
@@ -372,6 +385,7 @@ describe('ExceptionModal', () => {
     renderWithQueryClient(
       <ExceptionModal
         accountId={accountId}
+        registrationId={ZLtiRegistrationId.parse('1')}
         openState={openState}
         onClose={jest.fn()}
         onConfirm={jest.fn()}
