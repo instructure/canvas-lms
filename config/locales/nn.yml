@@ -21889,6 +21889,7 @@ nn:
           score_for_quiz: "Resultat for denne quizen"
           score_for_survey: "Resultat for denne undersøkinga"
           survey_score: "Resultat for undersøking"
+          warning_icon: Åtvaring
         links: 
           click_to_view_results: "Klikk her for å vise resultata."
         questions_not_graded: "Nokre spørsmål er ikkje vurderte enno"

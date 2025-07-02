@@ -16482,6 +16482,7 @@ tr:
           score_for_quiz: "Bu kısa sınavın puanı"
           score_for_survey: "Bu anketin puanı"
           survey_score: "Anket Puanı"
+          warning_icon: Uyarı
         links: 
           click_to_view_results: "Sonuçları görmek için tıklayınız."
         questions_not_graded: "Bazı sorular henüz notlandırılmadı"

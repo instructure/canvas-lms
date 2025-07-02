@@ -16364,6 +16364,7 @@ he:
           score_for_quiz: "ציון לבוחן זה"
           score_for_survey: "ציון לסקר זה"
           survey_score: "ציון סקר"
+          warning_icon: אזהרה
         links: 
           click_to_view_results: "יש להקליק כאן כדי לעיין בתוצאות"
         questions_not_graded: "חלק מהשאלות עדיין לא הוערכו"
