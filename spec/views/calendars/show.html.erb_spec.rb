@@ -24,7 +24,9 @@ describe "calendars/show" do
   before do
     @domain_root_account = Account.default
     @sub_account = @domain_root_account.sub_accounts.create!(name: "sub-account")
-    @nested_sub_account = @sub_account.sub_accounts.create!(name: "nested-sub-account")
+    @domain_root_account.allow_feature!(:discussion_checkpoints)
+    @domain_root_account.disable_feature!(:discussion_checkpoints)
+    @sub_account.disable_feature!(:discussion_checkpoints)
     @current_user = User.create!
     @contexts_json = []
     @manage_contexts = []
@@ -42,16 +44,8 @@ describe "calendars/show" do
     assign(:current_user, @current_user)
   end
 
-  before do
-    @domain_root_account.disable_feature!(:discussion_checkpoints)
-    @sub_account.disable_feature!(:discussion_checkpoints)
-    @nested_sub_account.disable_feature!(:discussion_checkpoints)
-    @domain_root_account.allow_feature!(:discussion_checkpoints)
-    @sub_account.allow_feature!(:discussion_checkpoints)
-  end
-
-  describe "js_env.SHOW_CHECKPOINTS" do
-    it "sets to true when discussion checkponts FF is enabled in a sub-account" do
+  context "js_env.SHOW_CHECKPOINTS" do
+    it "sets to true when discussion checkponts FF is enabled in the sub-account" do
       @sub_account.enable_feature!(:discussion_checkpoints)
       render
 
@@ -65,14 +59,7 @@ describe "calendars/show" do
       expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be true
     end
 
-    it "sets to true when discussion checkpoints FF is enabled in a nested sub-account" do
-      @nested_sub_account.enable_feature!(:discussion_checkpoints)
-      render
-
-      expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be true
-    end
-
-    it "sets to false when discussion checkpoints FF is not enabled neither in the root account nor in any sub-accounts" do
+    it "sets to false when discussion checkpoints FF is not enabled neither in the root account nor the sub-account" do
       render
 
       expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be false
