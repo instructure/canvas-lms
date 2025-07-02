@@ -40,34 +40,36 @@ export const ContextOption = React.memo(
     return (
       <Flex alignItems="start" direction="row" margin={margin}>
         {icon ? <Flex.Item margin="0 x-small 0 0">{icon}</Flex.Item> : undefined}
-        <Flex alignItems="start" direction="column" margin={margin}>
-          <Text wrap="break-word">{name}</Text>
-          <Flex.Item shouldShrink>
-            <Text size="small">
-              <Flex alignItems="center" gap="xx-small">
-                {hasPath ? (
-                  <EllipsifiedItem>{display_path.join(' / ')}</EllipsifiedItem>
-                ) : undefined}
-                {hasPath && (course_code || sis_id) ? <View>·</View> : undefined}
-                {course_code ? (
-                  <EllipsifiedItem>
-                    <View>
-                      {I18n.t('Course ID: %{course_code}', {
-                        course_code: course_code,
-                      })}
-                    </View>
-                  </EllipsifiedItem>
-                ) : undefined}
-                {sis_id && course_code ? <View>|</View> : undefined}
-                {sis_id ? (
-                  <EllipsifiedItem>
-                    <View>{I18n.t('SIS ID: %{sis_id}', {sis_id: sis_id})}</View>
-                  </EllipsifiedItem>
-                ) : undefined}
-              </Flex>
-            </Text>
-          </Flex.Item>
-        </Flex>
+        <Flex.Item>
+          <Flex alignItems="start" direction="column" as="div">
+            <Text wrap="break-word">{name}</Text>
+            <Flex.Item shouldShrink>
+              <Text size="small">
+                <Flex alignItems="center" gap="xx-small">
+                  {hasPath ? (
+                    <EllipsifiedItem>{display_path.join(' / ')}</EllipsifiedItem>
+                  ) : undefined}
+                  {hasPath && (course_code || sis_id) ? <View>·</View> : undefined}
+                  {course_code ? (
+                    <EllipsifiedItem>
+                      <View>
+                        {I18n.t('Course ID: %{course_code}', {
+                          course_code: course_code,
+                        })}
+                      </View>
+                    </EllipsifiedItem>
+                  ) : undefined}
+                  {sis_id && course_code ? <View>|</View> : undefined}
+                  {sis_id ? (
+                    <EllipsifiedItem>
+                      <View>{I18n.t('SIS ID: %{sis_id}', {sis_id: sis_id})}</View>
+                    </EllipsifiedItem>
+                  ) : undefined}
+                </Flex>
+              </Text>
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
       </Flex>
     )
   },

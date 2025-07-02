@@ -46,11 +46,17 @@ import {RenderApiResult} from '../../../../../common/lib/apiResult/RenderApiResu
 import {SearchableContexts} from '../../../../model/SearchableContext'
 import {ContextOption} from './ContextOption'
 import {ContextSearchOption} from './ContextSearchOption'
+import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
+import {LtiDeploymentId} from '../../../../model/LtiDeploymentId'
+import {ZAccountId} from '../../../../model/AccountId'
+import {LtiDeployment} from '../../../../model/LtiDeployment'
 
 const I18n = createI18nScope('lti_registrations')
 
 export type ContextBrowseProps = {
   rootAccountId: AccountId
+  registrationId: LtiRegistrationId
+  deployment: LtiDeployment
   onSelectContext: (context: ContextSearchOption) => void
   selectedContexts: ContextSearchOption[]
   browserOpen: boolean
@@ -61,7 +67,7 @@ type AccountSearchOption = Extract<ContextSearchOption, {type: 'account'}>['cont
 type SelectedAccountState = Array<AccountSearchOption>
 
 export const ContextBrowse = (props: ContextBrowseProps) => {
-  const {browserOpen, setBrowserOpen} = props
+  const {browserOpen, setBrowserOpen, rootAccountId, registrationId, deployment} = props
   const [selectedAccounts, setSelectedAccounts] = React.useState<SelectedAccountState>([])
   const addSelectedAccount = React.useCallback((account: AccountSearchOption) => {
     setSelectedAccounts(current => [...current, account])
@@ -79,10 +85,17 @@ export const ContextBrowse = (props: ContextBrowseProps) => {
 
   const selectedAccount = selectedAccounts[selectedAccounts.length - 1]
 
-  const scopedAccountId = selectedAccount?.id || props.rootAccountId
+  const scopedAccountId = selectedAccount?.id || ZAccountId.parse(deployment.context_id)
 
   const searchContextsQuery = useQuery({
-    queryKey: ['searchableContexts', props.rootAccountId, searchText, scopedAccountId],
+    queryKey: [
+      'searchableContexts',
+      rootAccountId,
+      registrationId,
+      deployment.id,
+      searchText,
+      scopedAccountId,
+    ],
     queryFn: queryify(fetchContextSearch),
   })
 
@@ -135,10 +148,12 @@ export const ContextBrowse = (props: ContextBrowseProps) => {
                   {selectedAccounts.length === 0 ? (
                     <Flex margin="x-small" gap="x-small">
                       <Flex.Item>
-                        <IconAdminLine size="x-small" />
+                        <IconSubaccountsLine size="x-small" />
                       </Flex.Item>
-                      <Flex.Item shouldGrow>
-                        <Text weight="bold">{I18n.t('Root')}</Text>
+                      <Flex.Item shouldGrow shouldShrink>
+                        <Text weight="bold" wrap="break-word">
+                          {deployment.context_name}
+                        </Text>
                       </Flex.Item>
                     </Flex>
                   ) : (

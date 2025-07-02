@@ -37,6 +37,7 @@ import {ContextSearch} from './ContextSearch'
 import {ContextSearchOption} from './ContextSearchOption'
 import {Spinner} from '@instructure/ui-spinner'
 import {ContextBrowse} from './ContextBrowse'
+import {LtiRegistrationId} from '../../../../model/LtiRegistrationId'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -51,6 +52,7 @@ export type ExceptionModalOpenState =
 
 export type ExceptionModalProps = {
   accountId: AccountId
+  registrationId: LtiRegistrationId
   openState: ExceptionModalOpenState
   onClose: () => void
   onConfirm: (controls: ContextControlParameter[]) => Promise<void>
@@ -61,7 +63,13 @@ type ContextControlFormState = Array<{
   available: boolean
 }>
 
-export const ExceptionModal = ({openState, onClose, accountId, onConfirm}: ExceptionModalProps) => {
+export const ExceptionModal = ({
+  openState,
+  onClose,
+  accountId,
+  onConfirm,
+  registrationId,
+}: ExceptionModalProps) => {
   const [contextControlForm, setContextControlForm] = React.useState<ContextControlFormState>([])
 
   const confirmHandler = useMutation({
@@ -107,20 +115,28 @@ export const ExceptionModal = ({openState, onClose, accountId, onConfirm}: Excep
         <View minHeight="20em" as="div">
           <Flex gap="small" margin="0 0 medium 0">
             <Flex.Item shouldGrow>
-              <ContextSearch
-                disabled={disableView}
-                accountId={accountId}
-                onSelectContext={onSelectContext}
-              />
+              {openState.open ? (
+                <ContextSearch
+                  disabled={disableView}
+                  rootAccountId={accountId}
+                  registrationId={registrationId}
+                  deploymentId={openState.deployment.id}
+                  onSelectContext={onSelectContext}
+                />
+              ) : undefined}
             </Flex.Item>
             <Flex.Item>
-              <ContextBrowse
-                rootAccountId={accountId}
-                onSelectContext={onSelectContext}
-                selectedContexts={contextControlForm.map(control => control.context)}
-                browserOpen={browserOpen}
-                setBrowserOpen={setBrowserOpen}
-              />
+              {openState.open ? (
+                <ContextBrowse
+                  rootAccountId={accountId}
+                  registrationId={registrationId}
+                  deployment={openState.deployment}
+                  onSelectContext={onSelectContext}
+                  selectedContexts={contextControlForm.map(control => control.context)}
+                  browserOpen={browserOpen}
+                  setBrowserOpen={setBrowserOpen}
+                />
+              ) : undefined}
             </Flex.Item>
           </Flex>
 

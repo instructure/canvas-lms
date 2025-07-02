@@ -203,6 +203,7 @@ export const DeploymentAvailability = (props: DeploymentAvailabilityProps) => {
       </Grid>
       <ExceptionModal
         accountId={props.accountId}
+        registrationId={registration.id}
         openState={exceptionModalOpenState}
         onClose={() => setExceptionModalOpenState({open: false})}
         onConfirm={contextControls => {
