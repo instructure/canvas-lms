@@ -20460,6 +20460,7 @@ hu:
           score_for_quiz: "Ezen kvíz eredménye"
           score_for_survey: "Ezen felmérés eredménye"
           survey_score: "Felmérés eredménye"
+          warning_icon: Figyelmeztetés
         links: 
           click_to_view_results: "Kattintson ide az eredmény megtekintéséhez!"
         questions_not_graded: "Néhány kérdés még nem lett értékelve"
