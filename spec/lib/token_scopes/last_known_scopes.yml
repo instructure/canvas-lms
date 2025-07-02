@@ -2088,6 +2088,8 @@
 - verb: PUT
   path: '/api/v1/submissions/:id/what_if_grades'
 - verb: GET
+  path: '/api/v1/support_helpers/asset_processor/submission_details'
+- verb: GET
   path: '/api/v1/support_helpers/crocodoc/shard'
 - verb: GET
   path: '/api/v1/support_helpers/crocodoc/submission'
