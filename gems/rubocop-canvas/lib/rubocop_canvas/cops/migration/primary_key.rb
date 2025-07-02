@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "parser/current"
-
 module RuboCop
   module Cop
     module Migration
@@ -32,13 +30,11 @@ module RuboCop
           end
         end
 
-        NO_PK = Parser::CurrentRuby.parse("{ id: false }").children.first
-
         def check_create_table(node, args)
           options = args.last
           return unless options.hash_type?
 
-          if options.children.find { |pair| pair == NO_PK }
+          if options.children.find { |pair| pair.key.literal? && pair.key.value == :id && pair.value.falsey_literal? }
             add_offense(node, message: MSG, severity: :warning)
           end
         end
