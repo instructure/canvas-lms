@@ -19903,6 +19903,7 @@ fa:
           score_for_quiz: "نمره این آزمون"
           score_for_survey: "نمره این نظرسنجی"
           survey_score: "نمره نظرسنجی"
+          warning_icon: هشدار
         links: 
           click_to_view_results: "برای مشاهده نتایج، اینجا کلیک کنید."
         questions_not_graded: "برخی پرسش ها هنوز نمره گذاری نشده اند"
