@@ -16,16 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ErrorBoundary from "@canvas/error-boundary/react"
-import { PropsWithChildren } from "react"
-import { FilesGenericErrorPage } from "./FilesGenericErrorPage"
+import ErrorBoundary from '@canvas/error-boundary/react'
+import {PropsWithChildren} from 'react'
+import {FilesGenericErrorPage} from './FilesGenericErrorPage'
 
 export const FilesErrorBoundary = (props: PropsWithChildren) => {
   return (
     <ErrorBoundary
       errorComponent={FilesGenericErrorPage}
-      beforeCapture={(scope) => {
-        scope.setTag("feature", "files_v2")
+      beforeCapture={scope => {
+        scope.setTag('inst.feature', 'files_v2')
       }}
     >
       {props.children}
