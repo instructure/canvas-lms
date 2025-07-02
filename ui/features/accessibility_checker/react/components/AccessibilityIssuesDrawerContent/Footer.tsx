@@ -22,7 +22,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-const I18n = createI18nScope('AccessibilityIssuesDrawerFooter')
+const I18n = createI18nScope('accessibility_checker')
 
 interface Props {
   onNext: () => void
@@ -33,7 +33,7 @@ interface Props {
   isSaveAndNextDisabled?: boolean
 }
 
-const AccessibilityIssuesDrawerFooter: React.FC<Props> = ({
+const Footer: React.FC<Props> = ({
   onNext,
   onSaveAndNext,
   onBack,
@@ -70,4 +70,4 @@ const AccessibilityIssuesDrawerFooter: React.FC<Props> = ({
   )
 }
 
-export default AccessibilityIssuesDrawerFooter
+export default Footer

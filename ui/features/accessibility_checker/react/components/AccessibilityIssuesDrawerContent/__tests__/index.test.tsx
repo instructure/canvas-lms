@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, screen, fireEvent, waitFor, within} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import AccessibilityIssuesDrawerContent from '../AccessibilityIssuesDrawerContent'
-import {AccessibilityIssue, ContentItem, ContentItemType, FormType} from '../../../types'
+import {render, screen, fireEvent, waitFor} from '@testing-library/react'
+
+import AccessibilityIssuesDrawerContent from '..'
+import {ContentItem, ContentItemType, FormType} from '../../../types'
 
 const mockClose = jest.fn()
 
@@ -37,7 +36,7 @@ const baseItem: ContentItem = {
     {
       id: 'issue-1',
       path: '/html/body/div[1]',
-      ruleId: 'rule-1',
+      ruleId: 'adjacent-links',
       message: 'This is a test issue',
       form: {type: FormType.Checkbox, label: 'checkbox A'},
       why: '',
@@ -46,7 +45,7 @@ const baseItem: ContentItem = {
     {
       id: 'issue-2',
       path: '/html/body/div[2]',
-      ruleId: 'rule-2',
+      ruleId: 'headings-sequence',
       message: 'Second issue',
       form: {
         type: FormType.DropDown,

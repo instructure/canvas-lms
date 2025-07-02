@@ -38,7 +38,7 @@ export interface IssueForm {
 
 export interface AccessibilityIssue {
   id: string
-  ruleId?: string
+  ruleId?: RuleId
   message: string
   why: string
   element: string
@@ -72,6 +72,8 @@ export interface PreviewResponse {
   path?: string
 }
 
+export type FormValue = any
+
 export type Severity = 'High' | 'Medium' | 'Low'
 
 export type IssueDataPoint = {
@@ -82,3 +84,19 @@ export type IssueDataPoint = {
 }
 
 export type RawData = Record<string, any>
+
+export type RuleId =
+  | 'adjacent-links'
+  | 'headings-sequence'
+  | 'has-lang-entry'
+  | 'headings-start-at-h2'
+  | 'img-alt'
+  | 'img-alt-filename'
+  | 'img-alt-length'
+  | 'large-text-contrast'
+  | 'small-text-contrast'
+  | 'list-structure'
+  | 'paragraphs-for-headings'
+  | 'table-caption'
+  | 'table-header'
+  | 'table-header-scope'
