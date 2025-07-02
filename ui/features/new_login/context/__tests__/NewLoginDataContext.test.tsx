@@ -55,6 +55,7 @@ const TestComponent = () => {
       <span data-testid="forgotPasswordUrl">{context.forgotPasswordUrl || ''}</span>
       <span data-testid="invalidLoginFaqUrl">{context.invalidLoginFaqUrl || ''}</span>
       <span data-testid="helpLink">{JSON.stringify(context.helpLink) || ''}</span>
+      <span data-testid="requireAup">{context.requireAup || ''}</span>
     </div>
   )
 }
@@ -92,6 +93,7 @@ describe('NewLoginDataContext', () => {
       'forgotPasswordUrl',
       'invalidLoginFaqUrl',
       'helpLink',
+      'requireAup',
     ]
     mockUseFetchNewLoginData.mockReturnValue({
       isDataLoading: false,
@@ -143,6 +145,7 @@ describe('NewLoginDataContext', () => {
         forgotPasswordUrl: 'https://example.com/password-reset',
         invalidLoginFaqUrl: 'https://example.com/faq',
         helpLink: {url: 'https://example.com/help', label: 'Need Help?'},
+        requireAup: 'true',
       },
     })
     render(
@@ -175,6 +178,7 @@ describe('NewLoginDataContext', () => {
     expect(screen.getByTestId('helpLink')).toHaveTextContent(
       JSON.stringify({url: 'https://example.com/help', label: 'Need Help?'}),
     )
+    expect(screen.getByTestId('requireAup')).toHaveTextContent('true')
   })
 
   it('handles undefined optional values gracefully', () => {
@@ -205,6 +209,7 @@ describe('NewLoginDataContext', () => {
     expect(screen.getByTestId('forgotPasswordUrl')).toBeEmptyDOMElement()
     expect(screen.getByTestId('invalidLoginFaqUrl')).toBeEmptyDOMElement()
     expect(screen.getByTestId('helpLink')).toBeEmptyDOMElement()
+    expect(screen.getByTestId('requireAup')).toBeEmptyDOMElement()
   })
 
   it('throws an error if useNewLoginData is used outside NewLoginDataProvider', () => {
