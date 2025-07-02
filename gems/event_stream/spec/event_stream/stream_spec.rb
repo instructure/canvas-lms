@@ -179,7 +179,7 @@ describe EventStream::Stream do
           allow(record_type).to receive(:update_from_event_stream!).and_raise(exception)
         end
 
-        include_examples "error callbacks"
+        it_behaves_like "error callbacks"
       end
 
       context "failing callbacks" do
@@ -189,7 +189,7 @@ describe EventStream::Stream do
           stream.on_update { raise exception }
         end
 
-        include_examples "error callbacks"
+        it_behaves_like "error callbacks"
       end
     end
   end

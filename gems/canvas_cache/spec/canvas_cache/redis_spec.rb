@@ -329,7 +329,7 @@ describe CanvasCache::Redis do
       end
     end
 
-    include_examples "disconnect_if_idle"
+    it_behaves_like "disconnect_if_idle"
 
     context "with a cluster" do
       let(:redis) do
@@ -350,7 +350,7 @@ describe CanvasCache::Redis do
         router.find_node(router.find_node_key(""))
       end
 
-      include_examples "disconnect_if_idle"
+      it_behaves_like "disconnect_if_idle"
     end
 
     it "works with a cluster that hasn't connected yet" do

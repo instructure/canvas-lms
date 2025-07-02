@@ -34,7 +34,7 @@ describe "OutcomeResultsReport" do
   let(:all_values) { [user1_values] }
   let(:order) { [0, 2, 3, 13, 18] }
 
-  include_examples "common outcomes report behavior"
+  it_behaves_like "common outcomes report behavior"
 
   context "with quiz question results" do
     before(:once) do

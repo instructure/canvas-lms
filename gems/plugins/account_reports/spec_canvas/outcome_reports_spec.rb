@@ -438,7 +438,7 @@ describe "Outcome Reports" do
       Account.site_admin.disable_feature!(:improved_outcome_report_generation)
     end
 
-    include_examples "common outcomes report behavior"
+    it_behaves_like "common outcomes report behavior"
   end
 
   describe "outcome results report" do
@@ -447,7 +447,7 @@ describe "Outcome Reports" do
     let(:all_values) { [user1_values] }
     let(:order) { [0, 2, 3, 13, 18] }
 
-    include_examples "common outcomes report behavior"
+    it_behaves_like "common outcomes report behavior"
 
     context "with quiz question results" do
       before(:once) do

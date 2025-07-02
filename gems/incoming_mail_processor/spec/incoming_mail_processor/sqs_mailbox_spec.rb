@@ -45,7 +45,7 @@ describe IncomingMailProcessor::SqsMailbox do
     }
   end
 
-  include_examples "Mailbox"
+  it_behaves_like "Mailbox"
 
   describe "#connect" do
     it "returns the incoming mail queue" do

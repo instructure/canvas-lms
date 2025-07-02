@@ -171,6 +171,9 @@ RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
+RSpec/Output:
+  Exclude:
+    - "**/fixtures/**/*.rb"
 RSpec/SubjectStub:
   Enabled: false # yes, canvas is big and complicated sometimes
 

@@ -21,7 +21,7 @@
 require "spec_helper"
 
 describe IncomingMailProcessor::ImapMailbox do
-  include_examples "Mailbox"
+  it_behaves_like "Mailbox"
 
   def default_config
     {

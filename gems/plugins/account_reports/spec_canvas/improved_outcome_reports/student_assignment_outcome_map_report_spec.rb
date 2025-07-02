@@ -89,6 +89,6 @@ describe "StudentAssignmentOutcomeMapReport" do
       Account.site_admin.enable_feature!(:improved_outcome_report_generation)
     end
 
-    include_examples "common outcomes report behavior"
+    it_behaves_like "common outcomes report behavior"
   end
 end
