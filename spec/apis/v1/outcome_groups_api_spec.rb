@@ -746,6 +746,39 @@ describe "Outcome Groups API", type: :request do
       expect(@group.description).to eq "New Description"
     end
 
+    it "updates attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:put,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
+               { controller: "outcome_groups_api",
+                 action: "update",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "New Title",
+                 description: aa_test_data.added_html })
+
+      @group.reload
+      attachment_ids = @group.attachment_associations.pluck(:attachment_id)
+      expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+    end
+
+    it "removes attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:put,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
+               { controller: "outcome_groups_api",
+                 action: "update",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "New Title",
+                 description: aa_test_data.removed_html })
+
+      @group.reload
+      expect(@group.attachment_associations.size).to eq 0
+    end
+
     it "leaves alone fields not provided" do
       api_call(:put,
                "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
@@ -1944,6 +1977,23 @@ describe "Outcome Groups API", type: :request do
       @subgroup = @group.child_outcome_groups.active.first
       expect(@subgroup.title).to eq "My Subgroup"
       expect(@subgroup.description).to eq "Description of my subgroup"
+    end
+
+    it "adds attachment associations if necessary" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+      api_call(:post,
+               "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
+               { controller: "outcome_groups_api",
+                 action: "create",
+                 account_id: @account.id.to_s,
+                 id: @group.id.to_s,
+                 format: "json" },
+               { title: "My Subgroup",
+                 description: aa_test_data.base_html })
+      @subgroup = @group.child_outcome_groups.active.first
+      aas = AttachmentAssociation.where(context_type: "LearningOutcomeGroup", context_id: @subgroup.id)
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
     end
 
     it "returns json of the new subgroup" do

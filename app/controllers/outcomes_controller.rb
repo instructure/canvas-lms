@@ -276,6 +276,7 @@ class OutcomesController < ApplicationController
     end
     @outcome_group ||= @context.root_outcome_group
     @outcome = @context.created_learning_outcomes.build(learning_outcome_params)
+    @outcome.saving_user = @current_user
 
     respond_to do |format|
       if @outcome.save
@@ -295,6 +296,7 @@ class OutcomesController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_outcomes)
 
     @outcome = @context.created_learning_outcomes.find(params[:id])
+    @outcome.saving_user = @current_user
 
     respond_to do |format|
       if @outcome.update(learning_outcome_params)
@@ -304,7 +306,7 @@ class OutcomesController < ApplicationController
       else
         flash[:error] = t :failed_outcome_update, "Outcome update failed"
         format.html { redirect_to named_context_url(@context, :context_outcomes_url) }
-        format.json { render json: @outcome.errors, statue: :bad_request }
+        format.json { render json: @outcome.errors, status: :bad_request }
       end
     end
   end
@@ -336,7 +338,9 @@ class OutcomesController < ApplicationController
   protected
 
   def learning_outcome_params
-    params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
+    oparams = params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
+    oparams[:description] = process_incoming_html_content(oparams[:description]) if oparams[:description]
+    oparams
   end
 
   private
