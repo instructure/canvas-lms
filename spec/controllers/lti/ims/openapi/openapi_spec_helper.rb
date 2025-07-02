@@ -105,7 +105,7 @@ module OpenApiSpecHelper
 
       content_type = response.content_type
       if content_type.include?(";")
-        content_type = content_type.slice(0..content_type.index(";") - 1)
+        content_type = content_type.slice(0..(content_type.index(";") - 1))
       end
       body_schema = spec_at_response_code.dig("content", content_type, "schema")
       if body_schema

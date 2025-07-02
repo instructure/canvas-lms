@@ -186,7 +186,7 @@ module Csp::AccountHelper
       files_host = if separator == "."
                      "*.#{files_host}"
                    else
-                     "*.#{files_host[files_host.index(".") + 1..]}"
+                     "*.#{files_host[(files_host.index(".") + 1)..]}"
                    end
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config["base_url"]).host

@@ -258,7 +258,7 @@ class GroupCategory < ActiveRecord::Base
   end
 
   def restore
-    groups.where(deleted_at: [deleted_at - 10.minutes..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
+    groups.where(deleted_at: [(deleted_at - 10.minutes)..deleted_at]).update_all(workflow_state: "available", deleted_at: nil)
     self.deleted_at = nil
     save!
   end

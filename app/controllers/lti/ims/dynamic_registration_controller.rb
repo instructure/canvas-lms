@@ -168,7 +168,7 @@ module Lti
         end
 
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
-          {errors:, registration_attrs:}
+          { errors:, registration_attrs: }
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
 
         registration_url = jwt["registration_url"]

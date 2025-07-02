@@ -1217,7 +1217,7 @@ describe Conversation do
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
         "conversation.delete",
         tags: hash_including(
-          caller: match(/\A\w+\.rb:\w+\z/)
+          caller: match(/\A\w+\.rb:[\w:#]+\z/)
         )
       )
     end
@@ -1231,7 +1231,7 @@ describe Conversation do
       expect(InstStatsd::Statsd).to have_received(:distributed_increment).with(
         "conversation.delete_all",
         tags: hash_including(
-          caller: match(/\A\w+\.rb:\w+\z/)
+          caller: match(/\A\w+\.rb:[\w:#]+\z/)
         )
       )
     end

@@ -381,7 +381,7 @@ class Course < ActiveRecord::Base
     {
       get_setting_name: -> { t("files", "Files") },
       flex: :any
-    },
+    }
   ].freeze
 
   def [](attr)

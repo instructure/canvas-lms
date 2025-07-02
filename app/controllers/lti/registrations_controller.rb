@@ -1454,7 +1454,7 @@ class Lti::RegistrationsController < ApplicationController
       registration:,
       workflow_state: params.require(:workflow_state),
       user: @current_user
-    ) => {lti_registration_account_binding:}
+    ) => { lti_registration_account_binding: }
 
     render json: lti_registration_account_binding_json(lti_registration_account_binding, @current_user, session, @context)
   end

@@ -25,7 +25,7 @@ module Factories
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first
     @course.enroll_student(@student, section: opts[:section], enrollment_state: :active) if enroll_user
     assignment.reload # it caches the course pre-student enrollment
-    @submission = assignment.submit_homework(@student, (opts.presence || { url: "http://www.instructure.com/" }))
+    @submission = assignment.submit_homework(@student, opts.presence || { url: "http://www.instructure.com/" })
     @submission
   end
 

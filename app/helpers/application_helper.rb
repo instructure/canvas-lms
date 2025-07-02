@@ -42,7 +42,7 @@ module ApplicationHelper
     user_id = user.is_a?(User) ? user.id : user
     Rails
       .cache
-      .fetch(["context_user_name", context, user_id].cache_key, { expires_in: 15.minutes }) do
+      .fetch(["context_user_name", context, user_id].cache_key, { expires_in: 15.minutes }) do # rubocop:disable Lint/UselessDefaultValueArgument -- this is not an Array or Hash
         user = User.find_by(id: user_id)
         user && context_user_name_display(user)
       end
@@ -231,7 +231,7 @@ module ApplicationHelper
     @script_chunks ||= []
     preload_chunks =
       new_js_bundles.map do |(bundle, plugin, *)|
-        ::Canvas::Cdn.registry.scripts_for("#{plugin ? "#{plugin}-" : ""}#{bundle}")
+        ::Canvas::Cdn.registry.scripts_for("#{"#{plugin}-" if plugin}#{bundle}")
       end.flatten.uniq - @script_chunks - @rendered_preload_chunks # subtract out the ones we already preloaded in the <head>
     @rendered_preload_chunks += preload_chunks
 
@@ -250,7 +250,7 @@ module ApplicationHelper
         concat javascript_tag new_js_bundles.map { |(bundle, plugin, defer)|
                                 defer ||= defer_js_bundle?(bundle)
                                 container = defer ? "window.deferredBundles" : "window.bundles"
-                                "(#{container} || (#{container} = [])).push('#{plugin ? "#{plugin}-" : ""}#{bundle}');"
+                                "(#{container} || (#{container} = [])).push('#{"#{plugin}-" if plugin}#{bundle}');"
                               }.join("\n")
       end
     end

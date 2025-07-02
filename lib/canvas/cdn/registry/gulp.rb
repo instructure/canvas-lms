@@ -61,7 +61,7 @@ module Canvas
           normal = source.sub(%r{^/}, "")
 
           if normal.start_with?(@asset_dir)
-            normal[@asset_dir.length + 1..]
+            normal[(@asset_dir.length + 1)..]
           else
             normal
           end

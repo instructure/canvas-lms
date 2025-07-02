@@ -1546,7 +1546,7 @@ describe EnrollmentsApiController, type: :request do
               "sis_import_id" => nil,
               "id" => e.user.id,
               "created_at" => e.user.created_at.iso8601,
-              "login_id" => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+              "login_id" => e.user.pseudonym&.unique_id
             },
             "html_url" => course_user_url(e.course_id, e.user_id),
             "grades" => {
@@ -1805,12 +1805,12 @@ describe EnrollmentsApiController, type: :request do
               "name" => e.user.name,
               "sortable_name" => e.user.sortable_name,
               "short_name" => e.user.short_name,
-              "sis_user_id" => e.user.pseudonym ? e.user.pseudonym&.sis_user_id : nil,
-              "integration_id" => e.user.pseudonym ? e.user.pseudonym&.integration_id : nil,
-              "sis_import_id" => e.user.pseudonym ? e.user.pseudonym.sis_batch_id : nil,
+              "sis_user_id" => e.user.pseudonym&.sis_user_id,
+              "integration_id" => e.user.pseudonym&.integration_id,
+              "sis_import_id" => e.user.pseudonym&.sis_batch_id,
               "id" => e.user.id,
               "created_at" => e.user.created_at.iso8601,
-              "login_id" => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+              "login_id" => e.user.pseudonym&.unique_id
             },
             "html_url" => course_user_url(e.course_id, e.user_id),
             "grades" => {
@@ -2415,7 +2415,7 @@ describe EnrollmentsApiController, type: :request do
             "short_name" => e.user.short_name,
             "id" => e.user.id,
             "created_at" => e.user.created_at.iso8601,
-            "login_id" => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
+            "login_id" => e.user.pseudonym&.unique_id
           }
           user_json["sis_user_id"] = e.user.pseudonym.sis_user_id
           user_json["integration_id"] = e.user.pseudonym.integration_id

@@ -74,8 +74,8 @@ describe EventStream::Failure do
     end
 
     it "defines accessors for attributes" do
-      expect((defined? @event.attribute1)).to eq "method"
-      expect((defined? @event.attribute2)).to eq "method"
+      expect(defined? @event.attribute1).to eq "method"
+      expect(defined? @event.attribute2).to eq "method"
 
       expect(@event.attribute1).to eq "value1"
       expect(@event.attribute2).to eq "value2"

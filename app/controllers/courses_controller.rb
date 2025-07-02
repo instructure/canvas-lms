@@ -2772,7 +2772,7 @@ class CoursesController < ApplicationController
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != "none"
       # this is used for linking and un-linking enrollments
-      enrollment.associated_user_id = student ? student.id : nil
+      enrollment.associated_user_id = student&.id
       enrollment.save!
       render json: enrollment.as_json(methods: :associated_user_name)
     end

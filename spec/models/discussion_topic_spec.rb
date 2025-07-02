@@ -853,7 +853,7 @@ describe DiscussionTopic do
 
           expect(@topic.context).to eq(@group)
           expect((@topic.check_policy(@teacher) & @relevant_permissions).sort).to eq @relevant_permissions.sort
-          expect((@topic.check_policy(@student1) & @relevant_permissions)).to be_empty
+          expect(@topic.check_policy(@student1) & @relevant_permissions).to be_empty
         end
 
         it "works for subtopics for graded assignments" do

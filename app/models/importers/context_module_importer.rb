@@ -250,7 +250,7 @@ module Importers
                                          assignment: ass,
                                          position: context_module.migration_position)
         end
-      elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
+      elsif /folder|heading|contextmodulesubheader/i.match?(hash[:linked_resource_type] || hash[:type])
         # just a snippet of text
         item = context_module.add_item({
                                          title: hash[:title] || hash[:linked_resource_title],

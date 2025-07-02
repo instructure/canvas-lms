@@ -1264,7 +1264,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def generate_refined_dynamic_content(focus, raw_summary)
-    locale = I18n.locale.to_s || I18n.default_locale.to_s || "en"
+    locale = I18n.locale.to_s
     pretty_locale = available_locales[locale] || "English"
     refined_dynamic_content = {
       CONTENT: DiscussionTopic::PromptPresenter.raw_summary_for_refinement(raw_summary: raw_summary.summary),

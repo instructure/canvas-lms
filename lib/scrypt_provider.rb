@@ -21,7 +21,7 @@
 ScryptProvider = Struct.new(:cost) do
   def encrypt(*tokens)
     SCrypt::Password.create(
-      join_tokens(tokens),
+      tokens.join,
       cost:
     )
   end
@@ -31,7 +31,7 @@ ScryptProvider = Struct.new(:cost) do
     hash = new_from_hash(hash)
     return false if hash.blank?
 
-    hash == join_tokens(tokens)
+    hash == tokens.join
   end
 
   def cost_matches?(hash)
@@ -39,10 +39,6 @@ ScryptProvider = Struct.new(:cost) do
   end
 
   private
-
-  def join_tokens(tokens)
-    tokens.flatten.join
-  end
 
   def new_from_hash(hash)
     SCrypt::Password.new(hash)

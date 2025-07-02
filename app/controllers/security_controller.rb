@@ -84,7 +84,7 @@ class SecurityController < ApplicationController
       reports = public_keyset.as_json[:keys].each_with_index.map do |key, i|
         date = CanvasSecurity::JWKKeyPair.time_from_kid(key[:kid]).utc.to_date
         this_month = [today.year, today.month] == [date.year, date.month]
-        "today is day #{today.day} and key #{i} is #{this_month ? "" : "not "}from this month"
+        "today is day #{today.day} and key #{i} is #{"not " unless this_month}from this month"
       end
       render json: reports
     else

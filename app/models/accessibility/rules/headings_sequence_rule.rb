@@ -92,7 +92,7 @@ module Accessibility
         h_num = elem.tag_name[1..].to_i
         ret = {}
 
-        (h_num - 1..6).each do |i|
+        ((h_num - 1)..6).each do |i|
           ret["h#{i}"] = true
         end
 

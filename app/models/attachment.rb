@@ -2288,7 +2288,7 @@ class Attachment < ActiveRecord::Base
     random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
     return random_backup_name if attempts >= 8
 
-    until block.call((new_name = "#{dir}#{basename}-#{addition}#{extname}"))
+    until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
       addition += 1
       return random_backup_name if addition >= 8
     end
@@ -2350,7 +2350,7 @@ class Attachment < ActiveRecord::Base
       second_dot = uri.host.rindex(".", first_dot - 1) if first_dot
       return ["file_download", uri.host] unless second_dot
 
-      ["file_download", uri.host[second_dot + 1..]]
+      ["file_download", uri.host[(second_dot + 1)..]]
     end
   end
 
