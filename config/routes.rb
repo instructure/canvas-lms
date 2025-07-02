@@ -2367,6 +2367,10 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/submission_lifecycle_manage/course", action: :course
     end
 
+    scope(controller: "support_helpers/asset_processor") do
+      get "support_helpers/asset_processor/submission_details", action: :submission_details
+    end
+
     scope(controller: :outcome_groups_api) do
       %w[global account course].each do |context|
         prefix = ((context == "global") ? context : "#{context}s/:#{context}_id")
