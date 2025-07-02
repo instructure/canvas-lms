@@ -576,7 +576,7 @@ module Types
 
     field :comment_bank_items_count, Integer, null: true
     def comment_bank_items_count
-      Loaders::AssociationCountLoader.for(User, :comment_bank_items).load(object)
+      Loaders::CommentBankItemCountLoader.load(object)
     end
 
     field :course_roles, [String], null: true do

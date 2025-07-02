@@ -1617,6 +1617,11 @@ describe Types::UserType do
     it "returns the count of comment bank items" do
       expect(type.resolve("commentBankItemsCount")).to eq 2
     end
+
+    it "ignores deleted comment bank items" do
+      @comment_bank_item_one.destroy
+      expect(type.resolve("commentBankItemsCount")).to eq 1
+    end
   end
 
   context "courseBuiltInRoles" do
