@@ -711,18 +711,46 @@ describe Folder do
       specs_require_sharding
 
       it "works across shards if multiple shards exist" do
-        course1 = course_factory
-        course2 = course_factory
+        account = Account.create!
+        course1 = account.courses.create!
+        Folder.root_folders(course1)
         @shard2.activate do
-          @shard2_course = course_factory
+          account = Account.create!
+          @shard2_course = account.courses.create!
+          Folder.root_folders(@shard2_course)
         end
+        @shard1.activate do
+          account = Account.create!
+          shard1_course = account.courses.create!
+          Folder.root_folders(shard1_course)
 
-        result = Folder.preload_root_folders([course1, course2, @shard2_course])
+          result = Folder.preload_root_folders([shard1_course, course1, @shard2_course])
 
-        expect(result.keys).to match_array([course1.asset_string, course2.asset_string, @shard2_course.asset_string])
-        expect(result[course1.asset_string]).to be_persisted
-        expect(result[course2.asset_string]).to be_persisted
-        expect(result[@shard2_course.asset_string]).to be_persisted
+          expect(result.keys).to match_array([shard1_course.asset_string, course1.asset_string, @shard2_course.asset_string])
+          expect(result[shard1_course.asset_string]).to be_persisted
+          expect(result[course1.asset_string]).to be_persisted
+          expect(result[@shard2_course.asset_string]).to be_persisted
+        end
+      end
+
+      it "works across shards if multiple shards exist when no root folders" do
+        account = Account.create!
+        course1 = account.courses.create!
+        @shard2.activate do
+          account = Account.create!
+          @shard2_course = account.courses.create!
+        end
+        @shard1.activate do
+          account = Account.create!
+          shard1_course = account.courses.create!
+
+          result = Folder.preload_root_folders([shard1_course, course1, @shard2_course])
+
+          expect(result.keys).to match_array([shard1_course.asset_string, course1.asset_string, @shard2_course.asset_string])
+          expect(result[shard1_course.asset_string]).to be_persisted
+          expect(result[course1.asset_string]).to be_persisted
+          expect(result[@shard2_course.asset_string]).to be_persisted
+        end
       end
     end
   end
