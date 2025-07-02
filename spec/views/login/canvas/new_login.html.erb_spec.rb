@@ -72,7 +72,8 @@ describe "login/canvas/new_login" do
       "data-require-email" => "true",
       "data-self-registration-type" => "all",
       "data-terms-of-use-url" => "http://example.com/terms",
-      "data-terms-required" => "true"
+      "data-terms-required" => "true",
+      "data-require-aup" => "true",
     }
   end
 
@@ -98,7 +99,7 @@ describe "login/canvas/new_login" do
       require_email_for_registration?: true,
       self_registration?: true,
       self_registration_type: "all",
-      terms_required?: true
+      account_terms_required?: true
     )
     # stub settings
     allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("http://example.com/faq")
@@ -106,6 +107,7 @@ describe "login/canvas/new_login" do
     allow(Setting).to receive(:get).with("privacy_policy_url", anything).and_return("http://example.com/privacy")
     allow(Setting).to receive(:get).with("terms_of_use_fft", anything).and_return("http://example.com/terms")
     allow(Setting).to receive(:get).with("privacy_policy_fft", anything).and_return("http://example.com/privacy")
+    allow(Setting).to receive(:get).with("terms_required", "true").and_return("true")
     # stub branding variables
     allow(view).to receive(:brand_variable).with("ic-brand-Login-logo").and_return("https://cdn.canvas.com/accounts/1/files/1/download?verifier=abc123")
     allow(view).to receive(:brand_variable).with("ic-brand-Login-body-bgd-color").and_return("#ffffff")

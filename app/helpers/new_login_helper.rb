@@ -43,6 +43,7 @@ module NewLoginHelper
       forgot_password_url:,
       invalid_login_faq_url:,
       help_link: help_link_info,
+      require_aup:,
     }.compact
   end
 
@@ -168,5 +169,9 @@ module NewLoginHelper
     @domain_root_account.authentication_providers.active.select do |aac|
       aac.class.login_button?
     end
+  end
+
+  def require_aup
+    (TermsOfService.ensure_terms_for_account(@domain_root_account)&.terms_type == "no_terms") ? nil : "true"
   end
 end

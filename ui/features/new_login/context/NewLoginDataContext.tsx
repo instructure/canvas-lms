@@ -18,7 +18,7 @@
 
 import React, {createContext, type ReactNode, useContext} from 'react'
 import {useFetchNewLoginData} from '../hooks'
-import {type AuthProvider, type HelpLink, type PasswordPolicy, SelfRegistrationType} from '../types'
+import type {AuthProvider, HelpLink, PasswordPolicy, SelfRegistrationType} from '../types'
 
 interface NewLoginDataContextType {
   isDataLoading: boolean
@@ -40,6 +40,7 @@ interface NewLoginDataContextType {
   forgotPasswordUrl?: string
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
+  requireAup?: boolean
 }
 
 const NewLoginDataContext = createContext<NewLoginDataContextType | undefined>(undefined)
@@ -70,6 +71,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     forgotPasswordUrl,
     invalidLoginFaqUrl,
     helpLink,
+    requireAup,
   } = data
 
   const value: NewLoginDataContextType = {
@@ -92,6 +94,7 @@ export const NewLoginDataProvider = ({children}: NewLoginDataProviderProps) => {
     forgotPasswordUrl,
     invalidLoginFaqUrl,
     helpLink,
+    requireAup,
   }
 
   return <NewLoginDataContext.Provider value={value}>{children}</NewLoginDataContext.Provider>
