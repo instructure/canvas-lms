@@ -162,7 +162,7 @@ class Auditors::GradeChange
 
     delegate :root_account, to: :account
     delegate :account, to: :context
-    delegate :assignment, to: :submission
+    delegate :assignment, :autograded?, to: :submission, allow_nil: true
 
     def course
       context if context_type == "Course"
@@ -208,10 +208,6 @@ class Auditors::GradeChange
     def in_grading_period?
       grading_period_id != Auditors::GradeChange::NULL_PLACEHOLDER
     end
-
-    delegate :assignment, :autograded?, to: :submission, allow_nil: true
-    delegate :account, to: :context
-    delegate :root_account, to: :account
   end
 
   def self.filter_by_assignment(scope)

@@ -656,7 +656,7 @@ module QuizzesHelper
     titles = []
 
     if selected_answer || correct_answer || show_correct_answers
-      titles << ("#{answer}.")
+      titles << "#{answer}."
     end
 
     if selected_answer

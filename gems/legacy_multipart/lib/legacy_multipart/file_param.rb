@@ -23,7 +23,7 @@ module LegacyMultipart
 
     def initialize(k, content)
       @k = k
-      @filename = (content.respond_to?(:path) && content.path) || k.to_s || "file.csv"
+      @filename = (content.respond_to?(:path) && content.path) || k.to_s
       @content = content
     end
 

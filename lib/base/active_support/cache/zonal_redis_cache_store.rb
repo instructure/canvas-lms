@@ -33,7 +33,7 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
     end
   end
 
-  delegate :read_multi, :read_entry, to: :zonal_store
+  delegate :read_multi, to: :zonal_store
 
   # This redis is for use by Canvas.redis for things that must be shared in a single place between AZs
   attr_reader :redis
@@ -52,10 +52,6 @@ class ActiveSupport::Cache::ZonalRedisCacheStore < ActiveSupport::Cache::Store
 
   def clear(**)
     @caches.each_value { |c| c.clear(**) }
-  end
-
-  def read_multi(*names)
-    zonal_store.read_multi(*names)
   end
 
   protected

@@ -275,7 +275,7 @@ module Api::V1::OutcomeResults
         row << sis_user_id
         outcomes.each do |outcome|
           score = rollup.scores.find { |x| x.outcome == outcome }
-          row << (score ? score.score : nil)
+          row << score&.score
           row << (mastery_points || outcome&.data&.dig(:rubric_criterion, :mastery_points))
         end
         csv << row

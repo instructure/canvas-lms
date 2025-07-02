@@ -342,7 +342,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
               next if x[:grade].blank? && x[:workflow_state] != "graded"
 
               score = x[:grade] ? assignment.points_possible * x[:grade] : nil
-              grade = score ? score.to_s : nil
+              grade = score&.to_s
 
               [x[:url], score, grade]
             end

@@ -91,7 +91,7 @@ module Types
           next nil if index.nil?
           next [] if index == visible_tag_ids.size - 1
 
-          previous_ids = visible_tag_ids[index + 1..]
+          previous_ids = visible_tag_ids[(index + 1)..]
           previous_ids.map { |id| Loaders::IDLoader.for(ContentTag).load(id) }
         end
       end

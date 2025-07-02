@@ -1209,7 +1209,7 @@ describe CoursePacesController do
       expect(response).to be_successful
       run_jobs
       expect(@section_pace.reload.deleted?).to be(true)
-      expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
+      expect(@default_pace.reload.published_at).to be > @default_pace_published_at
     end
 
     it "does not publish the default pace if the pace was not originally published" do
@@ -1231,7 +1231,7 @@ describe CoursePacesController do
       run_jobs
       expect(@section_pace.reload.deleted?).to be(true)
       expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
-      expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
+      expect(@another_section_pace.reload.published_at).to be > @another_section_pace_published_at
     end
 
     it "publishes the section pace if the student pace is deleted and the student is in a section with a pace" do
@@ -1242,7 +1242,7 @@ describe CoursePacesController do
       run_jobs
       expect(student_enrollment_pace.reload.deleted?).to be(true)
       expect(@default_pace.reload.published_at).to eq(@default_pace_published_at)
-      expect(@section_pace.reload.published_at).to be > (@section_pace_published_at)
+      expect(@section_pace.reload.published_at).to be > @section_pace_published_at
     end
 
     it "publishes the default pace if a student pace is deleted and the student is not in a section with a pace" do
@@ -1266,8 +1266,8 @@ describe CoursePacesController do
       expect(response).to be_successful
       run_jobs
       expect(@section_pace.reload.deleted?).to be(true)
-      expect(@default_pace.reload.published_at).to be > (@default_pace_published_at)
-      expect(@another_section_pace.reload.published_at).to be > (@another_section_pace_published_at)
+      expect(@default_pace.reload.published_at).to be > @default_pace_published_at
+      expect(@another_section_pace.reload.published_at).to be > @another_section_pace_published_at
     end
   end
 end

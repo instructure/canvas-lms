@@ -71,7 +71,7 @@ describe Lti::AssetProcessorNotifier do
       expect(notice_params[:cet_id_or_ids]).to eq(tool.id)
 
       builder_params = notice_params[:builders].first.instance_variable_get(:@params)
-      builder_params => {asset_report_service_url:, submission_lti_id:, assets:}
+      builder_params => { asset_report_service_url:, submission_lti_id:, assets: }
       expect(asset_report_service_url).to eq("http://localhost/api/lti/asset_processors/#{ap.id}/reports")
       expect(submission_lti_id).to eq(submission.lti_attempt_id)
 

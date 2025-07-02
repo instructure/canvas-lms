@@ -181,10 +181,10 @@ class ContextModulesApiController < ApplicationController
       end
 
       if includes.include?("items") && @context.user_has_been_observer?(@student || @current_user)
-        opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, (@student || @current_user))
+        opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(context, @student || @current_user)
       end
 
-      opts[:can_view_published] = @context.grants_right?((@student || @current_user), session, :read_as_admin)
+      opts[:can_view_published] = @context.grants_right?(@student || @current_user, session, :read_as_admin)
       opts[:can_have_estimated_time] = @context.horizon_course?
       render json: modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end

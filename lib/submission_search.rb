@@ -160,12 +160,12 @@ class SubmissionSearch
   def order_by_group_name(search_scope:, direction:)
     return search_scope unless @assignment.has_group_category? && @assignment.group_category.deleted_at.nil?
 
-    ComputedSubmissionColumnBuilder.add_group_name_column(search_scope, @assignment) => {scope:, column: group_name_column}
+    ComputedSubmissionColumnBuilder.add_group_name_column(search_scope, @assignment) => { scope:, column: group_name_column }
     scope.order(Arel.sql("#{group_name_column} #{direction}"))
   end
 
   def order_by_needs_grading(search_scope:, direction:)
-    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope) => {scope:, column: needs_grading_column}
+    ComputedSubmissionColumnBuilder.add_needs_grading_column(search_scope) => { scope:, column: needs_grading_column }
     # students needing grading come first when sorting ascending, last when sorting descending
     direction = reverse_direction(direction)
     scope.order(Arel.sql("#{needs_grading_column} #{direction}"))
@@ -173,7 +173,7 @@ class SubmissionSearch
 
   def order_by_submission_status(search_scope:, direction:)
     priorities = { not_graded: 1, resubmitted: 2, not_submitted: 3, graded: 4, other: 5 }
-    ComputedSubmissionColumnBuilder.add_submission_status_priority_column(search_scope, priorities) => {scope:, column: status_priority_column}
+    ComputedSubmissionColumnBuilder.add_submission_status_priority_column(search_scope, priorities) => { scope:, column: status_priority_column }
     scope.order(Arel.sql("#{status_priority_column} #{direction}"))
   end
 

@@ -437,7 +437,7 @@ class Rubric < ActiveRecord::Base
     {
       description: (rating_data[:description].presence || t("No Description")).strip,
       long_description: (rating_data[:long_description] || "").strip,
-      points: rating_data[:points].to_f || 0,
+      points: rating_data[:points].to_f,
       criterion_id:,
       id: unique_item_id(rating_data[:id])
     }
@@ -478,7 +478,7 @@ class Rubric < ActiveRecord::Base
         unless criterion_data[:learning_outcome_id].present?
           criterion[:long_description] = format_message((criterion_data[:long_description] || "").strip).first
         end
-        criterion[:points] = criterion_data[:points].to_f || 0
+        criterion[:points] = criterion_data[:points].to_f
         criterion_data[:id] = criterion_data[:id].strip if criterion_data[:id]
         criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
         criterion[:id] = unique_item_id(criterion_data[:id])

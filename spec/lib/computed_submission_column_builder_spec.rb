@@ -40,12 +40,12 @@ describe ComputedSubmissionColumnBuilder do
     end
 
     it "returns the generated column name" do
-      ComputedSubmissionColumnBuilder.add_group_name_column(@assignment.submissions, @assignment) => {column:}
+      ComputedSubmissionColumnBuilder.add_group_name_column(@assignment.submissions, @assignment) => { column: }
       expect(column).to eq("db_group_name")
     end
 
     it "returns a scope with the db_group_name column added" do
-      ComputedSubmissionColumnBuilder.add_group_name_column(@assignment.submissions, @assignment) => {scope:}
+      ComputedSubmissionColumnBuilder.add_group_name_column(@assignment.submissions, @assignment) => { scope: }
       sub1 = scope.find_by!(user: @student1)
       sub2 = scope.find_by!(user: @student2)
       expect(sub1.db_group_name).to eq("Apples")
@@ -55,13 +55,13 @@ describe ComputedSubmissionColumnBuilder do
 
   describe ".add_needs_grading_column" do
     it "returns the generated column name" do
-      ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions) => {column:}
+      ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions) => { column: }
       expect(column).to eq("db_needs_grading")
     end
 
     it "returns a scope with the db_needs_grading column added" do
       @assignment.submit_homework(@student2, body: "hello!")
-      ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions) => {scope:}
+      ComputedSubmissionColumnBuilder.add_needs_grading_column(@assignment.submissions) => { scope: }
       sub1 = scope.find_by!(user: @student1)
       sub2 = scope.find_by!(user: @student2)
       expect(sub1.db_needs_grading).to be false
@@ -71,13 +71,13 @@ describe ComputedSubmissionColumnBuilder do
 
   describe ".add_submission_status_column" do
     it "returns the generated column name" do
-      ComputedSubmissionColumnBuilder.add_submission_status_column(@assignment.submissions) => {column:}
+      ComputedSubmissionColumnBuilder.add_submission_status_column(@assignment.submissions) => { column: }
       expect(column).to eq("db_submission_status")
     end
 
     it "returns a scope with the db_submission_status column added" do
       @assignment.grade_student(@student1, score: 10, grader: @teacher)
-      ComputedSubmissionColumnBuilder.add_submission_status_column(@assignment.submissions) => {scope:}
+      ComputedSubmissionColumnBuilder.add_submission_status_column(@assignment.submissions) => { scope: }
       sub1 = scope.find_by!(user: @student1)
       sub2 = scope.find_by!(user: @student2)
       expect(sub1.db_submission_status).to eq("graded")
@@ -89,13 +89,13 @@ describe ComputedSubmissionColumnBuilder do
     let(:priorities) { { not_graded: 1, resubmitted: 2, not_submitted: 3, graded: 4, other: 5 } }
 
     it "returns the generated column name" do
-      ComputedSubmissionColumnBuilder.add_submission_status_priority_column(@assignment.submissions, priorities) => {column:}
+      ComputedSubmissionColumnBuilder.add_submission_status_priority_column(@assignment.submissions, priorities) => { column: }
       expect(column).to eq("db_submission_status_priority")
     end
 
     it "returns a scope with the db_submission_status_priority column added" do
       @assignment.grade_student(@student1, score: 10, grader: @teacher)
-      ComputedSubmissionColumnBuilder.add_submission_status_priority_column(@assignment.submissions, priorities) => {scope:}
+      ComputedSubmissionColumnBuilder.add_submission_status_priority_column(@assignment.submissions, priorities) => { scope: }
       sub1 = scope.find_by!(user: @student1)
       sub2 = scope.find_by!(user: @student2)
       expect(sub1.db_submission_status_priority).to eq(priorities.fetch(:graded))

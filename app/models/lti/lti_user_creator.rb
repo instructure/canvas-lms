@@ -51,8 +51,8 @@ module Lti
       user.timezone = Time.zone.tzinfo.name
       user.currently_active_in_course = -> { currently_active_in_course? }
       user.concluded_roles = -> { concluded_roles }
-      user.login_id = -> { pseudonym ? pseudonym.unique_id : nil }
-      user.sis_source_id = -> { pseudonym ? pseudonym.sis_user_id : nil }
+      user.login_id = -> { pseudonym&.unique_id }
+      user.sis_source_id = -> { pseudonym&.sis_user_id }
       user.current_observee_ids = -> { current_course_observee_lti_context_ids }
       user.current_roles = lti_helper.current_lis_roles.split(",")
 

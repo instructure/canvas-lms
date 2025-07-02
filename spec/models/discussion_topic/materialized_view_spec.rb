@@ -95,7 +95,7 @@ describe DiscussionTopic::MaterializedView do
       expect(deleted["deleted"]).to be true
       expect(deleted["user_id"]).to be_nil
       expect(deleted["message"]).to be_nil
-      expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1#{disable_adding_uuid_verifier_in_api ? "" : "&verifier=#{@attachment.uuid}"}"
+      expect(json[0]["replies"][1]["replies"][0]["attachment"]["url"]).to eq "https://placeholder.invalid/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
       # verify the api_user_content functionality in a non-request context
       html_message = json[0]["replies"][1]["message"]
       html = Nokogiri::HTML5.fragment(html_message)

@@ -155,7 +155,7 @@ class AssetUserAccess < ActiveRecord::Base
         when "topics"
           include_group_name ? t("%{group_name} - Group Discussions", group_name: group.name) : t("Group Discussions")
         else
-          "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
+          "#{"#{group.name} - " if include_group_name}Group #{split[0].titleize}"
         end
       elsif split[1].match?(/user_\d+/)
         case split[0]

@@ -162,7 +162,7 @@ class DiscussionTopicInsight < ActiveRecord::Base
   end
 
   def locale
-    discussion_topic.course.locale || I18n.default_locale.to_s || "en"
+    discussion_topic.course.locale || I18n.default_locale.to_s
   end
 
   def unprocessed_entries(should_preload: false)
