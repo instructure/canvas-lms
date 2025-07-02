@@ -22,6 +22,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Folder} from '../../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useQuery} from '@tanstack/react-query'
+import {getRootFolder} from '@canvas/files/util/apiFileUtils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -77,10 +78,20 @@ async function getFolders({queryKey}: {queryKey: [string, string]}): Promise<Fol
   }
 }
 
+export const useRootFolderPrefetch = (courseId: string) => {
+  return useQuery({
+    queryKey: ['rootFolder', courseId],
+    queryFn: () => getRootFolder('courses', courseId),
+    enabled: !!courseId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
 export const useCourseFolders = (courseId: string) => {
   const {data, isLoading, isError} = useQuery<Folder[], Error, Folder[], [string, string]>({
     queryKey: ['courseFolders', courseId],
     queryFn: getFolders,
+    staleTime: 5 * 60 * 1000,
   })
 
   return {

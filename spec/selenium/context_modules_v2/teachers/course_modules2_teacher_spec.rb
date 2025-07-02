@@ -20,12 +20,14 @@
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
 require_relative "../../helpers/items_assign_to_tray"
+require_relative "../../helpers/assignments_common"
 
 describe "context modules", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
   include Modules2IndexPage
   include ItemsAssignToTray
+  include AssignmentsCommon
 
   before :once do
     modules2_teacher_setup
@@ -80,9 +82,8 @@ describe "context modules", :ignore_js_errors do
         replace_content(title, "New Title")
 
         edit_item_modal.find_element(:css, "button[type='submit']").click
+        wait_for_ajaximations
         assignment_title = manage_module_item_container(@item.id).find_element(:css, "[data-testid='module-item-title-link']")
-        wait_for_animations
-
         expect(assignment_title.text).to eq("New Title")
       end
 
@@ -305,9 +306,15 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
-  context "empty module" do
+  context "adding files after course creation" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @teacher = @course.teachers.first
+    end
+
     before do
-      @empty_module = @course.context_modules.create!(name: "Empty Module")
+      user_session(@teacher)
+      @empty_module = @course.context_modules.create!(name: "Multi File Module")
     end
 
     it "displays the module file drop area when a module has no items" do
@@ -316,7 +323,6 @@ describe "context modules", :ignore_js_errors do
 
       module_header_expand_toggles.last.click
       wait_for_ajaximations
-
       expect(module_file_drop_element_exists?(@empty_module.id)).to be true
 
       drop_area = module_file_drop_element(@empty_module.id)
@@ -325,21 +331,42 @@ describe "context modules", :ignore_js_errors do
     end
 
     it "hides the module file drop area after adding a file item" do
-      @assignment = @course.assignments.create!(
-        title: "File 1",
-        submission_types: "online_text_entry",
-        points_possible: 10,
-        workflow_state: "published",
-        due_at: 2.days.from_now
-      )
-      @empty_module.add_item(type: "assignment", id: @assignment.id)
-
+      attachment = create_file("a_file.txt")
+      @empty_module.add_item(type: "File", id: attachment.id)
       go_to_modules
       wait_for_ajaximations
 
       module_header_expand_toggles.last.click
       wait_for_ajaximations
       expect(module_file_drop_element_exists?(@empty_module.id)).to be false
+    end
+
+    it "renders the added file in the module list" do
+      attachment = create_file("a_file.txt")
+      @empty_module.add_item(type: "File", id: attachment.id)
+      go_to_modules
+      wait_for_ajaximations
+
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+      item_titles = module_item_title_links.last.text
+      expect(item_titles).to include("a_file.txt")
+    end
+
+    it "renders multiple added files in the module list" do
+      file1 = create_file("a_file.txt")
+      file2 = create_file("b_file.txt")
+      @empty_module.add_item(type: "File", id: file1.id)
+      @empty_module.add_item(type: "File", id: file2.id)
+      go_to_modules
+      wait_for_ajaximations
+
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+      item_titles1 = module_item_title_links[0].text
+      item_titles2 = module_item_title_links[1].text
+      expect(item_titles1).to include("a_file.txt")
+      expect(item_titles2).to include("b_file.txt")
     end
   end
 end

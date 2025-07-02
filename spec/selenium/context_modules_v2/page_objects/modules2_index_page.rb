@@ -146,6 +146,10 @@ module Modules2IndexPage
     "[data-testid='module-item-title']"
   end
 
+  def module_item_title_link_selector
+    "[data-testid='module-item-title-link']"
+  end
+
   def module_item_url_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
@@ -326,6 +330,10 @@ module Modules2IndexPage
 
   def module_item_titles
     ff(module_item_title_selector)
+  end
+
+  def module_item_title_links
+    ff(module_item_title_link_selector)
   end
 
   def module_item_url_icon(module_item_id)
