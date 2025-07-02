@@ -78,6 +78,8 @@ describe('DiscussionTopicForm', () => {
       ASSIGNMENT_EDIT_PLACEMENT_NOT_ON_ANNOUNCEMENTS: false,
       context_is_not_group: true,
       RESTRICT_QUANTITATIVE_DATA: false,
+      context_type: 'Course',
+      context_id: '1',
     }
   })
 
@@ -119,6 +121,9 @@ describe('DiscussionTopicForm', () => {
           PERMISSIONS: {
             CAN_MANAGE_CONTENT: true,
             CAN_CREATE_ASSIGNMENT: true,
+          },
+          ATTRIBUTES: {
+            id: 1,
           },
         },
       }

@@ -339,7 +339,6 @@ lti_variable_expansions_use_group_course_as_course:
       state: allowed_on
     ci:
       state: allowed_on
-
 microsoft_group_enrollments_syncing:
   state: hidden
   display_name: Microsoft Group enrollment syncing
@@ -347,6 +346,18 @@ microsoft_group_enrollments_syncing:
     If enabled, syncing course enrollments to Microsoft Groups will be
     available. Account admins may enable this in account settings.
   applies_to: RootAccount
+open_tools_in_new_tab:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: "Open LTI tools in a new tab"
+  description: >-
+    If enabled, the tool launch will open a new tab and will default to the 'borderless' display type showing no Canvas UI elements.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 refactor_custom_variables:
   state: hidden
   shadow: true

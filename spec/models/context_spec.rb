@@ -326,6 +326,18 @@ describe Context do
                              ])
     end
 
+    it "does not return rubrics that have been archived or deleted" do
+      course = Course.create!(name: "c1")
+      user = user_factory(active_all: true)
+      r = Rubric.create!(context: course, title: "testing")
+      RubricAssociation.create!(context: course, rubric: r, purpose: :bookmark, association_object: course)
+      course.enroll_user(user, "TeacherEnrollment", enrollment_state: "active")
+      r.update(workflow_state: "archived")
+      expect(course.rubric_contexts(user)).to be_empty
+      r.update(workflow_state: "deleted")
+      expect(course.rubric_contexts(user)).to be_empty
+    end
+
     context "sharding" do
       specs_require_sharding
 

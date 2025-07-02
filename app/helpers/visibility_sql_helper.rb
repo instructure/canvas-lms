@@ -276,6 +276,31 @@ module VisibilitySqlHelper
               AND ao.workflow_state = 'active'
         WHERE #{filter_condition_sql}
               AND o.workflow_state NOT IN ('deleted','unpublished')
+
+        UNION
+
+        /* Discussion Section Overrides */
+        #{learning_object_select_sql(table_name:, id_column_name:)}
+
+        #{enrollment_join_sql}
+
+        JOIN #{DiscussionTopic.quoted_table_name} dt ON dt.assignment_id = o.id
+        AND dt.workflow_state NOT IN ('deleted','unpublished')
+
+        JOIN #{AssignmentOverride.quoted_table_name} ao
+              ON ao.discussion_topic_id = dt.id
+              AND ao.set_type = 'CourseSection'
+              AND ao.workflow_state = 'active'
+
+        JOIN #{Enrollment.quoted_table_name} se
+              ON se.course_section_id = ao.set_id
+              AND se.user_id = e.user_id
+              AND se.course_id = e.course_id
+              AND se.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+
+        WHERE #{filter_condition_sql}
+            AND o.workflow_state NOT IN ('deleted','unpublished')
+
       SQL
     end
 
@@ -331,6 +356,28 @@ module VisibilitySqlHelper
               AND aos.workflow_state <> 'deleted'
         WHERE #{filter_condition_sql}
               AND o.workflow_state NOT IN ('deleted','unpublished')
+
+        UNION
+
+        /* Discussion Topic Adhoc Overrides */
+        #{learning_object_select_sql(table_name:, id_column_name:)}
+
+        #{enrollment_join_sql}
+
+        JOIN #{DiscussionTopic.quoted_table_name} dt ON dt.assignment_id = o.id
+
+        JOIN #{AssignmentOverride.quoted_table_name} ao
+        ON ao.discussion_topic_id = dt.id
+        AND ao.set_type = 'ADHOC'
+        AND ao.workflow_state = 'active'
+
+        JOIN #{AssignmentOverrideStudent.quoted_table_name} aos
+        ON ao.id = aos.assignment_override_id
+        AND aos.user_id = e.user_id
+        AND aos.workflow_state <> 'deleted'
+
+        WHERE #{filter_condition_sql}
+        AND o.workflow_state NOT IN ('deleted','unpublished')
       SQL
     end
 

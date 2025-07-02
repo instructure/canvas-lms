@@ -19,7 +19,8 @@
 import React from 'react'
 import {render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/client/testing'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '@canvas/outcomes/graphql/MasteryScale'
 import MasteryScale from '../index'
@@ -155,14 +156,21 @@ describe('MasteryScale', () => {
   })
 
   describe('update outcomeProficiency', () => {
-    beforeEach(() => {
-      moxios.install()
-    })
-    afterEach(() => {
-      moxios.uninstall()
-    })
+    const server = setupServer()
+
+    beforeAll(() => server.listen())
+    afterEach(() => server.resetHandlers())
+    afterAll(() => server.close())
 
     it('submits a request when ratings are saved', async () => {
+      let requestUrl = null
+      server.use(
+        http.post('/api/v1/accounts/11/outcome_proficiency', ({request}) => {
+          requestUrl = request.url
+          return HttpResponse.json({})
+        }),
+      )
+
       useAllPages.mockReturnValue({
         data: {pages: [masteryScalesGraphqlMocks[0].result.data]},
         isError: false,
@@ -175,9 +183,8 @@ describe('MasteryScale', () => {
       fireEvent.click(getByText('Save'))
 
       await waitFor(() => {
-        const request = moxios.requests.mostRecent()
-        expect(request).not.toBeUndefined()
-        expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
+        expect(requestUrl).not.toBeNull()
+        expect(requestUrl).toContain('/api/v1/accounts/11/outcome_proficiency')
       })
     })
   })

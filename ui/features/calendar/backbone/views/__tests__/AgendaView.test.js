@@ -23,7 +23,8 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import tzInTest from '@instructure/moment-utils/specHelpers'
 import {isArray, isObject, uniq} from 'lodash'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
 import juneau from 'timezone/America/Juneau'
@@ -34,26 +35,90 @@ import eventResponse from './calendarEvents'
 
 const plannerItemsResponse = `[]`
 
-const loadEventPage = (server, includeNext = false) =>
-  sendCustomEvents(server, eventResponse, assignmentResponse, plannerItemsResponse, includeNext)
+let mockHandlers = []
+let requestCount = 0
 
-const sendCustomEvents = function (server, events, assignments, plannerItems, includeNext = false) {
-  const requestIndex = server.requests.length - 3
-  server.requests[requestIndex].respond(200, {'Content-Type': 'application/json'}, plannerItems)
-  server.requests[requestIndex + 1].respond(
-    200,
-    {
-      'Content-Type': 'application/json',
-      Link: `</api/magic>; rel="${includeNext ? 'next' : 'current'}"`,
-    },
-    events,
-  )
-  return server.requests[requestIndex + 2].respond(
-    200,
-    {'Content-Type': 'application/json'},
-    assignments,
-  )
+const loadEventPage = (includeNext = false) => {
+  requestCount = 0
+  let eventCount = 0
+  let assignmentCount = 0
+  mockHandlers = [
+    http.get('*/api/v1/planner/items*', () => {
+      requestCount++
+      return HttpResponse.json(JSON.parse(plannerItemsResponse))
+    }),
+    http.get('*/api/v1/calendar_events*', ({request}) => {
+      requestCount++
+      const url = new URL(request.url)
+      // Check if this is an assignment request by looking for type parameter
+      if (url.searchParams.get('type') === 'assignment') {
+        assignmentCount++
+        return HttpResponse.json(JSON.parse(assignmentResponse), {
+          headers:
+            assignmentCount === 1 && includeNext
+              ? {
+                  Link: `</api/magic>; rel="next"`,
+                }
+              : {},
+        })
+      } else {
+        // Regular events request
+        eventCount++
+        return HttpResponse.json(JSON.parse(eventResponse), {
+          headers:
+            eventCount === 1 && includeNext
+              ? {
+                  Link: `</api/magic>; rel="next"`,
+                }
+              : {},
+        })
+      }
+    }),
+  ]
+  server.use(...mockHandlers)
 }
+
+const sendCustomEvents = function (events, assignments, plannerItems, includeNext = false) {
+  requestCount = 0
+  let eventCount = 0
+  let assignmentCount = 0
+  mockHandlers = [
+    http.get('*/api/v1/planner/items*', () => {
+      requestCount++
+      return HttpResponse.json(JSON.parse(plannerItems))
+    }),
+    http.get('*/api/v1/calendar_events*', ({request}) => {
+      requestCount++
+      const url = new URL(request.url)
+      // Check if this is an assignment request by looking for type parameter
+      if (url.searchParams.get('type') === 'assignment') {
+        assignmentCount++
+        return HttpResponse.json(JSON.parse(assignments), {
+          headers:
+            assignmentCount === 1 && includeNext
+              ? {
+                  Link: `</api/magic>; rel="next"`,
+                }
+              : {},
+        })
+      } else {
+        // Regular events request
+        eventCount++
+        return HttpResponse.json(JSON.parse(events), {
+          headers:
+            eventCount === 1 && includeNext
+              ? {
+                  Link: `</api/magic>; rel="next"`,
+                }
+              : {},
+        })
+      }
+    }),
+  ]
+  server.use(...mockHandlers)
+}
+
+const server = setupServer()
 
 describe('AgendaView', () => {
   let container
@@ -61,7 +126,14 @@ describe('AgendaView', () => {
   let contextCodes
   let startDate
   let dataSource
-  let server
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     container = $('<div />', {id: 'agenda-wrapper'}).appendTo(document.body)
@@ -70,7 +142,6 @@ describe('AgendaView', () => {
     startDate = fcUtil.wrap(new Date(JSON.parse(eventResponse)[0].start_at))
     fcUtil.addMinuteDelta(startDate, -60 * 24 * 15)
     dataSource = new EventDataSource(contexts)
-    server = sinon.fakeServer.create()
     tzInTest.configureAndRestoreLater({
       tz: timezone(denver, 'America/Denver'),
       tzData: {
@@ -83,35 +154,42 @@ describe('AgendaView', () => {
 
   afterEach(() => {
     container.remove()
-    server.restore()
+    server.resetHandlers()
     tzInTest.restore()
     fakeENV.teardown()
   })
 
-  it('renders results', () => {
+  it('renders results', async () => {
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     expect(container.find('.agenda-event__item-container')).toHaveLength(18)
     expect(container.find('.agenda-date')).toHaveLength(view.toJSON().days.length)
     expect(container.find('.agenda-load-btn')).toHaveLength(0)
   })
 
-  it('shows "load more" if there are more results', () => {
+  it('shows "load more" if there are more results', async () => {
+    loadEventPage(true)
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server, true)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     expect(container.find('.agenda-load-btn')).toHaveLength(1)
   })
 
-  it('properly serializes results in toJSON', () => {
+  it('properly serializes results in toJSON', async () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(denver, 'America/Denver'),
       tzData: {
@@ -124,12 +202,16 @@ describe('AgendaView', () => {
         'date.abbr_month_names.10': 'Oct',
       },
     })
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     const serialized = view.toJSON()
 
     expect(isArray(serialized.days)).toBe(true)
@@ -139,12 +221,11 @@ describe('AgendaView', () => {
     serialized.days.forEach(d => expect(d.events.length).toBeGreaterThan(0))
   })
 
-  it('only includes days on page breaks once', () => {
+  it('only includes days on page breaks once', async () => {
     const view = new AgendaView({
       el: container,
       dataSource,
     })
-    view.fetch(contextCodes, startDate)
 
     let id = 1
     const addEvents = (events, date) =>
@@ -163,24 +244,31 @@ describe('AgendaView', () => {
       addEvents(events, date)
     }
 
-    sendCustomEvents(server, JSON.stringify(events), JSON.stringify([]), JSON.stringify([]), true)
+    sendCustomEvents(JSON.stringify(events), JSON.stringify([]), JSON.stringify([]), true)
+    view.fetch(contextCodes, startDate)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     expect(container.find('.agenda-event__item-container')).toHaveLength(40)
     expect(container.find('.agenda-load-btn')).toHaveLength(1)
 
-    view.loadMore({preventDefault: $.noop})
     events = []
     for (let i = 1; i <= 2; i++) {
       addEvents(events, date)
       date.setFullYear(date.getFullYear() + 1)
     }
 
-    sendCustomEvents(server, JSON.stringify(events), JSON.stringify([]), JSON.stringify([]), false)
+    sendCustomEvents(JSON.stringify(events), JSON.stringify([]), JSON.stringify([]), false)
+    view.loadMore({preventDefault: $.noop})
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
 
     expect(container.find('.agenda-event__item-container')).toHaveLength(70)
   })
 
-  it('renders non-assignment events with locale-appropriate format string', () => {
+  it('renders non-assignment events with locale-appropriate format string', async () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(denver, 'America/Denver', french, 'fr_FR'),
       tzData: {
@@ -189,17 +277,21 @@ describe('AgendaView', () => {
       momentLocale: 'fr',
       formats: {'time.formats.tiny': '%k:%M'},
     })
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     // this event has a start_at of 2013-10-08T20:30:00Z, or 1pm MDT
     expect(container.find('.agenda-event__time').slice(2, 3).text()).toMatch(/13:00/)
   })
 
-  it('renders assignment events with locale-appropriate format string', () => {
+  it('renders assignment events with locale-appropriate format string', async () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(denver, 'America/Denver', french, 'fr_FR'),
       tzData: {
@@ -208,17 +300,21 @@ describe('AgendaView', () => {
       momentLocale: 'fr',
       formats: {'time.formats.tiny': '%k:%M'},
     })
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     // this event has a start_at of 2013-10-13T05:59:59Z, or 11:59pm MDT
     expect(container.find('.agenda-event__time').slice(12, 13).text()).toMatch(/23:59/)
   })
 
-  it('renders non-assignment events in appropriate timezone', () => {
+  it('renders non-assignment events in appropriate timezone', async () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(juneau, 'America/Juneau'),
       tzData: {
@@ -228,17 +324,21 @@ describe('AgendaView', () => {
         'time.formats.tiny': '%l:%M%P',
       },
     })
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     // this event has a start_at of 2013-10-08T20:30:00Z, or 11:00am AKDT
     expect(container.find('.agenda-event__time').slice(2, 3).text()).toMatch(/11:00am/)
   })
 
-  it('renders assignment events in appropriate timezone', () => {
+  it('renders assignment events in appropriate timezone', async () => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(juneau, 'America/Juneau'),
       tzData: {
@@ -248,12 +348,16 @@ describe('AgendaView', () => {
         'time.formats.tiny': '%l:%M%P',
       },
     })
+    loadEventPage()
     const view = new AgendaView({
       el: container,
       dataSource,
     })
     view.fetch(contextCodes, startDate)
-    loadEventPage(server)
+
+    // Wait for the requests to complete
+    await new Promise(resolve => setTimeout(resolve, 100))
+
     // this event has a start_at of 2013-10-13T05:59:59Z, or 9:59pm AKDT
     expect(container.find('.agenda-event__time').slice(12, 13).text()).toMatch(/9:59pm/)
   })

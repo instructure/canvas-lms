@@ -63,13 +63,13 @@ describe Types::LtiAssetProcessorType do
     t.save!
 
     fields = {
-      :_id => [@ap1, @ap2].map { _1.id.to_s },
+      :_id => [@ap1, @ap2].map { it.id.to_s },
       :title => ["ap1", "ap2"],
       :text => ["ap1 text", @ap2.text],
       :iconOrToolIconUrl => [
         "https://example.com/ap1.png", "https://example.com/ap2_tool.png"
       ],
-      "externalTool { _id }" => [@ap1, @ap2].map { _1.context_external_tool_id.to_s },
+      "externalTool { _id }" => [@ap1, @ap2].map { it.context_external_tool_id.to_s },
       "externalTool { name }" => [@ap1.context_external_tool.name, "ap2 tool name"],
       "externalTool { labelFor(placement: ActivityAssetProcessor) }" => [
         @ap1.context_external_tool.label_for("ActivityAssetProcessor"),

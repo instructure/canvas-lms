@@ -20,6 +20,7 @@ import * as z from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
 import {ZAccountId} from './AccountId'
 import {ZUser} from './User'
+import {ZCourseId} from './CourseId'
 
 export type LtiContextControlId = z.infer<typeof ZLtiContextControlId>
 export const ZLtiContextControlId = z.string().brand('LtiContextControlId')
@@ -29,12 +30,15 @@ export const ZLtiContextControl = z.object({
   registration_id: ZLtiRegistrationId,
   deployment_id: z.string(),
   account_id: ZAccountId.nullable(),
-  course_id: z.string().nullable(),
+  course_id: ZCourseId.nullable(),
   available: z.boolean(),
   path: z.string(),
   display_path: z.array(z.string()),
   context_name: z.string(),
   depth: z.number(),
+  child_control_count: z.number(),
+  course_count: z.number(),
+  subaccount_count: z.number(),
   workflow_state: z.enum(['active', 'deleted']),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),

@@ -27,7 +27,16 @@ import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 
 const I18n = createI18nScope('theme_editor')
 
-export default function ThemeEditorSidebar(props) {
+export default function ThemeEditorSidebar({
+  allowGlobalIncludes = false,
+  brandConfig,
+  variableSchema,
+  getDisplayValue,
+  changeSomething,
+  changedValues = {},
+  themeState,
+  handleThemeStateChange,
+}) {
   const [selected, setSelected] = useState('tab-panel-edit')
   // xsslint safeString.identifier customCssLink
   const customCssLink = I18n.t('#community.admin_custom_js_css')
@@ -36,7 +45,7 @@ export default function ThemeEditorSidebar(props) {
     setSelected(id)
   }
 
-  if (props.allowGlobalIncludes) {
+  if (allowGlobalIncludes) {
     return (
       <Tabs padding="0" onRequestTabChange={changeTab}>
         <Tabs.Panel
@@ -45,13 +54,13 @@ export default function ThemeEditorSidebar(props) {
           isSelected={selected === 'tab-panel-edit'}
         >
           <ThemeEditorAccordion
-            variableSchema={props.variableSchema}
-            brandConfigVariables={props.brandConfig.variables}
-            getDisplayValue={props.getDisplayValue}
-            changedValues={props.changedValues}
-            changeSomething={props.changeSomething}
-            themeState={props.themeState}
-            handleThemeStateChange={props.handleThemeStateChange}
+            variableSchema={variableSchema}
+            brandConfigVariables={brandConfig.variables}
+            getDisplayValue={getDisplayValue}
+            changedValues={changedValues}
+            changeSomething={changeSomething}
+            themeState={themeState}
+            handleThemeStateChange={handleThemeStateChange}
           />
         </Tabs.Panel>
         <Tabs.Panel
@@ -93,22 +102,22 @@ export default function ThemeEditorSidebar(props) {
                 label={I18n.t('CSS file')}
                 accept=".css"
                 name="css_overrides"
-                currentValue={props.brandConfig.css_overrides}
-                userInput={props.changedValues.css_overrides}
-                onChange={props.changeSomething.bind(null, 'css_overrides')}
-                themeState={props.themeState}
-                handleThemeStateChange={props.handleThemeStateChange}
+                currentValue={brandConfig.css_overrides}
+                userInput={changedValues.css_overrides}
+                onChange={changeSomething.bind(null, 'css_overrides')}
+                themeState={themeState}
+                handleThemeStateChange={handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
                 label={I18n.t('JavaScript file')}
                 accept=".js"
                 name="js_overrides"
-                currentValue={props.brandConfig.js_overrides}
-                userInput={props.changedValues.js_overrides}
-                onChange={props.changeSomething.bind(null, 'js_overrides')}
-                themeState={props.themeState}
-                handleThemeStateChange={props.handleThemeStateChange}
+                currentValue={brandConfig.js_overrides}
+                userInput={changedValues.js_overrides}
+                onChange={changeSomething.bind(null, 'js_overrides')}
+                themeState={themeState}
+                handleThemeStateChange={handleThemeStateChange}
               />
             </div>
           </div>
@@ -124,22 +133,22 @@ export default function ThemeEditorSidebar(props) {
                 label={I18n.t('Mobile app CSS file')}
                 accept=".css"
                 name="mobile_css_overrides"
-                currentValue={props.brandConfig.mobile_css_overrides}
-                userInput={props.changedValues.mobile_css_overrides}
-                onChange={props.changeSomething.bind(null, 'mobile_css_overrides')}
-                themeState={props.themeState}
-                handleThemeStateChange={props.handleThemeStateChange}
+                currentValue={brandConfig.mobile_css_overrides}
+                userInput={changedValues.mobile_css_overrides}
+                onChange={changeSomething.bind(null, 'mobile_css_overrides')}
+                themeState={themeState}
+                handleThemeStateChange={handleThemeStateChange}
               />
 
               <ThemeEditorFileUpload
                 label={I18n.t('Mobile app JavaScript file')}
                 accept=".js"
                 name="mobile_js_overrides"
-                currentValue={props.brandConfig.mobile_js_overrides}
-                userInput={props.changedValues.mobile_js_overrides}
-                onChange={props.changeSomething.bind(null, 'mobile_js_overrides')}
-                themeState={props.themeState}
-                handleThemeStateChange={props.handleThemeStateChange}
+                currentValue={brandConfig.mobile_js_overrides}
+                userInput={changedValues.mobile_js_overrides}
+                onChange={changeSomething.bind(null, 'mobile_js_overrides')}
+                themeState={themeState}
+                handleThemeStateChange={handleThemeStateChange}
               />
             </div>
           </div>
@@ -150,13 +159,13 @@ export default function ThemeEditorSidebar(props) {
   return (
     <View padding="small" display="block">
       <ThemeEditorAccordion
-        variableSchema={props.variableSchema}
-        brandConfigVariables={props.brandConfig.variables}
-        getDisplayValue={props.getDisplayValue}
-        changedValues={props.changedValues}
-        changeSomething={props.changeSomething}
-        themeState={props.themeState}
-        handleThemeStateChange={props.handleThemeStateChange}
+        variableSchema={variableSchema}
+        brandConfigVariables={brandConfig.variables}
+        getDisplayValue={getDisplayValue}
+        changedValues={changedValues}
+        changeSomething={changeSomething}
+        themeState={themeState}
+        handleThemeStateChange={handleThemeStateChange}
       />
     </View>
   )
@@ -171,9 +180,4 @@ ThemeEditorSidebar.propTypes = {
   changedValues: object,
   themeState: object,
   handleThemeStateChange: func.isRequired,
-}
-
-ThemeEditorSidebar.defaultProps = {
-  allowGlobalIncludes: false,
-  changedValues: {},
 }

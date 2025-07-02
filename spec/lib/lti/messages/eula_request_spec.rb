@@ -71,6 +71,14 @@ describe Lti::Messages::EulaRequest do
   end
 
   it "includes custom params claim" do
-    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({})
+    tool.custom_fields = { "field1" => "$Canvas.user.id", "field2" => "$Canvas.user.id" }
+    tool.settings["ActivityAssetProcessor"] = {
+      "eula" => { "custom_fields" => { "field1" => "$Canvas.user.id" } }
+    }
+    tool.save!
+    expect(subject["#{IMS_CLAIM_PREFIX}/custom"]).to eq({
+                                                          "field1" => user.id.to_s,
+                                                          "field2" => user.id.to_s,
+                                                        })
   end
 end

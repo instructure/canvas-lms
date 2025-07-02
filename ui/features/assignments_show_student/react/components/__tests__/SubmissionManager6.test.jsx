@@ -148,7 +148,8 @@ describe('SubmissionManager', () => {
       jest.useRealTimers()
     })
 
-    // fickle
+    // TODO: These tests require complex RCE (Rich Content Editor) setup and proper tinymce mocking.
+    // The tests are skipped until we can properly mock the text editor initialization and draft saving behavior.
     it.skip('shows a "Saving Draft" label when the contents of a text entry have started changing', async () => {
       const {findByText} = await renderTextAttempt()
 
@@ -204,7 +205,6 @@ describe('SubmissionManager', () => {
       expect(await findByText('Draft Saved')).toBeInTheDocument()
     })
 
-    // fickle
     it.skip('shows a "Error Saving Draft" label when a problem has occurred while saving', async () => {
       const variables = {
         activeSubmissionType: 'online_text_entry',

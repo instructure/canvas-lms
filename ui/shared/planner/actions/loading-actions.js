@@ -181,7 +181,10 @@ export function getPlannerItems(fromMoment) {
 export function getCourseList() {
   return (dispatch, getState) => {
     if (getState().singleCourse) {
-      return Promise.resolve({data: getState().courses}) // set via INITIAL_OPTIONS
+      const courses = getState().courses
+      // Ensure courses is always an array
+      const coursesArray = Array.isArray(courses) ? courses : []
+      return Promise.resolve({data: coursesArray}) // set via INITIAL_OPTIONS
     }
     const observeeId = observedUserId(getState())
     const observeeParam = observeeId ? `?observed_user_id=${observeeId}` : ''
@@ -266,7 +269,7 @@ export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
     dispatch(startLoadingItems())
     const coursesPromise = getState().singleCourse
-      ? Promise.resolve({data: getState().courses}) // set in INITIAL_OPTIONS for the singleCourse case
+      ? Promise.resolve({data: Array.isArray(getState().courses) ? getState().courses : []}) // set in INITIAL_OPTIONS for the singleCourse case
       : dispatch(getCourseList())
     return coursesPromise
       .then(res => {

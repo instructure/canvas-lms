@@ -64,13 +64,6 @@ jest.mock('@canvas/util/globalUtils', () => ({
   windowPathname: jest.fn(),
 }))
 
-jest.mock('../../shared/LoginAlert', () => ({
-  __esModule: true,
-  default: () => (
-    <div data-testid="login-error-alert">Please verify your email or password and try again.</div>
-  ),
-}))
-
 describe('SignIn', () => {
   const setup = () => {
     return render(

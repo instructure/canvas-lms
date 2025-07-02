@@ -89,8 +89,8 @@ describe "Groups API", type: :request do
     json
   end
 
-  def users_json(users, **opts)
-    users.map { |user| user_json(user, **opts) }
+  def users_json(users, **)
+    users.map { |user| user_json(user, **) }
   end
 
   def user_json(user, **)

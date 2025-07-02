@@ -20,11 +20,20 @@
 require_relative "../pages/gradebook_page"
 require_relative "../setup/gradebook_setup"
 
-describe "Gradebook Controls" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook Controls" do |ff_enabled|
   include_context "in-process server selenium tests"
   include GradebookSetup
 
-  before(:once) do
+  before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
     course_with_teacher(active_all: true)
   end
 
@@ -129,4 +138,9 @@ describe "Gradebook Controls" do
       expect(driver.current_url).to include "courses/#{@course.id}/gradebook_uploads"
     end
   end
+end
+
+describe "Gradebook Controls" do
+  it_behaves_like "Gradebook Controls", true
+  it_behaves_like "Gradebook Controls", false
 end

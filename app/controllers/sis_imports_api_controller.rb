@@ -529,7 +529,7 @@ class SisImportsApiController < ApplicationController
   #   This option is only processed if 'override_sis_stickiness' is also provided.
   #
   # @argument clear_sis_stickiness [Boolean]
-  #   This option, if present, will clear "stickiness" from all fields touched
+  #   This option, if present, will clear "stickiness" from all fields processed
   #   by this import. Requires that 'override_sis_stickiness' is also provided.
   #   If 'add_sis_stickiness' is also provided, 'clear_sis_stickiness' will
   #   overrule the behavior of 'add_sis_stickiness'

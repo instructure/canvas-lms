@@ -50,18 +50,16 @@ const totalAssessingString = (score, possible) =>
 const HiddenTableRow = ({children}) => <tr style={{visibility: 'collapse'}}>{children}</tr>
 HiddenTableRow.displayName = 'Row'
 
-const Rubric = props => {
-  const {
-    allowExtraCredit,
-    customRatings,
-    onAssessmentChange,
-    rubric,
-    rubricAssessment,
-    rubricAssociation,
-    isSummary,
-    flexWidth,
-  } = props
-
+const Rubric = ({
+  allowExtraCredit = false,
+  customRatings = [],
+  onAssessmentChange = null,
+  rubric,
+  rubricAssessment = null,
+  rubricAssociation = {},
+  isSummary = false,
+  flexWidth = false,
+}) => {
   const tableRef = useRef()
   const [narrowColWidths, setNarrowColWidths] = useState(undefined)
 
@@ -232,16 +230,6 @@ Rubric.propTypes = {
   rubricAssociation: PropTypes.shape(rubricAssociationShape),
   isSummary: PropTypes.bool,
   flexWidth: PropTypes.bool,
-}
-
-Rubric.defaultProps = {
-  allowExtraCredit: false,
-  customRatings: [],
-  onAssessmentChange: null,
-  rubricAssessment: null,
-  rubricAssociation: {},
-  isSummary: false,
-  flexWidth: false,
 }
 
 export default Rubric

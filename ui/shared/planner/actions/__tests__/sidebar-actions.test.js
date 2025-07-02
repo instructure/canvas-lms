@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../msw/mswServer'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {moxiosRespond} from '@canvas/jest-moxios-utils'
 import {initialize} from '../../utilities/alertUtils'
 
 import * as Actions from '../sidebar-actions'
@@ -29,21 +29,27 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`),
 }))
 
+const server = mswServer([])
+
 beforeAll(() => {
   const alertSpy = jest.fn()
   initialize({visualErrorCallback: alertSpy})
+  server.listen()
 })
 
 beforeEach(() => {
-  moxios.install()
   MockDate.set('2018-01-01', 'UTC')
 })
 
 afterEach(() => {
-  moxios.uninstall()
+  server.resetHandlers()
   MockDate.reset()
   Actions.sidebarLoadNextItems.reset()
   Actions.maybeUpdateTodoSidebar.reset()
+})
+
+afterAll(() => {
+  server.close()
 })
 
 function mockGetState(overrides) {
@@ -92,16 +98,21 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper payload on success', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: '</>; rel="current"',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const promise = thunk(fakeDispatch, mockGetState())
-
-    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
-      status: 200,
-      headers: {
-        link: '</>; rel="current"',
-      },
-    })
+    await thunk(fakeDispatch, mockGetState())
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -111,16 +122,21 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADED with the proper url on success', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: '</>; rel="next"',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const promise = thunk(fakeDispatch, mockGetState())
-
-    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
-      status: 200,
-      headers: {
-        link: '</>; rel="next"',
-      },
-    })
+    await thunk(fakeDispatch, mockGetState())
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -130,14 +146,20 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ENOUGH_ITEMS_LOADED when initial load gets them all', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([{uniqueId: 1}, {uniqueId: 2}]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const promise = thunk(fakeDispatch, mockGetState({nextUrl: null}))
-
-    await moxiosRespond([{uniqueId: 1}, {uniqueId: 2}], promise, {
-      status: 200,
-      headers: {},
-    })
+    await thunk(fakeDispatch, mockGetState({nextUrl: null}))
 
     const expected = {
       type: 'SIDEBAR_ITEMS_LOADED',
@@ -148,9 +170,31 @@ describe('load items', () => {
   })
 
   it('continues to load if there are less than 14 incomplete items loaded', async () => {
+    let requestCount = 0
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        requestCount++
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: requestCount === 1 ? '</>; rel="next"' : '',
+          },
+        })
+      }),
+      http.get('*/', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -165,14 +209,13 @@ describe('load items', () => {
         ],
       }),
     )
-    await moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}})
 
     expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
     expect(fakeDispatch).toHaveBeenCalledTimes(6)
     const secondCallThunk = fakeDispatch.mock.calls[5][0]
     expect(secondCallThunk).toBe(Actions.sidebarLoadNextItems)
     fakeDispatch.mockReset()
-    const secondFetchPromise = secondCallThunk(
+    await secondCallThunk(
       fakeDispatch,
       mockGetState({
         nextUrl: '/',
@@ -200,13 +243,24 @@ describe('load items', () => {
         ],
       }),
     )
-    await moxiosRespond([], secondFetchPromise)
   })
 
   it('stops loading when it gets 14 incomplete items', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            link: '</>; rel="next"',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -227,15 +281,25 @@ describe('load items', () => {
         ],
       }),
     )
-    await moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}})
 
     expect(fakeDispatch).not.toHaveBeenCalledWith(Actions.sidebarLoadNextItems)
   })
 
   it('finishes loading even when there are less then 5 incomplete items', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify([]), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const fetchPromise = thunk(
+    await thunk(
       fakeDispatch,
       mockGetState({
         items: [
@@ -248,7 +312,6 @@ describe('load items', () => {
         ],
       }),
     )
-    await moxiosRespond([], fetchPromise)
 
     expect(fakeDispatch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -258,13 +321,20 @@ describe('load items', () => {
   })
 
   it('dispatches SIDEBAR_ITEMS_LOADING_FAILED on failure', async () => {
+    server.use(
+      http.get('*/api/v1/planner/items', () => {
+        return new HttpResponse(JSON.stringify({error: 'Something terrible'}), {
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }),
+    )
+
     const thunk = Actions.sidebarLoadInitialItems(moment().startOf('day'))
     const fakeDispatch = jest.fn(() => Promise.resolve({data: []}))
-    const promise = thunk(fakeDispatch, mockGetState())
-
-    await moxiosRespond({error: 'Something terrible'}, promise, {
-      status: 500,
-    })
+    await thunk(fakeDispatch, mockGetState())
 
     expect(fakeDispatch).toHaveBeenCalledWith(
       expect.objectContaining({type: 'SIDEBAR_ITEMS_LOADING_FAILED', error: true}),

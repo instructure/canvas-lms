@@ -105,8 +105,8 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_sort_order, mutation: Mutations::UpdateDiscussionSortOrder
   field :update_discussion_thread_read_state, mutation: Mutations::UpdateDiscussionThreadReadState
   field :update_discussion_topic, mutation: Mutations::UpdateDiscussionTopic
-  field :update_gradebook_group_filter, mutation: Mutations::UpdateGradebookGroupFilter
   field :update_discussion_topic_participant, mutation: Mutations::UpdateDiscussionTopicParticipant
+  field :update_gradebook_group_filter, mutation: Mutations::UpdateGradebookGroupFilter
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
   field :update_learning_outcome, mutation: Mutations::UpdateLearningOutcome
   field :update_learning_outcome_group, mutation: Mutations::UpdateLearningOutcomeGroup

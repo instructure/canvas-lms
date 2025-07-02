@@ -22,7 +22,6 @@ import AssignmentCellEditor from '../index'
 import GridEvent from '../../../GridSupport/GridEvent'
 import {createGradebook} from '../../../../__tests__/GradebookSpecHelper'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
 
 describe('GradebookGrid AssignmentCellEditor', () => {
   let $container
@@ -30,10 +29,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -60,8 +56,16 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    sandbox.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sandbox.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+    jest
+      .spyOn(gradebook, 'isGradeEditable')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
+    jest
+      .spyOn(gradebook, 'isGradeVisible')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
 
     editorOptions = {
       column: {
@@ -96,7 +100,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -105,34 +109,34 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      sandbox.spy(ReactDOM, 'render')
+      jest.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
-      ReactDOM.render.restore()
+      ReactDOM.render.mockRestore()
     })
 
     test('renders with React', () => {
       createEditor()
-      expect(ReactDOM.render.callCount).toBe(1)
+      expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(element.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      expect(element.type.name).toBe('AssignmentRowCell')
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
+      expect(element.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
-      const [, container] = ReactDOM.render.lastCall.args
+      const [, container] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(container).toBe($container)
     })
 
@@ -150,36 +154,39 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
+      const [event] =
+        editor.component.handleKeyDown.mock.calls[
+          editor.component.handleKeyDown.mock.calls.length - 1
+        ]
       expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -209,31 +216,31 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -254,41 +261,47 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      sandbox.stub(editor, 'renderComponent')
+      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
-      expect(editor.renderComponent.callCount).toBe(1)
+      expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [item] = editor.component.gradeSubmission.lastCall.args
+      const [item] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(item).toEqual({id: '1101'})
     })
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [, value] = editor.component.gradeSubmission.lastCall.args
+      const [, value] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(value).toBe('9.7')
     })
   })
@@ -308,10 +321,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -338,8 +348,16 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    sandbox.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sandbox.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+    jest
+      .spyOn(gradebook, 'isGradeEditable')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
+    jest
+      .spyOn(gradebook, 'isGradeVisible')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
 
     editorOptions = {
       column: {
@@ -374,7 +392,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -388,34 +406,34 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      sandbox.spy(ReactDOM, 'render')
+      jest.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
-      ReactDOM.render.restore()
+      ReactDOM.render.mockRestore()
     })
 
     test('renders with React', () => {
       createEditor()
-      expect(ReactDOM.render.callCount).toBe(1)
+      expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(element.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      expect(element.type.name).toBe('AssignmentRowCell')
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
+      expect(element.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
-      const [, container] = ReactDOM.render.lastCall.args
+      const [, container] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(container).toBe($container)
     })
 
@@ -433,36 +451,39 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
+      const [event] =
+        editor.component.handleKeyDown.mock.calls[
+          editor.component.handleKeyDown.mock.calls.length - 1
+        ]
       expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -492,31 +513,31 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -537,41 +558,47 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      sandbox.stub(editor, 'renderComponent')
+      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
-      expect(editor.renderComponent.callCount).toBe(1)
+      expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [item] = editor.component.gradeSubmission.lastCall.args
+      const [item] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(item).toEqual({id: '1101'})
     })
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [, value] = editor.component.gradeSubmission.lastCall.args
+      const [, value] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(value).toBe('9.7')
     })
   })
@@ -590,10 +617,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -620,8 +644,16 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    sandbox.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sandbox.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+    jest
+      .spyOn(gradebook, 'isGradeEditable')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
+    jest
+      .spyOn(gradebook, 'isGradeVisible')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
 
     editorOptions = {
       column: {
@@ -656,7 +688,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -670,34 +702,34 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      sandbox.spy(ReactDOM, 'render')
+      jest.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
-      ReactDOM.render.restore()
+      ReactDOM.render.mockRestore()
     })
 
     test('renders with React', () => {
       createEditor()
-      expect(ReactDOM.render.callCount).toBe(1)
+      expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(element.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      expect(element.type.name).toBe('AssignmentRowCell')
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
+      expect(element.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
-      const [, container] = ReactDOM.render.lastCall.args
+      const [, container] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(container).toBe($container)
     })
 
@@ -715,36 +747,39 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
+      const [event] =
+        editor.component.handleKeyDown.mock.calls[
+          editor.component.handleKeyDown.mock.calls.length - 1
+        ]
       expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -774,31 +809,31 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -819,41 +854,47 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      sandbox.stub(editor, 'renderComponent')
+      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
-      expect(editor.renderComponent.callCount).toBe(1)
+      expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [item] = editor.component.gradeSubmission.lastCall.args
+      const [item] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(item).toEqual({id: '1101'})
     })
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [, value] = editor.component.gradeSubmission.lastCall.args
+      const [, value] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(value).toBe('9.7')
     })
   })
@@ -872,10 +913,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -902,8 +940,16 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    sandbox.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sandbox.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+    jest
+      .spyOn(gradebook, 'isGradeEditable')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
+    jest
+      .spyOn(gradebook, 'isGradeVisible')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
 
     editorOptions = {
       column: {
@@ -938,7 +984,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -952,34 +998,34 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      sandbox.spy(ReactDOM, 'render')
+      jest.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
-      ReactDOM.render.restore()
+      ReactDOM.render.mockRestore()
     })
 
     test('renders with React', () => {
       createEditor()
-      expect(ReactDOM.render.callCount).toBe(1)
+      expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(element.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      expect(element.type.name).toBe('AssignmentRowCell')
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
+      expect(element.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
-      const [, container] = ReactDOM.render.lastCall.args
+      const [, container] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(container).toBe($container)
     })
 
@@ -997,36 +1043,39 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
+      const [event] =
+        editor.component.handleKeyDown.mock.calls[
+          editor.component.handleKeyDown.mock.calls.length - 1
+        ]
       expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -1056,31 +1105,31 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -1101,41 +1150,47 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      sandbox.stub(editor, 'renderComponent')
+      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
-      expect(editor.renderComponent.callCount).toBe(1)
+      expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [item] = editor.component.gradeSubmission.lastCall.args
+      const [item] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(item).toEqual({id: '1101'})
     })
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [, value] = editor.component.gradeSubmission.lastCall.args
+      const [, value] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(value).toBe('9.7')
     })
   })
@@ -1154,10 +1209,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   let editorOptions
   let gradebook
   let gridSupport
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true},
     })
@@ -1184,8 +1236,16 @@ describe('GradebookGrid AssignmentCellEditor', () => {
       user_id: '1101',
     })
 
-    sandbox.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
-    sandbox.stub(gradebook, 'isGradeVisible').withArgs('1101', '2301').returns(true)
+    jest
+      .spyOn(gradebook, 'isGradeEditable')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
+    jest
+      .spyOn(gradebook, 'isGradeVisible')
+      .mockImplementation(
+        (studentId, assignmentId) => studentId === '1101' && assignmentId === '2301',
+      )
 
     editorOptions = {
       column: {
@@ -1220,7 +1280,7 @@ describe('GradebookGrid AssignmentCellEditor', () => {
     }
     $container.remove()
     fakeENV.teardown()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   const createEditor = () => {
@@ -1234,34 +1294,34 @@ describe('GradebookGrid AssignmentCellEditor', () => {
 
   describe('initialization', () => {
     beforeEach(() => {
-      sandbox.spy(ReactDOM, 'render')
+      jest.spyOn(ReactDOM, 'render')
     })
 
     afterEach(() => {
-      ReactDOM.render.restore()
+      ReactDOM.render.mockRestore()
     })
 
     test('renders with React', () => {
       createEditor()
-      expect(ReactDOM.render.callCount).toBe(1)
+      expect(ReactDOM.render).toHaveBeenCalledTimes(1)
     })
 
     test('renders an AssignmentRowCell', () => {
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(element.type.name).toBe('AssignmentRowCell')
     })
 
     test('renders a ReadOnlyCell when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      const [element] = ReactDOM.render.lastCall.args
-      expect(element.type.name).toBe('AssignmentRowCell')
+      const [element] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
+      expect(element.type.name).toBe('ReadOnlyCell')
     })
 
     test('renders into the given container', () => {
       createEditor()
-      const [, container] = ReactDOM.render.lastCall.args
+      const [, container] = ReactDOM.render.mock.calls[ReactDOM.render.mock.calls.length - 1]
       expect(container).toBe($container)
     })
 
@@ -1279,36 +1339,39 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('"onKeyDown" event', () => {
     test('calls .handleKeyDown on the AssignmentRowCell component when triggered', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
 
     test('passes the event when calling handleKeyDown', () => {
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      const [event] = editor.component.handleKeyDown.lastCall.args
+      const [event] =
+        editor.component.handleKeyDown.mock.calls[
+          editor.component.handleKeyDown.mock.calls.length - 1
+        ]
       expect(event).toBe(keyboardEvent)
     })
 
     test('returns the return value from the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'handleKeyDown').returns(false)
+      jest.spyOn(editor.component, 'handleKeyDown').mockReturnValue(false)
       const keyboardEvent = new KeyboardEvent('example')
       const returnValue = gridSupport.events.onKeyDown.trigger(keyboardEvent)
       expect(returnValue).toBe(false)
     })
 
     test('calls .handleKeyDown on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'handleKeyDown')
+      jest.spyOn(editor.component, 'handleKeyDown')
       const keyboardEvent = new KeyboardEvent('example')
       gridSupport.events.onKeyDown.trigger(keyboardEvent)
-      expect(editor.component.handleKeyDown.callCount).toBe(1)
+      expect(editor.component.handleKeyDown).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -1338,31 +1401,31 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#focus()', () => {
     test('calls .focus on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
 
     test('calls .focus on the ReadOnlyCell component when grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.spy(editor.component, 'focus')
+      jest.spyOn(editor.component, 'focus')
       editor.focus()
-      expect(editor.component.focus.callCount).toBe(1)
+      expect(editor.component.focus).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#isValueChanged()', () => {
     test('returns the result of calling .isValueChanged on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
     test('calls .isValueChanged on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'isValueChanged').returns(true)
+      jest.spyOn(editor.component, 'isValueChanged').mockReturnValue(true)
       expect(editor.isValueChanged()).toBe(true)
     })
 
@@ -1383,41 +1446,47 @@ describe('GradebookGrid AssignmentCellEditor', () => {
   describe('#loadValue()', () => {
     test('renders the component', () => {
       createEditor()
-      sandbox.stub(editor, 'renderComponent')
+      jest.spyOn(editor, 'renderComponent').mockImplementation(() => {})
       editor.loadValue()
-      expect(editor.renderComponent.callCount).toBe(1)
+      expect(editor.renderComponent).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('#applyValue()', () => {
     test('calls .gradeSubmission on the AssignmentRowCell component', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('calls .gradeSubmission on the ReadOnlyCell component when the grade is not editable', () => {
-      gradebook.isGradeEditable.returns(false)
+      gradebook.isGradeEditable.mockReturnValue(false)
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      expect(editor.component.gradeSubmission.callCount).toBe(1)
+      expect(editor.component.gradeSubmission).toHaveBeenCalledTimes(1)
     })
 
     test('includes the given item when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [item] = editor.component.gradeSubmission.lastCall.args
+      const [item] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(item).toEqual({id: '1101'})
     })
 
     test('includes the given value when applying the value', () => {
       createEditor()
-      sandbox.stub(editor.component, 'gradeSubmission')
+      jest.spyOn(editor.component, 'gradeSubmission').mockImplementation(() => {})
       editor.applyValue({id: '1101'}, '9.7')
-      const [, value] = editor.component.gradeSubmission.lastCall.args
+      const [, value] =
+        editor.component.gradeSubmission.mock.calls[
+          editor.component.gradeSubmission.mock.calls.length - 1
+        ]
       expect(value).toBe('9.7')
     })
   })

@@ -62,6 +62,7 @@ module Lti::IMS
       timestamp
       title
       type
+      visibleToOwner
     ].freeze
 
     # @API Create an Asset Report
@@ -119,6 +120,11 @@ module Lti::IMS
     #
     # @argument type [String]
     #   An opaque value representing the type of report.
+    #
+    # @argument visibleToOwner [Optional, Boolean]
+    #   A boolean value indicates whether the indicator and report
+    #   should be visible to the user who owns the asset being reported on.
+    #   If no value is provided, the platform should assume a default value of false
     #
     # @returns the input arguments, as accepted and stored in the database.
     # Returns an HTTP 201 (Created) on success.

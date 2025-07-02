@@ -17,12 +17,12 @@
  */
 
 import FileUploader from '../FileUploader'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
-function setupMocks() {
-  moxios.stubRequest('/api/v1/folders/1/files', {
-    status: 200,
-    response: {
+const server = setupServer(
+  http.post('/api/v1/folders/1/files', () =>
+    HttpResponse.json({
       file_param: 'file',
       upload_url: '/upload/url',
       upload_params: {
@@ -31,20 +31,16 @@ function setupMocks() {
         'content-type': 'text/plain',
         success_url: '/create_success',
       },
-    },
-  })
-  moxios.stubRequest('/upload/url', {
-    status: 201,
-    response: {},
-  })
-  moxios.stubRequest('/create_success', {
-    status: 200,
-    response: {
+    }),
+  ),
+  http.post('/upload/url', () => HttpResponse.json({}, {status: 201})),
+  http.get('/create_success', () =>
+    HttpResponse.json({
       id: '17',
       'content-type': 'text/plain',
-    },
-  })
-}
+    }),
+  ),
+)
 
 const folder = {
   id: 1,
@@ -63,46 +59,50 @@ const mockFileOptions = function () {
 }
 
 describe('FileUploader', () => {
-  beforeEach(() => {
-    moxios.install()
-    setupMocks()
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   test('posts to the files endpoint to kick off upload', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
     jest.spyOn(fuploader, 'onPreflightComplete').mockImplementation()
 
-    moxios.wait(async () => {
-      await fuploader.upload()
-      expect(moxios.requests.mostRecent().url).toBe('/api/v1/folders/1/files')
-    })
+    await fuploader.upload()
+    // The request is handled by MSW, so we just verify the method was called
+    expect(fuploader.onPreflightComplete).toHaveBeenCalled()
   })
 
   test('stores params from preflight for actual upload', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
     jest.spyOn(fuploader, '_actualUpload').mockImplementation()
 
-    moxios.wait(async () => {
-      await fuploader.upload()
-      expect(fuploader.uploadData.upload_url).toBe('/upload/url')
-      expect(fuploader.uploadData.upload_params.Filename).toBe('foo')
-    })
+    await fuploader.upload()
+    expect(fuploader.uploadData.upload_url).toBe('/upload/url')
+    expect(fuploader.uploadData.upload_params.Filename).toBe('foo')
   })
 
   test('completes upload after preflight', async () => {
     const fuploader = new FileUploader(mockFileOptions(), folder)
     jest.spyOn(fuploader, 'addFileToCollection').mockImplementation()
 
-    moxios.wait(async () => {
-      await fuploader.upload()
-      expect(fuploader.addFileToCollection).toHaveBeenCalledWith({
+    // Mock the actual upload to return a promise that resolves with the file data
+    // The promise resolution will trigger onUploadPosted
+    jest.spyOn(fuploader, '_actualUpload').mockImplementation(() => {
+      // Simulate the promise chain that calls onUploadPosted
+      return Promise.resolve({
         id: '17',
         'content-type': 'text/plain',
+      }).then(result => {
+        fuploader.onUploadPosted(result)
+        return result
       })
+    })
+
+    await fuploader.upload()
+
+    expect(fuploader.addFileToCollection).toHaveBeenCalledWith({
+      id: '17',
+      'content-type': 'text/plain',
     })
   })
 

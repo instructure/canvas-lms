@@ -44,17 +44,17 @@ function renderJoinedItem(bodyAs, renderBody, renderFooter) {
 }
 
 export const FixedContentTray = ({
-  title,
-  isOpen,
-  onDismiss,
-  onUnmount,
+  title = null,
+  isOpen = false,
+  onDismiss = () => {},
+  onUnmount = () => {},
   mountNode,
   renderHeader,
   renderBody,
   renderFooter,
-  bodyAs,
-  shouldJoinBodyAndFooter,
-  shouldCloseOnDocumentClick,
+  bodyAs = 'div',
+  shouldJoinBodyAndFooter = false,
+  shouldCloseOnDocumentClick = true,
 }) => {
   return (
     <Tray
@@ -107,14 +107,4 @@ FixedContentTray.propTypes = {
   bodyAs: PropTypes.string,
   shouldJoinBodyAndFooter: PropTypes.bool,
   shouldCloseOnDocumentClick: PropTypes.bool,
-}
-
-FixedContentTray.defaultProps = {
-  title: null,
-  isOpen: false,
-  onDismiss: () => {},
-  onUnmount: () => {},
-  bodyAs: 'div',
-  shouldJoinBodyAndFooter: false,
-  shouldCloseOnDocumentClick: true,
 }

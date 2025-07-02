@@ -65,11 +65,15 @@ module AttachmentFu # :nodoc:
       end
 
       def authenticated_s3_url(*args)
-        if args[0].is_a?(Hash) && !args[0][:secure].nil?
-          protocol = args[0][:secure] ? "https://" : "http://"
+        if args[0].is_a?(Hash)
+          unless args[0][:secure].nil?
+            protocol = args[0][:secure] ? "https://" : "http://"
+          end
+          user = args[0][:user] if args[0][:user]
+          ttl = args[0][:ttl] if args[0][:ttl]
         end
         protocol ||= "#{HostUrl.protocol}://"
-        "#{protocol}#{local_storage_path}"
+        "#{protocol}#{local_storage_path(user:, ttl:)}"
       end
 
       def filename=(value)

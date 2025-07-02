@@ -144,12 +144,23 @@ class ConversationMessage < ActiveRecord::Base
     super(ids.join(","))
   end
 
+  set_policy do
+    given { |user, _| conversation_message_participants.where(user:).exists? }
+    can :read
+  end
+
   def relativize_attachment_ids(from_shard:, to_shard:)
     self.attachment_ids = attachment_ids.map { |id| Shard.relative_id_for(id, from_shard, to_shard) }.sort
   end
 
   def attachments
     attachment_associations.map(&:attachment)
+  end
+
+  def root_account_feature_enabled?(feature)
+    Account.where(id: root_account_ids&.split(",")).any? do |root_account|
+      root_account.feature_enabled?(feature)
+    end
   end
 
   def update_attachment_associations

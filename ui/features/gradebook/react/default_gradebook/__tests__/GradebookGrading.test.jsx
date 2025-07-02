@@ -24,11 +24,14 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from '@canvas/grading/GradeCalculatorSpecHelper'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
-import sinon from 'sinon'
+
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashSuccess: jest.fn(),
+  showFlashError: jest.fn(),
+}))
 
 describe('setupGrading', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     const fixturesDiv = document.createElement('div')
@@ -36,20 +39,19 @@ describe('setupGrading', () => {
     document.body.appendChild(fixturesDiv)
     gradebook = createGradebook()
     gradebook.students = [{id: '1101'}, {id: '1102'}]
-    sandbox = sinon.createSandbox()
-    sandbox.stub(gradebook, 'setAssignmentVisibility')
-    sandbox.stub(gradebook, 'invalidateRowsForStudentIds')
+    jest.spyOn(gradebook, 'setAssignmentVisibility').mockImplementation()
+    jest.spyOn(gradebook, 'invalidateRowsForStudentIds').mockImplementation()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
     document.getElementById('fixtures')?.remove()
   })
 
   test('does not cause gradebook to forget about students that are loaded but not currently in view', () => {
     gradebook.setupGrading(gradebook.students)
-    expect(gradebook.setAssignmentVisibility.callCount).toBe(1)
-    const [studentIds] = gradebook.setAssignmentVisibility.lastCall.args
+    expect(gradebook.setAssignmentVisibility).toHaveBeenCalledTimes(1)
+    const [studentIds] = gradebook.setAssignmentVisibility.mock.calls[0]
     expect(studentIds).toEqual(['1101', '1102'])
   })
 
@@ -61,15 +63,13 @@ describe('setupGrading', () => {
 
 describe('resetGrading', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     const fixturesDiv = document.createElement('div')
     fixturesDiv.id = 'fixtures'
     document.body.appendChild(fixturesDiv)
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
-    sandbox.stub(gradebook, 'setupGrading')
+    jest.spyOn(gradebook, 'setupGrading').mockImplementation()
 
     // Initialize required data structures
     gradebook.gridData = {
@@ -95,7 +95,7 @@ describe('resetGrading', () => {
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
     document.getElementById('fixtures')?.remove()
   })
 
@@ -131,22 +131,20 @@ describe('Gradebook Grading Schemes', () => {
   }
 
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     const fixturesDiv = document.createElement('div')
     fixturesDiv.id = 'fixtures'
     document.body.appendChild(fixturesDiv)
     setFixtureHtml(fixturesDiv)
-    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {
-    if (gradebook) {
-      gradebook.destroy && gradebook.destroy()
+    if (gradebook && gradebook.destroy) {
+      gradebook.destroy()
     }
     document.getElementById('fixtures')?.remove()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   function createInitializedGradebook(options = {}) {
@@ -225,15 +223,13 @@ describe('Gradebook Grading Schemes', () => {
 
 describe('Gradebook#weightedGrades', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('returns true when group_weighting_scheme is "percent"', () => {
@@ -263,15 +259,13 @@ describe('Gradebook#weightedGrades', () => {
 
 describe('Gradebook#weightedGroups', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
     gradebook = createGradebook()
-    sandbox = sinon.createSandbox()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('returns true when group_weighting_scheme is "percent"', () => {
@@ -289,17 +283,15 @@ describe('Gradebook#weightedGroups', () => {
 
 describe('Gradebook#calculateStudentGrade', () => {
   let gradebook
-  let sandbox
   let calculatedGrades
 
   beforeEach(() => {
     calculatedGrades = createGrades()
-    sandbox = sinon.createSandbox()
-    sandbox.stub(CourseGradeCalculator, 'calculate').returns(calculatedGrades)
+    jest.spyOn(CourseGradeCalculator, 'calculate').mockReturnValue(calculatedGrades)
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   function createGradebookWithOptions(options = {}) {
@@ -360,7 +352,7 @@ describe('Gradebook#calculateStudentGrade', () => {
       loaded: true,
       initialized: true,
     })
-    const args = CourseGradeCalculator.calculate.getCall(0).args
+    const args = CourseGradeCalculator.calculate.mock.calls[0]
     expect(args[0]).toBe(gradebook.submissions)
     expect(args[1]).toBe(gradebook.assignmentGroups)
     expect(args[2]).toBe(gradebook.options.group_weighting_scheme)
@@ -375,7 +367,7 @@ describe('Gradebook#calculateStudentGrade', () => {
       loaded: true,
       initialized: true,
     })
-    const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
+    const dueDates = CourseGradeCalculator.calculate.mock.calls[0][5]
     expect(dueDates).toEqual({
       201: {
         grading_period_id: '701',
@@ -393,7 +385,10 @@ describe('Gradebook#calculateStudentGrade', () => {
       initialized: true,
     }
     gradebook.calculateStudentGrade(student)
-    const args = CourseGradeCalculator.calculate.lastCall.args
+    const args =
+      CourseGradeCalculator.calculate.mock.calls[
+        CourseGradeCalculator.calculate.mock.calls.length - 1
+      ]
     expect(args[0]).toBe(gradebook.submissions)
     expect(args[1]).toBe(gradebook.assignmentGroups)
     expect(args[2]).toBe(gradebook.options.group_weighting_scheme)
@@ -474,7 +469,7 @@ describe('Gradebook#calculateStudentGrade', () => {
     }
     gradebook.calculateStudentGrade(student)
     gradebook.calculateStudentGrade(student, true)
-    expect(CourseGradeCalculator.calculate.callCount).toBe(1)
+    expect(CourseGradeCalculator.calculate).toHaveBeenCalledTimes(1)
   })
 
   test('does perform the calculation if preferCachedGrades is true and no cached value exists', () => {
@@ -487,7 +482,7 @@ describe('Gradebook#calculateStudentGrade', () => {
       initialized: true,
     }
     gradebook.calculateStudentGrade(student, true)
-    expect(CourseGradeCalculator.calculate.callCount).toBe(1)
+    expect(CourseGradeCalculator.calculate).toHaveBeenCalledTimes(1)
   })
 
   test('does not calculate when the student is not loaded', () => {
@@ -500,7 +495,7 @@ describe('Gradebook#calculateStudentGrade', () => {
       initialized: true,
     }
     gradebook.calculateStudentGrade(student)
-    expect(CourseGradeCalculator.calculate.called).toBeFalsy()
+    expect(CourseGradeCalculator.calculate).not.toHaveBeenCalled()
   })
 
   test('does not calculate when the student is not initialized', () => {
@@ -513,7 +508,7 @@ describe('Gradebook#calculateStudentGrade', () => {
       initialized: false,
     }
     gradebook.calculateStudentGrade(student)
-    expect(CourseGradeCalculator.calculate.called).toBeFalsy()
+    expect(CourseGradeCalculator.calculate).not.toHaveBeenCalled()
   })
 })
 
@@ -538,7 +533,6 @@ describe('Gradebook#allowApplyScoreToUngraded', () => {
 describe('Gradebook#onApplyScoreToUngradedRequested', () => {
   let gradebook
   let mountPoint
-  let sandbox
 
   beforeEach(() => {
     mountPoint = document.body.appendChild(document.createElement('div'))
@@ -546,13 +540,12 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
       allow_apply_score_to_ungraded: true,
       applyScoreToUngradedModalNode: mountPoint,
     })
-    sandbox = sinon.createSandbox()
-    sandbox.stub(ReactDOM, 'render')
-    sandbox.stub(React, 'createElement')
+    jest.spyOn(ReactDOM, 'render').mockImplementation()
+    jest.spyOn(React, 'createElement').mockImplementation()
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
     mountPoint.remove()
   })
 
@@ -562,20 +555,20 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
       applyScoreToUngradedModalNode: mountPoint,
     })
     gradebook.onApplyScoreToUngradedRequested()
-    expect(ReactDOM.render.notCalled).toBeTruthy()
+    expect(ReactDOM.render).not.toHaveBeenCalled()
   })
 
   test('renders the modal when the mount point is present and allow_apply_score_to_ungraded is true', () => {
     gradebook.onApplyScoreToUngradedRequested()
-    expect(ReactDOM.render.callCount).toBe(1)
-    expect(ReactDOM.render.firstCall.args[1]).toBe(mountPoint)
+    expect(ReactDOM.render).toHaveBeenCalledTimes(1)
+    expect(ReactDOM.render.mock.calls[0][1]).toBe(mountPoint)
   })
 
   test('passes the supplied assignmentGroup to the render if present', () => {
     const assignmentGroup = {id: '100', name: 'group'}
     gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
-    expect(React.createElement.callCount).toBe(1)
-    expect(React.createElement.firstCall.args[1].assignmentGroup).toEqual({
+    expect(React.createElement).toHaveBeenCalledTimes(1)
+    expect(React.createElement.mock.calls[0][1].assignmentGroup).toEqual({
       id: '100',
       name: 'group',
     })
@@ -584,10 +577,8 @@ describe('Gradebook#onApplyScoreToUngradedRequested', () => {
 
 describe('Gradebook#executeApplyScoreToUngraded', () => {
   let gradebook
-  let sandbox
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     gradebook = createGradebook({
       context_id: '1',
       grading_period_set: null,
@@ -619,13 +610,11 @@ describe('Gradebook#executeApplyScoreToUngraded', () => {
 
     gradebook.getAssignmentOrder = jest.fn().mockReturnValue(['1', '2'])
     gradebook.getStudentOrder = jest.fn().mockReturnValue(['1101', '1102'])
-
-    sandbox.stub(FlashAlert, 'showFlashSuccess')
-    sandbox.stub(FlashAlert, 'showFlashError')
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
+    jest.clearAllMocks()
   })
 
   test.skip('shows success message when starting the process', async () => {

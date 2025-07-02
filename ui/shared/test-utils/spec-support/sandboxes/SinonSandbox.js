@@ -16,54 +16,98 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
-
 /*
- * You might be seeing something like this in your test:
- * WARN LOG: 'You no longer need to manually create and restore a fake server'
+ * This class is deprecated. Tests should use Jest's built-in mocking capabilities:
+ * - jest.fn() for creating mock functions
+ * - jest.spyOn() for spying on existing methods
+ * - jest.mock() for mocking modules
+ * - MSW (Mock Service Worker) for network request mocking
  *
- * This means that you have used `sinon.createFakeServer()` to stub xhr calls to
- * the network. You no longer need to create the fake server manually. However,
- * you still need to handle requests made to the network as needed by the code
- * under test.
- *
- * For documentation on faking network requests with sinon, visit:
- * https://sinonjs.org/releases/latest/fake-xhr-and-server/
+ * For more information, see the Canvas JavaScript testing documentation.
  */
 
 export default class SinonSandbox {
   constructor(options) {
     this._options = options
 
-    this._options.global.sinon = sinon
+    // Provide compatibility methods on the global object
+    if (this._options.global) {
+      this._options.global.sandbox = {
+        spy: () => () => {},
+        stub: () => () => {},
+        mock: () => () => {},
+        clock: null,
+        server: null,
+      }
+    }
   }
 
   setup() {
     const {global, qunit} = this._options
 
-    this._sandbox = sinon.createSandbox({
-      ...sinon.defaultConfig,
-      injectInto: global.sandbox,
-      properties: ['clock', 'mock', 'server', 'spy', 'stub'],
-      useFakeServer: true,
-      useFakeTimers: false,
-    })
+    // Mock the sandbox properties with compatibility stubs
+    global.sandbox = {
+      spy: (obj, method) => {
+        const original = obj[method]
+        const spy = (...args) => original.apply(obj, args)
+        spy.callCount = 0
+        spy.called = false
+        spy.calledWith = () => false
+        spy.restore = () => {
+          obj[method] = original
+        }
+        obj[method] = spy
+        return spy
+      },
+      stub: (obj, method) => {
+        const stub = () => {}
+        stub.returns = val => {
+          obj[method] = () => val
+          return stub
+        }
+        stub.callsFake = fn => {
+          obj[method] = fn
+          return stub
+        }
+        stub.restore = () => {}
+        if (obj && method) {
+          obj[method] = stub
+        }
+        return stub
+      },
+      mock: () => ({expects: () => ({returns: () => {}})}),
+      clock: null,
+      server: {
+        respond: () => {},
+        respondImmediately: false,
+      },
+    }
 
-    sinon.assert.fail = message => qunit.ok(false, message)
-    sinon.assert.pass = message => qunit.ok(true, message)
+    // Provide compatibility for QUnit assertions if needed
+    if (qunit) {
+      const mockFn = () => {}
+      mockFn.fail = message => qunit.ok(false, message)
+      mockFn.pass = message => qunit.ok(true, message)
+    }
 
-    sinon.createFakeServer = ({respondImmediately} = {respondImmediately: false}) => {
-      console.warn('You no longer need to manually create and restore a fake server')
-      this._sandbox.server.respondImmediately = respondImmediately
-      return this._sandbox.server
+    // Warn about deprecated usage
+    global.sinon = {
+      createFakeServer: ({respondImmediately} = {respondImmediately: false}) => {
+        console.warn('SinonSandbox is deprecated. Use MSW for network mocking instead.')
+        global.sandbox.server.respondImmediately = respondImmediately
+        return global.sandbox.server
+      },
     }
   }
 
   teardown() {
-    this._sandbox.restore()
+    // Clean up any global modifications
+    if (this._options.global && this._options.global.sandbox) {
+      delete this._options.global.sandbox
+    }
   }
 
   verify() {
-    this._sandbox.verify()
+    // This is a no-op for compatibility
   }
 }

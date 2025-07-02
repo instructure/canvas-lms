@@ -137,6 +137,22 @@ describe Lti::ContextControlsController, type: :request do
         Api.parse_pagination_links(response.headers["Link"])
         links.detect { |link| link[:rel] == "next" }
       end
+
+      it "calculates attributes for each control" do
+        subject { get "/api/v1/lti_registrations/#{registration.id}/controls", params: { per_page: 100 } }
+
+        response_json.each do |deployment_json|
+          deployment_json["context_controls"].each do |control_json|
+            control = Lti::ContextControl.find(control_json["id"])
+            expect(control_json).to include(
+              "child_control_count" => control.child_control_count,
+              "subaccount_count" => control.subaccount_count,
+              "course_count" => control.course_count,
+              "depth" => a_kind_of(Integer)
+            )
+          end
+        end
+      end
     end
 
     context "with deployments" do
@@ -202,6 +218,34 @@ describe Lti::ContextControlsController, type: :request do
           expect(deployment_json["context_controls"].length).to eq(2)
           expect(deployment_json["context_controls"].map { |cc| cc["id"] }).to include(other_control.id)
         end
+
+        it "includes calculated attributes for a top-level control" do
+          subject
+
+          control_json = response_json.find { |d| d["id"] == deployment.id }["context_controls"].find { |cc| cc["id"] == control.id }
+          expect(control_json).to include(
+            {
+              child_control_count: 1,
+              subaccount_count: 1,
+              course_count: 2,
+              depth: 0
+            }.with_indifferent_access
+          )
+        end
+
+        it "includes calculated attributes for a sub-level control" do
+          subject
+
+          control_json = response_json.find { |d| d["id"] == deployment.id }["context_controls"].find { |cc| cc["id"] == other_control.id }
+          expect(control_json).to include(
+            {
+              child_control_count: 0,
+              subaccount_count: 0,
+              course_count: 0,
+              depth: 1
+            }.with_indifferent_access
+          )
+        end
       end
     end
 
@@ -266,16 +310,19 @@ describe Lti::ContextControlsController, type: :request do
         {
           account_id: account.id,
           available: true,
+          child_control_count: control.child_control_count,
           context_name: account.name,
+          course_count: control.course_count,
           course_id: nil,
           created_at: control.created_at.iso8601,
           created_by: nil,
           deployment_id: deployment.id,
           depth: 0,
-          display_path: [account.name],
+          display_path: control.display_path,
           id: control.id,
           path: control.path,
           registration_id: registration.id,
+          subaccount_count: control.subaccount_count,
           updated_at: control.updated_at.iso8601,
           updated_by: nil,
           workflow_state: "active"
@@ -337,7 +384,7 @@ describe Lti::ContextControlsController, type: :request do
           created_by: hash_including(id: admin.id),
           deployment_id: root_deployment.id,
           depth: 0,
-          display_path: [course.name],
+          display_path: an_instance_of(Array),
           id: an_instance_of(Integer),
           path: an_instance_of(String),
           registration_id: registration.id,

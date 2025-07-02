@@ -15,7 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import * as Actions from '../loading-actions'
@@ -58,19 +59,20 @@ const getBasicState = () => ({
   currentUser: {id: '1'},
 })
 
+const server = setupServer()
+
 describe('api actions', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    moxios.install()
     expect.hasAssertions()
     alertInitialize({
       visualSuccessCallback() {},
       visualErrorCallback() {},
       srAlertCallback() {},
     })
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
   })
   describe('weekly planner', () => {
     let mockDispatch
@@ -84,30 +86,30 @@ describe('api actions', () => {
     })
 
     beforeEach(() => {
-      moxios.install()
       mockDispatch = jest.fn(() => Promise.resolve({data: []}))
       weeklyState = getBasicState().weeklyDashboard
     })
 
     afterEach(() => {
-      moxios.uninstall()
       mockDispatch.mockReset()
     })
 
     describe('getWeeklyPlannerItems', () => {
       it('dispatches START_LOADING_ITEMS, gettingWeekItems, and starts the saga', async () => {
         const today = moment.tz('UTC').startOf('day')
-        // the future request
-        moxios.stubRequest(/\/api\/v1\/planner\/items\?end_date=/, {
-          status: 200,
-          response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
-        })
-        // the past request
-        moxios.stubRequest(/\/api\/v1\/planner\/items\?start_date=/, {
-          status: 200,
-          response: [{plannable_date: '2017-01-01T:00:00:00Z'}],
-        })
-        moxios.stubRequest(/dashboard_cards/, {response: {data: []}})
+
+        server.use(
+          http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+            const url = new URL(request.url)
+            if (url.searchParams.has('end_date')) {
+              return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+            } else if (url.searchParams.has('start_date')) {
+              return HttpResponse.json([{plannable_date: '2017-01-01T:00:00:00Z'}])
+            }
+            return HttpResponse.json([])
+          }),
+          http.get(/dashboard_cards/, () => HttpResponse.json({data: []})),
+        )
 
         await Actions.getWeeklyPlannerItems(today)(mockDispatch, getBasicState)
         expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems())
@@ -311,10 +313,14 @@ describe('api actions', () => {
 
     it('filters requests to specific contexts if in singleCourse mode', async () => {
       const today = moment.tz('UTC').startOf('day')
-      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
-        status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
-      })
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+      )
 
       const mockUiManager = {
         setStore: jest.fn(),
@@ -331,24 +337,29 @@ describe('api actions', () => {
 
       const expectedContextCodes = /context_codes%5B%5D=course_7/
       // Fetching current week, far future date, and far past date should all be filtered by context_codes
-      expect(moxios.requests.count()).toBe(3)
-      expect(moxios.requests.at(0).url).toMatch(expectedContextCodes)
-      expect(moxios.requests.at(1).url).toMatch(expectedContextCodes)
-      expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
+      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls[0]).toMatch(expectedContextCodes)
+      expect(capturedUrls[1]).toMatch(expectedContextCodes)
+      expect(capturedUrls[2]).toMatch(expectedContextCodes)
     })
 
     it('adds observee id, account calendars flag and all_courses flag to request if state contains selected observee', async () => {
       const today = moment.tz('UTC').startOf('day')
-      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
-        status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
-      })
-      moxios.stubRequest(/dashboard_cards/, {
-        response: [
-          {id: '11', assetString: 'course_11'},
-          {id: '12', assetString: 'course_12'},
-        ],
-      })
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+        http.get(/dashboard_cards/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([
+            {id: '11', assetString: 'course_11'},
+            {id: '12', assetString: 'course_12'},
+          ])
+        }),
+      )
 
       const mockUiManager = {
         setStore: jest.fn(),
@@ -371,19 +382,23 @@ describe('api actions', () => {
         /include%5B%5D=account_calendars&include%5B%5D=all_courses&order=desc&per_page=1&observed_user_id=35/
       // For multi-course mode, fetching current week, far future date, and far past date should all have observee id
       // , account calendars flag and context codes
-      expect(moxios.requests.count()).toBe(4)
-      expect(moxios.requests.at(0).url).toMatch(/dashboard_cards/)
-      expect(moxios.requests.at(1).url).toMatch(expectedParamsFutureRequest)
-      expect(moxios.requests.at(2).url).toMatch(expectedParamsPastRequest)
-      expect(moxios.requests.at(3).url).toMatch(expectedParams)
+      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls[0]).toMatch(/dashboard_cards/)
+      expect(capturedUrls[1]).toMatch(expectedParamsFutureRequest)
+      expect(capturedUrls[2]).toMatch(expectedParamsPastRequest)
+      expect(capturedUrls[3]).toMatch(expectedParams)
     })
 
     it('does not add the account calendars flag if state contains selected observee in singleCourse mode', async () => {
       const today = moment.tz('UTC').startOf('day')
-      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
-        status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
-      })
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+      )
 
       const mockUiManager = {
         setStore: jest.fn(),
@@ -401,21 +416,26 @@ describe('api actions', () => {
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
       const expectedParams = /observed_user_id=35&context_codes%5B%5D=course_11/
       // For single-course mode, fetching current week, far future date, and far past date should all have observee id and context codes
-      expect(moxios.requests.count()).toBe(3)
-      expect(moxios.requests.at(0).url).toMatch(expectedParams)
-      expect(moxios.requests.at(1).url).toMatch(expectedParams)
-      expect(moxios.requests.at(2).url).toMatch(expectedParams)
+      expect(capturedUrls.length).toBe(3)
+      expect(capturedUrls[0]).toMatch(expectedParams)
+      expect(capturedUrls[1]).toMatch(expectedParams)
+      expect(capturedUrls[2]).toMatch(expectedParams)
     })
 
     it('does not add observee id if observee id is the current user id', async () => {
       const today = moment.tz('UTC').startOf('day')
-      moxios.stubRequest(/\/api\/v1\/planner\/items/, {
-        status: 200,
-        response: [{plannable_date: '2017-05-01T:00:00:00Z'}],
-      })
-      moxios.stubRequest(/dashboard_cards/, {
-        response: [{id: '7', assetString: 'course_7'}],
-      })
+      const capturedUrls = []
+
+      server.use(
+        http.get(/\/api\/v1\/planner\/items/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{plannable_date: '2017-05-01T:00:00:00Z'}])
+        }),
+        http.get(/dashboard_cards/, ({request}) => {
+          capturedUrls.push(request.url)
+          return HttpResponse.json([{id: '7', assetString: 'course_7'}])
+        }),
+      )
 
       const mockUiManager = {
         setStore: jest.fn(),
@@ -430,12 +450,12 @@ describe('api actions', () => {
 
       await store.dispatch(Actions.getWeeklyPlannerItems(today))
 
-      expect(moxios.requests.count()).toBe(4)
-      expect(moxios.requests.at(0).url).toMatch(/dashboard_cards/)
-      expect(moxios.requests.at(0).url).not.toContain('observed_user_id')
-      expect(moxios.requests.at(1).url).not.toContain('observed_user_id')
-      expect(moxios.requests.at(2).url).not.toContain('observed_user_id')
-      expect(moxios.requests.at(3).url).not.toContain('observed_user_id')
+      expect(capturedUrls.length).toBe(4)
+      expect(capturedUrls[0]).toMatch(/dashboard_cards/)
+      expect(capturedUrls[0]).not.toContain('observed_user_id')
+      expect(capturedUrls[1]).not.toContain('observed_user_id')
+      expect(capturedUrls[2]).not.toContain('observed_user_id')
+      expect(capturedUrls[3]).not.toContain('observed_user_id')
     })
   })
 })

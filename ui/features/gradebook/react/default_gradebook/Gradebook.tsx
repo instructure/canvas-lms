@@ -2178,8 +2178,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             filename: name,
           },
         }),
-      setExportManager: (manager?: GradebookExportManager) =>
-        this.setState({exportManager: manager}),
+      setExportManager: (manager?: GradebookExportManager) => {
+        if (this._isMounted) {
+          this.setState({exportManager: manager})
+        }
+      },
     }
     if (this.options.gradebook_csv_progress) {
       const progressData = this.options.gradebook_csv_progress

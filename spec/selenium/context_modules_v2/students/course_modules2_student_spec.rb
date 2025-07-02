@@ -40,26 +40,154 @@ describe "context modules", :ignore_js_errors do
     expect(student_modules_container).to be_displayed
   end
 
-  it "toggles collapse" do
-    # load page
-    go_to_modules
-    expect(student_modules_container).to be_displayed
+  context "module expand and collapse" do
+    it "shows all modules items when module expanded" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
 
-    # module should default to collapsed
-    expect(page_body).not_to contain_jqcss(module_item_title_selector)
-    expand_btn = module_header_expand_toggle
-    expect(expand_btn).to be_displayed
-    expand_btn.click
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+      expand_btn = module_header_expand_toggles[0]
+      expect(expand_btn).to be_displayed
+      expand_btn.click
 
-    # module should be expanded
-    expect(module_item_title).to be_displayed
+      # module should be expanded
+      expect(module_item_titles[0]).to be_displayed
+      expect(module_item_titles[0].text).to eq(@module_item1.title)
+      expect(module_item_titles.count).to eq(2)
+    end
 
-    # reload page
-    go_to_modules
-    expect(student_modules_container).to be_displayed
+    it "can collapse module that has been expanded" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
 
-    # module should be expanded
-    expect(module_item_title).to be_displayed
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+      module_header_expand_toggles[0].click
+
+      # module should be expanded
+      expect(module_item_titles[0]).to be_displayed
+      expect(module_item_titles.count).to eq(2)
+
+      # collapse the module
+      module_header_expand_toggles[0].click
+
+      # module should be collapsed again
+      expect(page_body).not_to contain_css(module_item_title_selector)
+    end
+
+    it "retains module expand status" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+      expand_btn = module_header_expand_toggles[0]
+      expect(expand_btn).to be_displayed
+      expand_btn.click
+
+      # first module should be expanded
+      expect(module_item_titles.count).to eq(2)
+      expect(module_item_titles[0]).to be_displayed
+
+      # reload page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # first module should be expanded
+      expect(module_item_titles.count).to eq(2)
+      expect(module_item_titles[0]).to be_displayed
+    end
+
+    it "expands all modules" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+
+      # expand all modules
+      expand_all_modules_button.click
+
+      # all modules should be expanded
+      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles[0]).to be_displayed
+      expect(module_item_titles[1]).to be_displayed
+      expect(module_item_titles[2]).to be_displayed
+      expect(module_item_titles[3]).to be_displayed
+    end
+
+    it "collapses all modules" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+
+      # expand all modules
+      expand_all_modules_button.click
+
+      # all modules should be expanded
+      expect(module_item_titles.count).to eq(4)
+
+      # collapse all modules
+      collapse_all_modules_button.click
+
+      # all modules should be collapsed again
+      expect(page_body).not_to contain_css(module_item_title_selector)
+    end
+
+    it "expands all modules is retained on refresh" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+
+      # expand all modules
+      expand_all_modules_button.click
+
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # all modules should be expanded
+      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles[0]).to be_displayed
+      expect(module_item_titles[1]).to be_displayed
+      expect(module_item_titles[2]).to be_displayed
+      expect(module_item_titles[3]).to be_displayed
+    end
+
+    it "collapses all modules is retained on refresh" do
+      # load page
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+
+      # module should default to collapsed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+
+      # expand all modules
+      expand_all_modules_button.click
+
+      # all modules should be expanded
+      expect(module_item_titles.count).to eq(4)
+
+      # collapse all modules
+      collapse_all_modules_button.click
+
+      # all modules should be collapsed again
+      expect(page_body).not_to contain_css(module_item_title_selector)
+
+      go_to_modules
+      expect(student_modules_container).to be_displayed
+      expect(page_body).not_to contain_css(module_item_title_selector)
+    end
   end
 
   context "course home page" do

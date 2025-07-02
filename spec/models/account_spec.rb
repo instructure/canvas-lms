@@ -788,6 +788,59 @@ describe Account do
     expect(Account.limit(10).sub_accounts_recursive(sub.id).sort).to eq(subs.sort_by(&:id))
   end
 
+  context "partitioned_sub_account_ids_recursive" do
+    subject { Account.partitioned_sub_account_ids_recursive(account_ids) }
+
+    let(:account_ids) { [root.id, sub_1.id, sub_2.id] }
+    let(:sub_5) { account_model(parent_account: sub_3) }
+    let(:sub_4) { account_model(parent_account: sub_1) }
+    let(:sub_3) { account_model(parent_account: sub_1) }
+    let(:sub_2) { account_model(parent_account: root) }
+    let(:sub_1) { account_model(parent_account: root) }
+    let(:root) { account_model }
+
+    before do
+      root
+      sub_1
+      sub_2
+      sub_3
+      sub_4
+      sub_5
+    end
+
+    context "when given no account ids" do
+      let(:account_ids) { [] }
+
+      it "returns an empty hash" do
+        expect(subject).to eq({})
+      end
+    end
+
+    context "with ids across multiple shards" do
+      specs_require_sharding
+
+      let(:account) { account_model }
+      let(:xaccount) { @shard2.activate { account_model } }
+      let(:account_ids) { [account.id, xaccount.id] }
+
+      it "errors" do
+        expect { subject }.to raise_error(ArgumentError, "all parent_account_ids must be in the same shard")
+      end
+    end
+
+    it "returns empty array for an account with no sub-accounts" do
+      expect(subject[sub_2.id]).to eq([])
+    end
+
+    it "returns sub-account ids recursively for a given account" do
+      expect(subject[root.id]).to match_array([sub_1.id, sub_2.id, sub_3.id, sub_4.id, sub_5.id])
+    end
+
+    it "returns sub-account ids recursively for a given sub-account" do
+      expect(subject[sub_1.id]).to match_array([sub_3.id, sub_4.id, sub_5.id])
+    end
+  end
+
   it "returns the correct user count" do
     a = Account.default
     expect(a.all_users.count).to eq a.user_count
@@ -3135,6 +3188,38 @@ describe Account do
     it "returns false if the observer_appointment_groups flag is disabled" do
       Account.site_admin.disable_feature!(:assign_to_differentiation_tags)
       expect(@account.allow_assign_to_differentiation_tags?).to be false
+    end
+  end
+
+  context "number separator validation" do
+    let(:account) { Account.new(name: "test account") }
+
+    it "is valid when separators are not set" do
+      expect(account).to be_valid
+    end
+
+    it "is valid when both separators are different" do
+      account.settings[:decimal_separator] = { value: "." }
+      account.settings[:thousand_separator] = { value: "," }
+      expect(account).to be_valid
+    end
+
+    it "is invalid when both separators are the same" do
+      account.settings[:decimal_separator] = { value: "," }
+      account.settings[:thousand_separator] = { value: "," }
+      expect(account).not_to be_valid
+    end
+
+    it "is invalid if decimal_separator is present but thousand_separator is blank" do
+      account.settings[:decimal_separator] = { value: "." }
+      account.settings[:thousand_separator] = { value: "" }
+      expect(account).not_to be_valid
+    end
+
+    it "is invalid if thousand_separator is present but decimal_separator is blank" do
+      account.settings[:thousand_separator] = { value: "," }
+      account.settings[:decimal_separator] = { value: "" }
+      expect(account).not_to be_valid
     end
   end
 end

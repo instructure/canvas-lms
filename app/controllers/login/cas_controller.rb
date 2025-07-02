@@ -39,7 +39,16 @@ class Login::CasController < ApplicationController
 
     aac
     increment_statsd(:attempts)
-    redirect_to client.add_service_to_login_url(cas_login_url)
+
+    # inlines CASClient::Client#add_service_to_login_url method,
+    # so that multiple params can be added
+    uri = URI.parse(client.login_url)
+    uri.query = (uri.query ? uri.query + "&" : "") + "service=#{CGI.escape(cas_login_url)}"
+    if force_login_after_logout? || Canvas::Plugin.value_to_boolean(params[:force_login])
+      uri.query += "&renew=true"
+    end
+
+    redirect_to uri.to_s
   end
 
   def create

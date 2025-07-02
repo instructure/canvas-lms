@@ -37,7 +37,7 @@ import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {ContextView, View} from '@instructure/ui-view'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 import {useAppendBreadcrumb} from '../../../breadcrumbs/useAppendBreadcrumb'
 import type {Product} from '../../models/Product'
@@ -83,6 +83,17 @@ const ProductDetail = (props: ProductDetailProps) => {
   useAppendBreadcrumb(product?.name, previousPath, !!product?.name)
   // @ts-expect-error
   const productDescription = stripHtmlTags(product?.description)
+
+  useEffect(() => {
+    if (window.pendo && typeof window.pendo.track === 'function' && product?.id && product?.name) {
+      window.pendo.track('Product', {
+        productId: product.id,
+        productName: product.name,
+        source: 'canvas-apps',
+        placement: 'standard',
+      })
+    }
+  }, [product?.id, product?.name])
 
   const {otherProductsByCompany} = useSimilarProducts({
     params: {

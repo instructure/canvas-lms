@@ -38,9 +38,9 @@ module Lti
                  deep_link_response: {
                    placement: params[:placement],
                    content_items: [],
-                   msg: params[:lti_msg]&.then { t("Message from external tool: %{message}", message: _1.to_s) },
+                   msg: params[:lti_msg]&.then { t("Message from external tool: %{message}", message: it.to_s) },
                    log: params[:lti_log]&.to_s,
-                   errormsg: params[:lti_errormsg]&.then { t("Error message from external tool: %{message}", message: _1.to_s) },
+                   errormsg: params[:lti_errormsg]&.then { t("Error message from external tool: %{message}", message: it.to_s) },
                    errorlog: params[:lti_errorlog]&.to_s,
                    reloadpage: false,
                    moduleCreated: false,

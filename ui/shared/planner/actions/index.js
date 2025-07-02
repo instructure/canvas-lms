@@ -118,7 +118,7 @@ export const getNextOpportunities = () => {
   return (dispatch, getState) => {
     dispatch(startLoadingOpportunities())
     if (getState().opportunities.nextUrl) {
-      axios({
+      return axios({
         method: 'get',
         url: getState().opportunities.nextUrl,
       })
@@ -160,7 +160,7 @@ export const getInitialOpportunities = () => {
       })
     const request = asAxios(getPrefetchedXHR(url)) || axios({method: 'get', url})
 
-    request
+    return request
       .then(response => {
         const next = parseLinkHeader(getResponseHeader(response, 'link')).next
         dispatch(addOpportunities({items: response.data, nextUrl: next ? next.url : null}))

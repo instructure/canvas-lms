@@ -554,7 +554,35 @@ describe ContentMigration do
       @copy_from.allow_student_discussion_reporting = true
       @copy_from.allow_student_anonymous_discussion_topics = true
 
-      tool = external_tool_1_3_model(context: @copy_from)
+      # Course level tool
+      registration = lti_developer_key_model(account: @copy_from.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k, lti_registration: k.lti_registration)
+      end.lti_registration
+      tool = registration.new_external_tool(@copy_from)
+
+      # Account level tool with course level context control
+      registration2 = lti_developer_key_model(account: @copy_from.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k,
+                                     lti_registration: k.lti_registration,
+                                     domain: "example.com",
+                                     target_link_uri: "https://example.com/other-tool")
+      end.lti_registration
+      account_tool = registration2.new_external_tool(@copy_from.root_account)
+      Lti::ContextControl.create!(
+        deployment: account_tool,
+        course: @copy_from,
+        registration: registration2,
+        available: false
+      )
+
+      # Cross-account tool so the account level tool with course control can be copied over.
+      duplicate_cross_account_registration = lti_developer_key_model(account: @copy_to.root_account).tap do |k|
+        lti_tool_configuration_model(developer_key: k,
+                                     lti_registration: k.lti_registration,
+                                     domain: "example.com",
+                                     target_link_uri: "https://example.com/other-tool")
+      end.lti_registration
+      duplicate_cross_account_registration.new_external_tool(@copy_from.root_account)
 
       @copy_from.lti_resource_links.create!(
         context_external_tool: tool,
@@ -597,6 +625,7 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
 
       expect(@copy_to.lti_resource_links.size).to eq 2
+      expect(Lti::ContextControl.where(course: @copy_to).size).to eq 2
       rla = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7a" }
       expect(rla.url).to eq "http://example.com/resource-link-url"
 

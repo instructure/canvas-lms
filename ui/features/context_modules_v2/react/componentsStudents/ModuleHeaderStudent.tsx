@@ -25,7 +25,12 @@ import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import ModuleHeaderStatusIcon from './ModuleHeaderStatusIcon'
-import {ModuleProgression, CompletionRequirement, ModuleStatistics} from '../utils/types'
+import {
+  ModuleProgression,
+  CompletionRequirement,
+  ModuleStatistics,
+  Prerequisite,
+} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleProgressionStatusBar from './ModuleProgressionStatusBar'
 import {ModuleHeaderSupplementalInfoStudent} from './ModuleHeaderSupplementalInfoStudent'
@@ -41,6 +46,7 @@ export interface ModuleHeaderStudentProps {
   onToggleExpand: (id: string) => void
   progression?: ModuleProgression
   completionRequirements?: CompletionRequirement[]
+  prerequisites?: Prerequisite[]
   requirementCount?: number
   submissionStatistics?: ModuleStatistics
 }
@@ -52,6 +58,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   onToggleExpand,
   progression,
   completionRequirements,
+  prerequisites,
   requirementCount,
   submissionStatistics,
 }) => {
@@ -79,8 +86,8 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             <Flex.Item>
               <Flex gap="small" alignItems="center" justifyItems="end">
                 <Flex.Item shouldShrink>
-                  <Heading level="h3">
-                    <Text size="large" wrap="break-word">
+                  <Heading level="h2">
+                    <Text size="large" weight="bold" wrap="break-word">
                       {name}
                     </Text>
                   </Heading>
@@ -104,6 +111,22 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             <Flex.Item overflowX="hidden" overflowY="hidden" margin="small 0 0 0">
               <ModuleHeaderSupplementalInfoStudent submissionStatistics={submissionStatistics} />
             </Flex.Item>
+            {prerequisites?.length && (
+              <Flex.Item>
+                <Text size="small" color="secondary" data-testid="module-header-prerequisites">
+                  {I18n.t(
+                    {
+                      one: 'Prerequisite: %{prerequisiteName}',
+                      other: 'Prerequisites: %{prerequisiteName}',
+                    },
+                    {
+                      count: prerequisites?.length || 0,
+                      prerequisiteName: prerequisites?.map?.(p => p.name).join(', ') || '',
+                    },
+                  )}
+                </Text>
+              </Flex.Item>
+            )}
             {completionRequirements?.length && (
               <Flex.Item>
                 <ModuleProgressionStatusBar

@@ -22,7 +22,24 @@ class AttachmentAssociation < ActiveRecord::Base
   self.ignored_columns += %w[field_name]
 
   belongs_to :attachment
-  belongs_to :context, polymorphic: %i[conversation_message submission course group]
+  belongs_to :context, polymorphic: [
+    :account,
+    :account_notification,
+    :assignment,
+    :calendar_event,
+    :course,
+    :conversation_message,
+    :discussion_entry,
+    :discussion_topic,
+    :group,
+    :learning_outcome,
+    :learning_outcome_group,
+    :submission,
+    :wiki_page,
+    {
+      quiz: "Quizzes::Quiz",
+    }
+  ]
   belongs_to :user
   belongs_to :root_account, class_name: "Account", optional: true, inverse_of: :attachment_associations
 
@@ -106,6 +123,8 @@ class AttachmentAssociation < ActiveRecord::Base
                       association.context.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
                     elsif association.context.respond_to?(:root_account)
                       association.context.root_account.feature_enabled?(:file_association_access)
+                    elsif association.context.is_a?(ConversationMessage)
+                      association.context.root_account_feature_enabled?(:file_association_access)
                     end
 
     feature_is_on && association.context&.grants_right?(user, session, right_to_check)

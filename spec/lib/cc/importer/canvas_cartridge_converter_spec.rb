@@ -923,6 +923,46 @@ describe "Canvas Cartridge importing" do
       expect(page_2.body).to eq (@body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @mod2.id, @copy_to.id, @to_att.id]).gsub(%r{png" />}, 'png">')
       expect(page_2.unpublished?).to be true
     end
+
+    it "imports mastery path hidden assignment with assignment override" do
+      @copy_from.conditional_release = true
+      @copy_from.save!
+
+      wiki_page_assignment = @copy_from.assignments.create!(title: "Hidden Assignment", only_visible_to_overrides: true, migration_id: @migration.id, submission_types: "wiki_pages", grading_type: "points")
+      @page.assignment = wiki_page_assignment
+      @page.save!
+
+      assignment_override = wiki_page_assignment.assignment_overrides.create!(set_type: "Noop")
+
+      @meta_fields[:assignment_identifier] = wiki_page_assignment.migration_id
+      @meta_fields[:only_visible_to_overrides] = true
+      @meta_fields[:assignment_overrides] = [
+        assignment_override.slice(:set_type, :set_id, :title)
+      ].to_json
+
+      @migration.context.conditional_release = true
+      @migration.context.save!
+
+      exported_html = CC::CCHelper::HtmlContentExporter.new(@copy_from, @from_teacher).html_page(
+        @page.body, @page.title, @meta_fields
+      )
+      # convert to json
+      doc = Nokogiri::HTML5(exported_html)
+      hash = @converter.convert_wiki(doc, "some-page")
+      hash = hash.with_indifferent_access
+
+      # import into new course
+      Importers::WikiPageImporter.process_migration({ "wikis" => [hash, nil] }, @migration)
+      @migration.resolve_content_links!
+
+      page_2 = @copy_to.wiki_pages.where(migration_id: @migration_id).first
+
+      expect(page_2.assignment).to be_present
+      expect(page_2.assignment.title).to eq wiki_page_assignment.title
+      expect(page_2.assignment.only_visible_to_overrides).to be true
+      expect(page_2.assignment.assignment_overrides.count).to eq 1
+      expect(page_2.assignment.assignment_overrides.first.set_type).to eq "Noop"
+    end
   end
 
   it "imports migrate inline external tool URLs in wiki pages" do

@@ -33,28 +33,30 @@ import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps
 // to the underlying RCEWrapper. You probably shouldn't use it until
 // onInit has been called. Until then tinymce is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(
-  props: CanvasRcePropTypes,
+  {
+    autosave = true,
+    defaultContent,
+    mirroredAttrs = {},
+    readOnly = false,
+    textareaClassName = 'input-block-level',
+    textareaId,
+    height,
+    editorOptions = {},
+    onFocus = () => {},
+    onBlur = () => {},
+    onContentChange = () => {},
+    onInit = () => {},
+    resourceType,
+    resourceId,
+    features: _features = ENV?.FEATURES || {},
+    flashAlertTimeout: _flashAlertTimeout = ENV?.flashAlertTimeout || 10000,
+    timezone: _timezone = ENV?.TIMEZONE,
+    maxInitRenderedRCEs = -1,
+    ...rest
+  }: CanvasRcePropTypes,
   _rceRef: React.ForwardedRef<RCEWrapper>,
 ) {
   const rceRef = _rceRef as MutableRefObject<RCEWrapper>
-
-  const {
-    autosave,
-    defaultContent,
-    mirroredAttrs,
-    readOnly,
-    textareaClassName,
-    textareaId,
-    height,
-    editorOptions,
-    onFocus,
-    onBlur,
-    onContentChange,
-    onInit,
-    resourceType,
-    resourceId,
-    ...rest
-  } = props
 
   const [RCSProps] = useState(getRCSProps())
   const [tinymceConfig] = useState(() => {
@@ -71,8 +73,11 @@ const CanvasRce = forwardRef(function CanvasRce(
     return config
   })
   const [autosave_] = useState<RCEPropTypes['autosave']>({
-    enabled: props.autosave,
-    interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
+    enabled: autosave,
+    maxAge:
+      Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
+        ? 3600000
+        : ENV.rce_auto_save_max_age_ms,
   })
   const [refCreated, setRefCreated] = useState<Element | null>(null)
 
@@ -121,7 +126,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       // @ts-expect-error
       ltiTools={window.INST?.editorButtons}
-      maxInitRenderedRCEs={props.maxInitRenderedRCEs}
+      maxInitRenderedRCEs={maxInitRenderedRCEs}
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
@@ -219,7 +224,7 @@ export interface CanvasRcePropTypes {
   timezone?: string
 
   onFocus?: (rceWrapper: RCEWrapper) => void
-  onBlur: (event: React.FocusEvent<HTMLElement>) => void
+  onBlur?: (event: React.FocusEvent<HTMLElement>) => void
   onInit?: (tinymce_editor: Editor) => void
 
   /**
@@ -242,23 +247,5 @@ export interface CanvasRcePropTypes {
    */
   [key: string]: any
 }
-
-const defaultProps: Partial<CanvasRcePropTypes> = {
-  autosave: true,
-  editorOptions: {},
-  maxInitRenderedRCEs: -1,
-  mirroredAttrs: {},
-  readOnly: false,
-  textareaClassName: 'input-block-level',
-  features: ENV?.FEATURES || {},
-  flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
-  timezone: ENV?.TIMEZONE,
-  onFocus: () => {},
-  onBlur: () => {},
-  onContentChange: () => {},
-  onInit: () => {},
-}
-
-CanvasRce.defaultProps = defaultProps
 
 export default CanvasRce

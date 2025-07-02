@@ -556,6 +556,24 @@ describe ConversationMessage do
     end
   end
 
+  describe "set_policy" do
+    before do
+      course_with_teacher(active_all: true)
+      @student_with_access = student_in_course(active_all: true).user
+      @student_without_access = student_in_course(active_all: true).user
+      @conversation = @teacher.initiate_conversation([@student_with_access])
+      @attachment = attachment_model(context: @teacher)
+      @conversation.add_message("test", attachment_ids: [@attachment.id])
+    end
+
+    it "allow read access if the user can view the attachment when user participant is available for the convo" do
+      conversation_message = @conversation.conversation.conversation_messages.last
+      expect(conversation_message.grants_right?(@student_with_access, :read)).to be_truthy
+      expect(conversation_message.grants_right?(@teacher, :read)).to be_truthy
+      expect(conversation_message.grants_right?(@student_without_access, :read)).to be_falsey
+    end
+  end
+
   describe "reply_from" do
     before do
       course_with_teacher

@@ -22,6 +22,7 @@ import {responsiveQuerySizes} from '../../utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import React from 'react'
+import PropTypes from 'prop-types'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
@@ -88,6 +89,26 @@ export const DiscussionTopicAlertManager = props => {
                 {I18n.t(
                   'You must post before seeing replies. Edit history will be available to instructors.',
                 )}
+              </Text>
+            </Alert>,
+          )
+        }
+
+        if (
+          !props.userHasEntry &&
+          props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.length > 0
+        ) {
+          applicableAlerts.push(
+            <Alert
+              key="post-required-for-peer-review"
+              renderCloseButtonLabel="Close"
+              margin="0 0 x-small"
+            >
+              <Text
+                data-testid="post-required-for-peer-review"
+                size={responsiveProps?.alert?.textSize}
+              >
+                {I18n.t('You must post before being able to peer review.')}
               </Text>
             </Alert>,
           )
@@ -184,4 +205,5 @@ export const DiscussionTopicAlertManager = props => {
 
 DiscussionTopicAlertManager.propTypes = {
   discussionTopic: Discussion.shape.isRequired,
+  userHasEntry: PropTypes.bool.isRequired,
 }

@@ -23,7 +23,6 @@ import {Text} from '@instructure/ui-text'
 import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import ProficiencyFilter from './ProficiencyFilter'
 import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
 import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
@@ -34,19 +33,6 @@ import LMGBContext, {getLMGBContext} from '@canvas/outcomes/react/contexts/LMGBC
 import ExportCSVButton from './ExportCSVButton'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
-
-const getRatings = ratings => {
-  const masteryAt = ratings.find(rating => rating.mastery).points
-  return [
-    ...ratings.map(({points, description, color}) => ({
-      description: description === I18n.t('Below Mastery') ? I18n.t('Remediation') : description,
-      points,
-      masteryAt,
-      color: '#' + color,
-    })),
-    {points: null, masteryAt, color: null, description: I18n.t('Not Assessed')},
-  ]
-}
 
 const componentOverrides = {
   Link: {
@@ -63,14 +49,13 @@ const renderLoader = () => (
 
 const LearningMastery = ({courseId}) => {
   const contextValues = getLMGBContext()
-  const {contextURL, outcomeProficiency, accountLevelMasteryScalesFF} = contextValues.env
+  const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
 
   const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} =
     useRollups({
       courseId,
       accountLevelMasteryScalesFF,
     })
-  const [visibleRatings, setVisibleRatings] = useState([])
 
   const onGradebookFilterChange = filterItem => {
     const filters = new Set(gradebookFilters)
@@ -83,12 +68,6 @@ const LearningMastery = ({courseId}) => {
 
     setGradebookFilters(Array.from(filters))
   }
-
-  useEffect(() => {
-    if (accountLevelMasteryScalesFF) {
-      setVisibleRatings([true, true, true, true, true, true])
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <LMGBContext.Provider value={contextValues}>
@@ -131,15 +110,6 @@ const LearningMastery = ({courseId}) => {
           </View>
         </Flex>
       </InstUISettingsProvider>
-      {accountLevelMasteryScalesFF && (
-        <Flex.Item as="div" width="100%" padding="small 0 0 0">
-          <ProficiencyFilter
-            ratings={getRatings(outcomeProficiency.ratings)}
-            visibleRatings={visibleRatings}
-            setVisibleRatings={setVisibleRatings}
-          />
-        </Flex.Item>
-      )}
       {isLoading ? (
         renderLoader()
       ) : (
@@ -148,7 +118,6 @@ const LearningMastery = ({courseId}) => {
           outcomes={outcomes}
           students={students}
           rollups={rollups}
-          visibleRatings={visibleRatings}
           gradebookFilters={gradebookFilters}
           gradebookFilterHandler={onGradebookFilterChange}
         />

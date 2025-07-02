@@ -22,7 +22,7 @@ module Api::V1::Lti::Deployment
   include Api::V1::Json
   include Api::V1::Lti::ContextControl
 
-  def lti_deployment_json(deployment, user, session, context, context_controls: nil)
+  def lti_deployment_json(deployment, user, session, context, context_controls: nil, context_controls_calculated_attrs: {})
     api_json(deployment, user, session, only: %w[id context_id context_type]).tap do |json|
       json["registration_id"] = deployment.lti_registration_id
       json["deployment_id"] = deployment.deployment_id
@@ -31,7 +31,8 @@ module Api::V1::Lti::Deployment
 
       if context_controls
         json["context_controls"] = context_controls.map do |context_control|
-          lti_context_control_json(context_control, user, session, context)
+          calculated_attrs = context_controls_calculated_attrs[context_control.id] || {}
+          lti_context_control_json(context_control, user, session, context, calculated_attrs:)
         end
       end
     end

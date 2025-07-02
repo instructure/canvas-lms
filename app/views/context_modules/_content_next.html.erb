@@ -161,7 +161,7 @@ context_modules_header_props = {
           <label for="show_teacher_only_module_id">
             <%= t("Teachers View") %>
           </label>
-          <select id="show_teacher_only_module_id" class="module-select">
+          <select id="show_teacher_only_module_id" class="module-select" aria-describedby="show_teacher_only_module_id_description">
             <option value="0"
               <%= "selected=selected" if !selected_module || selected_module&.zero? %> >
               <%= t("All Modules") %>
@@ -173,7 +173,7 @@ context_modules_header_props = {
               </option>
             <% end %>
           </select>
-          <span class="description"><%= t("Selected module will be visible to teachers") %></span>
+          <span class="description" id="show_teacher_only_module_id_description"><%= t("Selected module will be visible to teachers") %></span>
         </div>
       <% end %>
       <% if @feature_student_module_selection && @modules.any?(&:published?) %>
@@ -182,7 +182,7 @@ context_modules_header_props = {
           <label for="show_student_only_module_id">
             <%= t("Students View") %>
           </label>
-          <select id="show_student_only_module_id" class="module-select">
+          <select id="show_student_only_module_id" class="module-select" aria-describedby="show_student_only_module_id_description">
             <option value="0"
               <%= "selected=selected" if !selected_module || selected_module&.zero? %> >
               <%= t("All Modules") %>
@@ -194,7 +194,7 @@ context_modules_header_props = {
               </option>
             <% end %>
           </select>
-          <span class="description"><%= t("Selected module will be visible to students") %></span>
+          <span class="description" id="show_student_only_module_id_description"><%= t("Selected module will be visible to students") %></span>
         </div>
       <% end %>
     <% end %>

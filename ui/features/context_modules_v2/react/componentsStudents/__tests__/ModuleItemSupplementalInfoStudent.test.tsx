@@ -60,11 +60,18 @@ const buildDefaultProps = (overrides: DefaultPropsOverrides = {}) => {
   }
 }
 
-const setUp = (completionRequirement: CompletionRequirement, content: ModuleItemContent) => {
+const setUp = (
+  completionRequirement: CompletionRequirement,
+  content: ModuleItemContent,
+  itemIcon?: React.ReactNode,
+  itemTypeText?: string,
+) => {
   return render(
     <ModuleItemSupplementalInfoStudent
       completionRequirement={completionRequirement}
       content={content}
+      itemIcon={itemIcon}
+      itemTypeText={itemTypeText}
     />,
   )
 }
@@ -166,6 +173,28 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       expect(container.container).toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
       expect(container.getByText('Mark done')).toBeInTheDocument()
+    })
+  })
+
+  describe('icon and item type display', () => {
+    it('renders itemIcon and itemTypeText when provided', () => {
+      const props = buildDefaultProps({})
+      const itemIcon = <div data-testid="item-icon">Icon</div>
+      const itemTypeText = 'discussion'
+
+      const container = setUp(props.completionRequirement, props.content, itemIcon, itemTypeText)
+
+      expect(container.getByTestId('item-icon')).toBeInTheDocument()
+      expect(container.getByText('discussion')).toBeInTheDocument()
+    })
+
+    it('does not render itemIcon or itemTypeText when not provided', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(props.completionRequirement, props.content)
+
+      // Both should not be present since we're not rendering them
+      expect(container.queryByTestId('item-icon')).not.toBeInTheDocument()
+      expect(container.queryByText('discussion')).not.toBeInTheDocument()
     })
   })
 })

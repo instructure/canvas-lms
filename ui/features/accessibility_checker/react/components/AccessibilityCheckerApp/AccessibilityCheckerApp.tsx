@@ -16,48 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Badge} from '@instructure/ui-badge'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
-import {IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
-import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import React, {useState, useEffect} from 'react'
-import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
-import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+
 import {TypeToKeyMap} from '../../constants'
+import {AccessibilityData, ContentItem, ContentItemType} from '../../types'
+import {calculateTotalIssuesCount, convertKeysToCamelCase} from '../../utils'
+import {AccessibilityIssuesModal} from '../AccessibilityIssuesModal/AccessibilityIssuesModal'
+import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
+import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
+import {IssuesCounter} from './IssuesCounter'
+
+const I18n = createI18nScope('accessibility_checker')
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [tableSortState, setTableSortState] = useState<TableSortState>({})
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const snakeToCamel = function (str: string): string {
-      return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
-    }
-
-    const convertKeysToCamelCase = function (input: any): object | boolean {
-      if (Array.isArray(input)) {
-        return input.map(convertKeysToCamelCase)
-      } else if (input !== null && typeof input === 'object') {
-        return Object.fromEntries(
-          Object.entries(input).map(([key, value]) => [
-            snakeToCamel(key),
-            convertKeysToCamelCase(value),
-          ]),
-        )
-      }
-      return input !== null && input !== undefined ? input : {}
-    }
-    doFetchApi({path: window.location.href + '/issues', method: 'GET'})
+    doFetchApi({path: window.location.href + '/issues', method: 'POST'})
       .then(data => {
         setAccessibilityIssues(convertKeysToCamelCase(data.json) as AccessibilityData)
       })
@@ -68,7 +55,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  const I18n = createI18nScope('accessibility_checker')
   const [selectedItem, setSelectedItem] = useState<ContentItem | null>(null)
   const [showModal, setShowModal] = useState(false)
   const [tableData, setTableData] = useState<ContentItem[]>([])
@@ -137,6 +123,26 @@ export const AccessibilityCheckerApp: React.FC = () => {
     window.location.reload()
   }
 
+  const handleSortRequest = (
+    sortId?: string,
+    sortDirection?: 'ascending' | 'descending' | 'none',
+  ) => {
+    try {
+      setLoading(true)
+      console.log('Sort request:', sortId, sortDirection)
+      // TODO invoke backend API with the new values to sort the data
+      // Then update states accordingly
+      setTableSortState({
+        sortId,
+        sortDirection,
+      })
+    } catch {
+      // Showing an error alert on the page
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const closeModal = (shallReload: boolean) => {
     setShowModal(false)
     if (shallReload) {
@@ -201,110 +207,30 @@ export const AccessibilityCheckerApp: React.FC = () => {
           )}
         </Flex>
 
-        <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">
-          <Table
-            caption={
-              <ScreenReaderContent>
-                {I18n.t('Content with accessibility issues')}
-              </ScreenReaderContent>
-            }
-            hover
-          >
-            <Table.Head>
-              <Table.Row>
-                <Table.ColHeader id="name-header">
-                  <Text weight="bold">{I18n.t('Content Name')}</Text>
-                </Table.ColHeader>
+        <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
+          <Flex.Item>
+            <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
+              <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
+            </View>
+          </Flex.Item>
+          <Flex.Item shouldGrow shouldShrink>
+            <View
+              as="div"
+              padding="medium"
+              borderWidth="small"
+              borderRadius="medium"
+              height="100%"
+            ></View>
+          </Flex.Item>
+        </Flex>
 
-                <Table.ColHeader id="issues-header" textAlign="center">
-                  <Text weight="bold">{I18n.t('Issues')}</Text>
-                </Table.ColHeader>
-
-                <Table.ColHeader id="content-type-header">
-                  <Text weight="bold">{I18n.t('Content Type')}</Text>
-                </Table.ColHeader>
-
-                <Table.ColHeader id="state-header">
-                  <Text weight="bold">{I18n.t('State')}</Text>
-                </Table.ColHeader>
-
-                <Table.ColHeader id="updated-header">
-                  <Text weight="bold">{I18n.t('Last updated')}</Text>
-                </Table.ColHeader>
-              </Table.Row>
-            </Table.Head>
-            <Table.Body>
-              {tableData.length === 0 ? (
-                <Table.Row>
-                  <Table.Cell colSpan={5} textAlign="center">
-                    <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                tableData.map(item => (
-                  <Table.Row key={`${item.type}-${item.id}`}>
-                    <Table.Cell>
-                      <Flex alignItems="center">
-                        <Flex.Item margin="0 0 0 x-small">
-                          <a href={item.url}>{item.title}</a>
-                        </Flex.Item>
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell textAlign="center">
-                      {item.count > 0 ? (
-                        <Badge
-                          count={item.count}
-                          countUntil={999}
-                          variant="danger"
-                          margin="small 0 small 0"
-                        >
-                          <Button onClick={() => handleRowClick(item)}>
-                            {I18n.t('View Issues')}
-                          </Button>
-                        </Badge>
-                      ) : (
-                        <Text color="secondary">No issues</Text>
-                      )}
-                    </Table.Cell>
-                    <Table.Cell>{item.type}</Table.Cell>
-                    <Table.Cell>
-                      <Flex alignItems="center">
-                        {item.published ? (
-                          <>
-                            <Flex.Item margin="medium">
-                              <IconPublishSolid color="success" />
-                            </Flex.Item>
-                            <Flex.Item>
-                              <Text>{I18n.t('Published')}</Text>
-                            </Flex.Item>
-                          </>
-                        ) : (
-                          <>
-                            <Flex.Item margin="medium">
-                              <IconUnpublishedSolid color="secondary" />
-                            </Flex.Item>
-                            <Flex.Item>
-                              <Text>{I18n.t('Unpublished')}</Text>
-                            </Flex.Item>
-                          </>
-                        )}
-                      </Flex>
-                    </Table.Cell>
-                    <Table.Cell>
-                      {item.updatedAt
-                        ? new Intl.DateTimeFormat('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: '2-digit',
-                          }).format(new Date(item.updatedAt))
-                        : '-'}
-                    </Table.Cell>
-                  </Table.Row>
-                ))
-              )}
-            </Table.Body>
-          </Table>
-        </View>
+        <AccessibilityIssuesTable
+          isLoading={loading}
+          onRowClick={handleRowClick}
+          onSortRequest={handleSortRequest}
+          tableData={tableData}
+          tableSortState={tableSortState}
+        />
 
         {selectedItem && (
           <AccessibilityIssuesModal isOpen={showModal} onClose={closeModal} item={selectedItem} />

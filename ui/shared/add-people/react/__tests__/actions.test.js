@@ -20,27 +20,14 @@ import axios from '@canvas/axios'
 import {createStore} from '../store'
 import {actions, actionTypes} from '../actions'
 import INITIAL_STATE from '@canvas/add-people/initialState'
-import sinon from 'sinon'
 
-let sandbox = null
-const restoreAxios = () => {
-  if (sandbox) sandbox.restore()
-  sandbox = null
-}
-const mockAxios = adapter => {
-  restoreAxios()
-  sandbox = sinon.createSandbox()
-  sandbox.stub(axios, 'post').callsFake(adapter)
-}
 const mockAxiosSuccess = (data = {}) => {
-  mockAxios(() =>
-    Promise.resolve({
-      data,
-      status: 200,
-      statusText: 'Ok',
-      headers: {},
-    }),
-  )
+  jest.spyOn(axios, 'post').mockResolvedValue({
+    data,
+    status: 200,
+    statusText: 'Ok',
+    headers: {},
+  })
 }
 const failureData = {
   message: 'Error',
@@ -52,13 +39,13 @@ const failureData = {
   },
 }
 const mockAxiosFail = () => {
-  mockAxios(() => Promise.reject(failureData))
+  jest.spyOn(axios, 'post').mockRejectedValue(failureData)
 }
 let store = null
 let storeSpy = null
 let runningState = INITIAL_STATE
 const mockStore = (state = runningState) => {
-  storeSpy = sinon.spy()
+  storeSpy = jest.fn()
   store = createStore((st, action) => {
     storeSpy(action)
     return st
@@ -69,7 +56,7 @@ const testConfig = () => ({
     mockStore()
   },
   afterEach() {
-    restoreAxios()
+    jest.restoreAllMocks()
   },
 })
 
@@ -81,7 +68,7 @@ describe('Add People Actions', () => {
     test('dispatches VALIDATE_USERS_START when called', () => {
       mockAxiosSuccess()
       store.dispatch(actions.validateUsers())
-      expect(storeSpy.calledWith({type: actionTypes.VALIDATE_USERS_START})).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({type: actionTypes.VALIDATE_USERS_START})
     })
 
     test('dispatches VALIDATE_USERS_SUCCESS with data when successful', async () => {
@@ -95,12 +82,10 @@ describe('Add People Actions', () => {
       store.dispatch(actions.validateUsers())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.VALIDATE_USERS_SUCCESS,
-          payload: apiResponse,
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.VALIDATE_USERS_SUCCESS,
+        payload: apiResponse,
+      })
     })
 
     test.skip('dispatches ENQUEUE_USERS_TO_BE_ENROLLED with data when validate users returns no dupes or missings', async () => {
@@ -123,14 +108,12 @@ describe('Add People Actions', () => {
       store.dispatch(actions.validateUsers())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith(
-          sinon.match({
-            type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
-            payload: apiResponse.users,
-          }),
-        ),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
+          payload: apiResponse.users,
+        }),
+      )
     })
 
     test('dispatches VALIDATE_USERS_ERROR with error when fails', async () => {
@@ -138,12 +121,10 @@ describe('Add People Actions', () => {
       store.dispatch(actions.validateUsers())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.VALIDATE_USERS_ERROR,
-          payload: failureData,
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.VALIDATE_USERS_ERROR,
+        payload: failureData,
+      })
     })
   })
 
@@ -178,7 +159,7 @@ describe('Add People Actions', () => {
       }
       mockStore(testState)
       store.dispatch(actions.resolveValidationIssues())
-      expect(storeSpy.calledWith({type: actionTypes.CREATE_USERS_START})).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({type: actionTypes.CREATE_USERS_START})
     })
 
     test.skip('dispatches CREATE_USERS_SUCCESS with data when successful', async () => {
@@ -200,18 +181,14 @@ describe('Add People Actions', () => {
       store.dispatch(actions.resolveValidationIssues())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.CREATE_USERS_SUCCESS,
-          payload: apiResponse,
-        }),
-      ).toBe(true)
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
-          payload: [newUser],
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.CREATE_USERS_SUCCESS,
+        payload: apiResponse,
+      })
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
+        payload: [newUser],
+      })
     })
 
     test.skip('dispatches CREATE_USERS_ERROR with error when fails', async () => {
@@ -219,12 +196,10 @@ describe('Add People Actions', () => {
       store.dispatch(actions.resolveValidationIssues())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.CREATE_USERS_ERROR,
-          payload: failureData,
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.CREATE_USERS_ERROR,
+        payload: failureData,
+      })
     })
   })
 
@@ -235,7 +210,7 @@ describe('Add People Actions', () => {
     test('dispatches START when called', () => {
       mockAxiosSuccess()
       store.dispatch(actions.enrollUsers())
-      expect(storeSpy.calledWith({type: actionTypes.ENROLL_USERS_START})).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({type: actionTypes.ENROLL_USERS_START})
     })
 
     test('dispatches SUCCESS with data when successful', async () => {
@@ -243,12 +218,10 @@ describe('Add People Actions', () => {
       store.dispatch(actions.enrollUsers(() => Promise.resolve()))
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.ENROLL_USERS_SUCCESS,
-          payload: {data: 'foo'},
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.ENROLL_USERS_SUCCESS,
+        payload: {data: 'foo'},
+      })
     })
 
     test('dispatches ERROR with error when fails', async () => {
@@ -256,12 +229,10 @@ describe('Add People Actions', () => {
       store.dispatch(actions.enrollUsers())
       // Wait for the promise to resolve
       await new Promise(resolve => setTimeout(resolve, 1))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.ENROLL_USERS_ERROR,
-          payload: failureData,
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.ENROLL_USERS_ERROR,
+        payload: failureData,
+      })
     })
   })
 
@@ -286,15 +257,13 @@ describe('Add People Actions', () => {
           user_id: 1,
         }),
       )
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.CHOOSE_DUPLICATE,
-          payload: {
-            address: 'foo',
-            user_id: 1,
-          },
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.CHOOSE_DUPLICATE,
+        payload: {
+          address: 'foo',
+          user_id: 1,
+        },
+      })
     })
   })
 
@@ -304,12 +273,10 @@ describe('Add People Actions', () => {
 
     test('dispatches dependent actions', () => {
       store.dispatch(actions.skipDuplicate({address: 'foo'}))
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.SKIP_DUPLICATE,
-          payload: {address: 'foo'},
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.SKIP_DUPLICATE,
+        payload: {address: 'foo'},
+      })
     })
   })
 
@@ -328,15 +295,13 @@ describe('Add People Actions', () => {
           newUserInfo: newUser,
         }),
       )
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.ENQUEUE_NEW_FOR_DUPLICATE,
-          payload: {
-            address: 'foo',
-            newUserInfo: newUser,
-          },
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.ENQUEUE_NEW_FOR_DUPLICATE,
+        payload: {
+          address: 'foo',
+          newUserInfo: newUser,
+        },
+      })
     })
 
     test('for missing dispatches dependent action', () => {
@@ -351,15 +316,13 @@ describe('Add People Actions', () => {
           newUser: newUser,
         }),
       )
-      expect(
-        storeSpy.calledWith({
-          type: actionTypes.ENQUEUE_NEW_FOR_MISSING,
-          payload: {
-            address: 'foo',
-            newUser: newUser,
-          },
-        }),
-      ).toBe(true)
+      expect(storeSpy).toHaveBeenCalledWith({
+        type: actionTypes.ENQUEUE_NEW_FOR_MISSING,
+        payload: {
+          address: 'foo',
+          newUser: newUser,
+        },
+      })
     })
   })
 })

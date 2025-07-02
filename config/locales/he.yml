@@ -4100,6 +4100,7 @@ he:
   cancel_custom_link_creation_39ec70bd: "ביטול יצירת קישורים יעודיים"
   cancel_submitting_comment_2666e98b: "ביטול שליחת תגובה"
   cancel_updating_comment_6816d855: "ביטול עדכון תגובה"
+  canceled_5a6e0ec8: בוטל
   cannot_access_group_in_concluded_course_90a8db52: "אין אפשרות להכנס לקבוצה בקורס שסוכם"
   cannot_autograde_at_this_time_a146ad9d: "לא ניתן לבצע כרגע הערכה אוטומטית"
   cannot_be_associated_with_a_different_account_ac863be2: "אין אפשרות לקשר לחשבון אחר"
@@ -4152,6 +4153,9 @@ he:
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "התראת קנבס - הגשה באיחור: %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "מאפיין קנבס"
   canvas_by_instructure_1490381: "קנבס באמצעות Instructure"
+  canvas_can_t_bind_login_to_your_ldap_server_2642aef1: "המערכת לא מצליחה לבצע היקשרות (bind) לשרת הLDAP"
+  canvas_can_t_connect_to_your_ldap_server_ca901b43: "מערכת קנבס אינה יכולה להתחבר לשרת ה- LDAP"
+  canvas_can_t_search_your_ldap_instance_7f5f53c3: " מערכת קנבס אינה יכולה לחפש בשרת הLDAP שלך"
   canvas_cartridge_description: "הדבר מאפשר המרה של ייצוא קנבס לפורמט זמני של JSON אשר אותו יש לייבא"
   canvas_cartridge_display: "Common Cartridge של קנבס"
   canvas_cartridge_file_description: "חבילת הייצוא של קורס קנבס"
@@ -4167,6 +4171,7 @@ he:
   canvas_error_report_ff678539: "דוח שגיאות של קנבס"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_introduction_video_2d81f3ad: "סרטון ההכירות של קנבס"
+  canvas_is_connecting_to_ips_9af7da93: "המערכת מתחברת אל %{ips}"
   canvas_lms_6ce68514: "קנבס LMS"
   canvas_login_failure_message_4c922f2f: " הודעת שגיאת התחברות למערכת קנבס"
   canvas_login_instructure_271b8d00: "התחברות לקנבס"
@@ -4238,6 +4243,7 @@ he:
   check_to_add_a_user_for_loginid_6cd25597: "סימון כדי להוסיף משתמש ל %{loginid}"
   check_to_select_all_98e484f1: "סמן כדי לבחור את כולם"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "סימון כדי לדלג על הוספת משתמש ל %{loginid}"
+  check_your_firewall_settings_are_all_canvas_ip_add_cbd119c5: "בדוק את הגדרות הfirewall שלך. האם כל כתובות הIP של מערכת קנבס רשאיות לגשת לשרת שלך?"
   checked_883b93fd: סומן
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "קורס בן חייב להשתייך לאותו החשבון של קורס האב"
   child_s_username_dde3aa9: "שם המשתמש של הילד/ה"
@@ -7508,6 +7514,7 @@ he:
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "מטלה זו אינה נספרת בציון הסופי"
   do_nothing_9672b478: "אין צורך לנקוט בפעולה"
   does_not_meet_expectations_b0736d20: "אינו עונה על הציפיות"
+  does_the_username_require_more_scoping_information_40d51df: "האם שם המשתמש צריך להיות ממוקד יותר? (למשל  'cn=Canvas,ou=people,dc=example,dc=com')."
   domain_3b54c511: דומיין
   domain_69fe564b: דומיין
   domain_is_required_1d4c8b25: "נדרש דומיין"
@@ -10658,6 +10665,7 @@ he:
   last_name_303122f3: "שם משפחה"
   last_post_display_last_reply_at_b9896355: "הפרסום האחרון %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "העדכון האחרון שנשלח: %{last_export_at}"
+  last_run_c6eedd69: "הרצה אחרונה"
   last_used_17553fed: "תאריך שימוש אחרון "
   last_used_f9457313: "שומש לאחרונה:"
   last_user_access_title: "כניסת משתמש אחרונה"
@@ -13027,6 +13035,7 @@ he:
     grading_standard_type: "תקן הערכה"
     group_type: קבוצה
     learning_outcome_type: "הישגי למידה"
+    module_item_type: "פריט מודול"
     module_type: מודול
     quiz_question_type: "שאלת בוחן"
     quiz_type: בוחן
@@ -16355,6 +16364,7 @@ he:
           score_for_quiz: "ציון לבוחן זה"
           score_for_survey: "ציון לסקר זה"
           survey_score: "ציון סקר"
+          warning_icon: אזהרה
         links: 
           click_to_view_results: "יש להקליק כאן כדי לעיין בתוצאות"
         questions_not_graded: "חלק מהשאלות עדיין לא הוערכו"
@@ -19161,6 +19171,7 @@ he:
   suggestions_b8b03b9d: "הצעות:"
   sum_of_all_files_in_mb_2b705055: "סך גודל כל הקבצים במגהבייט MB"
   summary_statistics_f74852a5: "סטטיסטיקה מסכמת"
+  supply_a_valid_ldap_username_password_to_test_logi_5685760b: "אנא ספק שם משתמש/סיסמאת LDAP תקינים על מנת לבדוק התחברות:"
   support: 
     array: 
       last_word_connector: ", ו"
@@ -19379,6 +19390,9 @@ he:
         term_start: "מועד תחילת עונת לימודים"
         unspecified: "כל פעם "
       timespan: "%{start_at} *עד* %{end_at}"
+  test_ldap_authentication_446cce4f: "בדיקת הזדהות LDAP"
+  test_ldap_settings_c387f136: "בדיקת הגדרות LDAP"
+  test_login_3dc3c119: "בדיקת התחברות"
   testing_state_effd4a82: "בודק מצב"
   text_document_eacbcdb7: "מסמך מלל"
   text_entry_e1808b2f: "הקלדת טקסט"
@@ -19396,6 +19410,7 @@ he:
   the_app_was_deactivated_573520ab: "האפליקציה הושבתה"
   the_app_was_updated_successfully_3d71cd1b: "האפליקציה עודכנה בהצלחה"
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: "מזהה ישות ה SAML של קנבס הנו %{metadata_url}, וספק השירות של מילון הנתונים זמין בכתובת הזו."
+  the_connection_either_timed_out_or_was_refused_thi_570177f7: "החיבור נדחה או עבר Timeout. דברים לקחת בחשבון:"
   the_course_link_validator_searches_through_course__76f0bc63: "מאמת תקינות הקישורים של הקורס מבצע חיפוש בתוכן הקורס ומאתר כל קישור לא תקין או לא מגיב. יש לשים לב שיתכנו קישורים שאינם מגיבים לשרתים שלנו אך הם פועלים בצורה תקינה עבור התלמידים. "
   the_date_and_time_this_to_do_is_due_74c823d4: "התאריך והשעה של פריט משימה זו הגיע"
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
@@ -19449,6 +19464,7 @@ he:
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "התפקיד שממנו מדווח המשתמש (תלמיד, מורה, מנהל מערכת, וכו')"
   the_salesforce_account_id_if_it_exists_e7949706: "מזהה חשבון Salesforce  (אם קיים)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "כלי התיזמון מאפשר לך להגדיר חלונות זמן כך שתלמידים (או קבוצות תלמידים) יוכלו להרשם אליהם. כדי להתחיל יש להקליק על הכפתור שבהמשך"
+  the_search_either_failed_or_returned_0_results_thi_b3a0e261: "החיפוש נכשל או החזיר 0 תוצאות. דברים לקחת בחשבון:"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "חומרת הבעיה, כפי שנבחרה ע\"י המשתמש מתפריט רשימה נפתחת."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "צלמית קיצור הדרך למכשירי iOS/Aandroid   בפורמט 180X180 PNG "
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "לקובץ המצויין עם file_id כבר בוצע דוח אותנטיות"
@@ -19598,6 +19614,7 @@ he:
   this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "משתמש זה טרם אישר את ההזמנה לקורס"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "משתמש זה אינו יכול כרגע לגשת לקורס"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"משתמש זה אינו יכול כרגע לגשת לקורס\""
+  this_was_only_a_connection_test_ssl_certificates_w_79ec9c54: " זו הייתה רק בדיקת התחברות. סרטיפיקציות ההצפנהSLL אינן תקפות"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "הדבר יאפשר לך לאשר לקנבס לפרסם הערכות במערכת הבית ספרית"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "הדבר יגרום ליישום השינויים לכלל החשבון. האם להמשיך?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "הדבר יגרום ליישום ערכת הנושא הזה לכלל החשבון. האם להמשיך?"
@@ -20595,6 +20612,9 @@ he:
   vericite_similarity_score_see_detailed_report_390ab687: "ניקוד תאימות של VeriCite - ניתן לעיין בפרטי הדו\"ח."
   verification_code_5acd64ef: "קוד אימות"
   verify_3dd8f159: וודא/י
+  verify_that_the_user_object_in_ldap_has_search_pri_159f5647: "וודא כי למשתמש ה- LDAP יש מספיק הרשאות לבצע את החיפוש עבור הבסיס (base) שסופק."
+  verify_the_provided_filter_string_i_e_samaccountna_e496a81c: "אנא וודא את הגדרת מחרוזת הסינון (למשל '(sAMAccountName={{login}})')."
+  verify_the_provided_search_base_i_e_ou_people_dc_e_23c08588: "וודא את בסיס הגדרות החיפוש שסופק (Base. למשל 'ou=people,dc=example,dc=com')."
   version_5599c321: גירסה
   video_b9f27375: וידאו
   video_content_is_not_supported_by_your_device_or_a_25214f57: "תוכן הוידאו אינו נתמך במכשיר או האפליקציה שלך."
@@ -21068,6 +21088,7 @@ he:
       
       ניתן לעיין בהם כאן:
       %{url}
+  your_ldap_server_rejected_the_bind_attempt_things__9d986660: "שרת הLDAP  דחה את נסיון ההתחברות. דברים שאפשר להביא בחשבון:"
   your_message_has_been_sent_thank_you_e0284316: "הודעתך נשלחה, תודה!"
   your_message_was_sent_977f6583: "הודעתך נשלחהֱ!"
   your_name_7665e1d8: שמך

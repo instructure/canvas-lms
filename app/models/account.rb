@@ -24,8 +24,6 @@ class Account < ActiveRecord::Base
   include Pronouns
   include SearchTermHelper
 
-  self.ignored_columns += ["enable_user_notes"]
-
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   CALENDAR_SUBSCRIPTION_TYPES = %w[manual auto].freeze
 
@@ -213,7 +211,7 @@ class Account < ActiveRecord::Base
   validate :validate_help_links, if: ->(a) { a.settings_changed? }
   validate :validate_course_template, if: ->(a) { a.has_attribute?(:course_template_id) && a.course_template_id_changed? }
   validates :account_calendar_subscription_type, inclusion: { in: CALENDAR_SUBSCRIPTION_TYPES }
-
+  validate :validate_number_separators, if: ->(a) { a.settings_changed? && (a.settings.dig(:decimal_separator, :value) != a.settings_was.dig(:decimal_separator, :value) || a.settings.dig(:thousand_separator, :value) != a.settings_was.dig(:thousand_separator, :value)) }
   include StickySisFields
   are_sis_sticky :name, :parent_account_id
 
@@ -438,6 +436,9 @@ class Account < ActiveRecord::Base
   add_setting :allow_assign_to_differentiation_tags, boolean: true, root_only: false, default: false, inheritable: true
 
   add_setting :horizon_account, boolean: true, default: false, inheritable: true
+
+  add_setting :decimal_separator, inheritable: true
+  add_setting :thousand_separator, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -1350,6 +1351,51 @@ class Account < ActiveRecord::Base
      #{relation_with_select.only(:select, :group, :having, :limit, :offset).from("t").to_sql}"
   end
 
+  # Recursively finds all sub-accounts in the chain for each parent account id,
+  # instead of for all of them like multi_parent_sub_accounts_recursive.
+  #
+  # @param parent_account_ids [Array] The "top" of the account chain.
+  # @return [Hash] A hash of parent account ids to an array of their sub-account ids.
+  # @example
+  #   Account.partitioned_sub_account_ids_recursive([1, 2, 3])
+  #   # => {1 => [4, 5], 2 => [6], 3 => []}
+  def self.partitioned_sub_account_ids_recursive(parent_account_ids)
+    return {} if parent_account_ids.blank?
+
+    # Validate all parent_account_ids are on the same shard
+    account_shards = parent_account_ids.map do |parent_account_id|
+      Shard.shard_for(parent_account_id)
+    end.uniq
+    raise ArgumentError, "all parent_account_ids must be in the same shard" if account_shards.length > 1
+
+    anchor = Account.active.where(parent_account_id: parent_account_ids).select(:id, :parent_account_id, Account.arel_table["parent_account_id"].as("original_parent_account_id"))
+    recurse = Account.active.joins("INNER JOIN t ON accounts.parent_account_id=t.id").select(:id, :parent_account_id, "t.original_parent_account_id AS original_parent_account_id")
+
+    sql = <<~SQL.squish
+      WITH RECURSIVE t AS (
+        #{anchor.to_sql}
+        UNION
+        #{recurse.to_sql}
+      )
+      SELECT id, original_parent_account_id FROM t
+    SQL
+
+    subaccount_ids = account_shards.first.activate do
+      with_secondary_role_if_possible do
+        rows = Account.connection.select_all(sql) # [{ id: 1, original_parent_account_id: 2}]
+        grouped_rows = rows.group_by { |r| r["original_parent_account_id"] } # { 2 => [{ id: 1, original_parent_account_id: 2 }] }
+        grouped_rows.transform_values { |gr| gr.map { |r| r["id"] } } # { 2 => [1] }
+      end
+    end
+
+    # accounts without subaccounts are not included by the query
+    parent_account_ids.each do |parent_account_id|
+      subaccount_ids[parent_account_id] ||= []
+    end
+
+    subaccount_ids
+  end
+
   def associated_accounts
     account_chain
   end
@@ -1768,6 +1814,21 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def validate_number_separators
+    decimal_sep = settings.dig(:decimal_separator, :value)
+    thousand_sep = settings.dig(:thousand_separator, :value)
+
+    if decimal_sep.present? && thousand_sep.blank?
+      errors.add(:thousand_separator_blank, t("Thousand separator cannot be blank if decimal separator is present."))
+    elsif thousand_sep.present? && decimal_sep.blank?
+      errors.add(:decimal_separator_blank, t("Decimal separator cannot be blank if thousand separator is present."))
+    end
+
+    if decimal_sep.present? && thousand_sep.present? && decimal_sep == thousand_sep
+      errors.add(:separators_cannot_be_the_same, t("Decimal and thousand separators cannot be the same."))
+    end
+  end
+
   def no_active_courses
     return true if root_account?
 
@@ -1955,11 +2016,15 @@ class Account < ActiveRecord::Base
   end
 
   def course_count
-    courses.active.size
+    return @course_count if defined?(@course_count)
+
+    GuardRail.activate(:secondary) { courses.active.size }
   end
 
   def sub_account_count
-    sub_accounts.active.size
+    return @sub_account_count if defined?(@sub_account_count)
+
+    GuardRail.activate(:secondary) { sub_accounts.active.size }
   end
 
   def user_count

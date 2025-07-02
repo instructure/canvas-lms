@@ -63,7 +63,7 @@ FolderChild.renderPublishCloud = function (canManage) {
     return (
       <PublishCloud
         model={this.props.model}
-        ref="publishButton"
+        ref={this.publishButtonRef}
         userCanEditFilesForContext={canManage && this.props.userCanRestrictFilesForContext}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
         disabled={ENV.horizon_course}
@@ -107,7 +107,7 @@ FolderChild.renderEditingState = function () {
         <div className="ic-Input-group">
           <input
             type="text"
-            ref="newName"
+            ref={this.newNameRef}
             className="ic-Input ef-edit-name-form__input"
             placeholder={I18n.t('name', 'Name')}
             aria-label={
@@ -143,7 +143,7 @@ FolderChild.renderEditingState = function () {
   } else if (this.isFolder()) {
     return (
       <a
-        ref="nameLink"
+        ref={this.nameLinkRef}
         href={`${filesEnv.baseUrl}/folder/${this.props.model.urlPath()}`}
         className="ef-name-col__link"
         params={{splat: this.props.model.urlPath()}}
@@ -173,7 +173,7 @@ FolderChild.renderEditingState = function () {
         href={this.props.model.get('url')}
         onClick={preventDefault(this.handleFileLinkClick)}
         className="ef-name-col__link"
-        ref="nameLink"
+        ref={this.nameLinkRef}
         role="button"
       >
         <span className="ef-big-icon-container">

@@ -26,9 +26,7 @@ const rootElement = document.getElementById('content')
 if (rootElement) {
   const root = createRoot(rootElement)
 
-  root.render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>,
-  )
+  // React.strictMode is not used here because <CanvasRce /> component's
+  // hooks malfunction in strict mode.
+  root.render(<App />)
 }

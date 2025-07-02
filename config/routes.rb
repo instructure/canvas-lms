@@ -537,10 +537,14 @@ CanvasRails::Application.routes.draw do
     get "canvas_career_validation" => "horizon#validate_course"
     post "canvas_career_conversion" => "horizon#convert_course"
     post "canvas_career_reversion" => "horizon#revert_course"
-    get "accessibility", controller: :accessibility, action: :show
-    get "accessibility/issues", controller: :accessibility, action: :issues
-    post "accessibility/update", controller: :accessibility, action: :update
+
+    resources :accessibility, only: [:index] do
+      collection do
+        resource :issues, only: [:create, :update], module: "accessibility"
+      end
+    end
   end
+
   get "quiz_statistics/:quiz_statistics_id/files/:file_id/download" => "files#show", :as => :quiz_statistics_download, :download => "1"
 
   resources :page_views, only: :update
@@ -1282,6 +1286,7 @@ CanvasRails::Application.routes.draw do
       get  "users/:user_id/temporary_enrollment_status", action: :show_temporary_enrollment_status
       get  "accounts/:account_id/enrollments/:id", action: :show, as: "enrollment"
 
+      post "accounts/:account_id/bulk_enrollment", action: :bulk_enrollment, as: "bulk_enrollment"
       post "courses/:course_id/enrollments", action: :create
       post "sections/:section_id/enrollments", action: :create
       post "courses/:course_id/enrollments/:id/accept", action: :accept
@@ -1504,6 +1509,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :discussion_topics_api) do
       put "courses/:course_id/discussion_topics/migrate_disallow", action: :migrate_disallow
+      put "courses/:course_id/discussion_topics/update_discussion_types", action: :update_discussion_types
 
       %w[course group].each do |context|
         put "#{context.pluralize}/:#{context}_id/discussion_topics/read_all", action: :mark_all_topic_read, as: "#{context}_discussion_mark_all_read"
@@ -1565,8 +1571,8 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :external_tools) do
-      post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
-      delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
+      post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :mark_rce_favorite, as: :account_external_tools_mark_rce_favorite
+      delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :unmark_rce_favorite, as: :account_external_tools_unmark_rce_favorite
 
       post "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :add_top_nav_favorite, as: :account_external_tools_add_top_nav_favorite
       delete "/accounts/:account_id/external_tools/top_nav_favorites/:id", action: :remove_top_nav_favorite, as: :account_external_tools_remove_top_nav_favorite
@@ -1750,6 +1756,11 @@ CanvasRails::Application.routes.draw do
         put "courses/:course_id/pages/:url_or_id/date_details/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
       end
 
+      scope(controller: :course_tag_conversion) do
+        put "courses/:course_id/convert_tag_overrides", action: :convert_tag_overrides_to_adhoc_overrides
+        get "courses/:course_id/convert_tag_overrides/status", action: :conversion_job_status
+      end
+
       scope(controller: :login) do
         get "login/session_token", action: :session_token, as: :login_session_token
       end
@@ -1805,7 +1816,9 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/permissions", action: :permissions
       get "accounts/:account_id/settings", action: :show_settings
       get "manually_created_courses_account", action: :manually_created_courses_account
+      delete "accounts/:account_id/users", action: :remove_users
       delete "accounts/:account_id/users/:user_id", action: :remove_user
+      put "accounts/:account_id/users/bulk_update", action: :update_users
       put "accounts/:account_id/users/:user_id/restore", action: :restore_user
       get "accounts/:account_id/quiz_ip_filters", action: :quiz_ip_filters, as: "quiz_ip_filters"
       get "acceptable_use_policy", action: :acceptable_use_policy
@@ -2003,6 +2016,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/lti_registrations", action: :create
       post "accounts/:account_id/lti_registrations/configuration/validate", action: :validate_lti_configuration
       delete "accounts/:account_id/lti_registrations/:id", action: :destroy
+      get "accounts/:account_id/lti_registrations/context_search", action: :context_search, as: "lti_registration_context_search"
       get "accounts/:account_id/lti_registrations/:id", action: :show
       get "accounts/:account_id/lti_registration_by_client_id/:client_id", action: :show_by_client_id
       put "accounts/:account_id/lti_registrations/:id", action: :update
@@ -2078,7 +2092,6 @@ CanvasRails::Application.routes.draw do
       # must be used.
       post "files/:id", action: :api_show
 
-      get "files/:id/:uuid/status", action: :api_file_status, as: "file_status"
       get "files/:id/public_url", action: :public_url
       get "courses/:course_id/files/file_ref/:migration_id", action: :file_ref
       %w[course group user].each do |context|

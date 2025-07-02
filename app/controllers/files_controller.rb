@@ -515,7 +515,7 @@ class FilesController < ApplicationController
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
     if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download, check_submissions: false)
-      render json: { public_url: @attachment.public_url(secure: request.ssl?) }
+      render json: { public_url: @attachment.public_url(secure: request.ssl?, user: @current_user) }
     end
   end
 
@@ -572,7 +572,7 @@ class FilesController < ApplicationController
 
     params[:include] = Array(params[:include])
     if access_allowed(attachment: @attachment, user: @current_user, access_type: :read)
-      options = { include: params[:include], location: params[:location], verifier: params[:verifier], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
+      options = { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) }
       if params[:access_token].present? && params[:instfs_id].present?
         options[:access_token] = params[:access_token]
         options[:instfs_id] = params[:instfs_id]
@@ -586,7 +586,7 @@ class FilesController < ApplicationController
         options[:context] = @context || @folder&.context || @attachment.context
         options[:can_view_hidden_files] = can_view_hidden_files?(options[:context], @current_user, session)
       end
-      json = attachment_json(@attachment, @current_user, {}, options)
+      json = attachment_json(@attachment, @current_user, { verifier: params[:verifier], location: params[:location] }, options)
 
       # Add canvadoc session URL if the file is unlocked
       json.merge!(
@@ -822,7 +822,7 @@ class FilesController < ApplicationController
                          end
 
           json[:attachment].merge!(
-            attachment_json(attachment, @current_user, {}, json_include.merge(verifier: params[:verifier]))
+            attachment_json(attachment, @current_user, { verifier: params[:verifier] }, json_include)
           )
 
           # Add canvadoc session URL if the file is unlocked
@@ -1221,7 +1221,7 @@ class FilesController < ApplicationController
     end
 
     render status: :created,
-           json: attachment_json(@attachment, @attachment.user, {}, { include: includes, verifier: params[:verifier] }),
+           json: attachment_json(@attachment, @attachment.user, { verifier: params[:verifier] }, { include: includes }),
            location: api_v1_attachment_url(@attachment, include: includes)
   end
 
@@ -1275,18 +1275,6 @@ class FilesController < ApplicationController
     json = attachment_json(@attachment, @current_user, {}, json_params)
 
     render json: json.merge!(doc_preview_json(@attachment))
-  end
-
-  def api_file_status
-    @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first!
-    case @attachment.file_state
-    when "available"
-      render json: { upload_status: "ready", attachment: attachment_json(@attachment, @current_user) }
-    when "deleted"
-      render json: { upload_status: "pending" }
-    else
-      render json: { upload_status: "errored", message: @attachment.upload_error_message }
-    end
   end
 
   def update
@@ -1412,7 +1400,7 @@ class FilesController < ApplicationController
       end
       if @attachment.save
         @attachment.handle_duplicates(on_duplicate) if on_duplicate
-        render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true, verifier: params[:verifier] })
+        render json: attachment_json(@attachment, @current_user, { verifier: params[:verifier] }, { omit_verifier_in_app: true })
       else
         render json: @attachment.errors, status: :bad_request
       end
@@ -1582,7 +1570,7 @@ class FilesController < ApplicationController
     @context = @attachment.context
     if can_replace_file?
       @attachment.reset_uuid!
-      render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true, verifier: params[:verifier] })
+      render json: attachment_json(@attachment, @current_user, { verifier: params[:verifier] }, { omit_verifier_in_app: true })
     else
       render_unauthorized_action
     end

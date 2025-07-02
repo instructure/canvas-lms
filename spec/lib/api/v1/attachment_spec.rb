@@ -48,10 +48,12 @@ describe Api::V1::Attachment do
     it "includes the location parameter in the url when the opts contains it" do
       params = {
         include: ["preview_url"],
-        location: "course_123",
         skip_permission_checks: true
       }
-      json = attachment_json(attachment, teacher, {}, params)
+      url_options = {
+        location: "course_123"
+      }
+      json = attachment_json(attachment, teacher, url_options, params)
       expect(json.fetch("url")).to include("location=course_123")
     end
 

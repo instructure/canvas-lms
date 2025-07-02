@@ -131,10 +131,17 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      @tools = if params[:include_parents]
+      @tools = if Canvas::Plugin.value_to_boolean(params[:include_parents])
                  Lti::ContextToolFinder.all_tools_for(@context, current_user: (params[:include_personal] ? @current_user : nil))
                else
-                 Lti::ContextToolFinder.only_for(@context).active
+                 base_scope = Lti::ContextToolFinder.only_for(@context).active
+
+                 if @context.root_account.feature_enabled?(:lti_registrations_next)
+                   available_deployment_ids = Lti::ContextControl.deployment_ids_for_context(@context)
+                   base_scope.where(id: available_deployment_ids).or(base_scope.lti_1_1)
+                 else
+                   base_scope
+                 end
                end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
@@ -740,7 +747,7 @@ class ExternalToolsController < ApplicationController
 
     # This is only for 1.3: editing collaborations for 1.1 goes thru content_item_selection_request()
     if selection_type == "collaboration"
-      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find _1 }
+      collaboration = opts[:content_item_id].presence&.then { ExternalToolCollaboration.find it }
       collaboration = nil unless collaboration&.update_url == params[:url]
     end
 
@@ -936,8 +943,8 @@ class ExternalToolsController < ApplicationController
   #   multiple times
   #
   # @argument is_rce_favorite [Boolean]
-  #   (Deprecated in favor of {api:ExternalToolsController#add_rce_favorite Add tool to RCE Favorites} and
-  #   {api:ExternalToolsController#remove_rce_favorite Remove tool from RCE Favorites})
+  #   (Deprecated in favor of {api:ExternalToolsController#mark_rce_favorite Mark tool to RCE Favorites} and
+  #   {api:ExternalToolsController#unmark_rce_favorite Unmark tool from RCE Favorites})
   #   Whether this tool should appear in a preferred location in the RCE.
   #   This only applies to tools in root account contexts that have an editor
   #   button placement.
@@ -1306,17 +1313,18 @@ class ExternalToolsController < ApplicationController
     render json: { jwt_token: Canvas::Security.create_jwt(params, nil, tool.shared_secret) }
   end
 
-  # @API Add tool to RCE Favorites
-  # Add the specified editor_button external tool to a preferred location in the RCE
+  # @API Mark tool as RCE Favorite
+  # Mark the specified editor_button external tool as a favorite in the RCE editor
   # for courses in the given account and its subaccounts (if the subaccounts
-  # haven't set their own RCE Favorites). Cannot set more than 2 RCE Favorites.
+  # haven't set their own RCE Favorites). This places the tool in a preferred location
+  # in the RCE. Cannot mark more than 2 tools as RCE Favorites.
   #
   # @example_request
   #
   #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
-  def add_rce_favorite
-    if authorized_action(@context, @current_user, :manage_lti_add)
+  def mark_rce_favorite
+    if authorized_action(@context, @current_user, :manage_lti_edit)
       @tool = Lti::ToolFinder.from_id(params[:id], @context)
       raise ActiveRecord::RecordNotFound unless @tool
       unless @tool.can_be_rce_favorite?
@@ -1344,16 +1352,17 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  # @API Remove tool from RCE Favorites
-  # Remove the specified external tool from a preferred location in the RCE
-  # for the given account
+  # @API Unmark tool as RCE Favorite
+  # Unmark the specified external tool as a favorite in the RCE editor
+  # for the given account. The tool will remain available but will no longer
+  # appear in the preferred favorites location.
   #
   # @example_request
   #
   #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
   #        -H "Authorization: Bearer <token>"
-  def remove_rce_favorite
-    if authorized_action(@context, @current_user, :manage_lti_delete)
+  def unmark_rce_favorite
+    if authorized_action(@context, @current_user, :manage_lti_edit)
       favorite_ids = @context.get_rce_favorite_tool_ids
       if favorite_ids.delete(Shard.global_id_for(params[:id]))
         @context.settings[:rce_favorite_tool_ids] = { value: favorite_ids }

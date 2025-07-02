@@ -24,13 +24,23 @@ require_relative "../pages/student_grades_page"
 require_relative "../pages/gradebook_cells_page"
 require_relative "../pages/gradebook_grade_detail_tray_page"
 
-describe "Gradebook Post Policy" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook Post Policy" do |ff_enabled|
   include_context "in-process server selenium tests"
 
   # all tests skipped due to flakiness; see the referenced ticket
   before { skip } # EVAL-3613
 
   before :once do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
+
     # course
     @course_with_manual_post = course_with_teacher(
       course_name: "Post Policy Course",
@@ -282,4 +292,9 @@ describe "Gradebook Post Policy" do
     StudentGradesPage.visit_as_student(course)
     expect(StudentGradesPage.fetch_assignment_score(assignment)).to eq grade
   end
+end
+
+describe "Gradebook Post Policy" do
+  it_behaves_like "Gradebook Post Policy", true
+  it_behaves_like "Gradebook Post Policy", false
 end

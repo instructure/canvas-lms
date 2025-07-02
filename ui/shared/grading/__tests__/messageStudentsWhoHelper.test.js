@@ -18,7 +18,9 @@
 
 import _ from 'lodash'
 import MessageStudentsWhoHelper from '../messageStudentsWhoHelper'
-import sinon from 'sinon'
+import axios from '@canvas/axios'
+
+jest.mock('@canvas/axios')
 
 describe('MessageStudentsWhoHelper', () => {
   let assignment
@@ -214,11 +216,11 @@ describe('MessageStudentsWhoHelper', () => {
 
     test('returns false if the cutoff is null or undefined', () => {
       const student = {score: 5}
-      let cutoff
+      const cutoff = undefined
       let scoreWithCutoff = MessageStudentsWhoHelper.scoreWithCutoff(student, cutoff)
       expect(scoreWithCutoff).toBe(false)
-      cutoff = null
-      scoreWithCutoff = MessageStudentsWhoHelper.scoreWithCutoff(student, cutoff)
+      const nullCutoff = null
+      scoreWithCutoff = MessageStudentsWhoHelper.scoreWithCutoff(student, nullCutoff)
       expect(scoreWithCutoff).toBe(false)
     })
   })
@@ -306,26 +308,16 @@ describe('MessageStudentsWhoHelper', () => {
     const contextCode = '1'
     const sendMessageStudentsWhoUrl = `/api/v1/conversations`
     const data = {}
-    let server
+    const mockedAxios = axios
 
     beforeEach(() => {
-      server = sinon.fakeServer.create({respondImmediately: true})
-      const responseBody = JSON.stringify(data)
-      server.respondWith('POST', sendMessageStudentsWhoUrl, [
-        200,
-        {'Content-Type': 'application/json'},
-        responseBody,
-      ])
+      jest.clearAllMocks()
+      mockedAxios.post.mockResolvedValue({data})
     })
 
     afterEach(() => {
-      server.restore()
+      jest.clearAllMocks()
     })
-
-    function getRequest() {
-      // filter requests to eliminate spec pollution from unrelated specs
-      return _.find(server.requests, request => request.url.includes(sendMessageStudentsWhoUrl))
-    }
 
     test('sends a post request to the "conversations" url', async () => {
       await MessageStudentsWhoHelper.sendMessageStudentsWho(
@@ -334,9 +326,7 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
       )
-      const request = getRequest()
-      expect(request.method).toBe('POST')
-      expect(request.url).toBe(sendMessageStudentsWhoUrl)
+      expect(mockedAxios.post).toHaveBeenCalledWith(sendMessageStudentsWhoUrl, expect.any(Object))
     })
 
     test('sends async for mode parameter', async () => {
@@ -346,8 +336,10 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData.mode).toBe('async')
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({mode: 'async'}),
+      )
     })
 
     test('sends true for group_conversation parameter', async () => {
@@ -357,8 +349,10 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData.group_conversation).toBe(true)
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({group_conversation: true}),
+      )
     })
 
     test('sends true for bulk_message parameter', async () => {
@@ -368,8 +362,10 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData.bulk_message).toBe(true)
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({bulk_message: true}),
+      )
     })
 
     test('includes media comment params if passed a media file', async () => {
@@ -383,9 +379,13 @@ describe('MessageStudentsWhoHelper', () => {
           type: 'video',
         },
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData.media_comment_id).toBe('123')
-      expect(bodyData.media_comment_type).toBe('video')
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({
+          media_comment_id: '123',
+          media_comment_type: 'video',
+        }),
+      )
     })
 
     test('includes attachment_ids param if passed attachment ids', async () => {
@@ -397,8 +397,12 @@ describe('MessageStudentsWhoHelper', () => {
         null,
         ['4', '8'],
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData.attachment_ids).toEqual(['4', '8'])
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({
+          attachment_ids: ['4', '8'],
+        }),
+      )
     })
 
     test('does not include media comment params if not passed a media file', async () => {
@@ -408,9 +412,21 @@ describe('MessageStudentsWhoHelper', () => {
         body,
         contextCode,
       )
-      const bodyData = JSON.parse(getRequest().requestBody)
-      expect(bodyData).not.toHaveProperty('media_comment_id')
-      expect(bodyData).not.toHaveProperty('media_comment_type')
+      expect(mockedAxios.post).toHaveBeenCalledWith(
+        sendMessageStudentsWhoUrl,
+        expect.objectContaining({
+          recipients: recipientsIds,
+          subject,
+          body,
+          context_code: contextCode,
+          mode: 'async',
+          group_conversation: true,
+          bulk_message: true,
+        }),
+      )
+      const callArg = mockedAxios.post.mock.calls[0][1]
+      expect(callArg.media_comment_id).toBeUndefined()
+      expect(callArg.media_comment_type).toBeUndefined()
     })
   })
 })

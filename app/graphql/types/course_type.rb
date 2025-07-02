@@ -613,5 +613,12 @@ module Types
 
       course.moderators.size
     end
+
+    field :settings, CourseSettingsType, "Settings for the course", null: true
+    def settings
+      return nil unless course.grants_right?(current_user, :read)
+
+      course
+    end
   end
 end

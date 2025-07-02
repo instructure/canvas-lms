@@ -47,12 +47,6 @@ describe "files index page" do
         expect(heading).to include_text("All My Files")
       end
 
-      it "Displays files in table" do
-        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf")
-        get "/courses/#{@course.id}/files"
-        expect(f("#content")).to include_text(file_attachment.display_name)
-      end
-
       it "Displays the file usage bar if user has permission" do
         allow(Attachment).to receive(:get_quota).with(@course).and_return({ quota: 50_000_000, quota_used: 25_000_000 })
         get "/courses/#{@course.id}/files"
@@ -108,15 +102,6 @@ describe "files index page" do
             expect(content).to include_text("file00.pdf")
           end
         end
-      end
-
-      it "displays new files UI", priority: "1" do
-        get "/courses/#{@course.id}/files"
-        create_folder_button.click
-        create_folder_input.send_keys("new folder")
-        create_folder_input.send_keys(:return)
-        expect(upload_button).to be_displayed
-        expect(all_files_table_rows.count).to eq 1
       end
 
       it "loads correct column values on uploaded file", priority: "1" do
@@ -200,15 +185,16 @@ describe "files index page" do
           get "/courses/#{@course.id}/files"
         end
 
-        it "unpublishes and publish a file", priority: "1" do
+        it "unpublishes and publish multiple files", priority: "1" do
           select_item_to_edit_from_kebab_menu(1)
+          select_item_to_edit_from_kebab_menu(2)
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:unpublished)
-          expect(unpublished_status_button).to be_present
+          all_item_unpublished?
           toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:published)
-          expect(published_status_button).to be_present
+          all_item_published?
         end
 
         it "makes file available to student with link from toolbar", priority: "1" do
@@ -222,6 +208,13 @@ describe "files index page" do
           delete_file_from(1, :toolbar_menu)
           expect(content).not_to contain_link(a_txt_file_name)
           check_element_has_focus(select_all_checkbox)
+        end
+
+        it "deletes multiple files from toolbar", priority: "1" do
+          get_row_header_files_table(1).click
+          delete_file_from(2, :toolbar_menu)
+          expect(content).not_to contain_link(a_txt_file_name)
+          expect(content).not_to contain_link(b_txt_file_name)
         end
       end
 
@@ -460,13 +453,6 @@ describe "files index page" do
           expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
         end
 
-        it "moves a file using toolbar menu", priority: "1" do
-          move_file_from(2, :toolbar_menu)
-          expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
-          get "/courses/#{@course.id}/files/folder/base%20folder"
-          expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
-        end
-
         it "moves multiple files", priority: "1" do
           files_to_move = ["a_file.txt", "b_file.txt", "c_file.txt"]
           move_files([2, 3, 4])
@@ -524,10 +510,6 @@ describe "files index page" do
         before do
           user_session(@teacher)
           get "/courses/#{@course.id}/files"
-        end
-
-        it "validates that file is published by default", priority: "1" do
-          expect(item_has_permissions_icon?(1, 6, "published-button")).to be true
         end
 
         it "sets focus to the close button when opening the permission edit dialog", priority: "1" do

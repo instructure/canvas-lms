@@ -118,6 +118,15 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".account_created" do
+    it "does not trigger for dummy accounts" do
+      a = Account.new
+      allow(a).to receive(:dummy?).and_return(true)
+      expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
+      Canvas::LiveEventsCallbacks.after_create(a)
+    end
+  end
+
   describe ".conversation_created" do
     it "triggers a conversation live event with conversation details" do
       user1 = user_model

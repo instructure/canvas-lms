@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../msw/mswServer'
 import moment from 'moment-timezone'
-import {moxiosWait, moxiosRespond} from '@canvas/jest-moxios-utils'
 import * as Actions from '../loading-actions'
 import {initialize as alertInitialize} from '../../utilities/alertUtils'
 
@@ -57,9 +57,14 @@ const getBasicState = () => ({
   currentUser: {id: '1'},
 })
 
+const server = mswServer([])
+
 describe('api actions', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
-    moxios.install()
     expect.hasAssertions()
     alertInitialize({
       visualSuccessCallback() {},
@@ -69,70 +74,123 @@ describe('api actions', () => {
   })
 
   afterEach(() => {
-    moxios.uninstall()
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   describe('sendFetchRequest', () => {
-    it('fetches from the specified moment if there is no next url in the loadingOptions', () => {
+    it('fetches from the specified moment if there is no next url in the loadingOptions', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
-      Actions.sendFetchRequest({
+      let capturedUrl
+      server.use(
+        http.get('*', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.sendFetchRequest({
         fromMoment,
         getState: () => ({loading: {}}),
       })
-      return moxiosWait(request => {
-        expect(request.config.url).toBe(
-          `/api/v1/planner/items?start_date=${encodeURIComponent(fromMoment.toISOString())}`,
-        )
-      })
+
+      const url = new URL(capturedUrl)
+      expect(url.pathname + url.search).toBe(
+        `/api/v1/planner/items?start_date=${encodeURIComponent(fromMoment.toISOString())}`,
+      )
     })
 
-    it('fetches using futureNextUrl if specified', () => {
+    it('fetches using futureNextUrl if specified', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
-      Actions.sendFetchRequest({
+      let capturedUrl
+      server.use(
+        http.get('*', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.sendFetchRequest({
         fromMoment,
         getState: () => ({loading: {futureNextUrl: '/next/url'}}),
       })
-      return moxiosWait(request => {
-        expect(request.config.url).toBe('/next/url')
-      })
+
+      const url = new URL(capturedUrl)
+      expect(url.pathname).toBe('/next/url')
     })
 
-    it('sends past parameters if loading into the past', () => {
+    it('sends past parameters if loading into the past', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
-      Actions.sendFetchRequest({
+      let capturedUrl
+      server.use(
+        http.get('*', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.sendFetchRequest({
         fromMoment,
         mode: 'past',
         getState: () => ({loading: {}}),
       })
-      return moxiosWait(request => {
-        expect(request.config.url).toBe(
-          `/api/v1/planner/items?end_date=${encodeURIComponent(
-            fromMoment.toISOString(),
-          )}&order=desc`,
-        )
-      })
+
+      const url = new URL(capturedUrl)
+      expect(url.pathname + url.search).toBe(
+        `/api/v1/planner/items?end_date=${encodeURIComponent(fromMoment.toISOString())}&order=desc`,
+      )
     })
 
-    it('sends pastNextUrl if loading into the past', () => {
+    it('sends pastNextUrl if loading into the past', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
-      Actions.sendFetchRequest({
+      let capturedUrl
+      server.use(
+        http.get('*', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify([]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.sendFetchRequest({
         fromMoment,
         mode: 'past',
         getState: () => ({loading: {pastNextUrl: '/past/next/url'}}),
       })
-      return moxiosWait(request => {
-        expect(request.config.url).toBe('/past/next/url')
-      })
+
+      const url = new URL(capturedUrl)
+      expect(url.pathname).toBe('/past/next/url')
     })
 
-    it('transforms the results', () => {
+    it('transforms the results', async () => {
       const fromMoment = moment.tz('Asia/Tokyo')
-      const fetchPromise = Actions.sendFetchRequest({fromMoment, getState: () => ({loading: {}})})
-      return moxiosRespond([{some: 'items'}], fetchPromise).then(result => {
-        expect(result).toEqual({
-          response: expect.anything(),
-          transformedItems: [{some: 'items', transformedToInternal: true}],
-        })
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(JSON.stringify([{some: 'items'}]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      const result = await Actions.sendFetchRequest({fromMoment, getState: () => ({loading: {}})})
+      expect(result).toEqual({
+        response: expect.anything(),
+        transformedItems: [{some: 'items', transformedToInternal: true}],
       })
     })
   })
@@ -141,7 +199,14 @@ describe('api actions', () => {
     it('dispatches START_LOADING_ITEMS, getFirstNewActivityDate, and starts the saga', async () => {
       const mockDispatch = jest.fn(() => Promise.resolve({data: []}))
       const mockMoment = moment()
-      moxios.stubRequest(/.*/, {status: 200, response: [{dateBucketMoment: mockMoment}]})
+      server.use(
+        http.get('*', () => {
+          return new HttpResponse(JSON.stringify([{dateBucketMoment: mockMoment}]), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
 
       await Actions.getPlannerItems(moment('2017-12-18'))(mockDispatch, getBasicState)
       expect(mockDispatch).toHaveBeenCalledWith(Actions.startLoadingItems())
@@ -151,14 +216,12 @@ describe('api actions', () => {
       const getFirstNewActivityDateThunk = mockDispatch.mock.calls[4][0]
       expect(typeof getFirstNewActivityDateThunk).toBe('function')
 
-      const newActivityPromise = getFirstNewActivityDateThunk(mockDispatch, getBasicState)
-      return moxiosRespond([{dateBucketMoment: mockMoment}], newActivityPromise).then(() => {
-        expect(mockDispatch).toHaveBeenCalledWith(
-          expect.objectContaining({
-            type: 'FOUND_FIRST_NEW_ACTIVITY_DATE',
-          }),
-        )
-      })
+      await getFirstNewActivityDateThunk(mockDispatch, getBasicState)
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'FOUND_FIRST_NEW_ACTIVITY_DATE',
+        }),
+      )
     })
   })
 
@@ -166,28 +229,45 @@ describe('api actions', () => {
     it('sends deep past, filter, and order parameters', async () => {
       const mockDispatch = jest.fn(() => Promise.resolve({data: []}))
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day')
-      moxios.stubRequest(/\/planner\/items/, {response: {data: []}})
-      const p = Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState)
-      await p
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toBe(
+      let capturedUrl
+      server.use(
+        http.get('*/planner/items', ({request}) => {
+          capturedUrl = request.url
+          return new HttpResponse(JSON.stringify({data: []}), {
+            status: 200,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState)
+
+      const url = new URL(capturedUrl)
+      expect(url.pathname + url.search).toBe(
         `/api/v1/planner/items?start_date=${encodeURIComponent(
           mockMoment.subtract(6, 'months').toISOString(),
         )}&filter=new_activity&order=asc`,
       )
     })
 
-    it('calls the alert method when it fails to get new activity', () => {
+    it('calls the alert method when it fails to get new activity', async () => {
       const fakeAlert = jest.fn()
       alertInitialize({
         visualErrorCallback: fakeAlert,
       })
       const mockDispatch = jest.fn()
       const mockMoment = moment.tz('Asia/Tokyo').startOf('day')
-      const promise = Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState)
-      return moxiosRespond({some: 'response data'}, promise, {status: 500}).then(() => {
-        expect(fakeAlert).toHaveBeenCalled()
-      })
+      server.use(
+        http.get('*/planner/items', () => {
+          return new HttpResponse(JSON.stringify({some: 'response data'}), {
+            status: 500,
+            headers: {'Content-Type': 'application/json'},
+          })
+        }),
+      )
+
+      await Actions.getFirstNewActivityDate(mockMoment)(mockDispatch, getBasicState)
+      expect(fakeAlert).toHaveBeenCalled()
     })
   })
 

@@ -39,7 +39,7 @@ class Thumbnail < ActiveRecord::Base
     self.namespace = attachment.namespace
   end
 
-  def local_storage_path
+  def local_storage_path(user: nil, ttl: nil)
     "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
   end
 

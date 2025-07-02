@@ -41,7 +41,7 @@ export default {
       hintText = this.getErrorMessage()
     }
     return hintText ? (
-      <span ref="hintText" className="hint-text">
+      <span ref={el => (this.hintText = el)} className="hint-text">
         {hintText}
       </span>
     ) : null

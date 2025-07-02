@@ -345,7 +345,9 @@ class FileBrowser extends React.Component {
 
   clearUploadInfo() {
     this.setState({uploading: false})
-    this.uploadInput.value = ''
+    if (this.uploadInput) {
+      this.uploadInput.value = ''
+    }
   }
 
   setSuccessMessage = message => {

@@ -59,16 +59,11 @@ class ActiveRecord::Base
       ].map do |method|
         next unless method
 
-        search_name = if RUBY_VERSION >= "3.4.0"
-                        owner_str = method.owner.to_s
-
-                        if owner_str =~ /\A#<Class:(.+)>\z/
-                          "'#{Regexp.last_match(1)}.#{method.name}'"
-                        else
-                          "'#{owner_str}##{method.name}'"
-                        end
+        owner_str = method.owner.to_s
+        search_name = if owner_str =~ /\A#<Class:(.+)>\z/
+                        "'#{Regexp.last_match(1)}.#{method.name}'"
                       else
-                        "`#{method.name}'"
+                        "'#{owner_str}##{method.name}'"
                       end
 
         regex = /\A#{Regexp.escape(method.source_location.first)}:\d+:in #{Regexp.escape(search_name)}\z/
@@ -838,13 +833,13 @@ end
 
 module UsefulFindInBatches
   # add the strategy param
-  def find_each(start: nil, finish: nil, order: :asc, **kwargs, &block)
+  def find_each(start: nil, finish: nil, order: :asc, **, &block)
     if block
-      find_in_batches(start:, finish:, order:, **kwargs) do |records|
+      find_in_batches(start:, finish:, order:, **) do |records|
         records.each(&block)
       end
     else
-      enum_for(:find_each, start:, finish:, order:, **kwargs) do
+      enum_for(:find_each, start:, finish:, order:, **) do
         relation = self
         order = build_batch_orders(order)
         apply_limits(relation, start, finish, order).size
@@ -853,17 +848,17 @@ module UsefulFindInBatches
   end
 
   # add the strategy param
-  def find_in_batches(batch_size: 1000, start: nil, finish: nil, order: :asc, **kwargs)
+  def find_in_batches(batch_size: 1000, start: nil, finish: nil, order: :asc, **)
     relation = self
     unless block_given?
-      return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **kwargs) do
+      return to_enum(:find_in_batches, start:, finish:, order:, batch_size:, **) do
         order = build_batch_orders(order)
         total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
     end
 
-    in_batches(of: batch_size, start:, finish:, order:, load: true, **kwargs) do |batch|
+    in_batches(of: batch_size, start:, finish:, order:, load: true, **) do |batch|
       yield batch.to_a
     end
   end
@@ -1642,9 +1637,9 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
       proxy_association.klass.respond_to?(name, include_private)
   end
 
-  def temp_record(*args)
+  def temp_record(*)
     # creates a record with attributes like a child record but is not added to the collection for autosaving
-    record = klass.unscoped.merge(scope).new(*args)
+    record = klass.unscoped.merge(scope).new(*)
     @association.set_inverse_instance(record)
     record
   end
@@ -2306,5 +2301,21 @@ module RollbackIgnoreNonDatedMigrations
   end
 end
 ActiveRecord::MigrationContext.prepend(RollbackIgnoreNonDatedMigrations)
+
+class NullSchemaMigration
+  def create_table; end
+  def integer_versions = []
+end
+
+module WithMigrationAdvisoryLock
+  def with_advisory_lock(&)
+    return yield if ActiveRecord::Base.in_migration
+
+    ActiveRecord::MigrationContext.new([], NullSchemaMigration.new)
+                                  .open
+                                  .send(:with_advisory_lock, &)
+  end
+end
+ActiveRecord::Migrator.singleton_class.include(WithMigrationAdvisoryLock)
 
 ActiveRecord::Enum.prepend(Extensions::ActiveRecord::Enum)

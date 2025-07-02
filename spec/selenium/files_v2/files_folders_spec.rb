@@ -192,13 +192,11 @@ describe "files index page" do
         select_item_to_edit_from_kebab_menu(1)
         toolbox_menu_button("edit-permissions-button").click
         edit_item_permissions(:unpublished)
-        expect(unpublished_status_button).to be_present
-        expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']") # all items unpublished
+        all_item_unpublished?
         toolbox_menu_button("more-button").click
         toolbox_menu_button("edit-permissions-button").click
         edit_item_permissions(:published)
-        expect(published_status_button).to be_present
-        expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']") # all items published
+        all_item_published?
       end
 
       context "Usage Rights" do

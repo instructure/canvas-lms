@@ -23,23 +23,25 @@ import '@canvas/media-comments'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import {setup, teardown} from '../index'
 import {waitFor} from '@testing-library/dom'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('submissions', () => {
-  beforeEach(async () => {
-    // Mock jQuery's ajaxJSON method with a proper implementation that returns a mock promise
-    $.ajaxJSON = jest.fn().mockImplementation(() => ({
-      // Mock the jQuery promise-like object
-      done: jest.fn().mockReturnThis(),
-      fail: jest.fn().mockReturnThis(),
-      always: jest.fn().mockReturnThis(),
-      then: jest.fn().mockReturnThis(),
-      catch: jest.fn().mockReturnThis(),
-      pipe: jest.fn().mockReturnThis(),
-      promise: jest.fn().mockReturnThis(),
-      state: jest.fn().mockReturnThis(),
-      statusCode: jest.fn().mockReturnThis(),
-    }))
+  beforeAll(() => {
+    server.listen()
+  })
 
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
+  beforeEach(async () => {
     fakeENV.setup()
     window.ENV.SUBMISSION = {
       user_id: 1,
@@ -103,79 +105,130 @@ describe('submissions', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
     teardown()
     fakeENV.teardown()
   })
 
   test('comment_change posts to update_submission_url', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
     // Set up the comment and trigger the save
     $('.grading_comment').val('Test comment.')
     $('.save_comment_button').click()
 
-    // Verify the AJAX call
-    expect($.ajaxJSON).toHaveBeenCalledTimes(1)
-    expect($.ajaxJSON).toHaveBeenCalledWith(
-      'submission_data_url.com',
-      'POST',
-      expect.objectContaining({
-        'submission[comment]': 'Test comment.',
-        'submission[assignment_id]': 27,
-        'submission[user_id]': 1,
-      }),
-      expect.any(Function),
-    )
+    // Wait for the request to complete
+    await waitFor(() => expect(capturedRequest).toBeDefined())
+
+    // Verify the request data
+    expect(capturedRequest.get('submission[comment]')).toBe('Test comment.')
+    expect(capturedRequest.get('submission[assignment_id]')).toBe('27')
+    expect(capturedRequest.get('submission[user_id]')).toBe('1')
   })
 
   test('comment_change submits the grading_comment but not grade', async () => {
-    // Reset the mock to ensure clean state for this test
-    $.ajaxJSON.mockClear()
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
 
     // Set the comment value and trigger the save
     $('.grading_comment').val('Hello again.')
     $('.save_comment_button').click()
 
-    // Verify the AJAX call was made correctly
-    expect($.ajaxJSON).toHaveBeenCalledTimes(1)
-    expect($.ajaxJSON).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.any(String),
-      expect.objectContaining({
-        'submission[comment]': 'Hello again.',
-        'submission[assignment_id]': 27,
-        'submission[user_id]': 1,
-      }),
-      expect.any(Function),
-    )
+    // Wait for the request to complete
+    await waitFor(() => expect(capturedRequest).toBeDefined())
 
+    // Verify the request data
+    expect(capturedRequest.get('submission[comment]')).toBe('Hello again.')
+    expect(capturedRequest.get('submission[assignment_id]')).toBe('27')
+    expect(capturedRequest.get('submission[user_id]')).toBe('1')
     // Check that grade was not included in the form data
-    const [, , formData] = $.ajaxJSON.mock.calls[0]
-    expect(formData).not.toHaveProperty('submission[grade]')
+    expect(capturedRequest.has('submission[grade]')).toBe(false)
   })
 
   test('comment_change submits the user_id of the submission if present', async () => {
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            user_id: '1',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
     $('.grading_comment').val('Hello again.')
     $('.save_comment_button').click()
 
-    const [, , formData] = $.ajaxJSON.mock.calls[0]
-    expect(formData['submission[user_id]']).toBe(1)
+    await waitFor(() => expect(capturedRequest).toBeDefined())
+    expect(capturedRequest.get('submission[user_id]')).toBe('1')
   })
 
   test('comment_change submits the anonymous_id of the submission if the user_id is not present', async () => {
     delete window.ENV.SUBMISSION.user_id
     window.ENV.SUBMISSION.anonymous_id = 'zxcvb'
 
+    let capturedRequest
+    server.use(
+      http.post('http://localhost/submission_data_url.com', async ({request}) => {
+        capturedRequest = await request.formData()
+        return HttpResponse.json({
+          submission: {
+            anonymous_id: 'zxcvb',
+            assignment_id: 27,
+            submission_comments: [],
+          },
+        })
+      }),
+    )
+
     $('.grading_comment').val('Hello again.')
     $('.save_comment_button').click()
 
-    const [, , formData] = $.ajaxJSON.mock.calls[0]
-    expect(formData['submission[anonymous_id]']).toBe('zxcvb')
+    await waitFor(() => expect(capturedRequest).toBeDefined())
+    expect(capturedRequest.get('submission[anonymous_id]')).toBe('zxcvb')
   })
 
   test('comment_change does not submit if no comment', async () => {
+    let requestMade = false
+    server.use(
+      http.post('http://localhost/submission_data_url.com', () => {
+        requestMade = true
+        return HttpResponse.json({})
+      }),
+    )
+
     $('.grading_comment').val('')
     $('.save_comment_button').click()
-    expect($.ajaxJSON).not.toHaveBeenCalled()
+
+    // Wait a bit to ensure no request was made
+    await new Promise(resolve => setTimeout(resolve, 100))
+    expect(requestMade).toBe(false)
   })
 
   test('html comment does not render with html tags', async () => {

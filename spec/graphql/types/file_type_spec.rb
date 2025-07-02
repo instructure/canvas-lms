@@ -80,6 +80,27 @@ describe Types::FileType do
     ).not_to include("verifier=#{uuid}")
   end
 
+  it "add a location query param to url if file_association_access feature flag is enabled" do
+    file.root_account.enable_feature!(:file_association_access)
+    file_type = GraphQLTypeTester.new(file, current_user: @teacher, in_app: true, domain_root_account: Account.default, asset_location: "course_#{file.context_id}")
+    expect(
+      file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
+    ).to include("location=course_#{file.context_id}")
+  end
+
+  it "does not add a location query param to url if file_association_access feature flag is disabled" do
+    file.root_account.disable_feature!(:file_association_access)
+    file.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
+    file_type = GraphQLTypeTester.new(file, current_user: @teacher, in_app: true, domain_root_account: Account.default, asset_location: "course_#{file.context_id}")
+    resolver = file_type.resolve("url", request: ActionDispatch::TestRequest.create, current_user: @student)
+    expect(
+      resolver
+    ).not_to include("location")
+    expect(
+      resolver
+    ).to include("verifier=#{file.uuid}")
+  end
+
   it "returns nil for the url if the file is locked" do
     file.locked = true
     file.save!

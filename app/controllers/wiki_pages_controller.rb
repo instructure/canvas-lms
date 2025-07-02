@@ -32,7 +32,7 @@ class WikiPagesController < ApplicationController
   before_action :set_pandapub_read_token
   before_action :set_js_rights
   before_action :set_js_wiki_data
-  before_action :rce_js_env, only: [:edit, :index]
+  before_action :rce_js_env, only: %i[edit index new]
 
   include K5Mode
 

@@ -20,16 +20,18 @@ import Backbone from '@canvas/backbone'
 import ExternalContentFileSubmissionView from '../ExternalContentFileSubmissionView'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import '@canvas/rails-flash-notifications'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import axios from '@canvas/axios'
-import sinon from 'sinon'
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+  reloadWindow: jest.fn(),
+}))
 
 const container = document.createElement('div')
 container.setAttribute('id', 'fixtures')
 document.body.appendChild(container)
-
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toBe(y)
 
 const contentItem = {
   '@type': 'FileItem',
@@ -39,13 +41,11 @@ const contentItem = {
   eula_agreement_timestamp: 1522419910,
 }
 
-let sandbox
 let model
 let view
 
 describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup()
     window.ENV.COURSE_ID = 42
     window.ENV.current_user_id = 5
@@ -53,40 +53,56 @@ describe('ExternalContentFileSubmissionView#uploadFileFromUrl', () => {
       ID: 24,
     }
     model = new Backbone.Model(contentItem)
-    view = new ExternalContentFileSubmissionView()
+    const el = $('<div><button class="submit_button">Submit</button></div>')
+    $('#fixtures').append(el)
+    view = new ExternalContentFileSubmissionView({el})
   })
 
   afterEach(() => {
     fakeENV.teardown()
     $('#fixtures').empty()
-    sandbox.restore()
+    jest.restoreAllMocks()
   })
 
   test('hits the course url', () => {
-    const spy = sandbox.spy(axios, 'post')
+    const spy = jest.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
-    ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
+    expect(spy).toHaveBeenCalledWith(
+      '/api/v1/courses/42/assignments/24/submissions/5/files',
+      expect.anything(),
+    )
   })
 
   test('hits the group url', () => {
     window.ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER = 2
 
-    const spy = sandbox.spy(axios, 'post')
+    const spy = jest.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
-    ok(spy.calledWith('/api/v1/groups/2/files?assignment_id=24&submit_assignment=1'))
+    expect(spy).toHaveBeenCalledWith(
+      '/api/v1/groups/2/files?assignment_id=24&submit_assignment=1',
+      expect.anything(),
+    )
   })
 
   test('sends the eula agreement timestamp to the submission endpoint', () => {
-    const spy = sandbox.spy(axios, 'post')
+    const spy = jest.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
-    equal(spy.args[0][1].eula_agreement_timestamp, model.get('eula_agreement_timestamp'))
-    ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
+    expect(spy).toHaveBeenCalledWith(
+      '/api/v1/courses/42/assignments/24/submissions/5/files',
+      expect.objectContaining({
+        eula_agreement_timestamp: model.get('eula_agreement_timestamp'),
+      }),
+    )
   })
 
   test('sends the comment to the submission endpoint', () => {
-    const spy = sandbox.spy(axios, 'post')
+    const spy = jest.spyOn(axios, 'post').mockResolvedValue({data: {upload_url: null}})
     view.uploadFileFromUrl({}, model)
-    equal(spy.args[0][1].comment, model.get('comment'))
-    ok(spy.calledWith('/api/v1/courses/42/assignments/24/submissions/5/files'))
+    expect(spy).toHaveBeenCalledWith(
+      '/api/v1/courses/42/assignments/24/submissions/5/files',
+      expect.objectContaining({
+        comment: model.get('comment'),
+      }),
+    )
   })
 })

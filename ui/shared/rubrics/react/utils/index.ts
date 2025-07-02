@@ -21,6 +21,7 @@ import type {
   Rubric,
   RubricAssessmentData,
   RubricAssociation,
+  RubricRating,
 } from '@canvas/rubrics/react/types/rubric'
 
 export type RubricUnderscoreType = {
@@ -160,4 +161,24 @@ export const mapRubricAssociationUnderscoredKeysToCamelCase = (
     hideScoreTotal: underscoreAssociation.hide_score_total,
     useForGrading: underscoreAssociation.use_for_grading,
   }
+}
+
+type ReorderProps = {
+  list: RubricRating[]
+  startIndex: number
+  endIndex: number
+}
+
+export const reorderRatingsAtIndex = ({list, startIndex, endIndex}: ReorderProps) => {
+  const result = Array.from(list)
+  const resultCopy = JSON.parse(JSON.stringify(list))
+
+  const [removed] = result.splice(startIndex, 1)
+  result.splice(endIndex, 0, removed)
+
+  result.forEach((item, index) => {
+    item.points = resultCopy[index].points
+  })
+
+  return result
 }

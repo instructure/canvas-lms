@@ -444,6 +444,7 @@ module UserLearningObjectScopes
     end
   end
 
+  # rubocop:disable Style/ArgumentsForwarding -- _params_hash needs the binding
   def discussion_topics_needing_viewing(
     due_after:,
     due_before:,
@@ -475,4 +476,5 @@ module UserLearningObjectScopes
         .todo_date_between(due_after, due_before)
     end
   end
+  # rubocop:enable Style/ArgumentsForwarding
 end

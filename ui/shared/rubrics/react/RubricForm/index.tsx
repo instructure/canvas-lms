@@ -36,8 +36,8 @@ import {Flex} from '@instructure/ui-flex'
 import {IconEyeLine, IconAiSolid, IconAiColoredSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
-import {RubricCriteriaRow} from './RubricCriteriaRow'
-import {NewCriteriaRow} from './NewCriteriaRow'
+import {RubricCriteriaRow} from './components/RubricCriteriaRow'
+import {NewCriteriaRow} from './components/NewCriteriaRow'
 import {
   fetchRubric,
   saveRubric,
@@ -46,11 +46,11 @@ import {
 } from './queries/RubricFormQueries'
 import {mapRubricUnderscoredKeysToCamelCase} from '@canvas/rubrics/react/utils'
 import type {RubricFormProps, GenerateCriteriaFormProps} from './types/RubricForm'
-import {CriterionModal} from './CriterionModal'
-import {WarningModal} from './WarningModal'
+import {CriterionModal} from './components/CriterionModal/CriterionModal'
+import {WarningModal} from './components/WarningModal'
 import {DragDropContext as DragAndDrop, Droppable} from 'react-beautiful-dnd'
 import type {DropResult} from 'react-beautiful-dnd'
-import {OutcomeCriterionModal} from './OutcomeCriterionModal'
+import {OutcomeCriterionModal} from './components/OutcomeCriterionModal'
 import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup'
@@ -152,7 +152,7 @@ export const RubricForm = ({
   const [currentProgress, setCurrentProgress] = useState<CanvasProgress>()
   const criteriaRef = useRef(rubricForm.criteria)
 
-  const header = rubricId ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
+  const header = rubricId || rubric?.id ? I18n.t('Edit Rubric') : I18n.t('Create New Rubric')
   const queryKey = ['fetch-rubric', rubricId ?? '']
 
   const {data, isLoading} = useQuery({
@@ -515,12 +515,14 @@ export const RubricForm = ({
                     />
                   </Flex.Item>
                 )}
-                <Flex.Item margin="0 0 0 small">
-                  <RubricRatingOrderSelect
-                    ratingOrder={rubricForm.ratingOrder}
-                    onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
-                  />
-                </Flex.Item>
+                {!rubricForm.freeFormCriterionComments && (
+                  <Flex.Item margin="0 0 0 small">
+                    <RubricRatingOrderSelect
+                      ratingOrder={rubricForm.ratingOrder}
+                      onChangeOrder={ratingOrder => setRubricFormField('ratingOrder', ratingOrder)}
+                    />
+                  </Flex.Item>
+                )}
                 {showAdditionalOptions && (
                   <Flex.Item margin="0 0 0 small">
                     <ScoringTypeSelect
@@ -865,7 +867,7 @@ export const RubricForm = ({
                 disabled={savePending || !formValid()}
                 data-testid="save-rubric-button"
               >
-                {rubric?.id ? I18n.t('Save Rubric') : I18n.t('Create Rubric')}
+                {rubricId || rubric?.id ? I18n.t('Save Rubric') : I18n.t('Create Rubric')}
               </Button>
             </Flex.Item>
             <Flex.Item>
@@ -898,7 +900,8 @@ export const RubricForm = ({
       <CriterionModal
         criterion={selectedCriterion}
         criterionUseRangeEnabled={criterionUseRangeEnabled}
-        hidePoints={rubricForm.hidePoints || rubricForm.freeFormCriterionComments}
+        hidePoints={rubricForm.hidePoints}
+        freeFormCriterionComments={rubricForm.freeFormCriterionComments}
         isOpen={isCriterionModalOpen}
         unassessed={rubricForm.unassessed}
         onDismiss={() => setIsCriterionModalOpen(false)}
@@ -972,7 +975,7 @@ const GradingTypeSelect = ({freeFormCriterionComments, onChange}: GradingTypeSel
   return (
     <SimpleSelect
       renderLabel={I18n.t('Type')}
-      width="10.563rem"
+      width={freeFormCriterionComments ? '12.563rem' : '10.563rem'}
       value={gradingType}
       onChange={(_e, {value}) => handleChange(value !== undefined ? value.toString() : '')}
       data-testid="rubric-rating-type-select"

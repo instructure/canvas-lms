@@ -182,7 +182,7 @@ describe('RotationControls', () => {
         const input = container.querySelector('label input[type="text"]')
         fireEvent.change(input, {target: {value: ''}})
         fireEvent.blur(input)
-        const messageContainer = container.querySelector('label > span:last-child span')
+        const messageContainer = container.querySelector('label div span span span')
         expect(messageContainer.textContent).toEqual('Invalid entry.')
       })
     })
@@ -351,7 +351,7 @@ describe('RotationControls', () => {
         fireEvent.change(input, {target: {value: ''}})
         await waitFor(
           () => {
-            const messageContainer = container.querySelector('label > span:last-child span')
+            const messageContainer = container.querySelector('label div span span span')
             expect(messageContainer.textContent).toEqual('Invalid entry.')
           },
           {timeout},

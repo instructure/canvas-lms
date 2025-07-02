@@ -22,12 +22,18 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleHeaderStudent from './ModuleHeaderStudent'
 import ModuleItemListStudent from './ModuleItemListStudent'
 import {useModuleItemsStudent} from '../hooks/queriesStudent/useModuleItemsStudent'
-import {CompletionRequirement, ModuleProgression, ModuleStatistics} from '../utils/types'
+import {
+  CompletionRequirement,
+  ModuleProgression,
+  ModuleStatistics,
+  Prerequisite,
+} from '../utils/types'
 
 export interface ModuleStudentProps {
   id: string
   name: string
   completionRequirements?: CompletionRequirement[]
+  prerequisites?: Prerequisite[]
   expanded?: boolean
   onToggleExpand?: (id: string) => void
   requireSequentialProgress?: boolean
@@ -39,6 +45,7 @@ export interface ModuleStudentProps {
 const ModuleStudent: React.FC<ModuleStudentProps> = ({
   id,
   completionRequirements,
+  prerequisites,
   expanded: propExpanded,
   onToggleExpand,
   name,
@@ -86,6 +93,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
             onToggleExpand={toggleExpanded}
             progression={progression}
             completionRequirements={completionRequirements}
+            prerequisites={prerequisites}
             requirementCount={requirementCount}
             submissionStatistics={submissionStatistics}
           />

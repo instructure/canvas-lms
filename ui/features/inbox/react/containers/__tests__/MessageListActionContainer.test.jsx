@@ -110,10 +110,10 @@ describe('MessageListActionContainer', () => {
     })
 
     it('should render concluded courses', async () => {
-      const {findByTestId, queryByText} = setup()
+      const {findByTestId, queryAllByText} = setup()
       const courseDropdown = await findByTestId('course-select')
       fireEvent.click(courseDropdown)
-      expect(await queryByText('Fighting Magneto 202')).toBeInTheDocument()
+      expect(await queryAllByText('Ipsum')).toHaveLength(4)
     })
 
     it('should render concluded groups in list action container', async () => {
@@ -133,8 +133,9 @@ describe('MessageListActionContainer', () => {
       const courseDropdown = await component.findByTestId('course-select')
       fireEvent.click(courseDropdown)
 
-      const option = await component.findByText('Fighting Magneto 101')
-      fireEvent.click(option)
+      const options = await component.findAllByText('Ipsum')
+      expect(options).toHaveLength(4)
+      fireEvent.click(options[0])
 
       expect(mock.mock.calls).toHaveLength(1)
     })

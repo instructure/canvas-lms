@@ -239,6 +239,7 @@ object for placement-specific target_link_uri's.</p>
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/score"</code>,
           <code class="enum">"https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"</code>,
           <code class="enum">"https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"</code>,
+          <code class="enum">"https://purl.imsglobal.org/spec/lti/scope/noticehandlers"</code>,
           <code class="enum">"https://canvas.instructure.com/lti/public_jwk/scope/update"</code>
      </p>
 </p>
@@ -634,7 +635,7 @@ The following settings only apply to certain placements.
     </tr>
     <tr class="request-param">
       <td>windowTarget</td>
-      <td>account_navigation, course_navigation</td>
+      <td>account_navigation, course_navigation, global_navigation, user_navigation</td>
       <td>string</td>
       <td class="param-desc">
         <p>Whether the tool should be launched in a new tab.</p>

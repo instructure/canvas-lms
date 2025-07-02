@@ -167,7 +167,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
-    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides){
+    if (!window.ENV.FEATURES.create_wiki_page_mastery_path_overrides) {
       json.assignment = json.assignment != null ? json.assignment.toView() : undefined
     }
 

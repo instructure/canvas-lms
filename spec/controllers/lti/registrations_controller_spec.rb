@@ -2012,4 +2012,254 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
   end
+
+  describe "GET context_search", type: :request do
+    subject do
+      get "/api/v1/accounts/#{account.id}/lti_registrations/context_search",
+          params: { search_term:, by_account_id: }.compact,
+          as: :json
+      response
+    end
+
+    let(:account) { account_model }
+    let(:admin) { account_admin_user(account:) }
+    let(:search_term) { nil }
+    let(:by_account_id) { nil }
+
+    before do
+      user_session(admin)
+      account.enable_feature!(:lti_registrations_page)
+      account.enable_feature!(:lti_registrations_next)
+    end
+
+    context "without user session" do
+      before { remove_user_session }
+
+      it "returns 401" do
+        subject
+        expect(response).to be_unauthorized
+      end
+    end
+
+    context "with non-admin user" do
+      let(:student) { student_in_course(account:).user }
+
+      before { user_session(student) }
+
+      it "returns 403" do
+        subject
+        expect(response).to be_forbidden
+      end
+    end
+
+    context "with flag disabled" do
+      before { account.disable_feature!(:lti_registrations_page) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with new flag disabled" do
+      before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    it { is_expected.to be_successful }
+
+    context "with an account" do
+      let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+
+      before { subaccount }
+
+      it "includes the account" do
+        subject
+        expect(response_json[:accounts].length).to eq(2)
+      end
+
+      it "includes all account data" do
+        subject
+        account_json = response_json[:accounts].find { |a| a[:id] == subaccount.id.to_s }.with_indifferent_access
+        expect(account_json).to include(
+          id: subaccount.id.to_s,
+          name: subaccount.name,
+          sis_id: subaccount.sis_source_id,
+          display_path: []
+        )
+      end
+
+      context "with nested subaccounts" do
+        let(:sub2) { account_model(parent_account: subaccount, root_account: account, name: "Sub Sub Account", sis_source_id: "BAR") }
+        let(:sub3) { account_model(parent_account: sub2, root_account: account, name: "Sub Sub Sub Account", sis_source_id: "BAZ") }
+
+        before { sub3 }
+
+        it "does not include self in the display path" do
+          subject
+          account_json = response_json[:accounts].find { |a| a[:id] == sub3.id.to_s }
+          expect(account_json[:display_path]).not_to include(sub3.name)
+        end
+
+        it "includes all parent accounts except root in the display path" do
+          subject
+          account_json = response_json[:accounts].find { |a| a[:id] == sub3.id.to_s }
+          expect(account_json[:display_path]).to eq([subaccount.name, sub2.name])
+        end
+      end
+    end
+
+    context "with a course" do
+      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101") }
+
+      before { course }
+
+      it "includes the course" do
+        subject
+        expect(response_json[:courses].length).to eq(1)
+      end
+
+      it "includes all course data" do
+        subject
+        expect(response_json[:courses].first.with_indifferent_access).to include(
+          id: course.id.to_s,
+          name: course.name,
+          sis_id: course.sis_source_id,
+          course_code: course.course_code,
+          display_path: []
+        )
+      end
+
+      context "with course nested in subaccounts" do
+        let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+        let(:sub2) { account_model(parent_account: subaccount, root_account: account, name: "Sub Sub Account", sis_source_id: "BAR") }
+        let(:course) { course_model(account: sub2, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101") }
+
+        before { course }
+
+        it "does not include self in the display path" do
+          subject
+          course_json = response_json[:courses].find { |c| c[:id] == course.id.to_s }
+          expect(course_json[:display_path]).not_to include(course.name)
+        end
+
+        it "includes all parent accounts except root in the display path" do
+          subject
+          course_json = response_json[:courses].find { |c| c[:id] == course.id.to_s }
+          expect(course_json[:display_path]).to eq([subaccount.name, sub2.name])
+        end
+      end
+    end
+
+    context "with normal data" do
+      let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101") }
+      let(:other_course) { course_model(account: subaccount, sis_source_id: "OTHER_COURSE_SIS_ID", course_code: "BAR202") }
+      let(:other_account) { account_model(parent_account: account, root_account: account, name: "Other Account", sis_source_id: "BAR") }
+
+      before do
+        subaccount
+        course
+        other_course
+        other_account
+      end
+
+      it "includes all accounts" do
+        subject
+        expect(response_json[:accounts].length).to eq(3)
+      end
+
+      it "includes all courses" do
+        subject
+        expect(response_json[:courses].length).to eq(2)
+      end
+
+      context "with search term" do
+        context "that matches nothing" do
+          let(:search_term) { "nonexistent" }
+
+          it "returns empty accounts and courses" do
+            subject
+            expect(response_json[:accounts].length).to eq(0)
+            expect(response_json[:courses].length).to eq(0)
+          end
+        end
+
+        context "that matches name" do
+          let(:search_term) { "foo" }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            expect(response_json[:accounts].length).to eq(1)
+            expect(response_json[:courses].length).to eq(1)
+
+            account_json = response_json[:accounts].first
+            expect(account_json[:name]).to include("Sub Account")
+
+            course_json = response_json[:courses].first
+            expect(course_json[:course_code]).to include("FOO101")
+          end
+        end
+
+        context "that matches sis_source_id" do
+          let(:search_term) { "COURSE_SIS_ID" }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            expect(response_json[:accounts].length).to eq(0)
+            expect(response_json[:courses].length).to eq(2)
+
+            course_json = response_json[:courses].first
+            expect(course_json[:sis_id]).to include("COURSE_SIS_ID")
+          end
+        end
+
+        context "that matches course_code" do
+          let(:search_term) { "FOO101" }
+
+          it "returns accounts and courses matching the search term" do
+            subject
+            expect(response_json[:accounts].length).to eq(0)
+            expect(response_json[:courses].length).to eq(1)
+
+            course_json = response_json[:courses].first
+            expect(course_json[:course_code]).to include("FOO101")
+          end
+        end
+      end
+
+      context "with by_account_id" do
+        let(:by_account_id) { subaccount.id }
+
+        it "returns only accounts and courses in the specified account" do
+          subject
+          expect(response_json[:accounts].length).to eq(1)
+          expect(response_json[:courses].length).to eq(1)
+
+          account_json = response_json[:accounts].first
+          expect(account_json[:id]).to eq(subaccount.id.to_s)
+
+          course_json = response_json[:courses].first
+          expect(course_json[:id]).to eq(other_course.id.to_s)
+        end
+
+        context "with search term" do
+          let(:root_course) { course_model(account:, sis_source_id: "ROOT_COURSE_SIS_ID", course_code: "FOO102") }
+
+          before { root_course }
+
+          it "will not return accounts or courses outside the specified account" do
+            subject
+
+            course_json = response_json[:courses].find { |c| c[:id] == root_course.id.to_s }
+            expect(course_json).to be_nil
+          end
+        end
+      end
+    end
+  end
 end

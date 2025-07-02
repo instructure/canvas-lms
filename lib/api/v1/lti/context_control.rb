@@ -26,11 +26,29 @@ module Api::V1::Lti::ContextControl
     id account_id course_id registration_id deployment_id workflow_state created_at updated_at available path
   ].freeze
 
-  def lti_context_control_json(context_control, user, session, context, depth: nil, display_path: nil, include_users: false)
+  # Returns a JSON representation of an LTI context control.
+  #
+  # @param context_control [Lti::ContextControl] the context control to serialize
+  # @param user [User] the user making the request
+  # @param session [Session] the session of the user making the request
+  # @param context [Context] the context in which the request is made
+  # @param calculated_attrs [Hash] additional data to include in the JSON, can contain:
+  #   depth [Integer] the depth of the context control in the hierarchy. used for the UI
+  #   display_path [String[]] the names of the accounts in the path. used for the UI
+  #   subaccount_count [Integer] the number of subaccounts affected by this control.
+  #   course_count [Integer] the number of courses affected by this control.
+  #   child_control_count [Integer] the number of child context controls for this control.
+  # @param include_users [Boolean] whether to include user details in created_by and updated_by fields
+  #
+  # @return [Hash] the JSON representation of the context control
+  def lti_context_control_json(context_control, user, session, context, calculated_attrs: {}, include_users: false)
     api_json(context_control, user, session, only: JSON_ATTRS).tap do |json|
       json["context_name"] = context_control.context_name
-      json["display_path"] = display_path || context_control.path_names
-      json["depth"] = depth || 0
+      json["child_control_count"] = calculated_attrs[:child_control_count] || context_control.child_control_count
+      json["subaccount_count"] = calculated_attrs[:subaccount_count] || context_control.subaccount_count
+      json["course_count"] = calculated_attrs[:course_count] || context_control.course_count
+      json["display_path"] = calculated_attrs[:display_path] || context_control.display_path
+      json["depth"] = calculated_attrs[:depth] || 0
 
       json["created_by"] = nil
       if include_users && context_control.created_by.present?

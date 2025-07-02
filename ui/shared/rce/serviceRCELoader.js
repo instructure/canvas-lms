@@ -156,7 +156,10 @@ const RCELoader = {
     //       Assignments2 student view is going to be doing their own autosave
     const autosave = {
       enabled: true,
-      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
+      maxAge:
+        Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
+          ? 3600000
+          : ENV.rce_auto_save_max_age_ms,
     }
 
     return {

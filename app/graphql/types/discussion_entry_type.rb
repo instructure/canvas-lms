@@ -232,7 +232,7 @@ module Types
 
     field :all_root_entries, [Types::DiscussionEntryType], null: true
     def all_root_entries
-      return nil unless object.root_entry_id.nil?
+      return [] unless object.root_entry_id.nil?
 
       load_association(:flattened_discussion_subentries)
     end
@@ -246,6 +246,7 @@ module Types
 
     field :attachment, Types::FileType, null: true
     def attachment
+      context.scoped_set!(:asset_location, object.asset_string)
       load_association(:attachment)
     end
 

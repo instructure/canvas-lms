@@ -17,16 +17,27 @@
  */
 
 import React from 'react'
-import {createRoot} from 'react-dom/client'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
+import {createRoot, type Root} from 'react-dom/client'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {queryClient} from '@canvas/query'
 import ItemAssignToManager from '@canvas/context-modules/differentiated-modules/react/Item/ItemAssignToManager'
 import type {ItemType, IconType} from '@canvas/context-modules/differentiated-modules/react/types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import {
+  generateDateDetailsPayload,
+  itemTypeToApiURL,
+} from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
+// Import payload types directly in onSave function to make TypeScript happy
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const ENV = window.ENV as GlobalEnv
+
+interface HTMLElementWithRoot extends HTMLElement {
+  reactRoot?: Root
+}
 
 export const getIconType = (contentType?: string): IconType => {
   if (!contentType) return 'page'
@@ -60,6 +71,7 @@ export interface ItemAssignToProps {
   moduleItemType: ItemType
   moduleItemContentId?: string
   pointsPossible?: number
+  moduleId?: string
 }
 
 export const renderItemAssignToManager = (
@@ -67,37 +79,88 @@ export const renderItemAssignToManager = (
   returnFocusTo: HTMLElement,
   itemProps: ItemAssignToProps,
 ) => {
-  let container = document.getElementById('module-item-assign-to-mount-point')
+  let container = document.getElementById(
+    'module-item-assign-to-mount-point',
+  ) as HTMLElementWithRoot
+  console.log(itemProps)
   if (!container) {
-    container = document.createElement('div')
+    container = document.createElement('div') as HTMLElementWithRoot
     container.id = 'module-item-assign-to-mount-point'
     document.body.appendChild(container)
   }
 
-  if ((container as any).reactRoot) {
-    ;(container as any).reactRoot.unmount()
+  if (container.reactRoot) {
+    container.reactRoot.unmount()
   }
-  ;(container as any).reactRoot = createRoot(container)
-  ;(container as any).reactRoot.render(
+  container.reactRoot = createRoot(container)
+  container.reactRoot.render(
     <ItemAssignToManager
       open={open}
       onClose={() => {
-        if ((container as any).reactRoot) {
-          ;(container as any).reactRoot.unmount()
+        if (container.reactRoot) {
+          container.reactRoot.unmount()
         }
       }}
       onDismiss={() => {
-        if ((container as any).reactRoot) {
-          ;(container as any).reactRoot.unmount()
+        if (container.reactRoot) {
+          container.reactRoot.unmount()
         }
         returnFocusTo.focus()
       }}
-      onSave={() => {
-        if ((container as any).reactRoot) {
-          ;(container as any).reactRoot.unmount()
+      onSave={(overrides, hasModuleOverrides, deletedModuleAssignees, _disabledOptionIds) => {
+        // Handle the save with our custom implementation that doesn't reload the page
+        const filteredCards = overrides.filter(
+          card =>
+            [null, undefined, ''].includes(card.contextModuleId) ||
+            (card.contextModuleId !== null && card.isEdited),
+        )
+        const payload = generateDateDetailsPayload(
+          filteredCards,
+          hasModuleOverrides,
+          deletedModuleAssignees,
+        )
+
+        if (itemProps.moduleItemContentId) {
+          doFetchApi({
+            path: itemTypeToApiURL(
+              itemProps.courseId,
+              itemProps.moduleItemType,
+              itemProps.moduleItemContentId,
+            ),
+            method: 'PUT',
+            body: payload,
+          })
+            .then(() => {
+              // On success, invalidate queries with exact module ID if available
+              if (itemProps.moduleId) {
+                queryClient.invalidateQueries({
+                  queryKey: ['moduleItems', itemProps.moduleId],
+                  exact: true,
+                })
+              }
+
+              showFlashAlert({
+                type: 'success',
+                message: I18n.t(`%{moduleItemName} updated`, {
+                  moduleItemName: itemProps.moduleItemName,
+                }),
+              })
+
+              if (container.reactRoot) {
+                container.reactRoot.unmount()
+              }
+              returnFocusTo.focus()
+            })
+            .catch((err: Error) => {
+              showFlashAlert({
+                type: 'error',
+                err,
+                message: I18n.t('Error updating “%{moduleItemName}”', {
+                  moduleItemName: itemProps.moduleItemName,
+                }),
+              })
+            })
         }
-        returnFocusTo.focus()
-        showFlashSuccess(I18n.t('Assignment settings saved successfully'))
       }}
       courseId={itemProps.courseId}
       itemName={itemProps.moduleItemName}

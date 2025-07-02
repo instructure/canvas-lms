@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GradebookExportManager from '../GradebookExportManager'
 
 const currentUserId = 42
-const exportingUrl = 'http://exportingUrl'
+const exportingUrl = '/api/v1/gradebook_exports'
 const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
 const attachmentBase = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 const workingExport = {
@@ -29,15 +30,13 @@ const workingExport = {
   workflowState: 'queued',
 }
 
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
+
 describe('GradebookExportManager - constructor', () => {
-  beforeEach(() => {
-    moxios.install()
-  })
-
-  afterEach(() => {
-    moxios.uninstall()
-  })
-
   test('sets the polling interval with a sensible default', () => {
     const manager = new GradebookExportManager(exportingUrl, currentUserId, undefined, 5000)
     expect(manager.pollingInterval).toBe(5000)
@@ -74,14 +73,12 @@ describe('GradebookExportManager - monitoringUrl', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject = undefined
   })
 
@@ -105,14 +102,12 @@ describe('GradebookExportManager - attachmentUrl', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
     subject.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     subject.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject = undefined
   })
 
@@ -136,22 +131,36 @@ describe('GradebookExportManager - startExport', () => {
   let subject
 
   beforeEach(() => {
-    moxios.install()
     subject = new GradebookExportManager(exportingUrl, currentUserId)
 
     // Initial request to start the export
-    moxios.stubRequest(new RegExp(exportingUrl), {
-      status: 200,
-      responseText: {
-        progress_id: 'newProgressId',
-        attachment_id: 'newAttachmentId',
-        filename: 'newfile',
-      },
-    })
+    server.use(
+      http.post('*', () =>
+        HttpResponse.json({
+          progress_id: 'newProgressId',
+          attachment_id: 'newAttachmentId',
+          filename: 'newfile',
+        }),
+      ),
+      // Default progress monitoring handler
+      http.get('*/api/v1/progress/*', () =>
+        HttpResponse.json({
+          workflow_state: 'completed',
+          completion: 100,
+          message: 'Done',
+        }),
+      ),
+      // Default attachment handler
+      http.get('*/api/v1/users/*/files/*', () =>
+        HttpResponse.json({
+          url: 'http://completedAttachmentUrl',
+          updated_at: '2009-01-20T17:00:00Z',
+        }),
+      ),
+    )
   })
 
   afterEach(() => {
-    moxios.uninstall()
     subject.clearMonitor()
     subject = undefined
   })
@@ -190,27 +199,17 @@ describe('GradebookExportManager - startExport', () => {
   })
 
   test('starts polling for progress and returns a rejected promise on progress failure', async () => {
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
-    // First stub the export request
-    moxios.stubRequest(exportingUrl, {
-      status: 200,
-      response: {
-        progress_id: 'newProgressId',
-        attachment_id: 'attachmentId',
-        filename: 'filename.csv',
-      },
-    })
-
-    // Then stub the monitoring request
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      response: {
-        workflow_state: 'failed',
-        message: 'Arbitrary failure',
-      },
-    })
+    // Override the progress endpoint to return failed
+    server.use(
+      http.get('*/api/v1/progress/*', () =>
+        HttpResponse.json({
+          workflow_state: 'failed',
+          message: 'Arbitrary failure',
+        }),
+      ),
+    )
 
     try {
       await subject.startExport(
@@ -226,24 +225,16 @@ describe('GradebookExportManager - startExport', () => {
   })
 
   test('starts polling for progress and returns a rejected promise on unknown progress status', async () => {
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
-    moxios.stubRequest(exportingUrl, {
-      status: 200,
-      response: {
-        attachmentId: 'attachmentId',
-        progressId: 'newProgressId',
-      },
-    })
-
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      response: {
-        workflow_state: 'unknown',
-        message: 'Unknown workflow state',
-      },
-    })
+    server.use(
+      http.get('*/api/v1/progress/*', () =>
+        HttpResponse.json({
+          workflow_state: 'unknown',
+          message: 'Unknown workflow state',
+        }),
+      ),
+    )
 
     await expect(
       subject.startExport(
@@ -256,25 +247,27 @@ describe('GradebookExportManager - startExport', () => {
   })
 
   test('starts polling for progress and returns a fulfilled promise on progress completion', async () => {
-    const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
     const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`
 
     subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
 
-    moxios.stubRequest(expectedMonitoringUrl, {
-      status: 200,
-      responseText: {
-        workflow_state: 'completed',
-      },
-    })
+    // Default handler already returns completed status
+    server.use(
+      http.get(expectedAttachmentUrl, () =>
+        HttpResponse.json({
+          workflow_state: 'completed',
+        }),
+      ),
+    )
 
-    moxios.stubRequest(expectedAttachmentUrl, {
-      status: 200,
-      responseText: {
-        url: 'http://completedAttachmentUrl',
-        updated_at: '2009-01-20T17:00:00Z',
-      },
-    })
+    server.use(
+      http.get(expectedAttachmentUrl, () =>
+        HttpResponse.json({
+          url: 'http://completedAttachmentUrl',
+          updated_at: '2009-01-20T17:00:00Z',
+        }),
+      ),
+    )
 
     const resolution = await subject.startExport(
       undefined,

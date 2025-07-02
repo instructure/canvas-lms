@@ -2211,6 +2211,38 @@ module Lti
                        -> { TextHelper.round_if_whole(@assignment.points_possible) },
                        ASSIGNMENT_GUARD
 
+    # Returns the decimal separator for the current context account.
+    # This is used to have custom formatting on numbers, independent from the account's locale.
+    # If the account does not have a decimal separator set, it will return "$Canvas.account.decimal_separator".
+    #
+    # @example
+    #   ```
+    #   "comma"
+    #   ```
+    register_expansion "Canvas.account.decimal_separator",
+                       [],
+                       lambda {
+                         lti_helper.account&.settings&.dig(:decimal_separator, :value) ||
+                           @root_account.settings&.dig(:decimal_separator, :value)
+                       },
+                       COURSE_GUARD
+
+    # Returns the thousand separator for the current context account.
+    # This is used to have custom formatting on numbers, independent from the account's locale.
+    # If the account does not have a thousand separator set, it will return "$Canvas.account.decimal_separator".
+    #
+    # @example
+    #   ```
+    #   "period"
+    #   ```
+    register_expansion "Canvas.account.thousand_separator",
+                       [],
+                       lambda {
+                         lti_helper.account&.settings&.dig(:thousand_separator, :value) ||
+                           @root_account.settings&.dig(:thousand_separator, :value)
+                       },
+                       COURSE_GUARD
+
     private
 
     def unique_submission_dates

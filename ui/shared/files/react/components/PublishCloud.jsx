@@ -31,6 +31,8 @@ const I18n = createI18nScope('publish_cloud')
 // dialog window. This allows us to do react things inside of this all ready rendered
 // jQueryUI widget
 PublishCloud.openRestrictedDialog = function () {
+  const buttonId = `publish-cloud-${this.props.model.id}`
+  const originatorButton = $(`#${buttonId}`) ? $(`#${buttonId}`)[0] : null
   const $dialog = $('<div>').dialog({
     title: I18n.t('Editing permissions for: %{name}', {name: this.props.model.displayName()}),
     width: 800,
@@ -38,6 +40,9 @@ PublishCloud.openRestrictedDialog = function () {
     close() {
       ReactDOM.unmountComponentAtNode(this)
       $(this).remove()
+      setTimeout(() => {
+        originatorButton?.focus()
+      }, 0)
     },
     modal: true,
     zIndex: 1000,
@@ -63,6 +68,7 @@ PublishCloud.render = function () {
     if (this.state.published && this.state.restricted) {
       return (
         <button
+          id={`publish-cloud-${this.props.model.id}`}
           data-testid="restricted-button"
           type="button"
           data-tooltip="left"
@@ -82,6 +88,7 @@ PublishCloud.render = function () {
     } else if (this.state.published && this.state.hidden) {
       return (
         <button
+          id={`publish-cloud-${this.props.model.id}`}
           data-testid="hidden-button"
           type="button"
           data-tooltip="left"
@@ -103,6 +110,7 @@ PublishCloud.render = function () {
     } else if (this.state.published) {
       return (
         <button
+          id={`publish-cloud-${this.props.model.id}`}
           data-testid="published-button"
           type="button"
           data-tooltip="left"
@@ -119,6 +127,7 @@ PublishCloud.render = function () {
     } else {
       return (
         <button
+          id={`publish-cloud-${this.props.model.id}`}
           data-testid="unpublished-button"
           type="button"
           data-tooltip="left"

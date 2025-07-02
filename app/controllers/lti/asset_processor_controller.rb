@@ -59,7 +59,7 @@ module Lti
     end
 
     def require_access_to_context
-      return if context.is_a?(Course) && context.grants_right?(@current_user, session, :manage_grades)
+      return if context.is_a?(Course) && context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
 
       render status: :forbidden, plain: "invalid_request"
     end

@@ -28,20 +28,27 @@ import {Text} from '@instructure/ui-text'
 const I18n = createI18nScope('conversations_2')
 
 export const AttachmentUploadSpinner = props => {
+  const {
+    label = I18n.t('Uploading Files'),
+    message = I18n.t('Please wait while we upload attachments.'),
+    sendMessage,
+    isMessageSending,
+    pendingUploads,
+  } = props
   return (
     <Modal
-      open={props.isMessageSending && !!props.pendingUploads.length}
-      label={props.label}
+      open={isMessageSending && !!pendingUploads.length}
+      label={label}
       shouldCloseOnDocumentClick={false}
-      onExited={() => props.sendMessage()}
+      onExited={() => sendMessage()}
     >
       <Modal.Body>
         <Flex direction="column" textAlign="center">
           <Flex.Item>
-            <Spinner renderTitle={props.label} size="large" />
+            <Spinner renderTitle={label} size="large" />
           </Flex.Item>
           <Flex.Item>
-            <Text>{props.message}</Text>
+            <Text>{message}</Text>
           </Flex.Item>
         </Flex>
       </Modal.Body>
@@ -50,11 +57,6 @@ export const AttachmentUploadSpinner = props => {
 }
 
 export default AttachmentUploadSpinner
-
-AttachmentUploadSpinner.defaultProps = {
-  label: I18n.t('Uploading Files'),
-  message: I18n.t('Please wait while we upload attachments.'),
-}
 
 AttachmentUploadSpinner.propTypes = {
   label: PropTypes.string,

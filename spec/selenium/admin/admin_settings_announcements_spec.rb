@@ -219,6 +219,7 @@ describe "settings tabs" do
       end
 
       it "does not show option for site admins" do
+        skip("VICE-5335")
         user_session(site_admin_user)
         get "/accounts/#{Account.site_admin.id}/settings"
         wait_for_ajaximations

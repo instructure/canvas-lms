@@ -23,6 +23,12 @@ export interface MasteryPathsData {
   releasedLabel: string | null
 }
 
+export interface Checkpoint {
+  dueAt?: string
+  name?: string
+  tag?: string
+}
+
 export type ModuleItemContent = {
   id?: string
   _id?: string
@@ -36,6 +42,7 @@ export type ModuleItemContent = {
     | 'ExternalUrl'
     | 'Attachment'
     | 'SubHeader'
+    | 'ModuleExternalTool'
   pointsPossible?: number
   published?: boolean
   canUnpublish?: boolean
@@ -57,6 +64,8 @@ export type ModuleItemContent = {
   assignmentGroupId?: string
   submissionTypes?: string[]
   discussionType?: string
+  replyToEntryRequiredCount?: number
+  checkpoints?: Checkpoint[]
   displayName?: string
   contentType?: string
   size?: string

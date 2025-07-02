@@ -170,14 +170,14 @@ describe Lti::PlatformNotificationService do
     let(:builder) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 1 }) }
     let(:builder2) { Lti::Pns::LtiHelloWorldNoticeBuilder.new({ custom: 2 }) }
 
-    def make_notice_handler!(**opts)
+    def make_notice_handler!(**)
       Lti::NoticeHandler.create!(
         context_external_tool_id: tool.id,
         notice_type: "LtiHelloWorldNotice",
         url: @valid_handler_url,
         root_account: tool.root_account,
         account: tool.account,
-        **opts
+        **
       )
     end
 

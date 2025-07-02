@@ -18,20 +18,25 @@
 
 import Module from '../Module'
 import ModuleItemCollection from '../../collections/ModuleItemCollection'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 const ok = value => expect(value).toBeTruthy()
 const equal = (value, expected) => expect(value).toEqual(expected)
 
-describe('Module', () => {
-  let ajaxMock
+const server = setupServer()
 
-  beforeEach(() => {
-    ajaxMock = jest.spyOn($, 'ajax')
+describe('Module', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
   })
 
   afterEach(() => {
-    ajaxMock.mockRestore()
+    server.resetHandlers()
   })
 
   test('should build an itemCollection from items', () => {
@@ -51,24 +56,14 @@ describe('Module', () => {
     })
     ok(mod.itemCollection instanceof ModuleItemCollection, 'itemCollection is not built')
 
-    // Mock the AJAX request
-    ajaxMock.mockImplementation(options => {
-      // Simulate successful response
-      if (options.success) {
-        options.success({id: 2})
-      }
-      return Promise.resolve({id: 2})
-    })
+    // Mock the request for module items
+    server.use(
+      http.get('/api/v1/courses/:courseId/modules/:moduleId/items', () => {
+        return HttpResponse.json([{id: 2}])
+      }),
+    )
 
-    const fetchPromise = new Promise(resolve => {
-      mod.itemCollection.fetch({
-        success() {
-          equal(mod.itemCollection.length, 1, 'incorrect item length')
-          resolve()
-        },
-      })
-    })
-
-    await fetchPromise
+    await mod.itemCollection.fetch()
+    equal(mod.itemCollection.length, 1, 'incorrect item length')
   })
 })

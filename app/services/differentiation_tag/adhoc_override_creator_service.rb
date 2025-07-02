@@ -56,7 +56,8 @@ module DifferentiationTag
           unlock_at: data.unlock_at,
           unlock_at_overridden: data.unlock_at.present?,
           lock_at: data.lock_at,
-          lock_at_overridden: data.lock_at.present?
+          lock_at_overridden: data.lock_at.present?,
+          parent_override_id: data.parent_override_id
         )
 
         add_students_to_override(adhoc_override, override_data[:student_ids])

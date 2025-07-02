@@ -576,6 +576,13 @@ describe "Files API", type: :request do
         expect(@existing.reload.instfs_uuid).to eq "new-instfs-uuid"
       end
 
+      it "does not delete the old instfs file if it is in use by a Canvadoc" do
+        expect(InstFS).not_to receive(:delete_file)
+        Canvadoc.create!(attachment_id: @existing)
+        json = api_call(:post, "/api/v1/files/capture?#{@capture_params.to_query}", @capture_params)
+        expect(json["id"]).to eq @existing.id
+      end
+
       it "does not delete the old instfs file if it is in use by other Attachments" do
         other_course = course_factory
         other_file = @existing.clone_for(other_course)
@@ -1241,6 +1248,7 @@ describe "Files API", type: :request do
 
     it "passes along given verifiers when creating the enhanced_preview_url" do
       user_session(@user)
+      @att.root_account.disable_feature!(:disable_adding_uuid_verifier_in_api)
       get @file_path + "?include[]=enhanced_preview_url&verifier=#{@att.uuid}"
       expect(response).to be_successful
       json = json_parse

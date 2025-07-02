@@ -25,6 +25,7 @@ export const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
       return {
         id: c.course._id,
         contextName: c.course.contextName,
+        courseNickname: c.course.courseNickname,
         assetString: c.course.assetString,
         concluded: c.concluded,
         horizonCourse: c.course.horizonCourse,

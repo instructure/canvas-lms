@@ -30,7 +30,7 @@ import {
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
-import CreateDSRModal from './CreateDSRModal'
+import {CreateDSRModal} from '@canvas/dsr'
 import UserLink from './UserLink'
 import TempEnrollUsersListRow from '@canvas/temporary-enrollment/react/TempEnrollUsersListRow'
 

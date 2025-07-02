@@ -20,6 +20,14 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import $ from 'jquery'
 import AdminSplit from '../index'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 function renderAdminSplit() {
   return render(
@@ -42,18 +50,21 @@ describe('admin split ui', () => {
     expect(getByText(/split2/)).toBeInTheDocument()
   })
 
-  it('makes the split api call', () => {
-    const spy = jest.spyOn($, 'ajaxJSON').mockImplementation(() => {
-      Promise.resolve([])
-    })
+  it('makes the split api call', async () => {
+    let requestReceived = false
+    server.use(
+      http.post('http://example.com/api/v1/users/1/split', () => {
+        requestReceived = true
+        return HttpResponse.json([])
+      }),
+    )
+
     const {getByText} = renderAdminSplit()
     fireEvent.click(getByText('Split'))
-    expect(spy).toHaveBeenCalledWith(
-      'http://example.com/api/v1/users/1/split',
-      'POST',
-      {},
-      expect.any(Function),
-      expect.any(Function),
-    )
+
+    // Wait a bit for the request to be made
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    expect(requestReceived).toBe(true)
   })
 })

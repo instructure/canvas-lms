@@ -275,6 +275,7 @@ class RoleOverridesController < ApplicationController
   #         temporary_enrollments_delete  -- Temporary Enrollments - delete
   #     manage_user_logins               -- Users - manage login details
   #     manage_user_observers            -- Users - manage observers
+  #     manage_users_in_bulk             -- Bulk actions - People page
   #     moderate_user_content            -- Users - moderate content
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list

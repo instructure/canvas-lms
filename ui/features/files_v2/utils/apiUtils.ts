@@ -42,7 +42,10 @@ export const generateFolderByPathUrl = (
     return baseUrl
   }
 
-  const encodedPath = encodeURIComponent(path).replace(/%2F/g, '/')
+  const encodedPath = path
+    .split('/')
+    .map(component => encodeURIComponent(decodeURIComponent(component).replaceAll('&#37;', '%')))
+    .join('/')
   return `${baseUrl}/${encodedPath}`
 }
 

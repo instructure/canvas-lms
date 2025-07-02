@@ -54,8 +54,8 @@ module LtiAdvantage::Serializers
     ].freeze
 
     CLAIM_MAPPING = [
-      *STANDARD_IMS_CLAIMS.map { [_1, IMS_CLAIM_PREFIX + _1] },
-      *DEEP_LINKING_CLAIMS.map { [_1, DL_CLAIM_PREFIX + _1] },
+      *STANDARD_IMS_CLAIMS.map { [it, IMS_CLAIM_PREFIX + it] },
+      *DEEP_LINKING_CLAIMS.map { [it, DL_CLAIM_PREFIX + it] },
     ].to_h.merge(
       "names_and_roles_service" =>
         "https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice",

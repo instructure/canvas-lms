@@ -267,7 +267,19 @@ describe CollaborationsController do
     let(:url) { "http://www.example.com/launch" }
     let(:domain) { "example.com" }
     let(:developer_key) { lti_developer_key_model(account: @course.account) }
-    let(:new_tool) { external_tool_1_3_model(context: @course, developer_key:, opts: { url:, name: "1.3 tool" }) }
+    let(:registration) do
+      lti_registration_with_tool(account: @course.root_account, configuration_params: {
+                                   domain:,
+                                   target_link_uri: url,
+                                   oidc_initiation_url: url,
+                                   placements: [
+                                     {
+                                       placement: "course_navigation",
+                                     }
+                                   ]
+                                 })
+    end
+    let(:new_tool) { registration.deployments.first }
     let(:old_tool) { external_tool_model(context: @course, opts: { url:, domain: }) }
 
     context "when the collaboration includes a resource_link_lookup_uuid" do

@@ -224,5 +224,33 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         expect(issues).to include("No essay submission found.")
       end
     end
+
+    context "when submission body contains an RCE file link" do
+      it "returns true" do
+        html_body = '<p><a class="instructure_file_link" data-api-returntype="File" href="/files/123">file.txt</a></p>'
+
+        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(html_body)
+
+        expect(result).to be true
+      end
+    end
+
+    context "when submission body does not contain an RCE file link" do
+      it "returns false" do
+        html_body = '<p><a href="/files/123">file.txt</a></p>'
+
+        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(html_body)
+
+        expect(result).to be false
+      end
+    end
+
+    context "when submission body is blank" do
+      it "returns false" do
+        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?("")
+
+        expect(result).to be false
+      end
+    end
   end
 end

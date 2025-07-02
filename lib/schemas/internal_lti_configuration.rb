@@ -141,6 +141,15 @@ module Schemas
       }.freeze
     end
 
+    def self.make_placement_specific_properties(**placement_properties_hash)
+      placement_properties_hash.map do |placement, properties|
+        {
+          if: { properties: { placement: { const: placement.to_s } } },
+          then: { properties: }
+        }
+      end
+    end
+
     def self.placements_schema
       {
         type: "array",
@@ -152,57 +161,31 @@ module Schemas
             enabled: { type: ["boolean", "string"] },
             **base_settings_properties
           },
-          allOf: [
-            {
-              if: {
-                properties: { placement: { const: "submission_type_selection" } }
-              },
-              then: {
-                properties: {
-                  description: { type: "string", maxLength: 255, errorMessage: "description must be a string with a maximum length of 255" },
-                  require_resource_selection: { type: "boolean" },
-                }
-              }
+          allOf: make_placement_specific_properties(
+            account_navigation: {
+              root_account_only: { type: "boolean" },
+              default: { type: "string" }, # , enum: %w[disabled enabled] },
             },
-            {
-              if: {
-                properties: { placement: { const: "account_navigation" } }
-              },
-              then: {
-                properties: {
-                  root_account_only: { type: "boolean" },
-                  default: { type: "string" }, # , enum: %w[disabled enabled] },
-                }
-              }
+            editor_button: { use_tray: { type: ["boolean", "string"] } },
+            file_menu: { accept_media_types: { type: "string" } },
+            global_navigation: { icon_svg_path_64: { type: "string" } },
+            submission_type_selection: {
+              description: { type: "string", maxLength: 255, errorMessage: "description must be a string with a maximum length of 255" },
+              require_resource_selection: { type: "boolean" },
             },
-            {
-              if: {
-                properties: { placement: { const: "global_navigation" } }
-              },
-              then: {
-                properties: { icon_svg_path_64: { type: "string" } }
-              }
-            },
-            {
-              if: {
-                properties: { placement: { const: "file_menu" } }
-              },
-              then: {
-                properties: { accept_media_types: { type: "string" } }
-              }
-            },
-            {
-              if: {
-                properties: { placement: { const: "editor_button" } }
-              },
-              then: {
-                properties: { use_tray: { type: ["boolean", "string"] } }
-              }
+            ActivityAssetProcessor: {
+              eula: { type: "object", properties: asset_processor_eula_properties },
             }
-          ]
-
+          )
         }
       }.freeze
+    end
+
+    def self.asset_processor_eula_properties
+      {
+        target_link_uri: { type: "string" },
+        custom_fields: { type: "object", additionalProperties: { type: "string" } },
+      }
     end
 
     # These can be set in the base-level settings, but only apply to specific placements

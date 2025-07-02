@@ -77,12 +77,18 @@ module CC::Importer::Canvas
       if (asg_id = meta["assignment_identifier"])
         wiki[:assignment] = {
           migration_id: asg_id,
-          assignment_overrides: [],
           submission_types: "wiki_page",
-          only_visible_to_overrides: meta["only_visible_to_overrides"] == "true"
+          only_visible_to_overrides: meta["only_visible_to_overrides"] == "true",
+          assignment_overrides: wiki_assignment_overrides(meta)
         }
       end
       wiki
+    end
+
+    def wiki_assignment_overrides(meta)
+      return [] unless meta["assignment_overrides"]
+
+      JSON.parse(meta["assignment_overrides"])
     end
   end
 end

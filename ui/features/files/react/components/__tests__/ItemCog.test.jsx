@@ -19,7 +19,8 @@
 import React from 'react'
 import {render, fireEvent, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import ItemCog from '../ItemCog'
 import File from '@canvas/files/backbone/models/File'
 import Folder from '@canvas/files/backbone/models/Folder'
@@ -77,6 +78,35 @@ const sampleProps = (
 describe('ItemCog', () => {
   let windowConfirm
   let fixtures
+  const server = setupServer(
+    // Mock the content_exports endpoint for folder downloads
+    http.post('/api/v1/*/content_exports', () => {
+      return HttpResponse.json({
+        id: 1,
+        progress_url: '/api/v1/progress/1',
+      })
+    }),
+    http.get('/api/v1/progress/:id', () => {
+      return HttpResponse.json({
+        id: 1,
+        completion: 100,
+        workflow_state: 'completed',
+        context_id: 1,
+      })
+    }),
+    http.get('/api/v1/*/content_exports/:id', () => {
+      return HttpResponse.json({
+        id: 1,
+        workflow_state: 'exported',
+        attachment: {
+          url: 'http://example.com/download.zip',
+        },
+      })
+    }),
+  )
+
+  beforeAll(() => server.listen())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     windowConfirm = window.confirm
@@ -98,26 +128,31 @@ describe('ItemCog', () => {
     window.confirm = windowConfirm
     fixtures.remove()
     fakeENV.teardown()
+    server.resetHandlers()
   })
 
   it('deletes model when delete link is pressed', async () => {
-    jest.spyOn($, 'ajax')
     const model = new Folder({id: 999})
-    const destroySpy = jest.spyOn(model, 'destroy')
+
+    server.use(
+      http.post('/api/v1/folders/999', async ({request}) => {
+        const formData = await request.formData()
+        const _method = formData.get('_method')
+        const force = formData.get('force')
+
+        expect(_method).toBe('DELETE')
+        expect(force).toBe('true')
+
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
+
     render(<ItemCog {...sampleProps(true, true, true)} model={model} />, {container: fixtures})
 
     await userEvent.click(screen.getByTestId('settingsCogBtn'))
     await userEvent.click(screen.getByTestId('deleteLink'))
 
     expect(window.confirm).toHaveBeenCalledTimes(1)
-    expect(destroySpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        emulateHTTP: true,
-        emulateJSON: true,
-        data: {force: 'true'},
-        wait: true,
-      }),
-    )
   })
 
   it('only shows download button for limited users', () => {
@@ -153,7 +188,12 @@ describe('ItemCog', () => {
 
   it('handles focus management when deleting items', async () => {
     const props = sampleProps(true, true, true)
-    props.model.destroy = () => true
+
+    server.use(
+      http.post('/api/v1/folders/999', () => {
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
 
     render(
       <div>
@@ -177,7 +217,12 @@ describe('ItemCog', () => {
 
   it('handles focus management when deleting the last item', async () => {
     const props = sampleProps(true, true, true)
-    props.model.destroy = () => true
+
+    server.use(
+      http.post('/api/v1/folders/999', () => {
+        return HttpResponse.json({}, {status: 200})
+      }),
+    )
 
     render(
       <div>

@@ -16,20 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import 'jquery-migrate'
 import WikiPage from '../WikiPage'
 import WikiPageRevision from '../WikiPageRevision'
 import '@canvas/jquery/jquery.ajaxJSON'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
+
+const server = setupServer()
 
 describe('WikiPageRevision', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
+
   beforeEach(() => {
+    fakeENV.setup()
     jest.clearAllMocks()
     jest.resetModules()
   })
 
   afterEach(() => {
+    fakeENV.teardown()
     jest.restoreAllMocks()
+    server.resetHandlers()
   })
 
   describe('urls', () => {
@@ -99,15 +114,6 @@ describe('WikiPageRevision', () => {
   })
 
   describe('parse', () => {
-    beforeEach(() => {
-      jest.spyOn($, 'ajaxJSON').mockImplementation(() => {
-        return {
-          done: jest.fn().mockReturnThis(),
-          fail: jest.fn().mockReturnThis(),
-          always: jest.fn().mockReturnThis(),
-        }
-      })
-    })
     test('parse sets the id to the url', () => {
       const revision = new WikiPageRevision()
       expect(revision.parse({url: 'bob'}).id).toBe('bob')
@@ -119,6 +125,18 @@ describe('WikiPageRevision', () => {
     })
 
     test('restore POSTs to the revision', async () => {
+      let capturedRequest = null
+
+      server.use(
+        http.post('*/api/v1/courses/73/pages/page-url/revisions/42', async ({request}) => {
+          capturedRequest = {
+            url: request.url,
+            method: request.method,
+          }
+          return HttpResponse.json({revision_id: 42})
+        }),
+      )
+
       const revision = new WikiPageRevision(
         {revision_id: 42},
         {
@@ -127,16 +145,25 @@ describe('WikiPageRevision', () => {
         },
       )
       await revision.restore()
-      expect($.ajaxJSON).toHaveBeenCalledWith(
-        '/api/v1/courses/73/pages/page-url/revisions/42',
-        'POST',
-      )
+
+      expect(capturedRequest).toBeTruthy()
+      expect(capturedRequest.method).toBe('POST')
+      expect(capturedRequest.url).toContain('/api/v1/courses/73/pages/page-url/revisions/42')
     })
   })
 
   describe('fetch', () => {
-    test('the summary flag is passed to the server', () => {
-      jest.spyOn($, 'ajax').mockReturnValue($.Deferred())
+    test('the summary flag is passed to the server', async () => {
+      let capturedParams = null
+
+      server.use(
+        http.get('*/api/v1/courses/73/pages/page-url/revisions', ({request}) => {
+          const url = new URL(request.url)
+          capturedParams = Object.fromEntries(url.searchParams.entries())
+          return HttpResponse.json([])
+        }),
+      )
+
       const revision = new WikiPageRevision(
         {},
         {
@@ -145,20 +172,36 @@ describe('WikiPageRevision', () => {
           summary: true,
         },
       )
-      revision.fetch()
-      expect($.ajax.mock.calls[0][0].data.summary).toBe(true)
+      await revision.fetch()
+      expect(capturedParams.summary).toBe('true')
     })
 
     test('pollForChanges performs a fetch at most every interval', () => {
-      const revision = new WikiPageRevision({}, {pageUrl: 'page-url'})
+      const revision = new WikiPageRevision(
+        {},
+        {
+          pageUrl: 'page-url',
+          contextAssetString: 'course_73',
+        },
+      )
       jest.useFakeTimers()
-      jest.spyOn(revision, 'fetch').mockReturnValue($.Deferred())
+
+      server.use(
+        http.get('*/api/v1/courses/73/pages/page-url/revisions', () => {
+          return HttpResponse.json([])
+        }),
+      )
+
+      const fetchSpy = jest.spyOn(revision, 'fetch')
+
       revision.pollForChanges(5000)
       revision.pollForChanges(5000)
       jest.advanceTimersByTime(4000)
-      expect(revision.fetch).not.toHaveBeenCalled()
+      expect(fetchSpy).not.toHaveBeenCalled()
       jest.advanceTimersByTime(2000)
-      expect(revision.fetch).toHaveBeenCalledTimes(1)
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+
+      fetchSpy.mockRestore()
       jest.useRealTimers()
     })
   })

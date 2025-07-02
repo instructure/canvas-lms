@@ -21,7 +21,8 @@ import {screen, render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import DeveloperKeyModal from '../NewKeyModal'
 import _devKeyActions from '../actions/developerKeysActions'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {_successfulLtiKeySaveResponse} from './fixtures/responses'
 import $ from '@canvas/rails-flash-notifications'
 
@@ -243,13 +244,11 @@ describe('NewKeyModal', () => {
   })
 
   describe('receiving an HTTP response', () => {
-    beforeEach(() => {
-      moxios.install()
-    })
+    const server = setupServer()
 
-    afterEach(() => {
-      moxios.uninstall()
-    })
+    beforeAll(() => server.listen())
+    afterEach(() => server.resetHandlers())
+    afterAll(() => server.close())
 
     it('shows flash message and closes modal', async () => {
       const handleSuccessfulSave = jest.fn()
@@ -278,13 +277,14 @@ describe('NewKeyModal', () => {
       })
 
       // Mock the API response
-      moxios.stubRequest(/.*/, {
-        status: 200,
-        response: {
-          developer_key: developerKey,
-          tool_configuration: validToolConfig,
-        },
-      })
+      server.use(
+        http.post('*', () =>
+          HttpResponse.json({
+            developer_key: developerKey,
+            tool_configuration: validToolConfig,
+          }),
+        ),
+      )
 
       // Monkey patch the component's methods
       const originalCloseModal = ref.current.closeModal
@@ -335,16 +335,20 @@ describe('NewKeyModal', () => {
       })
 
       // Mock the API response with an error
-      moxios.stubRequest(/.*/, {
-        status: 422,
-        response: {
-          errors: [
+      server.use(
+        http.post('*', () =>
+          HttpResponse.json(
             {
-              message: 'Invalid redirect_uris',
+              errors: [
+                {
+                  message: 'Invalid redirect_uris',
+                },
+              ],
             },
-          ],
-        },
-      })
+            {status: 422},
+          ),
+        ),
+      )
 
       // Monkey patch the saveLtiToolConfiguration method
       ref.current.saveLtiToolConfiguration = async () => {

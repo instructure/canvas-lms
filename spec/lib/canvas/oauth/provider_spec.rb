@@ -92,6 +92,26 @@ module Canvas::OAuth
       it "is true for an integer" do
         expect(Provider.new("123", "456").client_id_is_valid?).to be_truthy
       end
+
+      it "is true for minimum 64-bit integer value" do
+        min_64bit = -(2**63)
+        expect(Provider.new(min_64bit.to_s, "456").client_id_is_valid?).to be_truthy
+      end
+
+      it "is true for maximum 64-bit integer value" do
+        max_64bit = (2**63) - 1
+        expect(Provider.new(max_64bit.to_s, "456").client_id_is_valid?).to be_truthy
+      end
+
+      it "is false for values below minimum 64-bit integer" do
+        below_min = -(2**63) - 1
+        expect(Provider.new(below_min.to_s, "456").client_id_is_valid?).to be_falsey
+      end
+
+      it "is false for values above maximum 64-bit integer" do
+        above_max = (2**63)
+        expect(Provider.new(above_max.to_s, "456").client_id_is_valid?).to be_falsey
+      end
     end
 
     describe "#has_valid_redirect?" do

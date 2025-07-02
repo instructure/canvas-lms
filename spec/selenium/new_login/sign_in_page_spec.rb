@@ -52,17 +52,17 @@ describe "new login Sign In page" do
       f('[data-testid="username-input"]').send_keys("invalid@example.com")
       f('[data-testid="password-input"]').send_keys("wrongpassword123Ω")
       f('[data-testid="login-button"]').click
-      alert = fxpath("//*[contains(text(), 'Please verify your email or password and try again.')]")
-      expect(alert).to be_displayed
+      expect(fxpath("//*[text()='Please verify your email and password and try again.']")).to be_displayed
+      expect(f('[data-testid="password-input"]').attribute("value")).to eq("")
     end
 
     it "logs in with correct credentials and redirects" do
       user_with_pseudonym(
         active_user: true,
-        username: "test1@example.com",
+        username: "test@example.com",
         password: "correctpassword123"
       )
-      f('[data-testid="username-input"]').send_keys(@pseudonym.unique_id)
+      f('[data-testid="username-input"]').send_keys("test@example.com")
       f('[data-testid="password-input"]').send_keys("correctpassword123")
       f('[data-testid="login-button"]').click
       wait_for(method: :login_redirect) do
@@ -72,13 +72,13 @@ describe "new login Sign In page" do
       expect(f("#dashboard h1.screenreader-only").text).to eq("Dashboard")
     end
 
-    it "logs in with Remember Me checked" do
+    it "logs in with “Remember me” checked" do
       user_with_pseudonym(
         active_user: true,
-        username: "test2@example.com",
+        username: "test@example.com",
         password: "correctpassword123"
       )
-      f('[data-testid="username-input"]').send_keys(@pseudonym.unique_id)
+      f('[data-testid="username-input"]').send_keys("test@example.com")
       f('[data-testid="password-input"]').send_keys("correctpassword123")
       f('[data-testid="remember-me-checkbox"] + label').click
       f('[data-testid="login-button"]').click
@@ -89,12 +89,17 @@ describe "new login Sign In page" do
     end
 
     it "rejects login without CSRF token" do
+      user_with_pseudonym(
+        active_user: true,
+        username: "test@example.com",
+        password: "correctpassword123"
+      )
       driver.manage.delete_cookie("_csrf_token")
       f('[data-testid="username-input"]').send_keys("test@example.com")
       f('[data-testid="password-input"]').send_keys("correctpassword123")
       f('[data-testid="login-button"]').click
-      alert = fxpath("//*[contains(text(), 'Please verify your email or password and try again.')]")
-      expect(alert).to be_displayed
+      expect(fxpath("//*[text()='Please verify your email and password and try again.']")).to be_displayed
+      expect(f('[data-testid="password-input"]').attribute("value")).to eq("")
     end
   end
 

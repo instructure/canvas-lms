@@ -289,7 +289,11 @@ module SIS
           pseudo.account = @root_account
           unless pseudo.stuck_sis_fields.include?(:workflow_state)
             pseudo.workflow_state = status
-            pseudo.deleted_at = Time.now.utc if status == "deleted"
+            pseudo.deleted_at = if status == "deleted"
+                                  Time.now.utc
+                                else
+                                  nil
+                                end
           end
           if pseudo.new_record? && status != "deleted"
             should_add_account_associations = true
@@ -316,10 +320,13 @@ module SIS
 
           begin
             User.transaction(requires_new: true) do
-              if user.changed?
+              sticky_opts = user.sis_stickiness_options
+              if user.changed? || (sticky_opts[:override_sis_stickiness] && sticky_opts[:clear_sis_stickiness] &&
+                 user["stuck_sis_fields"].present?)
                 user_touched = true
                 user_saved = user.save
-                record_sync_for(user) if user_saved # need to call save first so we can get the user id
+                # need to call save first so we can get the user id
+                record_sync_for(user) if user_saved && user.changed?
                 if !user_saved && !user.errors.empty?
                   message = generate_user_warning(user.errors.first.join(" "), user_row.user_id, user_row.login_id)
                   raise ImportError, message

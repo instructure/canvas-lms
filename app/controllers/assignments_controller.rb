@@ -31,6 +31,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ContextModule
   include Api::V1::Rubric
   include Api::V1::RubricAssociation
+  include AssetProcessorStudentHelper
 
   include KalturaHelper
   include ObserverEnrollmentsHelper
@@ -234,7 +235,10 @@ class AssignmentsController < ApplicationController
              ISOBSERVER: @context_enrollment&.observer?,
              ORIGINALITY_REPORTS_FOR_A2: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              PREREQS: assignment_prereqs,
-             SUBMISSION_ID: graphql_submission_id
+             SUBMISSION_ID: graphql_submission_id,
+             ASSET_REPORTS: asset_reports(submission:),
+             ASSET_PROCESSORS: asset_processors(assignment: @assignment),
+             ASSIGNMENT_NAME: @assignment.title
            })
     css_bundle :assignments_2_student
     js_bundle :assignments_show_student

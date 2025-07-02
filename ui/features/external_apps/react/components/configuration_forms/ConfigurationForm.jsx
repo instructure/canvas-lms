@@ -45,6 +45,14 @@ export default class ConfigurationForm extends React.Component {
 
   constructor(props, context) {
     super(props, context)
+    this.configurationFormManualRef = React.createRef()
+    this.configurationFormUrlRef = React.createRef()
+    this.configurationFormXmlRef = React.createRef()
+    this.configurationFormLti2Ref = React.createRef()
+    this.configurationFormLti13Ref = React.createRef()
+    this.configurationTypeSelectorRef = React.createRef()
+    this.submitLti2Ref = React.createRef()
+    this.submitRef = React.createRef()
     const _state = this.defaultState()
     if (props.tool) {
       _state.name = props.tool.name
@@ -112,19 +120,19 @@ export default class ConfigurationForm extends React.Component {
     let form
     switch (this.state.configurationType) {
       case 'manual':
-        form = this.refs.configurationFormManual
+        form = this.configurationFormManualRef.current
         break
       case 'url':
-        form = this.refs.configurationFormUrl
+        form = this.configurationFormUrlRef.current
         break
       case 'xml':
-        form = this.refs.configurationFormXml
+        form = this.configurationFormXmlRef.current
         break
       case 'byClientId':
-        form = this.lti13Form
+        form = this.configurationFormLti13Ref.current
         break
       case 'lti2':
-        form = this.refs.configurationFormLti2
+        form = this.configurationFormLti2Ref.current
         break
     }
 
@@ -160,7 +168,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'manual') {
       return (
         <ConfigurationFormManual
-          ref="configurationFormManual"
+          ref={this.configurationFormManualRef}
           data-testid="configuration-form-manual"
           name={this.state.name}
           consumerKey={this.state.consumerKey}
@@ -180,7 +188,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'url') {
       return (
         <ConfigurationFormUrl
-          ref="configurationFormUrl"
+          ref={this.configurationFormUrlRef}
           data-testid="configuration-form-url"
           name={this.state.name}
           consumerKey={this.state.consumerKey}
@@ -195,7 +203,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'xml') {
       return (
         <ConfigurationFormXml
-          ref="configurationFormXml"
+          ref={this.configurationFormXmlRef}
           data-testid="configuration-form-xml"
           name={this.state.name}
           consumerKey={this.state.consumerKey}
@@ -210,7 +218,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'lti2') {
       return (
         <ConfigurationFormLti2
-          ref="configurationFormLti2"
+          ref={this.configurationFormLti2Ref}
           data-testid="configuration-form-lti2"
           registrationUrl={this.state.registrationUrl}
           hasBeenSubmitted={this.state.hasBeenSubmitted}
@@ -221,9 +229,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'byClientId') {
       return (
         <ConfigurationFormLti13
-          ref={el => {
-            this.lti13Form = el
-          }}
+          ref={this.configurationFormLti13Ref}
           data-testid="configuration-form-lti13"
         />
       )
@@ -234,7 +240,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.props.showConfigurationSelector) {
       return (
         <ConfigurationTypeSelector
-          ref="configurationTypeSelector"
+          ref={this.configurationTypeSelectorRef}
           data-testid="configuration-type-selector"
           handleChange={this.handleSwitchConfigurationType}
           configurationType={this.props.configurationType}
@@ -247,7 +253,7 @@ export default class ConfigurationForm extends React.Component {
     if (this.state.configurationType === 'lti2') {
       return (
         <button
-          ref="submitLti2"
+          ref={this.submitLti2Ref}
           type="button"
           id="submitExternalAppBtn"
           data-testid="submit-button"
@@ -260,7 +266,7 @@ export default class ConfigurationForm extends React.Component {
     } else {
       return (
         <button
-          ref="submit"
+          ref={this.submitRef}
           type="button"
           id="submitExternalAppBtn"
           data-testid="submit-button"

@@ -2926,19 +2926,110 @@ describe Submission do
     before(:once) do
       @course = Course.create!
       @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
-      assignment = @course.assignments.create!(anonymous_grading: true)
-      @submission = assignment.submissions.find_by(user: @student)
+      @teacher = @course.enroll_teacher(User.create!, enrollment_state: "active").user
+      @assignment = @course.assignments.create!
+      @submission = @assignment.submissions.find_by(user: @student)
     end
 
-    context "anonymous assignments" do
+    context "with anonymous grading" do
+      before(:once) do
+        @assignment.update!(anonymous_grading: true)
+      end
+
       it "returns true when the user is the submission's owner" do
         expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
       end
 
       it "returns false when the user is not the submission's owner" do
-        teacher = User.create!
-        @course.enroll_teacher(teacher, enrollment_state: :active)
         expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+    end
+
+    context "anonymous peer reviews" do
+      before(:once) do
+        @assignment.update!(anonymous_peer_reviews: true)
+        @reviewer = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+      end
+
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false for peer reviewers" do
+        expect(@submission.can_read_submission_user_name?(@reviewer, nil)).to be false
+      end
+
+      it "returns true for users with view_all_grades permission" do
+        admin = account_admin_user(account: @course.root_account)
+        expect(@submission.can_read_submission_user_name?(admin, nil)).to be true
+      end
+    end
+
+    context "with both anonymous grading and anonymous peer reviews enabled" do
+      before(:once) do
+        @assignment.update!(anonymous_grading: true, anonymous_peer_reviews: true)
+        @reviewer = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+      end
+
+      it "returns true when the user is the submission's owner" do
+        expect(@submission.can_read_submission_user_name?(@student, nil)).to be true
+      end
+
+      it "returns false for teachers" do
+        expect(@submission.can_read_submission_user_name?(@teacher, nil)).to be false
+      end
+
+      it "returns false for peer reviewers" do
+        expect(@submission.can_read_submission_user_name?(@reviewer, nil)).to be false
+      end
+    end
+
+    context "with session context" do
+      before(:once) do
+        @assignment.update!(anonymous_peer_reviews: true)
+        @ta = @course.enroll_ta(User.create!, enrollment_state: "active").user
+        @admin = account_admin_user(account: @course.root_account)
+      end
+
+      it "uses session context for permissions" do
+        mock_session = { become_user_id: @admin.id }
+        # Even as a TA, when in "become_user" mode as admin, you get admin permissions
+        expect(@submission.can_read_submission_user_name?(@ta, mock_session)).to be true
+      end
+    end
+
+    context "with different permission levels" do
+      before(:once) do
+        @assignment.update!(anonymous_peer_reviews: true)
+        @ta_with_permissions = @course.enroll_ta(User.create!, enrollment_state: "active").user
+        role = custom_account_role("Limited TA", account: @course.account)
+        @ta_without_permissions = @course.enroll_user(
+          User.create!,
+          "TaEnrollment",
+          enrollment_state: "active",
+          role:
+        ).user
+        # Remove view_all_grades permission from the limited TA role
+        @course.account.role_overrides.create!(
+          permission: "view_all_grades",
+          enabled: false,
+          role:
+        )
+      end
+
+      it "allows TAs with view_all_grades permission to see names" do
+        expect(@submission.can_read_submission_user_name?(@ta_with_permissions, nil)).to be true
+      end
+
+      it "prevents TAs without view_all_grades permission from seeing names" do
+        expect(@submission.can_read_submission_user_name?(@ta_without_permissions, nil)).to be false
+      end
+    end
+
+    context "non-anonymous assignments" do
+      it "returns true for any user" do
+        student2 = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+        expect(@submission.can_read_submission_user_name?(student2, nil)).to be true
       end
     end
   end

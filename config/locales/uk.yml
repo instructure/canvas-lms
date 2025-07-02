@@ -9331,6 +9331,7 @@ uk:
   last_name_303122f3: Прізвище
   last_post_display_last_reply_at_b9896355: "Остання публікація %{display_last_reply_at}"
   last_pushed_update_last_export_at_9f634f7c: "Останнє прискорене оновлення: %{last_export_at}"
+  last_run_c6eedd69: "Останній запуск"
   last_used_17553fed: "Останній раз використано"
   last_used_f9457313: "Востаннє використано:"
   last_user_access_title: "Останній доступ користувача"
@@ -11628,6 +11629,7 @@ uk:
     grading_standard_type: "Стандарт оцінювання"
     group_type: Група
     learning_outcome_type: "Вивчення результатів"
+    module_item_type: "Елемент модуля"
     module_type: Розділ
     quiz_question_type: "Питання контрольної роботи"
     quiz_type: "Контрольна робота"
@@ -14721,6 +14723,7 @@ uk:
           score_for_quiz: "Оцінка для цієї контрольної роботи"
           score_for_survey: "Оцінка для цього опитування"
           survey_score: "Оцінка результатів опитування"
+          warning_icon: Попередження
         links: 
           click_to_view_results: "Натисніть тут, щоб переглянути результати."
         questions_not_graded: "Деякі питання ще не оцінені"

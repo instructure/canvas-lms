@@ -19,8 +19,11 @@
 #
 
 RSpec.describe Lti::ResourceLink do
-  let(:tool) { external_tool_1_3_model }
-  let(:course) { Course.create!(name: "Course") }
+  let(:registration) do
+    lti_registration_with_tool(account: course.root_account, created_by: user_model)
+  end
+  let(:tool) { registration.deployments.first }
+  let(:course) { course_model }
   let(:assignment) { Assignment.create!(course:, name: "Assignment") }
   let(:resource_link) do
     Lti::ResourceLink.create!(context_external_tool: tool,
@@ -86,13 +89,13 @@ RSpec.describe Lti::ResourceLink do
       end
 
       context "when a matching tool exists in the specified context" do
-        let(:second_tool) { external_tool_1_3_model(context:) }
+        let(:second_tool) { registration.new_external_tool(context) }
 
         it { is_expected.to eq second_tool }
       end
 
       context "when a matching tool exists up the context account chain" do
-        let(:second_tool) { external_tool_1_3_model(context: context.root_account) }
+        let(:second_tool) { registration.new_external_tool(context.root_account) }
 
         it { is_expected.to eq second_tool }
       end
@@ -179,7 +182,6 @@ RSpec.describe Lti::ResourceLink do
     end
 
     let(:context) { course }
-    let(:tool) { external_tool_1_3_model(context:) }
     let(:resource_link) do
       Lti::ResourceLink.create!(context_external_tool: tool,
                                 context: course,

@@ -21,9 +21,20 @@ import {ReactElement} from 'react'
 
 export const useAddNode = () => {
   const {query, actions} = useEditor()
-  const addNode = (node: ReactElement, parentId: string) => {
+
+  const getIndex = (afterNodeId?: string) => {
+    if (!afterNodeId) {
+      return 0
+    }
+    const rootNode = query.node('ROOT').get()
+    const siblings = rootNode.data.nodes
+    return siblings.indexOf(afterNodeId) + 1
+  }
+
+  const addNode = (node: ReactElement, afterNodeId?: string) => {
     const nodeTree = query.parseReactElement(node).toNodeTree()
-    actions.addNodeTree(nodeTree, parentId)
+    const index = getIndex(afterNodeId)
+    actions.addNodeTree(nodeTree, 'ROOT', index)
   }
   return addNode
 }

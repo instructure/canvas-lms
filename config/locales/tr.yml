@@ -2,9 +2,11 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 tr: 
+  0_selected_1cfe37c0: "o seçilen"
   1_hour_and_count_minutes_27533c1b: 
     one: "1 saat ve dakika"
     other: "1 saat ve %{count} dakika"
+  1_item_deleted_successfully_19179407: "1 öğe başarıyla silindi."
   1_item_scores_5512cd03: "1- Öğe puanları"
   1_item_scores_examplescores_9736236: "1- Öğe  Puanları: %{exampleScores}"
   1_pt_cd3551c8: "1 puan"
@@ -141,8 +143,12 @@ tr:
     length_error: "255 karakter veya daha az olmalıdır"
     title: "Bu gruba isim verin"
   OutcomeView: 
+    calculation_int_decaying_average_error: "1 ile 99 arasında olmalı"
+    calculation_int_n_mastery_error: "1 ile 10 arasında olmalı"
     display_name: "Takma ad (opsiyonel)"
     length_error: "255 karakter veya daha az olmalıdır"
+    mastery_at_hint: "1 ile 99 arasında olmalı."
+    mastery_at_range_error: "1 ile 99 arasında olmalı."
     mastery_error: "0 a eşit ya da daha büyük olmalıdır"
     title: "Bu öğrenme çıktısına isim verin"
   OutcomesDirectoryView: 
@@ -10746,6 +10752,7 @@ tr:
   last_login_54565109: "Son oturum açma"
   last_modified_by_ca4bb5e1: "Son Düzenleme"
   last_name_303122f3: Soyad
+  last_run_c6eedd69: "Son Çalıştırılma"
   last_submission_activity_64ada9d0: "Son Gönderim Etkinliği"
   last_used_17553fed: "Son Kullanma"
   last_user_access_title: "Son Kullanıcı Erişimi"
@@ -13125,6 +13132,7 @@ tr:
     grading_standard_type: "Notlandırma Standardı"
     group_type: Grup
     learning_outcome_type: "Öğrenme Çıktıları"
+    module_item_type: "Modül Öğesi"
     module_type: Modül
     quiz_question_type: "Kısa Sınav Sorusu"
     quiz_type: "Kısa Sınav"
@@ -16474,6 +16482,7 @@ tr:
           score_for_quiz: "Bu kısa sınavın puanı"
           score_for_survey: "Bu anketin puanı"
           survey_score: "Anket Puanı"
+          warning_icon: Uyarı
         links: 
           click_to_view_results: "Sonuçları görmek için tıklayınız."
         questions_not_graded: "Bazı sorular henüz notlandırılmadı"

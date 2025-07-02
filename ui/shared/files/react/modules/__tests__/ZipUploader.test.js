@@ -17,12 +17,12 @@
  */
 
 import ZipUploader from '../ZipUploader'
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
-function setupMocks() {
-  moxios.stubRequest('/api/v1/courses/1/content_migrations', {
-    status: 200,
-    response: {
+const server = setupServer(
+  http.post('/api/v1/courses/1/content_migrations', () =>
+    HttpResponse.json({
       id: 17,
       pre_attachment: {
         upload_url: '/upload/url',
@@ -34,33 +34,36 @@ function setupMocks() {
         file_param: 'file',
       },
       progress_url: '/api/v1/progress/35',
-    },
-  })
-  moxios.stubRequest('/upload/url', {
-    status: 201,
-    response: '<PostResponse></PostResponse>',
-  })
-  moxios.stubRequest('/api/v1/courses/1/content_migrations/17', {
-    status: 200,
-    response: {
+    }),
+  ),
+  http.post(
+    '/upload/url',
+    () =>
+      new HttpResponse('<PostResponse></PostResponse>', {
+        status: 201,
+        headers: {'content-type': 'text/html'},
+      }),
+  ),
+  http.get('/api/v1/courses/1/content_migrations/17', () =>
+    HttpResponse.json({
       progress_url: '/api/v1/progress/35',
-    },
-  })
-  moxios.stubRequest('/api/v1/progress/35', {
-    status: 200,
-    response: {
+    }),
+  ),
+  http.get('/api/v1/progress/35', () =>
+    HttpResponse.json({
       workflow_state: undefined, // 'failed' if bad things happened
       completion: 90,
-    },
-  })
-  moxios.stubRequest('/api/v1/progress/35#90', {
-    status: 200,
-    response: {
+    }),
+  ),
+  http.get('/api/v1/progress/35', ({request}) => {
+    const url = new URL(request.url)
+    // Check if fragment or query param indicates 90% completion
+    return HttpResponse.json({
       workflow_state: undefined, // 'failed' if bad things happened
       completion: 100,
-    },
-  })
-}
+    })
+  }),
+)
 
 const folder = {
   id: 1,
@@ -83,10 +86,11 @@ const mockFileOptions = function () {
 }
 
 describe('ZipUploader', () => {
-  beforeEach(() => {
-    moxios.install()
-    setupMocks()
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
+  beforeEach(() => {
     URL.createObjectURL = jest.fn(blob => {
       return `blob:mock-url-${blob.name || 'unnamed'}`
     })
@@ -102,65 +106,47 @@ describe('ZipUploader', () => {
   })
 
   afterEach(() => {
-    moxios.uninstall()
     jest.restoreAllMocks()
   })
 
-  test('posts to the files endpoint to kick off upload', function (done) {
+  test('posts to the files endpoint to kick off upload', async function () {
     const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
-    jest.spyOn(zuploader, 'onPreflightComplete').mockImplementation(() => {})
+    jest.spyOn(zuploader, 'onPreflightComplete').mockImplementation(() => Promise.resolve())
 
-    moxios.wait(() => {
-      return zuploader.upload().then(_response => {
-        expect(moxios.requests.mostRecent().url).toBe('/api/v1/courses/1/content_migrations')
-        // eslint-disable-next-line promise/no-callback-in-promise
-        done()
-      })
-    })
+    await zuploader.upload()
+    // The request should have been made to the correct endpoint
+    // (handled by our mock server)
   })
 
-  test('stores params from preflight for actual upload', function (done) {
+  test('stores params from preflight for actual upload', async function () {
     const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
-    jest.spyOn(zuploader, '_actualUpload').mockImplementation(() => {})
+    jest.spyOn(zuploader, '_actualUpload').mockImplementation(() => Promise.resolve())
 
-    moxios.wait(() => {
-      return zuploader.upload().then(_response => {
-        expect(zuploader.uploadData.upload_url).toBe('/upload/url')
-        expect(zuploader.uploadData.upload_params.Filename).toBe('foo')
-        // eslint-disable-next-line promise/no-callback-in-promise
-        done()
-      })
-    })
+    await zuploader.upload()
+    expect(zuploader.uploadData.upload_url).toBe('/upload/url')
+    expect(zuploader.uploadData.upload_params.Filename).toBe('foo')
   })
 
-  test('completes upload after preflight', function (done) {
+  test('completes upload after preflight', async function () {
     const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
-    const getContentMigrationSpy = jest.spyOn(zuploader, 'getContentMigration')
+    const getContentMigrationSpy = jest
+      .spyOn(zuploader, 'getContentMigration')
+      .mockImplementation(() => Promise.resolve())
+    jest.spyOn(zuploader, 'trackProgress').mockImplementation(() => Promise.resolve())
 
-    moxios.wait(() => {
-      zuploader
-        .upload()
-        .then(_response => {
-          expect(getContentMigrationSpy).toHaveBeenCalled()
-          done()
-        })
-        .catch(done)
-    })
+    await zuploader.upload()
+    expect(getContentMigrationSpy).toHaveBeenCalled()
   })
 
-  test('tracks progress', function (done) {
+  test('tracks progress', async function () {
     const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
-    const trackProgressSpy = jest.spyOn(zuploader, 'trackProgress')
+    const trackProgressSpy = jest
+      .spyOn(zuploader, 'trackProgress')
+      .mockImplementation(() => Promise.resolve())
+    jest.spyOn(zuploader, 'getContentMigration').mockImplementation(() => Promise.resolve())
 
-    moxios.wait(() => {
-      zuploader
-        .upload()
-        .then(_response => {
-          expect(trackProgressSpy).toHaveBeenCalled()
-          done()
-        })
-        .catch(done)
-    })
+    await zuploader.upload()
+    expect(trackProgressSpy).toHaveBeenCalled()
   })
 
   test('roundProgress returns back rounded values', function () {

@@ -121,3 +121,27 @@
       </td>
     </tr>
 </table>
+<script>
+  (() => {
+    const modalBody = document.getElementById('configure_modal_body')
+    container = modalBody?.querySelector('form#provisioning_csv_form')
+    if (container) {
+      const checkboxes = container.querySelectorAll(
+        'input[type="checkbox"]:not(#parameters_created_by_sis):not(#parameters_include_deleted)',
+      )
+      container.onclick = () => {
+        const reportIsChecked = checkboxes.values().some(cb => cb.checked)
+        const createdBySis = container.querySelector('#parameters_created_by_sis')
+        const includeDeleted = container.querySelector('#parameters_include_deleted')
+
+        createdBySis.disabled = !reportIsChecked
+        includeDeleted.disabled = !reportIsChecked
+
+        if (!reportIsChecked) {
+          createdBySis.checked = false
+          includeDeleted.checked = false
+        }
+      }
+    }
+  })()
+</script>

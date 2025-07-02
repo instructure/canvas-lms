@@ -36,6 +36,11 @@ describe WikiPagesController do
         get :new, params: { course_id: @course.id }
         expect(response).to have_http_status(:ok)
       end
+
+      it "sets rce_js_env" do
+        get :new, params: { course_id: @course.id }
+        expect(assigns[:js_env]).to have_key :RICH_CONTENT_APP_HOST
+      end
     end
 
     context "when 'canvas_content_builder' feature is disabled" do

@@ -45,7 +45,7 @@ export type AttemptInformationProps = {
   assignment: Assignment
   submission: Submission
   reviewerSubmission: Submission
-  onChangeSubmission: (reviewerSubmission: Submission) => void
+  onChangeSubmission: (attempt: number) => void
   allSubmissions: Submission[]
   openCommentTray: () => void
   closeCommentTray: () => void
@@ -238,7 +238,7 @@ export default ({
 
               {assignment.env.currentUser && !lockAssignment && !peerReviewModeEnabled && (
                 <Flex.Item>
-                  <SubmissionWorkflowTracker submission={submission} />
+                  <SubmissionWorkflowTracker />
                 </Flex.Item>
               )}
 

@@ -75,6 +75,8 @@
   path: '/api/v1/accounts/:account_id/bounced_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/bounced_communication_channels/reset'
+- verb: POST
+  path: /api/v1/accounts/:account_id/bulk_enrollment
 - verb: GET
   path: '/api/v1/accounts/:account_id/content_migrations'
 - verb: POST
@@ -235,6 +237,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/context_search'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
@@ -397,6 +401,8 @@
   path: '/api/v1/accounts/:account_id/unconfirmed_communication_channels.csv'
 - verb: POST
   path: '/api/v1/accounts/:account_id/unconfirmed_communication_channels/confirm'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/users'
 - verb: GET
   path: '/api/v1/accounts/:account_id/users'
 - verb: POST
@@ -411,6 +417,8 @@
   path: '/api/v1/accounts/:account_id/users/:user_id/account_notifications/:id'
 - verb: PUT
   path: '/api/v1/accounts/:account_id/users/:user_id/restore'
+- verb: PUT
+  path: '/api/v1/accounts/:account_id/users/bulk_update'
 - verb: GET
   path: '/api/v1/accounts/:account_id/visible_calendars_count'
 - verb: GET
@@ -793,6 +801,10 @@
   path: '/api/v1/courses/:course_id/content_migrations/migrators'
 - verb: GET
   path: '/api/v1/courses/:course_id/content_share_users'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/convert_tag_overrides'
+- verb: GET
+  path: '/api/v1/courses/:course_id/convert_tag_overrides/status'
 - verb: POST
   path: '/api/v1/courses/:course_id/course_copy'
 - verb: GET
@@ -911,6 +923,8 @@
   path: '/api/v1/courses/:course_id/discussion_topics/read_all'
 - verb: POST
   path: '/api/v1/courses/:course_id/discussion_topics/reorder'
+- verb: PUT
+  path: '/api/v1/courses/:course_id/discussion_topics/update_discussion_types'
 - verb: GET
   path: '/api/v1/courses/:course_id/effective_due_dates'
 - verb: GET
@@ -1485,8 +1499,6 @@
   path: '/api/v1/files/:id'
 - verb: PUT
   path: '/api/v1/files/:id'
-- verb: GET
-  path: '/api/v1/files/:id/:uuid/status'
 - verb: GET
   path: '/api/v1/files/:id/create_success'
 - verb: OPTIONS

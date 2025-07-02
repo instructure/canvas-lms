@@ -318,8 +318,8 @@ describe DeveloperKeysController, type: :request do
     expect(DeveloperKey.where(id: key).first).to be_deleted
   end
 
-  def unauthorized_api_call(*args)
-    raw_api_call(*args)
+  def unauthorized_api_call(*)
+    raw_api_call(*)
     expect(response).to have_http_status :unauthorized
   end
 

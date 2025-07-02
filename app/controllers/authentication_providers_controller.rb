@@ -941,7 +941,7 @@ class AuthenticationProvidersController < ApplicationController
         account_authorization_config_id: config.id,
         ldap_login_test: config.test_ldap_login(params[:username], params[:password])
       }
-      results << h.merge({ errors: config.errors.map { |attr, msg| { attr => msg } } })
+      results << h.merge({ errors: config.errors.map { |error| { error.attribute => error.message } } })
     end
 
     if results.empty?

@@ -129,6 +129,14 @@ module ItemsAssignToTray
     card.find_all(assignee_selected_option_selector).map(&:text)
   end
 
+  def convert_override_alert_selector
+    "[data-testid='differentiation-tag-converter-message']"
+  end
+
+  def convert_override_button_selector
+    "[data-testid='convert-differentiation-tags-button']"
+  end
+
   def tray_header_selector
     "[data-testid='module-item-edit-tray'] h2"
   end

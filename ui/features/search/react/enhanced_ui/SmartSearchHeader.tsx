@@ -23,6 +23,7 @@ import type {IndexProgress, Result} from '../types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {IconAiSolid, IconAiColoredSolid} from '@instructure/ui-icons'
 import AutocompleteSearch from './AutocompleteSearch'
 import {useSearchParams} from 'react-router-dom'
 
@@ -138,11 +139,14 @@ export default function SmartSearchHeader(props: Props) {
 
   return (
     <>
-      <Heading level="h1" data-testid="smart-search-heading">
-        {I18n.t('Smart Search')}
+      <Heading variant="titlePageDesktop" data-testid="smart-search-heading">
+        <Flex alignItems="center" gap="small">
+          <IconAiColoredSolid size="small" />
+          {I18n.t('Smart Search')}
+        </Flex>
       </Heading>
       <Flex
-        width="50%"
+        width="495px"
         gap="x-small"
         as="form"
         onSubmit={e => {
@@ -160,7 +164,12 @@ export default function SmartSearchHeader(props: Props) {
             options={recentSearches}
           />
         </Flex.Item>
-        <Button color="primary" type="submit" data-testid="search-button">
+        <Button
+          color="ai-primary"
+          renderIcon={<IconAiSolid />}
+          type="submit"
+          data-testid="search-button"
+        >
           {I18n.t('Search')}
         </Button>
       </Flex>

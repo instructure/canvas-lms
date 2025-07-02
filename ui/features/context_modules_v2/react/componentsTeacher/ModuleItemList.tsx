@@ -32,14 +32,34 @@ import type {
 const I18n = createI18nScope('context_modules_v2')
 
 const MemoizedModuleItem = memo(ModuleItem, (prevProps, nextProps) => {
-  return (
+  const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.moduleId === nextProps.moduleId &&
     prevProps.published === nextProps.published &&
     prevProps.index === nextProps.index &&
     prevProps.content?.title === nextProps.content?.title &&
     prevProps.indent === nextProps.indent
-  )
+
+  if (!basicPropsEqual) return false
+
+  const prevOverrides = prevProps.content?.assignmentOverrides
+  const nextOverrides = nextProps.content?.assignmentOverrides
+
+  if (!!prevOverrides !== !!nextOverrides) return false
+
+  if (!prevOverrides && !nextOverrides) return true
+
+  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
+  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
+  if (prevEdgesCount !== nextEdgesCount) return false
+
+  if (prevEdgesCount > 0) {
+    const prevOverridesStr = JSON.stringify(prevOverrides)
+    const nextOverridesStr = JSON.stringify(nextOverrides)
+    return prevOverridesStr === nextOverridesStr
+  }
+
+  return true
 })
 
 export interface ModuleItemListProps {

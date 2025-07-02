@@ -26,8 +26,8 @@ import {View} from '@instructure/ui-view'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
-import {outcomeShape} from './shapes'
+import {CELL_HEIGHT, COLUMN_WIDTH} from './utils/constants'
+import {outcomeShape} from './types/shapes'
 import OutcomeDescriptionModal from './OutcomeDescriptionModal'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
@@ -38,7 +38,13 @@ const OutcomeHeader = ({outcome}) => {
 
   return (
     <>
-      <View background="secondary" as="div" width={COLUMN_WIDTH} borderWidth="large 0 medium 0">
+      <View
+        background="secondary"
+        as="div"
+        width={COLUMN_WIDTH}
+        borderWidth="large 0 medium 0"
+        data-testid="outcome-header"
+      >
         <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
           <Flex.Item size="80%" padding="0 0 0 small">
             <TruncateText>

@@ -29,7 +29,7 @@ import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
 export default function ExternalToolOptions({
   activeSubmissionType,
   externalTools,
-  updateActiveSubmissionType,
+  updateActiveSubmissionType = () => {},
   selectedExternalTool,
 }) {
   if (externalTools.length === 0) {
@@ -98,8 +98,4 @@ ExternalToolOptions.propTypes = {
   externalTools: arrayOf(ExternalTool.shape).isRequired,
   updateActiveSubmissionType: func,
   selectedExternalTool: ExternalTool.shape,
-}
-
-ExternalToolOptions.defaultProps = {
-  updateActiveSubmissionType: () => {},
 }

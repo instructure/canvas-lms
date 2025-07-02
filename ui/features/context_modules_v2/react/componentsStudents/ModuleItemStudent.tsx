@@ -17,7 +17,6 @@
  */
 
 import React, {useMemo} from 'react'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {getItemIcon, getItemTypeText, INDENT_LOOKUP} from '../utils/utils'
@@ -25,6 +24,7 @@ import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../ut
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
 import ModuleItemTitleStudent from './ModuleItemTitleStudent'
+import ModuleDiscussionCheckpointStudent from './ModuleDiscussionCheckpointStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -94,35 +94,20 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               </Flex.Item>
               {/* Due Date and Points Possible */}
               {content.type !== 'SubHeader' && (
-                <Flex.Item type="span">
-                  <div style={{lineHeight: '0.9375rem'}}>
-                    <Flex wrap="wrap">
-                      {/* Item Type Icon */}
-                      {itemIcon && (
-                        <>
-                          <Flex.Item margin="0 space4 0 0" aria-hidden="true">
-                            <View as="div" height="x-small">
-                              {itemIcon}
-                            </View>
-                          </Flex.Item>
-                          <Flex.Item margin="0 small 0 0" aria-hidden="true">
-                            <Text size="x-small" transform="capitalize">
-                              {itemTypeText}
-                            </Text>
-                          </Flex.Item>
-                        </>
-                      )}
-                      <Flex.Item>
-                        <ModuleItemSupplementalInfoStudent
-                          contentTagId={_id}
-                          content={content}
-                          completionRequirement={completionRequirements?.find(
-                            req => req.id === _id,
-                          )}
-                        />
-                      </Flex.Item>
-                    </Flex>
-                  </div>
+                <Flex.Item>
+                  <Flex wrap="wrap" direction="column">
+                    <Flex.Item>
+                      <ModuleItemSupplementalInfoStudent
+                        contentTagId={_id}
+                        content={content}
+                        itemIcon={itemIcon}
+                        itemTypeText={itemTypeText}
+                        completionRequirement={completionRequirements?.find(req => req.id === _id)}
+                        checkpoints={content.checkpoints}
+                        replyToEntryRequiredCount={content.replyToEntryRequiredCount}
+                      />
+                    </Flex.Item>
+                  </Flex>
                 </Flex.Item>
               )}
             </Flex>

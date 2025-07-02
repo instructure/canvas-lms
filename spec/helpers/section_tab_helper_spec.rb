@@ -392,8 +392,8 @@ describe SectionTabHelper do
 
         it "has a tooltip" do
           expect(html.attributes).to include("data-tooltip")
-          expect(html.attributes).to include("title")
-          expect(html.attributes["title"].value).to eq "No content. Not visible to students"
+          expect(html.attributes).to include("data-html-tooltip-title")
+          expect(html.attributes["data-html-tooltip-title"].value).to eq "No content. Not visible to students"
         end
 
         it "includes icon indicating it is not visible to students" do
@@ -412,8 +412,8 @@ describe SectionTabHelper do
 
         it "has a tooltip" do
           expect(html.attributes).to include("data-tooltip")
-          expect(html.attributes).to include("title")
-          expect(html.attributes["title"].value).to eq "Disabled. Not visible to students"
+          expect(html.attributes).to include("data-html-tooltip-title")
+          expect(html.attributes["data-html-tooltip-title"].value).to eq "Disabled. Not visible to students"
         end
 
         it "includes icon indicating it is not visible to students" do

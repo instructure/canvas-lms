@@ -38,12 +38,13 @@ export default class Placement extends React.Component {
   constructor(props) {
     super(props)
     let placement
+    const {placement: propsPlacement = {}} = props
     if (this.alwaysDeeplinking.includes(props.placementName)) {
-      placement = {...props.placement, message_type: 'LtiDeepLinkingRequest'}
-    } else if (!props.placement.message_type) {
-      placement = {...props.placement, message_type: 'LtiResourceLinkRequest'}
+      placement = {...propsPlacement, message_type: 'LtiDeepLinkingRequest'}
+    } else if (!propsPlacement.message_type) {
+      placement = {...propsPlacement, message_type: 'LtiResourceLinkRequest'}
     } else {
-      placement = props.placement
+      placement = propsPlacement
     }
 
     this.state = {
@@ -304,8 +305,4 @@ Placement.propTypes = {
   displayName: PropTypes.string.isRequired,
   placement: PropTypes.object,
   placementName: PropTypes.string.isRequired,
-}
-
-Placement.defaultProps = {
-  placement: {},
 }

@@ -40,10 +40,16 @@ const CommentsTrayBody = lazy(() => {
   )
 })
 
-function TrayContent(props) {
+function TrayContent({
+  assignment,
+  submission,
+  reviewerSubmission,
+  isPeerReviewEnabled = false,
+  onSuccessfulPeerReview,
+}) {
   // Case where this is backed by a submission draft, not a real submission, so
   // we can't actually save comments.
-  if (props.submission.state === 'unsubmitted' && props.submission.attempt > 1) {
+  if (submission.state === 'unsubmitted' && submission.attempt > 1) {
     // TODO: Get design/product to get an updated SVG or something for this: COMMS-2255
     return (
       <SVGWithTextPlaceholder
@@ -56,11 +62,11 @@ function TrayContent(props) {
   return (
     <Suspense fallback={<LoadingIndicator />}>
       <CommentsTrayBody
-        assignment={props.assignment}
-        submission={props.submission}
-        reviewerSubmission={props.reviewerSubmission}
-        isPeerReviewEnabled={props.isPeerReviewEnabled}
-        onSuccessfulPeerReview={props.onSuccessfulPeerReview}
+        assignment={assignment}
+        submission={submission}
+        reviewerSubmission={reviewerSubmission}
+        isPeerReviewEnabled={isPeerReviewEnabled}
+        onSuccessfulPeerReview={onSuccessfulPeerReview}
       />
     </Suspense>
   )
@@ -74,25 +80,23 @@ TrayContent.propTypes = {
   onSuccessfulPeerReview: func,
 }
 
-TrayContent.defaultProps = {
-  isPeerReviewEnabled: false,
-}
-
-export default function CommentsTray(props) {
+export default function CommentsTray({
+  assignment,
+  submission,
+  reviewerSubmission,
+  closeTray,
+  open,
+  isPeerReviewEnabled = false,
+  onSuccessfulPeerReview,
+}) {
   // attempts 0 and 1 get combined into a single attempt
-  const attempt = props.submission?.attempt || 1
-  const label = props.isPeerReviewEnabled
+  const attempt = submission?.attempt || 1
+  const label = isPeerReviewEnabled
     ? I18n.t('Peer Review Comments')
     : I18n.t('Attempt %{attempt} Feedback', {attempt})
 
   return (
-    <Tray
-      label={label}
-      open={props.open}
-      onDismiss={props.closeTray}
-      size="regular"
-      placement="end"
-    >
+    <Tray label={label} open={open} onDismiss={closeTray} size="regular" placement="end">
       <div id="comments-tray">
         <Flex direction="column" height="100%">
           <Flex.Item>
@@ -109,7 +113,7 @@ export default function CommentsTray(props) {
                     offset="medium"
                     screenReaderLabel="Close"
                     size="small"
-                    onClick={props.closeTray}
+                    onClick={closeTray}
                   />
                 </Flex.Item>
               </Flex>
@@ -118,11 +122,11 @@ export default function CommentsTray(props) {
 
           <Flex.Item shouldGrow={true}>
             <TrayContent
-              isPeerReviewEnabled={props.isPeerReviewEnabled}
-              assignment={props.assignment}
-              submission={props.submission}
-              reviewerSubmission={props.reviewerSubmission}
-              onSuccessfulPeerReview={props.onSuccessfulPeerReview}
+              isPeerReviewEnabled={isPeerReviewEnabled}
+              assignment={assignment}
+              submission={submission}
+              reviewerSubmission={reviewerSubmission}
+              onSuccessfulPeerReview={onSuccessfulPeerReview}
             />
           </Flex.Item>
         </Flex>
@@ -139,8 +143,4 @@ CommentsTray.propTypes = {
   open: bool.isRequired,
   isPeerReviewEnabled: bool,
   onSuccessfulPeerReview: func,
-}
-
-CommentsTray.defaultProps = {
-  isPeerReviewEnabled: false,
 }

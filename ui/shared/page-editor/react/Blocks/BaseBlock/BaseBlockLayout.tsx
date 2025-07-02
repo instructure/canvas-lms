@@ -19,12 +19,15 @@
 import './base-block-layout.css'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import React, {PropsWithChildren} from 'react'
+import React, {PropsWithChildren, ReactNode} from 'react'
 
 export const BaseBlockLayout = React.forwardRef<
   HTMLDivElement,
   PropsWithChildren<{
     title: string
+    menu: ReactNode
+    actionButtons: ReactNode
+    addButton: ReactNode
   }>
 >((props, ref) => {
   return (
@@ -36,10 +39,16 @@ export const BaseBlockLayout = React.forwardRef<
               {props.title}
             </Text>
           </Flex>
-          <Flex>{/*Menu items*/}</Flex>
+          <Flex>{props.menu}</Flex>
         </Flex>
-        <Flex>{props.children}</Flex>
+        <Flex direction="column" gap="small" width={'100%'}>
+          {props.children}
+        </Flex>
+        <Flex direction="row-reverse" width={'100%'} justifyItems="space-between">
+          <Flex.Item>{props.actionButtons}</Flex.Item>
+        </Flex>
       </Flex>
+      {props.addButton}
     </div>
   )
 })

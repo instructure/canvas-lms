@@ -25,8 +25,12 @@ module Lti
     before_action :require_context
     before_action { require_feature_enabled :lti_asset_processor }
     before_action :require_access_to_context
+
+    before_action :require_assignment_edit_permission, only: :launch_settings
+
     before_action :require_asset_report, only: :launch_report
     before_action :validate_report_belongs_to_processor, only: :launch_report
+    before_action :require_report_view_permission, only: :launch_report
 
     def launch_settings
       @lti_launch = create_and_log_launch(
@@ -115,6 +119,14 @@ module Lti
       unless asset_report.asset_processor.id == asset_processor.id
         render status: :bad_request, plain: "invalid_request"
       end
+    end
+
+    def require_assignment_edit_permission
+      authorized_action(assignment, @current_user, :update)
+    end
+
+    def require_report_view_permission
+      render_unauthorized_action unless asset_report.visible_to_user?(@current_user)
     end
   end
 end

@@ -19,20 +19,19 @@
 import CourseRestoreModel from '../CourseRestore'
 import $ from 'jquery'
 import 'jquery-migrate'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const fixturesDiv = document.createElement('div')
 fixturesDiv.id = 'fixtures'
 document.body.appendChild(fixturesDiv)
 
-const ok = x => expect(x).toBeTruthy()
-const equal = (x, y) => expect(x).toEqual(y)
-
 let account_id
 let course_id
 let courseRestore
-let server
-let clock
+
+const server = setupServer()
 
 const progressCompletedJSON = {
   completion: 0,
@@ -75,76 +74,111 @@ const courseJSON = {
 }
 
 describe('CourseRestore', () => {
-  beforeEach(() => {
-    account_id = 4
-    course_id = 42
-    courseRestore = new CourseRestoreModel({account_id})
-    server = sinon.fakeServer.create()
-    clock = sinon.useFakeTimers()
-    return $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
+  beforeAll(() => {
+    server.listen({onUnhandledRequest: 'bypass'})
   })
 
   afterEach(() => {
-    server.restore()
-    clock.restore()
-    account_id = null
+    server.resetHandlers()
+    fakeENV.teardown()
     $('#fixtures').empty()
+    jest.useRealTimers()
   })
-  // Describes searching for a course by ID
+
+  afterAll(() => server.close())
+
+  beforeEach(() => {
+    fakeENV.setup()
+    account_id = 4
+    course_id = 42
+    courseRestore = new CourseRestoreModel({account_id})
+    jest.useFakeTimers()
+    $('#fixtures').append($('<div id="flash_screenreader_holder" />'))
+  })
   test("triggers 'searching' when search is called", function () {
-    const callback = sinon.spy()
+    const callback = jest.fn()
     courseRestore.on('searching', callback)
     courseRestore.search(account_id)
-    ok(callback.called, 'Searching event is called when searching')
+    expect(callback).toHaveBeenCalled()
   })
 
-  test('populates CourseRestore model with response, keeping its original account_id', function () {
+  test('populates CourseRestore model with response, keeping its original account_id', function (done) {
+    server.use(http.get('*/api/v1/accounts/*/courses/*', () => HttpResponse.json(courseJSON)))
+
+    courseRestore.on('doneSearching', () => {
+      expect(courseRestore.get('account_id')).toBe(account_id)
+      expect(courseRestore.get('id')).toBe(courseJSON.id)
+      done()
+    })
+
     courseRestore.search(course_id)
-    server.respond('GET', courseRestore.searchUrl(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(courseJSON),
-    ])
-    equal(courseRestore.get('account_id'), account_id, 'account id stayed the same')
-    equal(courseRestore.get('id'), courseJSON.id, 'course id was updated')
   })
 
-  test('set status when course not found', function () {
+  test('set status when course not found', function (done) {
+    server.use(
+      http.get('*/api/v1/accounts/*/courses/*', () => HttpResponse.json({}, {status: 404})),
+    )
+
+    courseRestore.on('doneSearching', () => {
+      expect(courseRestore.get('status')).toBe(404)
+      done()
+    })
+
     courseRestore.search('a')
-    server.respond('GET', courseRestore.searchUrl(), [
-      404,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({}),
-    ])
-    equal(courseRestore.get('status'), 404)
   })
 
   test('responds with a deferred object', function () {
     const dfd = courseRestore.restore()
-    ok($.isFunction(dfd.done, 'This is a deferred object'))
+    expect($.isFunction(dfd.done)).toBeTruthy()
   })
 
-  // a restored course should be populated with a deleted course with an after a search was made.
-  test('restores a course after search finds a deleted course', function () {
-    courseRestore.search(course_id)
-    server.respond('GET', courseRestore.searchUrl(), [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(courseJSON),
-    ])
-    const dfd = courseRestore.restore()
-    server.respond(
-      'PUT',
-      `${courseRestore.baseUrl()}/?course_ids[]=${courseRestore.get('id')}&event=undelete`,
-      [200, {'Content-Type': 'application/json'}, JSON.stringify(progressQueuedJSON)],
+  test('restores a course after search finds a deleted course', function (done) {
+    jest.useRealTimers() // Use real timers for this test
+
+    // Set up handlers with exact URL patterns
+    server.use(
+      http.get(`/api/v1/accounts/${account_id}/courses/${course_id}`, ({request}) => {
+        const url = new URL(request.url)
+        // Check for the include[] parameter
+        if (url.searchParams.get('include[]') === 'all_courses') {
+          return HttpResponse.json(courseJSON)
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+      http.put(`/api/v1/accounts/${account_id}/courses/`, ({request}) => {
+        const url = new URL(request.url)
+        // Check for proper parameters
+        if (url.searchParams.get('event') === 'undelete') {
+          return HttpResponse.json(progressQueuedJSON)
+        }
+        return new HttpResponse(null, {status: 400})
+      }),
+      http.get(progressQueuedJSON.url, () => {
+        return HttpResponse.json(progressCompletedJSON)
+      }),
     )
-    clock.tick(1000)
-    server.respond('GET', progressQueuedJSON.url, [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(progressCompletedJSON),
-    ])
-    ok(dfd.state() === 'resolved', 'All ajax request in this deferred object should be resolved')
-    equal(courseRestore.get('workflow_state'), 'unpublished')
+
+    // First do the search
+    courseRestore.search(course_id)
+
+    // Wait for search to complete
+    courseRestore.on('doneSearching', () => {
+      // Verify search worked
+      expect(courseRestore.get('id')).toBe(courseJSON.id)
+
+      // Now do the restore
+      const dfd = courseRestore.restore()
+
+      // Check state changes
+      courseRestore.on('doneRestoring', () => {
+        expect(courseRestore.get('workflow_state')).toBe('unpublished')
+        expect(courseRestore.get('restored')).toBe(true)
+        // The deferred should be resolved after this event
+        setTimeout(() => {
+          expect(dfd.state()).toBe('resolved')
+          done()
+        }, 0)
+      })
+    })
   })
 })

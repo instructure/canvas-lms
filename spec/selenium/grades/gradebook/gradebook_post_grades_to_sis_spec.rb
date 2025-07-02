@@ -22,13 +22,22 @@ require_relative "../pages/gradebook_page"
 require_relative "../setup/gradebook_setup"
 require_relative "../../../feature_flag_helper"
 
-describe "Gradebook - post grades to SIS" do
+# NOTE: We are aware that we're duplicating some unnecessary testcases, but this was the
+# easiest way to review, and will be the easiest to remove after the feature flag is
+# permanently removed. Testing both flag states is necessary during the transition phase.
+shared_examples "Gradebook - post grades to SIS" do |ff_enabled|
   include GradebookCommon
   include GradebookSetup
   include FeatureFlagHelper
   include_context "in-process server selenium tests"
 
   before(:once) do
+    # Set feature flag state for the test run - this affects how the gradebook data is fetched, not the data setup
+    if ff_enabled
+      Account.site_admin.enable_feature!(:performance_improvements_for_gradebook)
+    else
+      Account.site_admin.disable_feature!(:performance_improvements_for_gradebook)
+    end
     gradebook_data_setup
     create_sis_assignment
     show_sections_filter(@teacher)
@@ -243,4 +252,9 @@ describe "Gradebook - post grades to SIS" do
       expect(f("iframe.post-grades-frame")).to be_displayed
     end
   end
+end
+
+describe "Gradebook - post grades to SIS" do
+  it_behaves_like "Gradebook - post grades to SIS", true
+  it_behaves_like "Gradebook - post grades to SIS", false
 end

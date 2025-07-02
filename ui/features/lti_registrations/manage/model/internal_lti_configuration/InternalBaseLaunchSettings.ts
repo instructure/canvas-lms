@@ -51,6 +51,12 @@ export const ZInternalBaseLaunchSettings = z.object({
   default: z.enum(['disabled', 'enabled']).optional(),
   accept_media_types: z.string().optional().nullable(),
   use_tray: z.boolean().optional().nullable(),
+  eula: z
+    .object({
+      target_link_uri: z.string().optional(),
+      custom_fields: z.record(z.string()).optional(),
+    })
+    .optional(),
 })
 
 export interface InternalBaseLaunchSettings extends z.infer<typeof ZInternalBaseLaunchSettings> {}

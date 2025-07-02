@@ -16,10 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {mswServer} from '../../../../msw/mswServer'
+import fakeENV from '@canvas/test-utils/fakeENV'
 import 'jquery-migrate'
 import '@canvas/jquery/jquery.ajaxJSON'
 import Assignment from '../Assignment'
+
+const server = mswServer([])
+
+beforeAll(() => {
+  server.listen()
+})
+
+beforeEach(() => {
+  fakeENV.setup()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+  fakeENV.teardown()
+})
+
+afterAll(() => {
+  server.close()
+})
 
 describe('Assignment', () => {
   describe('duplication functionality', () => {
@@ -111,21 +132,7 @@ describe('Assignment', () => {
     })
 
     describe('#duplicate_failed', () => {
-      let mockAjax
-      let mockAjaxJSON
-
-      beforeEach(() => {
-        mockAjax = jest.fn(() => ({done: jest.fn()}))
-        mockAjaxJSON = jest.fn()
-        $.ajax = mockAjax
-        $.ajaxJSON = mockAjaxJSON
-      })
-
-      afterEach(() => {
-        jest.restoreAllMocks()
-      })
-
-      it('makes ajax call with correct url when duplicate_failed is called', () => {
+      it('makes ajax call with correct url when duplicate_failed is called', async () => {
         const assignmentID = '200'
         const originalAssignmentID = '42'
         const courseID = '123'
@@ -138,10 +145,24 @@ describe('Assignment', () => {
           original_course_id: originalCourseID,
         })
 
-        assignment.duplicate_failed()
-        expect(mockAjaxJSON.mock.calls[0][0]).toBe(
-          `/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`,
+        let capturedUrl = null
+        server.use(
+          http.post('*/api/v1/courses/*/assignments/*/duplicate', ({request}) => {
+            capturedUrl = request.url
+            return HttpResponse.json({success: true}, {status: 200})
+          }),
         )
+
+        const callback = jest.fn()
+        assignment.duplicate_failed(callback)
+
+        await new Promise(resolve => setTimeout(resolve, 10))
+
+        expect(capturedUrl).toBe(
+          `http://localhost/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`,
+        )
+        expect(callback).toHaveBeenCalled()
+        expect(callback.mock.calls[0][0]).toEqual({success: true})
       })
     })
   })

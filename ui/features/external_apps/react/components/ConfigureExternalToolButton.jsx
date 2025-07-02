@@ -18,7 +18,7 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
-import {shape, func} from 'prop-types'
+import {shape, func, bool} from 'prop-types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
@@ -30,10 +30,12 @@ const I18n = createI18nScope('external_tools')
 
 export default class ConfigureExternalToolButton extends React.Component {
   removeCloseListener
+  btnTriggerModal = React.createRef()
 
   static propTypes = {
     tool: shape({}).isRequired,
     returnFocus: func.isRequired,
+    modalIsOpen: bool,
   }
 
   constructor(props) {
@@ -118,7 +120,7 @@ export default class ConfigureExternalToolButton extends React.Component {
         <a
           href="#"
           tabIndex="-1"
-          ref="btnTriggerModal"
+          ref={this.btnTriggerModal}
           role="menuitem"
           aria-label={I18n.t('Configure %{toolName} App', {toolName: this.props.tool.name})}
           className="icon-settings-2"

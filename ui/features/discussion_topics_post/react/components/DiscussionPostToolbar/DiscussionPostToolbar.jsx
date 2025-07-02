@@ -29,6 +29,8 @@ import {
   IconPermissionsLine,
   IconSearchLine,
   IconTroubleLine,
+  IconAiColoredSolid,
+  IconXSolid,
 } from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -130,18 +132,17 @@ export const DiscussionPostToolbar = props => {
   const renderTranslate = () => {
     const text = showTranslate ? I18n.t('Hide Translate Text') : I18n.t('Translate Text')
 
-    const translationText = props.isAnnouncement
-      ? I18n.t('Translate Announcement')
-      : I18n.t('Translate Discussion')
+    const translationText = I18n.t('Open Translate')
 
-    const improvedText = showTranslationControl ? I18n.t('Turn off Translation') : translationText
+    const improvedText = showTranslationControl ? I18n.t('Close Translate') : translationText
 
     return (
       <Button
         onClick={toggleTranslateText}
         data-testid="translate-button"
         data-action-state={showTranslationControl ? 'disableTranslation' : 'enableTranslation'}
-        renderIcon={<IconAiLine />}
+        renderIcon={showTranslationControl ? <IconXSolid /> : <IconAiColoredSolid />}
+        color={showTranslationControl ? 'secondary' : 'ai-secondary'}
       >
         {ENV.ai_translation_improvements ? improvedText : text}
       </Button>
@@ -290,18 +291,6 @@ export const DiscussionPostToolbar = props => {
                   shouldShrink={responsiveProps.shouldShrink}
                 >
                   <Flex>
-                    {/* Groups */}
-                    {props.childTopics?.length && props.isAdmin && (
-                      <Flex.Item
-                        data-testid="groups-menu-button"
-                        margin={responsiveProps?.groupSelect?.margin}
-                        padding={responsiveProps?.padding}
-                      >
-                        <span className="discussions-post-toolbar-groupsMenu">
-                          <GroupsMenu width="10px" childTopics={props.childTopics} />
-                        </span>
-                      </Flex.Item>
-                    )}
                     {/* Search */}
                     {!hideStudentNames && (
                       <Flex.Item
@@ -404,6 +393,18 @@ export const DiscussionPostToolbar = props => {
                       />
                     </Flex.Item>
                   )}
+                  {/* Groups */}
+                  {props.childTopics?.length >= 0 && props.isAdmin && (
+                    <Flex.Item
+                      data-testid="groups-menu-button"
+                      margin={responsiveProps?.groupSelect?.margin}
+                      padding={responsiveProps?.padding}
+                    >
+                      <span className="discussions-post-toolbar-groupsMenu">
+                        <GroupsMenu width="10px" childTopics={props.childTopics} />
+                      </span>
+                    </Flex.Item>
+                  )}
                   {translationLanguages.current.length > 0 && !isSpeedGraderInTopUrl && (
                     <Flex.Item margin="0 small 0 0" padding={responsiveProps.padding}>
                       {renderTranslate()}
@@ -443,22 +444,6 @@ export const DiscussionPostToolbar = props => {
                         {I18n.t('Assign To')}
                       </Button>
                     </Flex.Item>
-                  )}
-                  {window.ENV?.FEATURES?.discussion_default_sort && (
-                    <>
-                      {/* Groups */}
-                      {props.childTopics?.length && props.isAdmin && (
-                        <Flex.Item
-                          data-testid="groups-menu-button"
-                          margin={responsiveProps?.groupSelect?.margin}
-                          padding={responsiveProps?.padding}
-                        >
-                          <span className="discussions-post-toolbar-groupsMenu">
-                            <GroupsMenu width="10px" childTopics={props.childTopics} />
-                          </span>
-                        </Flex.Item>
-                      )}
-                    </>
                   )}
                 </Flex>
               </Flex.Item>

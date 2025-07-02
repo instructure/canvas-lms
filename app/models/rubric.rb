@@ -548,7 +548,7 @@ class Rubric < ActiveRecord::Base
     prompt, options = llm_config.generate_prompt_and_options(substitutions: dynamic_content)
 
     response = nil
-    _time = Benchmark.measure do
+    time = Benchmark.measure do
       InstLLMHelper.with_rate_limit(user:, llm_config:) do
         response = InstLLMHelper.client(llm_config.model_id).chat(
           [{ role: "user", content: prompt }],
@@ -557,14 +557,18 @@ class Rubric < ActiveRecord::Base
       end
     end
 
-    # TODO: log this to the database for tracking LLM generation
-    # [
-    #   response.message[:content],
-    #   response.usage[:input_tokens],
-    #   response.usage[:output_tokens],
-    #   time.real.round(2)
-    # ]
-    # logger.info(response.message[:content])
+    LLMResponse.create!(
+      associated_assignment: association_object,
+      user:,
+      prompt_name: llm_config.name,
+      prompt_model_id: llm_config.model_id,
+      prompt_dynamic_content: dynamic_content,
+      raw_response: response.message[:content],
+      input_tokens: response.usage[:input_tokens],
+      output_tokens: response.usage[:output_tokens],
+      response_time: time.real.round(2),
+      root_account_id: association_object.root_account_id
+    )
 
     ai_rubric = JSON.parse(response.message[:content], symbolize_names: true)
 
