@@ -1370,6 +1370,8 @@ class AccountsController < ApplicationController
           # when changing k5 settings on an account, the value gets saved to the root account and special
           # locking rules apply, so don't remove it from the update params here
           next if K5::EnablementService::K5_SETTINGS.include? setting
+          # also has special locking rules
+          next if setting == :horizon_account
           next unless params.dig(:account, :settings)
           next if !Account.account_settings_options[setting].key?(:boolean) && params.dig(:account, :settings, setting) != @account.parent_account&.send(setting)
           next if value_to_boolean(params.dig(:account, :settings, setting, :locked))
@@ -1410,9 +1412,6 @@ class AccountsController < ApplicationController
         enable_k5 = params.dig(:account, :settings, :enable_as_k5_account, :value)
         use_classic_font = params.dig(:account, :settings, :use_classic_font_in_k5, :value)
         K5::EnablementService.new(@account).set_k5_settings(value_to_boolean(enable_k5), value_to_boolean(use_classic_font)) unless enable_k5.nil?
-
-        enable_horizon = params.dig(:account, :settings, :horizon_account, :value)
-        @account.horizon_account = value_to_boolean(enable_horizon) unless enable_horizon.nil?
 
         # validate/normalize default due time parameter
         if (default_due_time = params.dig(:account, :settings, :default_due_time, :value))
@@ -2245,7 +2244,6 @@ class AccountsController < ApplicationController
                                    :enable_as_k5_account,
                                    :use_classic_font_in_k5,
                                    :show_sections_in_course_tray,
-                                   :horizon_account,
                                    { decimal_separator: [:value] }.freeze,
                                    { thousand_separator: [:value] }.freeze].freeze
   private_constant :PERMITTED_SETTINGS_FOR_UPDATE
