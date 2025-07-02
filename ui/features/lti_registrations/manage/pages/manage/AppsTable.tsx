@@ -327,7 +327,6 @@ const CondensedColumns: ReadonlyArray<Column> = [
             toolName={r.name}
             size={27}
             marginRight={12}
-            hideFromScreenReader={true}
           />
           {r.name}
         </Flex>
