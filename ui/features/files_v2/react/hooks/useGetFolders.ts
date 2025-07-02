@@ -24,8 +24,16 @@ import {createStubRootFolder} from '../../utils/folderUtils'
 import {generateFolderByPathUrl, NotFoundError, UnauthorizedError} from '../../utils/apiUtils'
 import {Folder} from '../../interfaces/File'
 
-function getRootFolder(pluralContextType: string, contextId: string) {
-  return createStubRootFolder(getFilesEnv().contextsDictionary[`${pluralContextType}_${contextId}`])
+function getRootFolder({
+  contextId,
+  pluralContextType,
+  rootFolderId,
+}: {
+  contextId: string
+  pluralContextType: string
+  rootFolderId: string
+}) {
+  return createStubRootFolder({contextId, pluralContextType, rootFolderId})
 }
 
 async function loadFolders(pluralContextType: string, contextId: string, path?: string) {
@@ -66,9 +74,17 @@ export const useGetFolders = () => {
     placeholderData: keepPreviousData,
     queryFn: async ({queryKey}) => {
       const [, {path, contextType, contextId}] = queryKey
-      return path
+      const context = getFilesEnv().contextsDictionary[`${contextType}_${contextId}`]
+
+      return path || !context?.root_folder_id
         ? await loadFolders(contextType, contextId, path)
-        : [getRootFolder(contextType, contextId)]
+        : [
+            getRootFolder({
+              contextId: context.contextId,
+              pluralContextType: context.contextType,
+              rootFolderId: context.root_folder_id,
+            }),
+          ]
     },
   })
 }

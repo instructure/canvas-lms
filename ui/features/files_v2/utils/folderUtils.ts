@@ -44,18 +44,21 @@ export const generateUrlPath = (folder: Folder) => {
 }
 
 // The root folder only needs to have context info for use in breadcrumbs
-export const createStubRootFolder = (context: {
+export const createStubRootFolder = ({
+  contextId,
+  pluralContextType,
+  rootFolderId,
+}: {
   contextId: string
-  // the plural form
-  contextType: string
-  root_folder_id: string
+  pluralContextType: string
+  rootFolderId: string
 }): Folder => {
   return {
-    id: parseInt(context.root_folder_id),
+    id: parseInt(rootFolderId),
     name: '',
     parent_folder_id: null,
-    context_id: context.contextId,
-    context_type: context.contextType.toLowerCase().slice(0, -1),
+    context_id: contextId,
+    context_type: pluralContextType.toLowerCase().slice(0, -1),
     hidden: false,
     full_name: '',
     created_at: '',
