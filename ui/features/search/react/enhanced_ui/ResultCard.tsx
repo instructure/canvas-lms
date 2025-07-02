@@ -54,12 +54,13 @@ const iconClass = (content_type: string) => {
 
 const MAX_MODULES_SHOWN = 5
 
-interface Props {
+export interface ResultCardProps {
   result: Result
+  resultType: 'best' | 'similar'
   searchTerm: string
 }
 
-export default function ResultCard(props: Props) {
+export default function ResultCard(props: ResultCardProps) {
   const {body, content_type, html_url, title, readable_type} = props.result
 
   const renderModuleList = (modules: Module[]) => {
@@ -135,7 +136,9 @@ export default function ResultCard(props: Props) {
       data-testid="search-result"
     >
       <Link href={html_url} target="_blank">
-        <Heading variant="titleCardLarge">{title}</Heading>
+        <Heading variant="titleCardLarge" data-pendo={`smart-search-${props.resultType}-result`}>
+          {title}
+        </Heading>
       </Link>
       <Flex gap="space8" alignItems="center">
         {iconClass(content_type)}

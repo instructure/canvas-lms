@@ -45,7 +45,12 @@ export default function SimilarResults(props: Props) {
         </Text>
       </Flex.Item>
       {props.results.map((result, index) => (
-        <ResultCard key={index} result={result} searchTerm={props.searchTerm} />
+        <ResultCard
+          key={index}
+          result={result}
+          searchTerm={props.searchTerm}
+          resultType="similar"
+        />
       ))}
     </Flex>
   )

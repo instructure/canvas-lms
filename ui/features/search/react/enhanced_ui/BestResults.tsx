@@ -86,6 +86,7 @@ export default function BestResults(props: Props) {
           <ResultCard
             key={`${result.content_id}-${result.content_type}`}
             result={result}
+            resultType="best"
             searchTerm={props.searchTerm}
           />
         )
