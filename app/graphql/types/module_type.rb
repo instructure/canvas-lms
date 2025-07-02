@@ -134,10 +134,7 @@ module Types
     field :has_active_overrides, Boolean, null: false
 
     def has_active_overrides
-      AssignmentOverride.where(
-        context_module_id: object.id,
-        workflow_state: "active"
-      ).exists?
+      Loaders::ModuleActiveOverridesLoader.for.load(object)
     end
   end
 end
