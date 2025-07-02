@@ -14723,6 +14723,7 @@ uk:
           score_for_quiz: "Оцінка для цієї контрольної роботи"
           score_for_survey: "Оцінка для цього опитування"
           survey_score: "Оцінка результатів опитування"
+          warning_icon: Попередження
         links: 
           click_to_view_results: "Натисніть тут, щоб переглянути результати."
         questions_not_graded: "Деякі питання ще не оцінені"
