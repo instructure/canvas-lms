@@ -2121,6 +2121,42 @@ describe Submission do
     end
   end
 
+  describe "#queue_conditional_release_grade_change_handler" do
+    let_once(:submission) { @assignment.submissions.find_by(user: @student) }
+
+    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" set to 'high'" do
+      it "queues override handler job with high priority" do
+        allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
+        Setting.set("conditional_release_handler_priority_#{@course.root_account.global_id}", "high")
+        submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
+
+        job = Delayed::Job.find_by(tag: "ConditionalRelease::OverrideHandler.handle_grade_change")
+        expect(job.priority).to eq(Delayed::HIGH_PRIORITY)
+      end
+    end
+
+    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" set to 'normal'" do
+      it "queues override handler job with normal priority" do
+        allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
+        Setting.set("conditional_release_handler_priority_#{@course.root_account.global_id}", "normal")
+        submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
+
+        job = Delayed::Job.find_by(tag: "ConditionalRelease::OverrideHandler.handle_grade_change")
+        expect(job.priority).to eq(Delayed::NORMAL_PRIORITY)
+      end
+    end
+
+    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" unset" do
+      it "queues override handler job with low priority" do
+        allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
+        submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
+
+        job = Delayed::Job.find_by(tag: "ConditionalRelease::OverrideHandler.handle_grade_change")
+        expect(job.priority).to eq(Delayed::LOW_PRIORITY)
+      end
+    end
+  end
+
   describe "#graded_anonymously" do
     it "saves when grade changed and set explicitly" do
       submission_spec_model

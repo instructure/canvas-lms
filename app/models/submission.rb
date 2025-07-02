@@ -2232,9 +2232,18 @@ class Submission < ActiveRecord::Base
     strand = "conditional_release_grade_change:#{global_assignment_id}"
 
     progress = Progress.create!(context: self, tag: "conditional_release_handler")
+    priority = case Setting.get("conditional_release_handler_priority_#{root_account.global_id}", nil)
+               when "high"
+                 Delayed::HIGH_PRIORITY
+               when "normal"
+                 Delayed::NORMAL_PRIORITY
+               else
+                 Delayed::LOW_PRIORITY
+               end
+
     progress.process_job(ConditionalRelease::OverrideHandler,
                          :handle_grade_change,
-                         { priority: Delayed::LOW_PRIORITY, strand: },
+                         { priority:, strand: },
                          self)
 
     assignment&.delay_if_production(strand:)&.multiple_module_actions([user_id], :scored, score)
