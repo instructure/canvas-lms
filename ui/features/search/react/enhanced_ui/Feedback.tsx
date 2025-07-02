@@ -69,6 +69,7 @@ export default function Feedback(props: Props) {
         <Flex.Item>
           <CondensedButton
             data-testid="positive-feedback"
+            data-pendo="smart-search-positive-feedback-button"
             onClick={_ => {
               setFeedback('liked')
               sendFeedback('LIKE', props.courseId, props.searchTerm)
@@ -89,6 +90,7 @@ export default function Feedback(props: Props) {
           <span style={{display: 'inline-block', transform: 'rotate(180deg)'}}>
             <CondensedButton
               data-testid="negative-feedback"
+              data-pendo="smart-search-negative-feedback-button"
               onClick={_ => {
                 setFeedback('disliked')
                 setNegModalOpen(true)
