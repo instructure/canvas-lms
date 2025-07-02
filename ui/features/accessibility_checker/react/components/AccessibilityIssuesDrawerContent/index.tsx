@@ -35,6 +35,7 @@ import Form, {FormHandle} from './Form'
 import {AccessibilityIssue, ContentItem, FormValue} from '../../types'
 import {ruleIdToLabelMap} from '../../constants'
 import Preview, {PreviewHandle} from './Preview'
+import WhyMattersPopover from './WhyMattersPopover'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -146,7 +147,8 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
                 current: currentIssueIndex + 1,
                 total: issues.length,
                 message: currentIssue.ruleId ? ruleIdToLabelMap[currentIssue.ruleId] : '',
-              })}
+              })}{' '}
+              <WhyMattersPopover issue={currentIssue} />
             </Text>
           </View>
           <Flex justifyItems="space-between">
