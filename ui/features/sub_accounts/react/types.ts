@@ -23,4 +23,4 @@ export interface AccountWithCounts extends Account {
   course_count: number
 }
 
-export type SubaccountQueryKey = ['account' | 'subAccountList', string]
+export type SubaccountQueryKey = ['subAccountList', string, string]

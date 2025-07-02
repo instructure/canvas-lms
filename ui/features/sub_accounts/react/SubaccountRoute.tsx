@@ -27,6 +27,7 @@ import {Portal} from '@instructure/ui-portal'
 import {calculateIndent, fetchRootAccount} from './util'
 import {Flex} from '@instructure/ui-flex'
 import {AccountWithCounts} from './types'
+import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -34,9 +35,16 @@ export function Component(): JSX.Element | null {
   const {accountId} = useParams()
   const mountPoint = document.getElementById('sub_account_mount')
 
-  const {error, isLoading, data} = useQuery<AccountWithCounts>({
-    queryKey: ['account', accountId],
-    queryFn: ({queryKey}) => fetchRootAccount(queryKey[1] as string),
+  const {error, isLoading, data} = useQuery<
+    AccountWithCounts,
+    Error,
+    AccountWithCounts,
+    ['account', string]
+  >({
+    queryKey: ['account', accountId!],
+    queryFn: ({queryKey}) => fetchRootAccount(queryKey[1]),
+    persister: sessionStoragePersister,
+    enabled: !!accountId,
   })
 
   const renderTree = () => {
