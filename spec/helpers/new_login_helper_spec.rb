@@ -59,7 +59,8 @@ describe NewLoginHelper do
       self_registration?: true,
       require_email_for_registration?: true,
       forgot_password_external_url: "https://forgot.com",
-      recaptcha_key: "xyz123"
+      recaptcha_key: "xyz123",
+      account_terms_required?: true
     )
   end
 
@@ -90,6 +91,10 @@ describe NewLoginHelper do
       "require_symbol_characters" => "false"
     )
     expect(data[:help_link]).to include("Get Help")
+    expect(data[:require_aup]).to eq("true")
+    terms = TermsOfService.ensure_terms_for_account(@domain_root_account)
+    expect(terms.passive).to be(false)
+    expect(terms.terms_type).to eq("default")
     expect(data).to be_a(Hash)
   end
 end

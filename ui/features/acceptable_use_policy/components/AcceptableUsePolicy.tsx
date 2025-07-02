@@ -25,8 +25,9 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import React, {useCallback} from 'react'
 import {useAUPContent} from '../hooks/useAUPContent'
-
 import {assignLocation} from '@canvas/util/globalUtils'
+import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+
 // @ts-expect-error
 import styles from './AcceptableUsePolicy.module.css'
 
@@ -34,14 +35,18 @@ const I18n = createI18nScope('acceptable_use_policy')
 
 const AcceptableUsePolicy = () => {
   const {content, loading, error} = useAUPContent()
+  const navigate = useNavigate()
+  const navigationType = useNavigationType()
+  const location = useLocation()
 
   const handleClose = useCallback(() => {
-    if (window.history.length > 1) {
-      window.history.back()
+    if (navigationType === 'PUSH' && location.key !== 'default') {
+      navigate(-1)
     } else {
-      assignLocation('/login/canvas')
+      // if no meaningful history then redirect to branded login entry point
+      assignLocation('/login')
     }
-  }, [])
+  }, [location.key, navigate, navigationType])
 
   const alertTermsUnavailable = () => (
     <Alert variant="error" transition="none" margin="none" hasShadow={false}>
@@ -75,6 +80,7 @@ const AcceptableUsePolicy = () => {
             padding="0 large medium 0"
           >
             <CloseButton
+              data-testid="close-acceptable-use-policy"
               onClick={handleClose}
               placement="end"
               offset="none"

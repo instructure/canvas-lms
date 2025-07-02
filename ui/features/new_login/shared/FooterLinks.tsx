@@ -19,15 +19,15 @@
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Link} from '@instructure/ui-link'
 import {InlineList} from '@instructure/ui-list'
-import {View, ViewOwnProps} from '@instructure/ui-view'
-import React from 'react'
+import {View, type ViewOwnProps} from '@instructure/ui-view'
+import type React from 'react'
 import {useHelpTray, useNewLogin, useNewLoginData} from '../context'
 
 const I18n = createI18nScope('new_login')
 
 const FooterLinks = () => {
   const {isUiActionPending} = useNewLogin()
-  const {isPreviewMode, helpLink} = useNewLoginData()
+  const {isPreviewMode, helpLink, requireAup} = useNewLoginData()
   const {openHelpTray, isHelpTrayOpen} = useHelpTray()
 
   const isDisabled = isPreviewMode || isUiActionPending
@@ -82,16 +82,18 @@ const FooterLinks = () => {
           </Link>
         </InlineList.Item>
 
-        <InlineList.Item>
-          <Link
-            data-testid="aup-link"
-            forceButtonRole={false}
-            href="/acceptable_use_policy"
-            onClick={handleClick}
-          >
-            {I18n.t('Acceptable Use Policy')}
-          </Link>
-        </InlineList.Item>
+        {requireAup && (
+          <InlineList.Item>
+            <Link
+              data-testid="aup-link"
+              forceButtonRole={false}
+              href="/acceptable_use_policy"
+              onClick={handleClick}
+            >
+              {I18n.t('Acceptable Use Policy')}
+            </Link>
+          </InlineList.Item>
+        )}
       </InlineList>
     </View>
   )
