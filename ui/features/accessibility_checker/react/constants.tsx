@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ContentItemType, Severity} from './types'
+import {ContentItemType, RuleId, Severity} from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('accessibility_checker')
@@ -27,7 +27,7 @@ export const TypeToKeyMap: Record<ContentItemType, 'pages' | 'assignments' | 'at
   [ContentItemType.Attachment]: 'attachments',
 }
 
-export const ruleIdToLabelMap: Record<string, string> = {
+export const ruleIdToLabelMap: Record<RuleId, string> = {
   'adjacent-links': I18n.t('Adjacent links'),
   'headings-sequence': I18n.t('Headings sequence'),
   'has-lang-entry': I18n.t('PDF language entry'),
