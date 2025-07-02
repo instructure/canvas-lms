@@ -1163,6 +1163,28 @@ describe "Accounts API", type: :request do
       end
     end
 
+    describe "horizon_account setting" do
+      it "can enable the horizon account setting" do
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { horizon_account: { value: true } } } })
+        @a1.reload
+        expect(@a1.settings[:horizon_account][:value]).to be true
+        expect(@a1.settings[:horizon_account][:locked]).to be true
+      end
+
+      it "can disable the horizon account setting" do
+        @a1.settings[:horizon_account] = { value: true }
+        @a1.save!
+        api_call(:put,
+                 "/api/v1/accounts/#{@a1.id}",
+                 { controller: "accounts", action: "update", id: @a1.to_param, format: "json" },
+                 { account: { settings: { horizon_account: { value: false } } } })
+        expect(@a1.reload.settings[:horizon_account][:value]).to be false
+      end
+    end
+
     context "PUT update_api" do
       let_once(:valid_attributes) { { minimum_character_length: 10, maximum_login_attempts: 5 } }
       let_once(:invalid_attributes) { { minimum_character_length: 2, maximum_login_attempts: 30 } }
@@ -2469,6 +2491,13 @@ describe "Accounts API", type: :request do
         json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
         expect(json["allow_assign_to_differentiation_tags"]).to be_nil
       end
+    end
+
+    it "includes the horizon_account setting" do
+      @a1.settings[:horizon_account] = { value: true }
+      @a1.save!
+      json = api_call(:get, show_settings_path, show_settings_header, {}, { expected_status: 200 })
+      expect(json["horizon_account"]["value"]).to be true
     end
   end
 
