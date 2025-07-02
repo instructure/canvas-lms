@@ -11715,6 +11715,7 @@ ko:
           score_for_quiz: "이 퀴즈의 점수"
           score_for_survey: "이 설문의 점수"
           survey_score: "설문 점수"
+          warning_icon: 경고
         links: 
           click_to_view_results: "결과를 보려면 클릭"
         questions_not_graded: "어떤 문제는 아직 평가 안 됨"
