@@ -784,7 +784,26 @@ class ContextModulesController < ApplicationController
       progression = collapse(@module, params[:collapse])
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-        format.json { render json: (progression.collapsed ? progression : @module.content_tags_visible_to(@current_user)) }
+        format.json do
+          if progression.collapsed
+            render json: progression
+          else
+            # Preload content associations to prevent N+1 queries when rendering JSON
+            content_tags = @module.content_tags_visible_to(@current_user)
+            assignment_ids = content_tags.filter_map { |ct| ct.content_id if ct.content_type == "Assignment" }
+
+            if assignment_ids.any?
+              assignments = Assignment.where(id: assignment_ids).index_by(&:id)
+              content_tags.each do |ct|
+                if ct.content_type == "Assignment" && assignments[ct.content_id]
+                  ct.association(:content).target = assignments[ct.content_id]
+                end
+              end
+            end
+
+            render json: content_tags
+          end
+        end
       end
     end
   end
