@@ -93,7 +93,9 @@ module Types
 
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
     def completion_requirements
-      context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+      ModuleItemsVisibleLoader.for(current_user).load(context_module).then do |_|
+        context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+      end
     end
 
     field :requirement_count, Integer, null: true
