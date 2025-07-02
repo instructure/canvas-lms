@@ -42,6 +42,8 @@ const mockUseNewLoginData = useNewLoginData as jest.Mock
 const mockUseHelpTray = useHelpTray as jest.Mock
 const mockUseNewLogin = useNewLogin as jest.Mock
 
+const mockHelpLink = {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'}
+
 describe('FooterLinks', () => {
   const renderFooterLinks = () =>
     render(
@@ -61,7 +63,7 @@ describe('FooterLinks', () => {
   it('renders without crashing', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
@@ -71,7 +73,8 @@ describe('FooterLinks', () => {
   it('renders all links', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
+      requireAup: true,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
@@ -86,7 +89,7 @@ describe('FooterLinks', () => {
     const mockOpenHelpTray = jest.fn()
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: true,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: mockOpenHelpTray})
@@ -99,7 +102,7 @@ describe('FooterLinks', () => {
   it('enables links when isDisabled is false', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
@@ -114,7 +117,7 @@ describe('FooterLinks', () => {
     const mockOpenHelpTray = jest.fn()
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: mockOpenHelpTray})
@@ -127,7 +130,7 @@ describe('FooterLinks', () => {
   it('renders tracking data for help link', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
@@ -149,10 +152,23 @@ describe('FooterLinks', () => {
     expect(helpLink).toBeNull()
   })
 
+  it('does not render acceptable use policy link if requireAup is not provided', () => {
+    mockUseNewLoginData.mockReturnValue({
+      isPreviewMode: false,
+      requireAup: null,
+    })
+    mockUseNewLogin.mockReturnValue({isUiActionPending: false})
+    mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
+    renderFooterLinks()
+    const helpLink = screen.queryByTestId('aup-link')
+    expect(helpLink).toBeNull()
+  })
+
   it('renders links with correct semantics and no unnecessary roles or hrefs', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
+      requireAup: 'true',
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
@@ -181,7 +197,7 @@ describe('FooterLinks', () => {
   it('sets aria-expanded to false when tray is closed', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({
@@ -196,7 +212,7 @@ describe('FooterLinks', () => {
   it('sets aria-expanded to true when tray is open', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({
@@ -211,7 +227,8 @@ describe('FooterLinks', () => {
   it('ensures all links open in the same window (no target="_blank")', () => {
     mockUseNewLoginData.mockReturnValue({
       isPreviewMode: false,
-      helpLink: {text: 'Help', trackCategory: 'test-category', trackLabel: 'test-label'},
+      helpLink: mockHelpLink,
+      requireAup: true,
     })
     mockUseNewLogin.mockReturnValue({isUiActionPending: false})
     mockUseHelpTray.mockReturnValue({openHelpTray: jest.fn()})
