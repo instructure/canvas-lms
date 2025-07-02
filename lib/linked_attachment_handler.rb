@@ -110,7 +110,7 @@ module LinkedAttachmentHandler
                 attachment_id: attachment.id,
                 user_id: user&.id,
                 context_concern:,
-                root_account_id:,
+                root_account_id: actual_root_account_id,
               }
             end
           end
@@ -137,6 +137,10 @@ module LinkedAttachmentHandler
 
   def access_for_attachment_association?(user, session, _location_param)
     grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
+  end
+
+  def actual_root_account_id
+    root_account_id
   end
 
   module ClassMethods

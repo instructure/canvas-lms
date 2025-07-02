@@ -23,10 +23,28 @@ class LearningOutcome < ActiveRecord::Base
   include Workflow
   include MasterCourses::Restrictor
   restrict_columns :state, [:workflow_state]
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[description]
+  end
+
+  def attachment_associations_enabled?
+    return context.root_account.feature_enabled?(:file_association_access) if context&.root_account
+
+    Account.site_admin.feature_enabled?(:file_association_access)
+  end
+
+  def actual_root_account_id
+    return context.root_account.id if context&.root_account
+
+    Account.site_admin.id
+  end
 
   belongs_to :context, polymorphic: [:account, :course]
   has_many :learning_outcome_results
   has_many :alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'") }, class_name: "ContentTag"
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   belongs_to :copied_from,
              class_name: "LearningOutcome",

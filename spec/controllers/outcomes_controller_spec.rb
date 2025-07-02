@@ -493,6 +493,16 @@ describe OutcomesController do
       end
     end
 
+    it "creates attachment associations if necessary" do
+      user_session(@teacher)
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      post "create", params: { course_id: @course.id, learning_outcome: outcome_params.merge({ description: aa_test_data.base_html }) }
+      expect(assigns[:outcome]).not_to be_nil
+      aas = AttachmentAssociation.where(context_type: "LearningOutcome", context_id: assigns[:outcome].id)
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
     it "allows creating a new outcome with a specific group" do
       # create a new group that is a child of the root group that we can
       # set our new outcome to belong to
@@ -550,6 +560,30 @@ describe OutcomesController do
                               learning_outcome: { short_description: test_string } }
       @outcome.reload
       expect(@outcome[:short_description]).to eql test_string
+    end
+
+    it "updates attachment associations if necessary" do
+      user_session(@teacher)
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
+                              learning_outcome: { description: aa_test_data.added_html } }
+
+      aas = AttachmentAssociation.where(context_type: "LearningOutcome", context_id: @outcome.id)
+      expect(aas.count).to eq 2
+      attachment_ids = aas.pluck(:attachment_id)
+      expect(attachment_ids).to match_array [aa_test_data.attachment1.id, aa_test_data.attachment2.id]
+    end
+
+    it "removes attachment associations if necessary" do
+      user_session(@teacher)
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@course.account, @course)
+      put "update", params: { course_id: @course.id,
+                              id: @outcome.id,
+                              learning_outcome: { description: aa_test_data.removed_html } }
+
+      aas = AttachmentAssociation.where(context_type: "LearningOutcome", context_id: @outcome.id)
+      expect(aas.count).to eq 0
     end
   end
 

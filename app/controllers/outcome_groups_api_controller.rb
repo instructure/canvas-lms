@@ -277,7 +277,8 @@ class OutcomeGroupsApiController < ApplicationController
       render json: "error".to_json, status: :bad_request
       return
     end
-    @outcome_group.update(params.permit(:title, :description, :vendor_guid))
+    @outcome_group.saving_user = @current_user
+    @outcome_group.update(outcome_groups_incoming_params)
     if params[:parent_outcome_group_id] && params[:parent_outcome_group_id] != @outcome_group.learning_outcome_group_id
       new_parent = context_outcome_groups.find(params[:parent_outcome_group_id])
       unless new_parent.adopt_outcome_group(@outcome_group)
@@ -541,6 +542,7 @@ class OutcomeGroupsApiController < ApplicationController
                                      :calculation_method,
                                      :calculation_int,
                                      ratings: strong_anything)
+      outcome_params[:description] = process_incoming_html_content(outcome_params[:description]) if outcome_params[:description]
       @outcome = context_create_outcome(outcome_params)
       unless @outcome.valid?
         render json: @outcome.errors, status: :bad_request
@@ -650,7 +652,8 @@ class OutcomeGroupsApiController < ApplicationController
     return unless can_manage_outcomes
 
     @outcome_group = context_outcome_groups.find(params[:id])
-    @child_outcome_group = @outcome_group.child_outcome_groups.build(params.permit(:title, :description, :vendor_guid))
+    @child_outcome_group = @outcome_group.child_outcome_groups.build(outcome_groups_incoming_params)
+    @child_outcome_group.saving_user = @current_user
     if @child_outcome_group.save
       render json: outcome_group_json(@child_outcome_group, @current_user, session)
     else
@@ -721,6 +724,7 @@ class OutcomeGroupsApiController < ApplicationController
 
     # import the validated source
     if value_to_boolean(params[:async])
+      @outcome_group.saving_user = @current_user
       progress = Progress.create!(context: @context, user: @current_user, tag: :import_outcome_group)
       progress.process_job(
         self.class,
@@ -732,13 +736,13 @@ class OutcomeGroupsApiController < ApplicationController
       )
       render json: progress_json(progress, @current_user, session)
     else
-      @child_outcome_group = @outcome_group.add_outcome_group(@source_outcome_group)
+      @child_outcome_group = @outcome_group.add_outcome_group(@source_outcome_group, {}, @current_user)
       render json: outcome_group_json(@child_outcome_group, @current_user, session)
     end
   end
 
   def self.add_outcome_group_async(progress, target_group, source_group, partial_path)
-    copy = target_group.add_outcome_group(source_group)
+    copy = target_group.add_outcome_group(source_group, {}, progress.user)
     progress.set_results(
       outcome_group_id: copy.id,
       outcome_group_url: "#{partial_path}/#{copy.id}"
@@ -786,7 +790,14 @@ class OutcomeGroupsApiController < ApplicationController
       outcome.calculation_method = data[:calculation_method]
       outcome.calculation_int = data[:calculation_int]
     end
+    outcome.saving_user = @current_user
     outcome.save
     outcome
+  end
+
+  def outcome_groups_incoming_params
+    ogparams = params.permit(:title, :description, :vendor_guid)
+    ogparams[:description] = process_incoming_html_content(ogparams[:description]) if ogparams[:description]
+    ogparams
   end
 end
