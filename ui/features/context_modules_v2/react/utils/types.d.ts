@@ -271,3 +271,54 @@ export interface Folder {
   id: string
   name: string
 }
+
+export type ExternalToolPlacementType =
+  | 'module_group_menu'
+  | 'module_menu_modal'
+  | 'module_menu'
+  | 'module_index_menu_modal'
+
+export interface ExternalToolPlacement {
+  message_type?: string
+  url?: string
+  title?: string
+  selection_width?: number
+  selection_height?: number
+  launch_width?: number
+  launch_height?: number
+}
+
+export interface ExternalToolTrayItem {
+  id: string
+  title: string
+  base_url: string
+  icon_url?: string | null
+  canvas_icon_class?: string | null
+}
+
+export interface ExternalToolModalItem {
+  definition_type: string
+  definition_id: string | number
+  url?: string
+  name: string
+  description?: string
+  domain?: string | null
+  placements: {
+    assignment_selection?: ExternalToolPlacement
+    link_selection?: ExternalToolPlacement
+    module_group_menu?: ExternalToolPlacement
+    module_menu_modal?: ExternalToolPlacement
+    module_menu?: ExternalToolPlacement
+    module_index_menu_modal?: ExternalToolPlacement
+    [key: string]: ExternalToolPlacement | undefined
+  }
+}
+
+export type ExternalTool = ExternalToolTrayItem | ExternalToolModalItem
+
+export interface ExternalToolLaunchOptions {
+  moduleId: string
+  placement: ExternalToolPlacementType
+  display?: 'borderless' | 'full'
+  contextModuleId?: string
+}

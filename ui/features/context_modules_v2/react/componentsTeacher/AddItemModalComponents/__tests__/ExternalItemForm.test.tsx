@@ -52,7 +52,7 @@ const setUp = (props = {}, externalTools: ExternalTool[] = [mockTool]) => {
   const finalProps = buildProps(props)
   return {
     ...render(
-      <ContextModuleProvider {...contextModuleDefaultProps} externalTools={externalTools}>
+      <ContextModuleProvider {...contextModuleDefaultProps} moduleMenuModalTools={externalTools}>
         <ExternalItemForm {...finalProps} />
       </ContextModuleProvider>,
     ),

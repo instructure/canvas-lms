@@ -116,7 +116,14 @@ const setupTest = (
   // Render the component with context provider
   return render(
     <QueryClientProvider client={queryClient}>
-      <ContextModuleProvider {...contextModuleDefaultProps} courseId={courseId} externalTools={[]}>
+      <ContextModuleProvider
+        {...contextModuleDefaultProps}
+        courseId={courseId}
+        moduleMenuModalTools={[]}
+        moduleGroupMenuTools={[]}
+        moduleMenuTools={[]}
+        moduleIndexMenuModalTools={[]}
+      >
         <ModulePageActionHeaderStudent {...props} />
       </ContextModuleProvider>
     </QueryClientProvider>,

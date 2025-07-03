@@ -218,7 +218,7 @@ class ContextModulesController < ApplicationController
     def module_tool_definitions
       tools = {}
       # commons favorites tray placements expect tool in display_hash format
-      %i[module_index_menu module_group_menu].each do |type|
+      %i[module_index_menu module_group_menu module_menu].each do |type|
         tools[type] = @menu_tools[type].map { |t| external_tool_display_hash(t, type) }
       end
       # newer modal placements expect tool in launch_definition format
