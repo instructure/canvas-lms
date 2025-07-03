@@ -114,12 +114,13 @@ lti_target_link_uri_for_assignment_edit_view:
       state: allowed_on
 lti_apps_page_ai_translation:
   state: hidden
-  shadow: true
-  applies_to: RootAccount
+  applies_to: Account
   display_name: AI Translation for LTI Apps Discover Page
   description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
   environments:
     development:
+      state: allowed_on
+    test:
       state: allowed_on
     ci:
       state: allowed_on
