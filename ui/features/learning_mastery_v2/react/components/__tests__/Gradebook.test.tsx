@@ -18,27 +18,16 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import {Gradebook} from '../Gradebook'
-import type {Student, Outcome, StudentRollupData} from '../../types/rollup'
+import {Gradebook, GradebookProps} from '../Gradebook'
 
 describe('Gradebook', () => {
-  interface GradebookTestProps {
-    students?: Student[]
-    outcomes?: Outcome[]
-    rollups?: StudentRollupData[]
-    courseId?: string
-    gradebookFilters?: string[]
-    gradebookFilterHandler?: jest.Mock
-  }
-
-  const defaultProps = (props: GradebookTestProps = {}) => {
+  const defaultProps = (props = {}): GradebookProps => {
     return {
       students: [
         {
           status: 'active',
           name: 'Student Test',
           display_name: 'Student Test',
-          sortable_name: 'Test, Student',
           avatar_url: '/avatar-url',
           id: '1',
         },
@@ -46,7 +35,6 @@ describe('Gradebook', () => {
           status: 'active',
           name: 'Student Test 2',
           display_name: 'Student Test 2',
-          sortable_name: 'Test 2, Student',
           avatar_url: '/avatar-url-2',
           id: '2',
         },
@@ -86,6 +74,7 @@ describe('Gradebook', () => {
       courseId: '100',
       gradebookFilters: [],
       gradebookFilterHandler: jest.fn(),
+      setCurrentPage: jest.fn(),
       ...props,
     }
   }
@@ -108,6 +97,34 @@ describe('Gradebook', () => {
     const {getByText} = render(<Gradebook {...props} />)
     props.outcomes.forEach(outcome => {
       expect(getByText(outcome.title)).toBeInTheDocument()
+    })
+  })
+
+  describe('pagination', () => {
+    it('does not render pagination controls when there is only one page', () => {
+      const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 1}})
+      const {queryByTestId} = render(<Gradebook {...props} />)
+      expect(queryByTestId('gradebook-pagination')).not.toBeInTheDocument()
+    })
+
+    it('does not render pagination controls when pagination is not provided', () => {
+      const props = defaultProps({pagination: undefined})
+      const {queryByTestId} = render(<Gradebook {...props} />)
+      expect(queryByTestId('gradebook-pagination')).not.toBeInTheDocument()
+    })
+
+    it('renders pagination controls when there are multiple pages', () => {
+      const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 2}})
+      const {queryByTestId} = render(<Gradebook {...props} />)
+      expect(queryByTestId('gradebook-pagination')).toBeInTheDocument()
+    })
+
+    it('calls setCurrentPage when page number button is clicked', () => {
+      const props = defaultProps({pagination: {currentPage: 1, perPage: 10, totalPages: 3}})
+      const {getByText} = render(<Gradebook {...props} />)
+      const page2Button = getByText('2')
+      page2Button.click()
+      expect(props.setCurrentPage).toHaveBeenCalledWith(2)
     })
   })
 })

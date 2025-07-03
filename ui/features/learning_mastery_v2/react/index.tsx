@@ -57,11 +57,19 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
   const contextValues = getLMGBContext() as LMGBContextType
   const {contextURL, accountLevelMasteryScalesFF} = contextValues.env
 
-  const {isLoading, students, outcomes, rollups, gradebookFilters, setGradebookFilters} =
-    useRollups({
-      courseId,
-      accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
-    })
+  const {
+    isLoading,
+    students,
+    outcomes,
+    rollups,
+    gradebookFilters,
+    setGradebookFilters,
+    pagination,
+    setCurrentPage,
+  } = useRollups({
+    courseId,
+    accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
+  })
 
   const onGradebookFilterChange = (filterItem: string) => {
     const filters = new Set(gradebookFilters)
@@ -126,6 +134,8 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           rollups={rollups}
           gradebookFilters={gradebookFilters}
           gradebookFilterHandler={onGradebookFilterChange}
+          pagination={pagination}
+          setCurrentPage={setCurrentPage}
         />
       )}
     </LMGBContext.Provider>

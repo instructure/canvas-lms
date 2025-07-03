@@ -83,7 +83,10 @@ module GradebookCommon
 
   def init_course_with_students(num = 1)
     course_with_teacher(active_all: true)
+    register_and_enroll_students(num)
+  end
 
+  def register_and_enroll_students(num = 1)
     @students = []
     (1..num).each do |i|
       student = User.create!(name: "Student_#{i} lastname#{i}")

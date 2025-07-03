@@ -29,15 +29,18 @@ import {
   COLUMN_PADDING,
   CELL_HEIGHT,
 } from '../utils/constants'
-import {Student, Outcome, StudentRollupData} from '../types/rollup'
+import {Student, Outcome, StudentRollupData, Pagination as PaginationType} from '../types/rollup'
+import {GradebookPagination} from './pagination/GradebookPagination'
 
-interface GradebookProps {
+export interface GradebookProps {
   courseId: string
   students: Student[]
   outcomes: Outcome[]
   rollups: StudentRollupData[]
   gradebookFilters: string[]
   gradebookFilterHandler: (filter: string) => void
+  pagination?: PaginationType
+  setCurrentPage: (page: number) => void
 }
 
 export const Gradebook: React.FC<GradebookProps> = ({
@@ -47,6 +50,8 @@ export const Gradebook: React.FC<GradebookProps> = ({
   rollups,
   gradebookFilters,
   gradebookFilterHandler,
+  pagination,
+  setCurrentPage,
 }) => {
   const headerRow = useRef<HTMLElement | null>(null)
   const gridRef = useRef<HTMLElement | null>(null)
@@ -129,6 +134,9 @@ export const Gradebook: React.FC<GradebookProps> = ({
           <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
         </View>
       </View>
+      {pagination && pagination.totalPages > 1 && (
+        <GradebookPagination pagination={pagination} onPageChange={setCurrentPage} />
+      )}
     </>
   )
 }

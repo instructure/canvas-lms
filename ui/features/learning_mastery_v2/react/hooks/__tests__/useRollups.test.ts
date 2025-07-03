@@ -138,6 +138,13 @@ describe('useRollups', () => {
           outcomes: mockedOutcomes,
         },
         rollups: mockedRollups,
+        meta: {
+          pagination: {
+            page: 1,
+            per_page: 20,
+            page_count: 1,
+          },
+        },
       },
     })
     ;(axios.get as jest.Mock).mockResolvedValue(promise)

@@ -70,12 +70,26 @@ export interface StudentRollupData {
   outcomeRollups: OutcomeRollup[]
 }
 
+export interface Pagination {
+  currentPage: number
+  perPage: number
+  totalPages: number
+}
+
 export interface RollupsResponse {
   data: {
     rollups: StudentRollup[]
     linked: {
       users: Student[]
       outcomes: Outcome[]
+    }
+    meta: {
+      pagination: {
+        count: number
+        page: number
+        page_count: number
+        per_page: number
+      }
     }
   }
 }
