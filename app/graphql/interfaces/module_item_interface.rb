@@ -108,6 +108,8 @@ module Interfaces::ModuleItemInterface
   def can_unpublish
     if object.is_a?(WikiPage)
       Loaders::WikiPageLoaders::CanUnpublishLoader.for(object.context).load(object.id)
+    elsif object.is_a?(DiscussionTopic)
+      Loaders::DiscussionTopicLoaders::CanUnpublishLoader.for(object.context).load(object.id)
     elsif object.respond_to?(:can_unpublish?)
       object.can_unpublish?
     else
