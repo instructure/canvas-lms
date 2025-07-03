@@ -955,7 +955,6 @@ describe SIS::CSV::CourseImporter do
     end
 
     it "applies an account's course template" do
-      @account.root_account.enable_feature!(:course_templates)
       template = @account.courses.create!(name: "Template Course", template: true)
       template.assignments.create!(title: "my assignment")
       @account.update!(course_template: template)

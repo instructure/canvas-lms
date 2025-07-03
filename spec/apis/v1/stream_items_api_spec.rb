@@ -729,7 +729,8 @@ describe UsersController, type: :request do
         "license" => nil,
         "homeroom_course" => false,
         "course_color" => nil,
-        "friendly_name" => nil
+        "friendly_name" => nil,
+        "template" => false
       },
 
       "user" => {
@@ -874,7 +875,8 @@ describe UsersController, type: :request do
         "license" => nil,
         "homeroom_course" => false,
         "course_color" => nil,
-        "friendly_name" => nil
+        "friendly_name" => nil,
+        "template" => false
       },
 
       "user" => {

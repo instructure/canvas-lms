@@ -756,7 +756,6 @@ describe "accounts/settings" do
     let_once(:admin) { account_admin_user(account:) }
 
     before do
-      account.enable_feature!(:course_templates)
       view_context(account, admin)
       assign(:current_user, admin)
       assign(:context, account)

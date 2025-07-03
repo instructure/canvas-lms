@@ -52,6 +52,7 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
+          "course_template_id" => nil
         },
         {
           "id" => @a2.id,
@@ -66,7 +67,8 @@ describe "Accounts API", type: :request do
           "default_storage_quota_mb" => 321,
           "default_user_storage_quota_mb" => 54,
           "default_group_storage_quota_mb" => 41,
-          "workflow_state" => "active"
+          "workflow_state" => "active",
+          "course_template_id" => nil
         },
       ]
     end
@@ -98,7 +100,8 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
-          "uuid" => @a1.uuid
+          "uuid" => @a1.uuid,
+          "course_template_id" => nil
         },
       ]
     end
@@ -367,6 +370,7 @@ describe "Accounts API", type: :request do
           "default_user_storage_quota_mb" => 45,
           "default_group_storage_quota_mb" => 42,
           "workflow_state" => "active",
+          "course_template_id" => nil
         }
       )
     end
@@ -1096,7 +1100,6 @@ describe "Accounts API", type: :request do
 
     context "with course_template_id" do
       before do
-        @a2.root_account.enable_feature!(:course_templates)
         @user.account_users.where(account: @a2).delete_all
       end
 

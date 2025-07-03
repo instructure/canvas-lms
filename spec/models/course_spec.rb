@@ -7357,7 +7357,6 @@ describe Course do
     describe "#copy_from_course_template" do
       it "copies unpublished content" do
         course = Course.create!(template: true)
-        course.root_account.enable_feature!(:course_templates)
         course.account.update!(course_template: course)
         a = course.assignments.create!(title: "bob", workflow_state: "unpublished")
         expect(a).to be_unpublished

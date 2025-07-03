@@ -897,7 +897,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Manage Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       edit_course_template: {
@@ -912,7 +911,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Courses - Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       delete_course_template: {
@@ -927,7 +925,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Manage Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       manage_account_banks: {

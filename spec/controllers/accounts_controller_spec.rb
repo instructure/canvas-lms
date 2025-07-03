@@ -1184,7 +1184,6 @@ describe AccountsController do
     context "course_template_id" do
       before do
         account_with_admin_logged_in
-        @account.enable_feature!(:course_templates)
       end
 
       let(:template) { @account.courses.create!(template: true) }
