@@ -25,9 +25,6 @@ module Accessibility
       # @param label [String] Human-readable label displayed to the user
       # @param options [Array<String>] Array of options for the dropdown
       # @param value [String] Optional default value for the dropdown
-      # @param dom_path [String] Optional DOM path for the element to update
-      # @param original_content [String] Optional original HTML content
-      # @param updated_content [String] Optional updated HTML content
       def initialize(label:,
                      options:,
                      value:)

@@ -42,15 +42,15 @@ module Accessibility
       }
     end
 
-    def update_content(raw_data)
-      html_fixer = HtmlFixer.new(raw_data, self)
+    def update_content(rule, content_type, content_id, path, value)
+      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
       return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
 
       html_fixer.apply_fix!
     end
 
-    def update_preview(raw_data)
-      html_fixer = HtmlFixer.new(raw_data, self)
+    def update_preview(rule, content_type, content_id, path, value)
+      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
       return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
 
       html_fixer.fix_preview

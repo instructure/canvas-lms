@@ -21,10 +21,7 @@ module Accessibility
   module Forms
     class CheckboxField < FormField
       # @param label [String] Human-readable label displayed to the user
-      # @param dom_path [String] Optional DOM path for the element to update
       # @param value [String] Optional default state for the checkbox
-      # @param original_content [String] Optional original HTML content
-      # @param updated_content [String] Optional updated HTML content
       def initialize(label:,
                      value:)
         super(
