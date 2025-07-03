@@ -206,20 +206,18 @@
           <% end %>
         </div>
       </div>
-      <% if @context.root_account.feature_enabled?(:course_templates) %>
-        <div class="form-row">
-          <div class="form-label nobr"><%= f.blabel :course_template, :en => "Course Template" %></div>
-          <div class="nobr">
-            <% editable = if @context.template?
-                   @context.can_stop_being_template? && @context.grants_right?(@current_user, session, :delete_course_template)
-                 else
-                   @context.can_become_template? && @context.grants_right?(@current_user, session, :add_course_template)
-                 end
-            %>
-            <div id="course_template_details" data-is-editable=<%= editable %> %>></div>
-          </div>
+      <div class="form-row">
+        <div class="form-label nobr"><%= f.blabel :course_template, :en => "Course Template" %></div>
+        <div class="nobr">
+          <% editable = if @context.template?
+                 @context.can_stop_being_template? && @context.grants_right?(@current_user, session, :delete_course_template)
+               else
+                 @context.can_become_template? && @context.grants_right?(@current_user, session, :add_course_template)
+               end
+          %>
+          <div id="course_template_details" data-is-editable=<%= editable %> %>></div>
         </div>
-      <% end %>
+      </div>
       <div class="form-row">
         <div class="form-label"><%= f.blabel :time_zone, :en => "Time Zone" %></div>
         <div>

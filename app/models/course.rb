@@ -4565,8 +4565,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_from_course_template
-    if root_account.feature_enabled?(:course_templates) &&
-       (template = account.effective_course_template)
+    if (template = account.effective_course_template)
       content_migration = content_migrations.new(
         source_course: template,
         migration_type: "course_copy_importer",

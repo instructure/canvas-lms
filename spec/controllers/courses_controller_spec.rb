@@ -2750,7 +2750,6 @@ describe CoursesController do
         template.assignments.create!(title: "my assignment")
         template.context_modules.create!(name: "Module 1")
         template.context_modules.create!(name: "Module 2")
-        template.root_account.enable_feature!(:course_templates)
         @account.update!(course_template: template)
         template
       end
@@ -2777,7 +2776,6 @@ describe CoursesController do
         end
 
         it "applies an account's course template if :copied is false" do
-          @account.root_account.enable_feature!(:course_templates)
           create_account_template
 
           post "create",
@@ -4964,7 +4962,6 @@ describe CoursesController do
     it "does not apply an account's course template" do
       template = course.account.courses.create!(name: "Template Course", template: true)
       template.assignments.create!(title: "my assignment")
-      course.root_account.enable_feature!(:course_templates)
       course.account.update!(course_template: template)
 
       post "copy_course", params: { course_id: course.id,

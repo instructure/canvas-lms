@@ -1198,7 +1198,8 @@ describe CoursesController, type: :request do
               "public_description" => "Nature is lethal but it doesn't hold a candle to man.",
               "course_format" => "online",
               "time_zone" => "America/Juneau",
-              "license" => "cc_by_sa"
+              "license" => "cc_by_sa",
+              "template" => false
             }
           }
           course_response = post_params["course"].merge({
@@ -1282,7 +1283,8 @@ describe CoursesController, type: :request do
               "sis_import_id" => nil,
               "public_description" => "Nature is lethal but it doesn't hold a candle to man.",
               "time_zone" => "America/Chicago",
-              "license" => "cc_by_sa"
+              "license" => "cc_by_sa",
+              "template" => false
             }
           }
           course_response = post_params["course"].merge({
@@ -1471,7 +1473,6 @@ describe CoursesController, type: :request do
           )
           template.assignments.create!(title: "my assignment")
 
-          @account.root_account.enable_feature!(:course_templates)
           @account.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @account.update!(course_template: template)
 
@@ -1822,8 +1823,6 @@ describe CoursesController, type: :request do
         end
 
         context "with course templates" do
-          before { @course.root_account.enable_feature!(:course_templates) }
-
           it "allows setting a template" do
             # can't do it if anyone is enrolled
             @course.enrollments.each(&:destroy)
@@ -4252,7 +4251,8 @@ describe CoursesController, type: :request do
                              "friendly_name" => nil,
                              "uuid" => @course1.uuid,
                              "blueprint" => false,
-                             "license" => nil
+                             "license" => nil,
+                             "template" => false
                            })
       end
 
@@ -4357,8 +4357,7 @@ describe CoursesController, type: :request do
         expect(json["tabs"].pluck("id")).to match_array(expected_tabs)
       end
 
-      it "includes template when feature enabled" do
-        @course1.root_account.enable_feature!(:course_templates)
+      it "includes template" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course1.id}.json",
                         { controller: "courses", action: "show", id: @course1.to_param, format: "json" })
