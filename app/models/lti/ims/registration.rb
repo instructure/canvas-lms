@@ -253,7 +253,7 @@ class Lti::IMS::Registration < ApplicationRecord
   end
 
   def scopes_are_valid
-    invalid_scopes = scopes - TokenScopes::LTI_SCOPES.keys
+    invalid_scopes = scopes - (TokenScopes::LTI_SCOPES.keys + TokenScopes::LTI_HIDDEN_SCOPES.keys)
     return if invalid_scopes.empty?
 
     errors.add(:scopes, "Invalid scopes: #{invalid_scopes.join(", ")}")
