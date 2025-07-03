@@ -909,4 +909,46 @@ describe('ToolAvailability', () => {
       })
     })
   })
+
+  describe('adding exceptions', () => {
+    it('does not allow adding exceptions for course deployments', async () => {
+      const reg = mockRegistrationWithAllInformation({
+        n: 'Test App',
+        i: 1,
+      })
+      const deployment = mockDeployment({
+        id: ZLtiDeploymentId.parse('dep-course-1'),
+        context_name: 'Test Course',
+        context_id: '10',
+        context_type: 'Course',
+        registration_id: ZLtiRegistrationId.parse(reg.id),
+        context_controls: [
+          mockContextControl({
+            id: ZLtiContextControlId.parse('cc-course-1'),
+            context_name: 'Test Course 101',
+            path: 'a10.c101.',
+            course_id: ZCourseId.parse('10'),
+            available: true,
+          }),
+        ],
+      })
+      const fetchControlsByDeployment = jest.fn().mockResolvedValue(success([deployment]))
+      const utils = renderAppWithRegistration(reg)(
+        <ToolAvailability
+          deleteDeployment={jest.fn()}
+          editContextControl={jest.fn()}
+          accountId={reg.account_id}
+          fetchControlsByDeployment={fetchControlsByDeployment}
+          deleteContextControl={jest.fn()}
+        />,
+      )
+
+      await waitFor(() => {
+        expect(utils.getByText('Deployment ID: default-deployment-id')).toBeInTheDocument()
+      })
+
+      // Assert that the "Add Exception" button is not present for course deployments
+      expect(utils.queryByRole('button', {name: /add exception/i})).not.toBeInTheDocument()
+    })
+  })
 })
