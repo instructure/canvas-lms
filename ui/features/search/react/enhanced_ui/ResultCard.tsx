@@ -35,31 +35,33 @@ import {htmlEscape} from '@instructure/html-escape'
 import {Pill} from '@instructure/ui-pill'
 import {fudgeDateForProfileTimezone} from '@canvas/datetime/date-functions'
 import {addSearchHighlighting} from './searchHighlighting'
+import {Link} from '@instructure/ui-link'
 
 const I18n = createI18nScope('SmartSearch')
 
 const iconClass = (content_type: string) => {
   switch (content_type) {
     case 'Assignment':
-      return <IconAssignmentLine color="brand" size="x-small" data-testid="assignment_icon" />
+      return <IconAssignmentLine size="x-small" data-testid="assignment_icon" />
     case 'Announcement':
-      return <IconAnnouncementLine color="brand" size="x-small" data-testid="announcement_icon" />
+      return <IconAnnouncementLine size="x-small" data-testid="announcement_icon" />
     case 'DiscussionTopic':
-      return <IconDiscussionLine color="brand" size="x-small" data-testid="discussion_icon" />
+      return <IconDiscussionLine size="x-small" data-testid="discussion_icon" />
     default:
-      return <IconDocumentLine color="brand" size="x-small" data-testid="document_icon" />
+      return <IconDocumentLine size="x-small" data-testid="document_icon" />
   }
 }
 
 const MAX_MODULES_SHOWN = 5
 
-interface Props {
+export interface ResultCardProps {
   result: Result
+  resultType: 'best' | 'similar'
   searchTerm: string
 }
 
-export default function ResultCard(props: Props) {
-  const {body, content_type, html_url, title} = props.result
+export default function ResultCard(props: ResultCardProps) {
+  const {body, content_type, html_url, title, readable_type} = props.result
 
   const renderModuleList = (modules: Module[]) => {
     let trimmedModules = modules
@@ -77,9 +79,9 @@ export default function ResultCard(props: Props) {
       return null
     }
     return (
-      <Flex gap="x-small">
+      <Flex gap="space8">
         {trimmedModules.map((module: Module, index: number) => (
-          <Flex key={module.id} gap="x-small">
+          <Flex key={module.id} gap="space8">
             <IconModuleLine data-testid="module_icon" />
             <Text variant="contentSmall">{module.name}</Text>
             {index < modules.length - 1 || extraModuleText ? <span> | </span> : null}
@@ -115,7 +117,7 @@ export default function ResultCard(props: Props) {
     }
     if (publishPill || datePill) {
       return (
-        <Flex gap="x-small">
+        <Flex gap="space8">
           {datePill}
           {publishPill}
         </Flex>
@@ -127,17 +129,20 @@ export default function ResultCard(props: Props) {
 
   return (
     <Flex
-      href={html_url}
-      target="_blank"
       alignItems="start"
       direction="column"
-      gap="x-small"
+      gap="space8"
       justifyItems="space-between"
       data-testid="search-result"
     >
-      <Flex gap="x-small" as="a" href={html_url} target="_blank">
+      <Link href={html_url} target="_blank">
+        <Heading variant="titleCardLarge" data-pendo={`smart-search-${props.resultType}-result`}>
+          {title}
+        </Heading>
+      </Link>
+      <Flex gap="space8" alignItems="center">
         {iconClass(content_type)}
-        <Heading variant="titleCardLarge">{title}</Heading>
+        <Text variant="content">{readable_type}</Text>
       </Flex>
       {renderPills(
         `${props.result.content_id}-${props.result.content_type}`,

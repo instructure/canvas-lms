@@ -2643,8 +2643,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         ),
       )
     }
+
+    let frozen = [...parentColumnIds, ...customColumnIds]
+    if (this.gridDisplaySettings.hideTotal) frozen = frozen.filter(id => id !== 'total_grade')
     return {
-      frozen: [...parentColumnIds, ...customColumnIds],
+      frozen,
       scrollable: scrollableColumns.map(column => column.id),
     }
   }

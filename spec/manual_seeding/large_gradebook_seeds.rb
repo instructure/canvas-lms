@@ -30,7 +30,7 @@ require "colorize"
 # Usage:
 # rails runner spec/manual_seeding/large_gradebook_seeds.rb
 # OR
-# docker-compose run --rm web rails runner spec/manual_seeding/large_gradebook_seeds.rb
+# docker compose run --rm web rails runner spec/manual_seeding/large_gradebook_seeds.rb
 
 # if you need to add a ton of students + assignments and you have UNIQUE
 # set to true, you'll get an error because faker runs out of unique content to

@@ -125,7 +125,6 @@ describe('SpeedGrader', () => {
         }),
       )
 
-      jest.spyOn($, 'getJSON')
       jest.spyOn(SpeedGrader.EG, 'domReady')
 
       // Mock $.ajaxJSON.storeRequest

@@ -278,7 +278,7 @@ class ContextModulesController < ApplicationController
       js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
       css_bundle :content_next, :context_modules2
 
-      if (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view))
+      if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
         context_modules_header_props = {
           title: t("Modules"),
@@ -292,13 +292,6 @@ class ContextModulesController < ApplicationController
             runningProgressId: @progress&.id,
             disabled: @modules.empty?,
             visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
-          },
-          expandCollapseAll: {
-            label: t("Collapse All"),
-            dataUrl: context_url(@context, :context_url) + "/collapse_all_modules",
-            dataExpand: false,
-            ariaExpanded: false,
-            ariaLabel: t("Collapse All Modules"),
           },
           addModule: {
             label: t("Add Module"),
@@ -791,7 +784,26 @@ class ContextModulesController < ApplicationController
       progression = collapse(@module, params[:collapse])
       respond_to do |format|
         format.html { redirect_to named_context_url(@context, :context_context_modules_url) }
-        format.json { render json: (progression.collapsed ? progression : @module.content_tags_visible_to(@current_user)) }
+        format.json do
+          if progression.collapsed
+            render json: progression
+          else
+            # Preload content associations to prevent N+1 queries when rendering JSON
+            content_tags = @module.content_tags_visible_to(@current_user)
+            assignment_ids = content_tags.filter_map { |ct| ct.content_id if ct.content_type == "Assignment" }
+
+            if assignment_ids.any?
+              assignments = Assignment.where(id: assignment_ids).index_by(&:id)
+              content_tags.each do |ct|
+                if ct.content_type == "Assignment" && assignments[ct.content_id]
+                  ct.association(:content).target = assignments[ct.content_id]
+                end
+              end
+            end
+
+            render json: content_tags
+          end
+        end
       end
     end
   end

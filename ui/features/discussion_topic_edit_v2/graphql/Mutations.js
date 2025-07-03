@@ -127,6 +127,7 @@ export const CREATE_DISCUSSION_TOPIC = gql`
           restrictQuantitativeData
           sisId
           state
+          suppressAssignment
           peerReviews {
             automaticReviews
             count
@@ -267,6 +268,7 @@ export const UPDATE_DISCUSSION_TOPIC = gql`
           restrictQuantitativeData
           sisId
           state
+          suppressAssignment
           peerReviews {
             automaticReviews
             count

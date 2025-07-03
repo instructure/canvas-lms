@@ -157,7 +157,7 @@ module QuizzesHelper
     end
 
     if !quiz.show_correct_answers
-      [I18n.t("Correct answers are hidden."), true]
+      I18n.t("Correct answers are hidden.")
     elsif hide_at.present? && hide_at < now
       I18n.t("Correct answers are no longer available.")
     elsif show_at.present? && hide_at.present?

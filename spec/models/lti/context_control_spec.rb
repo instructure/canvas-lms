@@ -140,22 +140,40 @@ describe Lti::ContextControl do
   describe "#destroy" do
     subject { control.destroy }
 
+    let_once(:parent_account) { account_model }
     let_once(:registration) do
-      lti_registration_with_tool(account:)
+      lti_registration_with_tool(account: parent_account)
     end
     let_once(:deployment) do
       registration.deployments.first
     end
+    let_once(:account) { account_model(parent_account:) }
     let_once(:control) do
-      Lti::ContextControl.find_by(account:, registration:, deployment:)
+      Lti::ContextControl.create!(
+        account:,
+        registration:,
+        deployment:
+      )
     end
 
     it "soft-deletes the control" do
       expect { subject }.to change { control.reload.workflow_state }.from("active").to("deleted")
     end
 
+    context "when control is primary for deployment" do
+      let_once(:control) do
+        Lti::ContextControl.find_by(account: parent_account, registration:, deployment:)
+      end
+
+      it "does not allow control deletion" do
+        expect(subject).to be_falsey
+        expect(control.reload.workflow_state).to eq("active")
+        expect(control.errors[:base]).to include("Cannot delete primary control for deployment")
+      end
+    end
+
     it "doesn't delete controls associated with other registrations" do
-      other_registration = lti_registration_with_tool(account:)
+      other_registration = lti_registration_with_tool(account: parent_account)
 
       subject
       expect(other_registration.reload.context_controls.where(workflow_state: "deleted").count).to eq(0)
@@ -190,10 +208,13 @@ describe Lti::ContextControl do
         end
       end
 
+      # exclude the primary control for the deployment which is not a child of `control`
+      let(:children) { deployment.reload.context_controls.where.not(account: parent_account) }
+
       it "soft-deletes the children as well" do
         subject
 
-        expect(deployment.reload.context_controls.pluck(:workflow_state)).to all(eq("deleted"))
+        expect(children.pluck(:workflow_state)).to all(eq("deleted"))
       end
 
       context "one of the child controls is already deleted" do
@@ -203,7 +224,7 @@ describe Lti::ContextControl do
 
         it "still soft-deletes the other children" do
           subject
-          expect(deployment.reload.context_controls.pluck(:workflow_state)).to all(eq("deleted"))
+          expect(children.pluck(:workflow_state)).to all(eq("deleted"))
         end
 
         it "doesn't try to update the already deleted control" do

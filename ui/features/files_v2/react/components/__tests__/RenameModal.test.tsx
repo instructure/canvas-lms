@@ -25,6 +25,7 @@ import {userEvent} from '@testing-library/user-event'
 import {Folder, File} from '../../../interfaces/File'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {RowsProvider} from '../../contexts/RowsContext'
+import {mockRowsContext} from '../FileFolderTable/__tests__/testUtils'
 
 const defaultProps: {
   isOpen: boolean
@@ -38,7 +39,7 @@ const defaultProps: {
 
 const renderComponent = (props = {}) => {
   return render(
-    <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: [defaultProps.renamingItem]}}>
+    <RowsProvider value={mockRowsContext}>
       <RenameModal {...defaultProps} {...props} />
     </RowsProvider>,
   )

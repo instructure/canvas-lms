@@ -21,75 +21,10 @@ import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {ModulesResponse, GraphQLResult} from '../../utils/types'
 import {InfiniteData} from '@tanstack/react-query'
+import persistedQueries from '@canvas/graphql/persistedQueries'
 
-const MODULES_STUDENT_QUERY = gql`
-  query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
-    legacyNode(_id: $courseId, type: Course) {
-      ... on Course {
-        modulesConnection(first: 100, after: $cursor) {
-          edges {
-            cursor
-            node {
-              id
-              _id
-              name
-              position
-              published
-              unlockAt
-              requirementCount
-              requireSequentialProgress
-              prerequisites {
-                id
-                name
-                type
-              }
-              completionRequirements {
-                id
-                type
-                minScore
-                minPercentage
-              }
-              progression {
-                id
-                _id
-                workflowState
-                collapsed
-                completedAt
-                completed
-                locked
-                unlocked
-                started
-                currentPosition
-                requirementsMet {
-                  id
-                  minPercentage
-                  minScore
-                  score
-                  type
-                }
-                incompleteRequirements {
-                  id
-                  minPercentage
-                  minScore
-                  score
-                  type
-                }
-              }
-              submissionStatistics {
-                latestDueAt
-                missingAssignmentCount
-              }
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  }
-`
+// use persistedQueries to make sure it loads without user session (public courses)
+const MODULES_STUDENT_QUERY = gql`${persistedQueries.GetModulesStudentQuery.query}`
 
 async function getModulesStudent({
   queryKey,

@@ -99,18 +99,12 @@ export const useShouldShowContent = (
     (ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE ||
       ENV.allow_student_anonymous_discussion_topics)
 
-  const shouldShowViewSettings =
-    ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE &&
-    !isAnnouncement &&
-    (ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED || ENV.DISCUSSION_DEFAULT_SORT_ENABLED)
+  const shouldShowViewSettings = ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !isAnnouncement
 
   const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
 
   const shouldShowGroupOptions =
-    !isAnnouncement &&
-    !isGroupContext &&
-    ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP &&
-    (!isCheckpoints || isAlreadyAGroupDiscussion || ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED)
+    !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
 
   const shouldShowGradedDiscussionOptions =
     !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_CREATE_ASSIGNMENT
@@ -141,6 +135,8 @@ export const useShouldShowContent = (
   const shouldShowAllowParticipantsToCommentOption =
     !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
 
+  const shouldShowSuppressAssignmentOption = isGraded && ENV.SETTINGS.suppress_assignments
+
   return {
     shouldShowTodoSettings,
     shouldShowPostToSectionOption,
@@ -158,5 +154,6 @@ export const useShouldShowContent = (
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
+    shouldShowSuppressAssignmentOption,
   }
 }

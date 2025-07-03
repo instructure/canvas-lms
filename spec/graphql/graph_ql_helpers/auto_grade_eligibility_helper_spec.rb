@@ -135,6 +135,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           submission_type: "online_text_entry",
           attachments: []
         )
+        allow(submission).to receive(:word_count).and_return(nil)
         issues = described_class.validate_submission(submission:)
         expect(issues).to include("Submission must be at least 5 words.")
       end
@@ -146,16 +147,16 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           user: @student,
           assignment:,
           body: "This is a valid essay submission.",
-          submission_type: "online_upload",
+          submission_type: "online_url",
           attachments: []
         )
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Submission must be a text entry type.")
+        expect(issues).to include("Submission must be a text entry type or file upload.")
       end
     end
 
     context "when word count is null" do
-      it "returns missing submission error like this" do
+      it "returns submission must be at least 5 words." do
         submission = submission_model(
           user: @student,
           assignment: @assignment,
@@ -165,45 +166,41 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         )
         allow(submission).to receive(:word_count).and_return(nil)
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("No essay submission found.")
+        expect(issues).to include("Submission must be at least 5 words.")
       end
     end
 
-    context "when submission contains attachments" do
-      it "returns attachment error" do
+    context "when submission contains attachments with invalid mime type" do
+      it "returns file type error" do
         submission = submission_model(
           user: @student,
           assignment:,
-          body: "This is a valid essay.",
-          submission_type: "online_text_entry",
-          attachments: []
-        )
-
-        fake_attachment = double("Attachment", id: 123, context: assignment, recently_created?: true)
-        allow(submission).to receive(:attachments).and_return([fake_attachment])
-
-        issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Submission contains file attachments.")
-      end
-    end
-
-    context "when submission has multiple issues" do
-      it "returns all applicable issues" do
-        submission = submission_model(
-          user: @student,
-          assignment:,
-          body: "",
           submission_type: "online_upload",
           attachments: []
         )
 
-        fake_attachment = double("Attachment", id: 123, context: assignment, recently_created?: true)
-        allow(submission).to receive_messages(word_count: nil, attachments: [fake_attachment])
+        bad_attachment = double("Attachment", mimetype: "text/plain")
+        allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
 
         issues = described_class.validate_submission(submission:)
+        expect(issues).to include("Only PDF and DOCX files are supported.")
+      end
+    end
 
-        expect(issues).to include("Submission must be a text entry type.")
-        expect(issues).to include("Submission contains file attachments.")
+    context "when submission contains PDF attachments images" do
+      it "returns there are images embedded in the file that can not be parsed" do
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          submission_type: "online_upload",
+          attachments: []
+        )
+
+        bad_attachment = double("Attachment", mimetype: "application/pdf")
+        allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: true, word_count: 50)
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to include("There are images embedded in the file that can not be parsed.")
       end
     end
 

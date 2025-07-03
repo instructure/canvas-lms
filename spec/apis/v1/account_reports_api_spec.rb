@@ -265,17 +265,31 @@ describe "Account Reports API", type: :request do
 
       expect(json["id"]).to eq @report.id
       expect(json["status"]).to eq "aborted"
-      expect(AccountReport.running.exists?(@report.id)).to be_falsey
+      expect(AccountReport.created_or_running.exists?(@report.id)).to be_falsey
     end
 
-    it "returns error on a report not started" do
+    it "aborts a report that hasn't started yet" do
+      @report.update!(workflow_state: "created")
+
+      json = api_call(:put,
+                      "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}/abort",
+                      { report: @report.report_type, controller: "account_reports", action: "abort", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s })
+
+      expect(json["id"]).to eq @report.id
+      expect(json["status"]).to eq "aborted"
+      expect(@report.reload).to be_aborted
+    end
+
+    it "returns error on a report that has already finished" do
+      @report.update!(workflow_state: "complete")
+
       json = api_call(:put,
                       "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}/abort",
                       { report: @report.report_type, controller: "account_reports", action: "abort", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s })
 
       expect(json["id"]).to be_nil
       expect(json["errors"]).to eq([{ "message" => "The specified resource does not exist." }])
-      expect(AccountReport.find(@report.id).workflow_state).to eq("created")
+      expect(AccountReport.find(@report.id).workflow_state).to eq("complete")
     end
   end
 end

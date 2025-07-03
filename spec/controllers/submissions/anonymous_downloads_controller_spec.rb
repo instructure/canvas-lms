@@ -150,7 +150,7 @@ describe Submissions::AnonymousDownloadsController do
       get :show, params: { assignment_id: assignment.id, course_id: @course.id, anonymous_id: @submission.anonymous_id, download: att.id }
 
       expect(response).to be_redirect
-      expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
+      expect(response.headers["Location"]).to match %r{/users/#{@student.id}/files/#{att.id}/download\?download_frd=true}
     end
   end
 end

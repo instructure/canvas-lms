@@ -2641,6 +2641,7 @@ class AbstractAssignment < ActiveRecord::Base
               is_primary_student ? homework.broadcast_group_submission : homework.save_without_broadcasting!
             end
           else
+            homework.saving_user = original_student
             homework.save!
             annotation_context.update!(submission_attempt: homework.attempt) if annotation_context.present?
           end
@@ -3392,6 +3393,7 @@ class AbstractAssignment < ActiveRecord::Base
     return true if unsupported_grading_types.include?(grading_type)
 
     known_features = {
+      moderated: -> { moderated_grading? },
       peer: -> { peer_reviews? },
       group: -> { has_group_category? },
       group_graded_group: -> { grade_as_group? },
@@ -3402,11 +3404,12 @@ class AbstractAssignment < ActiveRecord::Base
       rubric: -> { active_rubric_association? },
     }
 
-    unless Account.site_admin.feature_enabled?(:moderated_grading_modernized_speedgrader)
-      known_features[:moderated] = -> { moderated_grading? }
-    end
+    unsupported_features = if Account.site_admin.feature_enabled?(:moderated_grading_modernized_speedgrader)
+                             Setting.get("assignment_features_unsupported_in_sg2", "").strip.split(",").map(&:to_sym).intersection(known_features.keys)
+                           else
+                             Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
+                           end
 
-    unsupported_features = Setting.get("assignment_features_unsupported_in_sg2", "moderated").strip.split(",").map(&:to_sym).intersection(known_features.keys)
     unsupported_features.any? { |feature| known_features.fetch(feature).call }
   end
 
@@ -4302,7 +4305,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def anonymous_student_identities
-    @anonymous_student_identities ||= all_submissions.active.order(Arel.sql('anonymous_id COLLATE "C" ASC')).order("md5(id::text) ASC").each_with_object({}).with_index(1) do |(identity, identities), student_number|
+    @anonymous_student_identities ||= all_submissions.active.order(Arel.sql("#{Submission.anonymous_id_order_clause} ASC")).order("md5(id::text) ASC").each_with_object({}).with_index(1) do |(identity, identities), student_number|
       identities[identity["user_id"]] = {
         name: I18n.t("Student %{student_number}", { student_number: }),
         position: student_number,

@@ -1563,4 +1563,57 @@ describe Types::AssignmentType do
       expect(resolver.resolve("moduleItems { module { _id } }")).to eq [module_1.id.to_s, module_2.id.to_s]
     end
   end
+
+  describe "assigned_students" do
+    let(:regular_assignment) do
+      course.assignments.create!(
+        title: "regular assignment",
+        submission_types: "online_text_entry"
+      )
+    end
+
+    let_once(:student2) do
+      user = user_factory(name: "First Last", account: @account)
+      student_in_course(course:, user:, active_all: true).user
+    end
+
+    let_once(:fake_student) { course.student_view_student }
+
+    it "returns students with assignment visibility when user has :manage_grades permission" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to eq [student.id.to_s, student2.id.to_s]
+    end
+
+    it "returns nil when user doesn't have :manage_grades permission" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: student)
+      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to be_nil
+    end
+
+    it "doesn't include fake students" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect(resolver.resolve("assignedStudents { nodes { _id } }")).not_to include(fake_student.id.to_s)
+    end
+
+    it "filters by search term" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect(resolver.resolve("assignedStudents (filter: { searchTerm: \"First\" }) { edges { node { name } } }")).to include(student2.name)
+    end
+
+    it "raises an error if search term is too short" do
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      expect_error = "search term must be at least"
+      expect do
+        resolver.resolve("assignedStudents (filter: { searchTerm: \"a\" }) { edges { node { name } } }")
+      end.to raise_error(GraphQLTypeTester::Error, /#{Regexp.escape(expect_error)}/)
+    end
+
+    it "only returns students who have visibility for the assignment" do
+      create_adhoc_override_for_assignment(regular_assignment, student2)
+      regular_assignment.update!(only_visible_to_overrides: true)
+      resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
+      result = resolver.resolve("assignedStudents { nodes { _id } }")
+      expect(result).to eq [student2.id.to_s]
+      expect(result).not_to include(student.id.to_s)
+    end
+  end
 end

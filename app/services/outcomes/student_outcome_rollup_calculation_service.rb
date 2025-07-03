@@ -39,6 +39,19 @@ module Outcomes
               singleton: "calculate_for_student:#{course_id}:#{student_id}")
           .call(course_id:, student_id:)
       end
+
+      # Schedule outcome rollup calculations for all students in a course
+      #
+      # @param course_id [Integer] the ID of the course to calculate rollups for
+      def calculate_for_course(course_id:)
+        course = Course.find(course_id)
+
+        course.students.find_in_batches do |student_batch|
+          student_batch.each do |student|
+            calculate_for_student(course_id:, student_id: student.id)
+          end
+        end
+      end
     end
 
     # @param course_id [Integer] the course_id whose outcomes to roll up
@@ -73,8 +86,11 @@ module Outcomes
 
     # @return [Array<LearningOutcomeResult>]
     def fetch_canvas_results
-      # TODO: fetch results from Canvas
-      []
+      LearningOutcomeResult.where(
+        context_type: "Course",
+        context_id: @course.id,
+        user_id: @student.id
+      )
     end
 
     # @return [Array<LearningOutcomeResult>]

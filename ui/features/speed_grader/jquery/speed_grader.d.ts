@@ -21,6 +21,7 @@ import type JQuery from 'jquery'
 import {ZSubmissionOriginalityData, ZVericiteOriginalityData} from '@canvas/grading/grading.d'
 import type {SubmissionOriginalityData} from '@canvas/grading/grading.d'
 import {ZExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {ZSpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
 import PostPolicies from '../react/PostPolicies/index'
 import AssessmentAuditTray from '../react/AssessmentAuditTray'
 
@@ -217,11 +218,6 @@ export type SubmissionHistoryEntry = z.infer<typeof ZSubmissionHistoryEntry>
 export const ZSubmission = ZBaseSubmission.extend({
   submission_history: z.array(ZSubmissionHistoryEntry),
   lti_asset_reports: ZSpeedGraderLtiAssetReports,
-})
-
-export const ZSpeedGraderLtiAssetReports = z.object({
-  by_attachment: z.record(z.string() /* attachment ID */, ZLtiAssetReportsByProcessor).optional(),
-  // TODO: by_version (RCE content)
 })
 
 export type Submission = z.infer<typeof ZSubmission>
@@ -527,6 +523,7 @@ export type SpeedGrader = {
   goToStudent: (studentIdentifier: any, historyBehavior?: 'push' | 'replace' | null) => void
   handleGradingError: (error: GradingError) => void
   handleStatePopped: (event: PopStateEvent) => void
+  handleSGMessages: (MessageEvent) => void
   getStudentNameAndGrade: (student?: StudentWithSubmission) => string
   handleStudentChanged: (historyBehavior: 'push' | 'replace' | null) => void
   postPolicies?: PostPolicies
@@ -639,6 +636,7 @@ export type SpeedGrader = {
     retryDelay?: number,
   ) => void
   setState: (state: any) => void
+  submittedAtText: string
 }
 
 export type Grade = {

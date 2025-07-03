@@ -21,9 +21,11 @@
 class CalendarsController < ApplicationController
   include Api::V1::Conferences
   include CalendarConferencesHelper
+  include HorizonMode
 
   before_action :require_user
   before_action :check_limited_access_for_students, only: %i[show]
+  before_action :load_canvas_career, only: %i[show]
 
   def show
     get_context

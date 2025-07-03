@@ -17,6 +17,7 @@
  */
 
 import {createContext, PropsWithChildren, useContext, useState} from 'react'
+import {SerializedNodes} from '@craftjs/core'
 import {Prettify} from './utilities/Prettify'
 
 type AddBlockModal = {
@@ -26,21 +27,36 @@ type AddBlockModal = {
   close: () => void
 }
 
+type AddBlock = {
+  shouldShow: boolean
+  setShouldShow: (shouldShow: boolean) => void
+}
+
 type PageEditorContextType = {
   addBlockModal: AddBlockModal
+  addBlock: AddBlock
+}
+
+type PageEditorContextProps = {
+  data: SerializedNodes | null
 }
 
 const Context = createContext<PageEditorContextType>(null as any)
 
 export const usePageEditorContext = () => useContext(Context)
 
-export const PageEditorContext = (props: PropsWithChildren) => {
+export const PageEditorContext = (props: PropsWithChildren<PageEditorContextProps>) => {
   const [addBlockModal, setAddBlockModal] = useState<
     Prettify<Pick<AddBlockModal, 'isOpen' | 'insertAfterNodeId'>>
   >({
     isOpen: false,
     insertAfterNodeId: undefined,
   })
+
+  const [shouldShowAddBlock, setShouldShowAddBlock] = useState<boolean>(
+    (props?.data?.['ROOT']?.nodes.length ?? 0) === 0,
+  )
+
   const openAddBlockModal = (insertAfterNodeId?: string) => {
     setAddBlockModal({
       isOpen: true,
@@ -61,6 +77,10 @@ export const PageEditorContext = (props: PropsWithChildren) => {
           ...addBlockModal,
           open: openAddBlockModal,
           close: closeAddBlockModal,
+        },
+        addBlock: {
+          shouldShow: shouldShowAddBlock,
+          setShouldShow: setShouldShowAddBlock,
         },
       }}
     >

@@ -282,4 +282,54 @@ describe('WikiPageIndexView', () => {
       expect(sortByFieldStub).toHaveBeenCalled()
     })
   })
+
+  describe('new page button', () => {
+    let view
+    let collection
+    let model
+
+    beforeEach(() => {
+      fakeENV.setup({
+        context_asset_string: 'course_1',
+      })
+      model = new WikiPage({page_id: '42'})
+      collection = new WikiPageCollection([model])
+      view = new WikiPageIndexView({
+        collection,
+        WIKI_RIGHTS: {
+          create_page: true,
+          manage: true,
+        },
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+      jest.clearAllMocks()
+    })
+
+    it('has text "Page" when no preferred text editor', () => {
+      fakeENV.setup({
+        text_editor_preference: null,
+      })
+      view.render()
+      expect(view.$('.new_page')[0]).toHaveTextContent('Page')
+    })
+
+    it('has text "Page" when block_editor is preferred text editor', () => {
+      fakeENV.setup({
+        text_editor_preference: 'block_editor',
+      })
+      view.render()
+      expect(view.$('.new_page')[0]).toHaveTextContent('Page')
+    })
+
+    it('has text "RCE Page" when RCE is preferred text editor', () => {
+      fakeENV.setup({
+        text_editor_preference: 'rce',
+      })
+      view.render()
+      expect(view.$('.new_page')[0]).toHaveTextContent('RCE Page')
+    })
+  })
 })

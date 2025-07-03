@@ -1209,6 +1209,15 @@ describe SubmissionLifecycleManager do
         cacher.recompute
       end
 
+      it "kicks off LatePolicyApplicator job on the course when told to do so with multiple assignments" do
+        @assignment1 = @assignment
+        @assignment2 = assignment_model(course: @course)
+
+        expect(LatePolicyApplicator).to receive(:for_course).with(@course, [@assignment1.id, @assignment2.id])
+
+        SubmissionLifecycleManager.new(@course, [@assignment1, @assignment2], run_late_policy_applicator_for_course: true).recompute
+      end
+
       it "does not kick off a LatePolicyApplicator job when called with multiple assignments" do
         @assignment1 = @assignment
         @assignment2 = assignment_model(course: @course)

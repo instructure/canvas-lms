@@ -26,13 +26,24 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('file_rename_form')
 
+FileRenameForm.componentWillMount = function () {
+  this.bodyContentRef = React.createRef()
+  this.newNameRef = React.createRef()
+  this.commitChangeBtnRef = React.createRef()
+  this.renameBtnRef = React.createRef()
+  this.replaceBtnRef = React.createRef()
+  this.skipBtnRef = React.createRef()
+  this.backBtnRef = React.createRef()
+  this.canvasModalRef = React.createRef()
+}
+
 FileRenameForm.buildContent = function () {
   const {onRenameFileMessage, onLockFileMessage} = this.props
   const nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name
   let buildContentToRender
   if (!this.state.isEditing && !this.state.fileOptions.cannotOverwrite) {
     buildContentToRender = (
-      <div ref="bodyContent">
+      <div ref={this.bodyContentRef}>
         <p id="renameFileMessage">
           {onRenameFileMessage?.(nameToUse) ||
             I18n.t(
@@ -56,7 +67,7 @@ FileRenameForm.buildContent = function () {
     }
 
     buildContentToRender = (
-      <div ref="bodyContent">
+      <div ref={this.bodyContentRef}>
         <p>{renameMessage}</p>
         <form onSubmit={this.handleFormSubmit}>
           <label className="file-rename-form__form-label" htmlFor="renameFileInput">
@@ -67,7 +78,7 @@ FileRenameForm.buildContent = function () {
             className="input-block-level"
             type="text"
             defaultValue={nameToUse}
-            ref="newName"
+            ref={this.newNameRef}
             aria-label={I18n.t('File name')}
           />
         </form>
@@ -85,7 +96,7 @@ FileRenameForm.buildButtons = function () {
       <button
         type="button"
         key="commitChangeBtn"
-        ref="commitChangeBtn"
+        ref={this.commitChangeBtnRef}
         className="btn btn-primary"
         onClick={this.handleChangeClick}
       >
@@ -97,7 +108,7 @@ FileRenameForm.buildButtons = function () {
       <button
         type="button"
         key="renameBtn"
-        ref="renameBtn"
+        ref={this.renameBtnRef}
         className="btn btn-default"
         onClick={this.handleRenameClick}
       >
@@ -106,7 +117,7 @@ FileRenameForm.buildButtons = function () {
       <button
         type="button"
         key="replaceBtn"
-        ref="replaceBtn"
+        ref={this.replaceBtnRef}
         className="btn btn-primary"
         onClick={this.handleReplaceClick}
       >
@@ -118,7 +129,7 @@ FileRenameForm.buildButtons = function () {
         <button
           type="button"
           key="skipBtn"
-          ref="skipBtn"
+          ref={this.skipBtnRef}
           className="btn btn-default"
           onClick={this.handleSkipClick}
         >
@@ -131,7 +142,7 @@ FileRenameForm.buildButtons = function () {
       <button
         type="button"
         key="backBtn"
-        ref="backBtn"
+        ref={this.backBtnRef}
         className="btn btn-default"
         onClick={this.handleBackClick}
       >
@@ -140,7 +151,7 @@ FileRenameForm.buildButtons = function () {
       <button
         type="button"
         key="commitChangeBtn"
-        ref="commitChangeBtn"
+        ref={this.commitChangeBtnRef}
         className="btn btn-primary"
         onClick={this.handleChangeClick}
       >
@@ -157,7 +168,7 @@ FileRenameForm.render = function () {
     <div>
       <Modal
         className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-        ref="canvasModal"
+        ref={this.canvasModalRef}
         isOpen={this.props.fileOptions}
         title={I18n.t('Copy')}
         onRequestClose={this.props.onClose}

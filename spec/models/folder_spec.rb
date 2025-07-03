@@ -188,6 +188,15 @@ describe Folder do
     expect(f.active_file_attachments).not_to include(nil_a)
   end
 
+  it "doesn't create arbitrarily many unfiled folders if the numberless one is hidden" do
+    folder = Folder.unfiled_folder(@course)
+    folder.update workflow_state: "hidden"
+    folder1 = Folder.unfiled_folder(@course)
+    folder2 = Folder.unfiled_folder(@course)
+    expect(folder1).not_to eq folder
+    expect(folder1).to eq folder2
+  end
+
   it "implements the not_locked scope correctly" do
     not_locked = [
       Folder.root_folders(@course).first,

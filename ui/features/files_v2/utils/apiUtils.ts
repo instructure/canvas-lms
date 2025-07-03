@@ -107,7 +107,7 @@ export const parseBookmarkFromUrl = (url?: string) => {
 }
 
 const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
-  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
+  return `/api/v1/${singularContextType}s/${contextId}/folders_and_files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
 }
 
 const generateFetchAllUrl = (folderId: string) => {

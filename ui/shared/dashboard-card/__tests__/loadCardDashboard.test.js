@@ -17,13 +17,13 @@
  */
 
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CardDashboardLoader, resetCardCache} from '../loadCardDashboard'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('loadCardDashboard', () => {
   let cardDashboardLoader

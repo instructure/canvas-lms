@@ -26,8 +26,8 @@ import {within} from '@testing-library/dom'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
 import {inboxSettingsHandlers} from '../../../../graphql/mswHandlers'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {mswClient} from '@canvas/msw/mswClient'
+import {setupServer} from 'msw/node'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import MockDate from 'mockdate'
@@ -39,7 +39,7 @@ jest.mock('../../../../util/utils', () => ({
 }))
 
 describe('InboxSettingsModalContainer', () => {
-  const server = mswServer(inboxSettingsHandlers())
+  const server = setupServer(...inboxSettingsHandlers())
   let onDismissWithAlertMock
   const oldLocale = moment.locale()
 
@@ -275,7 +275,7 @@ describe('InboxSettingsModalContainer', () => {
   it('displays signature and auto response settings when inboxSignatureBlock and inboxAutoResponse props are true', async () => {
     const {getByText, getByTestId} = setup({...defaultProps()})
     await waitFor(() => {
-      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature');
+      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature')
       expect(getByText('Out of Office')).toBeInTheDocument()
     })
   })
@@ -288,7 +288,7 @@ describe('InboxSettingsModalContainer', () => {
       }),
     })
     await waitFor(() => {
-      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature');
+      expect(getByTestId('inbox-signature-input')).toHaveValue('My signature')
       expect(queryByText('Out of Office')).not.toBeInTheDocument()
     })
   })

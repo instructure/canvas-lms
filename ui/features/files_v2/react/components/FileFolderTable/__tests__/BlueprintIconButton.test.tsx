@@ -17,21 +17,32 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import BlueprintIconButton from '../BlueprintIconButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'
+import {RowsProvider} from '../../../contexts/RowsContext'
+import {mockRowsContext} from '../../../components/FileFolderTable/__tests__/testUtils'
 
 let defaultProps: any
 
-const renderComponent = () => render(<BlueprintIconButton {...defaultProps} />)
+const renderComponent = () =>
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <BlueprintIconButton {...defaultProps} />
+    </RowsProvider>,
+    {container: document.body},
+  )
 
 describe('BlueprintIconButton', () => {
   beforeEach(() => {
     defaultProps = {
-      item: {...FAKE_FILES[0], ...{
-        restricted_by_master_course: true,
-        is_master_course_master_content: true,
-      }}
+      item: {
+        ...FAKE_FILES[0],
+        ...{
+          restricted_by_master_course: true,
+          is_master_course_master_content: true,
+        },
+      },
     }
   })
 

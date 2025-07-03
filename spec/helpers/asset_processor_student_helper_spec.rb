@@ -26,9 +26,23 @@ describe AssetProcessorStudentHelper do
   include AssetProcessorStudentHelper
 
   before do
-    @domain_root_account = Account.default
-
+    # For text_entry scenario
     course_with_student(active_all: true)
+    @domain_root_account = @course.root_account
+
+    @assignment_text = assignment_model({ course: @course, submission_types: "online_text_entry" })
+    @submission_text = @assignment_text.submit_homework(@student, submission_type: "online_text_entry", body: "Text entry answer")
+    # Create a Lti::Asset for the text entry submission (no attachment, but with submission_attempt)
+    @asset_text = Lti::Asset.create!(submission_id: @submission_text.id, attachment_id: nil, submission_attempt: @submission_text.attempt)
+    @ap_text = lti_asset_processor_model(tool: @tool, assignment: @assignment_text, title: "Text Entry AP")
+    @apreport_text = lti_asset_report_model(
+      asset_processor: @ap_text,
+      asset: @asset_text,
+      title: "Text Entry Asset Report",
+      processing_progress: Lti::AssetReport::PROGRESS_PROCESSED,
+      visible_to_owner: true
+    )
+
     @assignment = assignment_model({ course: @course, submission_types: "online_upload" })
     @attachment1 = attachment_with_context @student, { display_name: "a1.txt", uploaded_data: StringIO.new("hello") }
     @attachment2 = attachment_with_context @student, { display_name: "a2.txt", uploaded_data: StringIO.new("world") }
@@ -62,6 +76,15 @@ describe AssetProcessorStudentHelper do
   end
 
   describe "#asset_reports" do
+    it "returns asset reports for a text_entry submission (no attachment, with submission_attempt)" do
+      reports = asset_reports(submission: @submission_text)
+      expect(reports).to be_a(Array)
+      expect(reports.length).to eq(1)
+      expect(reports.first[:title]).to eq("Text Entry Asset Report")
+      expect(reports.first[:asset][:attachment_id]).to be_nil
+      expect(reports.first[:asset][:submission_attempt]).to eq(@submission_text.attempt)
+    end
+
     it "returns asset reports for the submission" do
       reports = asset_reports(submission: @submission)
       expect(reports).to be_a(Array)

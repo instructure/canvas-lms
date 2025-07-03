@@ -31,9 +31,8 @@
   </td>
   <td>
     <% duration = duration_in_minutes((version.finished_at || version.end_at || version.started_at) - version.started_at) %>
-    <span aria-label="<%= t 'time', 'Time' %>: <%= duration %>">
-      <%= duration %>
-    </span>
+    <span class="screenreader-only"><%= t 'time', 'Time' %>:</span>
+    <span><%= duration %></span>
   </td>
 
   <% if submission_has_regrade?(@submission) && version.score_before_regrade.present? %>

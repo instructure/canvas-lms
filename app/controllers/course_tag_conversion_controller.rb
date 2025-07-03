@@ -41,7 +41,7 @@ class CourseTagConversionController < ApplicationController
   end
 
   def conversion_job_status
-    job = active_conversion_job
+    job = @context.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG).order(:created_at).last
     if job
       render json: { workflow_state: job.workflow_state, progress: job.completion, }, status: :ok
     else

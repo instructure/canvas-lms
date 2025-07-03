@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import sinon from 'sinon'
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
 import saveMediaRecording, {
@@ -76,7 +75,7 @@ const server = setupServer()
 beforeAll(() => server.listen({onUnhandledRequest: 'bypass'}))
 afterEach(() => {
   server.resetHandlers()
-  sinon.restore()
+  vi.clearAllMocks()
 })
 afterAll(() => server.close())
 

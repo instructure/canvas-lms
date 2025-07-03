@@ -147,6 +147,32 @@ development:
       #   region: 'us-west-2'
       # ams.yml: |
       #   launch_url: http://ams-ux.inseng.test:5173/src/remote-adapter.js
+      # canvas_career.yml: |
+      #   public_app_config:
+      #     hosts:
+      #       api_proxy: "https://dev.cd.canvashorizon.com"
+      #       cedar: "https://cedar-api-dev.domain-svcs.nonprod.inseng.io"
+      #       common_cartridge_viewer: "https://common-cartridge-viewer.netlify.app"
+      #       ignite: "https://career-agent-dev.journey.nonprod.inseng.io"
+      #       journey: "https://journey-server-dev.journey.nonprod.inseng.io"
+      #       pine: "https://pine-api-dev.domain-svcs.nonprod.inseng.io"
+      #       rcs: "https://rich-content-pdx-cd.inseng.net"
+      #       redwood: "https://redwood-api-dev.domain-svcs.nonprod.inseng.io"
+      #       upload: "https://instructure-uploads-pdx-cd.s3.us-west-2.amazonaws.com"
+      #     hotglue:
+      #       api_key: "gFd34vgi2D5OY8RrNInl55wDY1ixqSvxZsSHf965"
+      #       env_id: "demo.hg.instructure.com"
+      #       flow_id: "NsN76D10s"
+      #     pendo:
+      #       api_key: "f5faad90-a2af-4bf9-6f7b-862e00100be4"
+      #     sentry:
+      #       learner_dsn: "https://4c2589d43fafee7da8e0896a8667cfcb@relay-pdx.sentry.insops.net/486"
+      #       learning_provider_dsn: "https://feb64e6e836b324f39dd9c499a9d3a47@relay-pdx.sentry.insops.net/530"
+      #       replays_sample_rate: 1.0
+      #       traces_sample_rate: 0.1
+      #     environment: "dev"
+      #     feedback_url: "https://docs.google.com/forms/d/e/1FAIpQLScj-OKZVmsva-OE6T5rcvvm9fI6_eLtt2tk8pkgQ24DjSAPDQ/viewform"
+
   store:
     canvas:
       lti-keys:

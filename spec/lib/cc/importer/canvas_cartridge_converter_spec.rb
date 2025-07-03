@@ -24,9 +24,9 @@ require "nokogiri"
 describe "Canvas Cartridge importing" do
   before do
     @converter = get_cc_converter
-    @copy_from = course_model
+    @copy_from = course_model(name: "copy from course")
     @from_teacher = @user
-    @copy_to = course_model
+    @copy_to = course_model(name: "copy to course")
     @copy_to.conclude_at = nil
     @copy_to.start_at = nil
     @copy_to.name = "alt name"
@@ -714,6 +714,7 @@ describe "Canvas Cartridge importing" do
       <p><img src="/courses/#{@copy_from.id}/files/#{image.id}/preview"></p>
       <p><iframe src="/media_attachments_iframe/#{media.id}?type=video&amp;embedded=true" data-media-id="#{media.media_entry_id}"></iframe></p>
     HTML
+    @copy_from.saving_user = @from_teacher
     @copy_from.update!(syllabus_body: body)
 
     # export to html file

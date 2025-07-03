@@ -491,8 +491,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.assignment).to be_nil
     end
 
-    it "create sort order field when is flag on" do
-      Account.site_admin.enable_feature!(:discussion_default_sort)
+    it "create sort order field" do
       api_call(:post,
                "/api/v1/courses/#{@course.id}/discussion_topics",
                { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
@@ -502,8 +501,7 @@ describe DiscussionTopicsController, type: :request do
       expect(@topic.sort_order_locked).to be true
     end
 
-    it "create expanded field order when is flag on" do
-      Account.site_admin.enable_feature!(:discussion_default_expand)
+    it "create expanded field order" do
       api_call(:post,
                "/api/v1/courses/#{@course.id}/discussion_topics",
                { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
@@ -514,7 +512,6 @@ describe DiscussionTopicsController, type: :request do
     end
 
     it "should not allow !expanded and expanded_locked" do
-      Account.site_admin.enable_feature!(:discussion_default_expand)
       result = api_call(:post,
                         "/api/v1/courses/#{@course.id}/discussion_topics",
                         { controller: "discussion_topics", action: "create", format: "json", course_id: @course.to_param },
@@ -765,6 +762,10 @@ describe DiscussionTopicsController, type: :request do
           "allow_rating" => false,
           "only_graders_can_rate" => false,
           "sort_by_rating" => false,
+          "sort_order" => "desc",
+          "sort_order_locked" => false,
+          "expanded" => false,
+          "expanded_locked" => false,
           "todo_date" => nil,
           "group_category_id" => nil,
           "topic_children" => [],
@@ -2084,8 +2085,7 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic).not_to be_locked
       end
 
-      it "update sort order field when is flag on" do
-        Account.site_admin.enable_feature!(:discussion_default_sort)
+      it "update sort order field" do
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
@@ -2095,8 +2095,7 @@ describe DiscussionTopicsController, type: :request do
         expect(@topic.sort_order_locked).to be true
       end
 
-      it "update expanded field order when is flag on" do
-        Account.site_admin.enable_feature!(:discussion_default_expand)
+      it "update expanded field order" do
         api_call(:put,
                  "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                  { controller: "discussion_topics", action: "update", format: "json", course_id: @course.to_param, topic_id: @topic.to_param },
@@ -2408,6 +2407,10 @@ describe DiscussionTopicsController, type: :request do
           "allow_rating" => false,
           "only_graders_can_rate" => false,
           "sort_by_rating" => false,
+          "sort_order" => "desc",
+          "sort_order_locked" => false,
+          "expanded" => false,
+          "expanded_locked" => false,
           "todo_date" => nil,
           "anonymous_state" => nil,
           "ungraded_discussion_overrides" => nil,
@@ -2496,7 +2499,11 @@ describe DiscussionTopicsController, type: :request do
       "url" => "http://www.example.com/groups/#{@group.id}/discussion_topics/#{announcement.id}",
       "user_can_see_posts" => true,
       "user_name" => @user.name,
-      "ungraded_discussion_overrides" => nil
+      "ungraded_discussion_overrides" => nil,
+      "sort_order" => "desc",
+      "sort_order_locked" => false,
+      "expanded" => false,
+      "expanded_locked" => false,
     }
 
     expect(response).to have_http_status(:ok)

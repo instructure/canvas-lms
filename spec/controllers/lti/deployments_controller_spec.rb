@@ -69,7 +69,8 @@ RSpec.describe Lti::DeploymentsController do
     context "correctness verifications" do
       before do
         3.times do
-          registration.new_external_tool(account)
+          subaccount = account_model(parent_account: account)
+          registration.new_external_tool(subaccount)
         end
       end
 
@@ -299,6 +300,7 @@ RSpec.describe Lti::DeploymentsController do
           context_type: "Account",
           context_name: account.name,
           deployment_id: deployment.deployment_id,
+          root_account_deployment: true,
           registration_id: registration.id,
           workflow_state: "active",
         }.with_indifferent_access
@@ -309,10 +311,12 @@ RSpec.describe Lti::DeploymentsController do
   describe "POST create", type: :request do
     subject do
       post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments",
-           params: {},
+           params:,
            as: :json
       response
     end
+
+    let(:params) { {} }
 
     context "without user session" do
       before { remove_user_session }
@@ -365,6 +369,26 @@ RSpec.describe Lti::DeploymentsController do
         ContextExternalTool.last.id
       )
       expect(Lti::ContextControl.last.created_by).to eql(admin)
+    end
+
+    context "for a subaccount" do
+      let(:params) { { for_subaccount_id: subaccount.id } }
+      let(:subaccount) { account_model(parent_account: account) }
+
+      it "creates a deployment in the subaccount" do
+        expect { subject }.to change { ContextExternalTool.count }.by(1)
+        expect(ContextExternalTool.last.context.id).to eql(subaccount.id)
+      end
+    end
+
+    context "for a course" do
+      let(:params) { { for_course_id: course.id } }
+      let(:course) { course_model(account:) }
+
+      it "creates a deployment in the course" do
+        expect { subject }.to change { ContextExternalTool.count }.by(1)
+        expect(ContextExternalTool.last.context.id).to eql(course.id)
+      end
     end
   end
 

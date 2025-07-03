@@ -286,3 +286,29 @@ export const submitModuleItem = async (
     return null
   }
 }
+
+export const sharedHandleFileDrop = (
+  accepted: ArrayLike<File | DataTransferItem>,
+  _rejected: ArrayLike<File | DataTransferItem>,
+  _event: React.DragEvent<Element>,
+  {
+    setFile,
+    onChange,
+  }: {
+    setFile?: (file: File | null) => void
+    onChange?: (field: string, value: File) => void
+  },
+) => {
+  Array.from(accepted).forEach(item => {
+    if (item instanceof File) {
+      setFile?.(item)
+      onChange?.('file', item)
+    } else if (item.kind === 'file') {
+      const file = item.getAsFile()
+      if (file) {
+        setFile?.(file)
+        onChange?.('file', file)
+      }
+    }
+  })
+}

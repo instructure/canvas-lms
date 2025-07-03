@@ -142,4 +142,5 @@ export type TeacherAssignmentType = {
   hasSubmittedSubmissions?: boolean
   submissionsDownloads?: number
   submissions?: SubmissionsType
+  suppressAssignment?: boolean
 }

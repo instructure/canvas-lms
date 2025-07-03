@@ -45,7 +45,7 @@ import D2LImporter from './migrator_forms/d2l_importer'
 import AngelImporter from './migrator_forms/angel_importer'
 import BlackboardImporter from './migrator_forms/blackboard_importer'
 import ExternalToolImporter from './migrator_forms/external_tool_importer'
-import { compareMigrators } from './utils'
+import {compareMigrators} from './utils'
 
 const I18n = createI18nScope('content_migrations_redesign')
 
@@ -191,9 +191,7 @@ export const ContentMigrationsForm = ({
       .then((response: {json: Migrator[]}) => {
         // TODO: webct_scraper is not supported anymore, this should be removed from backend too.
         const filteredMigrators = response.json.filter((m: Migrator) => m.type !== 'webct_scraper')
-        setMigrators(
-          filteredMigrators.sort(compareMigrators),
-        )
+        setMigrators(filteredMigrators.sort(compareMigrators))
       })
       .catch(showFlashError(I18n.t("Couldn't load migrators")))
   }, [])
@@ -203,7 +201,7 @@ export const ContentMigrationsForm = ({
       <Heading level="h1" as="h1" margin="0 0 small">
         {I18n.t('Import Content')}
       </Heading>
-      <View as="div"  maxWidth="50rem">
+      <View as="div" maxWidth="50rem">
         <Text>
           {I18n.t(
             'Use the Import Content tool to migrate course materials from other sources into this course.',
@@ -211,7 +209,7 @@ export const ContentMigrationsForm = ({
         </Text>
         <Alert variant="warning">
           {I18n.t(
-            'Importing the same course content more than once will overwrite any existing content in the course.',
+            'Previously imported content from the same course will be replaced. Manually added content will remain.',
           )}
         </Alert>
       </View>

@@ -19,6 +19,19 @@
 #
 
 module GraphQLHelpers::AutoGradeEligibilityHelper
+  ALLOWED_UPLOAD_MIME_TYPES = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/x-docx"
+  ].freeze
+
+  NO_SUBMISSION_MSG       = I18n.t("No essay submission found.")
+  IMAGE_UPLOAD_MSG        = I18n.t("There are images embedded in the file that can not be parsed.")
+  INVALID_FILE_MSG        = I18n.t("Only PDF and DOCX files are supported.")
+  INVALID_TYPE_MSG        = I18n.t("Submission must be a text entry type or file upload.")
+  SHORT_ESSAY_MSG         = I18n.t("Submission must be at least 5 words.")
+  MISSING_RATING_MSG      = I18n.t("Rubric is missing rating description.")
+
   def self.validate_assignment(assignment:)
     assignment_issues = []
     rubric = assignment&.rubric_association&.rubric
@@ -43,22 +56,45 @@ module GraphQLHelpers::AutoGradeEligibilityHelper
     assignment_issues
   end
 
+  def self.no_submission?(submission)
+    submission.blank? ||
+      submission.attempt.to_i < 1 ||
+      (submission.submission_type == "online_text_entry" && submission.body.blank?) ||
+      (submission.submission_type == "online_upload" && !submission.extract_text_from_upload?)
+  end
+
+  def self.contains_images?(submission)
+    submission.submission_type == "online_upload" && submission.attachment_contains_images
+  end
+
+  def self.invalid_file?(submission)
+    return false if submission.submission_type != "online_upload"
+    return false if submission.attachments.blank?
+
+    submission.attachments.reject { |at| ALLOWED_UPLOAD_MIME_TYPES.include?(at.mimetype) }.any?
+  end
+
+  def self.invalid_type?(submission)
+    !["online_text_entry", "online_upload"].include?(submission.submission_type)
+  end
+
+  def self.short_essay?(submission)
+    submission.word_count.nil? || submission.word_count < 5
+  end
+
+  CHECKS = {
+    NO_SUBMISSION_MSG => ->(s) { no_submission?(s) },
+    INVALID_TYPE_MSG => ->(s) { invalid_type?(s) },
+    INVALID_FILE_MSG => ->(s) { invalid_file?(s) },
+    IMAGE_UPLOAD_MSG => ->(s) { contains_images?(s) },
+    SHORT_ESSAY_MSG => ->(s) { short_essay?(s) }
+  }.freeze
+
   def self.validate_submission(submission:)
-    submission_issues = []
-
-    if submission.submission_type != "online_text_entry"
-      submission_issues << I18n.t("Submission must be a text entry type.")
-    elsif submission.blank? || submission.body.blank? || submission.attempt < 1 || (word_count = submission.word_count).nil?
-      submission_issues << I18n.t("No essay submission found.")
-    elsif word_count < 5
-      submission_issues << I18n.t("Submission must be at least 5 words.")
+    CHECKS.each do |msg, check|
+      return [msg] if check.call(submission)
     end
-
-    unless submission.attachments.empty?
-      submission_issues << I18n.t("Submission contains file attachments.")
-    end
-
-    submission_issues
+    []
   end
 
   def self.contains_rce_file_link?(html_body)

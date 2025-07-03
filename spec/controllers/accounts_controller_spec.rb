@@ -1485,10 +1485,34 @@ describe AccountsController do
       c1.save
     end
 
-    it "returns the terms of service content" do
-      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
-
+    it "manages the attachment associations when an attachment is added" do
       admin_logged_in(@account)
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+
+      @account.update_terms_of_service({ terms_type: "custom", content: aa_test_data.base_html }, @user)
+
+      aas = AttachmentAssociation.where(context_type: "TermsOfServiceContent",
+                                        context_id: @account.terms_of_service_content.id)
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
+    it "removes the attachment associations when an attachment is removed" do
+      admin_logged_in(@account)
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+
+      @account.update_terms_of_service({ terms_type: "custom", content: aa_test_data.added_html }, @user)
+      @account.update_terms_of_service({ terms_type: "custom", content: aa_test_data.removed_html }, @user)
+
+      aas = AttachmentAssociation.where(context_type: "TermsOfServiceContent",
+                                        context_id: @account.terms_of_service_content.id)
+      expect(aas.count).to eq 0
+    end
+
+    it "returns the terms of service content" do
+      admin_logged_in(@account)
+      @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @user)
+
       get "terms_of_service", params: { account_id: @account.id }
 
       expect(response).to be_successful
@@ -1496,9 +1520,9 @@ describe AccountsController do
     end
 
     it "returns the terms of service content as teacher" do
-      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
-
       user_session(@teacher)
+      @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @teacher)
+
       get "terms_of_service", params: { account_id: @account.id }
 
       expect(response).to be_successful
@@ -1506,9 +1530,9 @@ describe AccountsController do
     end
 
     it "returns the terms of service content as student" do
-      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
-
       user_session(@student)
+      @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @student)
+
       get "terms_of_service", params: { account_id: @account.id }
 
       expect(response).to be_successful
@@ -1516,7 +1540,7 @@ describe AccountsController do
     end
 
     it "returns default self_registration_type" do
-      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+      @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @teacher)
 
       remove_user_session
       get "terms_of_service", params: { account_id: @account.id }
@@ -1526,7 +1550,8 @@ describe AccountsController do
     end
 
     it "returns other self_registration_type" do
-      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+      user_session(@teacher)
+      @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @teacher)
       @account.canvas_authentication_provider.update_attribute(:self_registration, "observer")
 
       remove_user_session

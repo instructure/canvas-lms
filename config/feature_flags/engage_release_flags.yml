@@ -35,14 +35,9 @@ deprecate_context_groups_old_view:
   applies_to: SiteAdmin
   display_name: Deprecate Legacy View of Context Groups
   description: Removes dead code from the context groups view that is no longer used.
-checkpoints_group_discussions:
+peer_review_allocation_updates:
   state: hidden
   applies_to: Account
   shadow: true
-  display_name: Checkpoints Group Discussions
-  description: Allows instructors to create group discussions with checkpoints.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
+  display_name: Peer Review Allocation Updates
+  description: Updates peer review allocation for an assignment to be at-time instead of pre-allocated.

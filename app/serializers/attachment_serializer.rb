@@ -25,6 +25,7 @@ class AttachmentSerializer < Canvas::APISerializer
   def_delegators :@controller,
                  :lock_explanation,
                  :thumbnail_image_url,
+                 :thumbnail_image_plain_url,
                  :file_download_url
 
   def initialize(object, options)

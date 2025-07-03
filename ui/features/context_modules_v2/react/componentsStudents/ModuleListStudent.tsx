@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useCallback, memo} from 'react'
+import React, {useState, useEffect, useCallback, useRef, memo} from 'react'
 import {debounce} from '@instructure/debounce'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleStudent from './ModuleStudent'
 import ModulePageActionHeaderStudent from './ModulePageActionHeaderStudent'
 import {handleCollapseAll, handleExpandAll} from '../handlers/modulePageActionHandlers'
-import {useIsFetching} from '@tanstack/react-query'
+import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
 
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
 import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
@@ -32,6 +32,7 @@ import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useTog
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -40,7 +41,7 @@ const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderReq
 const ModulesListStudent: React.FC = () => {
   const {courseId} = useContextModule()
   const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModulesStudent(courseId)
-  const moduleFetchingCount = useIsFetching({queryKey: ['moduleItemsStudent']})
+  const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const [expandCollapseButtonDisabled, setExpandCollapseButtonDisabled] = useState(false)
 
   // Initialize with an empty Map - all modules will be collapsed by default
@@ -92,7 +93,13 @@ const ModulesListStudent: React.FC = () => {
     } else {
       setExpandCollapseButtonDisabled(false)
     }
-  }, [moduleFetchingCount])
+
+    if (fetchComplete) {
+      if (maxFetchingCount > 1) {
+        showFlashSuccess('Module items loaded')()
+      }
+    }
+  }, [moduleFetchingCount, isLoading, maxFetchingCount, fetchComplete])
 
   const toggleCollapseMutation = useToggleCollapse(courseId)
 

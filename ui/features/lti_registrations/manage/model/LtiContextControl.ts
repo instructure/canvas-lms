@@ -18,9 +18,9 @@
 
 import * as z from 'zod'
 import {ZLtiRegistrationId} from './LtiRegistrationId'
-import {ZAccountId} from './AccountId'
+import {AccountId, ZAccountId} from './AccountId'
 import {ZUser} from './User'
-import {ZCourseId} from './CourseId'
+import {CourseId, ZCourseId} from './CourseId'
 
 export type LtiContextControlId = z.infer<typeof ZLtiContextControlId>
 export const ZLtiContextControlId = z.string().brand('LtiContextControlId')

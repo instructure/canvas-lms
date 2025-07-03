@@ -291,7 +291,7 @@ class AccountReportsController < ApplicationController
   # not those parameters are required), see
   # {api:AccountReportsController#available_reports List Available Reports}.
   #
-  # @argument parameters The parameters will vary for each report. To fetch a list
+  # @argument parameters[] [Hash] The parameters will vary for each report. To fetch a list
   #   of available parameters for each report, see {api:AccountReportsController#available_reports List Available Reports}.
   #   A few example parameters have been provided below. Note that the example
   #   parameters provided below may not be valid for every report.
@@ -415,7 +415,7 @@ class AccountReportsController < ApplicationController
   #
   def abort
     if authorized_action(@context, @current_user, :read_reports)
-      report = type_scope.running.find(params[:id])
+      report = type_scope.created_or_running.find(params[:id])
 
       if report.update(workflow_state: "aborted")
         render json: account_report_json(report, @current_user)

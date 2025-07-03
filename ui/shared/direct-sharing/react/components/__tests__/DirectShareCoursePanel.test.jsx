@@ -68,7 +68,11 @@ describe('DirectShareCoursePanel', () => {
 
   it('shows the overwrite warning', () => {
     const {getByText} = render(<DirectShareCoursePanel />)
-    expect(getByText(/^Importing the same course content more than once/)).toBeInTheDocument()
+    expect(
+      getByText(
+        'Previously imported content from the same course will be replaced. Manually added content will remain.',
+      ),
+    ).toBeInTheDocument()
   })
 
   it('calls the onCancel property', () => {

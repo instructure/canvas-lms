@@ -39,6 +39,7 @@ interface Props {
   onSuccess: (results: Result[]) => void
   onError: (error: string) => void
   onIndexingProgress: (progress: IndexProgress | null) => void
+  setSearchInputRef: (input: HTMLInputElement | null) => void
 }
 
 const executeSmartSearch = async (searchQuery: string, courseId: string) => {
@@ -54,11 +55,6 @@ const executeSmartSearch = async (searchQuery: string, courseId: string) => {
   return json
 }
 
-/*
- * This component is incomplete.
- * Will eventually contain the branding and updated search button.
- * For now, it simply displays a search bar.
- */
 export default function SmartSearchHeader(props: Props) {
   const searchInput = useRef<HTMLInputElement | null>(null)
   const [searchParam, setSearchParams] = useSearchParams()
@@ -145,9 +141,11 @@ export default function SmartSearchHeader(props: Props) {
           {I18n.t('Smart Search')}
         </Flex>
       </Heading>
+      {/* need to override form css styling in Flex (defaults to margin: 0 0 22px) */}
       <Flex
-        width="495px"
-        gap="x-small"
+        margin="0"
+        width="600px"
+        gap="buttons"
         as="form"
         onSubmit={e => {
           e.preventDefault()
@@ -159,6 +157,7 @@ export default function SmartSearchHeader(props: Props) {
             defaultValue={searchParam.get('q') || ''}
             setInputRef={input => {
               searchInput.current = input
+              props.setSearchInputRef(input)
             }}
             isLoading={props.isLoading}
             options={recentSearches}

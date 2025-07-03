@@ -192,7 +192,7 @@ MigrationConverterView.prototype.afterRender = function () {
   // eslint-disable-next-line react/no-children-prop
   const alert = React.createElement(Alert, {
     children: I18n.t(
-      'Importing the same course content more than once will overwrite any existing content in the course.',
+      'Previously imported content from the same course will be replaced. Manually added content will remain.',
     ),
     variant: 'warning',
     hasShadow: false,

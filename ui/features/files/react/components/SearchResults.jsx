@@ -35,6 +35,10 @@ import DirectShareCourseTray from '@canvas/direct-sharing/react/components/Direc
 
 const I18n = createI18nScope('react_files')
 
+SearchResults.componentWillMount = function () {
+  this.accessibilityMessageRef = React.createRef()
+}
+
 SearchResults.displayErrors = function (errors) {
   let error_message = null
 
@@ -94,8 +98,7 @@ SearchResults.render = function () {
         <div role="grid">
           {this.props.userCanEditFilesForContext && (
             <div
-              // eslint-disable-next-line react/no-string-refs
-              ref="accessibilityMessage"
+              ref={this.accessibilityMessageRef}
               className="SearchResults__accessbilityMessage col-xs"
               // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
               tabIndex="0"

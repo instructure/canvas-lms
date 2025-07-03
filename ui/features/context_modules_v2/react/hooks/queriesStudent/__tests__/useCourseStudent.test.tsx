@@ -30,12 +30,16 @@ const mockCourseStudentData = {
     missingSubmissionsCount: 5,
     submissionsDueThisWeekCount: 10,
   },
+  settings: {
+    showStudentOnlyModuleId: 'mod_1',
+  },
 }
 
 const mockGqlResponse = {
   legacyNode: {
     name: mockCourseStudentData.name,
     submissionStatistics: mockCourseStudentData.submissionStatistics,
+    settings: mockCourseStudentData.settings,
   },
 }
 

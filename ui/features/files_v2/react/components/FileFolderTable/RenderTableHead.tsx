@@ -20,6 +20,7 @@ import React, {Ref} from 'react'
 import {Table} from '@instructure/ui-table'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type ColumnHeader} from '../../../interfaces/FileFolderTable'
+import {type ColumnID} from './FileFolderTableUtils'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -46,7 +47,7 @@ const renderTableHead = (
   isStacked: boolean,
   columnHeaders: ColumnHeader[],
   sort: Sort,
-  handleSortChange: (column: string) => void,
+  handleSortChange: (column: ColumnID) => void,
   selectAllRef?: Ref<Checkbox>,
 ) => {
   return [

@@ -22,7 +22,7 @@ If you would rather do things manually, read on! And be sure to check the [Troub
 
 ## Recommendations
 
-By default `docker-compose` will look at 2 files
+By default `docker compose` will look at 2 files
 - docker-compose.yml
 - docker-compose.override.yml
 
@@ -80,27 +80,27 @@ Now you're ready to build all of the containers. This will take a while as a lot
 First let's get our Mutagen sidecar running.
 
 ```bash
-docker-compose build --pull
-docker-compose up --no-start web
+docker compose build --pull
+docker compose up --no-start web
 ```
 
 Now we can install assets, create and migrate databases.
 
 ```bash
-docker-compose run --rm web ./script/install_assets.sh
-docker-compose run --rm web bundle exec rake db:create db:initial_setup
-docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
+docker compose run --rm web ./script/install_assets.sh
+docker compose run --rm web bundle exec rake db:create db:initial_setup
+docker compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
 ```bash
-docker-compose up -d
+docker compose up -d
 open http://canvas.docker/
 ```
 
 ## Normal Usage
 
-Normally you can just start everything with `docker-compose up -d` and
+Normally you can just start everything with `docker compose up -d` and
 access Canvas at http://canvas.docker/
 
 After pulling new code, you'll want to update all your local gems, rebuild your
@@ -159,13 +159,13 @@ You can attach to the server once the container is started:
 Debugging web:
 
 ```
-docker-compose exec web bin/rdbg --attach
+docker compose exec web bin/rdbg --attach
 ```
 
 Debugging jobs:
 
 ```
-docker-compose exec jobs bin/rdbg --attach
+docker compose exec jobs bin/rdbg --attach
 ```
 
 ### Prefer pry?
@@ -174,17 +174,17 @@ Unfortunately, you can't start a pry session in a remote debug session. What
 you can do instead is use `pry-remote`.
 
 1. Add `pry-remote` to your Gemfile
-2. Run `docker-compose exec web bundle install` to install `pry-remote`
+2. Run `docker compose exec web bundle install` to install `pry-remote`
 3. Add `binding.remote_pry` in code where you want execution to yield a pry REPL
 4. Launch pry-remote and have it wait for execution to yield to you:
 ```
-docker-compose exec web pry-remote --wait
+docker compose exec web pry-remote --wait
 ```
 
 ## Running tests
 
 ```
-$ docker-compose exec web bundle exec rspec spec
+$ docker compose exec web bundle exec rspec spec
 ```
 
 ### Jest Tests
@@ -192,23 +192,23 @@ $ docker-compose exec web bundle exec rspec spec
 Run all Jest tests with:
 
 ```
-docker-compose run --rm webpack yarn test:jest
+docker compose run --rm webpack yarn test:jest
 ```
 
 Or run a targeted subset of tests:
 
 ```
-docker-compose run --rm webpack yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm webpack yarn test:jest ui/features/speed_grader/react/__tests__/CommentArea.test.js
 ```
 
 To run a targeted subset of tests in watch mode, use `test:jest:watch` and
 specify the paths to the test files as one or more arguments, e.g.:
 
 ```
-docker-compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
+docker compose run --rm webpack yarn test:jest:watch ui/features/speed_grader/react/__tests__/CommentArea.test.js
 
 
-docker-compose run --rm webpack yarn test:jest:watch ui/features/course_paces/react/components/course_pace_table/__tests__/assignment_row.test.tsx
+docker compose run --rm webpack yarn test:jest:watch ui/features/course_paces/react/components/course_pace_table/__tests__/assignment_row.test.tsx
 ```
 
 ## Selenium
@@ -222,7 +222,7 @@ Select a browser to run in selenium through config/selenium.yml and then ensure
 that only the corresponding browser is configured in selenium.override.yml.
 
 ```sh
-docker-compose up -d selenium-hub
+docker compose up -d selenium-hub
 ```
 
 With the container running, you should be able to open a VNC session:
@@ -232,7 +232,7 @@ With the container running, you should be able to open a VNC session:
 Now just run your choice of selenium specs:
 
 ```sh
-docker-compose exec web bundle exec rspec spec/selenium/dashboard_spec.rb
+docker compose exec web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
 ### Capturing Rails Logs and Screenshots
@@ -251,14 +251,14 @@ corresponds to each failed spec, plus a screenshot of the page at the time of
 the failure, by running your specs with the `spec/spec.opts` options like:
 
 ```sh
-docker-compose exec web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
+docker compose exec web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
 ```
 
 This will produce a `log/spec_failures` directory in the container, which you
 can then `docker cp` to your host to view in a browser:
 
 ```sh
-docker cp "$(docker-compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
+docker cp "$(docker compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
 open -a "Google Chrome" file:///"$(pwd)"/spec_failures
 ```
 
@@ -300,15 +300,15 @@ Finally, tail the statsd service logs to see what metrics Canvas is recording: `
 
 ## Tips
 
-It will likely be helpful to alias the various docker-compose commands like `docker-compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
+It will likely be helpful to alias the various docker-compose commands like `docker compose run --rm web` because that can get tiring to type over and over. Here are some recommended aliases you can add to your `~/.bash_profile` and reload your Terminal.
 
 ```
-alias mc='docker-compose'
-alias mcu='docker-compose up'
-alias mce='docker-compose exec'
-alias mcex='docker-compose exec web bundle exec'
-alias mcr='docker-compose run --rm web'
-alias mcrx='docker-compose run --rm web bundle exec'
+alias mc='docker compose'
+alias mcu='docker compose up'
+alias mce='docker compose exec'
+alias mcex='docker compose exec web bundle exec'
+alias mcr='docker compose run --rm web'
+alias mcrx='docker compose run --rm web bundle exec'
 ```
 
 Now you can just run commands like `mcex rake db:migrate` or `mcr bundle install`
@@ -369,8 +369,8 @@ web: &WEB
 
 Sometimes, very poor performance (or not loading at all) can be due to webpack
 problems. Running
-`docker-compose exec web bundle exec rake canvas:compile_assets` again, or
-`docker-compose exec web bundle exec rake js:webpack_development` again, may help.
+`docker compose exec web bundle exec rake canvas:compile_assets` again, or
+`docker compose exec web bundle exec rake js:webpack_development` again, may help.
 
 
 ### DNS

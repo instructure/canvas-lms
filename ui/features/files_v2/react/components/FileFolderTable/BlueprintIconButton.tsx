@@ -24,6 +24,7 @@ import {type File, type Folder} from '../../../interfaces/File'
 import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../utils/apiUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {useRows} from '../../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -46,6 +47,7 @@ const tooltipComponent = (title: string, child: React.ReactNode) => (
 const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isLocked, setIsLocked] = useState(item.restricted_by_master_course)
+  const {setSessionExpired} = useRows()
 
   if (!item.folder_id) return null // is a folder
 
@@ -65,7 +67,7 @@ const BlueprintIconButton = ({item}: BlueprintIconButtonProps) => {
       .then(() => setIsLocked(!isLocked))
       .catch(error => {
         if (error instanceof UnauthorizedError) {
-          window.location.href = '/login'
+          setSessionExpired(true)
           return
         }
         showFlashError(

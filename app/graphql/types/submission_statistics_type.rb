@@ -22,31 +22,23 @@ module Types
   class SubmissionStatisticsType < ApplicationObjectType
     graphql_name "SubmissionStatistics"
 
-    alias_method :course, :object
+    alias_method :submissions, :object
 
     field :submissions_due_this_week_count, Integer, null: false
     def submissions_due_this_week_count
       return 0 unless current_user
 
-      one_week_from_now = Time.zone.now.advance(days: 7)
-      Loaders::CourseSubmissionDataLoader.for(
-        :submissions_due_this_week_count,
-        {
-          start_date: Time.zone.now,
-          end_date: one_week_from_now,
-          current_user:
-        }
-      ).load(course.id)
+      start_date = Time.zone.now
+      end_date = Time.zone.now.advance(days: 7)
+
+      submissions.count { |submission| submission.cached_due_date&.between?(start_date, end_date) }
     end
 
     field :missing_submissions_count, Integer, null: false
     def missing_submissions_count
       return 0 unless current_user
 
-      Loaders::CourseSubmissionDataLoader.for(
-        :missing_submissions_count,
-        { current_user: }
-      ).load(course.id)
+      submissions.count(&:missing?)
     end
   end
 end

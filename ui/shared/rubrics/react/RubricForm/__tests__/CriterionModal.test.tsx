@@ -546,4 +546,49 @@ describe('CriterionModal tests', () => {
       expect(totalRatingPoints[3].value).toEqual('3.2')
     })
   })
+
+  describe('Range Tests', () => {
+    it('should render correct ranges for criterion use range', () => {
+      const criterion = getCriterion({
+        criterionUseRange: true,
+        ratings: [
+          {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+          {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+          {id: '2', description: 'Second Rating', points: 5, longDescription: ''},
+          {id: '2', description: 'Second Rating', points: 3, longDescription: ''},
+        ],
+      })
+
+      const {queryAllByTestId} = renderComponent({criterionUseRangeEnabled: true, criterion})
+
+      const rangeStarts = queryAllByTestId('range-start') as HTMLInputElement[]
+
+      expect(rangeStarts).toHaveLength(4)
+      expect(rangeStarts[0].textContent).toEqual('8.1 to ')
+      expect(rangeStarts[1].textContent).toEqual('5.1 to ')
+      expect(rangeStarts[2].textContent).toEqual('3.1 to ')
+      expect(rangeStarts[3].textContent).toEqual('--')
+    })
+
+    it('should render no range when the ratings of the previous rating are the same as the current rating', () => {
+      const criterion = getCriterion({
+        criterionUseRange: true,
+        ratings: [
+          {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+          {id: '2', description: 'Second Rating', points: 10, longDescription: ''},
+          {id: '3', description: 'Third Rating', points: 8, longDescription: ''},
+          {id: '3', description: 'Third Rating', points: 5, longDescription: ''},
+        ],
+      })
+
+      const {queryAllByTestId} = renderComponent({criterionUseRangeEnabled: true, criterion})
+
+      const rangeStarts = queryAllByTestId('range-start') as HTMLInputElement[]
+      expect(rangeStarts).toHaveLength(4)
+      expect(rangeStarts[0].textContent).toEqual('--')
+      expect(rangeStarts[1].textContent).toEqual('8.1 to ')
+      expect(rangeStarts[2].textContent).toEqual('5.1 to ')
+      expect(rangeStarts[3].textContent).toEqual('--')
+    })
+  })
 })

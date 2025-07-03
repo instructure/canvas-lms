@@ -29,8 +29,12 @@ import {useInfiniteQuery} from '@tanstack/react-query'
 import * as React from 'react'
 import {useOutletContext} from 'react-router-dom'
 import {RenderInfiniteApiResult} from '../../../../common/lib/apiResult/RenderInfiniteApiResult'
-import {fetchControlsByDeployment} from '../../../api/contextControls'
-import {createDeployment} from '../../../api/deployments'
+import {
+  DeleteContextControl,
+  FetchControlsByDeployment,
+  UpdateContextControl,
+} from '../../../api/contextControls'
+import {createDeployment, type DeleteDeployment} from '../../../api/deployments'
 import {AccountId} from '../../../model/AccountId'
 import {LtiRegistrationId} from '../../../model/LtiRegistrationId'
 import {ToolDetailsOutletContext} from '../ToolDetails'
@@ -41,8 +45,11 @@ import {Flex} from '@instructure/ui-flex'
 const I18n = createI18nScope('lti_registrations')
 
 export type ToolAvailabilityProps = {
-  fetchControlsByDeployment: typeof fetchControlsByDeployment
+  fetchControlsByDeployment: FetchControlsByDeployment
+  deleteContextControl: DeleteContextControl
+  editContextControl: UpdateContextControl
   accountId: AccountId
+  deleteDeployment: DeleteDeployment
 }
 
 const ControlPageSize = 20
@@ -104,7 +111,7 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                 <Text
                   dangerouslySetInnerHTML={{
                     __html: I18n.t(
-                      "Control %{app_name}'s availability and exceptions in Canvas, including setting exceptions for specific sub-accounts or courses. You can *view all of your sub-accounts* or **consult the documentation** for more information.",
+                      "Control %{app_name}'s availability and exceptions in Canvas, including setting exceptions for specific sub-accounts or courses. You can *view all of your sub-accounts* or consult the documentation for more information.",
                       {
                         app_name: registration.name,
                         wrappers: [
@@ -126,6 +133,9 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                       deployment={dep}
                       registration={registration}
                       refetchControls={controlsQuery.refetch}
+                      deleteControl={props.deleteContextControl}
+                      editControl={props.editContextControl}
+                      deleteDeployment={props.deleteDeployment}
                       debug={debug}
                     />
                   </List.Item>

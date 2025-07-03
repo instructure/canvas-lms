@@ -24,6 +24,8 @@ import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 import DirectShareCourseTray from '../DirectShareCourseTray'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
+import {RowsProvider} from '../../../../contexts/RowsContext'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
@@ -40,7 +42,11 @@ const defaultProps = {
 }
 
 const renderComponent = (props = {}) =>
-  render(<DirectShareCourseTray {...defaultProps} {...props} />)
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <DirectShareCourseTray {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 
 describe('DirectShareCourseTray', () => {
   let ariaLive: HTMLElement
@@ -75,7 +81,9 @@ describe('DirectShareCourseTray', () => {
   it('shows the overwrite warning', () => {
     renderComponent()
     expect(
-      screen.getByText(/^Importing the same course content more than once/),
+      screen.getByText(
+        'Previously imported content from the same course will be replaced. Manually added content will remain.',
+      ),
     ).toBeInTheDocument()
   })
 

@@ -21,10 +21,9 @@ import {render, screen} from '@testing-library/react'
 import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
 
 describe('StudentAssetReportModal', () => {
-  const createReport = (
+  const createBaseReport = (
     priority: 0 | 1 | 2 | 3 | 4 | 5 = 0,
-    assetAttachmentId: string = '10',
-    assetAttachmentName: string = 'test.pdf',
+    assetOverrides: Partial<LtiAssetReportWithAsset['asset']> = {},
     overrides: Partial<LtiAssetReportWithAsset> = {},
   ): LtiAssetReportWithAsset => ({
     // LtiAssetReport properties
@@ -37,13 +36,42 @@ describe('StudentAssetReportModal', () => {
     asset_processor_id: 1,
     asset: {
       id: 100,
-      attachment_id: assetAttachmentId,
-      attachment_name: assetAttachmentName,
+      attachment_id: null,
+      attachment_name: null,
       submission_id: '1000',
-      submission_attempt: '1',
+      submission_attempt: null,
+      ...assetOverrides,
     },
     ...overrides,
   })
+
+  const createUploadReport = (
+    priority: 0 | 1 | 2 | 3 | 4 | 5 = 0,
+    assetAttachmentId: string = '10',
+    assetAttachmentName: string = 'test.pdf',
+    overrides: Partial<LtiAssetReportWithAsset> = {},
+  ): LtiAssetReportWithAsset =>
+    createBaseReport(
+      priority,
+      {
+        attachment_id: assetAttachmentId,
+        attachment_name: assetAttachmentName,
+      },
+      overrides,
+    )
+
+  const createTextEntryReport = (
+    priority: 0 | 1 | 2 | 3 | 4 | 5 = 0,
+    submissionAttempt: string = '1',
+    overrides: Partial<LtiAssetReportWithAsset> = {},
+  ): LtiAssetReportWithAsset =>
+    createBaseReport(
+      priority,
+      {
+        submission_attempt: submissionAttempt,
+      },
+      overrides,
+    )
 
   const mockAssetProcessors = [
     {
@@ -68,7 +96,7 @@ describe('StudentAssetReportModal', () => {
   const assignmentName = 'Test Assignment'
 
   it('renders nothing when reports have no attachmentId', () => {
-    const reports = [createReport(0, '', 'test.pdf')]
+    const reports = [createUploadReport(0, '', 'test.pdf')]
 
     const {container} = render(
       <StudentAssetReportModal
@@ -76,6 +104,7 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={true}
+        submissionType="online_upload"
       />,
     )
 
@@ -83,7 +112,7 @@ describe('StudentAssetReportModal', () => {
   })
 
   it('renders the modal when open prop is true', () => {
-    const reports = [createReport()]
+    const reports = [createUploadReport()]
 
     render(
       <StudentAssetReportModal
@@ -91,6 +120,7 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={true}
+        submissionType="online_upload"
       />,
     )
 
@@ -98,7 +128,7 @@ describe('StudentAssetReportModal', () => {
   })
 
   it('does not render the modal when open prop is false', () => {
-    const reports = [createReport()]
+    const reports = [createUploadReport()]
 
     render(
       <StudentAssetReportModal
@@ -106,6 +136,7 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={false}
+        submissionType="online_upload"
       />,
     )
 
@@ -114,7 +145,7 @@ describe('StudentAssetReportModal', () => {
 
   it('renders the attachment name', () => {
     const attachmentName = 'important_file.pdf'
-    const reports = [createReport(0, '10', attachmentName)]
+    const reports = [createUploadReport(0, '10', attachmentName)]
 
     render(
       <StudentAssetReportModal
@@ -122,6 +153,7 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={true}
+        submissionType="online_upload"
       />,
     )
 
@@ -130,8 +162,8 @@ describe('StudentAssetReportModal', () => {
 
   it('filters asset processors to only include those with reports', () => {
     const reports = [
-      createReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
-      createReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
+      createUploadReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
+      createUploadReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
     ]
 
     render(
@@ -140,6 +172,7 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={true}
+        submissionType="online_upload"
       />,
     )
 
@@ -150,8 +183,8 @@ describe('StudentAssetReportModal', () => {
 
   it('properly renders with reports from multiple processors', () => {
     const reports = [
-      createReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
-      createReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
+      createUploadReport(0, '10', 'test.pdf', {asset_processor_id: 1}),
+      createUploadReport(1, '10', 'test.pdf', {asset_processor_id: 2}),
     ]
 
     render(
@@ -160,11 +193,75 @@ describe('StudentAssetReportModal', () => {
         assignmentName={assignmentName}
         reports={reports}
         open={true}
+        submissionType="online_upload"
       />,
     )
 
     expect(screen.getByText('test.pdf')).toBeInTheDocument()
     expect(screen.getByText('Needs attention')).toBeInTheDocument()
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+  })
+
+  describe('with online_text_entry submission type', () => {
+    it('renders the modal with text entry label', () => {
+      const reports = [createTextEntryReport()]
+
+      render(
+        <StudentAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          open={true}
+          submissionType="online_text_entry"
+        />,
+      )
+
+      expect(screen.getAllByText('Text submitted to Canvas')[0]).toBeInTheDocument()
+      expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+    })
+
+    it('filters asset processors for text entries same as for uploads', () => {
+      const reports = [
+        createTextEntryReport(0, '1', {asset_processor_id: 1}),
+        createTextEntryReport(1, '1', {asset_processor_id: 2}),
+      ]
+
+      render(
+        <StudentAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          open={true}
+          submissionType="online_text_entry"
+        />,
+      )
+
+      expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
+      expect(screen.getByText('Another Processor · Another Processor Title')).toBeInTheDocument()
+      expect(
+        screen.queryByText('Unused Processor · Unused Processor Title'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('renders correctly even when submission_attempt is null', () => {
+      const reports = [
+        createTextEntryReport(0, null as any, {
+          asset_processor_id: 1,
+        }),
+      ]
+
+      render(
+        <StudentAssetReportModal
+          assetProcessors={mockAssetProcessors}
+          assignmentName={assignmentName}
+          reports={reports}
+          open={true}
+          submissionType="online_text_entry"
+        />,
+      )
+
+      expect(screen.getAllByText('Text submitted to Canvas')[0]).toBeInTheDocument()
+      expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+    })
   })
 })

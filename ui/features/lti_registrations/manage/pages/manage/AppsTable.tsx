@@ -133,9 +133,10 @@ const Columns: ReadonlyArray<Column> = [
       return window.ENV.FEATURES.lti_registrations_next ? (
         <Link
           as={RouterLink}
-          to={`/manage/${r.id}/configuration`}
+          to={`/manage/${r.id}`}
           isWithinText={false}
           data-testid={`reg-link-${r.id}`}
+          data-pendo="lti-registrations-app-link"
         >
           {appName}
         </Link>
@@ -242,7 +243,7 @@ const Columns: ReadonlyArray<Column> = [
               data-testid={`actions-menu-${r.id}`}
               withBackground={false}
               withBorder={false}
-              screenReaderLabel={I18n.t('More Registration Options')}
+              screenReaderLabel={I18n.t('More Registration Options for %{name}', {name: r.name})}
             >
               <IconMoreLine />
             </IconButton>
@@ -256,6 +257,8 @@ const Columns: ReadonlyArray<Column> = [
                   showFlashAlert({
                     type: 'info',
                     message: I18n.t('Client ID copied (%{id})', {id: developerKeyId}),
+                    dismissible: false,
+                    politeness: 'polite',
                   })
                 } catch {
                   showFlashAlert({
@@ -263,6 +266,8 @@ const Columns: ReadonlyArray<Column> = [
                     message: I18n.t('There was an issue copying the client ID (%{id})', {
                       id: developerKeyId,
                     }),
+                    dismissible: false,
+                    politeness: 'polite',
                   })
                 }
               }}
@@ -308,15 +313,74 @@ const Columns: ReadonlyArray<Column> = [
   },
 ]
 
-const renderHeaderRow = (props: {
-  sort: AppsSortProperty
-  dir: AppsSortDirection
-  updateSearchParams: (
-    params: Partial<Record<keyof ManageSearchParams, string | undefined>>,
-  ) => void
-}) => (
+const CondensedColumns: ReadonlyArray<Column> = [
+  {
+    id: 'name',
+    header: I18n.t('App Name'),
+    width: '42%',
+    sortable: true,
+    render: r => {
+      const appName = (
+        <Flex>
+          <ToolIconOrDefault
+            iconUrl={r.icon_url}
+            toolId={r.id}
+            toolName={r.name}
+            size={27}
+            marginRight={12}
+          />
+          {r.name}
+        </Flex>
+      )
+      return (
+        <Link
+          as={RouterLink}
+          to={`/manage/${r.id}`}
+          isWithinText={false}
+          data-testid={`reg-link-${r.id}`}
+        >
+          {appName}
+        </Link>
+      )
+    },
+  },
+  {
+    id: 'nickname',
+    header: I18n.t('Nickname'),
+    width: '40%',
+    sortable: true,
+    render: r => (r.admin_nickname ? r.admin_nickname : null),
+  },
+  {
+    id: 'lti_version',
+    sortable: true,
+    header: I18n.t('Version'),
+    width: '8%',
+    render: r => <div>{'legacy_configuration_id' in r ? '1.1' : '1.3'}</div>,
+  },
+  {
+    id: 'on',
+    header: I18n.t('On/Off'),
+    width: '10%',
+    sortable: true,
+    render: r => (
+      <div>{r.account_binding?.workflow_state === 'on' ? I18n.t('On') : I18n.t('Off')}</div>
+    ),
+  },
+]
+
+const renderHeaderRow = (
+  props: {
+    sort: AppsSortProperty
+    dir: AppsSortDirection
+    updateSearchParams: (
+      params: Partial<Record<keyof ManageSearchParams, string | undefined>>,
+    ) => void
+  },
+  columns: ReadonlyArray<Column>,
+) => (
   <Table.Row>
-    {Columns.map(({id, header, width, textAlign, sortable}) => (
+    {columns.map(({id, header, width, textAlign, sortable}) => (
       <Table.ColHeader
         key={id}
         id={id}
@@ -405,10 +469,11 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const [, setManageSearchParams] = useManageSearchParams()
   const responsiveProps = props.responsiveProps
   const {page, apps} = props.tableProps
+  const columns = window.ENV.FEATURES.lti_registrations_next ? CondensedColumns : Columns
   const rows = React.useMemo(() => {
     return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
-        {Columns.map(({id, render, textAlign}) => (
+        {columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
             {render(row, {deleteApp: props.tableProps.deleteApp})}
           </Table.Cell>
@@ -423,7 +488,7 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
     <>
       <Table {...props.responsiveProps} caption={I18n.t('Installed Apps')} layout={layout}>
         <Table.Head renderSortLabel={I18n.t('Sort by')}>
-          {renderHeaderRow(props.tableProps)}
+          {renderHeaderRow(props.tableProps, columns)}
         </Table.Head>
         <Table.Body>{rows}</Table.Body>
       </Table>

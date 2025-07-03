@@ -140,7 +140,7 @@ export default function LtiFilterTray({
           {lpFilterValues &&
             lpFilterValues.map(filter => {
               return (
-                <View as="div">
+                <View as="div" key={filter.id}>
                   <Heading level="h4" as="h2">
                     {capitalize(filter.name)}
                   </Heading>

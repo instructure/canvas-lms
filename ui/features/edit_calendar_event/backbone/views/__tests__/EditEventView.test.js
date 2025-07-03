@@ -350,12 +350,8 @@ describe('EditEventView', () => {
     })
 
     it('shows the duplicates when section dates are enabled', async () => {
-      jest.spyOn($, 'ajaxJSON').mockImplementation((url, method, params, successCB) => {
-        const sections = [{id: 1}]
-        return Promise.resolve(sections).then(() => {
-          successCB(sections, {getResponseHeader: () => ''})
-        })
-      })
+      const sections = [{id: 1}]
+      server.use(http.get('/api/v1/courses/21/sections', () => HttpResponse.json(sections)))
 
       const event = new CalendarEvent({
         context_code: 'course_1',

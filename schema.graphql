@@ -3,8 +3,6 @@ type Account implements LegacyIDInterface & Node {
   legacy canvas id
   """
   _id: ID!
-  accountDomainLookups: [AccountDomainLookup!]
-  accountDomains: [AccountDomain!]
   coursesConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -180,28 +178,6 @@ type AccountConnection {
   pageInfo: PageInfo!
 }
 
-type AccountDomain implements LegacyIDInterface & Timestamped {
-  """
-  legacy canvas id
-  """
-  _id: ID!
-  createdAt: DateTime
-  host: String!
-  updatedAt: DateTime
-}
-
-type AccountDomainLookup implements LegacyIDInterface & Timestamped {
-  """
-  legacy canvas id
-  """
-  _id: ID!
-  accountDomain: AccountDomain
-  authenticationProvider: String
-  createdAt: DateTime
-  name: String
-  updatedAt: DateTime
-}
-
 """
 An edge in a connection.
 """
@@ -301,6 +277,10 @@ interface AssetString {
   assetString: String
 }
 
+input AssignedStudentsFilter {
+  searchTerm: String
+}
+
 type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
@@ -322,6 +302,28 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   anonymousInstructorAnnotations: Boolean
   anonymousStudentIdentities: [AnonymousStudentIdentity!]
   assessmentRequestsForCurrentUser: [AssessmentRequest!]
+  assignedStudents(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: AssignedStudentsFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): UserConnection
   assignmentGroup: AssignmentGroup
   assignmentGroupId: ID
   assignmentOverrides(
@@ -380,6 +382,10 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   specifies that the current user can update the rubric self-assessment.
   """
   canUpdateRubricSelfAssessment: Boolean
+
+  """
+  A list of checkpoints (also known as sub_assignments) that are associated with this assignment
+  """
   checkpoints: [Checkpoint!]
   course: Course
   courseId: ID
@@ -422,6 +428,12 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   gradesPublished: Boolean
   gradesPublishedAt: String
   gradingPeriodId: String
+
+  """
+  The grading role of the current user for this assignment. Returns null if the
+  user does not have sufficient grading permissions.
+  """
+  gradingRole: GradingRole
   gradingStandard: GradingStandard
   gradingStandardId: ID
   gradingType: GradingType
@@ -461,6 +473,11 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   hasGroupCategory: Boolean!
   hasMultipleDueDates: Boolean
   hasRubric: Boolean!
+
+  """
+  Boolean: returns true if the assignment is checkpointed. A checkpointed
+  assignment has checkpoints ( also known as sub_assignments)
+  """
   hasSubAssignments: Boolean!
 
   """
@@ -517,6 +534,10 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   moduleItems: [ModuleItem!]
   modules: [Module!]
   muted: Boolean
+
+  """
+  submissions for sub-assignments belonging to the current user
+  """
   mySubAssignmentSubmissionsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -571,6 +592,11 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   present if Sync Grades to SIS feature is enabled
   """
   postToSis: Boolean
+
+  """
+  Indicates if the user is locked out of provisional grading for this assignment.
+  """
+  provisionalGradingLocked: Boolean!
   published: Boolean
   quiz: Quiz
 
@@ -625,7 +651,11 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   ): SubmissionConnection
   submissionsDownloads: Int
   supportsGradeByQuestion: Boolean!
-  suppressAssignment: Boolean
+
+  """
+  internal use
+  """
+  suppressAssignment: Boolean!
   timeZoneEdited: String
   title: String
   totalGradedSubmissions: Int
@@ -678,6 +708,10 @@ input AssignmentCreate {
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   courseId: ID!
   dueAt: DateTime
+
+  """
+  if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at
+  """
   forCheckpoints: Boolean
   gradingStandardId: ID
   gradingType: GradingType
@@ -690,6 +724,7 @@ input AssignmentCreate {
   peerReviews: AssignmentPeerReviewsUpdate
   pointsPossible: Float
   postToSis: Boolean
+  suppressAssignment: Boolean
   unlockAt: DateTime
 }
 
@@ -1050,6 +1085,10 @@ input AssignmentUpdate {
   assignmentGroupId: ID
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   dueAt: DateTime
+
+  """
+  if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at
+  """
   forCheckpoints: Boolean
   gradingStandardId: ID
   gradingType: GradingType
@@ -1062,6 +1101,7 @@ input AssignmentUpdate {
   pointsPossible: Float
   postToSis: Boolean
   setAssignment: Boolean
+  suppressAssignment: Boolean
   unlockAt: DateTime
 }
 
@@ -1432,14 +1472,8 @@ type CommunicationChannel implements LegacyIDInterface & Node & Timestamped {
   _id: ID!
   createdAt: DateTime
   id: ID!
-  notificationPolicies(
-    contextType: NotificationPreferencesContextType
-  ): [NotificationPolicy!]
-  notificationPolicyOverrides(
-    accountId: ID
-    contextType: NotificationPreferencesContextType!
-    courseId: ID
-  ): [NotificationPolicy!]
+  notificationPolicies(contextType: NotificationPreferencesContextType): [NotificationPolicy!]
+  notificationPolicyOverrides(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): [NotificationPolicy!]
   path: String
   pathType: String
   updatedAt: DateTime
@@ -2178,6 +2212,11 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     """
     last: Int
   ): SectionConnection
+
+  """
+  Settings for the course
+  """
+  settings: CourseSettings
   sisId: String
   state: CourseWorkflowState!
 
@@ -2434,6 +2473,176 @@ input CourseSectionsFilter {
   assignmentId: ID
 }
 
+"""
+Settings for a course
+"""
+type CourseSettings {
+  """
+  Whether the course allows final grade override
+  """
+  allowFinalGradeOverride: Boolean
+
+  """
+  Whether the course allows students to create anonymous discussion topics
+  """
+  allowStudentAnonymousDiscussionTopics: Boolean
+
+  """
+  Whether the course allows students to edit their discussion posts
+  """
+  allowStudentDiscussionEditing: Boolean
+
+  """
+  Whether the course allows students to report discussion posts
+  """
+  allowStudentDiscussionReporting: Boolean
+
+  """
+  Whether the course allows students to create discussion topics
+  """
+  allowStudentDiscussionTopics: Boolean
+
+  """
+  Whether the course allows students to attach files to discussion posts
+  """
+  allowStudentForumAttachments: Boolean
+
+  """
+  Whether the course allows student organized groups
+  """
+  allowStudentOrganizedGroups: Boolean
+
+  """
+  ID of the course banner image
+  """
+  bannerImageId: ID
+
+  """
+  URL to the course banner image
+  """
+  bannerImageUrl: String
+
+  """
+  Whether the course has conditional release enabled
+  """
+  conditionalRelease: Boolean
+
+  """
+  Color for the course
+  """
+  courseColor: String
+
+  """
+  Default due time for the course
+  """
+  defaultDueTime: String
+
+  """
+  Whether the course filters SpeedGrader by student group
+  """
+  filterSpeedGraderByStudentGroup: Boolean
+
+  """
+  Friendly name for the course
+  """
+  friendlyName: String
+
+  """
+  Grade passback setting for the course
+  """
+  gradePassbackSetting: String
+
+  """
+  Whether the course has a grading standard enabled
+  """
+  gradingStandardEnabled: Boolean
+
+  """
+  ID of the grading standard, if enabled
+  """
+  gradingStandardId: ID
+
+  """
+  Whether the course hides grade distribution graphs from students
+  """
+  hideDistributionGraphs: Boolean
+
+  """
+  Whether the course hides final grades from students
+  """
+  hideFinalGrades: Boolean
+
+  """
+  Whether the course hides sections on the course users page
+  """
+  hideSectionsOnCourseUsersPage: Boolean
+
+  """
+  Maximum number of announcements to show on the home page
+  """
+  homePageAnnouncementLimit: Int
+
+  """
+  Whether the course is a homeroom course
+  """
+  homeroomCourse: Boolean
+
+  """
+  ID of the course image
+  """
+  imageId: ID
+
+  """
+  URL to the course image
+  """
+  imageUrl: String
+
+  """
+  Whether the course locks all announcements
+  """
+  lockAllAnnouncements: Boolean
+
+  """
+  How the course restricts quantitative data for students
+  """
+  restrictQuantitativeData: Boolean
+
+  """
+  Whether the course restricts students from viewing future courses
+  """
+  restrictStudentFutureView: Boolean
+
+  """
+  Whether the course restricts students from viewing past courses
+  """
+  restrictStudentPastView: Boolean
+
+  """
+  Whether the course shows announcements on the home page
+  """
+  showAnnouncementsOnHomePage: Boolean
+
+  """
+  ID of the module that should only be shown to students
+  """
+  showStudentOnlyModuleId: ID
+
+  """
+  ID of the module that should only be shown to teachers
+  """
+  showTeacherOnlyModuleId: ID
+
+  """
+  Whether the course shows the syllabus course summary
+  """
+  syllabusCourseSummary: Boolean
+
+  """
+  Whether the course requires usage rights for uploaded files
+  """
+  usageRightsRequired: Boolean
+}
+
 input CourseUsersFilter {
   """
   Only return users with the specified enrollment role ids
@@ -2510,23 +2719,6 @@ enum CourseWorkflowState {
 }
 
 """
-Autogenerated input type of CreateAccountDomainLookup
-"""
-input CreateAccountDomainLookupInput {
-  accountDomainId: ID!
-  authenticationProvider: String
-  name: String!
-}
-
-"""
-Autogenerated return type of CreateAccountDomainLookup.
-"""
-type CreateAccountDomainLookupPayload {
-  accountDomainLookup: AccountDomainLookup
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of CreateAssignment
 """
 input CreateAssignmentInput {
@@ -2543,6 +2735,10 @@ input CreateAssignmentInput {
   courseId: ID!
   description: String
   dueAt: DateTime
+
+  """
+  if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at
+  """
   forCheckpoints: Boolean
   gradeGroupStudentsIndividually: Boolean
   gradingStandardId: ID
@@ -2561,6 +2757,7 @@ input CreateAssignmentInput {
   postToSis: Boolean
   state: AssignmentState
   submissionTypes: [SubmissionType!]
+  suppressAssignment: Boolean
   unlockAt: DateTime
 }
 
@@ -3006,21 +3203,6 @@ input DateTimeRange {
 }
 
 """
-Autogenerated input type of DeleteAccountDomainLookup
-"""
-input DeleteAccountDomainLookupInput {
-  id: ID!
-}
-
-"""
-Autogenerated return type of DeleteAccountDomainLookup.
-"""
-type DeleteAccountDomainLookupPayload {
-  accountDomainLookupId: ID
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of DeleteCommentBankItem
 """
 input DeleteCommentBankItemInput {
@@ -3242,6 +3424,11 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   canGroup: Boolean
   canReplyAnonymously: Boolean!
   canUnpublish: Boolean!
+
+  """
+  a list of checkpoints(also known as sub_assignments) that belong to this discussion
+  """
+  checkpoints: [Checkpoint!]
   childTopics: [Discussion!]
   contextId: ID!
   contextName: String
@@ -3310,14 +3497,7 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
     """
     roleTypes: [String!]
   ): User
-  entriesTotalPages(
-    filter: DiscussionFilterType
-    perPage: Int!
-    rootEntries: Boolean
-    searchTerm: String
-    sortOrder: DiscussionSortOrderType
-    unreadBefore: String
-  ): Int
+  entriesTotalPages(filter: DiscussionFilterType, perPage: Int!, rootEntries: Boolean, searchTerm: String, sortOrder: DiscussionSortOrderType, unreadBefore: String): Int
   entryCounts: DiscussionEntryCounts
   expanded: Boolean
   expandedLocked: Boolean
@@ -3369,17 +3549,39 @@ type Discussion implements LegacyIDInterface & ModuleItemInterface & Node & Time
   published: Boolean!
   replyToEntryRequiredCount: Int!
   requireInitialPost: Boolean
-  rootEntriesTotalPages(
-    filter: DiscussionFilterType
-    perPage: Int!
-    searchTerm: String
-    sortOrder: DiscussionSortOrderType
-  ): Int
+  rootEntriesTotalPages(filter: DiscussionFilterType, perPage: Int!, searchTerm: String, sortOrder: DiscussionSortOrderType): Int
   rootTopic: Discussion
   searchEntryCount(filter: DiscussionFilterType, searchTerm: String): Int
   sortByRating: Boolean
   sortOrder(sort: DiscussionSortOrderType): DiscussionSortOrderType
   sortOrderLocked: Boolean
+
+  """
+  submissions for this assignment
+  """
+  submissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionSearchFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: [SubmissionSearchOrder!]
+  ): SubmissionConnection
   subscribed: Boolean!
   subscriptionDisabledForUser: Boolean
   title: String
@@ -4461,6 +4663,26 @@ type GradingPeriodGroup implements LegacyIDInterface & Node & Timestamped {
   weighted: Boolean!
 }
 
+"""
+The grading role of the current user for this assignment
+"""
+enum GradingRole {
+  """
+  User is a standard grader for the assignment
+  """
+  grader
+
+  """
+  User is a moderator for the assignment
+  """
+  moderator
+
+  """
+  User is a provisional grader for the assignment
+  """
+  provisional_grader
+}
+
 type GradingStandard implements Node {
   """
   legacy canvas id
@@ -4762,8 +4984,7 @@ scalar HtmlEncodedString
 """
 An ISO 8601-encoded datetime
 """
-scalar ISO8601DateTime
-  @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
+scalar ISO8601DateTime @specifiedBy(url: "https:\/\/tools.ietf.org\/html\/rfc3339")
 
 """
 An ISO 8601-encoded duration
@@ -4846,10 +5067,7 @@ type LearningOutcome implements LegacyIDInterface & Node & Timestamped {
   createdAt: DateTime
   description: String
   displayName: String
-  friendlyDescription(
-    contextId: ID!
-    contextType: String!
-  ): OutcomeFriendlyDescriptionType
+  friendlyDescription(contextId: ID!, contextType: String!): OutcomeFriendlyDescriptionType
   id: ID!
   isImported(targetContextId: ID!, targetContextType: String!): Boolean
   masteryPoints: Float
@@ -5703,12 +5921,6 @@ type Mutation {
     """
     input: AutoGradeSubmissionInput!
   ): AutoGradeSubmissionPayload
-  createAccountDomainLookup(
-    """
-    Parameters for CreateAccountDomainLookup
-    """
-    input: CreateAccountDomainLookupInput!
-  ): CreateAccountDomainLookupPayload
   createAssignment(
     """
     Parameters for CreateAssignment
@@ -5821,12 +6033,6 @@ type Mutation {
     """
     input: CreateUserInboxLabelInput!
   ): CreateUserInboxLabelPayload
-  deleteAccountDomainLookup(
-    """
-    Parameters for DeleteAccountDomainLookup
-    """
-    input: DeleteAccountDomainLookupInput!
-  ): DeleteAccountDomainLookupPayload
   deleteCommentBankItem(
     """
     Parameters for DeleteCommentBankItem
@@ -6021,12 +6227,6 @@ type Mutation {
     """
     input: SubscribeToDiscussionTopicInput!
   ): SubscribeToDiscussionTopicPayload
-  updateAccountDomainLookup(
-    """
-    Parameters for UpdateAccountDomainLookup
-    """
-    input: UpdateAccountDomainLookupInput!
-  ): UpdateAccountDomainLookupPayload
   updateAssignment(
     """
     Parameters for UpdateAssignment
@@ -7121,6 +7321,33 @@ type Quiz implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   Whether the module item is published
   """
   published: Boolean
+
+  """
+  submissions for this quiz's assignment
+  """
+  submissionsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionSearchFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    orderBy: [SubmissionSearchOrder!]
+  ): SubmissionConnection
   title: String
   type: String
   updatedAt: DateTime
@@ -7857,6 +8084,9 @@ type SubAssignmentSubmission {
   excused: Boolean
   grade: String
   gradeMatchesCurrentSubmission: Boolean
+  late: Boolean
+  latePolicyStatus: LatePolicyStatusType
+  missing: Boolean
   publishedGrade: String
   publishedScore: Float
   score: Float
@@ -8471,14 +8701,7 @@ input SubmissionHistoryFilterInput {
   history results. Defaults to true.
   """
   includeCurrentSubmission: Boolean = true
-  states: [SubmissionState!] = [
-    deleted
-    graded
-    pending_review
-    submitted
-    ungraded
-    unsubmitted
-  ]
+  states: [SubmissionState!] = [deleted, graded, pending_review, submitted, ungraded, unsubmitted]
 }
 
 """
@@ -8743,7 +8966,8 @@ input SubmissionSearchFilterInput {
 }
 
 """
-Specify a sort for the results
+Specify a sort for the results. The 'direction' argument is ignored for 'random'
+sorts. For sorts of boolean fields, 'true' comes before 'false' for ascending sorts.
 """
 input SubmissionSearchOrder {
   direction: OrderDirection
@@ -8754,9 +8978,15 @@ input SubmissionSearchOrder {
 The user or submission field to sort by
 """
 enum SubmissionSearchOrderField {
+  group_name
+  needs_grading
+  random
   score
+  submission_status
   submitted_at
+  test_student
   username
+  username_first_last
 }
 
 enum SubmissionState {
@@ -8888,24 +9118,6 @@ type TurnitinData {
 scalar URL
 
 """
-Autogenerated input type of UpdateAccountDomainLookup
-"""
-input UpdateAccountDomainLookupInput {
-  accountDomainId: ID
-  accountDomainLookupId: ID!
-  authenticationProvider: String
-  name: String
-}
-
-"""
-Autogenerated return type of UpdateAccountDomainLookup.
-"""
-type UpdateAccountDomainLookupPayload {
-  accountDomainLookup: AccountDomainLookup
-  errors: [ValidationError!]
-}
-
-"""
 Autogenerated input type of UpdateAssignment
 """
 input UpdateAssignmentInput {
@@ -8921,6 +9133,10 @@ input UpdateAssignmentInput {
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   description: String
   dueAt: DateTime
+
+  """
+  if true, this assignment is a parent assignment for checkpoints. cannot set points_possible, due_at, lock_at, or unlock_at
+  """
   forCheckpoints: Boolean
   gradeGroupStudentsIndividually: Boolean
   gradingStandardId: ID
@@ -8940,6 +9156,7 @@ input UpdateAssignmentInput {
   postToSis: Boolean
   state: AssignmentState
   submissionTypes: [SubmissionType!]
+  suppressAssignment: Boolean
   unlockAt: DateTime
 }
 
@@ -9558,6 +9775,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
     """
     query: String
   ): CommentBankItemConnection
+  commentBankItemsCount: Int
   conversationsConnection(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -9700,11 +9918,7 @@ type User implements LegacyIDInterface & Node & Timestamped {
   loginId: String
   name: HtmlEncodedString
   notificationPreferences: NotificationPreferences
-  notificationPreferencesEnabled(
-    accountId: ID
-    contextType: NotificationPreferencesContextType!
-    courseId: ID
-  ): Boolean!
+  notificationPreferencesEnabled(accountId: ID, contextType: NotificationPreferencesContextType!, courseId: ID): Boolean!
   pronouns: String
   recipients(context: String, search: String): Recipients
   recipientsObservers(

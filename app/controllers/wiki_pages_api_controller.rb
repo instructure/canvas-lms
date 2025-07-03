@@ -213,13 +213,8 @@ class WikiPagesApiController < ApplicationController
     end
 
     new_page = @page.duplicate
+    new_page.saving_user = @current_user
     new_page.save!
-
-    UserContent.associate_attachments_to_rce_object(
-      new_page.body,
-      new_page,
-      user: @current_user
-    )
 
     render json: wiki_page_json(new_page, @current_user, session)
   end
@@ -362,7 +357,7 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[publish_at] [Optional, DateTime]
   #   Schedule a future date/time to publish the page. This will have no effect unless the
   #   "Scheduled Page Publication" feature is enabled in the account. If a future date is
-  #   supplied, the page will be unpublished and wiki_page[published] will be ignored.
+  #   supplied, the page will be unpublished and +wiki_page[published]+ will be ignored.
   #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \
@@ -383,13 +378,8 @@ class WikiPagesApiController < ApplicationController
       allowed_fields << :estimated_duration_attributes if @context.is_a?(Course) && @context.horizon_course?
       update_params = get_update_params(allowed_fields)
       assign_todo_date
+      @page.saving_user = @current_user
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
-        UserContent.associate_attachments_to_rce_object(
-          @page.body,
-          @page,
-          user: @current_user
-        )
-
         log_asset_access(@page, "wiki", @wiki, "participate")
         render json: wiki_page_json(@page, @current_user, session)
       else
@@ -475,13 +465,8 @@ class WikiPagesApiController < ApplicationController
     if perform_update
       assign_todo_date
       update_params = get_update_params(allowed_fields)
+      @page.saving_user = @current_user
       if !update_params.is_a?(Symbol) && @page.update(update_params) && process_front_page
-        UserContent.associate_attachments_to_rce_object(
-          @page.body,
-          @page,
-          user: @current_user
-        )
-
         # This ensures the context module's UI items are updated
         @page.context_module_tags.each { |content_tag| content_tag.context_module&.touch }
 

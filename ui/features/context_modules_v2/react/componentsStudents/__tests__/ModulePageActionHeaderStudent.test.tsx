@@ -22,6 +22,53 @@ import ModulePageActionHeaderStudent from '../ModulePageActionHeaderStudent'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {CourseStudentResponse} from '../../utils/types.d'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import userEvent from '@testing-library/user-event'
+
+const contextModuleHeaderDefaultProps = {
+  title: 'Modules',
+  publishMenu: {
+    courseId: '1',
+    runningProgressId: null,
+    disabled: false,
+    visible: true,
+  },
+  viewProgress: {
+    label: 'View Progress',
+    url: '/courses/1/modules/progress',
+    visible: true,
+  },
+  addModule: {
+    label: 'Add Module',
+    visible: true,
+  },
+  moreMenu: {
+    label: 'More',
+    menuTools: {
+      items: [
+        {
+          href: '#url',
+          'data-tool-id': 1,
+          'data-tool-launch-type': null,
+          class: null,
+          icon: null,
+          title: 'External Tool',
+        },
+      ],
+      visible: true,
+    },
+    exportCourseContent: {
+      label: 'Export Course Content',
+      url: '/courses/1/modules/export',
+      visible: true,
+    },
+  },
+  lastExport: {
+    label: 'Last Export:',
+    url: '/courses/1/modules/last_export',
+    date: '2024-01-01 00:00:00',
+    visible: true,
+  },
+}
 
 // Setup QueryClient
 const queryClient = new QueryClient({
@@ -37,6 +84,7 @@ interface DefaultProps {
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
+  disabled?: boolean
 }
 
 const buildDefaultProps = (overrides: Partial<DefaultProps> = {}): DefaultProps => ({
@@ -68,14 +116,7 @@ const setupTest = (
   // Render the component with context provider
   return render(
     <QueryClientProvider client={queryClient}>
-      <ContextModuleProvider
-        courseId={courseId}
-        isMasterCourse={false}
-        isChildCourse={false}
-        permissions={contextModuleDefaultProps.permissions}
-        NEW_QUIZZES_BY_DEFAULT={false}
-        DEFAULT_POST_TO_SIS={false}
-      >
+      <ContextModuleProvider {...contextModuleDefaultProps} courseId={courseId} externalTools={[]}>
         <ModulePageActionHeaderStudent {...props} />
       </ContextModuleProvider>
     </QueryClientProvider>,
@@ -85,7 +126,8 @@ const setupTest = (
 describe('ModulePageActionHeaderStudent', () => {
   beforeEach(() => {
     queryClient.clear()
-    // No need to mock ENV since we're avoiding testing that part
+    // @ts-expect-error
+    window.ENV.CONTEXT_MODULES_HEADER_PROPS = contextModuleHeaderDefaultProps
   })
 
   it('renders the module page action header student component with course name', () => {
@@ -153,5 +195,61 @@ describe('ModulePageActionHeaderStudent', () => {
 
     expect(queryByText('0 Assignments Due This Week')).not.toBeInTheDocument()
     expect(getByText('1 Missing Assignment')).toBeInTheDocument()
+  })
+
+  it('calls onCollapseAll when anyModuleExpanded is true and button is clicked', async () => {
+    const props = buildDefaultProps({anyModuleExpanded: true})
+    const {getAllByText} = setupTest(props)
+
+    const button = getAllByText('Collapse All')[0].closest('button') as HTMLButtonElement
+    await userEvent.click(button)
+
+    expect(props.onCollapseAll).toHaveBeenCalled()
+    expect(props.onExpandAll).not.toHaveBeenCalled()
+  })
+
+  it('calls onExpandAll when anyModuleExpanded is false and button is clicked', async () => {
+    const props = buildDefaultProps({anyModuleExpanded: false})
+    const {getAllByText} = setupTest(props)
+
+    const button = getAllByText('Expand All')[0].closest('button') as HTMLButtonElement
+    await userEvent.click(button)
+
+    expect(props.onExpandAll).toHaveBeenCalled()
+    expect(props.onCollapseAll).not.toHaveBeenCalled()
+  })
+
+  it('does not call expand/collapse callbacks when button is disabled', async () => {
+    const props = buildDefaultProps({disabled: true, anyModuleExpanded: true})
+    const {getAllByText} = setupTest(props)
+
+    const button = getAllByText('Collapse All')[0].closest('button') as HTMLButtonElement
+    expect(button).toBeDisabled()
+
+    await userEvent.click(button)
+
+    expect(props.onCollapseAll).not.toHaveBeenCalled()
+    expect(props.onExpandAll).not.toHaveBeenCalled()
+  })
+
+  it('renders nothing when course data is still loading', () => {
+    // Instead of using setupTest which sets the query, do raw render
+    const props = buildDefaultProps()
+
+    queryClient.clear()
+
+    const {container} = render(
+      <QueryClientProvider client={queryClient}>
+        <ContextModuleProvider
+          {...contextModuleDefaultProps}
+          courseId="1"
+          permissions={contextModuleDefaultProps.permissions}
+        >
+          <ModulePageActionHeaderStudent {...props} />
+        </ContextModuleProvider>
+      </QueryClientProvider>,
+    )
+
+    expect(container).toBeEmptyDOMElement()
   })
 })

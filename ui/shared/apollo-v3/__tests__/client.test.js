@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
 import {createClient} from '..'
 import {gql} from '@apollo/client'
 

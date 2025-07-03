@@ -23,6 +23,7 @@ import type {AccountId} from '../manage/model/AccountId'
 import {fetchImpact} from './api/impact'
 import {fetchLtiUsageToken} from './api/jwt'
 import {ltiUsageConfig, ltiUsageOptions} from './utils'
+import {useBreadcrumbStore} from '@canvas/breadcrumbs/useBreadcrumbStore'
 
 const I18n = createI18nScope('lti_registrations.monitor')
 
@@ -30,13 +31,32 @@ export type MonitorProps = {
   accountId: AccountId
 }
 
+type Module = {
+  render: (args: {
+    basename: string
+    mountPoint: HTMLElement
+    config: {
+      fetchToken: () => Promise<{token: string}>
+      fetchImpact: typeof fetchImpact
+    }
+    breadcrumbStore: {
+      appendBreadcrumb: (breadcrumb: {name: string; url: string}) => void
+      popBreadcrumb: () => void
+    }
+    options: Record<string, any>
+  }) => () => void
+}
+
 export const Monitor = ({accountId}: MonitorProps) => {
   const root = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
+    const store = useBreadcrumbStore.getState()
     let unmount = () => {}
 
-    import('ltiusage/AppModule').then(module => {
+    let addedBreadcrumbCount = 0
+
+    import('ltiusage/AppModule').then((module: Module) => {
       if (root.current !== null) {
         unmount = module.render({
           basename: getBasename('apps') + '/monitor',
@@ -45,6 +65,19 @@ export const Monitor = ({accountId}: MonitorProps) => {
             ...ltiUsageConfig(),
             fetchToken: () => fetchLtiUsageToken(accountId),
             fetchImpact,
+          },
+          breadcrumbStore: {
+            appendBreadcrumb: breadcrumb => {
+              // We only want to append the breadcrumb once
+              store.appendBreadcrumb(breadcrumb)
+              addedBreadcrumbCount += 1
+            },
+            popBreadcrumb: () => {
+              if (addedBreadcrumbCount > 0) {
+                addedBreadcrumbCount -= 1
+                store.popBreadcrumb()
+              }
+            },
           },
           options: ltiUsageOptions(),
         })

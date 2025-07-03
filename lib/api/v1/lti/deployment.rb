@@ -28,6 +28,7 @@ module Api::V1::Lti::Deployment
       json["deployment_id"] = deployment.deployment_id
       json["context_name"] = deployment.context.name
       json["workflow_state"] = ["deleted", "disabled"].include?(deployment.workflow_state) ? "deleted" : "active"
+      json["root_account_deployment"] = !!deployment.context.try(:root_account?)
 
       if context_controls
         json["context_controls"] = context_controls.map do |context_control|

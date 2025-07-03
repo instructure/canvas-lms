@@ -195,6 +195,7 @@ class UsersController < ApplicationController
   include DashboardHelper
   include Api::V1::Submission
   include ObserverEnrollmentsHelper
+  include HorizonMode
 
   before_action :require_user, only: %i[grades
                                         merge
@@ -230,6 +231,7 @@ class UsersController < ApplicationController
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
   before_action :check_limited_access_for_students, only: %i[create_file set_custom_color]
+  before_action :load_canvas_career, only: %i[user_dashboard]
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -1672,7 +1674,7 @@ class UsersController < ApplicationController
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
-  #   This is commonly done with user[skip_registration] and communication_channel[skip_confirmation]
+  #   This is commonly done with +user[skip_registration]+ and +communication_channel[skip_confirmation]+
   #   so that the default communication_channel is also restored.
   #
   # @argument destination [URL]
@@ -2149,7 +2151,7 @@ class UsersController < ApplicationController
   # @argument user[avatar][token] [String]
   #   A unique representation of the avatar record to assign as the user's
   #   current avatar. This token can be obtained from the user avatars endpoint.
-  #   This supersedes the user [avatar] [url] argument, and if both are included
+  #   This supersedes the +user[avatar][url]+ argument, and if both are included
   #   the url will be ignored. Note: this is an internal representation and is
   #   subject to change without notice. It should be consumed with this api
   #   endpoint and used in the user update endpoint, and should not be

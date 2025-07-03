@@ -4,7 +4,7 @@ source script/common/utils/dinghy_proxy_setup.sh
 source script/common/utils/dory_setup.sh
 source script/common/utils/docker_desktop_setup.sh
 
-dependencies='docker,docker-compose 1.20.0'
+dependencies='docker'
 
 function dory_or_dinghy() {
   if $(installed dory) && $(! [[ "$(docker ps -aq --filter ancestor=codekitchen/dinghy-http-proxy)" == "" ]]); then

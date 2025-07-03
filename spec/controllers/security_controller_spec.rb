@@ -141,7 +141,8 @@ RSpec.describe SecurityController, type: :request do
           "https://canvas.instructure.com/lti/module_menu_modal",
           "https://canvas.instructure.com/lti/submission_type_selection",
           "ContentArea",
-          "RichTextEditor"] }]
+          "RichTextEditor"] },
+       { "type" => "LtiEulaRequest" }]
     end
 
     before do
@@ -205,7 +206,9 @@ RSpec.describe SecurityController, type: :request do
       end
 
       it "contains the correct information" do
-        messages.each { |message| message["placements"] -= ["ActivityAssetProcessor"] }
+        messages.each do |message|
+          message["placements"] -= ["ActivityAssetProcessor"] if message["placements"]
+        end
 
         get "/api/lti/security/openid-configuration?registration_token=#{make_jwt}"
 

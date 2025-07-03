@@ -109,15 +109,35 @@ describe Submissions::AttachmentForSubmissionDownload do
       end
     end
 
+    it "created attachment associations for online_text_entry type" do
+      @attachment = attachment_model(context: @student)
+      @attachment.root_account.enable_feature!(:file_association_access)
+      @submission = submission_model({
+                                       assignment: @assignment,
+                                       body: "<a href=/users/#{@student.id}/files/#{@attachment.id}>#{@attachment.display_name}</a>",
+                                       submission_type: "online_text_entry",
+                                       user: @student
+                                     })
+      expect(@attachment.attachment_associations).not_to be_nil
+      expect(@attachment.attachment_associations.first.context_type).to eq("Submission")
+      expect(@attachment.attachment_associations.first.context_id).to eq(@submission.id)
+    end
+
     context "when download id is in versioned_attachments" do
       before :once do
-        @attachment = attachment_model(context: @assignment)
-        @submission.attachment_ids = @attachment.id.to_s
-        @submission.save
+        @attachment = attachment_model(context: @student)
+        @submission.root_account.enable_feature!(:file_association_access)
         @options = { download: @attachment.id }
       end
 
-      it "returns attachment from versioned_attachments" do
+      it "returns attachment from versioned_attachments for online_upload type" do
+        @submission = submission_model({
+                                         assignment: @assignment,
+                                         body: "here my assignment",
+                                         submission_type: "online_upload",
+                                         user: @student,
+                                         attachments: [@attachment]
+                                       })
         expect(@submission.attachment_ids).not_to be_nil
         expect(subject.attachment).to eq @attachment
       end

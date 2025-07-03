@@ -87,7 +87,7 @@ describe('SpeedGrader Media Comments', () => {
         return HttpResponse.json({})
       }),
     )
-    jest.spyOn(window.$, 'getJSON').mockImplementation(() => ({always: () => {}}))
+    // No need to mock getJSON since we're already using MSW for all network requests
     jest.spyOn(SpeedGrader.EG, 'domReady').mockImplementation(() => {})
 
     window.INST = {

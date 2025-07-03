@@ -340,7 +340,7 @@ class AppointmentGroup < ActiveRecord::Base
                                           ->(c) { c.participating_students_by_date }
                                         end
                      if sub_contexts.empty?
-                       contexts.map(&participant_func).flatten
+                       contexts.select(&:published?).map(&participant_func).flatten
                      else
                        sub_contexts.map(&participant_func).flatten
                      end

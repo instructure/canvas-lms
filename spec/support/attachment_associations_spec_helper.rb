@@ -19,12 +19,35 @@
 #
 
 class AttachmentAssociationsSpecHelper
-  def self.create_attachments_and_html(account, course)
+  attr_reader :attachment1, :attachment2, :base_html, :added_html, :replaced_html, :removed_html
+
+  def initialize(account, course_or_user)
     account.root_account.enable_feature!(:file_association_access)
-    att = course.attachments.create!(uploaded_data: Rack::Test::UploadedFile.new("spec/fixtures/files/docs/doc.doc", "application/msword", true))
-    [
-      att,
-      "<p>Here is a link to a file: <a href=\"/courses/#{course.id}/files/#{att.id}/download\">doc.doc</a></p>"
-    ]
+    @attachment1 = course_or_user.attachments.create!(uploaded_data: Rack::Test::UploadedFile.new("spec/fixtures/files/docs/doc.doc", "application/msword", true))
+    @attachment2 = course_or_user.attachments.create!(uploaded_data: Rack::Test::UploadedFile.new("spec/fixtures/files/292.mp3", "audio/mpeg", true))
+    link_prefix = if course_or_user.is_a?(Course)
+                    "/courses/#{course_or_user.id}/files"
+                  else
+                    "/users/#{course_or_user.id}/files"
+                  end
+    @base_html = "<p>Here is a link to a file: <a href=\"#{link_prefix}/#{@attachment1.id}/download\">doc.doc</a></p>"
+    @added_html = "<p>Here is a link to a file: <a href=\"#{link_prefix}/#{@attachment1.id}/download\">doc.doc</a>, and to the audio: <a href=\"#{link_prefix}/#{@attachment2.id}/download\">292.mp3</a></p>"
+    @replaced_html = "<p>Here is a link to the audio: <a href=\"#{link_prefix}/#{@attachment2.id}/download\">292.mp3</a></p>"
+    @removed_html = "<p>Here is some text without attachments.</p>"
+  end
+
+  def count_aa_records(context_type, context_id, context_concern = nil)
+    aa_records = AttachmentAssociation.where(context_type:, context_id:, context_concern:).pluck(:context_id, :attachment_id)
+    id_occurences = {}
+    att_occurences = {}
+
+    aa_records.each do |item|
+      id_occurences[item[0]] ||= 0
+      id_occurences[item[0]] += 1
+      att_occurences[item[1]] ||= 0
+      att_occurences[item[1]] += 1
+    end
+
+    [id_occurences, att_occurences]
   end
 end

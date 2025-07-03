@@ -20,10 +20,9 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
 import groupBy from 'lodash/groupBy'
-import {LtiAssetReports} from './LtiAssetReports'
-import {type LtiAssetReportsByProcessor} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReports, LtiAssetReportsProps} from '../../../shared/lti/react/LtiAssetReports'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -37,6 +36,7 @@ interface Props {
   onClose?: () => void
   open?: boolean
   reports: LtiAssetReportWithAsset[]
+  submissionType: 'online_text_entry' | 'online_upload'
 }
 
 const I18n = createI18nScope('submissions_show_preview_asset_report_status')
@@ -48,25 +48,42 @@ export default function StudentAssetReportModal({
   onClose,
   open,
   reports,
+  submissionType,
 }: Props) {
-  const attachmentId = reports?.[0]?.asset.attachment_id
-  const attachmentName = reports?.[0]?.asset.attachment_name
+  const sgReports: SpeedGraderLtiAssetReports = {}
+  const attachments: LtiAssetReportsProps['versionedAttachments'] = []
+  let attachmentName: string = ''
+  let attempt: string = ''
   const assetProcessorsWithReports = assetProcessors.filter(assetProcessor =>
     reports.some(report => report.asset_processor_id === assetProcessor.id),
   )
 
-  if (!attachmentId) {
-    return null
-  }
-  const attachments = [
-    {
+  if (submissionType === 'online_text_entry') {
+    attachmentName = I18n.t('Text submitted to Canvas')
+    attempt = reports?.[0]?.asset?.submission_attempt?.toString() ?? ''
+    sgReports['by_attempt'] = {
+      [attempt]: groupBy(reports, rep => rep.asset_processor_id),
+    }
+  } else if (submissionType === 'online_upload') {
+    const attachmentId = reports?.[0]?.asset.attachment_id
+    attachmentName = reports?.[0]?.asset.attachment_name ?? ''
+    if (!attachmentId) {
+      return null
+    }
+    attachments.push({
       attachment: {
         id: attachmentId,
       },
-    },
-  ]
-  const reportsByAttachment: Record<string, LtiAssetReportsByProcessor> = {
-    [attachmentId]: groupBy(reports, rep => rep.asset_processor_id),
+    })
+
+    sgReports['by_attachment'] = {
+      [attachmentId]: groupBy(reports, rep => rep.asset_processor_id),
+    }
+  } else {
+    console.warn(
+      `Unsupported submission type: ${submissionType}. Expected 'online_text_entry' or 'online_upload'.`,
+    )
+    return null
   }
 
   return (
@@ -109,10 +126,11 @@ export default function StudentAssetReportModal({
         </Flex>
         <LtiAssetReports
           assetProcessors={assetProcessorsWithReports}
-          attempt={null}
-          reportsByAttachment={reportsByAttachment}
+          attempt={attempt}
+          reports={sgReports}
           studentId={undefined}
           versionedAttachments={attachments}
+          submissionType={submissionType}
         />
       </Modal.Body>
     </Modal>

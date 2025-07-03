@@ -266,6 +266,36 @@ RSpec.describe Lti::AssetReport do
         expect(result).to be_empty
       end
     end
+
+    context "with online text entry submissions" do
+      let(:online_text_assignment) { assignment_model(course:, submission_types: "online_text_entry") }
+      let(:online_submission) do
+        submission = online_text_assignment.submissions.find_by(user: student1)
+        submission.update!(submission_type: "online_text_entry")
+        submission
+      end
+      let(:online_asset) { lti_asset_model(submission: online_submission) }
+      let(:online_processor) { lti_asset_processor_model(assignment: online_text_assignment) }
+      let!(:online_report) { lti_asset_report_model(asset: online_asset, asset_processor: online_processor, report_type: "text_entry_report") }
+
+      it "includes online text entry asset reports organized by submission and asset in text_entry_by_attempt" do
+        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [online_submission.id])
+        expect(result.keys).to include(online_submission.id)
+        text_entry_by_attempt = result[online_submission.id][:by_attempt]
+        expect(text_entry_by_attempt).to be_a(Hash)
+        expect(text_entry_by_attempt.keys).to include(online_submission.attempt)
+
+        processor_hash = text_entry_by_attempt[online_submission.attempt]
+        expect(processor_hash.keys).to include(online_processor.id)
+        report_ids = processor_hash[online_processor.id].map { |r| r[:_id] }
+        expect(report_ids).to include(online_report.id)
+      end
+
+      it "returns empty results for non-matching online text entry submissions" do
+        result = Lti::AssetReport.info_for_display_by_submission(submission_ids: [online_submission.id + 1000])
+        expect(result).to be_empty
+      end
+    end
   end
 
   describe "#info_for_display" do

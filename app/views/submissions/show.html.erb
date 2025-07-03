@@ -250,6 +250,14 @@
         <% end %>
       </div>
     </div>
+    <% if @submission.submission_type == "online_text_entry" %>
+      <%
+        js_env ASSET_REPORTS: @asset_reports
+        js_env ASSET_PROCESSORS: @asset_processors
+        js_env ASSIGNMENT_NAME: @assignment.title
+      %>
+      <div id="asset_report_text_entry_status_container" data-attempt="<%= @submission.attempt %>"></div>
+    <% end %>
     <% if @assessment_request %>
       <div class="assessment_request_completed_message" style="<%= hidden unless @assessment_request.completed? %>">
         <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>

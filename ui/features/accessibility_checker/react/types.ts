@@ -64,4 +64,21 @@ export interface ContentItem {
   url: string
   editUrl?: string
   issues?: AccessibilityIssue[]
+  severity?: Severity
 }
+
+export interface PreviewResponse {
+  content: string
+  path?: string
+}
+
+export type Severity = 'High' | 'Medium' | 'Low'
+
+export type IssueDataPoint = {
+  id: string
+  issue: string
+  count: number
+  severity: Severity
+}
+
+export type RawData = Record<string, any>

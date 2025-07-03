@@ -24,6 +24,7 @@ import type {
 } from '@canvas/rubrics/react/types/rubric'
 import type {RubricQueryResponse} from '../queries/RubricFormQueries'
 import type {RubricFormProps} from '../types/RubricForm'
+import {isEqual} from 'lodash'
 
 export const translateRubricQueryResponse = (fields: RubricQueryResponse): RubricFormProps => {
   return {
@@ -115,4 +116,44 @@ export const autoGeneratePoints = (ratings: RubricRating[], points: number) => {
   }
 
   return ratingList
+}
+
+export const calcPointsPossible = (criteria: RubricCriterion[]): number =>
+  criteria.reduce((acc, c) => acc + (c.ignoreForScoring ? 0 : c.points), 0)
+
+export const defaultRubricForm: RubricFormProps = {
+  title: '',
+  hasRubricAssociations: false,
+  hidePoints: false,
+  criteria: [],
+  pointsPossible: 0,
+  buttonDisplay: 'numeric',
+  ratingOrder: 'descending',
+  unassessed: true,
+  workflowState: 'active',
+  freeFormCriterionComments: false,
+  hideOutcomeResults: false,
+  hideScoreTotal: false,
+  useForGrading: false,
+}
+
+export const hasRubricChanged = (formData: RubricFormProps, rubric: Rubric): boolean => {
+  const reducedFormData = {
+    title: formData.title,
+    criteria: formData.criteria,
+    pointsPossible: formData.pointsPossible,
+    ratingOrder: formData.ratingOrder,
+    freeFormCriterionComments: formData.freeFormCriterionComments,
+    hidePoints: formData.hidePoints,
+  }
+  const reducedRubricData = {
+    title: rubric.title,
+    criteria: rubric.criteria,
+    pointsPossible: rubric.pointsPossible,
+    ratingOrder: rubric.ratingOrder,
+    freeFormCriterionComments: rubric.freeFormCriterionComments,
+    hidePoints: rubric.hidePoints ?? false,
+  }
+
+  return !isEqual(reducedFormData, reducedRubricData)
 }

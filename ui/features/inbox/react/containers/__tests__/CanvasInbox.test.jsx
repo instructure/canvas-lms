@@ -22,7 +22,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
 
 import {mswClient} from '../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import {handlers, inboxSettingsHandlers} from '../../../graphql/mswHandlers'
 import {responsiveQuerySizes} from '../../../util/utils'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
@@ -35,7 +35,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('CanvasInbox App Container', () => {
-  const server = mswServer(handlers.concat(inboxSettingsHandlers()))
+  const server = setupServer(...handlers.concat(inboxSettingsHandlers()))
 
   beforeAll(() => {
     server.listen()

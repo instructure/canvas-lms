@@ -39,8 +39,10 @@ module Submissions
     protected
 
     def download_params
-      { verifier: @attachment.uuid, inline: params[:inline] }.tap do |h|
+      { inline: params[:inline] }.tap do |h|
         h[:download_frd] = true unless params[:inline]
+        h[:verifier] = @attachment.uuid unless @attachment.root_account.feature_enabled?(:disable_file_verifier_access)
+        h[:location] = params[:location] if @attachment.root_account.feature_enabled?(:file_association_access) && params[:location].present?
       end
     end
 

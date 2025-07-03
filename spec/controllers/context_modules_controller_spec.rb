@@ -1776,4 +1776,45 @@ describe ContextModulesController do
       expect(progression1.collapsed).to be_falsey
     end
   end
+
+  describe "POST 'toggle_collapse'" do
+    it "should not create N+1 queries for assignment content tags" do
+      course_with_teacher_logged_in(active_all: true)
+
+      @module = @course.context_modules.create!(name: "Test Module")
+
+      # Create multiple assignments and add them to the module
+      assignments = []
+      5.times do |i|
+        assignment = @course.assignments.create!(title: "Assignment #{i + 1}")
+        assignments << assignment
+        @module.add_item(type: "assignment", id: assignment.id)
+      end
+
+      # Ensure module is not collapsed initially
+      progression = @module.evaluate_for(@teacher)
+      progression.update!(collapsed: false)
+
+      # Count queries to ensure no N+1 when rendering JSON
+      query_count = 0
+      query_counter = lambda do |_name, _started, _finished, _unique_id, payload|
+        query_count += 1 if payload[:sql]&.include?("SELECT assignments.* FROM")
+      end
+
+      ActiveSupport::Notifications.subscribed(query_counter, "sql.active_record") do
+        post "toggle_collapse", params: {
+          course_id: @course.id,
+          context_module_id: @module.id,
+          collapse: "1",
+          format: "json"
+        }
+      end
+
+      expect(response).to be_successful
+      expect(query_count).to be <= 1, "Expected at most 1 assignment query, got #{query_count}"
+
+      response_data = response.parsed_body
+      expect(response_data).to eq(JSON.parse(progression.reload.to_json))
+    end
+  end
 end

@@ -21,11 +21,24 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {AppsTableInner} from '../AppsTable'
 import {mockPageOfRegistrations, mockRegistration} from './helpers'
 import {BrowserRouter} from 'react-router-dom'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Need to use AppsTableInner because AppsTable uses Responsive
 // which doesn't seem to work in these tests -- both media queries are
 // satisfied and the component gets two "layout" properties
 describe('AppsTableInner', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      FEATURES: {
+        lti_registrations_next: false,
+      },
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('calls the deleteApp callback when the Delete App menu item is clicked', async () => {
     const deleteApp = jest.fn()
     const wrapper = render(
@@ -44,7 +57,7 @@ describe('AppsTableInner', () => {
       </BrowserRouter>,
     )
 
-    const kebabMenuIcon = await wrapper.findAllByText('More Registration Options')
+    const kebabMenuIcon = await wrapper.findAllByText('More Registration Options', {exact: false})
     fireEvent.click(kebabMenuIcon[0])
     const deleteButton = await wrapper.findByText('Delete App')
 
@@ -174,36 +187,63 @@ describe('AppsTableInner', () => {
     expect(wrapper.getAllByText('Instructure')).toHaveLength(2)
   })
 
-  it("renders a link to the tool's detail page", async () => {
-    window.ENV.FEATURES.lti_registrations_next = true
-    const wrapper = render(
-      <BrowserRouter>
-        <AppsTableInner
-          tableProps={{
-            apps: {
-              data: [
-                mockRegistration(
-                  'ExampleApp',
-                  1,
-                  {},
-                  {created_by: 'Instructure', updated_by: 'Instructure'},
-                ),
-              ],
-              total: 1,
-            },
-            dir: 'asc',
-            sort: 'name',
-            updateSearchParams: () => {},
-            deleteApp: () => {},
-            page: 1,
-          }}
-          responsiveProps={undefined}
-        />
-      </BrowserRouter>,
-    )
+  describe('with flag on', () => {
+    beforeEach(() => {
+      window.ENV.FEATURES.lti_registrations_next = true
+    })
 
-    const link = wrapper.getByTestId('reg-link-1')
-    expect(link).toHaveAttribute('href', '/manage/1/configuration')
-    window.ENV.FEATURES.lti_registrations_next = false
+    it("renders a link to the tool's detail page", async () => {
+      const wrapper = render(
+        <BrowserRouter>
+          <AppsTableInner
+            tableProps={{
+              apps: {
+                data: [
+                  mockRegistration(
+                    'ExampleApp',
+                    1,
+                    {},
+                    {created_by: 'Instructure', updated_by: 'Instructure'},
+                  ),
+                ],
+                total: 1,
+              },
+              dir: 'asc',
+              sort: 'name',
+              updateSearchParams: () => {},
+              deleteApp: () => {},
+              page: 1,
+            }}
+            responsiveProps={undefined}
+          />
+        </BrowserRouter>,
+      )
+
+      const link = wrapper.getByTestId('reg-link-1')
+      expect(link).toHaveAttribute('href', '/manage/1')
+    })
+
+    it('shows condensed version of table', async () => {
+      const wrapper = render(
+        <BrowserRouter>
+          <AppsTableInner
+            tableProps={{
+              apps: mockPageOfRegistrations('Hello', 'World'),
+              dir: 'asc',
+              sort: 'name',
+              updateSearchParams: () => {},
+              deleteApp: () => {},
+              page: 1,
+            }}
+            responsiveProps={undefined}
+          />
+        </BrowserRouter>,
+      )
+
+      const kebabMenuIcons = wrapper.queryAllByText('More Registration Options', {
+        exact: false,
+      })
+      expect(kebabMenuIcons).toHaveLength(0)
+    })
   })
 })

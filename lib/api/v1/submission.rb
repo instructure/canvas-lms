@@ -52,7 +52,7 @@ module Api::V1::Submission
       hash["has_sub_assignment_submissions"] = assignment.has_sub_assignments
       hash["sub_assignment_submissions"] = (assignment.has_sub_assignments &&
                                            assignment.sub_assignments&.map do |sub_assignment|
-                                             sub_assignment_submission = sub_assignment.find_or_create_submission(submission.user)
+                                             sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
                                              sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, current_user, session, context, includes, params, avatars)
                                            end) || []
     end
@@ -279,7 +279,8 @@ module Api::V1::Submission
       hash["media_comment"] =
         media_comment_json(
           { media_id: attempt.media_comment_id,
-            media_type: attempt.media_comment_type }
+            media_type: attempt.media_comment_type },
+          location: attempt.asset_string
         )
     end
 
@@ -324,7 +325,7 @@ module Api::V1::Submission
               submission_id: attempt.id
             }
 
-            attachment_json(attachment, user, {}, options)
+            attachment_json(attachment, user, { location: attempt.asset_string }, options)
           end
       end
     end

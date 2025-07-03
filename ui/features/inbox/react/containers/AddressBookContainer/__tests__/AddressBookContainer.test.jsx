@@ -20,13 +20,13 @@ import React from 'react'
 import {ApolloProvider} from '@apollo/client'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {mswClient} from '@canvas/msw/mswClient'
+import {setupServer} from 'msw/node'
 import {AddressBookContainer} from '../AddressBookContainer'
 import {handlers} from '../../../../graphql/mswHandlers'
 
 describe('AddressBookContainer', () => {
-  const server = mswServer(handlers)
+  const server = setupServer(...handlers)
   let user
 
   beforeAll(() => {

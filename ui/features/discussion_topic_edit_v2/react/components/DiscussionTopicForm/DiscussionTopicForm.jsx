@@ -312,6 +312,12 @@ function DiscussionTopicForm({
 
   const [abGuid, setAbGuid] = useState(null)
 
+  // Suppressed assignment state
+  const [suppressedAssignment, setSuppressedAssignment] = useState(
+    (currentDiscussionTopic?.assignment?.suppressAssignment && ENV.SETTINGS.suppress_assignments) ||
+      false,
+  )
+
   // Checkpoints states
   const [isCheckpoints, setIsCheckpoints] = useState(
     (currentDiscussionTopic?.assignment?.hasSubAssignments && ENV.DISCUSSION_CHECKPOINTS_ENABLED) ||
@@ -488,13 +494,6 @@ function DiscussionTopicForm({
     )
   }, [gradingSchemeId, displayGradeAs, pointsPossible, isGraded])
 
-  useEffect(() => {
-    if (isCheckpoints && !ENV.CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED) {
-      setIsGroupDiscussion(false)
-      setGroupCategoryId(null)
-    }
-  }, [isCheckpoints])
-
   addToStudentToDoDateRef?.setAttribute('data-testid', 'add-to-student-to-do-date')
   addToStudentToDoTimeRef?.setAttribute('data-testid', 'add-to-student-to-do-time')
 
@@ -515,6 +514,7 @@ function DiscussionTopicForm({
     shouldShowCheckpointsOptions,
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
+    shouldShowSuppressAssignmentOption,
   } = useShouldShowContent(
     isGraded,
     isAnnouncement,
@@ -547,8 +547,8 @@ function DiscussionTopicForm({
       published: shouldPublish,
       isAnnouncement,
       fileId: attachment?._id,
-      delayedPostAt: availableFrom,
-      lockAt: availableUntil,
+      delayedPostAt: isCheckpoints ? null : availableFrom,
+      lockAt: isCheckpoints ? null : availableUntil,
       // Conditional payload properties
       assignment: prepareAssignmentPayload(
         abGuid,
@@ -571,6 +571,7 @@ function DiscussionTopicForm({
         importantDates,
         isCheckpoints,
         currentDiscussionTopic?.assignment,
+        suppressedAssignment,
       ),
       checkpoints: prepareCheckpointsPayload(
         assignedInfoList,
@@ -606,7 +607,7 @@ function DiscussionTopicForm({
           masteryPathsOption,
         ),
       )
-    } else if (isGraded && !isGroupDiscussion && ENV.context_type !== 'Group') {
+    } else if (isGraded && !isGroupDiscussion && ENV.context_type !== 'Group' && !isCheckpoints) {
       // Well, its fairly lame to call prepUngraded inside if isGraded, but availableUntil/From is ignored by selective release, so we need to fetch it somehow.
       const {delayedPostAt, lockAt} = prepareUngradedDiscussionOverridesPayload(
         assignedInfoList,
@@ -773,14 +774,21 @@ function DiscussionTopicForm({
   }
 
   const getPublishStatus = () => {
-    return published ? (
-      <Text color="success" weight="normal">
-        <IconPublishSolid /> {I18n.t('Published')}
-      </Text>
-    ) : (
-      <Text color="secondary" weight="normal">
-        <IconUnpublishedLine /> {I18n.t('Not Published')}
-      </Text>
+    return (
+      <div
+        aria-label={published ? I18n.t('Published') : I18n.t('Not Published')}
+        style={{display: 'inline-flex', alignItems: 'center'}}
+      >
+        {published ? (
+          <Text color="success" weight="normal">
+            <IconPublishSolid aria-hidden="true" /> {I18n.t('Published')}
+          </Text>
+        ) : (
+          <Text color="secondary" weight="normal">
+            <IconUnpublishedLine aria-hidden="true" /> {I18n.t('Not Published')}
+          </Text>
+        )}
+      </div>
     )
   }
 
@@ -788,7 +796,11 @@ function DiscussionTopicForm({
     return (
       <Flex justifyItems="space-between">
         <Flex.Item>{I18n.t('Topic Title')}</Flex.Item>
-        {!isAnnouncement && !instUINavEnabled() && <Flex.Item>{getPublishStatus()}</Flex.Item>}
+        {!isAnnouncement && !instUINavEnabled() && (
+          <Flex.Item style={{marginLeft: '1rem', whiteSpace: 'nowrap'}}>
+            {getPublishStatus()}
+          </Flex.Item>
+        )}
       </Flex>
     )
   }
@@ -962,6 +974,7 @@ function DiscussionTopicForm({
       setTodoDate(null)
     } else {
       setIsCheckpoints(false)
+      setSuppressedAssignment(false)
     }
   }
 
@@ -982,8 +995,9 @@ function DiscussionTopicForm({
           <TextInput
             data-testid="discussion-topic-title"
             renderLabel={renderLabelWithPublishStatus()}
-            type={I18n.t('text')}
+            aria-label={I18n.t('Topic Title')}
             placeholder={I18n.t('Topic Title')}
+            type="text"
             value={title}
             ref={textInputRef}
             onChange={(_event, value) => {
@@ -1221,6 +1235,24 @@ function DiscussionTopicForm({
                   </div>
                 </Tooltip>
               </>
+            )}
+            {shouldShowSuppressAssignmentOption && (
+              <View display="inline-block" padding="0 0 0 medium">
+                <Checkbox
+                  data-testid="suppressed-assignment-checkbox"
+                  data-pendo="suppressed-assignment-checkbox"
+                  data-action-state={
+                    suppressedAssignment ? 'suppressFromGradebook' : 'shownInGradebook'
+                  }
+                  label={I18n.t('Hide from gradebook view and student grades view')}
+                  value="suppress_from_gradebook"
+                  inline={true}
+                  checked={suppressedAssignment}
+                  onChange={() => {
+                    setSuppressedAssignment(!suppressedAssignment)
+                  }}
+                />
+              </View>
             )}
             {shouldShowLikingOption && (
               <>

@@ -17,29 +17,63 @@
 
 import {getSourcesAndTracks} from '../mediaComment'
 import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
+
+const server = setupServer()
 
 describe('getSourcesAndTracks', () => {
   beforeAll(() => {
-    $.getJSON = jest.fn()
+    server.listen()
   })
 
   beforeEach(() => {
     jest.resetModules()
   })
 
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
   afterAll(() => {
-    $.getJSON.mockRestore()
+    server.close()
     jest.resetAllMocks()
   })
 
-  it('with no attachment id', () => {
+  it('with no attachment id', async () => {
+    let requestUrl = null
+    server.use(
+      http.get('/media_objects/:id/info', ({request}) => {
+        requestUrl = request.url
+        return HttpResponse.json({
+          media_sources: [],
+          media_tracks: [],
+        })
+      }),
+    )
+
     getSourcesAndTracks(1)
-    expect($.getJSON).toHaveBeenCalledWith('/media_objects/1/info', expect.anything())
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    expect(requestUrl).toContain('/media_objects/1/info')
   })
 
-  it('with an attachment id', () => {
+  it('with an attachment id', async () => {
+    let requestUrl = null
+    server.use(
+      http.get('/media_attachments/:id/info', ({request}) => {
+        requestUrl = request.url
+        return HttpResponse.json({
+          media_sources: [],
+          media_tracks: [],
+        })
+      }),
+    )
+
     getSourcesAndTracks(1, 4)
-    expect($.getJSON).toHaveBeenCalledWith('/media_attachments/4/info', expect.anything())
+    await new Promise(resolve => setTimeout(resolve, 10))
+
+    expect(requestUrl).toContain('/media_attachments/4/info')
   })
 
   it('should return sources and tracks in the old format when studio_media_capture_enabled is false', async () => {
@@ -67,11 +101,12 @@ describe('getSourcesAndTracks', () => {
       can_add_captions: true,
     }
 
-    // Mock $.getJSON to return the mock response
-    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
-      callback(mockResponse)
-      return $.Deferred().resolve(mockResponse).promise()
-    })
+    // Setup MSW to return the mock response
+    server.use(
+      http.get('/media_objects/:id/info', () => {
+        return HttpResponse.json(mockResponse)
+      }),
+    )
 
     const id = '123'
     const result = await getSourcesAndTracks(id)
@@ -109,11 +144,12 @@ describe('getSourcesAndTracks', () => {
       can_add_captions: true,
     }
 
-    // Mock $.getJSON to return the mock response
-    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
-      callback(mockResponse)
-      return $.Deferred().resolve(mockResponse).promise()
-    })
+    // Setup MSW to return the mock response
+    server.use(
+      http.get('/media_objects/:id/info', () => {
+        return HttpResponse.json(mockResponse)
+      }),
+    )
 
     const id = '123'
     const result = await getSourcesAndTracks(id)
@@ -167,11 +203,12 @@ describe('getSourcesAndTracks', () => {
       can_add_captions: true,
     }
 
-    // Mock $.getJSON to return the mock response
-    jest.spyOn($, 'getJSON').mockImplementation((_, callback) => {
-      callback(mockResponse)
-      return $.Deferred().resolve(mockResponse).promise()
-    })
+    // Setup MSW to return the mock response
+    server.use(
+      http.get('/media_objects/:id/info', () => {
+        return HttpResponse.json(mockResponse)
+      }),
+    )
 
     const id = '123'
     const result = await getSourcesAndTracks(id)

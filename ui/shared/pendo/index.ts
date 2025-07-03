@@ -47,7 +47,7 @@ function init(): Promise<any> | null {
       },
       account: {
         id: ENV.DOMAIN_ROOT_ACCOUNT_UUID,
-        surveyOptOut: ENV.FEATURES['account_survey_notifications'],
+        surveyOptOut: !ENV.FEATURES['account_survey_notifications'],
       },
       globalKey: 'canvasUsageMetrics',
       plugins: [Replay, VocPortal],

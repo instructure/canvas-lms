@@ -18,15 +18,19 @@
 
 import {useEditor} from '@craftjs/core'
 import {ReactElement} from 'react'
+import {useGetRootNode} from './useGetRootNode'
+import {useHandleNodesCountChange} from './useHandleNodesCountChange'
 
 export const useAddNode = () => {
   const {query, actions} = useEditor()
+  const getRootNode = useGetRootNode()
+  const handleNodesCountChange = useHandleNodesCountChange()
 
   const getIndex = (afterNodeId?: string) => {
     if (!afterNodeId) {
       return 0
     }
-    const rootNode = query.node('ROOT').get()
+    const rootNode = getRootNode()
     const siblings = rootNode.data.nodes
     return siblings.indexOf(afterNodeId) + 1
   }
@@ -35,6 +39,7 @@ export const useAddNode = () => {
     const nodeTree = query.parseReactElement(node).toNodeTree()
     const index = getIndex(afterNodeId)
     actions.addNodeTree(nodeTree, 'ROOT', index)
+    handleNodesCountChange()
   }
   return addNode
 }

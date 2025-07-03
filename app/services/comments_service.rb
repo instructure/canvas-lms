@@ -60,7 +60,7 @@ class CommentsService
         root_account_uuid: @root_account_uuid
       )
 
-      guidance_list = JSON.parse(response)
+      guidance_list = safe_parse_json_array(response)
       guidance = guidance_list.to_h { |g| [g["criterion"], g["guidance"]] }
       @grade_data.each do |data|
         comment = guidance.fetch(data["description"], nil)
@@ -77,5 +77,22 @@ class CommentsService
     COMMENTS_PROMPT
       .gsub("{{assignment}}", @assignment.encode(xml: :text))
       .gsub("{{list_of_reasonings}}", list_of_reasonings.to_json)
+  end
+
+  def safe_parse_json_array(response)
+    return [] if response.blank?
+
+    begin
+      parsed = JSON.parse(response)
+      return parsed.is_a?(Array) ? parsed : []
+    rescue JSON::ParserError
+      if response.include?("[") && response.include?("]")
+        json_like = response[response.index("["), response.rindex("]") - response.index("[") + 1]
+        parsed = JSON.parse(json_like)
+        return parsed.is_a?(Array) ? parsed : []
+      end
+    end
+
+    raise CedarAIGraderError, "Invalid JSON response: could not extract valid JSON array"
   end
 end

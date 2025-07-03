@@ -18,14 +18,18 @@
 
 import {isEmpty} from 'lodash'
 import ProgressStore from '../ProgressStore'
-import $ from 'jquery'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
-jest.mock('jquery')
-
+const server = setupServer()
 let progress_id
 let progress
 
 describe('ProgressStoreSpec', () => {
+  beforeAll(() => {
+    server.listen()
+  })
+
   beforeEach(() => {
     progress_id = 2
     progress = {
@@ -41,22 +45,33 @@ describe('ProgressStoreSpec', () => {
 
   afterEach(() => {
     ProgressStore.clearState()
-    jest.clearAllMocks()
+    server.resetHandlers()
   })
 
-  it('get', function () {
-    $.getJSON.mockImplementation((url, callback) => {
-      if (url === `/api/v1/progress/${progress_id}`) {
-        callback(progress)
-      }
-    })
+  afterAll(() => {
+    server.close()
+  })
+
+  it('get', async function () {
+    server.use(
+      http.get('/api/v1/progress/:id', ({params}) => {
+        if (params.id === String(progress_id)) {
+          return HttpResponse.json(progress)
+        }
+        return new HttpResponse(null, {status: 404})
+      }),
+    )
 
     // precondition
     expect(isEmpty(ProgressStore.getState())).toBeTruthy()
+
+    // ProgressStore.get doesn't return a promise, so we need to wait for the state to update
     ProgressStore.get(progress_id)
+
+    // Wait for the async request to complete
+    await new Promise(resolve => setTimeout(resolve, 10))
 
     const state = ProgressStore.getState()
     expect(state[progress.id]).toEqual(progress)
-    expect($.getJSON).toHaveBeenCalledWith(`/api/v1/progress/${progress_id}`, expect.any(Function))
   })
 })

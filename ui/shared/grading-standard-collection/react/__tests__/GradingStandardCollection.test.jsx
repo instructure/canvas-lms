@@ -18,25 +18,21 @@
 
 import React from 'react'
 import {render, screen, within} from '@testing-library/react'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import GradingStandardCollection from '../index'
 
 // Mock jQuery and its plugins
 jest.mock('@canvas/jquery/jquery.instructure_misc_plugins', () => {})
+import $ from 'jquery'
 
-jest.mock('jquery', () => {
-  const mockJQuery = jest.fn(() => mockJQuery)
-  mockJQuery.fn = {
-    defaultAjaxError: jest.fn(),
-    extend: jest.fn((_deep, obj) => obj),
-  }
-  mockJQuery.getJSON = jest.fn()
-  mockJQuery.extend = jest.fn((_deep, obj) => obj)
-  mockJQuery.flashMessage = jest.fn()
-  mockJQuery.flashError = jest.fn()
-  return mockJQuery
-})
+const server = setupServer()
 
 describe('GradingStandardCollection', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   const mockStandards = [
     {
       grading_standard: {
@@ -72,28 +68,29 @@ describe('GradingStandardCollection', () => {
       context_asset_string: 'course_1',
     }
 
-    // Setup jQuery mock responses
-    const $ = require('jquery')
-    $.getJSON.mockImplementation(() => {
-      return {
-        done: callback => {
-          callback(mockStandards)
-          return {
-            fail: () => {
-              return {}
-            },
-          }
-        },
-      }
+    // Setup server handler for default case
+    server.use(
+      http.get('/courses/1/grading_standards.json', () => {
+        return HttpResponse.json(mockStandards)
+      }),
+    )
+
+    // Mock jQuery getJSON - component uses jQuery's promise interface
+    $.getJSON = jest.fn(url => {
+      const deferred = $.Deferred()
+
+      fetch(url)
+        .then(response => response.json())
+        .then(data => deferred.resolve(data))
+        .catch(error => deferred.reject(error))
+
+      return deferred.promise()
     })
 
-    // Mock jQuery.extend to properly clone objects
-    $.extend = jest.fn((deep, target, ...sources) => {
-      if (deep) {
-        return JSON.parse(JSON.stringify(Object.assign({}, target, ...sources)))
-      }
-      return Object.assign({}, target, ...sources)
-    })
+    // Mock jQuery plugins
+    $.flashMessage = jest.fn()
+    $.flashError = jest.fn()
+    $.fn.confirmDelete = jest.fn(({success}) => success())
   })
 
   afterEach(() => {
@@ -102,15 +99,11 @@ describe('GradingStandardCollection', () => {
   })
 
   it('shows empty state when no standards exist', async () => {
-    const $ = require('jquery')
-    $.getJSON.mockImplementation(() => ({
-      done: callback => {
-        callback([])
-        return {
-          fail: () => ({}),
-        }
-      },
-    }))
+    server.use(
+      http.get('/courses/1/grading_standards.json', () => {
+        return HttpResponse.json([])
+      }),
+    )
 
     render(<GradingStandardCollection />)
     expect(await screen.findByText('No grading schemes to display')).toBeInTheDocument()

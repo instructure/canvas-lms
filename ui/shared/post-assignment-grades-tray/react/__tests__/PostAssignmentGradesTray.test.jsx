@@ -137,7 +137,7 @@ describe('PostAssignmentGradesTray', () => {
       await waitForTrayToOpen()
 
       const closeButtons = screen.getAllByRole('button', {name: /close/i})
-      await userEvent.click(closeButtons[1]) // Use the second Close button like in QUnit test
+      await userEvent.click(closeButtons[1]) // Use the second Close button
       await waitFor(() => {
         expect(mockOnExited).toHaveBeenCalledTimes(1)
       })
@@ -149,7 +149,7 @@ describe('PostAssignmentGradesTray', () => {
       await waitForTrayToOpen()
 
       const closeButtons = screen.getAllByRole('button', {name: /close/i})
-      await userEvent.click(closeButtons[1]) // Use the second Close button like in QUnit test
+      await userEvent.click(closeButtons[1]) // Use the second Close button
       await waitFor(() => {
         expect(mockOnExited).toHaveBeenCalledTimes(1)
       })

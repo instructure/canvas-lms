@@ -133,7 +133,7 @@ class Attachment < ActiveRecord::Base
   has_one :estimated_duration, dependent: :destroy, inverse_of: :attachment
   has_many :lti_assets, class_name: "Lti::Asset", inverse_of: :attachment, dependent: :destroy
 
-  before_save :set_root_account
+  before_validation :set_root_account
   before_save :infer_display_name
   before_save :truncate_display_name
   before_save :default_values
@@ -1398,6 +1398,18 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= assignment_submissions.exists?
   end
 
+  def used_in_submission_history?(course)
+    return true if associated_with_submission?
+
+    att_user = context.is_a?(User) ? context : user
+    submission_histories = att_user.submissions.where(course_id: course.id).map(&:submission_history).flatten
+    submission_histories.any? do |s|
+      attachment_ids = (s.attachment_ids || "").split(",").map(&:to_i)
+      attachment_ids << s.attachment_id if s.attachment_id
+      attachment_ids.include?(id)
+    end
+  end
+
   def can_read_through_assignment?(user, session)
     return false unless assignment
     return true if user && user.id == user_id
@@ -1843,25 +1855,13 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  # after replacing this file's instfs_uuid, delete the old file if it's not being used by any other Attachments
-  def safe_delete_overwritten_instfs_uuid(instfs_uuid)
-    raise ArgumentError, "instfs_uuid not overwritten" if self.instfs_uuid == instfs_uuid
-
-    if cloned_item_id.present?
-      # we can't delete the old file since it's used by other attachments;
-      # however, this one isn't using it anymore so we should detach from the clone group
-      update!(cloned_item_id: nil)
-      return
-    end
+  # if we reused this Attachment when an identical file was re-uploaded, delete the unused instfs_uuid
+  def safe_delete_unused_instfs_uuid(instfs_uuid)
+    raise ArgumentError, "instfs_uuid in use" if self.instfs_uuid == instfs_uuid
 
     shard.activate do
-      # any linked Canvadoc retains the old instfs_uuid, and deleting it would break re-rendering
-      return if Canvadoc.where(attachment_id: self).exists?
-
       # double-check that no other attachments are using this instfs_uuid
-      return if Attachment.where(instfs_uuid:).exists?
-
-      InstFS.delete_file(instfs_uuid)
+      InstFS.delete_file(instfs_uuid) unless Attachment.where(instfs_uuid:).exists?
     end
   end
 
@@ -2467,7 +2467,7 @@ class Attachment < ActiveRecord::Base
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
     attachments.map do |attachment|
       if attachment.folder&.for_submissions? &&
-         !attachment.associated_with_submission?
+         !attachment.used_in_submission_history?(assignment_context)
         # if it's already in a submissions folder and has not been submitted previously, we can leave it there
         attachment
       elsif attachment.context.respond_to?(:submissions_folder)

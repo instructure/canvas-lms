@@ -151,6 +151,7 @@ class ConversationsController < ApplicationController
   include KalturaHelper
   include Api::V1::Conversation
   include Api::V1::Progress
+  include HorizonMode
 
   before_action :require_user, except: [:public_feed]
   before_action :reject_student_view_student
@@ -158,6 +159,7 @@ class ConversationsController < ApplicationController
   before_action :infer_scope, only: %i[index show create update add_recipients add_message remove_messages]
   before_action :normalize_recipients, only: [:create, :add_recipients]
   before_action :infer_tags, only: [:create, :add_recipients]
+  before_action :load_canvas_career, only: %i[index]
 
   # whether it's a bulk private message, or a big group conversation,
   # batch up all delayed jobs to make this more responsive to the user
@@ -308,13 +310,13 @@ class ConversationsController < ApplicationController
         hash[:INBOX_AUTO_RESPONSE_ENABLED] = Account.site_admin.feature_enabled?(:inbox_settings) &&
                                              @domain_root_account.enable_inbox_auto_response? &&
                                              (!is_student || (is_student && !@domain_root_account.disable_inbox_auto_response_for_students?))
-
+        translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
         js_env({
                  CONVERSATIONS: hash,
                  apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                  conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q"),
                  react_inbox_labels: Account.site_admin.feature_enabled?(:react_inbox_labels),
-                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages(@domain_root_account.feature_enabled?(:ai_translation_improvements)) : [],
+                 inbox_translation_languages: @domain_root_account.feature_enabled?(:translate_inbox_messages) ? Translation.languages(translation_flags) : [],
                  inbox_translation_enabled: @domain_root_account.feature_enabled?(:translate_inbox_messages)
                })
         @page_title = t("Inbox")

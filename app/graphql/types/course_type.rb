@@ -577,7 +577,7 @@ module Types
     def submission_statistics
       return nil unless course.grants_right?(current_user, :read)
 
-      course
+      Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
     end
 
     field :allow_final_grade_override, Boolean, null: true

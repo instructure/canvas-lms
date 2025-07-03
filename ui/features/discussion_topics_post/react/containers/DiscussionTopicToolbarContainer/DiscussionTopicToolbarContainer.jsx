@@ -46,8 +46,6 @@ import DiscussionTopicTitleContainer from '../DiscussionTopicTitleContainer/Disc
 const I18n = createI18nScope('discussion_topic')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
-const discDefaultSortEnabled = () => window.ENV?.FEATURES?.discussion_default_sort
-const discDefaultExpandEnabled = () => window.ENV?.FEATURES?.discussion_default_expand
 const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
   const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
@@ -99,44 +97,12 @@ const DiscussionTopicToolbarContainer = props => {
   }
 
   const renderSort = () => {
-    if (discDefaultSortEnabled) {
-      return (
-        <SortOrderDropDown
-          isLocked={props.discussionTopic.sortOrderLocked}
-          selectedSortType={props.sortDirection}
-          onSortClick={props.onSortClick}
-        />
-      )
-    }
     return (
-      <Tooltip
-        renderTip={props.sortDirection === 'desc' ? I18n.t('Newest First') : I18n.t('Oldest First')}
-        width="78px"
-        data-testid="sortButtonTooltip"
-      >
-        <span className="discussions-sort-button">
-          <Button
-            style={{width: '100%'}}
-            display="block"
-            onClick={props.onSortClick}
-            renderIcon={
-              props.sortDirection === 'desc' ? (
-                <IconArrowDownLine data-testid="DownArrow" />
-              ) : (
-                <IconArrowUpLine data-testid="UpArrow" />
-              )
-            }
-            data-testid="sortButton"
-          >
-            {I18n.t('Sort')}
-            <ScreenReaderContent>
-              {props.sortDirection === 'asc'
-                ? I18n.t('Sorted by Ascending')
-                : I18n.t('Sorted by Descending')}
-            </ScreenReaderContent>
-          </Button>
-        </span>
-      </Tooltip>
+      <SortOrderDropDown
+        isLocked={props.discussionTopic.sortOrderLocked}
+        selectedSortType={props.sortDirection}
+        onSortClick={props.onSortClick}
+      />
     )
   }
 
@@ -203,8 +169,6 @@ const DiscussionTopicToolbarContainer = props => {
                 breakpoints={props.breakpoints}
                 isSortOrderLocked={props.discussionTopic.sortOrderLocked}
                 isExpandedLocked={props.discussionTopic.expandedLocked}
-                discDefaultSortEnabled={discDefaultSortEnabled()}
-                discDefaultExpandEnabled={discDefaultExpandEnabled()}
                 showAssignTo={
                   !props.discussionTopic.isAnnouncement &&
                   props.discussionTopic.contextType === 'Course' &&
@@ -215,44 +179,33 @@ const DiscussionTopicToolbarContainer = props => {
               />
             </Flex.Item>
           </Flex>
-          {!window.ENV?.FEATURES?.discussion_default_sort ? (
-            !hideStudentNames && (
-              <DiscussionPostSearchTool
-                discussionAnonymousState={props.discussionTopic.anonymousState}
-                onSearchChange={value => setCurrentSearchValue(value)}
-                searchTerm={currentSearchValue}
-                breakpoints={props.breakpoints}
-              />
-            )
-          ) : (
-            <Flex
-              direction={props.breakpoints.mobileOnly ? 'column' : 'row'}
-              wrap="wrap"
-              gap={props.breakpoints.mobileOnly ? '0' : 'small'}
-              width="100%"
-              height="100%"
-              padding="xxx-small 0"
+          <Flex
+            direction={props.breakpoints.mobileOnly ? 'column' : 'row'}
+            wrap="wrap"
+            gap={props.breakpoints.mobileOnly ? '0' : 'small'}
+            width="100%"
+            height="100%"
+            padding="xxx-small 0"
+          >
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
+              {!hideStudentNames && (
+                <DiscussionPostSearchTool
+                  discussionAnonymousState={props.discussionTopic.anonymousState}
+                  onSearchChange={value => setCurrentSearchValue(value)}
+                  searchTerm={currentSearchValue}
+                  breakpoints={props.breakpoints}
+                />
+              )}
+            </Flex.Item>
+            <Flex.Item
+              shouldGrow={false}
+              shouldShrink={true}
+              width={props.breakpoints.mobileOnly ? '100%' : 'fit-content'}
+              padding={props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'}
             >
-              <Flex.Item shouldGrow={true} shouldShrink={true}>
-                {!hideStudentNames && (
-                  <DiscussionPostSearchTool
-                    discussionAnonymousState={props.discussionTopic.anonymousState}
-                    onSearchChange={value => setCurrentSearchValue(value)}
-                    searchTerm={currentSearchValue}
-                    breakpoints={props.breakpoints}
-                  />
-                )}
-              </Flex.Item>
-              <Flex.Item
-                shouldGrow={false}
-                shouldShrink={true}
-                width={props.breakpoints.mobileOnly ? '100%' : 'fit-content'}
-                padding={props.breakpoints.mobileOnly ? 'xx-small' : 'xxx-small'}
-              >
-                {renderSort()}
-              </Flex.Item>
-            </Flex>
-          )}
+              {renderSort()}
+            </Flex.Item>
+          </Flex>
         </>
       ) : (
         <>
@@ -286,8 +239,6 @@ const DiscussionTopicToolbarContainer = props => {
             isCheckpointed={props?.discussionTopic?.assignment?.checkpoints?.length > 0}
             isSortOrderLocked={props.discussionTopic.sortOrderLocked}
             isExpandedLocked={props.discussionTopic.expandedLocked}
-            discDefaultSortEnabled={discDefaultSortEnabled()}
-            discDefaultExpandEnabled={discDefaultExpandEnabled()}
             isAnnouncement={props.discussionTopic.isAnnouncement}
             showAssignTo={
               !props.discussionTopic.isAnnouncement &&

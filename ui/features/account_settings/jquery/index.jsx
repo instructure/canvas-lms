@@ -222,9 +222,9 @@ $(document).ready(function () {
             const html = reportCell.find('.report_dialog').html()
 
             const closeModal = () => reportRoot.render(null)
-            const onSuccess = reportName => {
+            const onSuccess = ({report}) => {
               reportRoot.render(null)
-              $(`#${reportName}`)
+              $(`#${report}`)
                 .find('.run_report_link')
                 .hide()
                 .end()
@@ -234,7 +234,7 @@ $(document).ready(function () {
                 .find('.running_report_message')
                 .show()
 
-              const nextRow = $(`#${reportName}`).next('tr')
+              const nextRow = $(`#${report}`).next('tr')
               nextRow.find('button.open_report_description_link').focus()
             }
 

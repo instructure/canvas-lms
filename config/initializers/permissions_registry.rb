@@ -261,11 +261,11 @@ Rails.application.config.to_prepare do
         available_to: %w[AccountAdmin AccountMembership],
       },
       manage_lti_registrations: {
-        label: -> { I18n.t("LTI Registrations - manage ") },
-        account_only: true,
+        label: -> { I18n.t("LTI Registrations - Manage") },
+        account_only: :root,
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
-        account_allows: ->(a) { a.root_account.feature_enabled?(:lti_registrations_page) }
+        account_allows: ->(a) { a.feature_enabled?(:lti_registrations_page) }
       },
       manage_release_notes: {
         label: -> { I18n.t("Manage release notes") },
@@ -1690,8 +1690,8 @@ Rails.application.config.to_prepare do
       view_students_in_need_in_course: {
         label: -> { I18n.t("Intelligent Insights - Students in Need of Attention - Course Level") },
         available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) && a.feature_enabled?(:students_in_need_of_attention_course_level_beta) } ## AND they are part of the beta group.
+        true_for: %w[AccountAdmin TeacherEnrollment],
+        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) }
       },
       view_course_readiness: {
         label: -> { I18n.t("Course Readiness") },

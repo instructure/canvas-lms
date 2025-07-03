@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import FakeServer, {
-  formBodyFromRequest,
-  pathFromRequest,
-} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import {createGradebook} from '../../__tests__/GradebookSpecHelper'
 
 describe('Gradebook', () => {
@@ -35,21 +33,38 @@ describe('Gradebook', () => {
   describe('#saveSettings()', () => {
     let onSuccess
     let onFailure
-    let server
+    let capturedRequest = null
+    const server = setupServer()
+
+    beforeAll(() => {
+      server.listen()
+    })
 
     beforeEach(() => {
-      server = new FakeServer()
-
       onSuccess = jest.fn()
       onFailure = jest.fn()
+      capturedRequest = null
 
-      server.for('/api/v1/courses/1201/settings').respond({status: 200, body: {}})
+      server.use(
+        http.post('/api/v1/courses/1201/settings', async ({request}) => {
+          capturedRequest = {
+            method: request.method,
+            url: request.url,
+            body: await request.text(),
+          }
+          return HttpResponse.json({})
+        }),
+      )
 
       gradebook = createGradebook(gradebookOptions)
     })
 
     afterEach(() => {
-      server.teardown()
+      server.resetHandlers()
+    })
+
+    afterAll(() => {
+      server.close()
     })
 
     function saveSettings(additionalSettings = {}) {
@@ -57,26 +72,60 @@ describe('Gradebook', () => {
     }
 
     function getSavedSettings() {
-      const request = server.receivedRequests[0]
-      return formBodyFromRequest(request).gradebook_settings
+      if (!capturedRequest) return {}
+      const formData = new URLSearchParams(capturedRequest.body)
+      const settings = {}
+      const arrayKeys = new Set()
+
+      // First pass: identify array parameters
+      for (const [key] of formData.entries()) {
+        if (key.includes('[]')) {
+          arrayKeys.add(key)
+        }
+      }
+
+      for (const [key, value] of formData.entries()) {
+        if (key.startsWith('gradebook_settings[')) {
+          const match = key.match(
+            /gradebook_settings\[([^\]]+)\](?:\[([^\]]+)\])?(?:\[([^\]]+)\])?/,
+          )
+          if (match) {
+            const [, first, second, third] = match
+            if (arrayKeys.has(key)) {
+              // Handle array parameters
+              const cleanKey = first.replace('[]', '')
+              settings[cleanKey] = settings[cleanKey] || []
+              settings[cleanKey].push(value)
+            } else if (third) {
+              settings[first] = settings[first] || {}
+              settings[first][second] = settings[first][second] || {}
+              settings[first][second][third] = value
+            } else if (second) {
+              settings[first] = settings[first] || {}
+              settings[first][second] = value
+            } else {
+              settings[first] = value
+            }
+          }
+        }
+      }
+      return settings
     }
 
     it('sends a request to update course settings', async () => {
       await saveSettings()
-      const request = server.receivedRequests[0]
-      expect(pathFromRequest(request)).toBe('/api/v1/courses/1201/settings')
+      expect(capturedRequest.url).toContain('/api/v1/courses/1201/settings')
     })
 
     it('sends a POST request', async () => {
       await saveSettings()
-      const request = server.receivedRequests[0]
-      expect(request.method).toBe('POST')
+      expect(capturedRequest.method).toBe('POST')
     })
 
     it('converts the POST to a PUT using the _method field', async () => {
       await saveSettings()
-      const request = server.receivedRequests[0]
-      expect(formBodyFromRequest(request)._method).toBe('PUT')
+      const formData = new URLSearchParams(capturedRequest.body)
+      expect(formData.get('_method')).toBe('PUT')
     })
 
     describe('"Submission Status Colors" setting', () => {
@@ -278,10 +327,11 @@ describe('Gradebook', () => {
     })
 
     it('calls the "on failure" callback when the request fails', async () => {
-      server.unsetResponses('/api/v1/courses/1201/settings')
-      server
-        .for('/api/v1/courses/1201/settings')
-        .respond({status: 500, body: {error: 'Server Error'}})
+      server.use(
+        http.post('/api/v1/courses/1201/settings', () => {
+          return HttpResponse.json({error: 'Server Error'}, {status: 500})
+        }),
+      )
       await saveSettings()
       expect(onFailure).toHaveBeenCalledTimes(1)
     })

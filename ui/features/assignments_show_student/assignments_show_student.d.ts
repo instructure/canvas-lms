@@ -39,7 +39,7 @@ export type Points = {
 
 export type AssessmentData = {
   artifactAttempt: number
-  comments: string | null
+  comments: string
   comments_html: string | null
   criterion_id: string
   description: string
@@ -160,9 +160,26 @@ export type Submission = {
   resourceLinkLookupUuid: string | null
   score: number | null
   state: string
-  submissionDraft: null
+  submissionDraft: SubmissionDraft | null
   submissionStatus: string | null
   submissionType: string
   submittedAt: string | null
   unreadCommentCount: number
+}
+
+export type SubmissionType =
+  | 'basic_lti_launch'
+  | 'media_recording'
+  | 'online_text_entry'
+  | 'online_upload'
+  | 'online_url'
+  | 'student_annotation'
+
+export type SubmissionDraft = {
+  meetsBasicLtiLaunchCriteria: boolean
+  meetsMediaRecordingCriteria: boolean
+  meetsTextEntryCriteria: boolean
+  meetsUploadCriteria: boolean
+  meetsUrlCriteria: boolean
+  meetsStudentAnnotationCriteria: boolean
 }

@@ -160,6 +160,24 @@ describe "Account Reports" do
     expect(ar.reload).to be_error
   end
 
+  it "does not run reports that were deleted before the job starts" do
+    ran = false
+    AccountReports.configure_account_report "Default", {
+      "sad_report" => {
+        title: -> { "Test Report" },
+        proc: ->(_report) { ran = true }
+      }
+    }
+
+    ar = AccountReport.create!(account: Account.default, user: account_admin_user, report_type: "sad_report")
+    ar.run_report
+    ar.destroy
+    run_jobs
+
+    expect(ar.reload).to be_deleted
+    expect(ran).to be false
+  end
+
   describe ".failed_report" do
     let(:account_report) { FakeAccountReport.new }
 

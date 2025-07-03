@@ -31,6 +31,7 @@ import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiU
 import {type File} from '../../../../interfaces/File'
 import DirectShareCoursePanel, {DirectShareCoursePanelPropsRef} from './DirectShareCoursePanel'
 import {getName} from '../../../../utils/fileFolderUtils'
+import {useRows} from '../../../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -115,7 +116,7 @@ const DirectShareCourseTrayBody = ({
             hasShadow={false}
           >
             {I18n.t(
-              'Importing the same course content more than once will overwrite any existing content in the course.',
+              'Previously imported content from the same course will be replaced. Manually added content will remain.',
             )}
           </Alert>
         </Flex.Item>
@@ -164,6 +165,8 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
   const [requestInFlight, setRequestInFlight] = useState<boolean>(false)
   const [warningVisible, setWarningVisible] = useState<boolean>(true)
 
+  const {setSessionExpired} = useRows()
+
   const resetState = useCallback(() => {
     setSelectedCourse(null)
     setSelectedModule(null)
@@ -207,13 +210,13 @@ const DirectShareCourseTray = ({open, onDismiss, courseId, file}: DirectShareCou
       .then(sendSuccessful)
       .catch(error => {
         if (error instanceof UnauthorizedError) {
-          window.location.href = '/login'
+          setSessionExpired(true)
           return
         }
         showFlashError(I18n.t('Copy operation failed.'))(error)
       })
       .finally(() => setRequestInFlight(false))
-  }, [coursePanelRef, sendSuccessful, startCopyOperation])
+  }, [coursePanelRef, sendSuccessful, startCopyOperation, setSessionExpired])
 
   const handleSelectCourse = useCallback((course: Course | null) => {
     setSelectedCourse(course)

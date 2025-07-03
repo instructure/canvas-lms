@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect} from 'react'
-import {useLocation, Link} from 'react-router-dom'
+import {useLocation, Link, useNavigate} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
@@ -29,7 +29,6 @@ import {generateUrlPath} from '../../../utils/folderUtils'
 import {generatePreviewUrlPath} from '../../../utils/fileUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {windowPathname} from '@canvas/util/globalUtils'
 
 const I18n = createI18nScope('files_v2')
 interface NameLinkProps {
@@ -41,6 +40,7 @@ interface NameLinkProps {
 const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -58,8 +58,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
       setIsModalOpen(true)
       const searchParams = new URLSearchParams(location.search)
       searchParams.set('preview', item.id.toString())
-      const newPath = `${windowPathname()}?${searchParams.toString()}`
-      window.history.pushState(null, '', newPath)
+      navigate(`?${searchParams.toString()}`, {replace: true})
     } else if (item.locked_for_user) {
       e.preventDefault()
       showFlashError(
@@ -72,10 +71,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    const searchParams = new URLSearchParams(location.search)
-    searchParams.delete('preview')
-    const newPath = `${windowPathname()}${searchParams.toString() ? '?' : ''}${searchParams.toString()}`
-    window.history.pushState(null, '', newPath)
+    navigate(location.pathname, {replace: true})
   }
 
   const isFile = 'display_name' in item

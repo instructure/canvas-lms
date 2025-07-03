@@ -19,10 +19,15 @@
 #
 require "lti_advantage"
 
+# This was/is an ActiveRecord model used in LTI 2, but now mostly serves as a
+# place for constants describing LTI 1.1/1.3 placements and LTI 1.3 message
+# types (it would be nice to split this class..)
 module Lti
   class InvalidMessageTypeForPlacementError < StandardError; end
 
   class ResourcePlacement < ActiveRecord::Base
+    # *** Placements and messages constants & helpers: ***
+
     CANVAS_PLACEMENT_EXTENSION_PREFIX = "https://canvas.instructure.com/lti/"
 
     # TODO: these are strings, later constants use symbols... should probably be consistent to avoid bugs
@@ -118,24 +123,16 @@ module Lti
     }.freeze
 
     PLACEMENTS = PLACEMENTS_BY_MESSAGE_TYPE.values.flatten.uniq.freeze
-    LTI_ADVANTAGE_MESSAGE_TYPES = PLACEMENTS_BY_MESSAGE_TYPE.keys.freeze
 
-    PLACEMENT_LOOKUP = {
-      "Canvas.placements.accountNavigation" => ACCOUNT_NAVIGATION,
-      "Canvas.placements.assignmentEdit" => ASSIGNMENT_EDIT,
-      "Canvas.placements.assignmentSelection" => ASSIGNMENT_SELECTION,
-      "Canvas.placements.assignmentView" => ASSIGNMENT_VIEW,
-      "Canvas.placements.courseNavigation" => COURSE_NAVIGATION,
-      "Canvas.placements.linkSelection" => LINK_SELECTION,
-      "Canvas.placements.postGrades" => POST_GRADES,
-      SIMILARITY_DETECTION_LTI2 => SIMILARITY_DETECTION,
-    }.freeze
+    PLACEMENTLESS_MESSAGE_TYPES = [
+      LtiAdvantage::Messages::EulaRequest::MESSAGE_TYPE,
+    ].freeze
 
-    belongs_to :message_handler, class_name: "Lti::MessageHandler"
-    belongs_to :resource_handler, class_name: "Lti::ResourceHandler"
-    validates :message_handler, :placement, presence: true
+    PLACEMENT_BASED_MESSAGE_TYPES = PLACEMENTS_BY_MESSAGE_TYPE.keys.freeze
 
-    validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
+    # NOTE: Some message types that currently don't appear anywhere in
+    # configurations (LtiAssetProcessorSettingsRequest, LtiReportReviewRequest)
+    # are not listed in this file.
 
     def self.add_extension_prefix_if_necessary(placement)
       if STANDARD_PLACEMENTS.include?(placement.to_sym)
@@ -170,5 +167,24 @@ module Lti
 
       PLACEMENTS_BY_MESSAGE_TYPE[message_type.to_s]&.include?(placement.to_sym)
     end
+
+    # *** LTI 2 model stuff: ***
+
+    PLACEMENT_LOOKUP = {
+      "Canvas.placements.accountNavigation" => ACCOUNT_NAVIGATION,
+      "Canvas.placements.assignmentEdit" => ASSIGNMENT_EDIT,
+      "Canvas.placements.assignmentSelection" => ASSIGNMENT_SELECTION,
+      "Canvas.placements.assignmentView" => ASSIGNMENT_VIEW,
+      "Canvas.placements.courseNavigation" => COURSE_NAVIGATION,
+      "Canvas.placements.linkSelection" => LINK_SELECTION,
+      "Canvas.placements.postGrades" => POST_GRADES,
+      SIMILARITY_DETECTION_LTI2 => SIMILARITY_DETECTION,
+    }.freeze
+
+    belongs_to :message_handler, class_name: "Lti::MessageHandler"
+    belongs_to :resource_handler, class_name: "Lti::ResourceHandler"
+    validates :message_handler, :placement, presence: true
+
+    validates :placement, inclusion: { in: PLACEMENT_LOOKUP.values }
   end
 end

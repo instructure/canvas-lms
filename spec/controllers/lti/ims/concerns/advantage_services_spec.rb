@@ -23,11 +23,13 @@ describe Lti::IMS::Concerns::AdvantageServices do
 
   describe "tool" do
     it "finds only tools for the developer key and context" do
-      dk1 = DeveloperKey.create!
-      dk2 = DeveloperKey.create!
+      registration1 = lti_registration_with_tool
+      registration2 = lti_registration_with_tool
+      dk1 = registration1.developer_key
+      dk2 = registration2.developer_key
       c1 = course_model
       c2 = course_model
-      tool = external_tool_1_3_model(context: c1, developer_key: dk1)
+      tool = registration1.new_external_tool(c1)
 
       results = {}
       [c1, c2].each do |ctx|

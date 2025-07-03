@@ -366,6 +366,82 @@ describe('FileFolderTable', () => {
     })
   })
 
+  describe('Keyboard Shortcuts', () => {
+    describe('when Ctrl+A / Cmd+A are pressed', () => {
+      let user: UserEvent
+      let setSelectedRows: jest.Mock
+
+      beforeEach(() => {
+        user = userEvent.setup()
+        setSelectedRows = jest.fn()
+      })
+
+      const TEST_CASES = [
+        {condition: 'when no rows are selected', selectedRows: new Set()},
+        {
+          condition: 'when some rows are selected',
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
+        },
+        {
+          condition: 'when all rows are selected',
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+        },
+      ]
+
+      TEST_CASES.forEach(({condition, selectedRows}) => {
+        describe(condition, () => {
+          beforeEach(() => {
+            renderComponent({
+              rows: [FAKE_FILES[0], FAKE_FILES[1]],
+              selectedRows: selectedRows as Set<string>,
+              setSelectedRows,
+            })
+          })
+
+          it('calls setSelectedRows with the full set of rows', async () => {
+            await user.keyboard('{Control>}{a}')
+            expect(setSelectedRows).toHaveBeenCalledWith(
+              new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+            )
+          })
+        })
+      })
+    })
+
+    describe("when Ctrl+Click or Cmd+Click is pressed on a row's non actionable column", () => {
+      let user: UserEvent
+      let setSelectedRows: jest.Mock
+
+      beforeEach(() => {
+        user = userEvent.setup()
+        setSelectedRows = jest.fn()
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
+          setSelectedRows,
+        })
+      })
+
+      it('toggles the selection of the unselected row', async () => {
+        const createdAtCells = await screen.findAllByTestId('table-cell-created_at')
+        await user.keyboard('{Control>}')
+        await user.click(createdAtCells[1])
+
+        expect(setSelectedRows).toHaveBeenCalledWith(
+          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
+        )
+      })
+
+      it('toggles the selection of the selected row', async () => {
+        const sizeCells = await screen.findAllByTestId('table-cell-size')
+        await user.keyboard('{Control>}')
+        await user.click(sizeCells[0])
+
+        expect(setSelectedRows).toHaveBeenCalledWith(new Set())
+      })
+    })
+  })
+
   describe('FileFolderTable - delete behavior', () => {
     // TODO: the scope of this test overextends unit test
     it.skip('opens delete modal when delete button is clicked', async () => {

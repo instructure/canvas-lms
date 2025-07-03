@@ -127,97 +127,6 @@ describe('RubricForm Tests', () => {
     })
   })
 
-  describe('save rubric', () => {
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
-    it('save button is disabled when title is empty', () => {
-      const {getByTestId} = renderComponent()
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-
-    it('save button is disabled when title is whitespace', () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: ' '}})
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-
-    it('save button is disabled when title is 255 whitespace even with criteria', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {
-        target: {
-          value:
-            '                                                                                                                                                                                                                                                               ',
-        },
-      })
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-
-    it('save button is enabled when title is 254 whitespace and 1 letter', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {
-        target: {
-          value:
-            'e                                                                                                                                                                                                                                                              ',
-        },
-      })
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-
-      expect(getByTestId('save-rubric-button')).toBeEnabled()
-    })
-
-    it('save button is disabled when there are no criteria', () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
-      expect(getByTestId('save-rubric-button')).toBeDisabled()
-    })
-
-    it('save button is enabled when title is not empty and there is criteria', async () => {
-      const {getByTestId} = renderComponent()
-      const titleInput = getByTestId('rubric-form-title')
-      fireEvent.change(titleInput, {target: {value: 'Rubric 1'}})
-
-      fireEvent.click(getByTestId('add-criterion-button'))
-      await new Promise(resolve => setTimeout(resolve, 0))
-      expect(getByTestId('rubric-criterion-modal')).toBeInTheDocument()
-      fireEvent.change(getByTestId('rubric-criterion-name-input'), {
-        target: {value: 'New Criterion Test'},
-      })
-      fireEvent.click(getByTestId('rubric-criterion-save'))
-
-      expect(getByTestId('save-rubric-button')).toBeEnabled()
-    })
-    it('does not display save as draft button if rubric has associations', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], {
-        ...RUBRICS_QUERY_RESPONSE,
-        hasRubricAssociations: true,
-      })
-
-      const {queryByTestId} = renderComponent({rubricId: '1'})
-      expect(queryByTestId('save-as-draft-button')).toBeNull()
-    })
-  })
-
   describe('rubric criteria', () => {
     it('renders all criteria rows for a rubric', () => {
       queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
@@ -605,6 +514,7 @@ describe('RubricForm Tests', () => {
       })
 
       expect(getByTestId('generate-criteria-form')).toBeInTheDocument()
+      expect(getByTestId('grade-level-input')).toHaveValue('Higher Education')
       expect(getByTestId('criteria-count-input')).toHaveValue('5')
       expect(getByTestId('rating-count-input')).toHaveValue('4')
       expect(getByTestId('points-per-criterion-input')).toHaveValue('20')
@@ -706,6 +616,7 @@ describe('RubricForm Tests', () => {
         pointsPerCriterion: '20',
         useRange: false,
         additionalPromptInfo: '',
+        gradeLevel: 'higher-ed',
       })
       expect(getByTestId('rubric-criteria-container')).toHaveTextContent('Generated Criterion 1')
     })
@@ -895,6 +806,82 @@ describe('RubricForm Tests', () => {
 
       expect(getByTestId('give-feedback-link')).toHaveTextContent('Give Feedback')
     })
+
+    it('disables generate button when progress is running', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'running',
+            message: null,
+            completion: 50,
+            results: undefined,
+          })
+        },
+      )
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // Button should be disabled while progress is running
+      expect(generateButton).toBeDisabled()
+    })
+
+    it('enables generate button when progress fails', async () => {
+      const generateCriteriaMock = RubricFormQueries.generateCriteria as jest.Mock
+      generateCriteriaMock.mockResolvedValue({
+        id: 1,
+        workflow_state: 'running',
+      })
+
+      const progressUpdateMock = ProgressHelpers.monitorProgress as jest.Mock
+      progressUpdateMock.mockImplementation(
+        (
+          progressId: string,
+          setCurrentProgress: (progress: ProgressHelpers.CanvasProgress) => void,
+        ) => {
+          setCurrentProgress({
+            id: progressId,
+            workflow_state: 'failed',
+            message: null,
+            completion: 100,
+            results: undefined,
+          })
+        },
+      )
+
+      const {getByTestId} = renderComponent({
+        aiRubricsEnabled: true,
+        assignmentId: '1',
+        courseId: '1',
+      })
+
+      const generateButton = getByTestId('generate-criteria-button')
+      fireEvent.click(generateButton)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+
+      // Button should be enabled when progress fails
+      expect(generateButton).not.toBeDisabled()
+    })
   })
 
   describe('assessed rubrics', () => {
@@ -923,33 +910,68 @@ describe('RubricForm Tests', () => {
       const {getByTestId} = renderComponent({rubricId: '1'})
       expect(getByTestId('rubric-rating-scoring-type-select')).toBeInTheDocument()
       expect(getByTestId('rubric-rating-type-select')).toBeInTheDocument()
-      expect(getByTestId('hide-outcome-results-checkbox')).toBeInTheDocument()
-      expect(getByTestId('use-for-grading-checkbox')).toBeInTheDocument()
-      expect(getByTestId('hide-score-total-checkbox')).toBeInTheDocument()
     })
 
-    it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
+    it('does not display options when showAdditionalOptions is set to false', () => {
       queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
 
-      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
 
-      const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
-      fireEvent.click(scoringTypeSelect)
-      fireEvent.click(getByTestId('scoring_type_unscored'))
-
+      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
+      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
       expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
 
-    it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+    describe('assignment level options', () => {
+      it('should not be rendered when assignmentId is not provided', () => {
+        const {queryByTestId} = renderComponent()
 
-      const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      })
 
-      const useForGradingCheckbox = getByTestId('use-for-grading-checkbox')
-      fireEvent.click(useForGradingCheckbox)
+      it('should be rendered when assignmentId is provided', () => {
+        const {getByTestId} = renderComponent({assignmentId: '1'})
 
-      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(getByTestId('use-for-grading-checkbox')).toBeInTheDocument()
+        expect(getByTestId('hide-score-total-checkbox')).toBeInTheDocument()
+        expect(getByTestId('hide-outcome-results-checkbox')).toBeInTheDocument()
+      })
+
+      it('should not be rendered when showAdditionalOptions is disabled', () => {
+        const {queryByTestId} = renderComponent({showAdditionalOptions: false})
+
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
+      })
+
+      it('hides hideScoreTotal checkbox when useForGrading checkbox checked', () => {
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent({rubricId: '1', assignmentId: '1'})
+
+        const useForGradingCheckbox = getByTestId('use-for-grading-checkbox')
+        fireEvent.click(useForGradingCheckbox)
+
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+      })
+
+      it('hides use useForGrading and hideScoreTotal checkboxes when scoring type is unscored', () => {
+        queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
+
+        const {getByTestId, queryByTestId} = renderComponent({rubricId: '1'})
+
+        const scoringTypeSelect = getByTestId('rubric-rating-scoring-type-select')
+        fireEvent.click(scoringTypeSelect)
+        fireEvent.click(getByTestId('scoring_type_unscored'))
+
+        expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
+        expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
+      })
     })
 
     it('hides points when scoring type is set to unscored', () => {
@@ -963,18 +985,6 @@ describe('RubricForm Tests', () => {
 
       expect(queryByTestId('rubric-points-possible-1')).not.toBeInTheDocument()
       expect(queryAllByTestId('rubric-criteria-row-points')).toHaveLength(0)
-    })
-
-    it('does not display options when showAdditionalOptions is set to false', () => {
-      queryClient.setQueryData(['fetch-rubric', '1'], RUBRICS_QUERY_RESPONSE)
-
-      const {queryByTestId} = renderComponent({rubricId: '1', showAdditionalOptions: false})
-
-      expect(queryByTestId('rubric-rating-scoring-type-select')).not.toBeInTheDocument()
-      expect(queryByTestId('rubric-rating-type-select')).not.toBeInTheDocument()
-      expect(queryByTestId('hide-outcome-results-checkbox')).not.toBeInTheDocument()
-      expect(queryByTestId('use-for-grading-checkbox')).not.toBeInTheDocument()
-      expect(queryByTestId('hide-score-total-checkbox')).not.toBeInTheDocument()
     })
   })
 

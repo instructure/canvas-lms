@@ -27,9 +27,9 @@ import {Flex} from '@instructure/ui-flex'
 import SubaccountNameForm from './SubaccountNameForm'
 import {calculateIndent, fetchSubAccounts, FetchSubAccountsResponse, generateQueryKey} from './util'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {queryClient, useAllPages} from '@canvas/query'
+import {queryClient} from '@canvas/query'
 import DeleteSubaccountModal from './DeleteSubaccountModal'
-import {InfiniteData} from '@tanstack/react-query'
+import {InfiniteData, useInfiniteQuery} from '@tanstack/react-query'
 
 const I18n = createI18nScope('sub_accounts')
 
@@ -51,6 +51,7 @@ interface Props {
 export default function SubaccountTree(props: Props) {
   const defaultExpanded = useRef(false)
   const newSubaccount = useRef('')
+  const observerRef = useRef<IntersectionObserver | null>(null)
   const [hasFocus, setHasFocus] = useState(props.isFocus || false)
   const [subCount, setSubCount] = useState(props.rootAccount.sub_account_count || 0)
   const [subaccounts, setSubaccounts] = useState([] as AccountWithCounts[])
@@ -58,19 +59,20 @@ export default function SubaccountTree(props: Props) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [displayConfirmation, setDisplayConfirmation] = useState(false)
 
-  const {data, isFetching, isLoading, isFetchingNextPage, hasNextPage, error} = useAllPages<
-    FetchSubAccountsResponse,
-    unknown,
-    InfiniteData<FetchSubAccountsResponse>,
-    SubaccountQueryKey
-  >({
-    queryKey: generateQueryKey(props.rootAccount.id),
-    queryFn: fetchSubAccounts,
-    getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
-    enabled: isExpanded,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    initialPageParam: '1',
-  })
+  const {data, isFetching, isLoading, fetchNextPage, isFetchingNextPage, hasNextPage, error} =
+    useInfiniteQuery<
+      FetchSubAccountsResponse,
+      unknown,
+      InfiniteData<FetchSubAccountsResponse>,
+      SubaccountQueryKey
+    >({
+      queryKey: generateQueryKey(props.rootAccount.id),
+      queryFn: fetchSubAccounts,
+      getNextPageParam: (lastPage: {nextPage: any}) => lastPage.nextPage,
+      enabled: isExpanded,
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      initialPageParam: '1',
+    })
 
   useEffect(() => {
     if (!isFetching && data != null) {
@@ -245,6 +247,24 @@ export default function SubaccountTree(props: Props) {
     )
   }
 
+  function clearPageLoadTrigger() {
+    if (observerRef.current === null) return
+    observerRef.current.disconnect()
+    observerRef.current = null
+  }
+
+  function setPageLoadTrigger(ref: Element | null) {
+    if (ref === null) return
+    clearPageLoadTrigger()
+    observerRef.current = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        fetchNextPage()
+        clearPageLoadTrigger()
+      }
+    })
+    observerRef.current.observe(ref)
+  }
+
   const childIndent = calculateIndent(props.depth + 1)
   if (error) {
     return (
@@ -290,6 +310,7 @@ export default function SubaccountTree(props: Props) {
             </Flex.Item>
           </Flex>
         ) : null}
+        {hasNextPage && !isFetchingNextPage ? <div ref={el => setPageLoadTrigger(el)}></div> : null}
         {parentExpanded && showForm ? (
           <SubaccountNameForm
             accountName={''}

@@ -100,7 +100,7 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   }, [isCompleted, isMissing, completionRequirement, moduleCompleted, hasCompletionRequirements])
 
   return renderPill && (completionRequirement || isSubmissionEmpty) ? (
-    <View as="div" margin="0 0 0 small" data-testid="module-item-status-icon">
+    <View as="div" data-testid="module-item-status-icon">
       {renderPill}
     </View>
   ) : null

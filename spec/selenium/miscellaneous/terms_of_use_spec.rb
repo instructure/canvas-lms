@@ -73,7 +73,7 @@ describe "terms of use test" do
     end
 
     it "populates the custom terms in the text area" do
-      @account.update_terms_of_service(terms_type: "custom", content: "other stuff")
+      @account.update_terms_of_service({ terms_type: "custom", content: "other stuff" }, @admin)
 
       get "/accounts/#{@account.id}/settings"
 

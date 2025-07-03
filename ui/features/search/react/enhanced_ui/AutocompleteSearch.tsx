@@ -160,6 +160,7 @@ export default function AutocompleteSearch(props: Props) {
       placeholder={I18n.t('Search this course')}
       inputRef={el => props.setInputRef(el)}
       data-testid="search-input"
+      data-pendo="smart-search-input-field"
       assistiveText="Type or use arrow keys to navigate options."
       renderLabel={<ScreenReaderContent>{I18n.t('Search')}</ScreenReaderContent>}
       renderBeforeInput={<IconSearchLine />}
@@ -171,6 +172,7 @@ export default function AutocompleteSearch(props: Props) {
           <IconButton
             withBorder={false}
             withBackground={false}
+            size="small"
             renderIcon={<IconTroubleLine />}
             onClick={() => handleInputChange('')}
             screenReaderLabel={I18n.t('Clear search')}

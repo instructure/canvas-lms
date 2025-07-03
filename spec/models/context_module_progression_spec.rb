@@ -312,6 +312,45 @@ describe ContextModuleProgression do
     expect(progression3).to be_locked
   end
 
+  it "relock_progressions changes state from completed to unlock when wiki page requirement added" do
+    context_module = @course.context_modules.create!(name: "Module 1")
+    context_module.publish
+    context_module.save!
+
+    students_array = (1..6).map do |i|
+      student = User.create!(name: "Student #{i}")
+      @course.enroll_student(student).accept!
+      student
+    end
+    students_array.each do |student|
+      progression = context_module.evaluate_for(student)
+      expect(progression.workflow_state).to eq "completed"
+    end
+
+    wiki_page = @course.wiki_pages.create!(title: "mark_as_done page", body: "")
+    wiki_page.workflow_state = "active"
+    wiki_page.save!
+
+    assignment = @course.assignments.create!(
+      title: "mark_as_done assignment",
+      points_possible: 10,
+      submission_types: "online_text_entry"
+    )
+    assignment.workflow_state = "active"
+    assignment.save!
+
+    @tag = context_module.add_item(id: wiki_page.id, type: "wiki_page")
+    context_module.completion_requirements = {
+      @tag.id => { type: "must_view" },
+    }
+    context_module.save!
+
+    context_module.relock_progressions
+    context_module.context_module_progressions.each do |progression|
+      expect(progression.workflow_state).to eq "unlocked"
+    end
+  end
+
   describe "#uncomplete_requirement" do
     it "uncompletes the requirement" do
       setup_modules

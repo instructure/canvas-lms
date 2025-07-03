@@ -21,7 +21,7 @@ import {
   makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 
 describe('determineSubmissionSelection', () => {
   let submission
@@ -56,7 +56,7 @@ describe('determineSubmissionSelection', () => {
   })
 })
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('makeSubmissionUpdateRequest', () => {
   let data

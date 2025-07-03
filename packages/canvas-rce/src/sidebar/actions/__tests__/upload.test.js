@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moxios from 'moxios'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import * as actions from '../upload'
 import * as filesActions from '../files'
 import * as imagesActions from '../images'
@@ -31,12 +32,30 @@ import {
   TYPE,
 } from '../../../rce/plugins/instructure_icon_maker/svg/constants'
 
+// Mock saveMediaRecording
+jest.mock('@instructure/canvas-media', () => ({
+  saveMediaRecording: jest.fn((file, opts, callback) => {
+    // Call the callback to simulate completion
+    callback(null, {
+      mediaObject: {
+        embedded_iframe_url: 'http://example.com/media/iframe',
+        media_object: {
+          media_id: 'm-123456',
+        },
+      },
+      uploadedFile: file,
+    })
+  }),
+}))
+
 const fakeFileReader = {
   readAsDataURL() {
     this.onload()
   },
   result: 'fakeDataURL',
 }
+
+const server = setupServer()
 
 describe('Upload data actions', () => {
   const results = {id: 47}
@@ -81,11 +100,14 @@ describe('Upload data actions', () => {
     fetchMediaFolder: jest.fn().mockResolvedValue({folders: [{id: 24}]}),
   }
 
-  beforeEach(() => {
+  beforeAll(() => server.listen())
+  afterEach(() => {
     Bridge.focusEditor(null)
     successSource.uploadFRD.mockClear()
     successSource.setUsageRights.mockClear()
+    server.resetHandlers()
   })
+  afterAll(() => server.close())
 
   const defaults = {
     host: 'http://host:port',
@@ -332,43 +354,33 @@ describe('Upload data actions', () => {
     let k5uploaderstub
 
     beforeEach(() => {
-      moxios.install()
       k5uploaderstub = jest
         .spyOn(K5Uploader.prototype, 'loadUiConf')
         .mockImplementation(() => 'mock')
     })
     afterEach(() => {
-      moxios.uninstall()
       k5uploaderstub.mockRestore()
+      jest.clearAllMocks()
     })
 
     it('uploads directly to notorious/kaltura', () => {
       const baseState = setupState()
       const store = spiedStore(baseState)
+      const {saveMediaRecording} = require('@instructure/canvas-media')
 
-      moxios.stubRequest(
-        'http://host:port/api/v1/services/kaltura_session?include_upload_config=1',
-        {
-          status: 200,
-          response: {
-            ks: 'averylongstring',
-            subp_id: '0',
-            partner_id: '9',
-            uid: '1234_567',
-            serverTime: 1234,
-            kaltura_setting: {
-              uploadUrl: 'url.url.url',
-              entryUrl: 'url.url.url',
-              uiconfUrl: 'url.url.url',
-              partnerData: 'data from our partners',
-            },
-          },
-        },
+      // This test uses mocked source methods rather than HTTP mocks
+      // Note: uploadToMediaFolder doesn't return a promise when using saveMediaRecording
+      store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData))
+
+      expect(saveMediaRecording).toHaveBeenCalledTimes(1)
+      expect(saveMediaRecording).toHaveBeenCalledWith(
+        fakeFileMetaData.domObject,
+        expect.objectContaining({
+          contextId: baseState.contextId,
+          contextType: baseState.contextType,
+        }),
+        expect.any(Function),
       )
-
-      return store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData)).then(() => {
-        expect(k5uploaderstub).toHaveBeenCalledTimes(1)
-      })
     })
   })
 

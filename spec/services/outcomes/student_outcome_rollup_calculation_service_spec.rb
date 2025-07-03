@@ -47,6 +47,52 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
     end
   end
 
+  describe ".calculate_for_course" do
+    let(:students) { Array.new(15) { user_model } }
+
+    before do
+      # Enroll 15 students in the course
+      students.each { |student| course.enroll_student(student) }
+    end
+
+    it "calls calculate_for_student for each student in the course" do
+      # Create a list of expected parameters using map
+      expected_params = students.map do |student|
+        { course_id: course.id, student_id: student.id }
+      end
+
+      # Expect calculate_for_student to be called exactly once for each student
+      expected_params.each do |params|
+        expect(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+          .with(params).once
+      end
+
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
+    end
+
+    it "finds the course by ID" do
+      expect(Course).to receive(:find).with(course.id).and_return(course)
+
+      # We need to stub calculate_for_student here to prevent actual calls
+      allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
+    end
+
+    it "calls the students method on the course" do
+      # Set up Course.find to return our course
+      expect(Course).to receive(:find).with(course.id).and_return(course)
+
+      # Expect the students method to be called on the course and allow it to return its normal value
+      expect(course).to receive(:students).and_call_original
+
+      # We need to stub calculate_for_student to prevent actual calls
+      allow(Outcomes::StudentOutcomeRollupCalculationService).to receive(:calculate_for_student)
+
+      Outcomes::StudentOutcomeRollupCalculationService.calculate_for_course(course_id: course.id)
+    end
+  end
+
   describe "#initialize" do
     it "loads the course and student after initialization" do
       expect(subject.course).to eq(course)
@@ -60,6 +106,32 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect do
         Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
       end.not_to raise_error
+    end
+  end
+
+  describe "#fetch_canvas_results" do
+    let(:outcome) { outcome_model(context: course) }
+    let(:alignment) { outcome.align(assignment_model(context: course), course) }
+
+    it "returns an empty array when no results exist" do
+      results = subject.send(:fetch_canvas_results)
+      expect(results).to eq([])
+    end
+
+    it "returns a learning outcome result associated to the user" do
+      user2 = user_model
+
+      [student, user2].each do |user|
+        LearningOutcomeResult.create!(
+          learning_outcome: outcome,
+          user:,
+          context: course,
+          alignment:
+        )
+      end
+
+      results = subject.send(:fetch_canvas_results)
+      expect(results.count).to eq(1)
     end
   end
 end

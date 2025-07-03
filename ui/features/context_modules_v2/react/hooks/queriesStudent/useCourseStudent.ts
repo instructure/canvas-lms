@@ -20,20 +20,10 @@ import {useQuery} from '@tanstack/react-query'
 import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {CourseStudentResponse, CourseStudentGraphQLResult} from '../../utils/types.d'
+import persistedQueries from '@canvas/graphql/persistedQueries'
 
-const COURSE_STUDENT_QUERY = gql`
-  query GetCourseStudentQuery($courseId: ID!) {
-    legacyNode(_id: $courseId, type: Course) {
-      ... on Course {
-        name
-        submissionStatistics {
-          missingSubmissionsCount
-          submissionsDueThisWeekCount
-        }
-      }
-    }
-  }
-`
+// use persistedQueries to make sure it loads without user session (public courses)
+const COURSE_STUDENT_QUERY = gql`${persistedQueries.GetCourseStudentQuery.query}`
 
 async function getCourseStudent(courseId: string): Promise<CourseStudentResponse> {
   const result = await executeQuery<CourseStudentGraphQLResult>(COURSE_STUDENT_QUERY, {
@@ -47,6 +37,7 @@ async function getCourseStudent(courseId: string): Promise<CourseStudentResponse
   return {
     name: result.legacyNode?.name,
     submissionStatistics: result.legacyNode?.submissionStatistics,
+    settings: result.legacyNode?.settings,
   }
 }
 

@@ -1712,11 +1712,21 @@ If the account does not have a decimal separator set, it will return "$Canvas.ac
 ## Canvas.account.thousand_separator
 Returns the thousand separator for the current context account.
 This is used to have custom formatting on numbers, independent from the account's locale.
-If the account does not have a thousand separator set, it will return "$Canvas.account.decimal_separator".
+If the account does not have a thousand separator set, it will return "$Canvas.account.thousand_separator".
 
 **Availability**: *when launched in a course (or a Group within a course)*  
 
 
 ```
 "period"
+```
+## Canvas.course.aiQuizGeneration
+Returns true if the AI quiz generation feature is enabled for the course.
+This is used to determine whether to display the "Generate With AI" button in the UI.
+
+**Availability**: *when launched in a course (or a Group within a course)*  
+
+
+```
+true
 ```

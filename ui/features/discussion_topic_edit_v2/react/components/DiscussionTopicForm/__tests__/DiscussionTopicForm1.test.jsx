@@ -73,6 +73,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {},
       PERMISSIONS: {},
+      SETTINGS: {},
       allow_student_anonymous_discussion_topics: false,
       USAGE_RIGHTS_REQUIRED: false,
       K5_HOMEROOM_COURSE: false,
@@ -115,7 +116,7 @@ describe('DiscussionTopicForm', () => {
       it('renders require initiator checkbox truth as default', () => {
         ENV = {
           FEATURES: {},
-          CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED: true,
+          SETTINGS: {},
           STUDENT_PLANNER_ENABLED: true,
           DISCUSSION_TOPIC: {
             ATTRIBUTES: {
@@ -137,7 +138,7 @@ describe('DiscussionTopicForm', () => {
         it('renders require initiator checkbox truth as default', () => {
           ENV = {
             FEATURES: {},
-            CHECKPOINTS_GROUP_DISCUSSIONS_ENABLED: true,
+            SETTINGS: {},
             STUDENT_PLANNER_ENABLED: true,
             DISCUSSION_TOPIC: {
               ATTRIBUTES: {
@@ -161,6 +162,7 @@ describe('DiscussionTopicForm', () => {
       it('renders require initiator checkbox truth as default', () => {
         ENV = {
           FEATURES: {},
+          SETTINGS: {},
           STUDENT_PLANNER_ENABLED: true,
           DISCUSSION_TOPIC: {
             ATTRIBUTES: {
@@ -469,11 +471,6 @@ describe('DiscussionTopicForm', () => {
   })
 
   describe('view settings', () => {
-    beforeEach(() => {
-      window.ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED = true
-      window.ENV.DISCUSSION_DEFAULT_SORT_ENABLED = true
-    })
-
     it('renders view settings, if the discussion is not announcement', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = false
       const {queryByTestId} = setup({
@@ -485,16 +482,6 @@ describe('DiscussionTopicForm', () => {
 
     it('does not render view settings, if the discussion is announcement', () => {
       window.ENV.DISCUSSION_TOPIC.ATTRIBUTES.is_announcement = true
-      const {queryByTestId} = setup({
-        isEditing: true,
-        currentDiscussionTopic: DiscussionTopic.mock({published: false}),
-      })
-      expect(queryByTestId('discussion-view-settings')).not.toBeInTheDocument()
-    })
-
-    it('does not render view settings, if no features are enabled', () => {
-      window.ENV.DISCUSSION_DEFAULT_EXPAND_ENABLED = false
-      window.ENV.DISCUSSION_DEFAULT_SORT_ENABLED = false
       const {queryByTestId} = setup({
         isEditing: true,
         currentDiscussionTopic: DiscussionTopic.mock({published: false}),

@@ -183,6 +183,23 @@ module Types
       field :position, Int, null: false
     end
 
+    class AssignedStudentsFilterInputType < Types::BaseInputObject
+      graphql_name "AssignedStudentsFilter"
+
+      argument :search_term,
+               String,
+               required: false,
+               prepare: :prepare_search_term
+
+      def prepare_search_term(term)
+        if term.presence && term.length < SearchTermHelper::MIN_SEARCH_TERM_LENGTH
+          raise GraphQL::ExecutionError, "search term must be at least #{SearchTermHelper::MIN_SEARCH_TERM_LENGTH} characters"
+        end
+
+        term
+      end
+    end
+
     global_id_field :id
 
     field :name, String, null: true
@@ -752,6 +769,22 @@ module Types
       else
         load_association(:context_module_tags)
       end
+    end
+
+    field :assigned_students, UserType.connection_type, null: true do
+      argument :filter, AssignedStudentsFilterInputType, required: false
+    end
+    def assigned_students(filter: {})
+      return nil unless assignment.context.grants_right?(current_user, :manage_grades)
+
+      search_term = filter[:search_term].presence
+      scope = assignment.students_with_visibility(assignment.context.participating_students_by_date.not_fake_student)
+
+      if search_term
+        scope = scope.name_like(search_term, "peer_review")
+      end
+
+      scope
     end
   end
 end

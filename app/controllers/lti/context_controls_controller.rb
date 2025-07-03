@@ -186,6 +186,7 @@ module Lti
         ContextControlsBookmarker,
         Lti::ContextControl
                .eager_load(:deployment)
+               .active
                .where(registration:)
                .where.not(context_external_tools: { workflow_state: ["deleted", "disabled"] })
                .order(:deployment_id, :path)
@@ -405,6 +406,10 @@ module Lti
     #
     # Deletes a context control. Returns the control that is now deleted.
     #
+    # Note: Deleting the "primary" control for a deployment (the control associated with the context
+    # where the deployment is installed) is not allowed and will return an error. This prevents
+    # situations where a deployment cannot be managed from the Apps page.
+    #
     # @returns Lti::ContextControl
     #
     # @example_request
@@ -413,9 +418,11 @@ module Lti
     #        -X DELETE \
     #        -H "Authorization: Bearer <token>"
     def delete
-      control.destroy
-
-      render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+      if control.destroy
+        render json: lti_context_control_json(control, @current_user, session, context, include_users: true)
+      else
+        render_errors(control.errors.full_messages, status: :unprocessable_entity)
+      end
     rescue => e
       report_error(e)
       raise e

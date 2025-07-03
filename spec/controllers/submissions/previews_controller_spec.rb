@@ -128,7 +128,7 @@ describe Submissions::PreviewsController do
       end
     end
 
-    context "when Asset Processor is attached" do
+    context "when Asset Processor is attached and submission type is online_upload" do
       render_views
 
       before do
@@ -154,11 +154,9 @@ describe Submissions::PreviewsController do
         body = response.body
         # The page includes Asset Processor data js ENV
         expect(body).to include("ASSET_PROCESSORS")
-        # The page includes ASSIGNMENT_NAME in js ENV
         expect(body).to include("ASSIGNMENT_NAME")
-        # The page includes ASSET_REPORTS in js ENV
         expect(body).to include("ASSET_REPORTS")
-        # Both random attachments are listed on the page
+
         expect(body).to include('data-attachment-id="' + @attachment1.id.to_s + '"')
         expect(body).to include('data-attachment-id="' + @attachment2.id.to_s + '"')
       end

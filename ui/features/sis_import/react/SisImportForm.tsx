@@ -23,17 +23,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {IconUploadSolid} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Alert} from '@instructure/ui-alerts'
-import {SimpleSelect} from '@instructure/ui-simple-select'
-import {useInfiniteQuery, type QueryFunctionContext} from '@tanstack/react-query'
-import {EnrollmentTerms, SisImport, Term} from 'api'
+import {SisImport} from 'api'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {Spinner} from '@instructure/ui-spinner'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {ConfirmationModal} from './ConfirmationModal'
-import {Select} from '@instructure/ui-select'
+import FullBatchDropdown from './FullBatchDropdown'
 
 const I18n = createI18nScope('sis_import')
 
@@ -55,9 +51,6 @@ export default function SisImportForm(props: Props) {
 
   const fileRef = useRef<HTMLInputElement | null>(null)
 
-  const fullBatchWarning = I18n.t(
-    'If selected, this will delete everything for this term, which includes all courses and enrollments that are not in the selected import file above. See the documentation for details.',
-  )
   const overrideSisText = I18n.t(
     "By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes. See the documentation for details.",
   )
@@ -68,44 +61,11 @@ export default function SisImportForm(props: Props) {
     'With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports.',
   )
 
-  const observerRef = useRef<IntersectionObserver | null>(null)
-
-  const accountId = ENV.ACCOUNT_ID
-
-  const fetchTerms = async ({
-    pageParam = '1',
-  }: QueryFunctionContext): Promise<{json: EnrollmentTerms; nextPage: string | null}> => {
-    const params = {
-      per_page: 100,
-      page: String(pageParam),
-    }
-    const {json, link} = await doFetchApi<EnrollmentTerms>({
-      path: `/api/v1/accounts/${accountId}/terms`,
-      params,
-    })
-    const nextPage = link?.next ? link.next.page : null
-    return {json: json || {enrollment_terms: []}, nextPage: nextPage}
-  }
-
-  const {data, fetchNextPage, isFetching, hasNextPage, error} = useInfiniteQuery({
-    queryKey: ['terms_list', accountId],
-    queryFn: fetchTerms,
-    getNextPageParam: lastPage => lastPage.nextPage,
-    initialPageParam: '1',
-  })
-
   useEffect(() => {
     if (submitting && confirmed) {
       handleSubmit()
     }
   }, [submitting, confirmed])
-
-  useEffect(() => {
-    if (data && data.pages.length === 1 && termId === '') {
-      // set first term as default
-      setTermId(data.pages[0].json.enrollment_terms[0].id as string)
-    }
-  }, [data])
 
   const createFormData = () => {
     const formData = new FormData()
@@ -154,76 +114,9 @@ export default function SisImportForm(props: Props) {
     }
   }
 
-  const renderObserver = () => {
-    return isFetching ? (
-      // (Simple)Select.Option's ref property has a parameter type of
-      // Option | null, so we cannot use a ref callback directly here.
-      // Instead, we use a span with a ref to trigger the IntersectionObserver.
-      // Additionally, we are using Select.Option instead of SimpleSelect.Option here
-      // because SimpleSelect.Option does not support ReactNode children.
-      <Select.Option id="loading" disabled={true} value="loading">
-        <Spinner size="small" renderTitle={I18n.t('Loading more terms')} />
-      </Select.Option>
-    ) : (
-      <Select.Option id="observer" disabled={true} value="observer">
-        <span ref={ref => setPageLoadTrigger(ref)} />
-      </Select.Option>
-    )
-  }
-
-  const renderSelect = (terms: Term[]) => {
-    if (error) {
-      return <Alert variant="error">{I18n.t('Error loading terms')}</Alert>
-    } else if (isFetching && !terms) {
-      return <Spinner renderTitle={I18n.t('Loading terms')} />
-    } else {
-      return (
-        <View margin="0 0 0 medium">
-          <Alert variant="warning" margin="small">
-            {fullBatchWarning}
-          </Alert>
-          <SimpleSelect
-            data-testid="term_select"
-            width="30rem"
-            renderLabel={I18n.t('Term')}
-            onChange={(_, {value}) => setTermId(value as string)}
-          >
-            {terms.map(term => (
-              <SimpleSelect.Option key={term.id} id={term.id} value={term.id}>
-                {term.name}
-              </SimpleSelect.Option>
-            ))}
-            {hasNextPage ? renderObserver() : null}
-          </SimpleSelect>
-        </View>
-      )
-    }
-  }
-
-  function clearPageLoadTrigger() {
-    if (observerRef.current === null) return
-    observerRef.current.disconnect()
-    observerRef.current = null
-  }
-
-  function setPageLoadTrigger(ref: Element | null) {
-    if (ref === null || !hasNextPage) return
-    clearPageLoadTrigger()
-    observerRef.current = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) {
-        fetchNextPage()
-        clearPageLoadTrigger()
-      }
-    })
-    observerRef.current.observe(ref)
-  }
-
   if (submitting && confirmed) {
     return <Spinner renderTitle={I18n.t('Starting SIS import')} />
   }
-  const terms = data?.pages.reduce((acc: Term[], page) => {
-    return acc.concat(page.json.enrollment_terms)
-  }, [] as Term[])
 
   return (
     <>
@@ -271,7 +164,11 @@ export default function SisImportForm(props: Props) {
           }}
           label={I18n.t('This is a full batch update')}
         />
-        {fullChecked && terms ? renderSelect(terms) : null}
+        <FullBatchDropdown
+          isVisible={fullChecked}
+          onSelect={(termId: string) => setTermId(termId)}
+          accountId={ENV.ACCOUNT_ID}
+        />
         <Checkbox
           id="override_sis_stickiness"
           data-testid="override_sis_stickiness"

@@ -16,20 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, render, waitFor} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import {render, waitFor, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {Assignment} from '../../../../graphql/Assignment'
 import {DiscussionTopic} from '../../../../graphql/DiscussionTopic'
-import {GroupSet} from '../../../../graphql/GroupSet'
-import {REPLY_TO_ENTRY, REPLY_TO_TOPIC} from '../../../util/constants'
-import DiscussionTopicForm, {isGuidDataValid, getAbGuidArray} from '../DiscussionTopicForm'
+import DiscussionTopicForm from '../DiscussionTopicForm'
 
 jest.mock('@canvas/rce/react/CanvasRce')
 
 describe('DiscussionTopicForm', () => {
   const setup = ({
-    isEditing = false,
+    isEditing = true,
     currentDiscussionTopic = {},
     assignmentGroups = [],
     isStudent = false,
@@ -69,6 +65,7 @@ describe('DiscussionTopicForm', () => {
       },
       FEATURES: {},
       PERMISSIONS: {},
+      SETTINGS: {},
       allow_student_anonymous_discussion_topics: false,
       USAGE_RIGHTS_REQUIRED: false,
       K5_HOMEROOM_COURSE: false,
@@ -172,5 +169,121 @@ describe('DiscussionTopicForm', () => {
     fireEvent.click(getByText('10 November 2020'))
 
     expect(dueTime).toHaveValue('10:00 AM')
+  })
+
+  describe('Checkpoints in Blueprint Course', () => {
+    beforeEach(() => {
+      window.ENV = {
+        ...window.ENV,
+        DISCUSSION_TOPIC: {
+          ...window.ENV.DISCUSSION_TOPIC,
+          PERMISSIONS: {
+            ...window.ENV.DISCUSSION_TOPIC.PERMISSIONS,
+            CAN_ATTACH: true,
+            CAN_MODERATE: true,
+            CAN_CREATE_ASSIGNMENT: true,
+            CAN_SET_GROUP: true,
+            CAN_MANAGE_ASSIGN_TO_GRADED: true,
+            CAN_MANAGE_ASSIGN_TO_UNGRADED: true,
+          },
+        },
+        FEATURES: {
+          discussion_checkpoints: true,
+        },
+        IS_BLUEPRINT_COURSE: true,
+        DISCUSSION_CHECKPOINTS_ENABLED: true,
+        context_type: 'Course',
+      }
+    })
+
+    it('sets delayedPostAt and lockAt to null when checkpoints are enabled in a blueprint course', async () => {
+      const mockOnSubmit = jest.fn()
+      const availableFrom = '2024-12-31T10:00:00Z'
+      const availableUntil = '2024-12-31T23:59:00Z'
+
+      const {getByText} = setup({
+        onSubmit: mockOnSubmit,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          assignment: {},
+          availableFrom,
+          availableUntil,
+        }),
+      })
+
+      // Submit form
+      getByText('Save').click()
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled()
+        const submissionData = mockOnSubmit.mock.calls[0][0]
+        expect(submissionData.delayedPostAt).toBeNull()
+        expect(submissionData.lockAt).toBeNull()
+      })
+    })
+
+    it('sets dates normally when checkpoints are disabled in a blueprint course', async () => {
+      window.ENV.FEATURES.discussion_checkpoints = false
+      window.ENV.DISCUSSION_CHECKPOINTS_ENABLED = false
+      const mockOnSubmit = jest.fn()
+      const availableFrom = '2024-12-31T10:00:00Z'
+      const availableUntil = '2024-12-31T23:59:00Z'
+
+      const {getByText} = setup({
+        onSubmit: mockOnSubmit,
+        currentDiscussionTopic: DiscussionTopic.mock({
+          groupSet: null,
+          assignment: {
+            __typename: 'Assignment',
+            id: 'QXNzaWdubWVudC0yMg==',
+            _id: '22',
+            name: 'Non checkpointed',
+            postToSis: false,
+            pointsPossible: 0,
+            gradingType: 'points',
+            importantDates: false,
+            onlyVisibleToOverrides: false,
+            visibleToEveryone: true,
+            dueAt: availableUntil,
+            unlockAt: availableFrom,
+            lockAt: availableUntil,
+            gradingStandard: null,
+            peerReviews: {
+              __typename: 'PeerReviews',
+              anonymousReviews: false,
+              automaticReviews: false,
+              count: 0,
+              dueAt: null,
+              enabled: false,
+              intraReviews: false,
+            },
+            assignmentGroup: {
+              __typename: 'AssignmentGroup',
+              _id: '3',
+              id: 'QXNzaWdubWVudEdyb3VwLTM=',
+              name: 'Assignments',
+            },
+            assignmentOverrides: {
+              __typename: 'AssignmentOverrideConnection',
+              nodes: [],
+            },
+            hasSubAssignments: false,
+            checkpoints: [],
+            hasSubmittedSubmissions: false,
+          },
+          availableFrom,
+          availableUntil,
+        }),
+      })
+
+      // Submit form without enabling checkpoints
+      getByText('Save').click()
+
+      await waitFor(() => {
+        expect(mockOnSubmit).toHaveBeenCalled()
+        const submissionData = mockOnSubmit.mock.calls[0][0]
+        expect(submissionData.delayedPostAt).toBe(availableFrom)
+        expect(submissionData.lockAt).toBe(availableUntil)
+      })
+    })
   })
 })

@@ -17,7 +17,7 @@
  */
 import Backbone from '@canvas/backbone'
 import ImportQuizzesNextView from '../../ImportQuizzesNextView'
-import assertions from '@canvas/test-utils/assertionsSpec'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('Import Quizzes Next', () => {
   test('it should be accessible', async () => {
@@ -27,7 +27,7 @@ describe('Import Quizzes Next', () => {
       disableNQMigrationCheckbox: false,
       model: new Backbone.Model(),
     })
-    await assertions.isAccessible(importQuizzesNext, {a11yReport: true})
+    await isAccessible(importQuizzesNext, {a11yReport: true})
   })
 
   test('it should have checkbox enabled, and not checked', () => {

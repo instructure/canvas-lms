@@ -44,6 +44,10 @@ jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   }
 })
 
+jest.mock('../DocumentProcessorsSection', () =>
+  jest.fn(() => <div data-testid="document-processors-section" />),
+)
+
 function gradedOverrides() {
   return {
     Submission: {
@@ -362,5 +366,26 @@ describe('Assignment Student Content View', () => {
       </MockedProvider>,
     )
     expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+  })
+
+  it('renders DocumentProcessorsSection when submission type is supported', async () => {
+    window.ENV = {
+      ...window.ENV,
+      ASSET_PROCESSORS: [{id: 'processor1', tool_name: 'Processor 1'}],
+      ASSET_REPORTS: [{asset: {_id: '1', attachment_id: '1'}, priority: 0}],
+    }
+
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionType: 'online_upload',
+        attachments: [{_id: '1', id: '1'}],
+      },
+    })
+
+    const {getByTestId} = render(
+      <MockedProvider>{withSubmissionContext(<StudentContent {...props} />)}</MockedProvider>,
+    )
+
+    expect(getByTestId('document-processors-section')).toBeInTheDocument()
   })
 })

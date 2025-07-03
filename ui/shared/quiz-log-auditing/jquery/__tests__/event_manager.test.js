@@ -21,7 +21,7 @@ import EventManager from '../event_manager'
 import EventTracker from '../event_tracker'
 import Backbone from 'node_modules-version-of-backbone'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('Quizzes::LogAuditing::EventManager', () => {
@@ -69,7 +69,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
       }),
     ]
 
-    server = mswServer(handlers)
+    server = setupServer(...handlers)
     server.listen()
 
     class _TestEventTracker extends EventTracker {
