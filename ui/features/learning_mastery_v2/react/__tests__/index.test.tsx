@@ -116,6 +116,7 @@ describe('LearningMastery', () => {
       setGradebookFilters: () => {},
       outcomes,
       rollups,
+      setCurrentPage: jest.fn(),
     })
   })
 

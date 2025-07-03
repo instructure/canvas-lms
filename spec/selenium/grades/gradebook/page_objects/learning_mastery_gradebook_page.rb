@@ -49,6 +49,10 @@ class LearningMasteryGradebookPage
       "svg[id='#{icon_id}']"
     end
 
+    def pagination_controls_selector
+      "[data-testid=\"gradebook-pagination\"]"
+    end
+
     def gradebook_menu
       f('[data-testid="lmgb-gradebook-menu"]')
     end
@@ -71,6 +75,10 @@ class LearningMasteryGradebookPage
 
     def export_csv_button
       f('[data-testid="export-button"]')
+    end
+
+    def pagination_controls
+      f(pagination_controls_selector)
     end
   end
 end

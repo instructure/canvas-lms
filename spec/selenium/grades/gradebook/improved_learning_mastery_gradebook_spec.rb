@@ -118,5 +118,19 @@ describe "Improved Learning Mastery Gradebook" do
         expect(exceeds_mastery_score_cell).to contain_css(LearningMasteryGradebookPage.score_icon_selector(LearningMasteryGradebookPage.exceeds_mastery_icon_id))
       end
     end
+
+    context "pagination" do
+      it "renders pagination controls when there are multiple pages" do
+        register_and_enroll_students(25)
+        navigate_to_gradebook
+        expect(LearningMasteryGradebookPage.pagination_controls).to be_displayed
+      end
+
+      it "doesn't render pagination controls when there is only one page" do
+        register_and_enroll_students(10)
+        navigate_to_gradebook
+        expect(f("body")).not_to contain_css(LearningMasteryGradebookPage.pagination_controls_selector)
+      end
+    end
   end
 end
