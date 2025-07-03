@@ -1140,6 +1140,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     @can_unpublish = if assignment
                        !assignment.has_student_submissions? && !assignment.has_student_submissions_for_sub_assignments?
+                     elsif !opts[:has_student_entries].nil?
+                       # Use preloaded data if available to avoid N+1 queries
+                       !opts[:has_student_entries]
                      else
                        student_ids = opts[:student_ids] || context.all_real_student_enrollments.select(:user_id)
                        if for_group_discussion?

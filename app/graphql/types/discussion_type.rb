@@ -361,7 +361,8 @@ module Types
 
     field :can_unpublish, Boolean, null: false
     def can_unpublish
-      object.can_unpublish?
+      # Use batch loader to avoid N+1 queries when checking multiple topics
+      Loaders::DiscussionTopicLoaders::CanUnpublishLoader.for(object.context).load(object.id)
     end
 
     field :can_reply_anonymously, Boolean, null: false
