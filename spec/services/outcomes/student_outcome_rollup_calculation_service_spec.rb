@@ -134,4 +134,149 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       expect(results.count).to eq(1)
     end
   end
+
+  describe "#combine_results" do
+    let(:outcome) { outcome_model(context: course) }
+    let(:assignment) { assignment_model(context: course) }
+
+    it "returns canvas results when outcomes service results are empty" do
+      canvas_results = [LearningOutcomeResult.new]
+      result = subject.send(:combine_results, canvas_results, [])
+      expect(result).to eq(canvas_results)
+    end
+
+    it "returns outcomes service results when canvas results are empty" do
+      os_results = [LearningOutcomeResult.new]
+      result = subject.send(:combine_results, [], os_results)
+      expect(result).to eq(os_results)
+    end
+
+    it "handles nil parameters by treating them as empty arrays" do
+      canvas_results = [LearningOutcomeResult.new]
+      result = subject.send(:combine_results, canvas_results, nil)
+      expect(result).to eq(canvas_results)
+
+      os_results = [LearningOutcomeResult.new]
+      result = subject.send(:combine_results, nil, os_results)
+      expect(result).to eq(os_results)
+    end
+
+    it "combines results from both sources" do
+      canvas_result = LearningOutcomeResult.new(learning_outcome_id: outcome.id)
+      os_result = LearningOutcomeResult.new(learning_outcome_id: outcome.id + 1)
+
+      result = subject.send(:combine_results, [canvas_result], [os_result])
+      expect(result.length).to eq(2)
+      expect(result).to include(canvas_result)
+      expect(result).to include(os_result)
+    end
+
+    it "deduplicates results with same outcome, user, and assignment" do
+      # Create two results with same identifying attributes
+      canvas_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment.id
+      )
+
+      os_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment.id
+      )
+
+      result = subject.send(:combine_results, [canvas_result], [os_result])
+      expect(result.length).to eq(1)
+    end
+
+    it "keeps results with different outcomes" do
+      outcome2 = outcome_model(context: course)
+
+      canvas_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment.id
+      )
+
+      os_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome2.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment.id
+      )
+
+      result = subject.send(:combine_results, [canvas_result], [os_result])
+      expect(result.length).to eq(2)
+    end
+
+    it "keeps results with different assignments" do
+      assignment2 = assignment_model(context: course)
+
+      canvas_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment.id
+      )
+
+      os_result = LearningOutcomeResult.new(
+        learning_outcome_id: outcome.id,
+        user_uuid: student.uuid,
+        associated_asset_id: assignment2.id
+      )
+
+      result = subject.send(:combine_results, [canvas_result], [os_result])
+      expect(result.length).to eq(2)
+    end
+  end
+
+  describe "#fetch_outcomes_service_results" do
+    let(:outcome) { outcome_model(context: course) }
+
+    context "with no quiz LTI assignments" do
+      before do
+        # Replace receive_message_chain with individual stubs
+        active_relation = double("active_relation")
+        where_relation = double("where_relation")
+        quiz_lti_relation = []
+
+        allow(Assignment).to receive(:active).and_return(active_relation)
+        allow(active_relation).to receive(:where).and_return(where_relation)
+        allow(where_relation).to receive(:quiz_lti).and_return(quiz_lti_relation)
+      end
+
+      it "returns an empty array" do
+        result = subject.send(:fetch_outcomes_service_results)
+        expect(result).to eq([])
+      end
+    end
+
+    context "with quiz LTI assignments" do
+      let(:quiz_assignment) { assignment_model(context: course) }
+
+      before do
+        # Replace receive_message_chain with individual stubs
+        active_relation = double("active_relation")
+        where_relation = double("where_relation")
+        quiz_lti_relation = [quiz_assignment]
+
+        allow(Assignment).to receive(:active).and_return(active_relation)
+        allow(active_relation).to receive(:where).and_return(where_relation)
+        allow(where_relation).to receive(:quiz_lti).and_return(quiz_lti_relation)
+
+        outcome
+      end
+
+      it "fetches results from the outcomes service" do
+        expect(subject).to receive(:find_outcomes_service_outcome_results) do |args|
+          expect(args[:users]).to eq([student])
+          expect(args[:context]).to eq(course)
+          expect(args[:assignments]).to eq([quiz_assignment])
+          expect(args[:include_hidden]).to be(false)
+          expect(args[:outcomes]).not_to be_nil
+          nil
+        end
+
+        subject.send(:fetch_outcomes_service_results)
+      end
+    end
+  end
 end

@@ -23,6 +23,10 @@ module Outcomes
   # Usage:
   #   Outcomes::StudentOutcomeRollupCalculationService.call(course_id: course.id, student_id: student.id)
   class StudentOutcomeRollupCalculationService < ApplicationService
+    include Outcomes::ResultAnalytics
+    include OutcomesServiceAuthoritativeResultsHelper
+    include CanvasOutcomesHelper
+
     attr_reader :course, :student
 
     class << self
@@ -72,12 +76,6 @@ module Outcomes
 
     private
 
-    # @return [Array<LearningOutcome>]
-    def load_course_outcomes
-      # TODO: load course.learning_outcomes
-      []
-    end
-
     # @return [Array<OutcomeRollup>]
     def generate_student_rollups
       # TODO: fetch_canvas_results, fetch_outcomes_service_results, combine_results, map to OutcomeRollup
@@ -95,16 +93,49 @@ module Outcomes
 
     # @return [Array<LearningOutcomeResult>]
     def fetch_outcomes_service_results
-      # TODO: fetch results from Outcomes Service
-      []
+      # First, find all quiz_lti assignments in the course
+      new_quiz_assignments = Assignment.active.where(context: course).quiz_lti
+      return [] if new_quiz_assignments.empty?
+
+      # Load all outcomes linked to the course
+      outcomes = course.linked_learning_outcomes
+
+      # Get results from outcomes service
+      os_results_json = find_outcomes_service_outcome_results(
+        users: [student],
+        context: course,
+        outcomes:,
+        assignments: new_quiz_assignments,
+        include_hidden: false
+      )
+      return [] if os_results_json.nil?
+
+      # Use the handle_outcomes_service_results method to transform the JSON into LearningOutcomeResult objects
+      handle_outcomes_service_results(os_results_json, course, outcomes, [student], new_quiz_assignments)
     end
 
     # @param canvas_results [Array<LearningOutcomeResult>]
     # @param outcomes_service_results [Array<LearningOutcomeResult>]
     # @return [Array<LearningOutcomeResult>]
-    def combine_results
-      # TODO: merge result sets
-      []
+    def combine_results(canvas_results = [], outcomes_service_results = [])
+      canvas_results ||= []
+      outcomes_service_results ||= []
+
+      return canvas_results if outcomes_service_results.blank?
+      return outcomes_service_results if canvas_results.blank?
+
+      combined_results = canvas_results + outcomes_service_results
+
+      # Remove any duplicate results (same outcome, same student, same assignment)
+      # This is important when a rubric result exists for the same assignment/outcome as an OS result
+      outcome_user_assignment_map = {}
+
+      combined_results.reject do |result|
+        key = [result.learning_outcome_id, result.user_uuid, result.try(:associated_asset_id)].join(":")
+        is_duplicate = outcome_user_assignment_map.key?(key)
+        outcome_user_assignment_map[key] = true unless is_duplicate
+        is_duplicate
+      end
     end
 
     # @param rollups [Array<OutcomeRollup>]
