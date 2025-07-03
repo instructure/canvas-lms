@@ -16658,6 +16658,7 @@ tr:
         details: "Ödev Değerlendirme Listesi Detayları"
     show: 
       answers: 
+        answered_correct: "Doğru cevap"
         correct: Doğru!
         correct_answers: "Doğru Cevaplar"
         incorrect: Yanlış
