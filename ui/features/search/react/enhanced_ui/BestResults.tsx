@@ -40,7 +40,7 @@ export default function BestResults(props: Props) {
   })
   const splitTranslated = startOverMsg.split('ZZZZ_STARTOVER')
   return (
-    <Flex direction="column" gap="sectionElements" width="80%">
+    <Flex direction="column" gap="sectionElements">
       <Flex direction="row" alignItems="start">
         <Flex.Item shouldGrow>
           <Heading variant="titleSection">
