@@ -27,6 +27,22 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   def perform(context_modules)
     GuardRail.activate(:secondary) do
       ActiveRecord::Associations.preload(context_modules, content_tags: { content: :context })
+
+      # Collect all quizzes across all modules to batch the preload_can_unpublish call
+      all_quizzes = []
+      context_modules.each do |context_module|
+        content_tags = context_module.content_tags_visible_to(@user)
+        content_items = content_tags.filter_map(&:content)
+        quizzes = content_items.select { |item| item.is_a?(Quizzes::Quiz) }
+        all_quizzes.concat(quizzes)
+      end
+
+      # Batch preload can_unpublish for all quizzes at once
+      unless all_quizzes.empty?
+        assmnt_ids_with_subs = Assignment.assignment_ids_with_submissions(all_quizzes.filter_map(&:assignment_id))
+        Quizzes::Quiz.preload_can_unpublish(all_quizzes, assmnt_ids_with_subs)
+      end
+
       context_modules.each do |context_module|
         content_tags = context_module.content_tags_visible_to(@user)
         fulfill(context_module, content_tags)
