@@ -22,7 +22,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import decodeFromHex from '@canvas/util/decodeFromHex'
-import ColorPicker from '@canvas/color-picker'
 import userSettings from '@canvas/user-settings'
 import contextListTemplate from '../jst/contextList.handlebars'
 import forceScreenreaderToReparse from 'force-screenreader-to-reparse'
@@ -31,6 +30,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
 import AccountCalendarsModal from '../react/AccountCalendarsModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {CalendarColorPicker} from '../react/CalendarColorPicker'
 
 const I18n = createI18nScope('calendar_sidebar')
 
@@ -350,38 +350,12 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
   })
 
   $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (_event) {
-    const positions = {
-      top: $(this).offset().top - $(window).scrollTop(),
-      left: $(this).offset().left - $(window).scrollLeft(),
-    }
-
     const assetString = $(this).closest('li').data('context')
 
     // ensures previously picked color clears
     ReactDOM.unmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
-
     ReactDOM.render(
-      <ColorPicker
-        isOpen={true}
-        positions={positions}
-        assetString={assetString}
-        afterClose={() => forceScreenreaderToReparse($('#application')[0])}
-        afterUpdateColor={color => {
-          color = `#${color}`
-          const $existingStyles = $('#calendar_color_style_overrides')
-          const $newStyles = $('<style>')
-          $newStyles.text(
-            `.group_${assetString},
-            .group_${assetString}:hover,
-            .group_${assetString}:focus{
-              color: ${color};
-              border-color: ${color};
-              background-color: ${color};
-            }`,
-          )
-          $existingStyles.append($newStyles)
-        }}
-      />,
+      <CalendarColorPicker assetString={assetString} />,
       $(`#calendars_color_picker_holder`)[0],
     )
   })

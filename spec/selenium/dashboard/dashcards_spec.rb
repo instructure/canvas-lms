@@ -205,14 +205,19 @@ describe "dashcards" do
       end
 
       it "customizes color by selecting from color palette on the calendar page", priority: "1" do
-        select_color_palette_from_calendar_page
+        get "/calendar"
+        raise "Not the right course" unless f("#calendars-context-list li:nth-of-type(2)").text.include? @course1.name
 
-        # pick a random color from the default 15 colors
-        new_color = ff(".ColorPicker__ColorContainer button.ColorPicker__ColorBlock")[rand(0...15)]
-        # anything to make chrome happy
-        driver.action.move_to(new_color).click.perform
-        new_color_code = f("#ColorPickerCustomInput-course_#{@course1.id}").attribute(:value)
-        f("#ColorPicker__Apply").click
+        f("#calendars-context-list li:nth-of-type(2) .ContextList__MoreBtn").click
+        wait_for_ajaximations
+        expect(f("[data-testid='calendar-color-picker-modal']")).to be_displayed
+        expect(f("#ColorPickerCustomInput-course_#{@course1.id}")).to be_displayed
+
+        input_element = f("#ColorPickerCustomInput-course_#{@course1.id}")
+        replace_content(input_element, "#0B9BE3")
+        new_color_code = input_element.attribute("value")
+
+        f("[data-testid='ColorPicker__Apply']").click
         wait_for_ajaximations
 
         new_displayed_color = f("[role='checkbox'].group_course_#{@course1.id}").style("color")
@@ -295,14 +300,5 @@ describe "dashcards" do
         expect(@student.custom_colors[@course.asset_string]).to eq "#000000"
       end
     end
-  end
-
-  def select_color_palette_from_calendar_page
-    get "/calendar"
-    raise "Not the right course" unless f("#calendars-context-list li:nth-of-type(2)").text.include? @course1.name
-
-    f("#calendars-context-list li:nth-of-type(2) .ContextList__MoreBtn").click
-    wait_for_ajaximations
-    expect(f(".ColorPicker__Container")).to be_displayed
   end
 end
