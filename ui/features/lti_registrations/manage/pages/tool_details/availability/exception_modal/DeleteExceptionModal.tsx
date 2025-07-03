@@ -63,8 +63,8 @@ export const DeleteExceptionModal = ({onClose, onDelete, ...props}: DeleteExcept
   let body: ReactNode
   if (deletingControl) {
     body = (
-      <Flex justifyItems="center" alignItems="center" margin="small">
-        <Flex.Item shouldGrow>
+      <Flex justifyItems="center" alignItems="center" margin="x-large">
+        <Flex.Item>
           <Spinner
             variant="inverse"
             size="large"
