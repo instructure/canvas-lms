@@ -14260,6 +14260,7 @@ hy:
         details: "Հանձնարարության ռուբրիկի մանրամասներ"
     show: 
       answers: 
+        answered_correct: "Ճիշտ պատասխան"
         correct: "Ճիշտ է:"
         correct_answers: "Ճիշտ պատասխաններ"
         incorrect: "Սխալ է"
