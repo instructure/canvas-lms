@@ -124,6 +124,24 @@ module Types
       ModuleItemsVisibleLoader.for(current_user).load(context_module)
     end
 
+    field :module_items_connection, Types::ModuleItemType.connection_type, null: true do
+      argument :filter, Types::ModuleItemFilterInputType, required: false
+    end
+
+    def module_items_connection(filter: {})
+      ModuleItemsVisibleLoader.for(current_user).load(context_module).then do |content_tags|
+        # Apply filtering if provided
+        filtered_tags = apply_module_item_filters(content_tags, filter)
+        # Return the array directly - GraphQL will handle connection structure
+        filtered_tags
+      end
+    end
+
+    field :module_items_total_count, Integer, null: false
+    def module_items_total_count
+      ModuleItemsVisibleLoader.for(current_user).load(context_module).then(&:size)
+    end
+
     field :submission_statistics, Types::ModuleStatisticsType, null: true
     def submission_statistics
       if current_user
@@ -151,6 +169,41 @@ module Types
 
     def has_active_overrides
       Loaders::ModuleActiveOverridesLoader.for.load(object)
+    end
+
+    private
+
+    def apply_module_item_filters(content_tags, filter)
+      return content_tags if filter.blank?
+
+      filtered_tags = content_tags.dup
+
+      if filter[:search_term].present?
+        search_term = filter[:search_term].downcase
+        filtered_tags = filtered_tags.select do |tag|
+          tag.title&.downcase&.include?(search_term) ||
+            tag.content&.title&.downcase&.include?(search_term)
+        end
+      end
+
+      if filter[:published].present?
+        filtered_tags = filtered_tags.select do |tag|
+          # Check both the tag and its content's published status
+          tag_published = tag.published?
+          content_published = tag.content&.published? if tag.content.respond_to?(:published?)
+          # If content has a published? method, use that; otherwise use tag's status
+          actual_published = content_published.nil? ? tag_published : content_published
+          actual_published == filter[:published]
+        end
+      end
+
+      if filter[:content_type].present?
+        filtered_tags = filtered_tags.select do |tag|
+          tag.content_type == filter[:content_type]
+        end
+      end
+
+      filtered_tags
     end
   end
 end
