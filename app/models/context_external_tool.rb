@@ -27,8 +27,8 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :context_external_tool_placements, autosave: true
   has_many :lti_resource_links, class_name: "Lti::ResourceLink"
   has_many :progresses, as: :context, inverse_of: :context
-  has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
-  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
+  has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler", dependent: :destroy
+  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor", dependent: :destroy
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
@@ -929,7 +929,7 @@ class ContextExternalTool < ActiveRecord::Base
     Lti::ContextControl
       .where(deployment_id: id)
       .update_all(workflow_state: "deleted")
-    save!
+    run_callbacks(:destroy) { save! }
   end
 
   def precedence

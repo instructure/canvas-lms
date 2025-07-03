@@ -3385,6 +3385,43 @@ describe ContextExternalTool do
         .to all(eq("deleted"))
     end
 
+    context "when the tool has lti_asset_processor_eula_acceptances" do
+      before(:once) do
+        lti_asset_processor_eula_model(context_external_tool: deployment)
+      end
+
+      it "soft-deletes the tool and its lti_asset_processor_eula_acceptances" do
+        expect { subject }.to change { deployment.reload.workflow_state }.to("deleted")
+        expect(deployment.lti_asset_processor_eula_acceptances.reload.pluck(:workflow_state))
+          .to all(eq("deleted"))
+      end
+    end
+
+    context "when the tool has lti_notice_handlers" do
+      before(:once) do
+        lti_notice_handler_model(context_external_tool: deployment)
+      end
+
+      it "soft-deletes the tool and its lti_notice_handlers" do
+        expect { subject }.to change { deployment.reload.workflow_state }.to("deleted")
+        expect(deployment.lti_notice_handlers.reload.pluck(:workflow_state))
+          .to all(eq("deleted"))
+      end
+    end
+
+    context "when the tool has lti_asset_processors" do
+      before(:once) do
+        course = course_model(account:)
+        lti_asset_processor_model(context_external_tool: deployment, assignment_opts: { context: course })
+      end
+
+      it "soft-deletes the tool and its lti_asset_processors" do
+        expect { subject }.to change { deployment.reload.workflow_state }.to("deleted")
+        expect(deployment.lti_asset_processors.reload.pluck(:workflow_state))
+          .to all(eq("deleted"))
+      end
+    end
+
     context "when the tool has lots of controls" do
       let_once(:subaccount1) { account_model(parent_account: account) }
       let_once(:subaccount2) { account_model(parent_account: account) }

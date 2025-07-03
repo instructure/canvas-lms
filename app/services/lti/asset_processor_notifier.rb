@@ -25,7 +25,7 @@ module Lti
     def notify_asset_processors(submission, asset_processor = nil)
       return unless submission.asset_processor_compatible?
 
-      asset_processors = Lti::AssetProcessor.for_assignment_id(submission.assignment.id)
+      asset_processors = submission.assignment.lti_asset_processors
       if asset_processor.present?
         asset_processors = asset_processors.where(id: asset_processor.id)
       end

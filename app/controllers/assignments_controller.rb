@@ -959,7 +959,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
-      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.for_assignment_id(@assignment.id).info_for_display
+      hash[:ASSET_PROCESSORS] = @assignment.lti_asset_processors.info_for_display
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(
         :submission_type_selection,
         @context,

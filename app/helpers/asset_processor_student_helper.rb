@@ -22,7 +22,7 @@ module AssetProcessorStudentHelper
     return nil unless @domain_root_account.feature_enabled?(:lti_asset_processor)
     return nil if submission.blank?
 
-    active_ap_ids = Lti::AssetProcessor.for_assignment_id(submission.assignment_id).pluck(:id)
+    active_ap_ids = submission.assignment.lti_asset_processors.pluck(:id)
     return nil if active_ap_ids.empty?
 
     sql = [
@@ -76,6 +76,6 @@ module AssetProcessorStudentHelper
   def asset_processors(assignment:)
     return nil unless @domain_root_account.feature_enabled?(:lti_asset_processor)
 
-    Lti::AssetProcessor.for_assignment_id(assignment.id).info_for_display
+    assignment.lti_asset_processors.info_for_display
   end
 end
