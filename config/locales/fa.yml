@@ -20077,6 +20077,7 @@ fa:
         details: "اطلاعات دستورالعمل ارزیابی تکلیف"
     show: 
       answers: 
+        answered_correct: "پاسخ درست"
         correct: "درست است!"
         correct_answers: "پاسخ های درست"
         incorrect: نادرست
