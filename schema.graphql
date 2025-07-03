@@ -5574,6 +5574,29 @@ type Module implements LegacyIDInterface & Node & Timestamped {
   hasActiveOverrides: Boolean!
   id: ID!
   moduleItems: [ModuleItem!]
+  moduleItemsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: ModuleItemFilter
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ModuleItemConnection
+  moduleItemsTotalCount: Int!
   name: String
   position: Int
   prerequisites: [ModulePrerequisite!]
@@ -5760,6 +5783,23 @@ type ModuleItemEdge {
   The item at the end of the edge.
   """
   node: ModuleItem
+}
+
+input ModuleItemFilter {
+  """
+  Filter by content type (Assignment, WikiPage, etc.)
+  """
+  contentType: String
+
+  """
+  Filter by published status
+  """
+  published: Boolean
+
+  """
+  Filter by title or content
+  """
+  searchTerm: String
 }
 
 """

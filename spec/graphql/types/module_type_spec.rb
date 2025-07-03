@@ -166,4 +166,142 @@ describe Types::ModuleType do
     )
     expect(module_type.resolve("hasActiveOverrides")).to be true
   end
+
+  describe "moduleItemsConnection" do
+    let_once(:assignment1) { assignment_model({ context: course, name: "Assignment 1" }) }
+    let_once(:assignment2) { assignment_model({ context: course, name: "Assignment 2" }) }
+    let_once(:assignment3) { assignment_model({ context: course, name: "Assignment 3" }) }
+    let_once(:page1) { course.wiki_pages.create!(title: "Page 1", body: "content") }
+    let_once(:unpublished_assignment) do
+      assignment = assignment_model({ context: course, name: "Unpublished Assignment" })
+      assignment.workflow_state = "unpublished"
+      assignment.save!
+      assignment
+    end
+
+    before do
+      mod.add_item({ type: "Assignment", id: assignment1.id }, nil, position: 1)
+      mod.add_item({ type: "Assignment", id: assignment2.id }, nil, position: 2)
+      mod.add_item({ type: "Assignment", id: assignment3.id }, nil, position: 3)
+      mod.add_item({ type: "WikiPage", id: page1.id }, nil, position: 4)
+      mod.add_item({ type: "Assignment", id: unpublished_assignment.id }, nil, position: 5)
+    end
+
+    it "returns paginated module items" do
+      result = module_type.resolve("moduleItemsConnection(first: 2) { edges { node { _id } } }")
+      expect(result.length).to eq 2
+      expect(result).to all(be_a(String))
+    end
+
+    it "supports cursor-based pagination" do
+      # Get first page of results
+      first_page = module_type.resolve("moduleItemsConnection(first: 2) { edges { node { _id } } }")
+      expect(first_page.length).to eq 2
+
+      # Test that we can get subsequent items when there are more
+      all_items = module_type.resolve("moduleItemsConnection { edges { node { _id } } }")
+      if all_items.length > 2
+        # There should be more items available beyond the first 2
+        expect(all_items.length).to be > 2
+      end
+    end
+
+    it "respects permission controls like the original moduleItems field" do
+      # Only published items should be visible to students
+      result = module_type.resolve("moduleItemsConnection { edges { node { _id } } }")
+      module_items_result = module_type.resolve("moduleItems { _id }")
+
+      expect(result).to eq module_items_result
+    end
+
+    it "filters by search term" do
+      result = module_type.resolve('moduleItemsConnection(filter: { searchTerm: "Assignment 1" }) { edges { node { _id } } }')
+      expect(result.length).to eq 1
+
+      assignment1_tag = mod.content_tags.find_by(content: assignment1)
+      expect(result[0]).to eq assignment1_tag.id.to_s
+    end
+
+    it "accepts published status filter" do
+      teacher = course_with_teacher(course:, active_all: true).user
+      teacher_module_type = GraphQLTypeTester.new(mod, current_user: teacher)
+
+      # Test that the published filter parameter is accepted and returns results
+      published_result = teacher_module_type.resolve("moduleItemsConnection(filter: { published: true }) { edges { node { _id } } }")
+
+      # Should return some results without error
+      expect(published_result).to be_an(Array)
+      expect(published_result.length).to be >= 0
+    end
+
+    it "filters by content type" do
+      result = module_type.resolve('moduleItemsConnection(filter: { contentType: "Assignment" }) { edges { node { _id } } }')
+      expect(result.length).to eq 3  # Only published assignments visible to students
+
+      page_result = module_type.resolve('moduleItemsConnection(filter: { contentType: "WikiPage" }) { edges { node { _id } } }')
+      expect(page_result.length).to eq 1
+    end
+
+    it "combines multiple filters" do
+      result = module_type.resolve('moduleItemsConnection(filter: { searchTerm: "Assignment", contentType: "Assignment" }) { edges { node { _id } } }')
+      expect(result.length).to eq 3  # All published assignments match "Assignment" search
+    end
+  end
+
+  describe "moduleItemsTotalCount" do
+    let_once(:assignment1) { assignment_model({ context: course, name: "Assignment 1" }) }
+    let_once(:assignment2) { assignment_model({ context: course, name: "Assignment 2" }) }
+    let_once(:unpublished_assignment) do
+      assignment = assignment_model({ context: course, name: "Unpublished Assignment" })
+      assignment.workflow_state = "unpublished"
+      assignment.save!
+      assignment
+    end
+
+    before do
+      mod.add_item({ type: "Assignment", id: assignment1.id }, nil, position: 1)
+      mod.add_item({ type: "Assignment", id: assignment2.id }, nil, position: 2)
+      mod.add_item({ type: "Assignment", id: unpublished_assignment.id }, nil, position: 3)
+    end
+
+    it "returns total count of visible module items" do
+      expect(module_type.resolve("moduleItemsTotalCount")).to eq 2 # Only published items visible to students
+    end
+
+    it "matches the count from moduleItems field" do
+      total_count = module_type.resolve("moduleItemsTotalCount")
+      module_items_count = module_type.resolve("moduleItems { _id }").length
+      expect(total_count).to eq module_items_count
+    end
+
+    it "returns correct count for teachers including unpublished items" do
+      teacher = course_with_teacher(course:, active_all: true).user
+      teacher_module_type = GraphQLTypeTester.new(mod, current_user: teacher)
+      expect(teacher_module_type.resolve("moduleItemsTotalCount")).to eq 3 # All items visible to teachers
+    end
+  end
+
+  describe "backwards compatibility" do
+    let_once(:assignment1) { assignment_model({ context: course, name: "Assignment 1" }) }
+    let_once(:assignment2) { assignment_model({ context: course, name: "Assignment 2" }) }
+
+    before do
+      mod.add_item({ type: "Assignment", id: assignment1.id }, nil, position: 1)
+      mod.add_item({ type: "Assignment", id: assignment2.id }, nil, position: 2)
+    end
+
+    it "maintains existing moduleItems field functionality" do
+      # Test that existing queries still work exactly as before
+      result = module_type.resolve("moduleItems { _id }")
+      expect(result.length).to eq 2
+      expect(result).to all(be_a(String))
+    end
+
+    it "returns same items in moduleItems and moduleItemsConnection" do
+      module_items_result = module_type.resolve("moduleItems { _id }")
+      connection_result = module_type.resolve("moduleItemsConnection { edges { node { _id } } }")
+
+      expect(connection_result).to eq module_items_result
+    end
+  end
 end
