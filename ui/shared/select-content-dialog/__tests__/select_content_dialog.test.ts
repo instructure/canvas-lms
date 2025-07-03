@@ -204,6 +204,27 @@ describe('SelectContentDialog', () => {
       expect(window.confirm).toHaveBeenCalledTimes(1)
     })
   })
+
+  it('sets aria-modal attribute to true on resource selection dialog', () => {
+    callOnContextExternalToolSelect()
+    const $dialog = $('#resource_selection_dialog')
+    const dialogContainer = $dialog.parent()
+    expect(dialogContainer.attr('aria-modal')).toBe('true')
+  })
+
+  it('sets aria-modal attribute on dialog container when resource selection dialog is created', () => {
+    // Ensure no existing dialog
+    $('#resource_selection_dialog').remove()
+
+    callOnContextExternalToolSelect()
+
+    const $dialog = $('#resource_selection_dialog')
+    expect($dialog).toHaveLength(1)
+
+    // Check that the dialog container (ui-dialog) has aria-modal set to true
+    const dialogContainer = $dialog.closest('.ui-dialog')
+    expect(dialogContainer.attr('aria-modal')).toBe('true')
+  })
 })
 
 describe('SelectContentDialog: Dialog options', () => {
@@ -234,6 +255,32 @@ describe('SelectContentDialog: Dialog options', () => {
     const dialogTitle = 'To be, or not to be?'
     selectContentDialog({dialog_title: dialogTitle})
     expect($.fn.dialog).toHaveBeenCalledWith(expect.objectContaining({title: dialogTitle}))
+  })
+
+  it('sets aria-modal attribute when ariaModal option is provided', () => {
+    const ariaModal = 'true'
+    selectContentDialog({ariaModal})
+
+    // The aria-modal attribute should be set on the dialog container
+    const dialogElement = $('#select_context_content_dialog').closest('.ui-dialog')
+    expect(dialogElement.attr('aria-modal')).toBe(ariaModal)
+  })
+
+  it('does not set aria-modal attribute when ariaModal option is not provided', () => {
+    selectContentDialog({})
+
+    // The aria-modal attribute should not be set when option is not provided
+    const dialogElement = $('#select_context_content_dialog').closest('.ui-dialog')
+    expect(dialogElement.attr('aria-modal')).toBeUndefined()
+  })
+
+  it('sets aria-modal attribute to false when ariaModal option is false', () => {
+    const ariaModal = 'false'
+    selectContentDialog({ariaModal})
+
+    // The aria-modal attribute should be set to false
+    const dialogElement = $('#select_context_content_dialog').closest('.ui-dialog')
+    expect(dialogElement.attr('aria-modal')).toBe(ariaModal)
   })
 })
 

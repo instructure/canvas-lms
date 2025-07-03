@@ -446,6 +446,9 @@ export const Events = {
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
             modal: true,
             zIndex: 1000,
+            create: () => {
+              $dialog.parent().attr('aria-modal', 'true')
+            },
           })
           .bind('dialogresize', function () {
             $(this)
@@ -572,6 +575,7 @@ export type SelectContentDialogOptions = {
   width?: number
   submit?: Function
   no_name_input?: boolean
+  ariaModal?: string
   close?: () => void
 }
 
@@ -636,6 +640,11 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
       },
       modal: true,
       zIndex: 1000,
+      create() {
+        if (options.ariaModal) {
+          $(this).closest('.ui-dialog').attr('aria-modal', options.ariaModal)
+        }
+      },
     })
     .fixDialogButtons()
 
