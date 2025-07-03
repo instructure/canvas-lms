@@ -2404,6 +2404,10 @@ class AbstractAssignment < ActiveRecord::Base
     end
     submission.audit_grade_changes = did_grade || submission.excused_changed?
 
+    if score.nil? && !submission.attempt?
+      submission.workflow_state = "unsubmitted"
+    end
+
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&
        ((submission.score && submission.grade) || submission.excused?)

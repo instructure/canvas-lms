@@ -2615,6 +2615,26 @@ describe Assignment do
     end
   end
 
+  describe "#save_grade_to_submission" do
+    before(:once) do
+      setup_assignment_with_students
+    end
+
+    it "sets workflow_state to unsubmitted when score is nil and there's no attempt" do
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
+      expect(@submission.workflow_state).to eq("unsubmitted")
+    end
+
+    it "does not set workflow_state to unsubmitted when score is nil but there is an attempt" do
+      @assignment.submit_homework(@student, body: "attempt for #{@student.name}")
+      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      @submission = @assignment.grade_student(@student, grade: nil, grader: @teacher).first
+
+      expect(@submission.workflow_state).to_not eq("unsubmitted")
+    end
+  end
+
   describe "#grade_student" do
     let_once(:now) { Time.zone.now }
     let_once(:student) { User.create!.tap { |u| course.enroll_student(u, enrollment_state: "active") } }
