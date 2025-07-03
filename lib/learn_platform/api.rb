@@ -25,15 +25,15 @@ module LearnPlatform
     end
 
     def valid_basic_auth_params?
-      !learnplatform.settings["username"].empty? && !learnplatform.settings["password"].empty?
+      learnplatform.settings["username"].present? && learnplatform.settings["password"].present?
     end
 
     def valid_token_auth_params?
-      !learnplatform.settings["jwt_issuer"].empty? && !learnplatform.settings["jwt_secret"].empty?
+      learnplatform.settings["jwt_issuer"].present? && learnplatform.settings["jwt_secret"].present?
     end
 
     def valid_learnplatform?
-      learnplatform&.enabled? && (valid_basic_auth_params? || valid_token_auth_params?)
+      learnplatform.enabled? && (valid_basic_auth_params? || valid_token_auth_params?)
     end
 
     def fetch_learnplatform_response(endpoint, expires, params = {})
