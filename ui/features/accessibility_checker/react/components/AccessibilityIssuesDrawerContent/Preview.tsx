@@ -31,7 +31,7 @@ const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
 const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
 
 export interface PreviewHandle {
-  update: (formValue: FormValue) => void
+  update: (formValue: FormValue, onSuccess?: () => void, onError?: () => void) => void
 }
 
 interface PreviewProps {
@@ -78,7 +78,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   const [error, setError] = useState<string | null>(null)
 
   useImperativeHandle(ref, () => ({
-    update: (formValue: FormValue) => {
+    update: (formValue: FormValue, onSuccess?: () => void, onError?: () => void) => {
       setIsLoading(true)
       doFetchApi<PreviewResponse>({
         path: window.location.href + '/preview',
@@ -96,8 +96,12 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
         .then(resultJson => {
           setContentResponse(resultJson || null)
           setError(null)
+          onSuccess?.()
         })
-        .catch(_ => setError(I18n.t('Error updating preview for accessibility issue')))
+        .catch(_ => {
+          setError(I18n.t('Error updating preview for accessibility issue'))
+          onError?.()
+        })
         .finally(() => setIsLoading(false))
     },
   }))

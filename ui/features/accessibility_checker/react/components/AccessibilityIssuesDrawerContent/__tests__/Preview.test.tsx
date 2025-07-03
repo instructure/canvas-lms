@@ -239,6 +239,58 @@ describe('Preview', () => {
       // Should show loading spinner during update
       expect(screen.getByText('Loading preview...')).toBeInTheDocument()
     })
+
+    it('calls onSuccess callback when update succeeds', async () => {
+      const mockResponse: PreviewResponse = {
+        content: '<div>Updated content</div>',
+        path: '//div',
+      }
+
+      // @ts-expect-error
+      mockDoFetchApi.mockResolvedValue({
+        json: Promise.resolve(mockResponse),
+      })
+
+      const ref = React.createRef<PreviewHandle>()
+      const onSuccess = jest.fn()
+      const onError = jest.fn()
+
+      render(<Preview {...defaultProps} ref={ref} />)
+
+      await waitFor(() => {
+        expect(ref.current).toBeDefined()
+      })
+
+      const formValue: FormValue = {value: 'test-value'}
+      ref.current?.update(formValue, onSuccess, onError)
+
+      await waitFor(() => {
+        expect(onSuccess).toHaveBeenCalledTimes(1)
+        expect(onError).not.toHaveBeenCalled()
+      })
+    })
+
+    it('calls onError callback when update fails', async () => {
+      mockDoFetchApi.mockRejectedValue(new Error('Update failed'))
+
+      const ref = React.createRef<PreviewHandle>()
+      const onSuccess = jest.fn()
+      const onError = jest.fn()
+
+      render(<Preview {...defaultProps} ref={ref} />)
+
+      await waitFor(() => {
+        expect(ref.current).toBeDefined()
+      })
+
+      const formValue: FormValue = {value: 'test-value'}
+      ref.current?.update(formValue, onSuccess, onError)
+
+      await waitFor(() => {
+        expect(onError).toHaveBeenCalledTimes(1)
+        expect(onSuccess).not.toHaveBeenCalled()
+      })
+    })
   })
 
   describe('component props', () => {
