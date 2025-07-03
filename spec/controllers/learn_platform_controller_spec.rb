@@ -419,7 +419,7 @@ describe LearnPlatformController do
     end
 
     it "includes translate_lang for index when feature flag is enabled and locale is not :en" do
-      Account.site_admin.enable_feature!(:lti_apps_page_ai_translation)
+      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:es)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
@@ -434,7 +434,7 @@ describe LearnPlatformController do
     end
 
     it "does not include translate_lang for index when feature flag is disabled" do
-      Account.site_admin.disable_feature!(:lti_apps_page_ai_translation)
+      @account.disable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:es)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
@@ -449,7 +449,7 @@ describe LearnPlatformController do
     end
 
     it "does not include translate_lang for index when locale is :en" do
-      Account.site_admin.enable_feature!(:lti_apps_page_ai_translation)
+      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:en)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products) do |_, options|
@@ -464,7 +464,7 @@ describe LearnPlatformController do
     end
 
     it "includes translate_lang for index_by_category when feature flag is enabled and locale is not :en" do
-      Account.site_admin.enable_feature!(:lti_apps_page_ai_translation)
+      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:fr)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:products_by_category) do |_, options|
@@ -476,7 +476,7 @@ describe LearnPlatformController do
     end
 
     it "includes translate_lang for show when feature flag is enabled and locale is not :en" do
-      Account.site_admin.enable_feature!(:lti_apps_page_ai_translation)
+      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:de)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:product) do |_, id, options|
@@ -489,7 +489,7 @@ describe LearnPlatformController do
     end
 
     it "includes translate_lang for filters when feature flag is enabled and locale is not :en" do
-      Account.site_admin.enable_feature!(:lti_apps_page_ai_translation)
+      @account.enable_feature!(:lti_apps_page_ai_translation)
       allow(I18n).to receive(:locale).and_return(:it)
 
       expect_any_instance_of(LearnPlatform::Api).to receive(:product_filters) do |_, options|
