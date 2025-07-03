@@ -34,7 +34,7 @@ export default function SimilarResults(props: Props) {
     return null
   }
   return (
-    <Flex gap="sectionElements" direction="column" width="80%">
+    <Flex gap="sectionElements" direction="column">
       <Flex.Item>
         <Heading variant="titleSection">{I18n.t('You may also be interested in')}</Heading>
       </Flex.Item>

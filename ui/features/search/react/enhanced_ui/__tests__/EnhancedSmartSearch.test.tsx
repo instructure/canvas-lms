@@ -146,7 +146,7 @@ describe('EnhancedSmartSearch', () => {
       fetchMock.restore()
     })
 
-    it('should render results', async () => {
+    it('renders results', async () => {
       const user = userEvent.setup()
       const {getByTestId, getByText} = renderSearch()
 
@@ -163,7 +163,7 @@ describe('EnhancedSmartSearch', () => {
       })
     })
 
-    it('should render modules for each result', async () => {
+    it('renders modules for each result', async () => {
       const user = userEvent.setup()
       const {getByTestId, getAllByTestId} = renderSearch()
 
@@ -186,7 +186,7 @@ describe('EnhancedSmartSearch', () => {
       expect(within(firstCard).queryByText('Module 2')).not.toBeInTheDocument()
     })
 
-    it('should render pills for each result', async () => {
+    it('renders pills for each result', async () => {
       const user = userEvent.setup()
       const {getByTestId, getAllByTestId} = renderSearch()
 
@@ -216,9 +216,53 @@ describe('EnhancedSmartSearch', () => {
         within(secondCard).getByTestId(`${results[1].content_id}-${results[1].content_type}-due`),
       ).toBeInTheDocument()
     })
+
+    it('applies filters to search results', async () => {
+      const FILTER_URL = encodeURI(
+        `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&filter[]=announcements&filter[]=pages&include[]=modules&include[]=status`,
+      )
+      const FILTER_URL2 = encodeURI(
+        `/api/v1/courses/${props.courseId}/smartsearch?q=${SEARCH_TERM}&per_page=25&filter[]=pages&include[]=modules&include[]=status`,
+      )
+      fetchMock.get(FILTER_URL, {
+        results: [results[0]], // only the first result matches the filters
+      })
+      fetchMock.get(FILTER_URL2, {
+        results: [], // only the first result matches the filters
+      })
+
+      const user = userEvent.setup()
+      const {getByTestId, getAllByTestId, queryByTestId, queryAllByTestId} = renderSearch()
+
+      const searchInput = getByTestId('search-input')
+      await user.click(searchInput)
+      fireEvent.change(searchInput, {
+        target: {value: SEARCH_TERM},
+      })
+
+      await user.click(getByTestId('filter-button'))
+      await user.click(getByTestId('discussion-topics-checkbox'))
+      await user.click(getByTestId('assignments-checkbox'))
+      await user.click(getByTestId('apply-filters-button'))
+
+      await waitFor(() => {
+        expect(getAllByTestId('search-result')).toHaveLength(1)
+        expect(getByTestId('filter-pill-announcements')).toBeInTheDocument()
+        expect(getByTestId('filter-pill-pages')).toBeInTheDocument()
+        expect(queryByTestId('filter-pill-assignments')).toBeNull()
+        expect(queryByTestId('filter-pill-discussion-topics')).toBeNull()
+      })
+
+      await user.click(getByTestId('filter-pill-announcements'))
+      await waitFor(() => {
+        expect(queryAllByTestId('search-result')).toHaveLength(0)
+        expect(getByTestId('filter-pill-pages')).toBeInTheDocument()
+        expect(queryByTestId('filter-pill-announcements')).toBeNull()
+      })
+    })
   })
 
-  it('should render error message after failing to get results', async () => {
+  it('renders error message after failing to get results', async () => {
     const user = userEvent.setup()
     fetchMock.get(INDEX_URL, {
       status: 'complete',
