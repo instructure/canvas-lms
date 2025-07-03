@@ -17,7 +17,7 @@
  */
 
 import {createContext, useContext, useState} from 'react'
-import {ExternalTool} from '../componentsTeacher/AddItemModalComponents/ExternalToolSelector'
+import {ExternalTool} from '../utils/types'
 
 const ContextModule = createContext<{
   courseId: string
@@ -29,6 +29,10 @@ const ContextModule = createContext<{
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   externalTools: ExternalTool[]
+  moduleMenuModalTools: ExternalTool[]
+  moduleGroupMenuTools: ExternalTool[]
+  moduleMenuTools: ExternalTool[]
+  moduleIndexMenuModalTools: ExternalTool[]
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 }>(
@@ -42,6 +46,10 @@ const ContextModule = createContext<{
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
     externalTools: ExternalTool[]
+    moduleMenuModalTools: ExternalTool[]
+    moduleGroupMenuTools: ExternalTool[]
+    moduleMenuTools: ExternalTool[]
+    moduleIndexMenuModalTools: ExternalTool[]
     state: Record<string, any>
     setState: (state: Record<string, any>) => void
   },
@@ -57,7 +65,10 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS,
   teacherViewEnabled,
   studentViewEnabled,
-  externalTools,
+  moduleMenuModalTools,
+  moduleGroupMenuTools,
+  moduleMenuTools,
+  moduleIndexMenuModalTools,
 }: {
   children: React.ReactNode
   courseId: string
@@ -77,7 +88,10 @@ export const ContextModuleProvider = ({
   DEFAULT_POST_TO_SIS: boolean | undefined
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
-  externalTools: ExternalTool[]
+  moduleMenuModalTools: ExternalTool[]
+  moduleGroupMenuTools: ExternalTool[]
+  moduleMenuTools: ExternalTool[]
+  moduleIndexMenuModalTools: ExternalTool[]
 }) => {
   const [state, setState] = useState({})
 
@@ -92,7 +106,11 @@ export const ContextModuleProvider = ({
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
         teacherViewEnabled,
         studentViewEnabled,
-        externalTools,
+        externalTools: moduleMenuModalTools,
+        moduleMenuModalTools,
+        moduleGroupMenuTools,
+        moduleMenuTools,
+        moduleIndexMenuModalTools,
         state,
         setState,
       }}
@@ -123,6 +141,10 @@ export const contextModuleDefaultProps = {
   teacherViewEnabled: false,
   studentViewEnabled: false,
   externalTools: [],
+  moduleMenuModalTools: [],
+  moduleGroupMenuTools: [],
+  moduleMenuTools: [],
+  moduleIndexMenuModalTools: [],
   state: {},
   setState: () => {},
 }

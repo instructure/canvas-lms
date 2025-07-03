@@ -63,9 +63,22 @@ ready(() => {
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
             teacherViewEnabled={!!ENV?.MODULE_FEATURES?.TEACHER_MODULE_SELECTION}
             studentViewEnabled={!!ENV?.MODULE_FEATURES?.STUDENT_MODULE_SELECTION}
-            externalTools={
+            moduleMenuModalTools={
               Array.isArray(ENV.MODULE_TOOLS?.module_menu_modal)
                 ? ENV.MODULE_TOOLS.module_menu_modal
+                : []
+            }
+            moduleGroupMenuTools={
+              Array.isArray(ENV.MODULE_TOOLS?.module_group_menu)
+                ? ENV.MODULE_TOOLS.module_group_menu
+                : []
+            }
+            moduleMenuTools={
+              Array.isArray(ENV.MODULE_TOOLS?.module_menu) ? ENV.MODULE_TOOLS.module_menu : []
+            }
+            moduleIndexMenuModalTools={
+              Array.isArray(ENV.MODULE_TOOLS?.module_index_menu_modal)
+                ? ENV.MODULE_TOOLS.module_index_menu_modal
                 : []
             }
           >

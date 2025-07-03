@@ -17,6 +17,8 @@
  */
 
 import React, {useCallback} from 'react'
+import ExternalToolTrayLauncher from './ExternalToolTrayLauncher'
+import ExternalToolModalLauncherWrapper from './ExternalToolModalLauncher'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {queryClient} from '@canvas/query'
@@ -43,7 +45,8 @@ import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandler
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModuleItems} from '../hooks/queries/useModuleItems'
-import {ModuleAction} from '../utils/types'
+import {ModuleAction, ExternalTool, ExternalToolPlacementType} from '../utils/types'
+import {useExternalToolLaunch} from '../hooks/useExternalToolLaunch'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -76,6 +79,14 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
 }) => {
   const {courseId, permissions} = useContextModule()
   const {data, isLoading, isError} = useModules(courseId)
+  const {
+    launchState,
+    launchExternalTool,
+    closeLaunch,
+    moduleGroupMenuTools,
+    moduleMenuModalTools,
+    moduleMenuTools,
+  } = useExternalToolLaunch()
 
   const {data: moduleItems} = useModuleItems(id, expanded || isMenuOpen)
 
@@ -162,103 +173,160 @@ const ModuleActionMenu: React.FC<ModuleActionMenuProps> = ({
   const canDuplicate =
     moduleItems?.moduleItems.every(item => item.content?.canDuplicate) && expanded
 
+  const handleExternalToolLaunch = useCallback(
+    (tool: ExternalTool, placement: ExternalToolPlacementType) => {
+      launchExternalTool(tool, id, placement)
+      setIsMenuOpen(false)
+    },
+    [launchExternalTool, id, setIsMenuOpen],
+  )
+
+  const renderExternalToolMenuItems = () => {
+    const allTools = [
+      ...moduleMenuTools.map(tool => ({...tool, placement: 'module_menu' as const})),
+      ...moduleGroupMenuTools.map(tool => ({...tool, placement: 'module_group_menu' as const})),
+      ...moduleMenuModalTools.map(tool => ({...tool, placement: 'module_menu_modal' as const})),
+    ]
+
+    return allTools.map(tool => {
+      // Get the right identifier and name based on tool structure
+      const toolId = 'id' in tool ? tool.id : tool.definition_id
+      const toolName = 'title' in tool ? tool.title : tool.name
+
+      return (
+        <Menu.Item
+          key={`${tool.placement}-${toolId}`}
+          onClick={() => handleExternalToolLaunch(tool, tool.placement)}
+        >
+          <Flex>
+            <Flex.Item margin="0 0 0 x-small">{toolName}</Flex.Item>
+          </Flex>
+        </Menu.Item>
+      )
+    })
+  }
+
   return (
-    <Menu
-      onToggle={isOpen => setIsMenuOpen(isOpen)}
-      open={isMenuOpen}
-      trigger={
-        <IconButton
-          screenReaderLabel={I18n.t('Module Options')}
-          data-testid={`module-action-menu_${id}`}
-          renderIcon={IconMoreLine}
-          withBackground={false}
-          withBorder={false}
-          size="small"
-          disabled={isLoading || isError}
+    <>
+      <Menu
+        onToggle={isOpen => setIsMenuOpen(isOpen)}
+        open={isMenuOpen}
+        trigger={
+          <IconButton
+            screenReaderLabel={I18n.t('Module Options')}
+            data-testid={`module-action-menu_${id}`}
+            renderIcon={IconMoreLine}
+            withBackground={false}
+            withBorder={false}
+            size="small"
+            disabled={isLoading || isError}
+          />
+        }
+      >
+        {permissions?.canEdit && (
+          <Menu.Item onClick={handleEditRef}>
+            <Flex>
+              <Flex.Item>
+                <IconEditLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canEdit && (
+          <Menu.Item onClick={handleMoveContentsRef}>
+            <Flex>
+              <Flex.Item>
+                <IconMoveDownLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Contents...')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canEdit && (
+          <Menu.Item onClick={handleMoveModuleRef}>
+            <Flex>
+              <Flex.Item>
+                <IconUpdownLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Module...')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canEdit && (
+          <Menu.Item onClick={handleAssignToRef}>
+            <Flex>
+              <Flex.Item>
+                <IconPermissionsSolid />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canDelete && (
+          <Menu.Item onClick={handleDeleteRef}>
+            <Flex>
+              <Flex.Item>
+                <IconTrashLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Delete')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canAdd && canDuplicate && (
+          <Menu.Item onClick={handleDuplicateRef}>
+            <Flex>
+              <Flex.Item>
+                <IconDuplicateLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canDirectShare && (
+          <Menu.Item onClick={handleSendToRef}>
+            <Flex>
+              <Flex.Item>
+                <IconUserLine />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {permissions?.canDirectShare && (
+          <Menu.Item onClick={handleCopyToRef}>
+            <Flex>
+              <Flex.Item>
+                <IconCopySolid />
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
+            </Flex>
+          </Menu.Item>
+        )}
+        {renderExternalToolMenuItems()}
+      </Menu>
+      {launchState.isTrayOpen && launchState.selectedTool && (
+        <ExternalToolTrayLauncher
+          tool={launchState.selectedTool}
+          isOpen={true}
+          onClose={closeLaunch}
+          contextModuleId={launchState.contextModuleId || ''}
+          launchType={launchState.launchType || 'module_group_menu'}
+          moduleId={id}
+          expanded={expanded}
+          isMenuOpen={isMenuOpen}
         />
-      }
-    >
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleEditRef}>
-          <Flex>
-            <Flex.Item>
-              <IconEditLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Edit')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
       )}
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleMoveContentsRef}>
-          <Flex>
-            <Flex.Item>
-              <IconMoveDownLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Contents...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
+      {launchState.isModalOpen && launchState.selectedTool && (
+        <ExternalToolModalLauncherWrapper
+          tool={launchState.selectedTool}
+          isOpen={true}
+          onClose={closeLaunch}
+          contextModuleId={launchState.contextModuleId}
+          launchType={launchState.launchType || 'module_menu_modal'}
+        />
       )}
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleMoveModuleRef}>
-          <Flex>
-            <Flex.Item>
-              <IconUpdownLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Move Module...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canEdit && (
-        <Menu.Item onClick={handleAssignToRef}>
-          <Flex>
-            <Flex.Item>
-              <IconPermissionsSolid />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Assign To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canDelete && (
-        <Menu.Item onClick={handleDeleteRef}>
-          <Flex>
-            <Flex.Item>
-              <IconTrashLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Delete')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canAdd && canDuplicate && (
-        <Menu.Item onClick={handleDuplicateRef}>
-          <Flex>
-            <Flex.Item>
-              <IconDuplicateLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Duplicate')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canDirectShare && (
-        <Menu.Item onClick={handleSendToRef}>
-          <Flex>
-            <Flex.Item>
-              <IconUserLine />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Send To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-      {permissions?.canDirectShare && (
-        <Menu.Item onClick={handleCopyToRef}>
-          <Flex>
-            <Flex.Item>
-              <IconCopySolid />
-            </Flex.Item>
-            <Flex.Item margin="0 0 0 x-small">{I18n.t('Copy To...')}</Flex.Item>
-          </Flex>
-        </Menu.Item>
-      )}
-    </Menu>
+    </>
   )
 }
 
