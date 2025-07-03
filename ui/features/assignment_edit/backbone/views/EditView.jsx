@@ -769,6 +769,7 @@ EditView.prototype.showExternalToolsDialog = function () {
     dialog_title: I18n.t('select_external_tool_dialog_title', 'Configure External Tool'),
     select_button_text: I18n.t('buttons.select_url', 'Select'),
     no_name_input: true,
+    ariaModal: 'true',
     submit: data => {
       this.handleAssignmentSelectionSubmit(data)
     },
