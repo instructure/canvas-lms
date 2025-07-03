@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,7 +18,7 @@
 
 import React from 'react'
 import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, queryByTestId, render, waitFor} from '@testing-library/react'
 import {CriterionModal, type CriterionModalProps} from '../components/CriterionModal/CriterionModal'
 import {DEFAULT_RUBRIC_RATINGS} from '../constants'
 import {reorderRatingsAtIndex} from '../../utils'
@@ -34,7 +34,7 @@ describe('CriterionModal tests', () => {
         onSave={() => {}}
         hidePoints={false}
         freeFormCriterionComments={false}
-        isFullWidth={true}
+        isFullWidth={false}
         {...props}
       />,
     )
@@ -66,35 +66,18 @@ describe('CriterionModal tests', () => {
       for (let i = 0; i < DEFAULT_RUBRIC_RATINGS.length; i++) {
         const ratingName = queryAllByTestId(`rating-name`)[i] as HTMLInputElement
         const ratingPoints = queryAllByTestId(`rating-points`)[i] as HTMLInputElement
-        const ratingScale = queryAllByTestId(`rating-scale`)[i] as HTMLElement
+        const ratingScale = queryAllByTestId(`rating-scale`)[i] as HTMLInputElement
         const expectedRatingScale = DEFAULT_RUBRIC_RATINGS.length - (i + 1)
         expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[i].points.toString())
         expect(ratingName.value).toEqual(DEFAULT_RUBRIC_RATINGS[i].description.toString())
-        expect(ratingScale.textContent).toEqual(expectedRatingScale.toString())
+        expect(ratingScale.value).toEqual(expectedRatingScale.toString())
+        expect(ratingScale).toBeDisabled()
       }
     })
 
-    it('should add a new rating at specified index', () => {
-      const {queryAllByTestId} = renderComponent()
-      const addRatingRow = queryAllByTestId('add-rating-row')[1]
-
-      fireEvent.mouseOver(addRatingRow)
-      fireEvent.click(addRatingRow.firstChild as Element)
-
-      const totalRatingNames = queryAllByTestId('rating-name')
-      expect(totalRatingNames).toHaveLength(DEFAULT_RUBRIC_RATINGS.length + 1)
-
-      const ratingName = totalRatingNames[1] as HTMLInputElement
-      const ratingPoints = queryAllByTestId(`rating-points`)[1] as HTMLInputElement
-      const ratingScale = queryAllByTestId(`rating-scale`)[1] as HTMLElement
-      expect(ratingPoints.value).toEqual(DEFAULT_RUBRIC_RATINGS[0].points.toString())
-      expect(ratingName.value).toEqual('')
-      expect(ratingScale.textContent).toEqual((DEFAULT_RUBRIC_RATINGS.length - 1).toString())
-    })
-
     it('should add a new rating to the end of the list', () => {
-      const {queryAllByTestId} = renderComponent()
-      const addRatingRow = queryAllByTestId('add-rating-row')[DEFAULT_RUBRIC_RATINGS.length]
+      const {getByTestId, queryAllByTestId} = renderComponent()
+      const addRatingRow = getByTestId('add-rating-button')
 
       fireEvent.mouseOver(addRatingRow)
       fireEvent.click(addRatingRow.firstChild as Element)
@@ -105,17 +88,21 @@ describe('CriterionModal tests', () => {
       const newLastIndex = totalRatingNames.length - 1
       const ratingName = totalRatingNames[newLastIndex] as HTMLInputElement
       const ratingPoints = queryAllByTestId(`rating-points`)[newLastIndex] as HTMLInputElement
-      const ratingScale = queryAllByTestId(`rating-scale`)[newLastIndex] as HTMLElement
+      const ratingScale = queryAllByTestId(`rating-scale`)[newLastIndex] as HTMLInputElement
       expect(ratingPoints.value).toEqual('0')
       expect(ratingName.value).toEqual('')
-      expect(ratingScale.textContent).toEqual('0')
+      expect(ratingScale.value).toEqual('0')
     })
 
-    it('should remove a rating at specified index', () => {
-      const {queryAllByTestId} = renderComponent()
-      const removeRating = queryAllByTestId('remove-rating')[2]
+    it('should remove a rating at specified index', async () => {
+      const {queryAllByTestId, getByTestId, queryByTestId} = renderComponent()
+      const ratingPopover = queryAllByTestId('rating-options-popover')[2]
+      fireEvent.click(ratingPopover)
 
-      fireEvent.click(removeRating)
+      await waitFor(() => {
+        expect(queryByTestId('delete-rating-menu-item')).not.toBeNull()
+      })
+      fireEvent.click(getByTestId('delete-rating-menu-item'))
 
       const totalRatingNames = queryAllByTestId('rating-name')
       expect(totalRatingNames).toHaveLength(DEFAULT_RUBRIC_RATINGS.length - 1)
@@ -258,6 +245,122 @@ describe('CriterionModal tests', () => {
       expect(totalRatingPoints[2].value).toEqual('8')
       expect(totalRatingPoints[3].value).toEqual('4')
     })
+
+    it('should move a rating up', async () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId, getByTestId, queryByTestId} = renderComponent({criterion})
+      const ratingPopover = queryAllByTestId('rating-options-popover')[2]
+      fireEvent.click(ratingPopover)
+
+      await waitFor(() => {
+        expect(queryByTestId('move-up-rating-menu-item')).not.toBeNull()
+      })
+      fireEvent.click(getByTestId('move-up-rating-menu-item'))
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('10')
+      expect(totalRatingPoints[1].value).toEqual('8')
+      expect(totalRatingPoints[2].value).toEqual('6')
+      expect(totalRatingPoints[3].value).toEqual('4')
+    })
+
+    it('should move a rating down', async () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId, getByTestId, queryByTestId} = renderComponent({criterion})
+      const ratingPopover = queryAllByTestId('rating-options-popover')[0]
+      fireEvent.click(ratingPopover)
+
+      await waitFor(() => {
+        expect(queryByTestId('move-down-rating-menu-item')).not.toBeNull()
+      })
+      fireEvent.click(getByTestId('move-down-rating-menu-item'))
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+
+      const totalRatingPoints = queryAllByTestId('rating-points') as HTMLInputElement[]
+      expect(totalRatingPoints[0].value).toEqual('10')
+      expect(totalRatingPoints[1].value).toEqual('8')
+      expect(totalRatingPoints[2].value).toEqual('6')
+      expect(totalRatingPoints[3].value).toEqual('4')
+    })
+
+    it('should have the move up button disabled if the rating is the first rating', async () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId, queryByTestId} = renderComponent({criterion})
+      const ratingPopover = queryAllByTestId('rating-options-popover')[0]
+      fireEvent.click(ratingPopover)
+
+      await waitFor(() => {
+        expect(queryByTestId('move-up-rating-menu-item')).not.toBeNull()
+      })
+
+      const moveUpButton = queryByTestId('move-up-rating-menu-item')
+      expect(moveUpButton).toHaveAttribute('aria-disabled', 'true')
+
+      fireEvent.click(moveUpButton!)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+    })
+
+    it('should have the move down button disabled if the rating is the last rating', async () => {
+      const ratings = [
+        {id: '1', description: 'First Rating', points: 10, longDescription: ''},
+        {id: '2', description: 'Second Rating', points: 8, longDescription: ''},
+        {id: '3', description: 'Third Rating', points: 6, longDescription: ''},
+        {id: '4', description: 'Fourth Rating', points: 4, longDescription: ''},
+      ]
+      const criterion = getCriterion({ratings})
+      const {queryAllByTestId, queryByTestId} = renderComponent({criterion})
+      const ratingPopover = queryAllByTestId('rating-options-popover')[3]
+      fireEvent.click(ratingPopover)
+
+      await waitFor(() => {
+        expect(queryByTestId('move-down-rating-menu-item')).not.toBeNull()
+      })
+
+      const moveDownButton = queryByTestId('move-down-rating-menu-item')
+      expect(moveDownButton).toHaveAttribute('aria-disabled', 'true')
+
+      fireEvent.click(moveDownButton!)
+
+      const totalRatingNames = queryAllByTestId('rating-name') as HTMLInputElement[]
+      expect(totalRatingNames[0].value).toEqual(ratings[0].description)
+      expect(totalRatingNames[1].value).toEqual(ratings[1].description)
+      expect(totalRatingNames[2].value).toEqual(ratings[2].description)
+      expect(totalRatingNames[3].value).toEqual(ratings[3].description)
+    })
   })
 
   describe('Save and Cancel Tests', () => {
@@ -350,20 +453,11 @@ describe('CriterionModal tests', () => {
       expect(queryAllByTestId('rating-points-assessed')).toHaveLength(5)
     })
 
-    it('should not add a new rating if the rubric is assessed', () => {
-      const {queryAllByTestId} = renderComponent({unassessed: false})
-      const addRatingRow = queryAllByTestId('add-rating-row')[1]
+    it('should not render the add rating button if the rubric is assessed', () => {
+      const {queryByTestId} = renderComponent({unassessed: false})
+      const addRatingButton = queryByTestId('add-rating-button')
 
-      fireEvent.mouseOver(addRatingRow)
-      expect(addRatingRow).toBeEmptyDOMElement()
-    })
-
-    it('should not add a new rating if the rubric is assessed when hovering over the last add rating row', () => {
-      const {queryAllByTestId} = renderComponent({unassessed: false})
-      const addRatingRow = queryAllByTestId('add-rating-row')[DEFAULT_RUBRIC_RATINGS.length]
-
-      fireEvent.mouseOver(addRatingRow)
-      expect(addRatingRow).toBeEmptyDOMElement()
+      expect(addRatingButton).toBeNull()
     })
   })
 
