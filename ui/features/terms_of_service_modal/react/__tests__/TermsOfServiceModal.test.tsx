@@ -20,21 +20,26 @@ import React from 'react'
 import $ from 'jquery'
 import {render, screen} from '@testing-library/react'
 import TermsOfServiceModal from '../TermsOfServiceModal'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
-const renderTermsOfServiceModal = (props = {}) => render(<TermsOfServiceModal {...props} />)
+interface TermsOfServiceModalProps {
+  preview?: boolean
+}
+
+const renderTermsOfServiceModal = (props: TermsOfServiceModalProps = {}) =>
+  render(<TermsOfServiceModal {...props} />)
 
 describe('TermsOfServiceModal', () => {
   beforeEach(() => {
-    $('#fixtures').html('<div id="main">')
-
-    window.ENV = {
+    fakeENV.setup({
       TERMS_OF_SERVICE_CUSTOM_CONTENT: 'Hello World',
-    }
+    })
+    $('#fixtures').html('<div id="main">')
   })
 
   afterEach(() => {
     $('#fixtures').empty()
-    delete window.ENV
+    fakeENV.teardown()
   })
 
   it('renders correct link when preview is provided', () => {

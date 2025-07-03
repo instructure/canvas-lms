@@ -27,19 +27,19 @@ const defaultProps = () => ({
 })
 
 test('renders cancel and delete button', () => {
-  const ref = React.createRef()
+  const ref = React.createRef<any>()
   const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
-  ref.current.show()
+  ref.current?.show()
 
   expect(getByText('Cancel')).toBeInTheDocument()
   expect(getByText('Delete')).toBeInTheDocument()
 })
 
 test('closes the ConfirmDeleteModal when cancel pressed', async () => {
-  const ref = React.createRef()
+  const ref = React.createRef<any>()
   const onHide = jest.fn()
   const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} onHide={onHide} ref={ref} />)
-  ref.current.show()
+  ref.current?.show()
 
   const cancelButton = getByText('Cancel')
   fireEvent.click(cancelButton)
@@ -49,9 +49,9 @@ test('closes the ConfirmDeleteModal when cancel pressed', async () => {
 })
 
 test('shows spinner on delete', () => {
-  const ref = React.createRef()
+  const ref = React.createRef<any>()
   const {getByText, getByTitle} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
-  ref.current.show()
+  ref.current?.show()
 
   const deleteButton = getByText('Delete')
   fireEvent.click(deleteButton)
@@ -60,9 +60,9 @@ test('shows spinner on delete', () => {
 })
 
 test('renders provided page titles', () => {
-  const ref = React.createRef()
+  const ref = React.createRef<any>()
   const {getByText} = render(<ConfirmDeleteModal {...defaultProps()} ref={ref} />)
-  ref.current.show()
+  ref.current?.show()
 
   expect(getByText('page_1')).toBeInTheDocument()
   expect(getByText('1 page selected for deletion')).toBeInTheDocument()
