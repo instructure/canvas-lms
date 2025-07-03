@@ -16544,6 +16544,7 @@ he:
         details: "פרטי טור המשימה"
     show: 
       answers: 
+        answered_correct: "תשובה נכונה"
         correct: נכון!
         correct_answers: "תשובות נכונות"
         incorrect: "לא נכון"
