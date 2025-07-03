@@ -20,7 +20,28 @@ import React from 'react'
 import SearchMessage, {LAST_PAGE_UNKNOWN_MARKER} from '../SearchMessage'
 import {render} from '@testing-library/react'
 
-function defaultProps() {
+interface Link {
+  url: string
+  page: string
+}
+
+interface Collection {
+  loading: boolean
+  data: number[]
+  links: {
+    current: Link
+    last?: Link
+  }
+}
+
+interface Props {
+  collection: Collection
+  setPage: jest.Mock
+  noneFoundMessage: string
+  knownLastPage?: string
+}
+
+function defaultProps(): Props {
   return {
     collection: {
       loading: false,
@@ -36,7 +57,7 @@ function defaultProps() {
 }
 
 describe('SearchMessage::', () => {
-  let flashElements
+  let flashElements: HTMLDivElement
 
   beforeEach(() => {
     flashElements = document.createElement('div')
@@ -47,7 +68,6 @@ describe('SearchMessage::', () => {
 
   afterEach(() => {
     document.body.removeChild(flashElements)
-    flashElements = undefined
   })
 
   it('shows a spinner while loading', () => {
@@ -58,12 +78,13 @@ describe('SearchMessage::', () => {
   })
 
   describe('Pagination', () => {
-    const textContents = elts => elts.map(elt => elt.textContent)
-    const hasUnknownMarker = elts => textContents(elts).includes(LAST_PAGE_UNKNOWN_MARKER)
+    const textContents = (elts: HTMLElement[]) => elts.map(elt => elt.textContent)
+    const hasUnknownMarker = (elts: HTMLElement[]) =>
+      textContents(elts).includes(LAST_PAGE_UNKNOWN_MARKER)
 
     it('can handle a lot of pages', () => {
       const props = defaultProps()
-      props.collection.links.last.page = '1000'
+      props.collection.links.last!.page = '1000'
       const {queryAllByTestId} = render(<SearchMessage {...props} />)
       expect(textContents(queryAllByTestId('page-button'))).toEqual([
         '1',
