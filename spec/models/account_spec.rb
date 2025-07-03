@@ -867,6 +867,26 @@ describe Account do
     expect(a.user_count).to eq 4
   end
 
+  describe "users_with_permission" do
+    before :once do
+      @account = Account.default.sub_accounts.create!
+      @admin1 = account_admin_user(account: @account)
+      @admin2 = account_admin_user_with_role_changes(account: @account,
+                                                     role: Role.get_built_in_role("AccountMembership", root_account_id: Account.default),
+                                                     role_changes: { view_feature_flags: true })
+    end
+
+    it "returns active users with the specified permission" do
+      expect(@account.users_with_permission(:manage_storage_quotas)).to match_array [@admin1]
+      expect(@account.users_with_permission(:view_feature_flags)).to match_array [@admin1, @admin2]
+    end
+
+    it "excludes inactive users" do
+      @admin1.account_users.find_by(account_id: @account).update!(workflow_state: "deleted")
+      expect(@account.users_with_permission(:manage_storage_quotas)).to be_empty
+    end
+  end
+
   it "group_categories should not include deleted categories" do
     account = Account.default
     expect(account.group_categories.count).to eq 0

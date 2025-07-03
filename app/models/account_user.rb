@@ -105,7 +105,7 @@ class AccountUser < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_account_user
-    p.to { |record| record.account.users }
+    p.to { |record| record.account.users_with_permission(:manage_account_memberships) }
     p.whenever(&:previously_new_record?)
 
     p.dispatch :account_user_registration
