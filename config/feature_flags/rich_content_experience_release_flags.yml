@@ -264,3 +264,15 @@ visibility_performance_improvements:
       state: allowed_on
     development:
       state: allowed_on
+
+standardize_assignment_date_formatting:
+  state: hidden
+  display_name: Standardize Assignment Dates Formatting
+  description: |-
+    Standardizes the formatting of assignment and quiz dates to include selective release logic and be consistent across canvas.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

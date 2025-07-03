@@ -561,7 +561,7 @@ describe "assignments show page assign to" do
     before do
       @assignment1.due_at = 1.week.from_now
       @assignment1.save!
-      @assignment1.assignment_overrides.create!(set_type: "ADHOC")
+      @assignment1.assignment_overrides.create!(set_type: "ADHOC", title: "1 student")
       @assignment1.assignment_overrides.first.assignment_override_students.create!(user: @student)
       user_session(@teacher)
     end
@@ -574,7 +574,7 @@ describe "assignments show page assign to" do
     it "shows all overrides for teachers when they are also observers in the course" do
       @assignment1.update!(only_visible_to_overrides: true)
       @student3 = student_in_course(course: @course, active_all: true, name: "Student 3").user
-      @assignment1.assignment_overrides.create!(set_type: "ADHOC", due_at: Time.zone.parse("2024-04-12"))
+      @assignment1.assignment_overrides.create!(set_type: "ADHOC", due_at: Time.zone.parse("2024-04-12"), title: "1 student")
       @assignment1.assignment_overrides.last.assignment_override_students.create!(user: @student3)
 
       get "/courses/#{@course.id}/assignments/#{@assignment1.id}"

@@ -273,7 +273,7 @@ module DatesOverridable
   end
 
   def all_due_dates
-    due_at_overrides = preloaded_all_overrides ? preloaded_all_overrides.select { |ao| ao.active? && ao.due_at_overridden } : all_assignment_overrides.active.overriding_due_at
+    due_at_overrides = preloaded_all_overrides ? preloaded_all_overrides.select(&:active?) : all_assignment_overrides.active
     dates = due_at_overrides.map(&:as_hash)
     dates << base_due_date_hash unless differentiated_assignments_applies?
     dates
@@ -371,6 +371,10 @@ module DatesOverridable
   end
 
   def dates_hash_visible_to(user)
+    if Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
+      return dates_hash_visible_to_v2(user)
+    end
+
     all_dates = all_dates_visible_to(user)
 
     if all_dates
@@ -504,6 +508,10 @@ module DatesOverridable
   end
 
   def formatted_dates_hash_visible_to(user, context)
+    if Account.site_admin.feature_enabled?(:standardize_assignment_date_formatting)
+      return dates_hash_visible_to_v2(user)
+    end
+
     # All overrides that could contain a Hash or an AssignmentOverride.
     # Everyone option is represented in a Hash for example.
     all_overrides = []
@@ -604,6 +612,135 @@ module DatesOverridable
     end
 
     result.values
+  end
+
+  def merge_overrides_by_date_v2(overrides)
+    result = {}
+
+    overrides.each do |override|
+      key = [override[:due_at], override[:unlock_at], override[:lock_at]]
+
+      unless result[key]
+        result[key] = {
+          due_at: override[:due_at],
+          unlock_at: override[:unlock_at],
+          lock_at: override[:lock_at],
+          options: []
+        }
+      end
+
+      result[key][:options] << if override[:set_type] == "ADHOC"
+                                 override[:title]
+                               else
+                                 override[:set_type]
+                               end
+    end
+
+    result.values
+  end
+
+  def get_overridden_assignees_v2(assignment_overrides = [], visible_users_ids = nil)
+    # return a list of any duplicate ids for each type (student, section, group)
+    section_ids = assignment_overrides&.select { |override| override.set_type == "CourseSection" }&.map(&:set_id)
+    group_ids = assignment_overrides&.select { |override| override.set_type == "Group" }&.map(&:set_id)
+    student_ids = assignment_overrides&.select { |override| override.set_type == "ADHOC" }&.map do |override|
+      get_student_ids_v2(override, visible_users_ids)
+    end
+    student_ids.flatten!
+
+    duplicate_section_ids = section_ids.tally.select { |_, count| count > 1 }.keys
+    duplicate_group_ids = group_ids.tally.select { |_, count| count > 1 }.keys
+    duplicate_student_ids = student_ids.tally.select { |_, count| count > 1 }.keys
+
+    if duplicate_section_ids.empty? && duplicate_group_ids.empty? && duplicate_student_ids.empty?
+      return {}
+    end
+
+    {
+      sections: duplicate_section_ids,
+      groups: duplicate_group_ids,
+      students: duplicate_student_ids
+    }
+  end
+
+  def get_student_ids_v2(override, visible_users_ids = nil)
+    if override.preloaded_student_ids
+      override.preloaded_student_ids
+    elsif visible_users_ids.present?
+      override.assignment_override_students.where(user_id: visible_users_ids).pluck(:user_id)
+    else
+      override.assignment_override_students.pluck(:user_id)
+    end
+  end
+
+  def dates_hash_visible_to_v2(user, include_all_dates: false)
+    all_dates = include_all_dates ? all_due_dates : all_dates_visible_to(user)
+    return [due_date_hash] unless all_dates
+
+    assignment_overrides = all_dates.filter_map { |o| o[:override].presence }
+    # only need to check for overridden assignees if there are module overrides
+    visible_users_ids, overridden_targets = if assignment_overrides.any?(&:context_module_id)
+                                              user_ids = AssignmentOverride.visible_enrollments_for(assignment_overrides.compact, user).select(:user_id)
+                                              duplicate_overrides = get_overridden_assignees_v2(assignment_overrides, user_ids)
+                                              [user_ids, duplicate_overrides]
+                                            end
+
+    everyone_overrides = []
+    section_override_ids = []
+    result = []
+
+    # remove any overridden module overrides or unassigned overrides
+    all_dates.each do |o|
+      override = o[:override] || o
+      next if override[:unassign_item]
+
+      set_id = override[:set_id]
+
+      if override[:context_module_id]
+        case override[:set_type]
+        when "CourseSection"
+          next if overridden_targets[:sections]&.include?(set_id)
+        when "Group"
+          next if overridden_targets[:groups]&.include?(set_id)
+        when "ADHOC"
+          student_ids = get_student_ids_v2(override, visible_users_ids)
+          if overridden_targets[:students].present?
+            student_ids -= overridden_targets[:students]
+            next if student_ids.empty?
+          end
+          o[:title] = "#{student_ids.length} students" if student_ids.present?
+        end
+      end
+
+      if override[:set_type] == "CourseSection"
+        section_override_ids << set_id
+      end
+
+      if override[:set_type] == "Course" || (override.is_a?(Hash) && override[:base])
+        everyone_overrides << o
+        next
+      end
+
+      new_result = o.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id)
+      result << new_result
+    end
+
+    # if all sections have overrides, do not include the 'everyone' option
+    if !everyone_overrides.empty? && !(context.is_a?(Course) && section_override_ids.length == context.active_course_sections.count)
+      # if there is a course override and a base override, remove the base override
+      if everyone_overrides.length > 1
+        everyone_overrides.reject! { |o| o[:base] }
+      end
+
+      everyone_override = everyone_overrides.first
+      everyone_override[:title] = (result.empty? ? "Everyone" : "Everyone else")
+      result << everyone_override.slice(:id, :due_at, :unlock_at, :lock_at, :title, :base, :set_type, :set_id)
+    end
+
+    result.sort_by do |date|
+      due_at = date[:due_at]
+      [due_at.present? ? CanvasSort::First : CanvasSort::Last, due_at.presence || CanvasSort::First]
+    end
   end
 
   def base_due_date_hash
