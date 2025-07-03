@@ -35,13 +35,13 @@ module Accessibility
       validate :rule_must_exist
       validate :record_must_exist
 
-      def initialize(data, issue)
+      def initialize(rule, content_type, content_id, path, value, issue)
         @issue        = issue
-        @raw_rule     = data["rule"]
-        @content_type = data["content_type"]
-        @content_id   = data["content_id"]
-        @path         = data["path"]
-        @value        = data["value"]
+        @raw_rule     = rule
+        @content_type = content_type
+        @content_id   = content_id
+        @path         = path
+        @value        = value
         @rule         = issue.rules[@raw_rule]
         @record       = find_record
       end

@@ -25,9 +25,6 @@ module Accessibility
       # @param label [String] Human-readable label displayed to the user
       # @param placeholder [String] Optional placeholder text for text fields
       # @param value [String] Optional default value for the text field
-      # @param dom_path [String] Optional DOM path for the element to update
-      # @param original_content [String] Optional original HTML content
-      # @param updated_content [String] Optional updated HTML content
       def initialize(label:,
                      value:,
                      placeholder: nil)

@@ -163,7 +163,7 @@ describe Accessibility::Issue do
 
     it "returns bad request for empty input" do
       issue = described_class.new(context: double, rules: rules_hash)
-      response = issue.update_content({})
+      response = issue.update_content(nil, nil, nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
       expect(response[:json][:error]).to include("Raw rule can't be blank")
@@ -171,7 +171,7 @@ describe Accessibility::Issue do
 
     it "returns unprocessable entity for invalid content type" do
       issue = described_class.new(context: double, rules: rules_hash)
-      response = issue.update_content({ rule: "mock-rule", content_type: "InvalidType" }.transform_keys(&:to_s))
+      response = issue.update_content("mock-rule", "InvalidType", nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
       expect(response[:json][:error]).to include("Content InvalidType with ID  not found")
@@ -185,9 +185,9 @@ describe Accessibility::Issue do
       allow(wiki_pages_double).to receive(:find_by).and_return(nil)
 
       issue = described_class.new(context: context_double, rules: rules_hash)
-      response = issue.update_content({
-        rule: "invalid-rule", content_type: "Page", content_id: 1
-      }.transform_keys(&:to_s))
+      response = issue.update_content(
+        "invalid-rule", "Page", 1, nil, nil
+      )
 
       expect(response[:status]).to eq(:bad_request)
       expect(response[:json][:error]).to include("Raw rule is invalid")
@@ -207,9 +207,9 @@ describe Accessibility::Issue do
       issue = described_class.new(context: context_double, rules: rules_hash)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
 
-      response = issue.update_content({
-        rule: "mock-rule", content_type: "Page", content_id: 1, path: "path", value: "value"
-      }.transform_keys(&:to_s))
+      response = issue.update_content(
+        "mock-rule", "Page", 1, "path", "value"
+      )
 
       expect(response[:status]).to eq(:ok)
       expect(response[:json][:success]).to be true
@@ -231,14 +231,94 @@ describe Accessibility::Issue do
       issue = described_class.new(context: context_double, rules: rules_hash)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
 
-      response = issue.update_content({
-        rule: "mock-rule", content_type: "Assignment", content_id: 2, path: "path", value: "value"
-      }.transform_keys(&:to_s))
+      response = issue.update_content(
+        "mock-rule", "Assignment", 2, "path", "value"
+      )
 
       expect(response[:status]).to eq(:ok)
       expect(response[:json][:success]).to be true
       expect(assignment).to have_received(:description=).with("<div>fixed description</div>")
       expect(assignment).to have_received(:save!)
+    end
+  end
+
+  describe "#update_preview" do
+    let(:rules_hash) { { "mock-rule" => mock_rule } }
+
+    it "returns bad request for empty input" do
+      issue = described_class.new(context: double, rules: rules_hash)
+      response = issue.update_preview(nil, nil, nil, nil, nil)
+
+      expect(response[:status]).to eq(:bad_request)
+      expect(response[:json][:error]).to include("Raw rule can't be blank")
+    end
+
+    it "returns unprocessable entity for invalid content type" do
+      issue = described_class.new(context: double, rules: rules_hash)
+      response = issue.update_preview("mock-rule", "InvalidType", nil, nil, nil)
+
+      expect(response[:status]).to eq(:bad_request)
+      expect(response[:json][:error]).to include("Content InvalidType with ID  not found")
+    end
+
+    it "returns bad request for invalid rule name" do
+      context_double = double("Context")
+      wiki_pages_double = double("WikiPages")
+
+      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
+      allow(wiki_pages_double).to receive(:find_by).and_return(nil)
+
+      issue = described_class.new(context: context_double, rules: rules_hash)
+      response = issue.update_content(
+        "invalid-rule", "Page", 1, nil, nil
+      )
+
+      expect(response[:status]).to eq(:bad_request)
+      expect(response[:json][:error]).to include("Raw rule is invalid")
+    end
+
+    it "updates a page successfully" do
+      page = double("Page", id: 1, body: "<div>content</div>", save!: true)
+      context_double = double("Context")
+      wiki_pages_double = double("WikiPages")
+
+      allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
+      allow(wiki_pages_double).to receive(:find_by).and_return(page)
+
+      allow(page).to receive(:body).and_return("<div>content</div>")
+      allow(page).to receive(:body=)
+
+      issue = described_class.new(context: context_double, rules: rules_hash)
+      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
+
+      response = issue.update_preview(
+        "mock-rule", "Page", 1, "path", "value"
+      )
+
+      expect(response[:status]).to eq(:ok)
+      expect(response[:json][:content]).to eq("<div>fixed content</div>")
+    end
+
+    it "updates an assignment successfully" do
+      assignment = double("Assignment", id: 2, description: "<div>desc</div>", save!: true)
+      context_double = double("Context")
+      assignments_double = double("Assignments")
+
+      allow(context_double).to receive(:assignments).and_return(assignments_double)
+      allow(assignments_double).to receive(:find_by).and_return(assignment)
+
+      allow(assignment).to receive(:description).and_return("<div>desc</div>")
+      allow(assignment).to receive(:description=)
+
+      issue = described_class.new(context: context_double, rules: rules_hash)
+      allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
+
+      response = issue.update_preview(
+        "mock-rule", "Assignment", 2, "path", "value"
+      )
+
+      expect(response[:status]).to eq(:ok)
+      expect(response[:json][:content]).to eq("<div>fixed description</div>")
     end
   end
 end

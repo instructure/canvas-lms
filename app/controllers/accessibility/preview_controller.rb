@@ -19,10 +19,6 @@
 
 module Accessibility
   class PreviewController < ApplicationController
-    include Api::V1::Assignment
-    include Api::V1::Attachment
-    include Api::V1::WikiPage
-
     before_action :require_context
     before_action :require_user
     before_action :validate_allowed
@@ -33,7 +29,7 @@ module Accessibility
     end
 
     def create
-      response = Accessibility::Issue.new(context: @context).update_preview(params.to_unsafe_h)
+      response = Accessibility::Issue.new(context: @context).update_preview(params[:rule], params[:content_type], params[:content_id], params[:path], params[:value])
       render json: response[:json], status: response[:status]
     end
 
