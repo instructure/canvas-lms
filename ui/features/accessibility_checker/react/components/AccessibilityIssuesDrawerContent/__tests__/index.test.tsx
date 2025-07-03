@@ -89,7 +89,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
     const next = screen.getByTestId('next-button')
 
     expect(back).toBeDisabled()
-    expect(next).not.toBeDisabled()
+    expect(next).toBeEnabled()
   })
 
   it('disables "Next" on last issue', async () => {
@@ -108,7 +108,15 @@ describe('AccessibilityIssuesDrawerContent', () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
     const saveAndNext = screen.getByTestId('save-and-next-button')
-    fireEvent.click(saveAndNext)
+    expect(saveAndNext).toBeDisabled()
+
+    const apply = screen.getByTestId('apply-button')
+    fireEvent.click(apply)
+
+    await waitFor(() => {
+      expect(saveAndNext).toBeEnabled()
+      fireEvent.click(saveAndNext)
+    })
 
     await waitFor(() => {
       expect(screen.getByText(/Issue 1\/1:/)).toBeInTheDocument()
