@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {RubricCriterion} from '@canvas/rubrics/react/types/rubric'
+import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
+import {FormMessage} from '@instructure/ui-form-field'
 
 export type GenerateCriteriaFormProps = {
   criteriaCount: number
@@ -51,3 +52,25 @@ export type RubricFormFieldSetter = <K extends keyof RubricFormProps>(
   key: K,
   value: RubricFormProps[K],
 ) => void
+
+export type RubricRatingFieldSetting = <K extends keyof RubricRating>(
+  key: K,
+  value: RubricRating[K],
+) => void
+
+export type RatingRowProps = {
+  criterionUseRange: boolean
+  errorMessage: FormMessage[]
+  hidePoints: boolean
+  index: number
+  rating: RubricRating
+  scale: number
+  rangeStart: number
+  pointsInputText: string | number
+  onPointsBlur: () => void
+  setRatingForm: RubricRatingFieldSetting
+  setPointsInputText: (value: string | number) => void
+  showRemoveButton: boolean
+  onRemove: () => void
+  unassessed: boolean
+}
