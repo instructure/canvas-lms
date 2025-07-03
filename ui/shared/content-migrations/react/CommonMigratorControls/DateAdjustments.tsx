@@ -45,10 +45,14 @@ export const DateAdjustments = ({
   dateAdjustmentConfig,
   setDateAdjustments,
   disabled,
+  setEndDate,
+  setStartDate,
 }: {
   dateAdjustmentConfig: DateAdjustmentConfig
   setDateAdjustments: (arg0: DateAdjustmentConfig) => void
   disabled?: boolean
+  setEndDate?: (date: Date | null) => void
+  setStartDate?: (date: Date | null) => void
 }) => {
   const old_start_date = dateAdjustmentConfig.date_shift_options.old_start_date
   const new_start_date = dateAdjustmentConfig.date_shift_options.new_start_date
@@ -56,25 +60,23 @@ export const DateAdjustments = ({
   const new_end_date = dateAdjustmentConfig.date_shift_options.new_end_date
 
   const [dateOperation, setDateOperation] = useState<'shift_dates' | 'remove_dates'>('shift_dates')
-  const [start_from_date, setOldStartDate] = useState<string>(old_start_date || '')
-  const [start_to_date, setStartToDate] = useState<string>(new_start_date || '')
-  const [end_from_date, setEndFromDate] = useState<string>(old_end_date || '')
-  const [end_to_date, setEndToDate] = useState<string>(new_end_date || '')
+  const [oldStartDate, setOldStartDate] = useState<string>(old_start_date || '')
+  const [oldEndDate, setEndFromDate] = useState<string>(old_end_date || '')
 
   useEffect(() => {
     if (dateAdjustmentConfig) {
       setOldStartDate(old_start_date || '')
-      setStartToDate(new_start_date || '')
       setEndFromDate(old_end_date || '')
-      setEndToDate(new_end_date || '')
     }
-  }, [dateAdjustmentConfig, new_end_date, new_start_date, old_end_date, old_start_date])
+  }, [dateAdjustmentConfig, old_end_date, old_start_date])
 
   const handleSetDate = (date: Date | null, setter: any, key: string) => {
     const tmp = JSON.parse(JSON.stringify(dateAdjustmentConfig))
     tmp.date_shift_options[key] = date ? date.toISOString() : ''
     setDateAdjustments(tmp)
-    setter(date ? date.toISOString() : '')
+    if (setter) {
+      setter(date || '')
+    }
   }
 
   const setSubstitution = (id: number, data: any, to_or_from: 'to' | 'from') => {
@@ -156,7 +158,7 @@ export const DateAdjustments = ({
                     alignItems="stretch"
                   >
                     <CanvasDateInput2
-                      selectedDate={start_from_date}
+                      selectedDate={oldStartDate}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setOldStartDate, 'old_start_date')
                       }}
@@ -169,11 +171,7 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={isMobileView ? '100%' : '18.5rem'}
-                      messages={timeZonedFormMessages(
-                        courseTimeZone,
-                        userTimeZone,
-                        start_from_date,
-                      )}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, oldStartDate)}
                       dataTestid="old_start_date"
                     />
                     <View
@@ -186,9 +184,9 @@ export const DateAdjustments = ({
                       <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput2
-                      selectedDate={start_to_date}
+                      selectedDate={new_start_date}
                       onSelectedDateChange={d => {
-                        handleSetDate(d, setStartToDate, 'new_start_date')
+                        handleSetDate(d, setStartDate, 'new_start_date')
                       }}
                       formatDate={formatDate}
                       placeholder={I18n.t('Select a date (optional)')}
@@ -199,7 +197,7 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={isMobileView ? '100%' : '18.5rem'}
-                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, start_to_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, new_start_date)}
                       dataTestid="new_start_date"
                     />
                   </Flex>
@@ -213,7 +211,7 @@ export const DateAdjustments = ({
                     alignItems="stretch"
                   >
                     <CanvasDateInput2
-                      selectedDate={end_from_date}
+                      selectedDate={oldEndDate}
                       onSelectedDateChange={d => {
                         handleSetDate(d, setEndFromDate, 'old_end_date')
                       }}
@@ -226,7 +224,7 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={isMobileView ? '100%' : '18.5rem'}
-                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_from_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, oldEndDate)}
                       dataTestid="old_end_date"
                     />
                     <View
@@ -239,9 +237,9 @@ export const DateAdjustments = ({
                       <span style={{whiteSpace: 'nowrap'}}>{I18n.t('change to')}</span>
                     </View>
                     <CanvasDateInput2
-                      selectedDate={end_to_date}
+                      selectedDate={new_end_date}
                       onSelectedDateChange={d => {
-                        handleSetDate(d, setEndToDate, 'new_end_date')
+                        handleSetDate(d, setEndDate, 'new_end_date')
                       }}
                       formatDate={formatDate}
                       placeholder={I18n.t('Select a date (optional)')}
@@ -250,7 +248,7 @@ export const DateAdjustments = ({
                       }
                       interaction={disabled ? 'disabled' : 'enabled'}
                       width={isMobileView ? '100%' : '18.5rem'}
-                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, end_to_date)}
+                      messages={timeZonedFormMessages(courseTimeZone, userTimeZone, new_end_date)}
                       dataTestid="new_end_date"
                     />
                   </Flex>

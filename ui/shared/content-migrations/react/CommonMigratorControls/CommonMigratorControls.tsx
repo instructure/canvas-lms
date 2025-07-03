@@ -49,6 +49,8 @@ type CommonMigratorControlsProps = {
   oldEndDate?: string | null
   newStartDate?: string | null
   newEndDate?: string | null
+  setEndDate?: (date: Date | null) => void
+  setStartDate?: (date: Date | null) => void
   SubmitLabel: ComponentType
   SubmittingLabel: ComponentType
   CancelLabel: ComponentType
@@ -138,6 +140,8 @@ export const CommonMigratorControls = ({
   SubmitLabel,
   SubmittingLabel,
   CancelLabel,
+  setEndDate,
+  setStartDate,
 }: CommonMigratorControlsProps) => {
   const [selectiveImport, setSelectiveImport] = useState<null | boolean>(false)
   const [importBPSettings, setImportBPSettings] = useState<null | boolean>(null)
@@ -356,6 +360,8 @@ export const CommonMigratorControls = ({
             <DateAdjustments
               dateAdjustmentConfig={dateAdjustmentConfig}
               setDateAdjustments={setDateAdjustmentConfig}
+              setStartDate={setStartDate}
+              setEndDate={setEndDate}
               disabled={isSubmitting}
             />
           ) : null}
