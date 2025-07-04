@@ -6,7 +6,7 @@ externally from the main application, in your own programs and scripts.
 This documentation describes the resources that make up the API.
 
 To get started, you'll want to review the general basics, including the
-information below and the page on <a href="oauth.html">Authentication using OAuth2</a>.
+information below and the page on <a href="file.oauth.html">Authentication using OAuth2</a>.
 
 API Changes
 ------
@@ -73,7 +73,7 @@ OAuth2 Token sent in query string:
 curl "https://canvas.instructure.com/api/v1/courses?access_token=<ACCESS-TOKEN>"
 ```
 
-Read more about <a href="oauth.html">OAuth2 and how to get access tokens.</a>
+Read more about <a href="file.oauth.html">OAuth2 and how to get access tokens.</a>
 
 SSL
 ---

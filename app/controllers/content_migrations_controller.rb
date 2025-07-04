@@ -87,7 +87,7 @@
 #           "type": "datetime"
 #         },
 #         "pre_attachment": {
-#           "description": "file uploading data, see {file:file_uploads.html File Upload Documentation} for file upload workflow This works a little differently in that all the file data is in the pre_attachment hash if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key This data will only be here after a create or update call",
+#           "description": "file uploading data, see {file:file.file_uploads.html File Upload Documentation} for file upload workflow This works a little differently in that all the file data is in the pre_attachment hash if there is no upload_url then there was an attachment pre-processing error, the error message will be in the message key This data will only be here after a create or update call",
 #           "example": "{\"upload_url\"=>\"\", \"message\"=>\"file exceeded quota\", \"upload_params\"=>{}}",
 #           "type": "string"
 #         }
@@ -244,7 +244,7 @@ class ContentMigrationsController < ApplicationController
   #
   # Create a content migration. If the migration requires a file to be uploaded
   # the actual processing of the file will start once the file upload process is completed.
-  # File uploading works as described in the {file:file_uploads.html File Upload Documentation}
+  # File uploading works as described in the {file:file.file_uploads.html File Upload Documentation}
   # except that the values are set on a *pre_attachment* sub-hash.
   #
   # For migrations that don't require a file to be uploaded, like course copy, the
@@ -264,7 +264,7 @@ class ContentMigrationsController < ApplicationController
   # For file uploading:
   #
   # 1. POST to create with file info in *pre_attachment*
-  # 2. Do {file:file_uploads.html file upload processing} using the data in the *pre_attachment* data
+  # 2. Do {file:file.file_uploads.html file upload processing} using the data in the *pre_attachment* data
   # 3. {api:ContentMigrationsController#show GET} the ContentMigration
   # 4. Use the {api:ProgressController#show Progress} specified in _progress_url_ to monitor progress
   #
@@ -277,11 +277,11 @@ class ContentMigrationsController < ApplicationController
   #
   # @argument pre_attachment[name] [String]
   #   Required if uploading a file. This is the first step in uploading a file
-  #   to the content migration. See the {file:file_uploads.html File Upload
+  #   to the content migration. See the {file:file.file_uploads.html File Upload
   #   Documentation} for details on the file upload workflow.
   #
   # @argument pre_attachment[*]
-  #   Other file upload properties, See {file:file_uploads.html File Upload
+  #   Other file upload properties, See {file:file.file_uploads.html File Upload
   #   Documentation}
   #
   # @argument settings[file_url] [string] A URL to download the file from. Must not require authentication.

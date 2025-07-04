@@ -20,7 +20,7 @@
 
 module Lti
   # @API Originality Reports
-  # **LTI API for OriginalityReports (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  # **LTI API for OriginalityReports (Must use <a href="file.jwt_access_tokens.html">JWT access tokens</a> with this API).**
   #
   # Originality reports may be used by external tools providing plagiarism
   # detection services to give an originality score to an assignment

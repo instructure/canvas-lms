@@ -84,7 +84,7 @@ class SubmissionCommentsApiController < ApplicationController
   #
   # Upload a file to attach to a submission comment
   #
-  # See the {file:file_uploads.html File Upload Documentation} for details on the file upload workflow.
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on the file upload workflow.
   #
   # The final step of the file upload workflow will return the attachment data,
   # including the new file id. The caller can then PUT the file_id to the

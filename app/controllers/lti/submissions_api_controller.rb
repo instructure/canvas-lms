@@ -19,7 +19,7 @@
 
 module Lti
   # @API Plagiarism Detection Submissions
-  # **LTI API for Plagiarism Detection Submissions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  # **LTI API for Plagiarism Detection Submissions (Must use <a href="file.jwt_access_tokens.html">JWT access tokens</a> with this API).**
   #
   # @model Submission
   #     {
