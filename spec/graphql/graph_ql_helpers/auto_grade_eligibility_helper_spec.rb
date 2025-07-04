@@ -172,6 +172,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
 
     context "when submission contains attachments with invalid mime type" do
       it "returns file type error" do
+        Account.site_admin.enable_feature!(:grading_assistance_file_uploads)
         submission = submission_model(
           user: @student,
           assignment:,
@@ -185,10 +186,27 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         issues = described_class.validate_submission(submission:)
         expect(issues).to include("Only PDF and DOCX files are supported.")
       end
+
+      it "returns file uploads disabled error when feature flag is off" do
+        Account.site_admin.disable_feature!(:grading_assistance_file_uploads)
+        submission = submission_model(
+          user: @student,
+          assignment:,
+          submission_type: "online_upload",
+          attachments: []
+        )
+
+        bad_attachment = double("Attachment", mimetype: "text/plain")
+        allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
+
+        issues = described_class.validate_submission(submission:)
+        expect(issues).to include("Grading assistance is disabled for file uploads.")
+      end
     end
 
     context "when submission contains PDF attachments images" do
       it "returns there are images embedded in the file that can not be parsed" do
+        Account.site_admin.enable_feature!(:grading_assistance_file_uploads)
         submission = submission_model(
           user: @student,
           assignment:,
