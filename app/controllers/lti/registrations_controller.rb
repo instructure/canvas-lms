@@ -29,7 +29,7 @@
 #
 # The Dynamic Registration process uses a different API endpoint to finalize
 # the process and create the registration.  The
-# <a href="/doc/api/registration.html">Registration guide</a> has more details on that process.
+# <a href="file.registration.html">Registration guide</a> has more details on that process.
 #
 # @model Lti::Registration
 #     {
@@ -1189,7 +1189,7 @@ class Lti::RegistrationsController < ApplicationController
   # Create a new LTI Registration, as well as an associated Tool Configuration, Developer Key, and Registration Account
   # binding.
   # To install/create using Dynamic Registration, please use the
-  # <a href="/doc/api/registration.html">Dynamic Registration API.</a>
+  # {file:file.registration.html Dynamic Registration API}.
   #
   # @argument name [String] The name of the tool. If one isn't provided, it will be inferred from the configuration's title.
   # @argument admin_nickname [String] A friendly nickname set by admins to override the tool name

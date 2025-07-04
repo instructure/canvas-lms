@@ -1045,7 +1045,7 @@ class CoursesController < ApplicationController
   # Upload a file to the course.
   #
   # This API endpoint is the first step in uploading a file to a course.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a course can upload files

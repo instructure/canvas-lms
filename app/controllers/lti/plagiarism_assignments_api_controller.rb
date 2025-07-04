@@ -19,7 +19,7 @@
 
 module Lti
   # @API Plagiarism Detection Platform Assignments
-  # **Plagiarism Detection Platform API for Assignments (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  # **Plagiarism Detection Platform API for Assignments (Must use <a href="file.jwt_access_tokens.html">JWT access tokens</a> with this API).**
   #
   # @model LtiAssignment
   #     {
