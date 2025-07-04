@@ -490,3 +490,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     }
   }
 }
+
+#files-table {
+  user-select: none;
+}
