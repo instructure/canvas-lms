@@ -2248,7 +2248,7 @@ module Lti
                        COURSE_GUARD
 
     # Returns true if the AI quiz generation feature is enabled for the course.
-    # This is used to determine whether to display the "Generate Quiz" button in the UI.
+    # This is used to determine whether to display the "Generate With AI" button in the UI.
     #
     # @example
     #   ```
