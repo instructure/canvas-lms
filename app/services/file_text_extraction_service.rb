@@ -42,13 +42,13 @@ class FileTextExtractionService
           extract_docx
         else
           Rails.logger.warn("[LocalTextExtractor] Unsupported MIME type: #{attachment.mime_type}")
-          Result.new(nil, false)
+          Result.new("", false)
         end
       end
     end
   rescue => e
     Rails.logger.error("[LocalTextExtractor] Failed for attachment #{attachment.id}: #{e.message}")
-    Result.new(nil, false)
+    Result.new("", false)
   end
 
   private
