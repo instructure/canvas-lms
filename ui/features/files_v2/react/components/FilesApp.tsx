@@ -192,7 +192,9 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
               />
             }
-            search={<SearchBar initialValue={search.term} onSearch={search.set} />}
+            search={
+              <SearchBar key={search.term} initialValue={search.term} onSearch={search.set} />
+            }
             breadcrumbs={<Breadcrumbs folders={folders} size={size} search={search.term} />}
             bulkActions={
               <BulkActionButtons
