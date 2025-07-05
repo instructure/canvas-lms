@@ -36,13 +36,13 @@ module Accessibility
       end
 
       def self.message
-        "Adjacent links with the same URL should be combined."
+        "These are two links that go to the same place. Turn them into one link to avoid repetition."
       end
 
       def self.why
-        "When adjacent links go to the same location, screen reader users have to navigate through " \
-          "redundant links. This creates unnecessary repetition and confusion. " \
-          "Combining adjacent links with the same destination improves navigation efficiency."
+        "When two or more links are next to each other and lead to the same destination, " \
+          "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
+          "This creates unnecessary repetition and is confusing."
       end
 
       def self.link_text
@@ -54,9 +54,8 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::CheckboxField.new(
-          label: "Merge links",
-          value: "false"
+        Accessibility::Forms::Button.new(
+          label: "Merge links"
         )
       end
 
