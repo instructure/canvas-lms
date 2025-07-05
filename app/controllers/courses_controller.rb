@@ -849,8 +849,9 @@ class CoursesController < ApplicationController
   # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
   #
-  # @argument copied [Boolean]
-  #   Set to true to indicate the course is a copy of other.
+  # @argument skip_course_template [Boolean]
+  #   If this option is set to true, the template of the account will not be applied to this course
+  #   It means copy_from_course_template will not be executed. This option is thought for a course copy.
   #
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
@@ -969,7 +970,7 @@ class CoursesController < ApplicationController
       changes = changed_settings(@course.changes, @course.settings)
 
       respond_to do |format|
-        success = if params[:copied].to_s == "true"
+        success = if value_to_boolean(params[:skip_course_template])
                     Course.suspend_callbacks(:copy_from_course_template) do
                       @course.save
                     end

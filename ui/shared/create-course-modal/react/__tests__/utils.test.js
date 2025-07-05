@@ -23,7 +23,7 @@ import {createNewCourse, getAccountsFromEnrollments} from '../utils'
 const server = setupServer()
 
 const NEW_COURSE_URL =
-  '/api/v1/accounts/15/courses?course[name]=Science&course[sync_enrollments_from_homeroom]=true&course[homeroom_course_id]=14&enroll_me=true&copied=false'
+  '/api/v1/accounts/15/courses?course[name]=Science&course[sync_enrollments_from_homeroom]=true&course[homeroom_course_id]=14&enroll_me=true'
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
