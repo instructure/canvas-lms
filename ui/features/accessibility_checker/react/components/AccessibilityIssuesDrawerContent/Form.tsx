@@ -25,6 +25,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Text} from '@instructure/ui-text'
 
 import {AccessibilityIssue, FormType, FormValue} from '../../types'
+import {Button} from '@instructure/ui-buttons'
 
 export interface FormHandle {
   getValue: () => FormValue
@@ -82,6 +83,14 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
                 onChange(newValue)
               }}
             />
+          </View>
+        )
+      case FormType.Button:
+        return (
+          <View as="div" margin="small 0" data-testid="button-form">
+            <Button onClick={() => onChange('true')} color="primary">
+              {issue.form.label}
+            </Button>
           </View>
         )
       case FormType.ColorPicker:

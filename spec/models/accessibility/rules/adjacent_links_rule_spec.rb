@@ -59,4 +59,10 @@ RSpec.describe "AdjacentLinksRule", type: :feature do
       expect(fixed_html).not_to include('<a id="test-link" href="https://example.com">Link 2</a>')
     end
   end
+
+  context "form" do
+    it "merges adjacent links with the same URL" do
+      expect(Accessibility::Rules::AdjacentLinksRule.form(nil).label).to eq("Merge links")
+    end
+  end
 end
