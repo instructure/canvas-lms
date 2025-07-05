@@ -2744,7 +2744,9 @@ describe CoursesController do
         course = Course.find(json["id"])
         expect(course.attachment_associations).to be_empty
       end
+    end
 
+    context "when course templates are enabled" do
       def create_account_template
         template = @account.courses.create!(name: "Template Course", template: true)
         template.assignments.create!(title: "my assignment")
@@ -2754,46 +2756,62 @@ describe CoursesController do
         template
       end
 
-      context "when course templates are enabled" do
-        it "does not apply an account's course template if :copied is true" do
-          create_account_template
+      it "does not apply an account's course template if :skip_course_template is true" do
+        create_account_template
 
-          post "create",
-               params: {
-                 account_id: @account.id,
-                 course: {
-                   name: "new course",
-                   is_public: true,
-                   public_syllabus: true,
-                   is_public_to_auth_users: true,
-                   public_syllabus_to_auth: true
-                 },
-                 copied: true
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
                },
-               format: :json
+               skip_course_template: true
+             },
+             format: :json
 
-          expect(Course.last.content_migrations.length).to eq 0
-        end
+        expect(Course.last.content_migrations.length).to eq 0
+      end
 
-        it "applies an account's course template if :copied is false" do
-          create_account_template
+      it "applies an account's course template if :skip_course_template is false" do
+        create_account_template
 
-          post "create",
-               params: {
-                 account_id: @account.id,
-                 course: {
-                   name: "new course",
-                   is_public: true,
-                   public_syllabus: true,
-                   is_public_to_auth_users: true,
-                   public_syllabus_to_auth: true
-                 },
-                 copied: false
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
                },
-               format: :json
+               skip_course_template: false
+             },
+             format: :json
 
-          expect(Course.last.content_migrations.length).to eq 1
-        end
+        expect(Course.last.content_migrations.length).to eq 1
+      end
+
+      it "applies an account's course template if :skip_course_template is missing" do
+        create_account_template
+        post "create",
+             params: {
+               account_id: @account.id,
+               course: {
+                 name: "new course",
+                 is_public: true,
+                 public_syllabus: true,
+                 is_public_to_auth_users: true,
+                 public_syllabus_to_auth: true
+               }
+             },
+             format: :json
+
+        expect(Course.last.content_migrations.length).to eq 1
       end
     end
   end

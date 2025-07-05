@@ -47,7 +47,6 @@ export const createNewCourse = (
       'course[sync_enrollments_from_homeroom]': syncHomeroomEnrollments,
       'course[homeroom_course_id]': homeroomCourseId,
       enroll_me: true,
-      copied: false,
     },
   }).then(data => data.json)
 
