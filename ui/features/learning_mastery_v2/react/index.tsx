@@ -33,6 +33,7 @@ import LMGBContext, {
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {ExportCSVButton} from './components/ExportCSVButton'
+import {FilterWrapper} from './components/filters/FilterWrapper'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -66,6 +67,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     setGradebookFilters,
     pagination,
     setCurrentPage,
+    setStudentsPerPage,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
@@ -124,6 +126,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           </View>
         </Flex>
       </InstUISettingsProvider>
+      <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
       {isLoading ? (
         renderLoader()
       ) : (
