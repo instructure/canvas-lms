@@ -33,6 +33,7 @@ export type ModalTagMode = 'single' | 'multi'
 
 export interface Course {
   readonly id: string
+  readonly max_variants_per_tag_category?: number
 }
 
 export interface UserTags {

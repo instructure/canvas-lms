@@ -40,8 +40,14 @@ import {
 } from '../util/constants'
 import {useBulkManageDifferentiationTags} from '../hooks/useBulkManageDifferentiationTags'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import type {Course} from '../types.d'
+import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 
 const I18n = createI18nScope('differentiation_tags')
+
+declare const ENV: GlobalEnv & Course
+
+const variantLimit = ENV?.course?.max_variants_per_tag_category ?? 10
 
 const modeConfig = {
   create: {
@@ -521,16 +527,28 @@ export default function DifferentiationTagModalForm(props: DifferentiationTagMod
               />
             ))}
 
-            {(tagMode === MULTIPLE_TAGS || (tagMode === SINGLE_TAG && mode === CREATE_MODE)) && (
-              <CondensedButton
-                onClick={handleAddTagClick}
-                margin="0 0 small 0"
-                aria-label={I18n.t('Add another tag')}
+            {(tagMode === MULTIPLE_TAGS || (tagMode === SINGLE_TAG && mode === CREATE_MODE)) &&
+              tags.length < variantLimit && (
+                <CondensedButton
+                  onClick={handleAddTagClick}
+                  margin="0 0 small 0"
+                  aria-label={I18n.t('Add another tag')}
+                >
+                  {I18n.t('+ Add another tag')}
+                </CondensedButton>
+              )}
+            {tags.length >= variantLimit && (
+              <Alert
+                variant="info"
+                liveRegion={() => document.getElementById('flash-messages') as Element}
+                liveRegionPoliteness="assertive"
+                variantScreenReaderLabel={I18n.t('Information')}
               >
-                {I18n.t('+ Add another tag')}
-              </CondensedButton>
+                {I18n.t('Variant limit reached. Current limit is %{limit}', {
+                  limit: variantLimit,
+                })}
+              </Alert>
             )}
-
             {modeConfig[mode].showTagSetSelector && (
               <SimpleSelect
                 value={selectedCategoryId}

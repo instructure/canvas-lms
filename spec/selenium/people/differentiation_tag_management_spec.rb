@@ -716,7 +716,7 @@ describe "Differentiation Tag Management" do
             expect(f(".flashalert-message")).to be_displayed
           end
 
-          it "Displays an error message if tag variant limit is reached", :ignore_js_errors do
+          it "Displays an info alert if tag variant limit is reached", :ignore_js_errors do
             multiple_tags_full = @course.group_categories.create!(name: "Project Tags", non_collaborative: true)
             (1..10).each do |x|
               @course.groups.create!(name: x, group_category: multiple_tags_full)
@@ -728,17 +728,9 @@ describe "Differentiation Tag Management" do
             f("button[aria-label='Edit tag set: #{multiple_tags_full.name}']").click
             wait_for_ajaximations
 
-            fj("button:contains('+ Add another tag')").click
-            wait_for_ajaximations
-            tag_inputs = ff("[data-testid='tag-name-input']")
-            new_input = tag_inputs.last
-            new_input.send_keys("11")
+            expect(f("body")).not_to contain_jqcss("button:contains('+ Add another tag')")
 
-            fj("button:contains('Save')").click
-            wait_for_ajaximations
-
-            expect(f(".flashalert-message")).to be_displayed
-            expect(fj("p:contains('Validation failed: Variant limit reached for tag')")).to be_displayed
+            expect(fj("div:contains('Variant limit reached. Current limit is #{Group.MAX_VARIANTS_PER_TAG_CATEGORY}')")).to be_displayed
           end
 
           it "Displays an error message for tag limit", :ignore_js_errors do

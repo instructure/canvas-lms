@@ -24,7 +24,11 @@ import type {DifferentiationTagModalFormProps} from '../DifferentiationTagModalF
 import '@testing-library/jest-dom'
 import {CREATE_MODE, EDIT_MODE} from '../../util/constants'
 import {MockedQueryProvider} from '@canvas/test-utils/query'
-import {multipleTagsCategory, singleTagCategory} from '../../util/tagCategoryCardMocks'
+import {
+  multipleTagsCategory,
+  singleTagCategory,
+  multipleTagsCategoryLimit,
+} from '../../util/tagCategoryCardMocks'
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -62,6 +66,11 @@ describe('DifferentiationTagModalForm', () => {
       </MockedQueryProvider>,
     )
   }
+
+  beforeAll(() => {
+    const globalEnv = global as any
+    globalEnv.ENV = {course: {id: '456', max_variants_per_tag_category: 10}}
+  })
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -388,5 +397,11 @@ describe('DifferentiationTagModalForm', () => {
     const tagInput = screen.getByLabelText(/Tag Name/i)
     await user.type(tagInput, 'Valid Tag')
     expect(screen.queryByText('Tag Name is required')).not.toBeInTheDocument()
+  })
+
+  it('does not render the "+ Add another tag" button when reached limit in multiple tag mode', () => {
+    renderComponent({mode: EDIT_MODE, differentiationTagSet: multipleTagsCategoryLimit})
+    expect(screen.queryByText('Add another tag')).not.toBeInTheDocument()
+    expect(screen.queryByText('Variant limit reached. Current limit is 10')).toBeInTheDocument()
   })
 })
