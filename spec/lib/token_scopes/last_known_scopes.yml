@@ -229,6 +229,8 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments'
+- verb: GET
+  path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:deployment_id/context_search'
 - verb: DELETE
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id'
 - verb: GET
@@ -237,8 +239,6 @@
   path: '/api/v1/accounts/:account_id/lti_registrations/:registration_id/deployments/:id/controls'
 - verb: POST
   path: '/api/v1/accounts/:account_id/lti_registrations/configuration/validate'
-- verb: GET
-  path: '/api/v1/accounts/:account_id/lti_registrations/context_search'
 - verb: GET
   path: '/api/v1/accounts/:account_id/outcome_group_links'
 - verb: GET
