@@ -2038,16 +2038,18 @@ RSpec.describe Lti::RegistrationsController do
 
   describe "GET context_search", type: :request do
     subject do
-      get "/api/v1/accounts/#{account.id}/lti_registrations/context_search",
-          params: { search_term:, by_account_id: }.compact,
+      get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/deployments/#{deployment.id}/context_search",
+          params: { search_term:, only_children_of: }.compact,
           as: :json
       response
     end
 
     let(:account) { account_model }
     let(:admin) { account_admin_user(account:) }
+    let(:registration) { lti_registration_with_tool(account:) }
+    let(:deployment) { registration.deployments.first }
     let(:search_term) { nil }
-    let(:by_account_id) { nil }
+    let(:only_children_of) { nil }
 
     before do
       user_session(admin)
@@ -2085,11 +2087,56 @@ RSpec.describe Lti::RegistrationsController do
     end
 
     context "with new flag disabled" do
-      before { account.disable_feature!(:lti_registrations_next) }
+      before do
+        deployment # create before disabling flag that would otherwise prevent this
+        account.disable_feature!(:lti_registrations_next)
+      end
 
       it "returns 404" do
         subject
         expect(response).to be_not_found
+      end
+    end
+
+    context "with invalid registration id" do
+      let(:other_root_account) { account_model }
+      let(:registration) { lti_registration_with_tool(account: other_root_account) }
+
+      before do
+        other_root_account.enable_feature!(:lti_registrations_page)
+        other_root_account.enable_feature!(:lti_registrations_next)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with invalid deployment id" do
+      let(:other_account) { account_model }
+      let(:other_registration) { lti_registration_with_tool(account: other_account) }
+      let(:deployment) { other_registration.deployments.first }
+
+      before do
+        other_account.enable_feature!(:lti_registrations_page)
+        other_account.enable_feature!(:lti_registrations_next)
+      end
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "with course-level deployment" do
+      let(:course) { course_model(account:) }
+      let(:deployment) { registration.new_external_tool(course) }
+
+      it "returns empty accounts and courses" do
+        subject
+        expect(response_json[:accounts].length).to eq(0)
+        expect(response_json[:courses].length).to eq(0)
       end
     end
 
@@ -2102,7 +2149,7 @@ RSpec.describe Lti::RegistrationsController do
 
       it "includes the account" do
         subject
-        expect(response_json[:accounts].length).to eq(2)
+        expect(response_json[:accounts].length).to eq(1)
       end
 
       it "includes all account data" do
@@ -2193,7 +2240,7 @@ RSpec.describe Lti::RegistrationsController do
 
       it "includes all accounts" do
         subject
-        expect(response_json[:accounts].length).to eq(3)
+        expect(response_json[:accounts].length).to eq(2)
       end
 
       it "includes all courses" do
@@ -2255,19 +2302,38 @@ RSpec.describe Lti::RegistrationsController do
         end
       end
 
-      context "with by_account_id" do
-        let(:by_account_id) { subaccount.id }
+      context "with only_children_of" do
+        let(:only_children_of) { subaccount.id }
+        let(:subsubaccount) { account_model(parent_account: subaccount, root_account: account, name: "Sub Sub Account", sis_source_id: "BAZ") }
+        let(:subsubcourse) { course_model(account: subsubaccount, sis_source_id: "SUBSUB_COURSE_SIS_ID", course_code: "BAZ303") }
+        let(:subsubsubaccount) { account_model(parent_account: subsubaccount, root_account: account, name: "Sub Sub Sub Account", sis_source_id: "QUX") }
 
-        it "returns only accounts and courses in the specified account" do
+        before do
+          subsubaccount
+          subsubcourse
+          subsubsubaccount
+        end
+
+        it "returns only accounts and courses that are direct children of the account" do
           subject
           expect(response_json[:accounts].length).to eq(1)
           expect(response_json[:courses].length).to eq(1)
 
           account_json = response_json[:accounts].first
-          expect(account_json[:id]).to eq(subaccount.id.to_s)
+          expect(account_json[:id]).to eq(subsubaccount.id.to_s)
 
           course_json = response_json[:courses].first
           expect(course_json[:id]).to eq(other_course.id.to_s)
+        end
+
+        it "does not include nested children" do
+          subject
+
+          nested_account = response_json[:accounts].find { |a| a[:id] == subsubsubaccount.id.to_s }
+          expect(nested_account).to be_nil
+
+          nested_course = response_json[:courses].find { |c| c[:id] == subsubcourse.id.to_s }
+          expect(nested_course).to be_nil
         end
 
         context "with search term" do
@@ -2280,6 +2346,17 @@ RSpec.describe Lti::RegistrationsController do
 
             course_json = response_json[:courses].find { |c| c[:id] == root_course.id.to_s }
             expect(course_json).to be_nil
+          end
+        end
+
+        context "that is for account outside deployment" do
+          let(:deployment) { registration.new_external_tool(subaccount) }
+          let(:other_account) { account_model(parent_account: account, root_account: account, name: "Other Account", sis_source_id: "BAR") }
+          let(:only_children_of) { other_account.id }
+
+          it "returns 422" do
+            subject
+            expect(response).to be_unprocessable
           end
         end
       end

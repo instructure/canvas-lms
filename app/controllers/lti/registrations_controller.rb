@@ -1463,10 +1463,11 @@ class Lti::RegistrationsController < ApplicationController
   # This is a utility endpoint used by the Canvas Apps UI and may not serve general use cases.
   #
   # Search for accounts and courses that match the search term on name, SIS id, or course code.
-  # Returns bare-bones data about each account and course. Used to populate the search dropdowns
-  # when managing LTI registration availability.
+  # Returns all matching accounts and courses, including those nested in sub-accounts.
+  # Returns bare-bones data about each account and course, and only up to 20 of each.
+  # Used to populate the search dropdowns when managing LTI registration availability.
   #
-  # @argument by_account_id [Optional, String] If provided, only searches within this account.
+  # @argument only_children_of [Optional, String] Account ID. If provided, only searches within this account and only returns direct children of this account.
   # @argument search_term [Optional, String] String to search for in account names, SIS ids, or course codes.
   #
   # @returns ContextSearchResponse
@@ -1474,22 +1475,39 @@ class Lti::RegistrationsController < ApplicationController
   # @example_request
   #
   #   This would search for accounts and courses matching the search term "example"
-  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/context_search?search_term=example' \
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/deployments/<deployment_id>/context_search?search_term=example' \
   #        -H "Authorization: Bearer <token>"
   #
   def context_search
-    account_id = params[:by_account_id]
-    search_term = params[:search_term].to_s.strip
-    can_read_sis = @context.grants_any_right?(@current_user, :read_sis, :manage_sis)
+    registration = Lti::Registration.active.find_by(id: params[:registration_id], account: @account)
+    raise ActiveRecord::RecordNotFound unless registration
 
-    account_scope = Account.active.where(root_account_id: @domain_root_account.id).or(Account.where(id: @domain_root_account.id))
-    if account_id.present?
-      subaccount_ids = Account.sub_account_ids_recursive(account_id)
-      account_scope = account_scope.where(id: subaccount_ids + [account_id])
+    deployment = ContextExternalTool.active.find_by(id: params[:deployment_id], lti_registration: registration)
+    raise ActiveRecord::RecordNotFound unless deployment
+
+    if deployment.context_type != "Account"
+      return render json: { accounts: [], courses: [] }
     end
 
-    course_scope = Course.active.where(account: account_scope)
+    accounts_within_deployment = Account.sub_account_ids_recursive(deployment.context_id)
+    account_scope = Account.active.where(id: accounts_within_deployment)
 
+    account_id = params[:only_children_of]
+    if account_id.present?
+      unless accounts_within_deployment.include?(account_id.to_i) || account_id.to_i == deployment.context_id
+        return render_error(:invalid_account_id, "only_children_of account ID must be or belong to deployment's account")
+      end
+
+      account_scope = account_scope.where(parent_account_id: account_id)
+    end
+
+    course_scope = if account_id.present?
+                     Course.active.where(account_id:)
+                   else
+                     Course.active.where(account: account_scope).or(Course.active.where(account: deployment.context))
+                   end
+
+    search_term = params[:search_term].to_s.strip
     if search_term.present?
       account_scope = account_scope.where("name ILIKE :s OR sis_source_id ILIKE :s", s: "%#{search_term}%")
       course_scope = course_scope.where("name ILIKE :s OR sis_source_id ILIKE :s OR course_code ILIKE :s", s: "%#{search_term}%")
@@ -1509,6 +1527,7 @@ class Lti::RegistrationsController < ApplicationController
                             .transform_values { |ids| ids.tap(&:pop).reverse }
     all_account_chain_ids = account_chains.values.flatten.uniq
     account_names = Account.where(id: all_account_chain_ids).pluck(:id, :name).to_h
+    can_read_sis = @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
 
     accounts_json = accounts.map do |account|
       display_path = account_chains[account.id].filter_map do |id|
