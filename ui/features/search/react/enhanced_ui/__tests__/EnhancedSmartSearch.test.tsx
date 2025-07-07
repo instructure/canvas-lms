@@ -107,8 +107,8 @@ describe('EnhancedSmartSearch', () => {
     fetchMock.get(SEARCH_URL, {results: []})
     const {getByTestId, queryByText, getByText} = renderSearch()
 
-    expect(queryByText('Similar Results')).toBeNull()
-    expect(queryByText('Best Matches')).toBeNull()
+    expect(queryByText('You may also be interested in')).toBeNull()
+    expect(queryByText('No results')).toBeNull()
     await waitFor(() => {
       expect(getByTestId('indexing_progress')).toBeInTheDocument()
       expect(getByText(/wait a moment while we get Smart Search ready/)).toBeInTheDocument()
@@ -125,8 +125,8 @@ describe('EnhancedSmartSearch', () => {
 
     expect(getByTestId('search-input')).toBeInTheDocument()
 
-    expect(queryByText('Similar Results')).toBeNull()
-    expect(queryByText('Best Matches')).toBeNull()
+    expect(queryByText('You may also be interested in')).toBeNull()
+    expect(queryByText('No results')).toBeNull()
     expect(queryByTestId('indexing_progress')).toBeNull()
     expect(queryByText(/wait a moment while we get Smart Search ready/)).toBeNull()
   })
@@ -156,8 +156,8 @@ describe('EnhancedSmartSearch', () => {
       user.click(getByTestId('search-button'))
 
       await waitFor(() => {
-        expect(getByText('Similar results')).toBeInTheDocument()
-        expect(getByText('Best matches')).toBeInTheDocument()
+        expect(getByText('You may also be interested in')).toBeInTheDocument()
+        expect(getByText('1 result')).toBeInTheDocument()
         expect(getByText(results[0].title)).toBeInTheDocument()
         expect(getByText(results[1].title)).toBeInTheDocument()
       })
