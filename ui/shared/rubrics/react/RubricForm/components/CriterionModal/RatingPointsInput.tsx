@@ -20,24 +20,29 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RubricRating} from '../../../types/rubric'
+import {MutableRefObject} from 'react'
 
 const I18n = createI18nScope('rubrics-criterion-modal')
 
 type RatingPointsInputProps = {
+  index: number
   isRange: boolean
   pointsInputText: string | number
   rating: RubricRating
   onPointsBlur: () => void
   setNewRating: (newNumber: number, textValue: string) => void
   shouldRenderLabel: boolean
+  ratingInputRefs?: MutableRefObject<HTMLInputElement[]>
 }
 export const RatingPointsInput = ({
+  index,
   isRange,
   pointsInputText,
   rating,
   onPointsBlur,
   setNewRating,
   shouldRenderLabel,
+  ratingInputRefs,
 }: RatingPointsInputProps) => {
   const setNumber = (value: number) => {
     if (Number.isNaN(value)) return 0
@@ -53,6 +58,11 @@ export const RatingPointsInput = ({
   )
   return (
     <NumberInput
+      inputRef={el => {
+        if (ratingInputRefs && ratingInputRefs.current && el) {
+          ratingInputRefs.current[index] = el
+        }
+      }}
       allowStringValue={true}
       renderLabel={renderLabel}
       value={pointsInputText}

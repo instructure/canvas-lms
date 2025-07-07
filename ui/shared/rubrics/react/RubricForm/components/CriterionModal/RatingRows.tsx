@@ -40,6 +40,7 @@ type RatingRowsProps = {
   dragging: boolean
   hidePoints: boolean
   unassessed: boolean
+  ratingInputRefs: React.MutableRefObject<HTMLInputElement[]>
 }
 export const RatingRows = ({
   ratings,
@@ -56,6 +57,7 @@ export const RatingRows = ({
   dragging,
   hidePoints,
   unassessed,
+  ratingInputRefs,
 }: RatingRowsProps) => {
   return (
     <View as="div" position="relative">
@@ -88,6 +90,7 @@ export const RatingRows = ({
                         isFullWidth={isFullWidth}
                         isLastIndex={index === ratings.length - 1}
                         rating={rating}
+                        ratingInputRefs={ratingInputRefs}
                         scale={scale}
                         showRemoveButton={ratings.length > 1}
                         criterionUseRange={criterionUseRange}

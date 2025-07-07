@@ -38,6 +38,7 @@ export const RatingRowFullWidth = ({
   rating,
   scale,
   rangeStart,
+  ratingInputRefs,
   pointsInputText,
   onPointsBlur,
   setRatingForm,
@@ -73,9 +74,11 @@ export const RatingRowFullWidth = ({
                   {unassessed ? (
                     <Flex.Item>
                       <RatingPointsInput
+                        index={index}
                         isRange={criterionUseRange}
                         pointsInputText={pointsInputText}
                         rating={rating}
+                        ratingInputRefs={ratingInputRefs}
                         onPointsBlur={onPointsBlur}
                         setNewRating={(newNumber, textValue) => {
                           setRatingForm('points', newNumber)

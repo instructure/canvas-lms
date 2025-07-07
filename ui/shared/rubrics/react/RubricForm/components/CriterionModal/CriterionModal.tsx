@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -75,6 +75,7 @@ export const CriterionModal = ({
   const [showWarningModal, setShowWarningModal] = useState(false)
 
   const [maxPoints, setMaxPoints] = useState<string | number>(0)
+  const ratingInputRefs = useRef<HTMLInputElement[]>([])
 
   useEffect(() => {
     const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : 0
@@ -99,6 +100,12 @@ export const CriterionModal = ({
     const newRatings = [...ratings]
     newRatings.splice(index, 0, newRating)
     setRatings(newRatings)
+
+    requestAnimationFrame(() => {
+      if (!hidePoints) {
+        ratingInputRefs.current[index]?.focus()
+      }
+    })
   }
 
   const removeRating = (index: number) => {
@@ -392,6 +399,7 @@ export const CriterionModal = ({
                 dragging={dragging}
                 hidePoints={hidePoints}
                 unassessed={unassessed}
+                ratingInputRefs={ratingInputRefs}
               />
             </>
           )}

@@ -18,6 +18,7 @@
 
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {FormMessage} from '@instructure/ui-form-field'
+import {MutableRefObject} from 'react'
 
 export type GenerateCriteriaFormProps = {
   criteriaCount: number
@@ -63,9 +64,10 @@ export type RatingRowProps = {
   errorMessage: FormMessage[]
   hidePoints: boolean
   index: number
-  rating: RubricRating
-  scale: number
   rangeStart: number
+  rating: RubricRating
+  ratingInputRefs: MutableRefObject<HTMLInputElement[]>
+  scale: number
   pointsInputText: string | number
   onPointsBlur: () => void
   setRatingForm: RubricRatingFieldSetting
