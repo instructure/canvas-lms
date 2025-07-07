@@ -306,12 +306,12 @@ describe "files index page", :ignore_js_errors do
         b_txt_file_name = "b_file.txt"
         mp3_file_name = "292.mp3"
         before do
-          add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
-                   @course,
-                   a_txt_file_name)
-          add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
-                   @course,
-                   b_txt_file_name)
+          @file_a = add_file(fixture_file_upload(a_txt_file_name, "text/plain"),
+                             @course,
+                             a_txt_file_name)
+          @file_b = add_file(fixture_file_upload(b_txt_file_name, "text/plain"),
+                             @course,
+                             b_txt_file_name)
           add_file(fixture_file_upload(mp3_file_name, "audio/mpeg"),
                    @course,
                    mp3_file_name)
@@ -335,6 +335,50 @@ describe "files index page", :ignore_js_errors do
           expect(preview_file_header).to include_text(a_txt_file_name)
           preview_close_button.click
           expect(breadcrumb).to contain_css("li", text: "Sub")
+        end
+
+        context "URL-based preview" do
+          it "opens preview modal when URL contains preview parameter" do
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            expect(preview_modal).to be_displayed
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+          end
+
+          it "updates URL when navigating between files in preview" do
+            # First load the files page to ensure files are in the collection
+            get "/courses/#{@course.id}/files"
+            wait_for_ajaximations
+
+            # Then navigate to the preview
+            get "/courses/#{@course.id}/files?preview=#{@file_a.id}"
+            wait_for_ajaximations
+
+            preview_next_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_b.id}")
+            expect(preview_file_header).to include_text("b_file.txt")
+
+            preview_previous_button.click
+            wait_for_ajaximations
+
+            expect(driver.current_url).to include("preview=#{@file_a.id}")
+            expect(preview_file_header).to include_text("a_file.txt")
+          end
+
+          it "shows error state for file from different course context" do
+            current_course = @course
+            other_course = course_factory(active_all: true)
+            other_file = add_file(fixture_file_upload("a_file.txt", "text/plain"), other_course, "a_file.txt")
+
+            get "/courses/#{current_course.id}/files?preview=#{other_file.id}"
+
+            expect(preview_modal).to be_displayed
+            expect(file_not_found).to be_displayed
+            expect(file_not_found).to include_text("File Not Found")
+          end
         end
 
         context "with media file" do
@@ -618,6 +662,17 @@ describe "files index page", :ignore_js_errors do
         file_attachment.publish!
         get "/courses/#{@course.id}/files"
         expect(content).not_to contain_css(files_usage_text_selector)
+      end
+
+      it "can open file preview via URL parameter" do
+        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "student_file.pdf")
+        file_attachment.publish!
+
+        get "/courses/#{@course.id}/files?preview=#{file_attachment.id}"
+        wait_for_ajaximations
+
+        expect(preview_file_header).to include_text("student_file.pdf")
+        expect(preview_modal).to be_displayed
       end
     end
   end

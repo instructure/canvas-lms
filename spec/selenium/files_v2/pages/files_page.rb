@@ -412,6 +412,14 @@ module FilesPage
     f("#file-preview-modal-alert")
   end
 
+  def preview_modal
+    f("[data-testid='file-preview-modal']")
+  end
+
+  def file_not_found
+    f("#file-not-found")
+  end
+
   def usage_rights_manage_modal
     f("[aria-label='Manage Usage Rights']")
   end

@@ -53,6 +53,7 @@ interface TableBodyProps {
   userCanRestrictFilesForContext: boolean
   usageRightsRequiredForContext: boolean
   setModalOrTrayOptions: (modalOrTray: ModalOrTrayOptions | null) => () => void
+  onPreviewFile?: (file: File) => void
 }
 
 const TableBody: React.FC<TableBodyProps> = ({
@@ -68,6 +69,7 @@ const TableBody: React.FC<TableBodyProps> = ({
   userCanRestrictFilesForContext,
   usageRightsRequiredForContext,
   setModalOrTrayOptions,
+  onPreviewFile,
 }) => {
   const [unresolvedCollisions, setUnresolvedCollisions] = useState<FileOptions[]>([])
   const [fixingNameCollisions, setFixingNameCollisions] = useState<boolean>(false)
@@ -309,6 +311,7 @@ const TableBody: React.FC<TableBodyProps> = ({
                 toggleSelect: () => toggleRowSelection(getUniqueId(row)),
                 setModalOrTrayOptions,
                 rowIndex: index,
+                onPreviewFile,
               })}
             </Table.Cell>
           )),
