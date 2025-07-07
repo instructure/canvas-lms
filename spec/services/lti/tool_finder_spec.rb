@@ -442,7 +442,7 @@ describe Lti::ToolFinder do
       t.lti_version = "1.3"
       t.save!
       t.context_controls.create!(
-        account: tool.context.root_account,
+        course:,
         available: true,
         registration: t.lti_registration
       )
@@ -473,7 +473,7 @@ describe Lti::ToolFinder do
         t = lti_1_3_tool.dup
         t.save!
         t.context_controls.create!(
-          account: course.root_account,
+          course:,
           registration: t.lti_registration,
           available: true
         )
@@ -1394,7 +1394,7 @@ describe Lti::ToolFinder do
         t = tool1.dup
         t.save!
         t.context_controls.create!(
-          account: @course.root_account,
+          course: @course,
           registration:,
           available: true
         )
@@ -1405,7 +1405,7 @@ describe Lti::ToolFinder do
         t.name = "preferred"
         t.save!
         t.context_controls.create!(
-          account: @course.root_account,
+          course: @course,
           registration:,
           available: true
         )

@@ -81,7 +81,7 @@ describe Lti::ContextControlService do
     end
 
     context "when the course_id is provided" do
-      let(:course) { course_model }
+      let(:course) { course_model(account: root_account) }
       let(:account) { nil }
 
       it "creates a new control if no existing one is found" do
