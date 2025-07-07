@@ -69,3 +69,60 @@ export const tagSetWithOneTag: TagCategoryCardProps['category'] = {
     },
   ],
 }
+
+export const multipleTagsCategoryLimit: TagCategoryCardProps['category'] = {
+  id: 3,
+  name: 'Reading Groups',
+  groups: [
+    {
+      id: 201,
+      name: 'Variant A',
+      members_count: 10,
+    },
+    {
+      id: 202,
+      name: 'Variant B',
+      members_count: 20,
+    },
+    {
+      id: 203,
+      name: 'Variant C',
+      members_count: 30,
+    },
+    {
+      id: 204,
+      name: 'Variant D',
+      members_count: 40,
+    },
+    {
+      id: 205,
+      name: 'Variant E',
+      members_count: 50,
+    },
+    {
+      id: 206,
+      name: 'Variant F',
+      members_count: 60,
+    },
+    {
+      id: 207,
+      name: 'Variant G',
+      members_count: 70,
+    },
+    {
+      id: 208,
+      name: 'Variant H',
+      members_count: 80,
+    },
+    {
+      id: 209,
+      name: 'Variant I',
+      members_count: 90,
+    },
+    {
+      id: 210,
+      name: 'Variant J',
+      members_count: 100,
+    },
+  ],
+}

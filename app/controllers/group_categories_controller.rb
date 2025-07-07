@@ -397,6 +397,13 @@ class GroupCategoriesController < ApplicationController
         @group_category.update!(name: gc_params[:name])
       end
 
+      delete_ops.each do |group_params|
+        permitted_attrs = group_params.permit(:id)
+        group = @group_category.groups.find(permitted_attrs[:id])
+        group.destroy!
+        results[:deleted] << group
+      end
+
       create_ops.each do |group_params|
         permitted_attrs = group_params.permit(:name)
         group = @group_category.groups.create!(permitted_attrs.merge(context: @group_category.context))
@@ -408,13 +415,6 @@ class GroupCategoriesController < ApplicationController
         group = @group_category.groups.find(permitted_attrs[:id])
         group.update!(name: permitted_attrs[:name])
         results[:updated] << group
-      end
-
-      delete_ops.each do |group_params|
-        permitted_attrs = group_params.permit(:id)
-        group = @group_category.groups.find(permitted_attrs[:id])
-        group.destroy!
-        results[:deleted] << group
       end
     end
 

@@ -132,6 +132,8 @@ class ContextController < ApplicationController
                  user_services_url: context_url(@context, :context_user_services_url),
                  observer_pairing_codes_url: course_observer_pairing_codes_url(@context),
                  course_student_count: allow_assign_to_differentiation_tags ? @context.student_enrollments.count : nil,
+                 max_differentiation_tag_per_course: allow_assign_to_differentiation_tags ? GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE : nil,
+                 max_variants_per_tag_category: allow_assign_to_differentiation_tags ? Group.MAX_VARIANTS_PER_TAG_CATEGORY : nil,
                }
              })
       set_tutorial_js_env
