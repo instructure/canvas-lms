@@ -97,34 +97,34 @@ export default function ResultCard(props: ResultCardProps) {
   }
 
   const renderPills = (id: string, dueDate: string | null, published: boolean | null) => {
-    let datePill, publishPill
+    const pills = [
+      <>
+        {iconClass(content_type)}
+        <Text variant="content">{readable_type}</Text>
+      </>,
+    ]
     if (dueDate) {
       const fudgedDate = fudgeDateForProfileTimezone(new Date(dueDate))
-      datePill = (
+      pills.push(
         <Pill data-testid={`${id}-due`} renderIcon={<IconCalendarMonthLine />}>
           {I18n.t('Due %{date}', {
             date: fudgedDate!.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}),
           })}
-        </Pill>
+        </Pill>,
       )
     }
     if (published === false) {
-      publishPill = (
+      pills.push(
         <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishedLine />}>
           {I18n.t('Unpublished')}
-        </Pill>
+        </Pill>,
       )
     }
-    if (publishPill || datePill) {
-      return (
-        <Flex gap="space8">
-          {datePill}
-          {publishPill}
-        </Flex>
-      )
-    } else {
-      return null
-    }
+    return (
+      <Flex key="content-type" gap="space8" alignItems="center">
+        {pills}
+      </Flex>
+    )
   }
 
   return (
@@ -140,10 +140,6 @@ export default function ResultCard(props: ResultCardProps) {
           {title}
         </Heading>
       </Link>
-      <Flex gap="space8" alignItems="center">
-        {iconClass(content_type)}
-        <Text variant="content">{readable_type}</Text>
-      </Flex>
       {renderPills(
         `${props.result.content_id}-${props.result.content_type}`,
         props.result.due_date ?? null,

@@ -19,7 +19,6 @@
 import {Flex} from '@instructure/ui-flex'
 import type {Result} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Text} from '@instructure/ui-text'
 import ResultCard from './ResultCard'
 import {Heading} from '@instructure/ui-heading'
 
@@ -37,12 +36,7 @@ export default function SimilarResults(props: Props) {
   return (
     <Flex gap="sectionElements" direction="column" width="80%">
       <Flex.Item>
-        <Heading variant="titleSection">{I18n.t('Similar results')}</Heading>
-        <Text>
-          {I18n.t(
-            'While not a direct match, these results could still provide useful information.',
-          )}
-        </Text>
+        <Heading variant="titleSection">{I18n.t('You may also be interested in')}</Heading>
       </Flex.Item>
       {props.results.map((result, index) => (
         <ResultCard
