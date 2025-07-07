@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useMemo, useState} from 'react'
+import {useCallback, useMemo, useState, useEffect} from 'react'
 import {getSelectionScreenReaderText} from '../components/FileFolderTable/FileFolderTableUtils'
 
 export const useHandleSelections = (
@@ -24,6 +24,10 @@ export const useHandleSelections = (
   setSelectionAnnouncement: (announcement: string) => void,
 ) => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    setSelectedIds(new Set())
+  }, [selectableIds])
 
   const idsIndex = useMemo(
     () =>
