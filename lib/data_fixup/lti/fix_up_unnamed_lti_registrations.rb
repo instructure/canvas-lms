@@ -21,6 +21,7 @@ module DataFixup::Lti::FixUpUnnamedLtiRegistrations
   def self.run
     Lti::Registration.joins(:developer_key)
                      .where(name: "Unnamed tool")
+                     .where.not(developer_keys: { name: nil })
                      .in_batches
                      .update_all("name = developer_keys.name")
   end
