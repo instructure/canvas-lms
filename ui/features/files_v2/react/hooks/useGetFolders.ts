@@ -21,7 +21,12 @@ import {useParams} from 'react-router-dom'
 import splitAssetString from '@canvas/util/splitAssetString'
 import {getFilesEnv} from '../../utils/filesEnvUtils'
 import {createStubRootFolder} from '../../utils/folderUtils'
-import {generateFolderByPathUrl, NotFoundError, UnauthorizedError} from '../../utils/apiUtils'
+import {
+  doFetchApiWithAuthCheck,
+  generateFolderByPathUrl,
+  NotFoundError,
+  UnauthorizedError,
+} from '../../utils/apiUtils'
 import {Folder} from '../../interfaces/File'
 
 function getRootFolder({
@@ -38,24 +43,26 @@ function getRootFolder({
 
 async function loadFolders(pluralContextType: string, contextId: string, path?: string) {
   const url = generateFolderByPathUrl(pluralContextType, contextId, path)
-  const resp = await fetch(url)
-  if (resp.status === 401) {
-    throw new UnauthorizedError()
-  }
 
-  if (resp.status === 404) {
-    throw new NotFoundError(url)
-  }
+  try {
+    const {json} = await doFetchApiWithAuthCheck<Folder[]>({
+      path: url,
+    })
 
-  if (!resp.ok) {
-    throw new Error(`Request failed with status ${resp.status}`)
-  }
+    if (!json || json.length === 0) {
+      throw new Error()
+    }
 
-  const folders = await resp.json()
-  if (!folders || folders.length === 0) {
+    return json
+  } catch (err) {
+    if (err instanceof UnauthorizedError) {
+      throw err
+    }
+    const status = (err as any).response?.status
+    if (status === 404) throw new NotFoundError(url)
+    if (status && status >= 400) throw new Error(`Request failed with status ${status}`)
     throw new Error('Error fetching by_path')
   }
-  return folders as Folder[]
 }
 
 export const useGetFolders = () => {

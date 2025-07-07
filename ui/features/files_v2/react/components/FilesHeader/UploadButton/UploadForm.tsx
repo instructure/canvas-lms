@@ -29,7 +29,7 @@ import {Flex} from '@instructure/ui-flex'
 const I18n = createI18nScope('upload_drop_zone')
 
 type UploadFormProps = {
-  contextId: string | number
+  contextId: string
   contextType: string
   currentFolder: BBFolderWrapper
   open: boolean

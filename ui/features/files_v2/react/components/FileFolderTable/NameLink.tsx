@@ -45,7 +45,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
     const previewId = searchParams.get('preview')
-    if (previewId === item.id.toString()) {
+    if (previewId === item.id) {
       setIsModalOpen(true)
     } else {
       setIsModalOpen(false)
@@ -57,7 +57,7 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
       e.preventDefault()
       setIsModalOpen(true)
       const searchParams = new URLSearchParams(location.search)
-      searchParams.set('preview', item.id.toString())
+      searchParams.set('preview', item.id)
       navigate(`?${searchParams.toString()}`, {replace: true})
     } else if (item.locked_for_user) {
       e.preventDefault()

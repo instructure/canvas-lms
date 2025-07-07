@@ -17,7 +17,7 @@
  */
 
 export const file = {
-  id: 1,
+  id: '1',
   folder_id: 'folder-1',
   display_name: 'example.pdf',
   filename: 'example.pdf',

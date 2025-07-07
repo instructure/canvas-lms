@@ -34,7 +34,7 @@ const defaultProps: BulkActionButtonsProps = {
   userCanDeleteFilesForContext: true,
   userCanRestrictFilesForContext: true,
   usageRightsRequiredForContext: true,
-  rows: [{id: 1, display_name: 'File 1'} as File, {id: 2, display_name: 'File 2'} as File],
+  rows: [{id: '1', display_name: 'File 1'} as File, {id: '2', display_name: 'File 2'} as File],
 }
 
 const renderComponent = (props: BulkActionButtonsProps = {...defaultProps}) => {
@@ -162,8 +162,8 @@ describe('BulkActionButtons', () => {
     renderComponent({
       ...defaultProps,
       rows: [
-        {id: 1, display_name: 'File 1', restricted_by_master_course: true} as File,
-        {id: 2, display_name: 'File 2'} as File,
+        {id: '1', display_name: 'File 1', restricted_by_master_course: true} as File,
+        {id: '2', display_name: 'File 2'} as File,
       ],
     })
     const moreButton = screen.getByTestId('bulk-actions-more-button')
@@ -189,7 +189,7 @@ describe('BulkActionButtons', () => {
     beforeEach(() => {
       renderComponent({
         ...defaultProps,
-        rows: [{id: 1, name: 'Folder 1'} as Folder, {id: 2, name: 'Folder 2'} as Folder],
+        rows: [{id: '1', name: 'Folder 1'} as Folder, {id: '2', name: 'Folder 2'} as Folder],
         selectedRows: new Set(['folder-1', 'folder-2']),
       })
     })

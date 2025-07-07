@@ -26,7 +26,7 @@ import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import getCookie from '@instructure/get-cookie'
-import {UnauthorizedError} from '../../../../utils/apiUtils'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -54,25 +54,12 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
     setIsDeleting(true)
     try {
       const deletePromises = items.filter(Boolean).map(async (item: File | Folder) => {
-        const response = await fetch(
-          `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}?force=true`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': getCookie('_csrf_token'),
-            },
-          },
-        )
-
-        if (response.status === 401) {
-          throw new UnauthorizedError()
-        }
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`Failed to delete ${item.id}: ${response.status} - ${errorText}`)
-        }
+        return doFetchApiWithAuthCheck({
+          path: `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}?force=true`,
+          method: 'DELETE',
+        }).catch(err => {
+          throw err
+        })
       })
 
       await Promise.all(deletePromises)
@@ -89,7 +76,9 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
         setSessionExpired(true)
         return
       }
-      const errorMessage = I18n.t('Failed to delete items. Please try again.')
+      const errorMessage = isMultiple
+        ? I18n.t('Failed to delete items. Please try again.')
+        : I18n.t('Failed to delete item. Please try again.')
       showFlashError(errorMessage)
     } finally {
       onClose()

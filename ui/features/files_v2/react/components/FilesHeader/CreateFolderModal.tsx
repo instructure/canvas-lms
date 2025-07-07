@@ -25,7 +25,11 @@ import {TextInput} from '@instructure/ui-text-input'
 import {queryClient} from '@canvas/query'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {useRows} from '../../contexts/RowsContext'
-import {generateFolderPostUrl, UnauthorizedError} from '../../../utils/apiUtils'
+import {
+  doFetchApiWithAuthCheck,
+  generateFolderPostUrl,
+  UnauthorizedError,
+} from '../../../utils/apiUtils'
 import getCookie from '@instructure/get-cookie'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {View} from '@instructure/ui-view'
@@ -55,20 +59,15 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
     mutationFn: async (name: string) => {
       setIsRequestInFlight(true)
       const postUrl = generateFolderPostUrl(parentFolderId)
-      const response = await fetch(postUrl, {
+      return doFetchApiWithAuthCheck({
+        path: postUrl,
         method: 'POST',
-        body: JSON.stringify({name}),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': getCookie('_csrf_token'),
+        body: {
+          name: name,
         },
+      }).catch(err => {
+        throw err
       })
-      if (response.status === 401) {
-        throw new UnauthorizedError()
-      }
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
     },
     onSuccess: async () => {
       setWasRequestSuccessful(true)
@@ -80,9 +79,7 @@ const CreateFolderModal = ({isOpen, onRequestClose, onExited}: CreateFolderModal
         setSessionExpired(true)
         return
       }
-      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))(
-        error as Error,
-      )
+      showFlashError(I18n.t('There was an error creating the folder. Please try again.'))()
     },
     onSettled: () => {
       setIsRequestInFlight(false)
