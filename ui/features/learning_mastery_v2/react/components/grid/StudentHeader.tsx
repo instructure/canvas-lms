@@ -27,21 +27,7 @@ import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-type GradebookFilter = 'missing_user_rollups' | 'inactive_enrollments' | 'concluded_enrollments'
-
-interface StudentHeaderProps {
-  gradebookFilters: string[]
-  gradebookFilterHandler: (filter: GradebookFilter) => void
-}
-
-export const StudentHeader: React.FC<StudentHeaderProps> = ({
-  gradebookFilters,
-  gradebookFilterHandler,
-}) => {
-  const toggleStudentsWithoutAssessments = () => gradebookFilterHandler('missing_user_rollups')
-  const toggleInactiveEnrollments = () => gradebookFilterHandler('inactive_enrollments')
-  const toggleConcludedEnrollments = () => gradebookFilterHandler('concluded_enrollments')
-
+export const StudentHeader = () => {
   return (
     <View background="secondary" as="div" width={STUDENT_COLUMN_WIDTH}>
       <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
@@ -63,28 +49,6 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
             }
           >
             <Menu.Item>{I18n.t('Sort By')}</Menu.Item>
-            <Menu.Item>{I18n.t('Display as')}</Menu.Item>
-            <Menu.Item>{I18n.t('Secondary info')}</Menu.Item>
-            <Menu.Group label={I18n.t('Show')} allowMultiple={true}>
-              <Menu.Item
-                selected={!gradebookFilters.includes('missing_user_rollups')}
-                onSelect={toggleStudentsWithoutAssessments}
-              >
-                {I18n.t('Students without assessments')}
-              </Menu.Item>
-              <Menu.Item
-                selected={!gradebookFilters.includes('inactive_enrollments')}
-                onSelect={toggleInactiveEnrollments}
-              >
-                {I18n.t('Inactive Enrollments')}
-              </Menu.Item>
-              <Menu.Item
-                selected={!gradebookFilters.includes('concluded_enrollments')}
-                onSelect={toggleConcludedEnrollments}
-              >
-                {I18n.t('Concluded Enrollments')}
-              </Menu.Item>
-            </Menu.Group>
           </Menu>
         </Flex.Item>
       </Flex>

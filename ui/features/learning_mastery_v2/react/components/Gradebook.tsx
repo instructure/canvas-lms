@@ -48,8 +48,6 @@ export const Gradebook: React.FC<GradebookProps> = ({
   students,
   outcomes,
   rollups,
-  gradebookFilters,
-  gradebookFilterHandler,
   pagination,
   setCurrentPage,
 }) => {
@@ -79,10 +77,7 @@ export const Gradebook: React.FC<GradebookProps> = ({
       <Flex padding="medium 0 0 0">
         <Flex.Item>
           <View borderWidth="large 0 medium 0">
-            <StudentHeader
-              gradebookFilters={gradebookFilters}
-              gradebookFilterHandler={gradebookFilterHandler}
-            />
+            <StudentHeader />
           </View>
         </Flex.Item>
         <Flex.Item size={`${STUDENT_COLUMN_RIGHT_PADDING}px`} />

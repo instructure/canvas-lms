@@ -21,63 +21,14 @@ import {render, fireEvent} from '@testing-library/react'
 import {StudentHeader} from '../StudentHeader'
 
 describe('StudentHeader', () => {
-  let gradebookFilterHandlerMock: jest.Mock
-
-  const defaultProps = (
-    _props = {},
-  ): {
-    gradebookFilters: string[]
-    gradebookFilterHandler: jest.Mock
-  } => ({
-    gradebookFilters: [],
-    gradebookFilterHandler: gradebookFilterHandlerMock,
-  })
-
-  beforeEach(() => {
-    gradebookFilterHandlerMock = jest.fn()
-  })
-
   it('renders a "Student" cell', () => {
-    const {getByText} = render(<StudentHeader {...defaultProps()} />)
+    const {getByText} = render(<StudentHeader />)
     expect(getByText('Students')).toBeInTheDocument()
   })
 
   it('renders a menu with various sorting options', () => {
-    const {getByText} = render(<StudentHeader {...defaultProps()} />)
+    const {getByText} = render(<StudentHeader />)
     fireEvent.click(getByText('Sort Students'))
     expect(getByText('Sort By')).toBeInTheDocument()
-    expect(getByText('Display as')).toBeInTheDocument()
-    expect(getByText('Secondary info')).toBeInTheDocument()
-    expect(
-      getByText('Students without assessments').closest('[role=menuitemcheckbox]'),
-    ).toBeChecked()
-    expect(getByText('Inactive Enrollments').closest('[role=menuitemcheckbox]')).toBeChecked()
-    expect(getByText('Concluded Enrollments').closest('[role=menuitemcheckbox]')).toBeChecked()
-  })
-
-  describe('gradebook filter handler', () => {
-    it("calls gradebook handler function with correct parameter when selecting 'Students without assessments'", () => {
-      const {getByText} = render(<StudentHeader {...defaultProps()} />)
-      fireEvent.click(getByText('Sort Students'))
-      fireEvent.click(getByText('Students without assessments'))
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledTimes(1)
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledWith('missing_user_rollups')
-    })
-
-    it("calls gradebook handler function with correct parameter when selecting 'Inactive Enrollments'", () => {
-      const {getByText} = render(<StudentHeader {...defaultProps()} />)
-      fireEvent.click(getByText('Sort Students'))
-      fireEvent.click(getByText('Inactive Enrollments'))
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledTimes(1)
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledWith('inactive_enrollments')
-    })
-
-    it("calls gradebook handler function with correct parameter when selecting 'Concluded Enrollments'", () => {
-      const {getByText} = render(<StudentHeader {...defaultProps()} />)
-      fireEvent.click(getByText('Sort Students'))
-      fireEvent.click(getByText('Concluded Enrollments'))
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledTimes(1)
-      expect(gradebookFilterHandlerMock).toHaveBeenCalledWith('concluded_enrollments')
-    })
   })
 })
