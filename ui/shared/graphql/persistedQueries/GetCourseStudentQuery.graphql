@@ -1,0 +1,14 @@
+query GetCourseStudentQuery($courseId: ID!) {
+  legacyNode(_id: $courseId, type: Course) {
+    ... on Course {
+      name
+      submissionStatistics {
+        missingSubmissionsCount
+        submissionsDueThisWeekCount
+      }
+      settings {
+        showStudentOnlyModuleId
+      }
+    }
+  }
+}

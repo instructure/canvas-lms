@@ -20,7 +20,8 @@
 module GraphQL
   # Predefined GraphQL queries to mitigate abuse by unauthenticated users
   class PersistedQuery
-    QUERY_FILE_PATH = "ui/shared/graphql/persistedQueries.yml"
+    QUERIES_DIR = "ui/shared/graphql/persistedQueries"
+    MANIFEST_FILE = "manifest.json"
 
     class << self
       def find(operation_name)
@@ -28,10 +29,24 @@ module GraphQL
       end
 
       def known_queries
-        @known_queries ||= YAML.safe_load_file(Rails.root.join(QUERY_FILE_PATH))
+        @known_queries ||= load_queries
       rescue => e
-        Rails.logger.error "Error while loading yaml file #{QUERY_FILE_PATH}: #{e}"
+        Rails.logger.error "Error while loading persisted queries: #{e}"
         raise
+      end
+
+      private
+
+      def load_queries
+        manifest_path = Rails.root.join(QUERIES_DIR, MANIFEST_FILE)
+        manifest = JSON.parse(File.read(manifest_path))
+
+        manifest.each_with_object({}) do |(query_name, metadata), result|
+          query_path = Rails.root.join(QUERIES_DIR, "#{query_name}.graphql")
+          query_content = File.read(query_path)
+
+          result[query_name] = metadata.merge("query" => query_content)
+        end
       end
     end
   end
