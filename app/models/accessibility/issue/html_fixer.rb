@@ -48,16 +48,24 @@ module Accessibility
 
       def apply_fix!
         body = record.send(target_attribute)
-        fixed_content, = fix_content(body, rule, path, value)
-        record.send("#{target_attribute}=", fixed_content)
-        record.save!
-        { json: { success: true }, status: :ok }
+        fixed_content, _, error = fix_content(body, rule, path, value)
+        if error.nil?
+          record.send("#{target_attribute}=", fixed_content)
+          record.save!
+          { json: { success: true }, status: :ok }
+        else
+          { json: { error: }, status: :bad_request }
+        end
       end
 
       def fix_preview
         body = record.send(target_attribute)
-        fixed_content, fixed_path = fix_content(body, rule, path, value)
-        { json: { content: fixed_content, path: fixed_path }, status: :ok }
+        fixed_content, fixed_path, error = fix_content(body, rule, path, value)
+        if error.nil?
+          { json: { content: fixed_content, path: fixed_path }, status: :ok }
+        else
+          { json: { error: }, status: :bad_request }
+        end
       end
 
       private
@@ -69,16 +77,19 @@ module Accessibility
         begin
           element = doc.at_xpath(target_element)
           if element
-            rule.fix(element, fix_value)
+            changed = rule.fix!(element, fix_value)
+            error = nil
+            unless changed.nil?
+              error = rule.test(element)
+            end
+            [doc.to_html, element_path(element), error]
           else
             raise "Element not found for path: #{target_element}"
           end
-
-          [doc.to_html, element_path(element)]
         rescue => e
-          Rails.logger.error "Accessibility Rule content fix problem encountered: #{e.message}"
+          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
           Rails.logger.error e.backtrace.join("\n")
-          [html_content, nil]
+          [html_content, nil, e.message]
         end
       end
 

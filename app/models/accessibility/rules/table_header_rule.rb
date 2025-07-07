@@ -24,9 +24,9 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H51.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "table"
+        return nil if elem.tag_name != "table"
 
-        !elem.query_selector("th").nil?
+        "Table shall have a header." if elem.query_selector("th").nil?
       end
 
       def self.message
@@ -50,15 +50,14 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
-        # Remove existing headers by converting <th> to <td>
+      def self.fix!(elem, value)
         elem.query_selector_all("th").each do |th|
           th.name = "td"
         end
 
         case value
         when "None"
-          return elem
+          return nil
         when "Header row", "Header row and column"
           first_row = elem.query_selector("tr")
           first_row&.query_selector_all("td")&.each do |td|

@@ -24,10 +24,11 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
 
       def self.test(elem)
-        return true if elem.tag_name.downcase != "table"
+        return nil if elem.tag_name.downcase != "table"
 
         caption = elem.query_selector("caption")
-        !!caption && caption.text_content.gsub(/\s/, "") != ""
+
+        "Table caption should be present." if !caption || caption.text_content.gsub(/\s/, "") == ""
       end
 
       def self.message
@@ -57,9 +58,14 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
+        raise StandardError, "Caption cannot be empty." if value.blank?
+
         caption = elem.at_css("caption")
-        unless caption
+        if caption
+          return nil if (caption.content = value)
+
+        else
           caption = elem.document.create_element("caption")
           prepend(elem, caption)
         end

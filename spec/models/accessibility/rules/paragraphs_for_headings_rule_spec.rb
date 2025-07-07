@@ -23,20 +23,9 @@ require_relative "rule_test_helper"
 RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
   include RuleTestHelper
 
-  context "when testing paragraphs after headings" do
-    it "identifies headings without following paragraphs" do
-      input_html = "<div><h2>Heading without paragraph</h2><h3>Another heading</h3><p>This paragraph belongs to the second heading.</p></div>"
-
-      issues = find_issues(:paragraphs_for_headings, input_html, "page-123")
-
-      expect(issues).not_to be_empty
-      if issues.any?
-        expect(issues.first[:element_type]).to eq("h2")
-      end
-    end
-
-    it "maintains resource-specific isolation between content types" do
-      input_html = "<div><h2>Heading without paragraph</h2><h3>Another heading</h3><p>This paragraph belongs to the second heading.</p></div>"
+  context "when testing headling lengths" do
+    it "finds a heading with very long text" do
+      input_html = "<div><h2>This heading is way much longer than 120 characters. This heading is way much longer than 120 characters. This heading is way much longer than 120 characters.</h2></div>"
 
       page_issues = find_issues(:paragraphs_for_headings, input_html, "page-123")
       assignment_issues = find_issues(:paragraphs_for_headings, input_html, "assignment-456")
@@ -48,9 +37,19 @@ RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+
+    it "skips a heading with short text" do
+      input_html = "<div><h2>Short heading</h2></div>"
+
+      page_issues = find_issues(:paragraphs_for_headings, input_html, "page-123")
+      assignment_issues = find_issues(:paragraphs_for_headings, input_html, "assignment-456")
+
+      expect(page_issues).to be_empty
+      expect(assignment_issues).to be_empty
+    end
   end
 
-  context "when fixing headings to paragraphs" do
+  context "find a heading with short text" do
     it "changes a heading to a paragraph" do
       input_html = '<div><h2 id="test-element">Heading text</h2></div>'
       fixed_html = fix_issue(:paragraphs_for_headings, input_html, './/h2[@id="test-element"]', "true")

@@ -22,7 +22,7 @@ require "spec_helper"
 describe Accessibility::Issue do
   let(:mock_rule) do
     Class.new do
-      def self.test(_elem) = true
+      def self.test(_elem) = nil
       def self.id = "mock-rule"
       def self.message = "No issue"
       def self.why = "Just a mock"

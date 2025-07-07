@@ -26,13 +26,13 @@ module Accessibility
       MAX_LENGTH = 120
 
       def self.test(elem)
-        return true if elem.tag_name != "img"
-        return true unless elem.attribute?("alt")
+        return nil if elem.tag_name != "img"
+        return nil unless elem.attribute?("alt")
 
         alt = elem.get_attribute("alt")
-        return true if alt.blank?
+        return nil if alt.blank?
 
-        alt.length <= MAX_LENGTH
+        "Alt text is longer than #{MAX_LENGTH}." if alt.length > MAX_LENGTH
       end
 
       def self.message
@@ -55,8 +55,13 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
+        raise StandardError, "Too long alt text. It should be less than #{MAX_LENGTH} characters." if value.length > MAX_LENGTH
+
+        return nil if elem["alt"] == value
+
         elem["alt"] = value
+        elem
       end
     end
   end

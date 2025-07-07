@@ -27,7 +27,7 @@ module Accessibility
         info = elem.info || {}
 
         # Language can be stored in different fields depending on the PDF creator
-        info.values_at(:Lang, :Language, "Lang", "Language").any?
+        "PDF does not contain language." if info.values_at(:Lang, :Language, "Lang", "Language").none?
       end
 
       def self.message

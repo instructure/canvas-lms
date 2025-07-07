@@ -37,7 +37,7 @@ module Accessibility
                 next unless node.is_a?(Nokogiri::XML::Element)
 
                 walk_dom_tree(node) do |element|
-                  next if rule_class.test(element)
+                  next if rule_class.test(element).nil?
 
                   issues << build_issue(rule_class, element: element.name, form: rule_class.form(element).to_h, path: element_path(element))
                 rescue => e

@@ -25,9 +25,9 @@ module Accessibility
       VALID_SCOPES = %w[row col rowgroup colgroup].freeze
 
       def self.test(elem)
-        return true if elem.tag_name.downcase != "th"
+        return nil if elem.tag_name.downcase != "th"
 
-        elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
+        "Table header shall have a valid scope associated with it." unless elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
       end
 
       def self.message
@@ -52,7 +52,7 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
         value_symbol = value.to_sym
 
         scope_lookup_table = {
@@ -65,9 +65,12 @@ module Accessibility
         if value_symbol == :None
           elem.remove_attribute("scope")
         elsif scope_lookup_table.key?(value_symbol)
-          elem["scope"] = scope_lookup_table[value_symbol]
-        end
+          return nil if elem["scope"] == scope_lookup_table[value_symbol]
 
+          elem["scope"] = scope_lookup_table[value_symbol]
+        else
+          raise StandardError, "Invalid scope value. Valid options are: #{VALID_SCOPES.join(", ")}." unless VALID_SCOPES.include?(value)
+        end
         elem
       end
     end

@@ -62,7 +62,7 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.fix(nil, nil)
+          described_class.fix!(nil, nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement fix")
       end
     end

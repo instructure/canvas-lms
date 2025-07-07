@@ -24,7 +24,7 @@ module Accessibility
       self.link = "https://www.w3.org/WAI/tutorials/page-structure/headings/"
 
       def self.test(elem)
-        elem.tag_name != "h1"
+        "Document shall not contain a H1 element." if elem.tag_name == "h1"
       end
 
       def self.message
@@ -49,10 +49,10 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
         case value
         when "Leave as is"
-          # Do nothing
+          return nil
         when "Change only this headings level"
           elem.name = "h2"
         when "Remove heading style"
@@ -60,6 +60,7 @@ module Accessibility
         else
           raise ArgumentError, "Invalid value for form: #{value}"
         end
+        elem
       end
     end
   end
