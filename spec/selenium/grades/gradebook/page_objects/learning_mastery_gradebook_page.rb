@@ -53,6 +53,10 @@ class LearningMasteryGradebookPage
       "[data-testid=\"gradebook-pagination\"]"
     end
 
+    def per_page_dropdown_selector
+      '[data-testid="per-page-selector"]'
+    end
+
     def gradebook_menu
       f('[data-testid="lmgb-gradebook-menu"]')
     end
@@ -79,6 +83,14 @@ class LearningMasteryGradebookPage
 
     def pagination_controls
       f(pagination_controls_selector)
+    end
+
+    def per_page_dropdown
+      f('[data-testid="per-page-selector"]')
+    end
+
+    def per_page_dropdown_options
+      INSTUI_Select_options(per_page_dropdown_selector)
     end
   end
 end

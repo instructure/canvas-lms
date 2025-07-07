@@ -117,6 +117,7 @@ describe('LearningMastery', () => {
       outcomes,
       rollups,
       setCurrentPage: jest.fn(),
+      setStudentsPerPage: jest.fn(),
     })
   })
 

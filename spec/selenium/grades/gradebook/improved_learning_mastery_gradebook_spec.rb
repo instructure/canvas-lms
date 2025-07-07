@@ -131,6 +131,18 @@ describe "Improved Learning Mastery Gradebook" do
         navigate_to_gradebook
         expect(f("body")).not_to contain_css(LearningMasteryGradebookPage.pagination_controls_selector)
       end
+
+      it "updates the number of students per page" do
+        register_and_enroll_students(30)
+        navigate_to_gradebook
+
+        per_page_dropdown = LearningMasteryGradebookPage.per_page_dropdown
+        expect(per_page_dropdown).to be_displayed
+        expect(LearningMasteryGradebookPage.per_page_dropdown_options.map(&:text)).to include("15", "30", "50", "100")
+        click_INSTUI_Select_option(per_page_dropdown, "30")
+        wait_for_ajaximations
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
+      end
     end
   end
 end

@@ -31,6 +31,7 @@ import {
   StudentRollupData,
   Pagination,
 } from '../types/rollup'
+import {DEFAULT_STUDENTS_PER_PAGE} from '../utils/constants'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -44,6 +45,7 @@ interface UseRollupsReturn extends RollupData {
   gradebookFilters: string[]
   setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentPage: (page: number) => void
+  setStudentsPerPage: (studentsPerPage: number) => void
 }
 
 interface RollupData {
@@ -109,6 +111,7 @@ export default function useRollups({
     outcomes: [],
     students: [],
   })
+  const [studentsPerPage, setStudentsPerPage] = useState<number>(DEFAULT_STUDENTS_PER_PAGE)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -121,6 +124,7 @@ export default function useRollups({
           gradebookFilters,
           needMasteryAndColorDefaults,
           currentPage,
+          studentsPerPage,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -133,6 +137,7 @@ export default function useRollups({
             currentPage: data.meta.pagination.page,
             perPage: data.meta.pagination.per_page,
             totalPages: data.meta.pagination.page_count,
+            totalCount: data.meta.pagination.count,
           },
         })
         setIsLoading(false)
@@ -143,7 +148,7 @@ export default function useRollups({
         })
       }
     })()
-  }, [courseId, needMasteryAndColorDefaults, gradebookFilters, currentPage])
+  }, [courseId, needMasteryAndColorDefaults, gradebookFilters, currentPage, studentsPerPage])
 
   return {
     isLoading,
@@ -152,7 +157,8 @@ export default function useRollups({
     rollups: data.rollups,
     gradebookFilters,
     setGradebookFilters,
-    pagination: data.pagination,
+    pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
     setCurrentPage,
+    setStudentsPerPage,
   }
 }
