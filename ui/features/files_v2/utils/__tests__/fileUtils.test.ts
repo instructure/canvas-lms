@@ -92,19 +92,19 @@ describe('fileUtils', () => {
 
   describe('generatePreviewUrlPath', () => {
     it('should return the correct preview URL path', () => {
-      const item: File = {context_asset_string: 'model_1', id: 123} as File
+      const item: File = {context_asset_string: 'model_1', id: '123'} as File
       expect(generatePreviewUrlPath(item)).toBe('?preview=123')
     })
 
     it('should throw an error if context_asset_string is missing', () => {
-      const item: File = {context_asset_string: '', id: 123} as File
+      const item: File = {context_asset_string: '', id: '123'} as File
       expect(() => generatePreviewUrlPath(item)).toThrow(
         'File must have context_asset_string and id properties',
       )
     })
 
     it('should throw an error if context_asset_string format is invalid', () => {
-      const item: File = {context_asset_string: 'invalid', id: 123} as File
+      const item: File = {context_asset_string: 'invalid', id: '123'} as File
       expect(() => generatePreviewUrlPath(item)).toThrow('Invalid context_asset_string format')
     })
   })

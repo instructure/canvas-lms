@@ -31,7 +31,7 @@ import {queueOptionsCollectionUploads, startUpload} from '../../../utils/uploadU
 const I18n = createI18nScope('upload_drop_zone')
 
 type FileUploadDropProps = {
-  contextId: string | number
+  contextId: string
   contextType: string
   currentFolder: BBFolderWrapper
   onClose?: () => void

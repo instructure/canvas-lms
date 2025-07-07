@@ -23,24 +23,19 @@ import {
   parseLinkHeader,
   parseBookmarkFromUrl,
   generateTableUrl,
-  UnauthorizedError,
+  doFetchApiWithAuthCheck,
 } from '../../utils/apiUtils'
 import {useSearchTerm} from './useSearchTerm'
 
 export const PER_PAGE = 25
 
 const fetchFilesAndFolders = async (url: string) => {
-  const response = await fetch(url)
-  if (response.status === 401) {
-    throw new UnauthorizedError()
-  }
-  if (!response.ok) {
-    throw new Error()
-  }
+  const {json, response} = await doFetchApiWithAuthCheck<(File | Folder)[]>({
+    path: url,
+  })
   const links = parseLinkHeader(response.headers.get('Link'))
   const totalItems = Number(response.headers.get('X-Total-Items')) || 0
-  const rows = (await response.json()) as (File | Folder)[]
-  return {rows, links, totalItems}
+  return {rows: json!, links, totalItems}
 }
 
 type BookmarkByPage = {[key: number]: string}
@@ -73,7 +68,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
         searchTerm: urlEncodedSearchTerm,
         contextId: folder.context_id,
         contextType: folder.context_type.toLowerCase(),
-        folderId: folder.id.toString(),
+        folderId: folder.id,
         sortBy: sort.by,
         sortDirection: sort.direction,
         pageQueryParam: bookmarkByPage[currentPage],

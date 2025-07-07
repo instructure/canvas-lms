@@ -404,7 +404,7 @@ describe('ActionMenuButton', () => {
       await user.click(confirmButton)
 
       await waitFor(() => {
-        expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
+        expect(showFlashError).toHaveBeenCalledWith('Failed to delete item. Please try again.')
       })
     })
 

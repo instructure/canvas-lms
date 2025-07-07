@@ -19,7 +19,7 @@
 import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../utils/apiUtils'
 import {InfiniteData} from '@tanstack/react-query'
 
-export type ApiFolderItem = {id: string | number; name: string}
+export type ApiFolderItem = {id: string; name: string}
 export type ApiFoldersResponse = ApiFolderItem[]
 export type MultiPagePartialResponse = {json: ApiFoldersResponse; nextPage: string | null}
 export type MultiPageResponse = InfiniteData<{json: ApiFoldersResponse; nextPage: string | null}>

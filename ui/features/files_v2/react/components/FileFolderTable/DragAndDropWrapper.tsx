@@ -39,7 +39,7 @@ export const DragAndDropWrapper = (
     enabled: boolean
     minHeight: number
     currentFolder: BBFolderWrapper
-    contextId: string | number
+    contextId: string
     contextType: string
   }>,
 ) => {

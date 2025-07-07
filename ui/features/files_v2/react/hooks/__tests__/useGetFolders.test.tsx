@@ -85,7 +85,7 @@ describe('useGetFolders', () => {
     expect(fetchMock.called()).toBe(false)
     expect(result.current.data).toHaveLength(1)
     expect(result.current.data?.[0]).toMatchObject({
-      id: 2,
+      id: '2',
       context_id: '1',
       context_type: 'user',
     })

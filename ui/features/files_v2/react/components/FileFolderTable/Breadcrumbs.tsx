@@ -102,7 +102,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
 
   const breadcrumbs = folders.map((folder, index) => {
     const folderContextType = (folder.context_type || '').toLowerCase()
-    const folderContextId = (folder.context_id || -1).toString()
+    const folderContextId = folder.context_id || '-1'
     const isContextRoot = folderContextType === contextType && folderContextId === contextId
     const isRootCrumb = index === 0 && isContextRoot
 
@@ -117,7 +117,7 @@ const ResponsiveBreadcrumbs = ({folders, size, search}: ResponsiveBreadcrumbsPro
     name ||= folder.custom_name || folder.name
 
     const url = isRootCrumb && !showingAllContexts ? '/' : generateUrlPath(folder)
-    return {id: folder.id.toString(), name, url}
+    return {id: folder.id, name, url}
   })
 
   if (search) {

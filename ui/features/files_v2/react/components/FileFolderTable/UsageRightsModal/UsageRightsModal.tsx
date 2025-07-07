@@ -95,9 +95,9 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
     const fileIds: string[] = []
     items.forEach(item => {
       if (isFile(item)) {
-        fileIds.push(item.id.toString())
+        fileIds.push(item.id)
       } else {
-        folderIds.push(item.id.toString())
+        folderIds.push(item.id)
       }
     })
 

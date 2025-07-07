@@ -54,11 +54,11 @@ export const createStubRootFolder = ({
   rootFolderId: string
 }): Folder => {
   return {
-    id: parseInt(rootFolderId),
+    id: rootFolderId,
     name: '',
     parent_folder_id: null,
     context_id: contextId,
-    context_type: pluralContextType.toLowerCase().slice(0, -1),
+    context_type: pluralContextType.slice(0, -1),
     hidden: false,
     full_name: '',
     created_at: '',
