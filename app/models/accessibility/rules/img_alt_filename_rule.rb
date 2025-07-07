@@ -24,17 +24,17 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "img"
-        return true unless elem.attribute?("alt") && elem.attribute?("src")
+        return nil if elem.tag_name != "img"
+        return nil unless elem.attribute?("alt") && elem.attribute?("src")
 
         alt = elem.get_attribute("alt")
-        return true if alt.blank?
+        return nil if alt.blank?
 
         src = elem.get_attribute("src")
         filename = src.split("/").last.split("?").first
         filename_without_extension = filename.split(".").first
 
-        alt != filename && alt != filename_without_extension
+        "Alt text should not be the filename of the image." if alt == filename || alt == filename_without_extension
       end
 
       def self.message
@@ -57,8 +57,11 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
+        return nil if elem["alt"] == value
+
         elem["alt"] = value
+        elem
       end
     end
   end

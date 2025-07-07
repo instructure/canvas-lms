@@ -50,7 +50,8 @@ module Accessibility
 
       # Tests if an element passes this accessibility rule
       # @param elem [Nokogiri::XML::Element] The element to test
-      # @return [Boolean] True if the element passes, false if there's an issue
+      # @return [String] nil if the element passes, the validation problem
+      # if there's an issue
       def test(elem)
         raise NotImplementedError, "#{self} must implement/override test"
       end
@@ -62,11 +63,14 @@ module Accessibility
         {}
       end
 
-      # Fixes the issue in content, returning the updated element
+      # Fixes the issue in content, changing it in-place
       # @param _elem [Nokogiri::XML::Element] The element in the content to fix
       # @param _value [String] The value received back from the correction form
-      # @return [Nokogiri::XML::Element] The updated element
-      def fix(_elem, _value)
+      # @throws [StandardError] if the fix cannot be applied for a reason
+      # @throws [NotImplementedError] if not implemented in a rule
+      # @return [String] Potential error message if the fix fails, or nil if it
+      # succeeds
+      def fix!(_elem, _value)
         raise NotImplementedError, "#{self} must implement fix"
       end
 

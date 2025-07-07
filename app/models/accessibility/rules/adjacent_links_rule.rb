@@ -24,15 +24,15 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "a"
+        return nil if elem.tag_name != "a"
 
         next_elem = elem.next_element_sibling
-        return true unless next_elem && next_elem.tag_name == "a"
+        return nil unless next_elem && next_elem.tag_name == "a"
 
         elem_href = elem.get_attribute("href")
         next_href = next_elem.get_attribute("href")
 
-        elem_href != next_href
+        "Adjacent links contain the same URL." if elem_href == next_href
       end
 
       def self.message
@@ -59,9 +59,9 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
-        return elem unless test(elem) == false
-        return elem unless value == "true" || elem.tag_name == "a"
+      def self.fix!(elem, value)
+        return nil if test(elem).nil?
+        return nil unless value == "true" || elem.tag_name == "a"
 
         next_elem = elem.next_element_sibling
 

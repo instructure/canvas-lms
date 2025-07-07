@@ -35,9 +35,9 @@ module Accessibility
       }.freeze
 
       def self.test(elem)
-        return true unless IS_HEADING[elem.tag_name.downcase]
+        return nil unless IS_HEADING[elem.tag_name.downcase]
 
-        elem.text_content.length <= MAX_HEADING_LENGTH
+        "Heading shall be shorter than #{MAX_HEADING_LENGTH}." if elem.text_content.length > MAX_HEADING_LENGTH
       end
 
       def self.message
@@ -59,8 +59,8 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
-        return elem unless value == "true"
+      def self.fix!(elem, value)
+        return nil unless value == "true"
 
         elem.name = "p"
         elem

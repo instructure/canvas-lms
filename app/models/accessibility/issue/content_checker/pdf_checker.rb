@@ -28,7 +28,7 @@ module Accessibility
             pdf_reader = PDF::Reader.new(pdf.open)
 
             pdf_rules.each do |rule_class|
-              next if rule_class.test(pdf_reader)
+              next if rule_class.test(pdf_reader).nil?
 
               issues << build_issue(rule_class, element: "PDF Document")
             rescue => e

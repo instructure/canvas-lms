@@ -108,16 +108,16 @@ module Accessibility
           "h6" => true
         }
 
-        return true if test_tags[elem.tag_name.downcase] != true
+        return nil if test_tags[elem.tag_name.downcase] != true
 
         valid_headings = get_valid_headings(elem)
         prior_heading = get_prior_heading(elem)
 
         if prior_heading
-          return valid_headings[prior_heading.tag_name.downcase]
+          return "Headings are not in sequence." unless valid_headings[prior_heading.tag_name.downcase]
         end
 
-        true
+        nil
       end
 
       def self.form(_elem)
@@ -142,10 +142,10 @@ module Accessibility
         "Learn more about proper heading sequences"
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
         case value
         when "Leave as is"
-          return elem
+          return nil
         when "Fix heading hierarchy"
           prior_h = get_prior_heading(elem)
           h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0

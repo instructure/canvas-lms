@@ -24,10 +24,10 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "img"
+        return nil if elem.tag_name != "img"
 
         alt = elem.attribute?("alt") ? elem.get_attribute("alt") : nil
-        !alt.nil?
+        "Alt text should be present for the image." if alt.nil?
       end
 
       def self.message
@@ -49,8 +49,13 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
+      def self.fix!(elem, value)
+        raise StandardError, "Alt text cannot be empty." if value.blank?
+
+        return nil if elem["alt"] == value
+
         elem["alt"] = value
+        elem
       end
     end
   end

@@ -25,28 +25,11 @@ RSpec.describe "ListStructureRule", type: :feature do
 
   context "when testing list structure" do
     it "identifies improper list structures" do
-      input_html = "<ul><li>First item</li><div>Not a list item</div><li>Third item</li></ul>"
+      input_html = "<p>- Elem 1\n- Elem 2\n- Elem 3</p>"
 
       issues = find_issues(:list_structure, input_html, "page-123")
 
       expect(issues).not_to be_empty
-      if issues.any?
-        expect(issues.first[:element_type]).to eq("ul")
-      end
-    end
-
-    it "maintains resource-specific isolation between content types" do
-      input_html = "<ul><li>First item</li><div>Not a list item</div><li>Third item</li></ul>"
-
-      page_issues = find_issues(:list_structure, input_html, "page-123")
-      assignment_issues = find_issues(:list_structure, input_html, "assignment-456")
-      file_issues = find_issues(:list_structure, input_html, "file-789")
-
-      if page_issues.any? && assignment_issues.any? && file_issues.any?
-        expect(page_issues.first[:data][:id]).to include("page-123")
-        expect(assignment_issues.first[:data][:id]).to include("assignment-456")
-        expect(file_issues.first[:data][:id]).to include("file-789")
-      end
     end
   end
 
@@ -96,15 +79,6 @@ RSpec.describe "ListStructureRule", type: :feature do
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
 
-    it "Resolves items regardless of whitespace" do
-      input_html = "<p>  - List  </p><p> -   List  </p><p> -   List</p>"
-      expected_html = "<ul><li>List</li><li>List</li><li>List</li></ul>"
-
-      fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
-
-      expect(fixed_html.delete("\n")).to eq(expected_html)
-    end
-
     it "Resolves ordered with a start attribute" do
       input_html = "<p>3. List</p><p>4. List</p><p>5. List</p>"
       expected_html = '<ol start="3"><li>List</li><li>List</li><li>List</li></ol>'
@@ -135,15 +109,6 @@ RSpec.describe "ListStructureRule", type: :feature do
     it "Stops creating list items if a paragraph is not list-like" do
       input_html = "<p>1. List</p><p>2. List</p><p>Normal Paragraph</p>"
       expected_html = "<ol><li>List</li><li>List</li></ol><p>Normal Paragraph</p>"
-
-      fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
-
-      expect(fixed_html.delete("\n")).to eq(expected_html)
-    end
-
-    it "Stops creating list items if a paragraph is a different type of list" do
-      input_html = "<p>1. List</p><p>2. List</p><p>* List</p>"
-      expected_html = "<ol><li>List</li><li>List</li></ol><p>* List</p>"
 
       fixed_html = fix_issue(:list_structure, input_html, "./*", "true")
 

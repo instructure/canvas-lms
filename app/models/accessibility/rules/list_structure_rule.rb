@@ -34,7 +34,7 @@ module Accessibility
       LIST_LIKE_REGEX = /#{UNORDERED_LIST_REGEX.source}|#{ORDERED_LIST_REGEX.source}/
       LIST_LIKE_REGEX_WITH_HTML_TAG = /#{HTML_TAG_PATTERN.source}#{LIST_LIKE_REGEX.source}/
 
-      def self.list_check_helper(elem, regex)
+      def self.list_check_helper?(elem, regex)
         if elem.tag_name.downcase == "p"
           return true if regex.match?(elem.content)
 
@@ -47,15 +47,15 @@ module Accessibility
       end
 
       def self.list?(elem)
-        list_check_helper(elem, LIST_LIKE_REGEX)
+        list_check_helper?(elem, LIST_LIKE_REGEX)
       end
 
       def self.ordered_list?(elem)
-        list_check_helper(elem, ORDERED_LIST_REGEX)
+        list_check_helper?(elem, ORDERED_LIST_REGEX)
       end
 
       def self.unordered_list?(elem)
-        list_check_helper(elem, UNORDERED_LIST_REGEX)
+        list_check_helper?(elem, UNORDERED_LIST_REGEX)
       end
 
       def self.just_single_text_child?(elem)
@@ -73,9 +73,12 @@ module Accessibility
 
       def self.test(elem)
         is_list = list?(elem)
-        is_first = elem.previous_element_sibling ? !list?(elem.previous_element_sibling) : true
+        is_element = elem.is_a?(Nokogiri::XML::Element)
+        is_first = (is_element && elem.previous_element_sibling) ? !list?(elem.previous_element_sibling) : true
 
-        !(is_list && is_first)
+        return "Lists shall be formatted as lists." if is_first && is_list
+
+        nil
       end
 
       def self.message
@@ -97,53 +100,59 @@ module Accessibility
         )
       end
 
-      def self.fix(elem, value)
-        return elem unless test(elem) == false
-        return elem unless value == "true"
+      def self.strip_list_marker_from_node(node)
+        if node.text?
+          node.content = node.content.sub(LIST_LIKE_REGEX, "")
+        elsif node.element?
+          node.children.each { |child| strip_list_marker_from_node(child) }
+        end
+      end
 
-        match_data = LIST_LIKE_REGEX.match(elem.content)
+      def self.fix!(elem, value)
+        return nil unless list?(elem) && value == "true"
+
+        # Find the first and last consecutive list-like siblings
+        first_elem = elem
+        first_elem = first_elem.previous_element_sibling while first_elem.previous_element_sibling && list?(first_elem.previous_element_sibling)
+        list_elems = []
+        current_elem = first_elem
+        while current_elem && list?(current_elem)
+          list_elems << current_elem
+          current_elem = current_elem.next_element_sibling
+        end
+
+        # Determine list type and start index
+        match_data = LIST_LIKE_REGEX.match(list_elems.first.content)
         is_ordered = !!match_data&.captures&.first
         start_index = is_ordered ? match_data.captures.first : nil
-        list_container = elem.document.create_element(is_ordered ? "ol" : "ul")
+        list_tag = is_ordered ? "ol" : "ul"
+        list_container = elem.document.create_element(list_tag)
+        list_container["start"] = start_index if is_ordered && start_index =~ /^\d+$/ && start_index.to_i > 1
 
-        if is_ordered && start_index && start_index =~ /^\d+$/ && start_index.to_i > 1
-          list_container["start"] = start_index
-        end
+        # Add <li> for each list-like element
+        list_elems.each do |le|
+          if br_children?(le)
+            le.inner_html.split(%r{<br\s*/?>}).each do |text|
+              text = text.gsub(LIST_LIKE_REGEX, "").strip
+              next if text.empty?
 
-        current_elem = elem
-        while current_elem && (is_ordered ? ordered_list?(current_elem) : unordered_list?(current_elem))
-          just_single_text_child = just_single_text_child?(current_elem)
-
-          if br_children?(current_elem)
-            current_elem.inner_html.split(%r{<br\s*/?>}).each do |text|
-              text = text.strip.gsub(LIST_LIKE_REGEX, "")
-              list_item = elem.document.create_element("li")
-              list_item.content = text
-              list_container.add_child(list_item)
+              li = elem.document.create_element("li")
+              li.content = text
+              list_container.add_child(li)
             end
           else
-            list_item = elem.document.create_element("li")
-            current_elem.children.each do |child|
-              if child.text?
-                child.content = just_single_text_child ? child.content.strip.gsub(LIST_LIKE_REGEX, "") : child.content.gsub(LIST_LIKE_REGEX, "")
-              end
-              child.children.each do |grandchild|
-                grandchild.content = grandchild.content.strip.gsub(LIST_LIKE_REGEX, "")
-              end
-              list_item.add_child(child)
+            li = elem.document.create_element("li")
+            le.children.each do |child|
+              strip_list_marker_from_node(child)
+              li.add_child(child)
             end
-            list_container.add_child(list_item)
+            list_container.add_child(li)
           end
-
-          next_elem = current_elem.next_element_sibling
-          current_elem.unlink unless current_elem == elem
-          break unless next_elem && list?(next_elem)
-
-          current_elem = next_elem
         end
 
-        elem.replace(list_container)
-        list_container
+        first_elem.add_previous_sibling(list_container)
+        list_elems.each(&:unlink)
+        first_elem
       end
     end
   end

@@ -48,7 +48,7 @@ const applyHighlight = (previewResponse: PreviewResponse | null, issue: Accessib
 
   try {
     const target = doc.evaluate(
-      previewResponse.path || '',
+      previewResponse.path || issue.path || '',
       doc.body,
       null,
       XPathResult.FIRST_ORDERED_NODE_TYPE,
@@ -59,6 +59,15 @@ const applyHighlight = (previewResponse: PreviewResponse | null, issue: Accessib
       const newStyle = `${target.getAttribute('style') || ''}; ${SELECTOR_STYLE}`
       target.setAttribute('style', newStyle)
       target.setAttribute(A11Y_ISSUE_ATTR_NAME, encodeURIComponent(issue.path))
+      setTimeout(() => {
+        document
+          .querySelector(`[${A11Y_ISSUE_ATTR_NAME}="${encodeURIComponent(issue.path)}"]`)
+          ?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'nearest',
+          })
+      }, 0)
     }
   } catch (err) {
     console.log('Failed to evaluate XPath:', previewResponse.path, err)
@@ -111,7 +120,6 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
       content_type: itemType,
       content_id: String(itemId),
     })
-
     setIsLoading(true)
     doFetchApi<PreviewResponse>({
       path: `${window.location.href}/preview?${params.toString()}`,
@@ -154,6 +162,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
       borderWidth="small"
       height="15rem"
       overflowY="auto"
+      padding="x-small x-small x-small x-small"
       dangerouslySetInnerHTML={{__html: applyHighlight(contentResponse, issue)}}
     />
   )
