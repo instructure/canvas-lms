@@ -221,7 +221,8 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
                 isApplied={isRemediated}
                 isLoading={isFormLocked}
               >
-                {currentIssue.form.type === FormType.Checkbox
+                {currentIssue.form.type === FormType.Checkbox ||
+                currentIssue.form.type === FormType.Button
                   ? currentIssue.form.label
                   : I18n.t('Apply')}
               </ApplyButton>
