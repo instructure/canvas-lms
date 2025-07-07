@@ -69,6 +69,20 @@ describe DataFixup::Lti::FixUpUnnamedLtiRegistrations do
       expect(registration.name).to eq(custom_name)
     end
 
+    it "skips developer keys with nil names" do
+      registration = lti_registration_with_tool(
+        account:,
+        created_by: user,
+        developer_key_params: { name: nil },
+        registration_params: { name: "Unnamed tool", admin_nickname: nil }
+      )
+
+      DataFixup::Lti::FixUpUnnamedLtiRegistrations.run
+
+      registration.reload
+      expect(registration.name).to eq("Unnamed tool")
+    end
+
     it "handles multiple registrations correctly" do
       # Registration that should have both name and nickname updated
       reg1 = lti_registration_with_tool(
@@ -94,12 +108,20 @@ describe DataFixup::Lti::FixUpUnnamedLtiRegistrations do
         registration_params: { name: custom_name, admin_nickname: "Custom Nickname" }
       )
 
+      reg4 = lti_registration_with_tool(
+        account:,
+        created_by: user,
+        developer_key_params: { name: nil },
+        registration_params: { name: "Unnamed tool", admin_nickname: nil }
+      )
+
       DataFixup::Lti::FixUpUnnamedLtiRegistrations.run
 
-      [reg1, reg2, reg3].each(&:reload)
+      [reg1, reg2, reg3, reg4].each(&:reload)
       expect(reg1.name).to eq(dev_key_name)
       expect(reg2.name).to eq(second_dev_key_name)
       expect(reg3.name).to eq(custom_name)
+      expect(reg4.name).to eq("Unnamed tool")
     end
   end
 end
