@@ -42,7 +42,7 @@ const FolderTreeBrowser = forwardRef<FolderTreeBrowserRef, FolderTreeBrowserProp
   ({rootFolder, onSelectFolder}, ref) => {
     const containerRef = useRef<Element | null>(null)
     const hasValidSelection = useRef<boolean>(false)
-    const [currentFolderId, setCurrentFolderId] = useState<string>(rootFolder.id.toString())
+    const [currentFolderId, setCurrentFolderId] = useState<string>(rootFolder.id)
     const [formError, setFormError] = useState<string | null>(null)
     const [folders, setFolders] = useState<FolderCollection>({
       [rootFolder.id]: {id: rootFolder.id, name: rootFolder.name},

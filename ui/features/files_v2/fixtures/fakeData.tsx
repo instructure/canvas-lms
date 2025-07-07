@@ -20,7 +20,7 @@ import {type File, type Folder} from '../interfaces/File'
 
 export const FAKE_FILES: File[] = [
   {
-    id: 178,
+    id: '178',
     folder_id: '42',
     display_name: '6jaB2L4OsOE_44100_160_0.mp3',
     filename: '6jaB2L4OsOE_44100_160_0.mp3',
@@ -55,7 +55,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 179,
+    id: '179',
     folder_id: '42',
     display_name: '3196600-uhd_3840_2160_25fps.mp4',
     filename: '3196600-uhd_3840_2160_25fps.mp4',
@@ -90,7 +90,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 181,
+    id: '181',
     folder_id: '42',
     display_name:
       '79982331_2180357832259423_6140409675306237952_n-d7aa2543-3bb6-4577-ae11-69b99e11421f.jpeg',
@@ -128,7 +128,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 182,
+    id: '182',
     folder_id: '42',
     display_name: 'digital-library.png',
     filename: 'digital-library.png',
@@ -164,7 +164,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 202,
+    id: '202',
     folder_id: '42',
     display_name: 'digital-library2.png',
     filename: 'digital-library2.png',
@@ -199,7 +199,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 180,
+    id: '180',
     folder_id: '42',
     display_name: 'Submitting_Assignment_Canvas.pdf',
     filename: 'Submitting_Assignment_Canvas.pdf',
@@ -234,7 +234,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 183,
+    id: '183',
     folder_id: '42',
     display_name: 'template-1.svg',
     filename: 'template-1.svg',
@@ -269,7 +269,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_8',
   },
   {
-    id: 186,
+    id: '186',
     folder_id: '49',
     display_name: 'File available in future.jpeg',
     filename:
@@ -311,7 +311,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_2',
   },
   {
-    id: 189,
+    id: '189',
     folder_id: '49',
     display_name: 'File available in past.jpeg',
     filename:
@@ -353,7 +353,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_2',
   },
   {
-    id: 188,
+    id: '188',
     folder_id: '49',
     display_name: 'File available now.jpeg',
     filename:
@@ -395,7 +395,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_2',
   },
   {
-    id: 191,
+    id: '191',
     folder_id: '49',
     display_name: 'File Published.jpeg',
     filename: '79982331_2180357832259423_6140409675306237952_n.jpeg',
@@ -436,7 +436,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_2',
   },
   {
-    id: 190,
+    id: '190',
     folder_id: '49',
     display_name: 'File Unpublished.jpeg',
     filename:
@@ -478,7 +478,7 @@ export const FAKE_FILES: File[] = [
     context_asset_string: 'course_2',
   },
   {
-    id: 187,
+    id: '187',
     folder_id: '49',
     display_name: 'File with link.jpeg',
     filename:
@@ -523,7 +523,7 @@ export const FAKE_FILES: File[] = [
 
 export const FAKE_FOLDERS: Folder[] = [
   {
-    id: 46,
+    id: '46',
     name: ',._;\'[]\\<>?:"{}|-=!@#$%^&*()',
     full_name: 'course files/,._;\'[]\\<>?:"{}|-=!@#$%^&*()',
     context_id: '8',
@@ -546,7 +546,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 44,
+    id: '44',
     name: '2nd Folder',
     full_name: 'course files/2nd Folder',
     context_id: '8',
@@ -569,7 +569,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 47,
+    id: '47',
     name: 'a',
     full_name: 'course files/a',
     context_id: '8',
@@ -592,7 +592,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 43,
+    id: '43',
     name: 'A folder',
     full_name: 'course files/A folder',
     context_id: '8',
@@ -615,7 +615,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 45,
+    id: '45',
     name: 'Probably locked folder?',
     full_name: 'course files/Probably locked folder?',
     context_id: '8',
@@ -638,7 +638,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 48,
+    id: '48',
     name: 'Locked Folder',
     full_name: 'course files/Locked Folder',
     context_id: '8',
@@ -661,7 +661,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: false,
   },
   {
-    id: 49,
+    id: '49',
     name: 'Hidden Folder',
     full_name: 'course files/Hidden Folder',
     context_id: '8',
@@ -684,7 +684,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 5001,
+    id: '5001',
     name: 'Submission Folder',
     full_name: 'course files/Submission Folder',
     context_id: '8',
@@ -707,7 +707,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 500,
+    id: '500',
     name: 'Mixed Folder',
     full_name: 'course files/Mixed Folder',
     context_id: '8',
@@ -730,7 +730,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: false,
   },
   {
-    id: 55,
+    id: '55',
     name: 'Folder available in future',
     full_name: 'course files/Publish Statuses/Folder available in future',
     context_id: '2',
@@ -753,7 +753,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 53,
+    id: '53',
     name: 'Folder available in past',
     full_name: 'course files/Publish Statuses/Folder available in past',
     context_id: '2',
@@ -776,7 +776,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 54,
+    id: '54',
     name: 'Folder available now',
     full_name: 'course files/Publish Statuses/Folder available now',
     context_id: '2',
@@ -799,7 +799,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 50,
+    id: '50',
     name: 'Folder Published',
     full_name: 'course files/Publish Statuses/Folder Published',
     context_id: '2',
@@ -822,7 +822,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 51,
+    id: '51',
     name: 'Folder Unpublished',
     full_name: 'course files/Publish Statuses/Folder Unpublished',
     context_id: '2',
@@ -845,7 +845,7 @@ export const FAKE_FOLDERS: Folder[] = [
     can_upload: true,
   },
   {
-    id: 52,
+    id: '52',
     name: 'Folder with Link',
     full_name: 'course files/Publish Statuses/Folder with Link',
     context_id: '2',
@@ -871,8 +871,8 @@ export const FAKE_FOLDERS: Folder[] = [
 
 export const FAKE_FOLDERS_AND_FILES: (File | Folder)[] = [...FAKE_FOLDERS, ...FAKE_FILES]
 
-export const FAKE_COURSE_FOLDER = {
-  id: 1,
+export const FAKE_COURSE_FOLDER: Folder = {
+  id: '1',
   name: 'A Fake Course folder',
   full_name: 'course files/2nd Folder/A Fake Course Folder',
   context_id: '1',
@@ -895,8 +895,8 @@ export const FAKE_COURSE_FOLDER = {
   can_upload: true,
 }
 
-export const FAKE_USER_FOLDER = {
-  id: 1,
+export const FAKE_USER_FOLDER: Folder = {
+  id: '1',
   name: 'A Fake Course folder',
   full_name: 'my files/2nd Folder/A Fake Course Folder',
   context_id: '1',

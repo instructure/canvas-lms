@@ -92,7 +92,7 @@ export const performRequest = ({
   })
 
   if (selectedItems.files.length == 1 && selectedItems.folders.length == 0) {
-    downloadFile(rows.find(row => row.id.toString() == selectedItems.files[0])?.url || '')
+    downloadFile(rows.find(row => row.id == selectedItems.files[0])?.url || '')
     return false
   }
 

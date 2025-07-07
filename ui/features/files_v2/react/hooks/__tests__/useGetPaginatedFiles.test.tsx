@@ -21,11 +21,13 @@ import {renderHook} from '@testing-library/react-hooks'
 import fetchMock from 'fetch-mock'
 import {useGetPaginatedFiles} from '../useGetPaginatedFiles'
 import {useSearchTerm} from '../useSearchTerm'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {queryClient} from '@canvas/query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 
 jest.mock('../useSearchTerm')
 const mockGenerateTableUrl = jest.fn()
 jest.mock('../../../utils/apiUtils', () => ({
+  ...jest.requireActual('../../../utils/apiUtils'),
   parseLinkHeader: jest.fn(() => ({next: 'next-link'})),
   parseBookmarkFromUrl: jest.fn(() => 'bookmark'),
   generateTableUrl: (params: any) => {
@@ -46,16 +48,8 @@ describe('useGetPaginatedFiles', () => {
   const mockOnSettled = jest.fn()
   const mockSetSearchTerm = jest.fn()
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
-
   const wrapper = ({children}: {children: React.ReactNode}) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MockedQueryClientProvider client={queryClient}>{children}</MockedQueryClientProvider>
   )
 
   beforeEach(() => {
@@ -88,7 +82,6 @@ describe('useGetPaginatedFiles', () => {
       {wrapper},
     )
     await waitForNextUpdate()
-
     expect(fetchMock.called()).toBe(true)
     expect(mockOnSettled).toHaveBeenCalled()
     expect(result.current.data).toBeTruthy()

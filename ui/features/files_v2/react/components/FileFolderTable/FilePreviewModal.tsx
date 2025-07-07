@@ -88,8 +88,8 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
       }
 
       // Only update state if we have a different preview ID
-      if (previewId !== currentItem.id.toString() && collection) {
-        const newItem = collection.find(item => item.id.toString() === previewId)
+      if (previewId !== currentItem.id && collection) {
+        const newItem = collection.find(item => item.id === previewId)
         if (newItem) {
           setCurrentItem(newItem as File)
           setCurrentIndex(collection.indexOf(newItem))
