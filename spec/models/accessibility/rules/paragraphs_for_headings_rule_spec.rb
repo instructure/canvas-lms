@@ -57,5 +57,9 @@ RSpec.describe "ParagraphsForHeadingsRule", type: :feature do
       expect(fixed_html).to include('<p id="test-element">Heading text</p>')
       expect(fixed_html).not_to include('<h2 id="test-element">Heading text</h2>')
     end
+
+    it "change to paragraph button must be in the form" do
+      expect(Accessibility::Rules::ParagraphsForHeadingsRule.form(nil).label).to eq("Change to paragraph")
+    end
   end
 end

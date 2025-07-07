@@ -38,7 +38,7 @@ export const ruleIdToLabelMap: Record<string, string> = {
   'large-text-contrast': I18n.t('Large text contrast'),
   'small-text-contrast': I18n.t('Small text contrast'),
   'list-structure': I18n.t('List structure'),
-  'paragraphs-for-headings': I18n.t('Paragraphs for headings'),
+  'paragraphs-for-headings': I18n.t('Heading is too long'),
   'table-caption': I18n.t('Table caption'),
   'table-header': I18n.t('Table header'),
   'table-header-scope': I18n.t('Table header scope'),

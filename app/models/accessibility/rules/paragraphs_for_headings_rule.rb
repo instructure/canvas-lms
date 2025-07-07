@@ -21,7 +21,7 @@ module Accessibility
   module Rules
     class ParagraphsForHeadingsRule < Accessibility::Rule
       self.id = "paragraphs-for-headings"
-      self.link = ""
+      self.link = "https://www.w3.org/TR/WCAG20-TECHS/G141.html"
 
       MAX_HEADING_LENGTH = 120
 
@@ -41,11 +41,14 @@ module Accessibility
       end
 
       def self.message
-        I18n.t("Headings should not contain more than 120 characters.")
+        "This heading is very long. Is it meant to be a paragraph?"
       end
 
       def self.why
-        I18n.t("Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should be concise within the proper structure.")
+        "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
+          "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
+          "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
+          "short, specific, and meaningful, not full sentences or paragraphs."
       end
 
       def self.link_text
@@ -53,8 +56,8 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::CheckboxField.new(
-          label: "Change heading tag to paragraph",
+        Accessibility::Forms::ButtonField.new(
+          label: "Change to paragraph",
           value: "false"
         )
       end
