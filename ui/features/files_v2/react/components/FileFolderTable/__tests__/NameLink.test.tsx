@@ -124,25 +124,74 @@ describe('NameLink', () => {
     })
   })
 
-  it('should call the navigate with existing query params, but the preview query param is removed when closing modal', async () => {
-    const user = userEvent.setup()
-    const file = {...FAKE_FILES[0]}
-    renderComponent({item: file})
+  describe('file preview functionality', () => {
+    const mockOnPreviewFile = jest.fn()
 
-    await user.click(screen.getByText(file.display_name))
-
-    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining(`preview=${file.id}`), {
-      replace: true,
+    beforeEach(() => {
+      mockOnPreviewFile.mockClear()
     })
 
-    mockNavigate.mockClear()
+    describe('when item is a file', () => {
+      it('calls onPreviewFile when file link is clicked', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          onPreviewFile: mockOnPreviewFile,
+        })
 
-    const closeButton = screen.getByTestId('close-button')
-    await user.click(closeButton)
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).toHaveBeenCalledWith(file)
+      })
 
-    const expectedUrl = `${path}${queryParams.replace('&preview=123', '')}`
-    expect(mockNavigate).toHaveBeenCalledWith(expectedUrl, {
-      replace: true,
+      it('does not call onPreviewFile when onPreviewFile is not provided', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          onPreviewFile: undefined,
+        })
+
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).not.toHaveBeenCalled()
+      })
+
+      it('should call onPreviewFile when isStacked is true', async () => {
+        const file = FAKE_FILES[0]
+        renderComponent({
+          item: file,
+          isStacked: true,
+          onPreviewFile: mockOnPreviewFile,
+        })
+
+        const link = screen.getByTestId(file.display_name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).toHaveBeenCalledWith(file)
+      })
+    })
+
+    describe('when item is a folder', () => {
+      it('does not call onPreviewFile for folders', async () => {
+        const folder = FAKE_FOLDERS[0]
+        renderComponent({
+          item: folder,
+          onPreviewFile: mockOnPreviewFile,
+        })
+
+        const link = screen.getByTestId(folder.name)
+        await userEvent.click(link)
+        expect(mockOnPreviewFile).not.toHaveBeenCalled()
+      })
+
+      it('navigates to folder URL when folder link is clicked', async () => {
+        const user = userEvent.setup()
+        const folder = FAKE_FOLDERS[1]
+        renderComponent({item: folder, onPreviewFile: mockOnPreviewFile})
+
+        const link = screen.getByTestId(folder.name)
+        await user.click(link)
+        expect(window.location.pathname).toBe(`/folder/${encodeURIComponent(folder.name)}`)
+      })
     })
   })
 })

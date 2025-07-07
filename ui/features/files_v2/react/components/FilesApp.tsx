@@ -47,6 +47,8 @@ import CurrentDownloads from './FilesHeader/CurrentDownloads'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
 import {BasicPagination} from './BasicPagination'
+import {usePreviewHandler} from '../hooks/usePreviewHandler'
+import {FilePreviewModal} from './FileFolderTable/FilePreviewModal'
 
 const I18n = createI18nScope('files_v2')
 
@@ -167,6 +169,18 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
 
   const {selectedIds, selectionHandlers} = useHandleSelections(rowIds, setSelectionAnnouncement)
 
+  const currentFiles = useMemo(() => {
+    if (!currentRows) return []
+
+    return currentRows.filter((item): item is File => 'display_name' in item)
+  }, [currentRows])
+
+  const {previewState, previewHandlers} = usePreviewHandler({
+    collection: currentFiles,
+    contextType: contextType,
+    contextId: contextId,
+  })
+
   return (
     <FileManagementProvider
       value={{
@@ -230,6 +244,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 selectionHandler={selectionHandlers}
                 handleFileDropRef={handleFileDropRef}
                 selectAllRef={selectAllRef}
+                onPreviewFile={previewHandlers.handleOpenPreview}
               />
             }
             usageBar={userCanManageFilesForContext && <FilesUsageBar />}
@@ -261,6 +276,16 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
             isOpen={sessionExpired}
             onClose={() => setSessionExpired(false)}
           />
+          {previewState.isModalOpen && (
+            <FilePreviewModal
+              isOpen={previewState.isModalOpen}
+              onClose={previewHandlers.handleCloseModal}
+              item={previewState.previewFile}
+              collection={currentFiles}
+              showNavigationButtons={previewState.showNavigationButtons}
+              error={previewState.error}
+            />
+          )}
         </RowsProvider>
       </RowFocusProvider>
       {selectionAnnouncement && (
