@@ -1,0 +1,66 @@
+query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
+  legacyNode(_id: $courseId, type: Course) {
+    ... on Course {
+      modulesConnection(first: 100, after: $cursor) {
+        edges {
+          cursor
+          node {
+            id
+            _id
+            name
+            position
+            published
+            unlockAt
+            requirementCount
+            requireSequentialProgress
+            prerequisites {
+              id
+              name
+              type
+            }
+            completionRequirements {
+              id
+              type
+              minScore
+              minPercentage
+            }
+            progression {
+              id
+              _id
+              workflowState
+              collapsed
+              completedAt
+              completed
+              locked
+              unlocked
+              started
+              currentPosition
+              requirementsMet {
+                id
+                minPercentage
+                minScore
+                score
+                type
+              }
+              incompleteRequirements {
+                id
+                minPercentage
+                minScore
+                score
+                type
+              }
+            }
+            submissionStatistics {
+              latestDueAt
+              missingAssignmentCount
+            }
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
+    }
+  }
+}
