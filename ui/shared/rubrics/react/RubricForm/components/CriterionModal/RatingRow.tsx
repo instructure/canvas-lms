@@ -32,6 +32,7 @@ type RatingRowProps = {
   isLastIndex: boolean
   rangeStart?: number
   rating: RubricRating
+  ratingInputRefs: React.MutableRefObject<HTMLInputElement[]>
   scale: number
   showRemoveButton: boolean
   unassessed: boolean
@@ -49,6 +50,7 @@ export const RatingRow = ({
   isFullWidth,
   isLastIndex,
   rating,
+  ratingInputRefs,
   scale,
   showRemoveButton,
   unassessed,
@@ -78,6 +80,7 @@ export const RatingRow = ({
     hidePoints,
     index,
     rating,
+    ratingInputRefs,
     scale,
     showRemoveButton,
     unassessed,

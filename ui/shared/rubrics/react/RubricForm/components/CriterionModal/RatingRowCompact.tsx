@@ -42,6 +42,7 @@ export const RatingRowCompact = ({
   rating,
   scale,
   rangeStart,
+  ratingInputRefs,
   pointsInputText,
   onPointsBlur,
   setRatingForm,
@@ -81,9 +82,11 @@ export const RatingRowCompact = ({
                   </View>
                 )}
                 <RatingPointsInput
+                  index={index}
                   isRange={criterionUseRange}
                   pointsInputText={pointsInputText}
                   rating={rating}
+                  ratingInputRefs={ratingInputRefs}
                   onPointsBlur={onPointsBlur}
                   setNewRating={(newNumber, textValue) => {
                     setRatingForm('points', newNumber)
