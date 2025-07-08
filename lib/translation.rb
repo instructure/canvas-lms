@@ -101,7 +101,7 @@ module Translation
       {
         translation: enabled,
         ai_translation_improvements: domain_root_account.feature_enabled?(:ai_translation_improvements),
-        cedar_translation: Account.site_admin.feature_enabled?(:cedar_translation),
+        cedar_translation: domain_root_account.feature_enabled?(:cedar_translation),
       }
     end
   end
