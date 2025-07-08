@@ -27,13 +27,31 @@ import {DeleteModal} from '../DeleteModal'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {mockRowFocusContext, mockRowsContext} from '../../__tests__/testUtils'
+import {DeleteItemError} from '../DeleteItemError'
+import {deleteItems} from '../deleteItems'
+import {UnauthorizedError} from '../../../../../utils/apiUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashSuccess: jest.fn(),
-  showFlashError: jest.fn(),
+  showFlashSuccess: jest.fn(() => jest.fn()),
+  showFlashWarning: jest.fn(() => jest.fn()),
+  showFlashError: jest.fn(() => jest.fn()),
 }))
 
 jest.mock('@canvas/do-fetch-api-effect')
+
+// Mock deleteItems function
+jest.mock('../deleteItems', () => ({
+  deleteItems: jest.fn(),
+}))
+
+// Mock Sentry
+jest.mock('@sentry/react', () => ({
+  captureException: jest.fn(),
+}))
+
+const mockDeleteItems = deleteItems as jest.MockedFunction<typeof deleteItems>
+const mockFlashAlerts = require('@canvas/alerts/react/FlashAlert')
+const {captureException} = require('@sentry/react')
 
 const defaultProps = {
   open: true,
@@ -52,13 +70,38 @@ const renderComponent = (props?: any) =>
     </FileManagementProvider>,
   )
 
+const renderComponentWithCustomContexts = (
+  props?: any,
+  customRowFocusContext?: any,
+  customRowsContext?: any,
+) =>
+  render(
+    <FileManagementProvider value={createMockFileManagementContext()}>
+      <RowFocusProvider value={customRowFocusContext || mockRowFocusContext}>
+        <RowsProvider value={customRowsContext || mockRowsContext}>
+          <DeleteModal {...defaultProps} {...props} />
+        </RowsProvider>
+      </RowFocusProvider>
+    </FileManagementProvider>,
+  )
+
 describe('DeleteModal', () => {
+  let user: ReturnType<typeof userEvent.setup>
+
+  const clickDeleteButton = async () => {
+    const deleteButton = await screen.findByTestId('modal-delete-button')
+    await user.click(deleteButton)
+    return deleteButton
+  }
+
   beforeAll(() => {
     const filesContexts = createFilesContexts()
     resetAndGetFilesEnv(filesContexts)
   })
 
-  afterEach(() => {
+  beforeEach(() => {
+    user = userEvent.setup()
+    mockDeleteItems.mockReset()
     jest.clearAllMocks()
   })
 
@@ -95,14 +138,120 @@ describe('DeleteModal', () => {
   })
 
   it('disables delete button and renders spinner while deleting', async () => {
-    const user = userEvent.setup()
+    mockDeleteItems.mockImplementation(() => new Promise(() => {})) // Never resolves to keep loading state
     renderComponent()
 
-    const deleteButton = await screen.findByTestId('modal-delete-button')
-    await user.click(deleteButton)
+    const deleteButton = await clickDeleteButton()
 
     const spinner = await screen.findByTestId('delete-spinner')
     expect(spinner).toBeInTheDocument()
     expect(deleteButton).toBeDisabled()
+  })
+
+  describe('successful deletion', () => {
+    it('calls deleteItems and shows success message for multiple items', async () => {
+      const onCloseMock = jest.fn()
+      mockDeleteItems.mockResolvedValue(undefined)
+
+      renderComponent({onClose: onCloseMock})
+
+      await clickDeleteButton()
+
+      expect(mockDeleteItems).toHaveBeenCalledWith(FAKE_FOLDERS_AND_FILES)
+      expect(mockFlashAlerts.showFlashSuccess).toHaveBeenCalledWith(
+        `${FAKE_FOLDERS_AND_FILES.length} items deleted successfully.`,
+      )
+      expect(onCloseMock).toHaveBeenCalled()
+    })
+
+    it('shows success message for single item deletion', async () => {
+      mockDeleteItems.mockResolvedValue(undefined)
+
+      renderComponent({items: [FAKE_FILES[0]]})
+
+      await clickDeleteButton()
+
+      expect(mockFlashAlerts.showFlashSuccess).toHaveBeenCalledWith('1 item deleted successfully.')
+    })
+  })
+
+  describe('error handling', () => {
+    it('handles UnauthorizedError by setting session expired', async () => {
+      const mockSetSessionExpired = jest.fn()
+      const mockRowsContextWithExpired = {
+        ...mockRowsContext,
+        setSessionExpired: mockSetSessionExpired,
+      }
+
+      mockDeleteItems.mockRejectedValue(new UnauthorizedError())
+
+      renderComponentWithCustomContexts({}, undefined, mockRowsContextWithExpired)
+
+      await clickDeleteButton()
+
+      expect(mockSetSessionExpired).toHaveBeenCalledWith(true)
+    })
+
+    it('shows error message when all items fail to delete', async () => {
+      const failedItems = [FAKE_FILES[0], FAKE_FOLDERS[0]]
+      const deleteError = new DeleteItemError('Failed to delete some items', failedItems)
+
+      mockDeleteItems.mockRejectedValue(deleteError)
+      renderComponent({items: failedItems})
+
+      await clickDeleteButton()
+
+      const expectedMessage = 'Failed to delete all selected items. Please try again.'
+      expect(mockFlashAlerts.showFlashError).toHaveBeenCalledWith(expectedMessage)
+    })
+
+    it('shows warning message when some items fail to delete', async () => {
+      const allItems = [FAKE_FILES[0], FAKE_FOLDERS[0], FAKE_FILES[1]]
+      const failedItems = [FAKE_FILES[0]] // Only one item fails
+      const deleteError = new DeleteItemError('Failed to delete some items', failedItems)
+
+      mockDeleteItems.mockRejectedValue(deleteError)
+      renderComponent({items: allItems})
+
+      await clickDeleteButton()
+
+      const expectedMessage = `Failed to delete ${failedItems.length} of the ${allItems.length} selected items. Please try again.`
+      expect(mockFlashAlerts.showFlashWarning).toHaveBeenCalledWith(expectedMessage)
+    })
+
+    it('handles unexpected errors and captures them in Sentry', async () => {
+      const unexpectedError = new Error('Network error')
+
+      mockDeleteItems.mockRejectedValue(unexpectedError)
+      renderComponent()
+
+      await clickDeleteButton()
+
+      expect(mockFlashAlerts.showFlashError).toHaveBeenCalledWith(
+        'An error occurred while deleting the items. Please try again.',
+      )
+      expect(captureException).toHaveBeenCalledWith(unexpectedError)
+    })
+
+    it('always calls onClose and sets row focus after error', async () => {
+      const onCloseMock = jest.fn()
+      const mockSetRowToFocus = jest.fn()
+      const mockRowFocusContextWithSetter = {
+        ...mockRowFocusContext,
+        setRowToFocus: mockSetRowToFocus,
+      }
+
+      mockDeleteItems.mockRejectedValue(new Error('Some error'))
+
+      renderComponentWithCustomContexts(
+        {onClose: onCloseMock, rowIndex: 5},
+        mockRowFocusContextWithSetter,
+      )
+
+      await clickDeleteButton()
+
+      expect(onCloseMock).toHaveBeenCalled()
+      expect(mockSetRowToFocus).toHaveBeenCalledWith(5)
+    })
   })
 })
