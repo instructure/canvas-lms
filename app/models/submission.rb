@@ -357,26 +357,6 @@ class Submission < ActiveRecord::Base
     %w[body]
   end
 
-  def self.submission_status_conditions
-    <<~SQL.squish
-      CASE
-        WHEN submissions.workflow_state = 'unsubmitted'
-          OR (
-            submissions.submitted_at IS NULL
-            AND submissions.grade IS NULL
-            AND submissions.excused IS NOT TRUE
-          ) THEN 'not_submitted'
-        WHEN submissions.excused IS NOT TRUE
-          AND (
-            submissions.grade IS NULL
-            OR submissions.workflow_state = 'pending_review'
-          ) THEN 'not_graded'
-        WHEN submissions.grade_matches_current_submission IS FALSE THEN 'resubmitted'
-        ELSE 'graded'
-      END
-    SQL
-  end
-
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
   # maintain performance.
