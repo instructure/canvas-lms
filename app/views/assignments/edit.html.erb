@@ -27,6 +27,8 @@
   css_bundle :assignments, :assignments_edit, :conditional_release_editor, :tinymce
 %>
 
+<% is_a2_student_view = false if is_a2_student_view.nil? %>
+
 <% if @assignment.omit_from_final_grade %>
   <div class="alert alert-info omit-from-final-warning">
     <%= t("This assignment does not count toward the final grade.") %>
@@ -66,5 +68,8 @@
 
   <% if !Rubric.enhanced_rubrics_assignments_enabled?(@context)%>
     <%= render partial: "shared/rubrics_component" %>
+  <% end %>
+  <% if Rubric.enhanced_rubrics_assignments_enabled?(@context) %>
+    <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? && !is_a2_student_view %>
   <% end %>
 <% end %>
