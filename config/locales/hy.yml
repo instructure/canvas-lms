@@ -4705,6 +4705,8 @@ hy:
   count_people_489946e7: "%{count} մարդ"
   count_people_found_1ab374c0: 
     zero: "Ոչ մի օգտատեր չի գտնվել"
+  count_results_9926447c: 
+    zero: "Արդյունքներ չկան"
   count_sections_bf1baf0a: 
     one: "1 բաժին"
     other: "%{count} բաժին"
