@@ -5188,6 +5188,7 @@ uk:
     many: "%{count} результатів"
     one: "Один результат"
     other: "%{count} результатів"
+    zero: "Немає результатів"
   count_results_displayed_ed39a0f0: 
     few: "%{count} результатів показано"
     many: "%{count} результатів показано"
