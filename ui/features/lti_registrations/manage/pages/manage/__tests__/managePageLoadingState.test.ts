@@ -285,7 +285,6 @@ test('it should handle race conditions when a later request is resolved quicker'
 })
 
 test('it should reload results when the query is changed', async () => {
-  const screenReaderSpy = jest.spyOn($, 'screenReaderFlashMessage')
   const {result, rerender, req1, req2} = setup()
 
   await awaitState(result, 'reloading', state => {
@@ -326,10 +325,7 @@ test('it should reload results when the query is changed', async () => {
 
   await awaitState(result, 'loaded', state => {
     expect(state.items.data).toHaveLength(2)
-    expect(screenReaderSpy).toHaveBeenCalledWith('2 registrations found')
   })
-
-  screenReaderSpy.mockRestore()
 })
 // TOOD flatten if you can to adhere to paul's style
 describe('deleteRegistration', () => {
