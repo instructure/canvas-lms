@@ -19,12 +19,12 @@
 
 module Accessibility
   module Forms
-    class DropdownField < FormField
+    class RadioInputGroupField < FormField
       attr_accessor :options
 
       # @param label [String] Human-readable label displayed to the user
-      # @param options [Array<String>] Array of options for the dropdown
-      # @param value [String] Optional default value for the dropdown
+      # @param options [Array<String>] Array of options for the radio input group
+      # @param value [String] Optional default value for the radio input group
       def initialize(label:,
                      options:,
                      value:)
@@ -36,7 +36,7 @@ module Accessibility
       end
 
       def field_type
-        "dropdown"
+        "radio_input_group"
       end
 
       def to_h

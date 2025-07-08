@@ -29,7 +29,7 @@ export const TypeToKeyMap: Record<ContentItemType, 'pages' | 'assignments' | 'at
 
 export const ruleIdToLabelMap: Record<string, string> = {
   'adjacent-links': I18n.t('Adjacent links'),
-  'headings-sequence': I18n.t('Headings sequence'),
+  'headings-sequence': I18n.t('Skipped heading level'),
   'has-lang-entry': I18n.t('PDF language entry'),
   'headings-start-at-h2': I18n.t('Headings start at H2'),
   'img-alt': I18n.t('Image alt text missing'),
@@ -40,7 +40,7 @@ export const ruleIdToLabelMap: Record<string, string> = {
   'list-structure': I18n.t('List structure'),
   'paragraphs-for-headings': I18n.t('Heading is too long'),
   'table-caption': I18n.t('Table caption'),
-  'table-header': I18n.t('Table header'),
+  'table-header': I18n.t('Table headers aren’t set up'),
   'table-header-scope': I18n.t('Table header scope'),
 }
 

@@ -42,18 +42,16 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Choose action",
-          value: "Leave as is",
-          options: ["Leave as is", "Change only this headings level", "Remove heading style"]
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: "How would you like to proceed?",
+          value: "Change only this heading level",
+          options: ["Change only this heading level", "Remove heading style"]
         )
       end
 
       def self.fix!(elem, value)
         case value
-        when "Leave as is"
-          return nil
-        when "Change only this headings level"
+        when "Change only this heading level"
           elem.name = "h2"
         when "Remove heading style"
           elem.name = "p"

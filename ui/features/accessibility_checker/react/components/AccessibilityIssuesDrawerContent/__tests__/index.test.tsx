@@ -48,7 +48,7 @@ const baseItem: ContentItem = {
       ruleId: 'headings-sequence',
       message: 'Second issue',
       form: {
-        type: FormType.DropDown,
+        type: FormType.RadioInputGroup,
         label: 'Choose one',
         options: ['One', 'Two'],
         value: 'One',
@@ -104,7 +104,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
     })
   })
 
-  it('removes issue on save', async () => {
+  it('removes issue on save and next', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
     const saveAndNext = screen.getByTestId('save-and-next-button')

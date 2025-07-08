@@ -18,6 +18,7 @@
 
 import React, {createRef, Ref, useCallback, useEffect, useRef, useState} from 'react'
 
+import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -26,9 +27,10 @@ import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
-import {useDebouncedCallback} from 'use-debounce'
+import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useDebouncedCallback} from 'use-debounce'
 
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
@@ -37,8 +39,6 @@ import {ruleIdToLabelMap} from '../../constants'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
-import {Alert} from '@instructure/ui-alerts'
-import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -162,71 +162,69 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   return (
     <>
       <Flex as="div" direction="column" height="100vh" width="100%">
-        <Flex.Item shouldGrow={true} as="main">
-          <View
-            as="div"
-            padding="medium"
-            elementRef={(el: Element | null) => {
-              regionRef.current = el as HTMLDivElement | null
-            }}
-            aria-label={I18n.t('Accessibility Issues for %{title}', {title: item.title})}
-          >
-            <View>
-              <Heading level="h2">{item.title}</Heading>
-              <CloseButton
-                placement="end"
-                data-testid="close-button"
-                margin="small"
-                screenReaderLabel={I18n.t('Close')}
-                onClick={onClose}
-              />
-            </View>
-            <View margin="large 0">
-              <Text size="large" as="h3">
-                {I18n.t('Issue %{current}/%{total}: %{message}', {
-                  current: currentIssueIndex + 1,
-                  total: issues.length,
-                  message: currentIssue.ruleId ? ruleIdToLabelMap[currentIssue.ruleId] : '',
-                })}{' '}
-                <WhyMattersPopover issue={currentIssue} />
-              </Text>
-            </View>
-            <Flex justifyItems="space-between">
-              <Text weight="bold">{I18n.t('Preview')}</Text>
-              <Flex gap="small">
-                <Link href={item.url} variant="standalone">
-                  {I18n.t('Open Page')}
-                </Link>
-                <Link href={item.editUrl} variant="standalone">
-                  {I18n.t('Edit Page')}
-                </Link>
-              </Flex>
+        <Flex.Item
+          as="header"
+          padding="medium"
+          elementRef={(el: Element | null) => {
+            regionRef.current = el as HTMLDivElement | null
+          }}
+        >
+          <View>
+            <Heading level="h2">{item.title}</Heading>
+            <CloseButton
+              placement="end"
+              data-testid="close-button"
+              margin="small"
+              screenReaderLabel={I18n.t('Close')}
+              onClick={onClose}
+            />
+          </View>
+          <View margin="large 0">
+            <Text size="large" as="h3">
+              {I18n.t('Issue %{current}/%{total}: %{message}', {
+                current: currentIssueIndex + 1,
+                total: issues.length,
+                message: currentIssue.ruleId ? ruleIdToLabelMap[currentIssue.ruleId] : '',
+              })}{' '}
+              <WhyMattersPopover issue={currentIssue} />
+            </Text>
+          </View>
+        </Flex.Item>
+        <Flex.Item as="main" padding="x-small medium" shouldGrow={true}>
+          <Flex justifyItems="space-between">
+            <Text weight="weightImportant">{I18n.t('Problem area')}</Text>
+            <Flex gap="small">
+              <Link href={item.url} variant="standalone">
+                {I18n.t('Open Page')}
+              </Link>
+              <Link href={item.editUrl} variant="standalone">
+                {I18n.t('Edit Page')}
+              </Link>
             </Flex>
-            <View as="div" margin="medium 0">
-              <Preview
-                ref={previewRef}
-                issue={currentIssue}
-                itemId={item.id}
-                itemType={item.type}
-              />
-            </View>
-            <View as="section" margin="medium 0">
-              {currentIssue.message}
-            </View>
-            <View as="section" margin="medium 0">
-              <Form ref={formRef} issue={currentIssue} onReload={updatePreview} />
-              <ApplyButton
-                onApply={handleApply}
-                onUndo={handleUndo}
-                isApplied={isRemediated}
-                isLoading={isFormLocked}
-              >
-                {currentIssue.form.type === FormType.Checkbox ||
-                currentIssue.form.type === FormType.Button
-                  ? currentIssue.form.label
-                  : I18n.t('Apply')}
-              </ApplyButton>
-            </View>
+          </Flex>
+          <View as="div" margin="medium 0">
+            <Preview ref={previewRef} issue={currentIssue} itemId={item.id} itemType={item.type} />
+          </View>
+          <View as="section" margin="medium 0">
+            <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+            <br aria-hidden={true} />
+            <Text weight="weightRegular">{currentIssue.message}</Text>
+          </View>
+          <View as="section" margin="medium 0">
+            <Form ref={formRef} issue={currentIssue} onReload={updatePreview} />
+          </View>
+          <View as="section" margin="medium 0">
+            <ApplyButton
+              onApply={handleApply}
+              onUndo={handleUndo}
+              isApplied={isRemediated}
+              isLoading={isFormLocked}
+            >
+              {currentIssue.form.type === FormType.Checkbox ||
+              currentIssue.form.type === FormType.Button
+                ? currentIssue.form.label
+                : I18n.t('Apply')}
+            </ApplyButton>
           </View>
         </Flex.Item>
         <Flex.Item as="footer">

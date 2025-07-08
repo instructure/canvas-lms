@@ -30,7 +30,7 @@ module Accessibility
       end
 
       def self.message
-        "Tables should include header cells."
+        "Tables should include a caption describing the contents of the table."
       end
 
       def self.why
@@ -43,10 +43,10 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Set table header",
-          value: "No headers",
-          options: ["None", "Header row", "Header column", "Header row and column"]
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: "Which part of the table should contain the headings?",
+          value: "The top row",
+          options: ["The top row", "The left column", "Both"]
         )
       end
 
@@ -55,10 +55,7 @@ module Accessibility
           th.name = "td"
         end
 
-        case value
-        when "None"
-          return nil
-        when "Header row", "Header row and column"
+        if ["The top row", "Both"].include?(value)
           first_row = elem.query_selector("tr")
           first_row&.query_selector_all("td")&.each do |td|
             td.name = "th"
@@ -66,7 +63,7 @@ module Accessibility
           end
         end
 
-        if ["Header column", "Header row and column"].include?(value)
+        if ["The left column", "Both"].include?(value)
           elem.query_selector_all("tr").each_with_index do |row, index|
             next if index == 0 # Skip the first row
 

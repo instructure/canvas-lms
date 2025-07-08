@@ -24,7 +24,7 @@ export enum ContentItemType {
 
 export enum FormType {
   TextInput = 'textinput',
-  DropDown = 'dropdown',
+  RadioInputGroup = 'radio_input_group',
   Button = 'button',
   Checkbox = 'checkbox',
   ColorPicker = 'colorpicker',
