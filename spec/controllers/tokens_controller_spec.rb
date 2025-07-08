@@ -366,7 +366,53 @@ describe TokensController do
           end
         end
 
-        context "with limit_personal_access_tokens setting off" do
+        context "with restrict_personal_access_tokens_from_students setting on" do
+          before(:once) { Account.default.change_root_account_setting!(:restrict_personal_access_tokens_from_students, true) }
+
+          shared_examples_for "access token creation and update denied" do
+            it "does not allow creating an access token" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              assert_status(401)
+            end
+
+            it "does not allow updating an access token" do
+              token = @user.access_tokens.create!(purpose: "test")
+              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+              assert_status(401)
+            end
+          end
+
+          context "as a 'nobody'" do
+            it_behaves_like "access token creation and update denied"
+          end
+
+          context "as a student" do
+            before do
+              course_with_student(active_all: true, user: @user)
+            end
+
+            it_behaves_like "access token creation and update denied"
+          end
+
+          context "as a teacher" do
+            before do
+              course_with_teacher(active_all: true, user: @user)
+            end
+
+            it "does allows creating an access token" do
+              post "create", params: { user_id: "self", token: { purpose: "test", expires_at: "" } }
+              assert_status(200)
+            end
+
+            it "does allows updating an access token" do
+              token = @user.access_tokens.create!(purpose: "test")
+              put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
+              assert_status(200)
+            end
+          end
+        end
+
+        context "with both limit_personal_access_tokens and restrict_personal_access_tokens_from_students setting off" do
           before(:once) { Account.default.change_root_account_setting!(:limit_personal_access_tokens, false) }
 
           context "as non-admin" do
