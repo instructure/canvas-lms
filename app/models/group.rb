@@ -415,6 +415,8 @@ class Group < ActiveRecord::Base
   end
 
   def bulk_add_users_to_differentiation_tag(user_ids, options = {})
+    # filter out duplicate user_ids, a user can only be in a differentiation tag once
+    user_ids = user_ids.uniq
     return [] if user_ids.empty?
 
     old_group_memberships = group_memberships.where(user_id: user_ids).to_a
