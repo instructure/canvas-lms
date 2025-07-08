@@ -194,5 +194,8 @@ DEPENDENCIES
   rspec (~> 3.12)
   rubocop-canvas!
 
+RUBY VERSION
+   ruby 3.4.1p0
+
 BUNDLED WITH
    2.6.7
