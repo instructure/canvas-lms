@@ -4061,6 +4061,8 @@ ko:
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
+  count_results_9926447c: 
+    zero: "결과 없음"
   count_sections_bf1baf0a: 
     one: "섹션 %{count}개"
     other: "섹션 %{count}개"

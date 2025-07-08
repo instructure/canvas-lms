@@ -7897,6 +7897,7 @@ nn:
   count_results_9926447c: 
     one: "Eit resultat"
     other: "*%{count}* resultat"
+    zero: "Utan resultat"
   count_results_displayed_ed39a0f0: 
     one: "Eit resultat viser"
     other: "%{count} resultat viser"
