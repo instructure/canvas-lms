@@ -38,6 +38,7 @@ interface NewLoginData {
   forgotPasswordUrl?: string
   invalidLoginFaqUrl?: string
   helpLink?: HelpLink
+  requireAup?: boolean
 }
 
 interface NewLoginDataResult {
@@ -54,7 +55,7 @@ const transformPasswordPolicy = (rawPolicy: any): PasswordPolicy => {
 
   return {
     minimumCharacterLength: rawPolicy.minimum_character_length
-      ? parseInt(rawPolicy.minimum_character_length, 10)
+      ? Number.parseInt(rawPolicy.minimum_character_length, 10)
       : undefined,
     requireNumberCharacters: rawPolicy.require_number_characters === 'true',
     requireSymbolCharacters: rawPolicy.require_symbol_characters === 'true',
@@ -147,6 +148,7 @@ const fetchLoginDataFromAttributes = (): NewLoginData => {
         forgotPasswordUrl: getStringAttribute(container, 'data-forgot-password-url'),
         invalidLoginFaqUrl: getStringAttribute(container, 'data-invalid-login-faq-url'),
         helpLink: getObjectAttribute<HelpLink>(container, 'data-help-link', transformHelpLink),
+        requireAup: getBooleanAttribute(container, 'data-require-aup'),
       }
     : {}
 }
@@ -172,13 +174,13 @@ export const useFetchNewLoginData = (): NewLoginDataResult => {
     forgotPasswordUrl: undefined,
     invalidLoginFaqUrl: undefined,
     helpLink: undefined,
+    requireAup: undefined,
   })
   const [isDataLoading, setIsDataLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // TODO: replace with new endpoint and a doFetchApi() call
         const data = fetchLoginDataFromAttributes()
         setNewLoginData(data)
       } catch (error) {

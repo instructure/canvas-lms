@@ -21,126 +21,124 @@
 describe "login/canvas/new_login" do
   subject(:rendered_page) do
     render
-    Nokogiri::HTML5(response.body)
+    Nokogiri::HTML5(rendered)
   end
 
   let(:account) { Account.default }
 
-  let(:expected_attribute_count) { 17 }
-
-  let(:always_present_attributes) do
-    {
-      "data-enable-course-catalog" => "true",
-      "data-is-preview-mode" => "true",
-      "data-terms-required" => "true"
-    }
+  let!(:apple_provider) do
+    account.authentication_providers.create!(auth_type: "apple")
   end
 
-  let(:conditionally_present_attributes) do
+  let!(:google_provider) do
+    account.authentication_providers.create!(auth_type: "google")
+  end
+
+  let(:attributes) do
     {
-      "data-auth-providers" => account.authentication_providers.active.to_json,
-      "data-login-handle-name" => "Username",
-      "data-login-logo-url" => "custom-logo.png",
-      "data-login-logo-text" => "Default Account",
+      "data-auth-providers" => [
+        {
+          id: apple_provider.id,
+          auth_type: apple_provider.auth_type,
+          display_name: apple_provider.class.display_name
+        },
+        {
+          id: google_provider.id,
+          auth_type: google_provider.auth_type,
+          display_name: google_provider.class.display_name
+        }
+      ].to_json,
       "data-body-bg-color" => "#ffffff",
       "data-body-bg-image" => "bg.png",
-      "data-self-registration-type" => "all",
-      "data-recaptcha-key" => "test-recaptcha-key",
-      "data-terms-of-use-url" => view.terms_of_use_url,
-      "data-privacy-policy-url" => view.privacy_policy_url,
-      "data-require-email" => "true",
-      "data-password-policy" => account.password_policy.to_json,
+      "data-enable-course-catalog" => "true",
       "data-forgot-password-url" => "http://example.com/forgot",
-      "data-invalid-login-faq-url" => nil, # defaults to nil
-      "data-help-link" => "{\"text\":\"Help\",\"trackCategory\":\"help system\",\"trackLabel\":\"help button\"}",
+      "data-help-link" => {
+        text: "Help",
+        trackCategory: "help system",
+        trackLabel: "help button"
+      }.to_json,
+      "data-invalid-login-faq-url" => "http://example.com/faq",
+      "data-is-preview-mode" => "true",
+      "data-login-handle-name" => "Username",
+      "data-login-logo-text" => "Default Account",
+      "data-login-logo-url" => "https://cdn.canvas.com/accounts/1/files/1/download?verifier=abc123",
+      "data-password-policy" => {
+        minimum_character_length: 8,
+        require_number_characters: true,
+        require_symbol_characters: true
+      }.to_json,
+      "data-privacy-policy-url" => "http://example.com/privacy",
+      "data-recaptcha-key" => "test-recaptcha-key",
+      "data-require-email" => "true",
+      "data-self-registration-type" => "all",
+      "data-terms-of-use-url" => "http://example.com/terms",
+      "data-terms-required" => "true",
+      "data-require-aup" => "true",
     }
   end
+
+  let(:login_data) { rendered_page.at_css("#new_login_data") }
 
   before do
     # assign view variables
     assign(:domain_root_account, account)
-    assign(:auth_providers, account.authentication_providers.active)
-    # stub account methods
+    # stub provider class display names
+    allow(apple_provider.class).to receive(:display_name).and_return("Apple")
+    allow(google_provider.class).to receive(:display_name).and_return("Google")
+    # stub account feature flags and settings
     allow(account).to receive_messages(
       enable_course_catalog?: true,
-      login_handle_name_with_inference: "Username",
-      self_registration_type: "all",
-      recaptcha_key: "test-recaptcha-key",
-      terms_required?: true,
-      require_email_for_registration?: true,
       forgot_password_external_url: "http://example.com/forgot",
-      password_policy: { minimum_character_length: 8, require_number_characters: true, require_symbol_characters: true }
+      login_handle_name_with_inference: "Username",
+      password_policy: {
+        minimum_character_length: 8,
+        require_number_characters: true,
+        require_symbol_characters: true
+      },
+      recaptcha_key: "test-recaptcha-key",
+      require_email_for_registration?: true,
+      self_registration?: true,
+      self_registration_type: "all",
+      account_terms_required?: true
     )
-    # authentication providers
-    mock_auth_providers = [
-      { id: 1, auth_type: "apple", display_name: "Apple" },
-      { id: 2, auth_type: "google", display_name: "Google" }
-    ]
-    allow(view).to receive(:auth_providers_with_buttons).and_return(mock_auth_providers)
-    assign(:auth_providers, mock_auth_providers)
-    # branding values
-    allow(view).to receive(:brand_variable).with("ic-brand-Login-logo").and_return("custom-logo.png")
+    # stub settings
+    allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("http://example.com/faq")
+    allow(Setting).to receive(:get).with("terms_of_use_url", anything).and_return("http://example.com/terms")
+    allow(Setting).to receive(:get).with("privacy_policy_url", anything).and_return("http://example.com/privacy")
+    allow(Setting).to receive(:get).with("terms_of_use_fft", anything).and_return("http://example.com/terms")
+    allow(Setting).to receive(:get).with("privacy_policy_fft", anything).and_return("http://example.com/privacy")
+    allow(Setting).to receive(:get).with("terms_required", "true").and_return("true")
+    # stub branding variables
+    allow(view).to receive(:brand_variable).with("ic-brand-Login-logo").and_return("https://cdn.canvas.com/accounts/1/files/1/download?verifier=abc123")
     allow(view).to receive(:brand_variable).with("ic-brand-Login-body-bgd-color").and_return("#ffffff")
     allow(view).to receive(:brand_variable).with("ic-brand-Login-body-bgd-image").and_return("bg.png")
-    # external urls
+    # stub view parameters
     allow(view).to receive_messages(
-      terms_of_use_url: "http://www.canvaslms.com/policies/terms-of-use",
-      privacy_policy_url: "http://www.canvaslms.com/policies/privacy-policy",
       params: { previewing_from_themeeditor: "true" }
     )
   end
 
-  it "renders the correct number of data attributes" do
-    login_data = rendered_page.at_css("#new_login_data")
-    data_attributes = login_data.attributes.keys.grep(/^data-/)
-    expect(data_attributes.size).to eq expected_attribute_count
+  it "renders the login data div" do
+    expect(login_data).not_to be_nil
   end
 
-  it "renders the login data div with all expected always-present attributes" do
-    login_data = rendered_page.at_css("#new_login_data")
-    aggregate_failures "checking always-present attributes" do
-      always_present_attributes.each do |attr, expected_value|
+  it "renders the correct number of data attributes" do
+    data_attributes = login_data.attributes.keys.grep(/^data-/)
+    # puts "\nrendered data-* keys (#{data_attributes.count}):"
+    # data_attributes.each { |attr| puts "  - #{attr}" }
+    expect(data_attributes.size).to eq attributes.size
+  end
+
+  it "renders the login data div with all expected data-* attributes" do
+    aggregate_failures "checking data-* attributes" do
+      attributes.each do |attr, expected_value|
         expect(login_data[attr]).to eq(expected_value)
       end
     end
   end
 
-  it "renders only the conditionally present attributes that should exist" do
-    login_data = rendered_page.at_css("#new_login_data")
-    aggregate_failures "checking conditionally present attributes" do
-      conditionally_present_attributes.each do |attr, expected_value|
-        if expected_value.nil?
-          expect(login_data.attributes).not_to include(attr)
-        else
-          expect(login_data.attributes).to include(attr)
-        end
-      end
-    end
-  end
-
-  context "when forgot password url is not set" do
-    before { allow(account).to receive(:forgot_password_external_url).and_return(nil) }
-
-    it "does not include the forgot password url attribute" do
-      login_data = rendered_page.at_css("#new_login_data")
-      expect(login_data.attributes).not_to include("data-forgot-password-url")
-    end
-  end
-
-  context "when invalid login faq url is set" do
-    before do
-      allow(Setting).to receive(:get).with("invalid_login_faq_url", nil).and_return("http://example.com/faq")
-    end
-
-    it "includes the invalid login faq url attribute" do
-      login_data = rendered_page.at_css("#new_login_data")
-      expect(login_data["data-invalid-login-faq-url"]).to eq("http://example.com/faq")
-    end
-  end
-
   describe "password policy" do
     context "when set" do
-      let(:login_data) { rendered_page.at_css("#new_login_data") }
       let(:policy_json) { JSON.parse(login_data["data-password-policy"]) }
 
       it "renders only the allowed attributes" do
@@ -177,7 +175,6 @@ describe "login/canvas/new_login" do
       before { allow(account).to receive(:password_policy).and_return(nil) }
 
       it "does not include the data-password-policy attribute" do
-        login_data = rendered_page.at_css("#new_login_data")
         expect(login_data.attributes).not_to include("data-password-policy")
       end
     end
@@ -186,8 +183,81 @@ describe "login/canvas/new_login" do
       before { allow(account).to receive(:password_policy).and_return({}) }
 
       it "does not include the data-password-policy attribute" do
-        login_data = rendered_page.at_css("#new_login_data")
         expect(login_data.attributes).not_to include("data-password-policy")
+      end
+    end
+  end
+
+  describe "xss and weird character handling" do
+    let(:xss_string)             { %{" onmouseover="alert('xss')} }
+    let(:xss_string_with_script) { "<script>alert('xss')</script>" }
+    let(:weird_unicode)          { "string with 𝒲𝒺𝒾𝓇𝒹 chars 💣" }
+
+    before do
+      allow(view).to receive(:brand_variable)
+        .with("ic-brand-Login-logo")
+        .and_return("https://cdn.canvas.com/accounts/1/files/1/download?verifier=abc123")
+      allow(account).to receive_messages(
+        login_handle_name_with_inference: xss_string,
+        short_name: "#{xss_string_with_script} #{weird_unicode}"
+      )
+      allow(view).to receive_messages(
+        help_link_name: xss_string_with_script,
+        help_link_data: {
+          "track-category": "category",
+          "track-label": "label"
+        }
+      )
+      render template: "login/canvas/new_login"
+    end
+
+    it "renders the login data div" do
+      expect(rendered_page.at_css("#new_login_data")).to be_present, "Expected #new_login_data div to be present in rendered HTML"
+    end
+
+    it "escapes login_handle_name to prevent HTML/script injection" do
+      # check raw HTML escaping since Nokogiri auto-decodes attribute values
+      attr_value = rendered[/data-login-handle-name="([^"]+)"/, 1]
+      aggregate_failures "HTML escaping for data-login-handle-name" do
+        expect(attr_value).to be_present
+        expect(attr_value).to include("&quot;"), "Expected double quotes to be escaped"
+        expect(attr_value).not_to include("<"), "Raw '<' should not appear"
+        expect(attr_value).not_to include(">"), "Raw '>' should not appear"
+        # un-escaping should yield the original input, confirming only HTML entity escaping
+        expect(CGI.unescapeHTML(attr_value)).to eq(xss_string), "Expected unescaped data-login-handle-name to match original xss_string input"
+      end
+    end
+
+    it "escapes help_link JSON to prevent HTML injection" do
+      raw_attr = rendered[/data-help-link="([^"]+)"/, 1]
+      aggregate_failures "help_link data-* escaping and decoding" do
+        expect(raw_attr).to be_present, "Expected data-help-link to be present in rendered HTML"
+        expect(raw_attr).to include("&quot;"), "Expected escaped double quotes (&quot;) in attribute value"
+        expect(raw_attr).not_to include("<"), "Raw '<' should not appear in the attribute value"
+        expect(raw_attr).not_to include(">"), "Raw '>' should not appear in the attribute value"
+        decoded_json = CGI.unescapeHTML(raw_attr)
+        expect(decoded_json).not_to include("<script>"), "Decoded help_link JSON should not contain raw script tags"
+        parsed = JSON.parse(decoded_json)
+        expect(parsed["text"]).to eq(xss_string_with_script), "Expected JSON 'text' value to match xss_string_with_script"
+        expect(parsed["trackCategory"]).to eq("category"), "Expected JSON trackCategory to match"
+        expect(parsed["trackLabel"]).to eq("label"), "Expected JSON trackLabel to match"
+      end
+    end
+
+    it "renders short_name safely in visible HTML, escaping scripts and preserving unicode" do
+      escaped_short_name = CGI.escapeHTML(xss_string_with_script)
+      aggregate_failures "short_name output safety" do
+        expect(rendered).to include(escaped_short_name), "Expected HTML to contain escaped short_name"
+        expect(rendered).not_to include(xss_string_with_script), "Expected raw <script> to be escaped"
+        expect(rendered).to include(weird_unicode), "Expected weird unicode characters to be preserved in rendered output"
+      end
+    end
+
+    it "does not render unexpected attributes like onmouseover in the login data div" do
+      node = rendered_page.at_css("#new_login_data")
+      aggregate_failures "unexpected attribute checks" do
+        expect(node).to be_present, "Expected #new_login_data div to be present in rendered HTML"
+        expect(node.attribute_nodes.map(&:name)).not_to include("onmouseover"), "Expected no injected attributes like 'onmouseover' on #new_login_data"
       end
     end
   end

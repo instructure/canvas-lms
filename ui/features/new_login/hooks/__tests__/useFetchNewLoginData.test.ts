@@ -39,6 +39,7 @@ const createMockContainer = (
   forgotPasswordUrl: string | null,
   invalidLoginFaqUrl: string | null,
   helpLink: string | null,
+  requireAup: string | null,
 ) => {
   const container = document.createElement('div')
   container.id = 'new_login_data'
@@ -96,6 +97,9 @@ const createMockContainer = (
   if (helpLink !== null) {
     container.setAttribute('data-help-link', helpLink)
   }
+  if (requireAup !== null) {
+    container.setAttribute('data-require-aup', requireAup)
+  }
   document.body.appendChild(container)
 }
 
@@ -132,6 +136,7 @@ describe('useFetchNewLoginData', () => {
       '', // forgotPasswordUrl
       '', // invalidLoginFaqUrl
       '', // helpLink
+      '', // requireAup
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     await waitFor(() => {
@@ -155,6 +160,7 @@ describe('useFetchNewLoginData', () => {
         'forgotPasswordUrl',
         'invalidLoginFaqUrl',
         'helpLink',
+        'requireAup',
       ]
       expect(hookAttributes.sort()).toEqual(expectedAttributes.sort())
     })
@@ -179,6 +185,9 @@ describe('useFetchNewLoginData', () => {
       requireEmail: undefined,
       passwordPolicy: undefined,
       forgotPasswordUrl: undefined,
+      invalidLoginFaqUrl: undefined,
+      helpLink: undefined,
+      requireAup: undefined,
     })
   })
 
@@ -210,6 +219,7 @@ describe('useFetchNewLoginData', () => {
         trackCategory: 'login',
         trackLabel: 'help',
       }),
+      'true',
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
@@ -239,6 +249,7 @@ describe('useFetchNewLoginData', () => {
         trackCategory: 'login',
         trackLabel: 'help',
       },
+      requireAup: true,
     })
   })
 
@@ -247,6 +258,7 @@ describe('useFetchNewLoginData', () => {
     createMockContainer(
       null,
       'invalid JSON',
+      null,
       null,
       null,
       null,
@@ -288,19 +300,22 @@ describe('useFetchNewLoginData', () => {
       null,
       null,
       null,
+      'false',
       null,
       null,
       null,
       null,
-      null,
+      'false',
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data.enableCourseCatalog).toBe(false)
     expect(result.current.data.isPreviewMode).toBe(false)
+    expect(result.current.data.requireEmail).toBe(false)
+    expect(result.current.data.requireAup).toBe(false)
   })
 
   it('returns undefined for empty string attributes', () => {
-    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
+    createMockContainer('', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')
     const {result} = renderHook(() => useFetchNewLoginData())
     expect(result.current.data).toEqual({
       enableCourseCatalog: undefined,
@@ -321,6 +336,7 @@ describe('useFetchNewLoginData', () => {
       forgotPasswordUrl: undefined,
       invalidLoginFaqUrl: undefined,
       helpLink: undefined,
+      requireAup: undefined,
     })
   })
 
@@ -344,6 +360,7 @@ describe('useFetchNewLoginData', () => {
       null,
       null,
       JSON.stringify({}), // helpLink
+      null,
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     const data = result.current.data
@@ -372,11 +389,34 @@ describe('useFetchNewLoginData', () => {
       null,
       null,
       null, // helpLink
+      null,
     )
     const {result} = renderHook(() => useFetchNewLoginData())
     const data = result.current.data
     expect(data.passwordPolicy).toBeUndefined()
     expect(data.authProviders).toBeUndefined()
     expect(data.helpLink).toBeUndefined()
+  })
+
+  // returns raw values; escaping/sanitizing is the responsibility of the rendering layer
+  it('returns potentially unsafe-looking strings without decoding or sanitizing', () => {
+    const xssString = '" onmouseover="alert(\'xss\')'
+    const xssScript = '<script>alert("xss")</script>'
+    const weirdUnicode = 'string with 𝒲𝒺𝒾𝓇𝒹 chars 💣'
+    const helpLink = {
+      text: xssScript,
+      trackCategory: 'category',
+      trackLabel: 'label',
+    }
+    const container = document.createElement('div')
+    container.id = 'new_login_data'
+    container.setAttribute('data-login-handle-name', xssString)
+    container.setAttribute('data-login-logo-text', `${xssScript} ${weirdUnicode}`)
+    container.setAttribute('data-help-link', JSON.stringify(helpLink))
+    document.body.appendChild(container)
+    const {result} = renderHook(() => useFetchNewLoginData())
+    expect(result.current.data.loginHandleName).toBe(xssString)
+    expect(result.current.data.loginLogoText).toBe(`${xssScript} ${weirdUnicode}`)
+    expect(result.current.data.helpLink).toEqual(helpLink)
   })
 })
