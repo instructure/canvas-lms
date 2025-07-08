@@ -348,6 +348,16 @@ export const DiscussionThreadContainer = props => {
       )
     }
 
+    if (ENV.discussion_pin_post) {
+      threadActions.push(
+        <ThreadingToolbar.Pin
+          key={`pin-${props.discussionEntry._id}`}
+          delimiterKey={`pin-delimiter-${props.discussionEntry._id}`}
+          onClick={() => {}}
+        />,
+      )
+    }
+
     if (!props.discussionEntry.deleted) {
       threadActions.push(
         <ThreadingToolbar.MarkAsRead

@@ -31,6 +31,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 import {isSpeedGraderInTopUrl} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
+import {Pin} from './Pin'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -101,6 +102,7 @@ ThreadingToolbar.propTypes = {
 
 ThreadingToolbar.Reply = Reply
 ThreadingToolbar.Like = Like
+ThreadingToolbar.Pin = Pin
 ThreadingToolbar.Expansion = Expansion
 ThreadingToolbar.MarkAsRead = MarkAsRead
 
