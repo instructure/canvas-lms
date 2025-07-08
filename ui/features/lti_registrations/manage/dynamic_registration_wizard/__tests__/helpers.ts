@@ -78,6 +78,7 @@ export const mockRegistration = (
   name: 'Test Registration',
   admin_nickname: 'Test Admin',
   workflow_state: 'active',
+  description: 'Test Description',
   vendor: 'canvas',
   internal_service: false,
   ims_registration_id: ZLtiImsRegistrationId.parse('1'),
