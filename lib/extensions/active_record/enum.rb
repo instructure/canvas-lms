@@ -44,6 +44,11 @@ module Extensions
           raise ArgumentError, "Enum values #{values} must only contain symbols or strings."
         end
 
+        # preset the attribute type to string, so that the set_ignored_columns rake task doesn't
+        # fail when the model is loaded, but the column doesn't exist yet, and it doesn't know
+        # what type it is.
+        attribute(name, :string)
+
         # Pass an "identity" hash based on the values array where the key and value are the same.
         super(name, values.index_with(&:to_s), **)
       end
