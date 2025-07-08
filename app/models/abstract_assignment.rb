@@ -2660,6 +2660,7 @@ class AbstractAssignment < ActiveRecord::Base
         primary_homework = homework if is_primary_student
       end
     end
+    AttachmentAssociation.copy_associations(primary_homework, homeworks.excluding(primary_homework))
     homeworks.each do |homework|
       context_module_action(homework.student, homework.workflow_state.to_sym)
       next unless comment && (group_comment || homework == primary_homework)

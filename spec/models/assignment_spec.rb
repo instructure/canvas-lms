@@ -6799,6 +6799,19 @@ describe Assignment do
       expect(subs.map(&:body).uniq).to eql(["Some text for you"])
     end
 
+    it "creates attachment associations for all students in the same group when file_association_access flag is enabled" do
+      attachment = attachment_model(context: @u1)
+      attachment.root_account.enable_feature!(:file_association_access)
+      body = "<a href='/users/#{@u1.id}/files/#{attachment.id}'>#{attachment.display_name}</a>"
+      @a.submit_homework(@u1, submission_type: "online_text_entry", body:)
+      @a.reload
+
+      sub1, sub2 = @a.all_submissions.where(user_id: [@u1.id, @u2.id])
+
+      expect(attachment.attachment_associations.count).to eq(2)
+      expect(attachment.attachment_associations.pluck(:context_id)).to match_array([sub1.id, sub2.id])
+    end
+
     it "submits the homework for all students in the group if grading them individually" do
       @a.update_attribute(:grade_group_students_individually, true)
       @a.submit_homework(@u1, submission_type: "online_text_entry", body: "Test submission")
