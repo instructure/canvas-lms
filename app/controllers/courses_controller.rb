@@ -4031,6 +4031,81 @@ class CoursesController < ApplicationController
     end
   end
 
+  def youtube_migration
+    get_context
+
+    unless @context.root_account.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    js_env(COURSE_ID: @context.id)
+    js_bundle :youtube_migration
+
+    render html: "", layout: true
+  end
+
+  def youtube_migration_scan
+    get_context
+
+    unless @context.root_account.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    progress = YoutubeMigrationService.last_youtube_embed_scan_progress_by_course(@context)
+
+    unless progress
+      render json: { id: nil, workflow_state: nil, resources: [], total_count: 0 }, status: :ok
+      return
+    end
+
+    json = {
+      id: progress.id,
+      workflow_state: progress.workflow_state,
+      resources: progress.results&.dig(:resources)&.values || [],
+      total_count: progress.results&.dig(:total_count) || 0
+    }
+
+    render json:, status: :ok
+  end
+
+  def start_youtube_migration_scan
+    get_context
+
+    unless @context.root_account.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    progress = YoutubeMigrationService.queue_scan_course_for_embeds(@context)
+
+    render json: { id: progress.id, workflow_state: progress.workflow_state, resources: [], total_count: 0 }, status: :ok
+  end
+
+  def start_youtube_migration_convert
+    get_context
+
+    unless @context.root_account.feature_enabled?(:youtube_migration)
+      return render status: :not_found, template: "shared/errors/404_message"
+    end
+
+    authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+
+    embed = params.require(:embed).permit(:field, :id, :path, :resource_type, :src, :resource_group_key).to_h.with_indifferent_access
+    embed[:id] = embed[:id].to_i
+    embed[:field] = embed[:field].to_sym
+    scan_id = params.require(:scan_id)
+
+    service = YoutubeMigrationService.new(@context)
+    progress = service.convert_embed(scan_id, embed)
+
+    render json: { id: progress.id }, status: :ok
+  end
+
   def start_link_validation
     get_context
     return unless authorized_action(@context, @current_user, RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
