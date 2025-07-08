@@ -17,9 +17,12 @@
  */
 
 import React from 'react'
-import {render, screen, waitFor} from '@testing-library/react'
+import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import AcceptableUsePolicy from '../AcceptableUsePolicy'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {assignLocation} from '@canvas/util/globalUtils'
+import {userEvent} from '@testing-library/user-event'
+import {useLocation, useNavigate, useNavigationType} from 'react-router-dom'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/alerts/react/FlashAlert')
@@ -28,9 +31,34 @@ const mockApiResponse = {
   content: '<p>Test Acceptable Use Policy Content</p>',
 }
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: jest.fn(),
+  useNavigationType: jest.fn(),
+  useLocation: jest.fn(),
+}))
+
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
+
 describe('AcceptableUsePolicy', () => {
+  const mockNavigate = jest.fn()
+  const mockNavigationType = useNavigationType as jest.Mock
+  const mockLocation = useLocation as jest.Mock
+  beforeAll(() => {
+    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
+  })
+
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.restoreAllMocks()
+    mockNavigationType.mockReturnValue('PUSH')
+    mockLocation.mockReturnValue({key: 'default'})
+  })
+
+  afterEach(() => {
+    cleanup()
   })
 
   it('mounts without crashing', () => {
@@ -82,5 +110,43 @@ describe('AcceptableUsePolicy', () => {
       ).toBeInTheDocument(),
     )
     expect(screen.queryByText('Loading page')).not.toBeInTheDocument()
+  })
+
+  describe('navigation behavior', () => {
+    it('redirects to /login when the CloseButton is clicked with no history', async () => {
+      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
+        json: mockApiResponse,
+        response: {ok: true},
+      })
+      mockNavigationType.mockReturnValue('POP')
+      mockLocation.mockReturnValue({key: 'default'})
+      render(<AcceptableUsePolicy />)
+      await waitFor(() =>
+        expect(screen.getByText('Test Acceptable Use Policy Content')).toBeInTheDocument(),
+      )
+      await userEvent.click(
+        screen.getByTestId('close-acceptable-use-policy').querySelector('button')!,
+      )
+      expect(assignLocation).toHaveBeenCalledWith('/login')
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it('navigates back when the CloseButton is clicked and history exists', async () => {
+      ;(doFetchApi as jest.Mock).mockResolvedValueOnce({
+        json: mockApiResponse,
+        response: {ok: true},
+      })
+      mockNavigationType.mockReturnValue('PUSH')
+      mockLocation.mockReturnValue({key: 'abc123'})
+      render(<AcceptableUsePolicy />)
+      await waitFor(() =>
+        expect(screen.getByText('Test Acceptable Use Policy Content')).toBeInTheDocument(),
+      )
+      await userEvent.click(
+        screen.getByTestId('close-acceptable-use-policy').querySelector('button')!,
+      )
+      expect(mockNavigate).toHaveBeenCalledWith(-1)
+      expect(assignLocation).not.toHaveBeenCalled()
+    })
   })
 })
