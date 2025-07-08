@@ -70,7 +70,7 @@ export const VerticalButtonDisplay = ({
         const isSelfAssessmentSelected =
           rating.id != null && rating.id === selectedSelfAssessmentRatingId
 
-        const min = criterionUseRange ? rangingFrom(ratings, index) : undefined
+        const min = criterionUseRange ? rangingFrom(ratings, index, undefined, true) : undefined
 
         const getPossibleText = (points?: number) => {
           return min != null ? possibleStringRange(min, points) : possibleString(points)
@@ -126,7 +126,10 @@ export const VerticalButtonDisplay = ({
                     padding="xx-small"
                     margin="0 0 x-small xx-small"
                     data-testid={`rating-details-${rating.id}`}
-                    themeOverride={{borderColorBrand: colors.contrasts.green4570, borderWidthMedium: '0.188rem'}}
+                    themeOverride={{
+                      borderColorBrand: colors.contrasts.green4570,
+                      borderWidthMedium: '0.188rem',
+                    }}
                   >
                     <View as="div">
                       <Text size="x-small" weight="bold">
