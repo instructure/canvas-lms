@@ -1087,7 +1087,8 @@ class GradebooksController < ApplicationController
         gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
         can_view_audit_trail: @assignment.present? && @assignment.can_view_audit_trail?(@current_user),
         PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse),
-        GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
+        GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads),
+        DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
       }
       js_env(env)
 
