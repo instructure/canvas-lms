@@ -19,7 +19,8 @@ ai_translation_improvements:
 
 cedar_translation:
   state: hidden
-  applies_to: SiteAdmin
+  applies_to: RootAccount
   display_name: Cedar Translation
   description: |-
     Uses Cedar for translations
+  shadow: true
