@@ -28,6 +28,7 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Link as RouterLink} from 'react-router-dom'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
@@ -405,7 +406,10 @@ const renderHeaderRow = (
             }
           : {})}
       >
-        {header}
+        <>
+          <span aria-hidden="true">{header}</span>
+          <ScreenReaderContent>{I18n.t('sort by %{header}', {header})}</ScreenReaderContent>
+        </>
       </Table.ColHeader>
     ))}
   </Table.Row>
@@ -413,6 +417,7 @@ const renderHeaderRow = (
 
 export const AppsTable = (appsTableProps: AppsTableProps) => {
   const {apps, stale, ...restOfProps} = appsTableProps
+
   return (
     <div
       style={{
@@ -486,8 +491,31 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
 
   const layout = responsiveProps && responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
 
+  const totalScreenReaderText = I18n.t(
+    {one: 'Showing %{count} registration.', other: 'Showing %{count} registrations.'},
+    {count: props.tableProps.apps.total},
+  )
+
+  const col = columns.find(column => column.id === props.tableProps.sort)
+  // Default sortedScreenReaderText to an empty string for the initial load, when
+  // props.tableProps.sort isn't set yet
+  let sortedScreenReaderText = ''
+  if (col) {
+    sortedScreenReaderText =
+      props.tableProps.dir === 'asc'
+        ? I18n.t('Sorted by %{column} in ascending order', {column: col.header})
+        : I18n.t('Sorted by %{column} in descending order', {column: col.header})
+  }
+
   return (
     <>
+      <Alert
+        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+        liveRegionPoliteness="polite"
+        screenReaderOnly
+      >
+        {`${totalScreenReaderText} ${sortedScreenReaderText}`}
+      </Alert>
       <Table {...props.responsiveProps} caption={I18n.t('Installed Apps')} layout={layout}>
         <Table.Head renderSortLabel={I18n.t('Sort by')}>
           {renderHeaderRow(props.tableProps, columns)}
