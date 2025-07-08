@@ -18,7 +18,8 @@
 
 import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import React from 'react'
 import ConfirmChangePassword, {type ConfirmChangePasswordProps} from '../ConfirmChangePassword'
 
@@ -58,9 +59,11 @@ describe('ConfirmChangePassword', () => {
   }
   const CONFIRM_CHANGE_PASSWORD_URL = `/pseudonyms/${pseudonyms[0].id}/change_password/${props.cc.confirmation_code}`
 
-  afterEach(() => {
-    fetchMock.reset()
-  })
+  const server = setupServer()
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('should render the user name in the title', async () => {
     render(<ConfirmChangePassword {...props} />)
@@ -135,40 +138,12 @@ describe('ConfirmChangePassword', () => {
   })
 
   it('should redirect to the login page after a successful password change', async () => {
-    fetchMock.post(CONFIRM_CHANGE_PASSWORD_URL, 200, {overwriteRoutes: true})
-    render(<ConfirmChangePassword {...props} />)
-    const submit = screen.getByLabelText('Update Password')
-    const password = screen.getByLabelText('New Password *')
-    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
-    const passwordValue = 'password1234'
-
-    await userEvent.type(password, passwordValue)
-    await userEvent.type(passwordConfirmation, passwordValue)
-    await userEvent.click(submit)
-
-    await waitFor(() => {
-      expect(
-        fetchMock.called(CONFIRM_CHANGE_PASSWORD_URL, {
-          method: 'POST',
-          body: {
-            pseudonym: {
-              id: pseudonyms[0].id,
-              password: passwordValue,
-              password_confirmation: passwordValue,
-            },
-          },
-        }),
-      ).toBe(true)
-    })
-  })
-
-  it('should redirect if the request fails due to link expiration', async () => {
-    fetchMock.post(
-      CONFIRM_CHANGE_PASSWORD_URL,
-      {status: 400, body: {errors: {nonce: 'expired'}}},
-      {
-        overwriteRoutes: true,
-      },
+    let capturedBody: any = null
+    server.use(
+      http.post(CONFIRM_CHANGE_PASSWORD_URL, async ({request}) => {
+        capturedBody = await request.json()
+        return new HttpResponse(null, {status: 200})
+      }),
     )
     render(<ConfirmChangePassword {...props} />)
     const submit = screen.getByLabelText('Update Password')
@@ -181,41 +156,63 @@ describe('ConfirmChangePassword', () => {
     await userEvent.click(submit)
 
     await waitFor(() => {
-      expect(
-        fetchMock.called(CONFIRM_CHANGE_PASSWORD_URL, {
-          method: 'POST',
-          body: {
-            pseudonym: {
-              id: pseudonyms[0].id,
-              password: passwordValue,
-              password_confirmation: passwordValue,
-            },
-          },
-        }),
-      ).toBe(true)
+      expect(capturedBody).toEqual({
+        pseudonym: {
+          id: pseudonyms[0].id,
+          password: passwordValue,
+          password_confirmation: passwordValue,
+        },
+      })
+    })
+  })
+
+  it('should redirect if the request fails due to link expiration', async () => {
+    let capturedBody: any = null
+    server.use(
+      http.post(CONFIRM_CHANGE_PASSWORD_URL, async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json({errors: {nonce: 'expired'}}, {status: 400})
+      }),
+    )
+    render(<ConfirmChangePassword {...props} />)
+    const submit = screen.getByLabelText('Update Password')
+    const password = screen.getByLabelText('New Password *')
+    const passwordConfirmation = screen.getByLabelText('Confirm New Password *')
+    const passwordValue = 'password1234'
+
+    await userEvent.type(password, passwordValue)
+    await userEvent.type(passwordConfirmation, passwordValue)
+    await userEvent.click(submit)
+
+    await waitFor(() => {
+      expect(capturedBody).toEqual({
+        pseudonym: {
+          id: pseudonyms[0].id,
+          password: passwordValue,
+          password_confirmation: passwordValue,
+        },
+      })
     })
   })
 
   it('should show an error if the request fails due to a validation error', async () => {
-    fetchMock.post(
-      CONFIRM_CHANGE_PASSWORD_URL,
-      {
-        status: 400,
-        body: {
-          pseudonym: {
-            password: [
-              {
-                attribute: 'password',
-                type: 'no_symbols',
-                message: 'no_symbols',
-              },
-            ],
+    server.use(
+      http.post(CONFIRM_CHANGE_PASSWORD_URL, () =>
+        HttpResponse.json(
+          {
+            pseudonym: {
+              password: [
+                {
+                  attribute: 'password',
+                  type: 'no_symbols',
+                  message: 'no_symbols',
+                },
+              ],
+            },
           },
-        },
-      },
-      {
-        overwriteRoutes: true,
-      },
+          {status: 400},
+        ),
+      ),
     )
     render(<ConfirmChangePassword {...props} />)
     const submit = screen.getByLabelText('Update Password')
@@ -232,9 +229,7 @@ describe('ConfirmChangePassword', () => {
   })
 
   it('should show an error alert if the request fails due to an unexpected server error', async () => {
-    fetchMock.post(CONFIRM_CHANGE_PASSWORD_URL, 500, {
-      overwriteRoutes: true,
-    })
+    server.use(http.post(CONFIRM_CHANGE_PASSWORD_URL, () => new HttpResponse(null, {status: 500})))
     render(<ConfirmChangePassword {...props} />)
     const submit = screen.getByLabelText('Update Password')
     const password = screen.getByLabelText('New Password *')

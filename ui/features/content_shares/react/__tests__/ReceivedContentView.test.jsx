@@ -21,12 +21,19 @@ import {render, fireEvent, act} from '@testing-library/react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import ReceivedContentView from '../ReceivedContentView'
 import {assignmentShare, unreadDiscussionShare} from './test-utils'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 jest.mock('@canvas/use-fetch-api-hook')
 
+const server = setupServer()
+
 describe('view of received content', () => {
   let liveRegion
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     liveRegion = document.createElement('div')
@@ -37,10 +44,6 @@ describe('view of received content', () => {
 
   afterEach(() => {
     if (liveRegion) liveRegion.remove()
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
   })
 
   it('renders spinner while loading', () => {
@@ -118,10 +121,11 @@ describe('view of received content', () => {
 
   it('displays a preview modal when requested', async () => {
     const shares = [assignmentShare]
-    fetchMock.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, {
-      status: 200,
-      body: {read_state: 'read', id: unreadDiscussionShare.id},
-    })
+    server.use(
+      http.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, () =>
+        HttpResponse.json({read_state: 'read', id: unreadDiscussionShare.id}),
+      ),
+    )
     useFetchApi.mockImplementationOnce(({loading, success}) => {
       loading(false)
       success(shares)
@@ -129,7 +133,9 @@ describe('view of received content', () => {
     const {getByText} = render(<ReceivedContentView />)
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Preview'))
-    await act(() => fetchMock.flush(true))
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0))
+    })
     expect(document.querySelector('iframe')).toBeInTheDocument()
   })
 
@@ -163,23 +169,35 @@ describe('view of received content', () => {
         loading(false)
         success(shares)
       })
-      fetchMock.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, {
-        status: 200,
-        body: {read_state: 'read', id: unreadDiscussionShare.id},
-      })
+      server.use(
+        http.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, () =>
+          HttpResponse.json({read_state: 'read', id: unreadDiscussionShare.id}),
+        ),
+      )
     })
 
     it('makes an update API call', async () => {
+      let apiCalled = false
+      server.use(
+        http.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, () => {
+          apiCalled = true
+          return HttpResponse.json({read_state: 'read', id: unreadDiscussionShare.id})
+        }),
+      )
       const {getByTestId} = render(<ReceivedContentView />)
       fireEvent.click(getByTestId('received-table-row-unread'))
-      await act(() => fetchMock.flush(true))
-      expect(fetchMock.called()).toBeTruthy()
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+      expect(apiCalled).toBeTruthy()
     })
 
     it('updates the unread dot', async () => {
       const {queryByTestId, getByTestId} = render(<ReceivedContentView />)
       fireEvent.click(getByTestId('received-table-row-unread'))
-      await act(() => fetchMock.flush(true))
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
       expect(queryByTestId('received-table-row-unread')).toBeNull()
     })
   })
@@ -201,14 +219,19 @@ describe('view of received content', () => {
         loading(false)
         success(shares)
       })
-      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 200, {
-        method: 'DELETE',
-      })
+      server.use(
+        http.delete(
+          `/api/v1/users/self/content_shares/${assignmentShare.id}`,
+          () => new HttpResponse(null, {status: 200}),
+        ),
+      )
       window.confirm.mockImplementation(() => true)
       const {getByText, queryByText} = render(<ReceivedContentView />)
       fireEvent.click(getByText(/manage options/i))
       fireEvent.click(getByText('Remove'))
-      await act(() => fetchMock.flush(true))
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
       expect(queryByText(assignmentShare.name)).toBeNull()
     })
 
@@ -233,14 +256,19 @@ describe('view of received content', () => {
         loading(false)
         success(shares)
       })
-      fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 401, {
-        method: 'DELETE',
-      })
+      server.use(
+        http.delete(
+          `/api/v1/users/self/content_shares/${assignmentShare.id}`,
+          () => new HttpResponse(null, {status: 401}),
+        ),
+      )
       window.confirm.mockImplementation(() => true)
       const {getByText, getAllByText} = render(<ReceivedContentView />)
       fireEvent.click(getByText(/manage options/i))
       fireEvent.click(getByText('Remove'))
-      await act(() => fetchMock.flush(true))
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
       expect(getAllByText(/401/)[0]).toBeInTheDocument()
     })
   })

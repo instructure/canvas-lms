@@ -17,7 +17,8 @@
 import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import MobileContextMenu from '../MobileContextMenu'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 
 const tabsFromApi = [
   {
@@ -59,6 +60,8 @@ const spinner = 'Spinner'
 const contextType = 'Course'
 const contextId = '1'
 
+const server = setupServer()
+
 const props = {
   spinner,
   contextType,
@@ -66,13 +69,13 @@ const props = {
 }
 
 describe('MobileContextMenu', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     window.ENV = {context_asset_string: 'courses_1'}
-    fetchMock.mock('*', tabsFromApi)
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
+    server.use(http.get('*', () => HttpResponse.json(tabsFromApi)))
   })
 
   it('renders spinner while loading', () => {

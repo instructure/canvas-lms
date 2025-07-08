@@ -18,11 +18,13 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {PageViewsTable, type PageViewsTableProps} from '../PageViewsTable'
 import {type APIPageView} from '../utils'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
+const server = setupServer()
 const queryClient = new QueryClient()
 
 // As of this writing, JS-DOM does not implement Intl.DurationFormat, so we will
@@ -69,13 +71,13 @@ const sample2: APIPageView[] = [
 ]
 
 describe('PageViewsTable', () => {
-  afterEach(() => {
-    fetchMock.resetHistory()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('renders the spinner while waiting for the API return', () => {
     const id = '122'
-    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample1)
+    server.use(http.get(`/api/v1/users/${id}/page_views`, () => HttpResponse.json(sample1)))
     const {getByLabelText} = render(<Subject userId={id} />)
     const spinner = getByLabelText('Loading')
     expect(spinner).toBeInTheDocument()
@@ -83,7 +85,7 @@ describe('PageViewsTable', () => {
 
   it('renders a table from the API data', async () => {
     const id = '123'
-    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample1)
+    server.use(http.get(`/api/v1/users/${id}/page_views`, () => HttpResponse.json(sample1)))
     const {findByTestId, getByTestId} = render(<Subject userId={id} />)
     expect(await findByTestId('page-views-table-body')).toBeInTheDocument()
     const cells = getByTestId('page-view-row').querySelectorAll('td')
@@ -95,7 +97,7 @@ describe('PageViewsTable', () => {
 
   it('properly formats the interaction time', async () => {
     const id = '124'
-    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample2)
+    server.use(http.get(`/api/v1/users/${id}/page_views`, () => HttpResponse.json(sample2)))
     const {findByTestId, getByTestId} = render(<Subject userId={id} />)
     expect(await findByTestId('page-views-table-body')).toBeInTheDocument()
     const time = getByTestId('page-view-row').querySelector('td:nth-child(4)')
@@ -104,7 +106,7 @@ describe('PageViewsTable', () => {
 
   it('shows the full user agent string in a tooltip', async () => {
     const id = '125'
-    fetchMock.get(`/api/v1/users/${id}/page_views?page=1&per_page=50`, sample1)
+    server.use(http.get(`/api/v1/users/${id}/page_views`, () => HttpResponse.json(sample1)))
     const {findByTestId, getByTestId} = render(<Subject userId={id} />)
     expect(await findByTestId('page-views-table-body')).toBeInTheDocument()
     const agentTip = screen.getByText(sample1[0].user_agent)
@@ -115,12 +117,18 @@ describe('PageViewsTable', () => {
 
   it('passes along the date range to the API when one is provided', async () => {
     const id = '126'
-    fetchMock.get(`begin:/api/v1/users/${id}`, sample1)
+    let capturedUrl = ''
+    server.use(
+      http.get(`/api/v1/users/${id}/page_views`, ({request}) => {
+        capturedUrl = request.url
+        return HttpResponse.json(sample1)
+      }),
+    )
     render(
       <Subject userId={id} startDate={new Date('2024-01-01')} endDate={new Date('2024-01-02')} />,
     )
-    await waitFor(() => expect(fetchMock.called()).toBe(true))
-    expect(fetchMock.lastUrl()).toMatch(/start_time=2024-01-01/)
-    expect(fetchMock.lastUrl()).toMatch(/end_time=2024-01-02/)
+    await waitFor(() => expect(capturedUrl).toBeTruthy())
+    expect(capturedUrl).toMatch(/start_time=2024-01-01/)
+    expect(capturedUrl).toMatch(/end_time=2024-01-02/)
   })
 })

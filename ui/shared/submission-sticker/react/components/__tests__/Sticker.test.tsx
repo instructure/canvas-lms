@@ -18,9 +18,12 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import Sticker from '../Sticker'
 import type {StickerProps} from '../../types/stickers.d'
+
+const server = setupServer()
 
 const renderComponent = (props: StickerProps) => {
   return render(<Sticker {...props} />)
@@ -29,6 +32,10 @@ const renderComponent = (props: StickerProps) => {
 describe('Sticker', () => {
   let props: StickerProps
   let liveRegion: HTMLElement
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
     liveRegion = document.createElement('div')
@@ -39,7 +46,6 @@ describe('Sticker', () => {
 
   afterEach(() => {
     liveRegion.remove()
-    fetchMock.restore()
   })
 
   describe('when not editable', () => {
@@ -197,7 +203,9 @@ describe('Sticker', () => {
     })
 
     it('optimistically updates the sticker', async () => {
-      fetchMock.put(updateUrl, {status: 200, body: {...props.submission, sticker: 'book'}})
+      server.use(
+        http.put(updateUrl, () => HttpResponse.json({...props.submission, sticker: 'book'})),
+      )
       props.onStickerChange = jest.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
@@ -209,14 +217,15 @@ describe('Sticker', () => {
         )
       })
       fireEvent.click(newSticker)
-      await fetchMock.flush(true)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
 
       expect(props.onStickerChange).toHaveBeenCalledTimes(1)
       expect(props.onStickerChange).toHaveBeenLastCalledWith('book')
     })
 
     it('reverts back to the original sticker if the update fails', async () => {
-      fetchMock.put(updateUrl, 404)
+      server.use(http.put(updateUrl, () => new HttpResponse(null, {status: 404})))
       props.onStickerChange = jest.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
@@ -228,7 +237,8 @@ describe('Sticker', () => {
         )
       })
       fireEvent.click(newSticker)
-      await fetchMock.flush(true)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
 
       expect(props.onStickerChange).toHaveBeenCalledTimes(2)
       expect(props.onStickerChange).toHaveBeenNthCalledWith(1, 'book')
@@ -244,7 +254,11 @@ describe('Sticker', () => {
       }
       props.onStickerChange = jest.fn()
       const anonymousUpdateUrl = `${baseUrl}/anonymous_submissions/${props.submission.anonymousId}`
-      fetchMock.put(anonymousUpdateUrl, {status: 200, body: {...props.submission, sticker: 'book'}})
+      server.use(
+        http.put(anonymousUpdateUrl, () =>
+          HttpResponse.json({...props.submission, sticker: 'book'}),
+        ),
+      )
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
       fireEvent.click(button)
@@ -255,21 +269,23 @@ describe('Sticker', () => {
         )
       })
       fireEvent.click(newSticker)
-      await fetchMock.flush(true)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
 
       expect(props.onStickerChange).toHaveBeenCalledTimes(1)
       expect(props.onStickerChange).toHaveBeenLastCalledWith('book')
     })
 
     it('removes stickers', async () => {
-      fetchMock.put(updateUrl, {status: 200, body: {...props.submission, sticker: null}})
+      server.use(http.put(updateUrl, () => HttpResponse.json({...props.submission, sticker: null})))
       props.onStickerChange = jest.fn()
       const {getByTestId} = renderComponent(props)
       const button = getByTestId('sticker-button')
       fireEvent.click(button)
       const removeStickerButton = getByTestId('sticker-remove')
       fireEvent.click(removeStickerButton)
-      await fetchMock.flush(true)
+
+      await new Promise(resolve => setTimeout(resolve, 0))
 
       expect(props.onStickerChange).toHaveBeenCalledTimes(1)
       expect(props.onStickerChange).toHaveBeenLastCalledWith(null)
