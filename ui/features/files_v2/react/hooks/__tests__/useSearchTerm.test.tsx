@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { renderHook, act } from '@testing-library/react-hooks'
-import { MemoryRouter, useNavigate } from 'react-router-dom'
-import { useSearchTerm } from '../useSearchTerm'
-import { generateSearchNavigationUrl } from '../../../utils/apiUtils'
+import {renderHook, act} from '@testing-library/react-hooks'
+import {MemoryRouter, useNavigate} from 'react-router-dom'
+import {useSearchTerm} from '../useSearchTerm'
+import {generateSearchNavigationUrl} from '../../../utils/apiUtils'
 
 jest.mock('../../../utils/apiUtils', () => ({
-  generateSearchNavigationUrl: jest.fn((term) => getExpectedSearchUrl(term)),
+  generateSearchNavigationUrl: jest.fn(term => getExpectedSearchUrl(term)),
 }))
 
 jest.mock('react-router-dom', () => ({
@@ -31,9 +31,11 @@ jest.mock('react-router-dom', () => ({
 }))
 
 const getExpectedSearchUrl = (term: string) => `/search?search_term=${term}`
-const getWrapper = (initialEntry: string) => ({ children }: { children: React.ReactNode }) => (
-  <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>
-)
+const getWrapper =
+  (initialEntry: string) =>
+  ({children}: {children: React.ReactNode}) => (
+    <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>
+  )
 
 describe('useSearchTerm', () => {
   const expectedSearchTerm = 'new-term'
@@ -49,22 +51,44 @@ describe('useSearchTerm', () => {
   })
 
   it('should return the current search term from the URL', () => {
-    const { result } = renderHook(() => useSearchTerm(), { wrapper: getWrapper(`/?search_term=${expectedSearchTerm}`) })
+    const {result} = renderHook(() => useSearchTerm(), {
+      wrapper: getWrapper(`/?search_term=${expectedSearchTerm}`),
+    })
     expect(result.current.searchTerm).toBe(expectedSearchTerm)
   })
 
   it('should return an empty string if no search term is present in the URL', () => {
-    const { result } = renderHook(() => useSearchTerm(), { wrapper: getWrapper('/') })
+    const {result} = renderHook(() => useSearchTerm(), {wrapper: getWrapper('/')})
     expect(result.current.searchTerm).toBe('')
   })
 
   it('should navigate to the correct URL when setSearchTerm is called', () => {
-    const { result } = renderHook(() => useSearchTerm(), { wrapper: getWrapper('/') })
+    const {result} = renderHook(() => useSearchTerm(), {wrapper: getWrapper('/')})
     act(() => {
       result.current.setSearchTerm(expectedSearchTerm)
     })
 
     expect(generateSearchNavigationUrl).toHaveBeenCalledWith(expectedSearchTerm)
     expect(mockNavigate).toHaveBeenCalledWith(getExpectedSearchUrl(expectedSearchTerm))
+  })
+
+  it('should encode the search term when navigating', () => {
+    const specialTerm = 'test term with spaces & special characters'
+    const encodedTerm = encodeURIComponent(specialTerm)
+    const {result} = renderHook(() => useSearchTerm(), {wrapper: getWrapper('/')})
+
+    act(() => {
+      result.current.setSearchTerm(specialTerm)
+    })
+
+    expect(generateSearchNavigationUrl).toHaveBeenCalledWith(encodedTerm)
+    expect(mockNavigate).toHaveBeenCalledWith(getExpectedSearchUrl(encodedTerm))
+  })
+
+  it('should return the URL-encoded search term', () => {
+    const {result} = renderHook(() => useSearchTerm(), {
+      wrapper: getWrapper(`/?search_term=${expectedSearchTerm}`),
+    })
+    expect(result.current.urlEncodedSearchTerm).toBe(encodeURIComponent(expectedSearchTerm))
   })
 })
