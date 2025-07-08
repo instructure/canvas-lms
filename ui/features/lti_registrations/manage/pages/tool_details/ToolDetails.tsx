@@ -311,7 +311,7 @@ export const ToolDetailsInner = ({
             <Pill>v1.3</Pill>
           </Flex>
           <Flex direction="column">
-            <Flex gap="small" margin="0 0 small">
+            <Flex gap="small" margin="0">
               <Button
                 data-pendo="lti-registrations-copy-client-id"
                 color="secondary"
