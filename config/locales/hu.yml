@@ -7302,6 +7302,7 @@ hu:
   count_results_9926447c: 
     one: "1 eredmény"
     other: "%{count} eredmény"
+    zero: "Nincsenek eredmények"
   count_results_displayed_ed39a0f0: 
     one: "1 megjelenített találat"
     other: "%{count} megjelenített találat"
