@@ -5892,6 +5892,7 @@ tr:
   count_results_9926447c: 
     one: "Bir sonuç"
     other: "%{count} sonuç"
+    zero: "Sonuç yok"
   count_results_displayed_ed39a0f0: 
     one: "Bir sonuç gösteriliyor"
     other: "%{count} sonuç gösteriliyor"
