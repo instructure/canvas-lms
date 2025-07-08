@@ -442,6 +442,10 @@ describe ProfileController do
       end
     end
 
+    before do
+      allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
+    end
+
     context "when rendering the full view" do
       render_views
 
@@ -477,6 +481,7 @@ describe ProfileController do
 
       context "is_default_account" do
         it "should be 'true' if the domain root account is the default" do
+          allow(LoadAccount).to receive(:default_domain_root_account).and_return(Account.default)
           user_session(@user)
 
           get "settings"
@@ -504,14 +509,14 @@ describe ProfileController do
       end
 
       it "sets discussions_reporting to falsey if discussions_reporting is off" do
-        Account.default.disable_feature! :discussions_reporting
+        @account.disable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_falsey
       end
 
       it "sets discussions_reporting to truthy if discussions_reporting is on" do
-        Account.default.enable_feature! :discussions_reporting
+        @account.enable_feature! :discussions_reporting
         user_session(@user)
         get "communication"
         expect(assigns[:js_env][:discussions_reporting]).to be_truthy

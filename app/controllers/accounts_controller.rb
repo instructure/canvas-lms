@@ -2176,6 +2176,7 @@ class AccountsController < ApplicationController
                                    :enable_course_catalog,
                                    :limit_parent_app_web_access,
                                    :limit_personal_access_tokens,
+                                   :restrict_personal_access_tokens_from_students,
                                    { allow_gradebook_show_first_last_names: [:value] }.freeze,
                                    { enable_offline_web_export: [:value] }.freeze,
                                    { disable_rce_media_uploads: [:value] }.freeze,
