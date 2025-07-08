@@ -177,3 +177,11 @@ disallow_threaded_replies_manage:
   display_name: Manage Disallow Threaded Replies in Discussions
   description: |-
     This feature flag controls the visibility of the alert that allows teachers to manage threaded replies for each discussion topic on the Discussions Index page, this will override the Dissalow Threaded Replies Fix Alert.
+
+discussion_pin_post:
+  state: hidden
+  applies_to: Course
+  display_name: Discussion Pin Post
+  description: |-
+    This feature flag controls the ability to pin posts on the Discussions page.
+  shadow: true
