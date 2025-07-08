@@ -25,11 +25,11 @@ module LearnPlatform
     end
 
     def valid_basic_auth_params?
-      learnplatform.settings["username"].present? && learnplatform.settings["password"].present?
+      learnplatform.settings["username"].present? && learnplatform.settings["password"].present? && !learnplatform.settings["username"].empty? && !learnplatform.settings["password"].empty?
     end
 
     def valid_token_auth_params?
-      learnplatform.settings["jwt_issuer"].present? && learnplatform.settings["jwt_secret"].present?
+      learnplatform.settings["jwt_issuer"].present? && learnplatform.settings["jwt_secret"].present? && !learnplatform.settings["jwt_issuer"].empty? && !learnplatform.settings["jwt_secret"].empty?
     end
 
     def valid_learnplatform?
