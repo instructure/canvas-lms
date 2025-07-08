@@ -255,6 +255,9 @@ describe('ProcessGradebookUpload.upload', () => {
     const uploadPromise = ProcessGradebookUpload.upload(gradebook)
     await uploadPromise
 
+    // Wait for any pending promises to resolve
+    await waitForAsync()
+
     expect(window.alert).not.toHaveBeenCalled()
   })
 

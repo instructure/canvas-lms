@@ -21,33 +21,69 @@ import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import SubmissionList from '../SubmissionList'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {generatePageListKey} from '../utils'
-import fetchMock from 'fetch-mock'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+// Mock showFlashAlert to prevent React rendering issues during static initialization
+jest.mock('@canvas/alerts/react/FlashAlert', () => ({
+  showFlashAlert: jest.fn(),
+  showFlashError: jest.fn(),
+  showFlashSuccess: jest.fn(),
+  showFlashWarning: jest.fn(),
+  destroyContainer: jest.fn(),
+}))
+
+const sectionList = [{name: 'First Section', id: 1, position: 1, category_url: '/path/to/first'}]
+const submissionList = [
+  {
+    id: 1,
+    name: 'First Submission',
+    course_name: 'Original Course',
+    assignment_name: 'Original Assignment',
+    preview_url: 'path/to/preview',
+    submitted_at: '2024-01-01T00:00:00Z',
+    attachment_count: 0,
+  },
+]
+
+const server = setupServer(
+  http.get('/eportfolios/0/recent_submissions', ({request}) => {
+    const url = new URL(request.url)
+    const page = url.searchParams.get('page')
+    const perPage = url.searchParams.get('per_page')
+
+    // Match the exact query params the component uses
+    if (page === '1' && perPage === '100') {
+      return HttpResponse.json(submissionList)
+    }
+    return HttpResponse.json([])
+  }),
+  http.get('/eportfolios/0/categories/1/pages', () => {
+    return HttpResponse.json([])
+  }),
+)
 
 describe('SubmissionList', () => {
   let queryClient: QueryClient
-
-  const portfolio = {id: 0, name: 'Test Portfolio', public: true, profile_url: 'path/to/profile'}
-  const sectionList = [{name: 'First Section', id: 1, position: 1, category_url: '/path/to/first'}]
-  const pageList = [{name: 'First Page', id: 1, url: '/path/to/first', section_id: 1}]
-  const submissionList = [
-    {
-      id: 1,
-      name: 'First Submission',
-      course_name: 'Original Course',
-      assignment_name: 'Original Assignment',
-      preview_url: 'path/to/preview',
-      submitted_at: '2024-01-01T00:00:00Z',
-      attachment_count: 0,
-    },
-  ]
 
   const defaultProps = {
     sections: sectionList,
     portfolioId: 0,
     sectionId: 1,
   }
+
+  beforeAll(() => {
+    server.listen()
+  })
+
+  afterEach(() => {
+    server.resetHandlers()
+  })
+
+  afterAll(() => {
+    server.close()
+  })
 
   beforeEach(() => {
     fakeENV.setup({
@@ -63,25 +99,12 @@ describe('SubmissionList', () => {
         },
       },
     })
-
-    // Pre-populate the query cache with our test data
-    queryClient.setQueryData(['submissionList'], submissionList)
-    queryClient.setQueryData(generatePageListKey(sectionList[0].id, portfolio.id), {
-      pages: [{json: pageList, nextPage: null}],
-      pageParams: [null],
-    })
-
-    // Mock the API call for submissions
-    fetchMock.get('/eportfolios/0/recent_submissions?page=1&per_page=100', {
-      body: submissionList,
-      status: 200,
-    })
   })
 
   afterEach(() => {
     queryClient.clear()
-    fetchMock.restore()
     fakeENV.teardown()
+    jest.clearAllMocks()
   })
 
   const renderWithClient = (ui: React.ReactElement) => {
@@ -89,12 +112,19 @@ describe('SubmissionList', () => {
   }
 
   it('renders a list of submissions', async () => {
-    const {getByText} = renderWithClient(<SubmissionList {...defaultProps} />)
+    const {container, getByText} = renderWithClient(<SubmissionList {...defaultProps} />)
 
-    await waitFor(() => {
-      expect(getByText('Original Course')).toBeInTheDocument()
-      expect(getByText('Original Assignment')).toBeInTheDocument()
-    })
+    // Check if component renders at all
+    expect(container.firstChild).toBeTruthy()
+
+    // Wait for content to load
+    await waitFor(
+      () => {
+        expect(getByText('Original Course')).toBeInTheDocument()
+        expect(getByText('Original Assignment')).toBeInTheDocument()
+      },
+      {timeout: 5000},
+    )
   })
 
   it('renders submission modal when clicking create page', async () => {
