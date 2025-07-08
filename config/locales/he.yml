@@ -5644,6 +5644,7 @@ he:
     one: "תוצאה אחת"
     other: "%{count} תוצאות"
     two: "%{count} תוצאות"
+    zero: "אין תוצאות"
   count_results_displayed_ed39a0f0: 
     many: "%{count} תוצאות הוצגו"
     one: "תוצאה אחת הוצגה"
