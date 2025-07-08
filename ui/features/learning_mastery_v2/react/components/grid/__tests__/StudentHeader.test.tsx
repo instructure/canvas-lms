@@ -18,17 +18,46 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import {StudentHeader} from '../StudentHeader'
+import {StudentHeader, StudentHeaderProps} from '../StudentHeader'
+import {SortOrder} from '../../../utils/constants'
+
+const makeProps = (props = {}): StudentHeaderProps => {
+  return {
+    sorting: {
+      sortOrder: SortOrder.ASC,
+      setSortOrder: jest.fn(),
+    },
+    ...props,
+  }
+}
 
 describe('StudentHeader', () => {
   it('renders a "Student" cell', () => {
-    const {getByText} = render(<StudentHeader />)
+    const {getByText} = render(<StudentHeader {...makeProps()} />)
     expect(getByText('Students')).toBeInTheDocument()
   })
 
   it('renders a menu with various sorting options', () => {
-    const {getByText} = render(<StudentHeader />)
+    const {getByText} = render(<StudentHeader {...makeProps()} />)
     fireEvent.click(getByText('Sort Students'))
-    expect(getByText('Sort By')).toBeInTheDocument()
+    expect(getByText('Sort')).toBeInTheDocument()
+    expect(getByText('Ascending')).toBeInTheDocument()
+    expect(getByText('Descending')).toBeInTheDocument()
+  })
+
+  it('calls setSortOrder when a sorting option is selected', () => {
+    const props = makeProps()
+    const {getByText} = render(<StudentHeader {...props} />)
+    fireEvent.click(getByText('Sort Students'))
+    fireEvent.click(getByText('Ascending'))
+    expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.ASC)
+  })
+
+  it('calls setSortOrder with descending order when "Descending" is selected', () => {
+    const props = makeProps()
+    const {getByText} = render(<StudentHeader {...props} />)
+    fireEvent.click(getByText('Sort Students'))
+    fireEvent.click(getByText('Descending'))
+    expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.DESC)
   })
 })

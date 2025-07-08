@@ -17,6 +17,7 @@
  */
 import axios from '@canvas/axios'
 import {AxiosResponse} from 'axios'
+import {SortOrder} from './utils/constants'
 
 /**
  * Parameters for outcome rollups API
@@ -27,6 +28,7 @@ interface RollupParams {
   exclude: string[]
   include: string[]
   sort_by: string
+  sort_order: string
   page: number
   add_defaults?: boolean
 }
@@ -46,6 +48,7 @@ export const loadRollups = (
   needDefaults: boolean = false,
   page: number = 1,
   perPage: number = 20,
+  sortOrder: SortOrder = SortOrder.ASC,
 ): Promise<AxiosResponse> => {
   const params: {params: RollupParams} = {
     params: {
@@ -54,6 +57,7 @@ export const loadRollups = (
       exclude: gradebookFilters,
       include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
       sort_by: 'student',
+      sort_order: sortOrder,
       page,
       ...(needDefaults && {add_defaults: true}),
     },

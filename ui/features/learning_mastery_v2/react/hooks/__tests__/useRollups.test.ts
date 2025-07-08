@@ -20,7 +20,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import axios from '@canvas/axios'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useRollups from '../useRollups'
-import {DEFAULT_STUDENTS_PER_PAGE} from '../../utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../../utils/constants'
 
 jest.useFakeTimers()
 
@@ -225,6 +225,7 @@ describe('useRollups', () => {
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
           sort_by: 'student',
           add_defaults: true,
+          sort_order: SortOrder.ASC,
           page: 1,
         },
       }
