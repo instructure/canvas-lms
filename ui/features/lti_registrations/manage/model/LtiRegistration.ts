@@ -44,6 +44,7 @@ export const ZLtiRegistration = z.object({
   created_by: z.union([ZUser, z.literal('Instructure')]).optional(),
   updated_by: z.union([ZUser, z.literal('Instructure')]).optional(),
   vendor: z.string().nullable(),
+  description: z.string().nullable(),
   internal_service: z.boolean(),
   developer_key_id: ZDeveloperKeyId.nullable(),
   ims_registration_id: ZLtiImsRegistrationId.nullable(),
