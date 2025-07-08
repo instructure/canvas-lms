@@ -121,15 +121,16 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
-          label: "Merge links",
-          value: "Leave as is",
-          options: ["Leave as is", "Fix heading hierarchy", "Remove heading style"]
+        Accessibility::Forms::RadioInputGroupField.new(
+          label: "How would you like to proceed?",
+          value: "Fix heading hierarchy",
+          options: ["Fix heading hierarchy", "Remove heading style"]
         )
       end
 
       def self.message
-        "Headings should not skip levels."
+        "Make sure heading levels follow a logical order (for example, H2, then H3, then H4)." \
+          "This helps screen reader users understand the structure of the page."
       end
 
       def self.why
@@ -144,8 +145,6 @@ module Accessibility
 
       def self.fix!(elem, value)
         case value
-        when "Leave as is"
-          return nil
         when "Fix heading hierarchy"
           prior_h = get_prior_heading(elem)
           h_idx = prior_h ? prior_h.tag_name[1..].to_i : 0

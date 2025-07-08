@@ -93,8 +93,8 @@ describe('Form', () => {
       expect(ref.current?.getValue()).toBe('initial-value')
     })
 
-    it('returns current value for FormType.DropDown', () => {
-      const mockIssue = createMockIssue(FormType.DropDown, 'selected-option')
+    it('returns current value for FormType.RadioInputGroup', () => {
+      const mockIssue = createMockIssue(FormType.RadioInputGroup, 'selected-option')
       const ref = React.createRef<FormHandle>()
 
       render(<Form issue={mockIssue} ref={ref} />)

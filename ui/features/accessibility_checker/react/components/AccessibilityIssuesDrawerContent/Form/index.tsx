@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useImperativeHandle, useState} from 'react'
+import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react'
 
 import ColorPickerForm from './ColorPicker'
 import TextInputForm from './TextInput'
-import RadioButtonGroupForm from './RadioButtonGroup'
+import RadioInputGroupForm from './RadioInputGroupForm'
 import CheckboxTextInputForm from './CheckboxTextInput'
 import {AccessibilityIssue, FormType, FormValue} from '../../../types'
 
@@ -42,7 +42,7 @@ interface FormProps {
 
 const FormTypeMap = {
   [FormType.TextInput]: TextInputForm,
-  [FormType.DropDown]: RadioButtonGroupForm,
+  [FormType.RadioInputGroup]: RadioInputGroupForm,
   [FormType.ColorPicker]: ColorPickerForm,
   [FormType.CheckboxTextInput]: CheckboxTextInputForm,
 }
@@ -52,6 +52,10 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
   FormProps
 >(({issue, onReload}: FormProps, ref) => {
   const [value, setValue] = useState<FormValue>(issue.form.value || null)
+
+  useEffect(() => {
+    setValue(issue.form.value || null)
+  }, [issue])
 
   useImperativeHandle(ref, () => ({
     getValue: () => {

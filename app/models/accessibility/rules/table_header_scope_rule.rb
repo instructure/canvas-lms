@@ -45,10 +45,10 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::DropdownField.new(
+        Accessibility::Forms::RadioInputGroupField.new(
           label: "Set header scope",
-          value: "None",
-          options: ["None", "Row", "Column", "Row group", "Column group"]
+          value: "Row",
+          options: ["Row", "Column", "Row group", "Column group"]
         )
       end
 

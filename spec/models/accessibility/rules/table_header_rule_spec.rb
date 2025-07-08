@@ -53,7 +53,25 @@ RSpec.describe "TableHeaderRule", type: :feature do
       input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
       expected_html = "<table><tr><th scope=\"col\">Cell 1</th><th scope=\"col\">Cell 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
 
-      fixed_html = fix_issue(:table_header, input_html, "./*", "Header row")
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The top row")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes tables by adding headers to the first column" do
+      input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+      expected_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "The left column")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes tables by adding headers to both the first row and column" do
+      input_html = "<table><tr><td>Cell 1</td><td>Cell 2</td></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+      expected_html = "<table><tr><th scope=\"col\">Cell 1</th><th scope=\"col\">Cell 2</th></tr><tr><th scope=\"row\">Data 1</th><td>Data 2</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header, input_html, "./*", "Both")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
