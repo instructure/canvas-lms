@@ -75,7 +75,11 @@ const getBasicState = () => ({
   },
 })
 
-const server = setupServer()
+const server = setupServer(
+  http.post('/api/v1/planner/overrides', () => {
+    return HttpResponse.json({}, {status: 201})
+  }),
+)
 
 describe('api actions', () => {
   beforeAll(() => server.listen())
