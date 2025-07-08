@@ -481,6 +481,7 @@ class ApplicationController < ActionController::Base
     open_tools_in_new_tab
     horizon_learner_app
     horizon_learning_provider_app_on_contextless_routes
+    youtube_migration
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[

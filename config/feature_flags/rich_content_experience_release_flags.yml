@@ -276,3 +276,10 @@ standardize_assignment_date_formatting:
       state: allowed_on
     development:
       state: allowed_on
+
+youtube_migration:
+  applies_to: RootAccount
+  state: hidden
+  display_name: YouTube content migration
+  description: |-
+    Turn on YouTube Content Migration feature. Adding the scanning ability and the convert option on YouTube embeddings.

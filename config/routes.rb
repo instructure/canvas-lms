@@ -523,6 +523,7 @@ CanvasRails::Application.routes.draw do
     delete "test_student" => "courses#reset_test_student"
     get "content_migrations" => "content_migrations#index"
     get "link_validator" => "courses#link_validator", :as => :link_validator
+    get "youtube_migration" => "courses#youtube_migration", :as => :youtube_migration
 
     get "grading_schemes" => "grading_schemes_json#detail_list"
     get "grading_scheme_summaries" => "grading_schemes_json#summary_list"
@@ -1228,6 +1229,10 @@ CanvasRails::Application.routes.draw do
 
       get "courses/:course_id/link_validation", action: :link_validation, as: "course_link_validation"
       post "courses/:course_id/link_validation", action: :start_link_validation
+
+      get "courses/:course_id/youtube_migration/scan", action: :youtube_migration_scan, as: "course_youtube_migration_scan"
+      post "courses/:course_id/youtube_migration/scan", action: :start_youtube_migration_scan
+      post "courses/:course_id/youtube_migration/convert", action: :start_youtube_migration_convert
 
       post "courses/:course_id/reset_content", action: :reset_content
       get  "users/:user_id/courses", action: :user_index, as: "user_courses"

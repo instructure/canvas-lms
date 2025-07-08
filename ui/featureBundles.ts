@@ -230,6 +230,7 @@ const featureBundles: {
   wiki_page_index: () => import('./features/wiki_page_index/index'),
   wiki_page_revisions: () => import('./features/wiki_page_revisions/index'),
   wiki_page_show: () => import('./features/wiki_page_show/index'),
+  youtube_migration: () => import('./features/youtube_migration/index'),
 }
 
 export default featureBundles
