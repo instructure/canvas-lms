@@ -56,7 +56,7 @@ export type PaginatedFiles = {
 }
 
 export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
-  const {searchTerm, setSearchTerm} = useSearchTerm()
+  const {searchTerm, urlEncodedSearchTerm, setSearchTerm} = useSearchTerm()
   const [sort, setSort] = useState<Sort>({
     by: 'name',
     direction: 'asc',
@@ -70,7 +70,7 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
   const url = isSingleCharSearch
     ? ''
     : generateTableUrl({
-        searchTerm,
+        searchTerm: urlEncodedSearchTerm,
         contextId: folder.context_id,
         contextType: folder.context_type.toLowerCase(),
         folderId: folder.id.toString(),

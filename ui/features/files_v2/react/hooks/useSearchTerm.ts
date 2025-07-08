@@ -16,17 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useNavigate, useSearchParams } from "react-router-dom"
-import { generateSearchNavigationUrl } from "../../utils/apiUtils"
+import {useNavigate, useSearchParams} from 'react-router-dom'
+import {generateSearchNavigationUrl} from '../../utils/apiUtils'
 
 export const useSearchTerm = () => {
   const navigate = useNavigate()
   const setSearchTerm = (term: string) => {
-    const searchUrl = generateSearchNavigationUrl(term)
+    const encodedTerm = encodeURIComponent(term)
+    const searchUrl = generateSearchNavigationUrl(encodedTerm)
     navigate(searchUrl)
   }
   const [searchParams] = useSearchParams()
   const searchTerm = searchParams.get('search_term') || ''
 
-  return { searchTerm, setSearchTerm }
+  return {searchTerm, urlEncodedSearchTerm: encodeURIComponent(searchTerm), setSearchTerm}
 }

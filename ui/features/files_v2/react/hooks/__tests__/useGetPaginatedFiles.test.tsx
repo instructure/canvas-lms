@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {act} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
 import fetchMock from 'fetch-mock'
 import {useGetPaginatedFiles} from '../useGetPaginatedFiles'
@@ -29,8 +28,8 @@ const mockGenerateTableUrl = jest.fn()
 jest.mock('../../../utils/apiUtils', () => ({
   parseLinkHeader: jest.fn(() => ({next: 'next-link'})),
   parseBookmarkFromUrl: jest.fn(() => 'bookmark'),
-  generateTableUrl: () => {
-    mockGenerateTableUrl()
+  generateTableUrl: (params: any) => {
+    mockGenerateTableUrl(params)
     return 'generated-url'
   },
   UnauthorizedError: class UnauthorizedError extends Error {},
@@ -147,5 +146,30 @@ describe('useGetPaginatedFiles', () => {
     expect(fetchMock.called()).toBe(false)
     expect(mockOnSettled).toHaveBeenCalledWith([])
     expect(result.current.data).toEqual([])
+  })
+
+  it('calls backend with URL-encoded search term', async () => {
+    const searchTerm = '!@#$%^&*()_+'
+    const expectedEncodedTerm = encodeURIComponent(searchTerm)
+    ;(useSearchTerm as jest.Mock).mockImplementation(() => ({
+      searchTerm,
+      urlEncodedSearchTerm: expectedEncodedTerm,
+      setSearchTerm: mockSetSearchTerm,
+    }))
+
+    const {waitForNextUpdate} = renderHook(
+      () => useGetPaginatedFiles({folder: mockFolder as any, onSettled: mockOnSettled}),
+      {wrapper},
+    )
+    await waitForNextUpdate()
+
+    expect(mockGenerateTableUrl).toHaveBeenCalledWith(
+      expect.objectContaining({
+        contextId: mockFolder.context_id,
+        contextType: mockFolder.context_type.toLowerCase(),
+        folderId: mockFolder.id.toString(),
+        searchTerm: expectedEncodedTerm,
+      }),
+    )
   })
 })
