@@ -127,6 +127,12 @@ def computeTestCount() {
   }
 }
 
+def sendRspecqSlack(status) {
+  def jobInfo = ":alert: <$env.BUILD_URL|RspecQ Timings Build> ${status}! :alert:"
+  def message = "$jobInfo\nResolve this issue to prevent further build failures!"
+  slackSend channel: '#devx-alerts', color: 'danger', message: message
+}
+
 def sendCrystalballSlack(summary, color, status) {
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>: **$status!**"
   def message = "$jobInfo\n$summary"
@@ -189,6 +195,9 @@ pipeline {
               node('master') {
                 if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
                   sendCrystalballSlack(summaryMessage, crystalballColor, stageConfig.status())
+                }
+                if (stageConfig.status() != 'SUCCESS' && env.RSPECQ_UPDATE_TIMINGS == '1') {
+                  sendRspecqSlack(stageConfig.status())
                 }
                 buildSummaryReport.saveRunManifest()
               }
