@@ -18,13 +18,8 @@
 
 import React from 'react'
 import {render, act, fireEvent, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
 
 import {DashboardHeader} from '../DashboardHeader'
-import {
-  SHOW_K5_DASHBOARD_ROUTE,
-  showK5DashboardResponse,
-} from '@canvas/observer-picker/react/__tests__/fixtures'
 import injectGlobalAlertContainers from '@canvas/util/react/testing/injectGlobalAlertContainers'
 import {resetPlanner} from '@canvas/planner'
 

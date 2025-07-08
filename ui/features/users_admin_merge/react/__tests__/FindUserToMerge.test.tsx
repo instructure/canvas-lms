@@ -19,10 +19,13 @@
 import {fireEvent, render, screen} from '@testing-library/react'
 import FindUserToMerge, {type FindUserToMergeProps} from '../FindUserToMerge'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {QueryClient} from '@tanstack/react-query'
 import {sourceUser, destinationUser, accountSelectOptions} from './test-data'
+
+const server = setupServer()
 
 describe('FindUserToMerge', () => {
   const props: FindUserToMergeProps = {
@@ -47,8 +50,12 @@ describe('FindUserToMerge', () => {
     )
   }
 
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.get(createUserForMergeUrl(sourceUser.id), sourceUser, {overwriteRoutes: true})
+    server.use(http.get(createUserForMergeUrl(sourceUser.id), () => HttpResponse.json(sourceUser)))
   })
 
   it("should render the source user's name and email", async () => {
@@ -90,9 +97,12 @@ describe('FindUserToMerge', () => {
     })
 
     it('should show an error if the user is not found', async () => {
-      fetchMock.get(createUserForMergeUrl(destinationUser.id), 404, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(
+          createUserForMergeUrl(destinationUser.id),
+          () => new HttpResponse(null, {status: 404}),
+        ),
+      )
       renderComponent()
       const userId = await screen.findByLabelText('User ID *')
       const selectButton = await screen.findByLabelText('Select')
@@ -105,9 +115,12 @@ describe('FindUserToMerge', () => {
     })
 
     it('should show an error if failed to load the user for merge due to an unexpected error', async () => {
-      fetchMock.get(createUserForMergeUrl(destinationUser.id), 500, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(
+          createUserForMergeUrl(destinationUser.id),
+          () => new HttpResponse(null, {status: 500}),
+        ),
+      )
       renderComponent()
       const userId = await screen.findByLabelText('User ID *')
       const selectButton = await screen.findByLabelText('Select')
@@ -122,9 +135,11 @@ describe('FindUserToMerge', () => {
     })
 
     it('should call onFind correctly if the form submission was successful', async () => {
-      fetchMock.get(createUserForMergeUrl(destinationUser.id), destinationUser, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(createUserForMergeUrl(destinationUser.id), () =>
+          HttpResponse.json(destinationUser),
+        ),
+      )
       renderComponent()
       const userId = await screen.findByLabelText('User ID *')
       const selectButton = await screen.findByLabelText('Select')
@@ -159,9 +174,11 @@ describe('FindUserToMerge', () => {
     })
 
     it('should call onFind correctly if the form submission was successful', async () => {
-      fetchMock.get(createUserForMergeUrl(destinationUser.id), destinationUser, {
-        overwriteRoutes: true,
-      })
+      server.use(
+        http.get(createUserForMergeUrl(destinationUser.id), () =>
+          HttpResponse.json(destinationUser),
+        ),
+      )
       const selectButton = await screen.findByLabelText('Select')
       const userId = await screen.findByLabelText('User *')
 

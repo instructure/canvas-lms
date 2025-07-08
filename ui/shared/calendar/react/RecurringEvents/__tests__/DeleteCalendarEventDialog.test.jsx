@@ -20,11 +20,14 @@ import React from 'react'
 import {render, act, waitFor, cleanup} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {getByText as domGetByText} from '@testing-library/dom'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {
   DeleteCalendarEventDialog,
   renderDeleteCalendarEventDialog,
 } from '../DeleteCalendarEventDialog'
+
+const server = setupServer()
 
 const handleCancel = jest.fn()
 const handleDeleting = jest.fn()
@@ -48,27 +51,30 @@ function renderDialog(overrideProps = {}) {
 }
 
 describe('DeleteCalendarEventDialog', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
     handleCancel.mockClear()
     handleDeleting.mockClear()
     handleDeleted.mockClear()
     handleUpdated.mockClear()
 
-    // Reset fetchMock before each test
-    fetchMock.restore()
-    fetchMock.delete('.', {
-      body: [
-        {title: 'deleted event', workflow_state: 'deleted'},
-        {title: 'updated event', workflow_state: 'active'},
-      ],
-    })
+    server.use(
+      http.delete('.', () =>
+        HttpResponse.json([
+          {title: 'deleted event', workflow_state: 'deleted'},
+          {title: 'updated event', workflow_state: 'active'},
+        ]),
+      ),
+    )
   })
 
   afterEach(() => {
     // Clean up after each test
     cleanup() // Clean up any rendered components
     jest.resetAllMocks()
-    fetchMock.restore()
   })
 
   it('renders single event dialog', () => {
@@ -137,9 +143,7 @@ describe('DeleteCalendarEventDialog', () => {
       expect(handleDeleting).toHaveBeenCalled()
     })
 
-    await act(async () => {
-      await fetchMock.flush(true)
-    })
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     await waitFor(() => {
       expect(handleDeleted).toHaveBeenCalledWith([
@@ -153,6 +157,16 @@ describe('DeleteCalendarEventDialog', () => {
 
   it('sends which=one when "this event" is selected', async () => {
     const testIdPrefix = 'one-test-'
+    let capturedBody = null
+    server.use(
+      http.delete('.', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json([
+          {title: 'deleted event', workflow_state: 'deleted'},
+          {title: 'updated event', workflow_state: 'active'},
+        ])
+      }),
+    )
     const {getByTestId} = renderDialog({testIdPrefix})
 
     // The radio is already selected by default, so we don't need to click it
@@ -161,18 +175,23 @@ describe('DeleteCalendarEventDialog', () => {
       await userEvent.click(getByTestId(`${testIdPrefix}delete-button`))
     })
 
-    await act(async () => {
-      await fetchMock.flush(true)
-    })
+    await new Promise(resolve => setTimeout(resolve, 0))
 
-    const lastCall = fetchMock.lastCall()
-    expect(lastCall).not.toBeNull()
-    const which = JSON.parse(lastCall[1].body).which
-    expect(which).toEqual('one')
+    expect(capturedBody?.which).toEqual('one')
   })
 
   it('sends which=following when "this and all following" is selected', async () => {
     const testIdPrefix = 'following-test-'
+    let capturedBody = null
+    server.use(
+      http.delete('.', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json([
+          {title: 'deleted event', workflow_state: 'deleted'},
+          {title: 'updated event', workflow_state: 'active'},
+        ])
+      }),
+    )
     const {getByTestId} = renderDialog({testIdPrefix})
 
     await act(async () => {
@@ -183,18 +202,23 @@ describe('DeleteCalendarEventDialog', () => {
       await userEvent.click(getByTestId(`${testIdPrefix}delete-button`))
     })
 
-    await act(async () => {
-      await fetchMock.flush(true)
-    })
+    await new Promise(resolve => setTimeout(resolve, 0))
 
-    const lastCall = fetchMock.lastCall()
-    expect(lastCall).not.toBeNull()
-    const which = JSON.parse(lastCall[1].body).which
-    expect(which).toEqual('following')
+    expect(capturedBody?.which).toEqual('following')
   })
 
   it('sends which=all when "all events" is selected', async () => {
     const testIdPrefix = 'all-test-'
+    let capturedBody = null
+    server.use(
+      http.delete('.', async ({request}) => {
+        capturedBody = await request.json()
+        return HttpResponse.json([
+          {title: 'deleted event', workflow_state: 'deleted'},
+          {title: 'updated event', workflow_state: 'active'},
+        ])
+      }),
+    )
     const {getByTestId} = renderDialog({testIdPrefix})
 
     await act(async () => {
@@ -205,14 +229,9 @@ describe('DeleteCalendarEventDialog', () => {
       await userEvent.click(getByTestId(`${testIdPrefix}delete-button`))
     })
 
-    await act(async () => {
-      await fetchMock.flush(true)
-    })
+    await new Promise(resolve => setTimeout(resolve, 0))
 
-    const lastCall = fetchMock.lastCall()
-    expect(lastCall).not.toBeNull()
-    const which = JSON.parse(lastCall[1].body).which
-    expect(which).toEqual('all')
+    expect(capturedBody?.which).toEqual('all')
   })
 
   describe('while delete is in flight', () => {
