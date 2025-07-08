@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,17 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const MAX_GRID_WIDTH: number = 1440
-export const COLUMN_WIDTH: number = 160
-export const STUDENT_COLUMN_WIDTH: number = 220
-export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
-export const COLUMN_PADDING: number = 2
-export const CELL_HEIGHT: number = 45
+import {SortOrder} from '../utils/constants'
 
-export const DEFAULT_STUDENTS_PER_PAGE: number = 15
-export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]
-
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
+export interface Sorting {
+  sortOrder: SortOrder
+  setSortOrder: (sortOrder: SortOrder) => void
 }

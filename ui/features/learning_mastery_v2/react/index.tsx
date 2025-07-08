@@ -68,6 +68,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     pagination,
     setCurrentPage,
     setStudentsPerPage,
+    sorting,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
@@ -139,6 +140,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
           gradebookFilterHandler={onGradebookFilterChange}
           pagination={pagination}
           setCurrentPage={setCurrentPage}
+          sorting={sorting}
         />
       )}
     </LMGBContext.Provider>

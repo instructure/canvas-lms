@@ -31,7 +31,8 @@ import {
   StudentRollupData,
   Pagination,
 } from '../types/rollup'
-import {DEFAULT_STUDENTS_PER_PAGE} from '../utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../utils/constants'
+import {Sorting} from '../types/shapes'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -46,6 +47,7 @@ interface UseRollupsReturn extends RollupData {
   setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentPage: (page: number) => void
   setStudentsPerPage: (studentsPerPage: number) => void
+  sorting: Sorting
 }
 
 interface RollupData {
@@ -112,6 +114,7 @@ export default function useRollups({
     students: [],
   })
   const [studentsPerPage, setStudentsPerPage] = useState<number>(DEFAULT_STUDENTS_PER_PAGE)
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -125,6 +128,7 @@ export default function useRollups({
           needMasteryAndColorDefaults,
           currentPage,
           studentsPerPage,
+          sortOrder,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -148,7 +152,14 @@ export default function useRollups({
         })
       }
     })()
-  }, [courseId, needMasteryAndColorDefaults, gradebookFilters, currentPage, studentsPerPage])
+  }, [
+    courseId,
+    needMasteryAndColorDefaults,
+    gradebookFilters,
+    currentPage,
+    studentsPerPage,
+    sortOrder,
+  ])
 
   return {
     isLoading,
@@ -160,5 +171,9 @@ export default function useRollups({
     pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
     setCurrentPage,
     setStudentsPerPage,
+    sorting: {
+      sortOrder,
+      setSortOrder,
+    },
   }
 }
