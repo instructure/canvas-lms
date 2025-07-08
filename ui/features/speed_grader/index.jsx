@@ -177,6 +177,7 @@ ready(() => {
           projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
           gradingAssistanceFileUploadEnabled:
             window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
+          discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
         },
       })
     })
