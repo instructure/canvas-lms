@@ -63,5 +63,87 @@ describe AccessibilityResourceScan do
         end
       end
     end
+
+    describe "resource_workflow_state" do
+      context "when resource_workflow_state is missing" do
+        before { subject.resource_workflow_state = nil }
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:resource_workflow_state]).to include("can't be blank")
+        end
+      end
+
+      context "when resource_workflow_state is not in the allowed list" do
+        before { subject.resource_workflow_state = "invalid_state" }
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:resource_workflow_state]).to include("is not included in the list")
+        end
+      end
+    end
+
+    describe "issue_count" do
+      context "when issue_count is missing" do
+        before { subject.issue_count = nil }
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:issue_count]).to include("can't be blank")
+        end
+      end
+    end
+
+    describe "wiki_page_id" do
+      context "when the wiki_page_id is not unique" do
+        let(:course) { course_model }
+        let(:wiki_page) { wiki_page_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(wiki_page:)
+          subject.wiki_page = wiki_page
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:wiki_page_id]).to include("has already been taken")
+        end
+      end
+    end
+
+    describe "assignment_id" do
+      context "when the assignment_id is not unique" do
+        let(:course) { course_model }
+        let(:assignment) { assignment_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(assignment:)
+          subject.assignment = assignment
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:assignment_id]).to include("has already been taken")
+        end
+      end
+    end
+
+    describe "attachment_id" do
+      context "when the attachment_id is not unique" do
+        let(:course) { course_model }
+        let(:attachment) { attachment_model(course:) }
+
+        before do
+          accessibility_resource_scan_model(attachment:)
+          subject.attachment = attachment
+        end
+
+        it "is invalid" do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:attachment_id]).to include("has already been taken")
+        end
+      end
+    end
   end
 end
