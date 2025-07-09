@@ -38,10 +38,13 @@ import {DynamicInstUISettingsProvider} from '@canvas/instui-bindings/react/Dynam
 const portalRouter = createBrowserRouter(
   createRoutesFromElements(
     <Route>
-      <Route path="/users/:userId/messages" lazy={() => import('../../features/messages/index')} />
+      <Route
+        path="/users/:userId/messages"
+        lazy={() => import('../../features/messages/react/MessagesRoute')}
+      />
       <Route
         path="/users/:userId/messages/:messageId"
-        lazy={() => import('../../features/messages/index')}
+        lazy={() => import('../../features/messages/react/MessagesRoute')}
       />
       <Route path="/login/otp" lazy={() => import('../../features/otp_login/index')} />
       <Route
