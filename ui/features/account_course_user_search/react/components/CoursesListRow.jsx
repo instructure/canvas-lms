@@ -97,20 +97,6 @@ export default class CoursesListRow extends React.Component {
 
   handleNewEnrollments = newEnrollments => {
     if (newEnrollments && newEnrollments.length) {
-      $.flashMessage({
-        html: I18n.t(
-          {
-            one: '%{user_name} successfully enrolled into *%{course_name}*.',
-            other: '%{count} people successfully enrolled into *%{course_name}*.',
-          },
-          {
-            count: newEnrollments.length,
-            user_name: newEnrollments[0].enrollment.name,
-            course_name: this.props.name,
-            wrappers: [`<a href="/courses/${this.props.id}">$1</a>`],
-          },
-        ),
-      })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
       this.setState(oldState => {
         const newlyEnrolledStudents = oldState.newlyEnrolledStudents + newStudents.length
