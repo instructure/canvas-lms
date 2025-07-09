@@ -154,22 +154,27 @@ class FoldersController < ApplicationController
     return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
 
     @folder = Folder.find(params[:id])
-    return unless authorized_action(@folder, @current_user, :read_contents)
-
-    items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
-    headers["X-Total-Items"] = all_item_count.to_s
-    render json: folders_or_files_json(items, @current_user, session, opts)
+    if authorized_action(@folder, @current_user, :read_contents)
+      items, opts, all_item_count = paginated_folders_and_files(api_v1_list_folders_and_files_url)
+      headers["X-Total-Items"] = all_item_count.to_s
+      render json: folders_or_files_json(items, @current_user, session, opts)
+    else
+      store_location(request.referer)
+    end
   end
 
   # internal API
   def list_all_folders_and_files
     return render_json_unauthorized unless Account.site_admin.feature_enabled?(:files_a11y_rewrite)
-    return unless authorized_action(@context, @current_user, :read_files)
 
-    base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
-    items, opts, all_item_count = paginated_folders_and_files(base_url)
-    headers["X-Total-Items"] = all_item_count.to_s
-    render json: folders_or_files_json(items, @current_user, session, opts)
+    if authorized_action(@context, @current_user, :read_files)
+      base_url = polymorphic_url([:api, :v1, @context, :folders_and_files])
+      items, opts, all_item_count = paginated_folders_and_files(base_url)
+      headers["X-Total-Items"] = all_item_count.to_s
+      render json: folders_or_files_json(items, @current_user, session, opts)
+    else
+      store_location(request.referer)
+    end
   end
 
   # Setup additional options based on context and permissions
@@ -312,6 +317,8 @@ class FoldersController < ApplicationController
       raise ActiveRecord::RecordNotFound if folders.blank?
 
       render json: folders_json(folders, @current_user, session, can_view_hidden_files:, context: @context)
+    else
+      store_location(request.referer)
     end
   end
 
