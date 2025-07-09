@@ -281,6 +281,23 @@ describe Types::ModuleType do
     end
   end
 
+  describe "progression" do
+    let_once(:mod3) do
+      course.context_modules.create!(
+        name: "module3",
+        position: 3,
+        prerequisites: [{ id: mod2.id, name: mod2.name, type: "context_module" }]
+      )
+    end
+    let(:module3_type) { GraphQLTypeTester.new(mod3, current_user: @student) }
+
+    it "initializes progressions for students" do
+      result = module3_type.resolve("progression { locked }")
+
+      expect(result).to be true
+    end
+  end
+
   describe "backwards compatibility" do
     let_once(:assignment1) { assignment_model({ context: course, name: "Assignment 1" }) }
     let_once(:assignment2) { assignment_model({ context: course, name: "Assignment 2" }) }
