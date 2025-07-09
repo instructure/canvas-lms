@@ -58,6 +58,7 @@ export type ModuleItemContent = {
     | 'ModuleExternalTool'
     | 'ExternalTool'
   pointsPossible?: number
+  title?: string
   published?: boolean
   canUnpublish?: boolean
   canDuplicate?: boolean
@@ -173,6 +174,7 @@ export interface ModuleStatistics {
 }
 
 export interface Module {
+  moduleItemsTotalCount: number
   id: string
   _id: string
   name: string
@@ -259,20 +261,6 @@ interface GraphQLResult {
   }>
 }
 
-export interface ModuleItemsResponse {
-  moduleItems: ModuleItem[]
-}
-
-interface ModuleItemsGraphQLResult {
-  legacyNode?: {
-    moduleItems?: ModuleItem[]
-  }
-  errors?: Array<{
-    message: string
-    [key: string]: any
-  }>
-}
-
 export interface ModuleItem {
   id: string
   _id: string
@@ -337,6 +325,8 @@ export interface ExternalToolModalItem {
   }
 }
 
+export type ModuleCursorState = Record<string, string | null>
+
 export type ExternalTool = ExternalToolTrayItem | ExternalToolModalItem
 
 export interface ExternalToolLaunchOptions {
@@ -353,4 +343,35 @@ export interface ModuleItemMasterCourseRestrictionType {
   dueDates: boolean | null
   points: boolean | null
   settings: boolean | null
+}
+
+export interface GraphQLError {
+  message: string
+  [key: string]: any
+}
+
+export interface PageInfo {
+  hasNextPage: boolean
+  endCursor: string | null
+}
+
+interface LegacyNodeModuleItemsConnection {
+  moduleItemsTotalCount?: number
+  moduleItemsConnection?: {
+    edges: Array<{
+      cursor: string
+      node: ModuleItem
+    }>
+    pageInfo: PageInfo
+  }
+}
+
+export interface PaginatedNavigationResponse {
+  moduleItems: ModuleItem[]
+  pageInfo: PageInfo
+}
+
+interface PaginatedNavigationGraphQLResult {
+  legacyNode?: LegacyNodeModuleItemsConnection
+  errors?: GraphQLError[]
 }

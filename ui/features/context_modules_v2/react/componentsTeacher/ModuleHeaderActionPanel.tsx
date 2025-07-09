@@ -44,7 +44,6 @@ interface ModuleHeaderActionPanelProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
-  itemCount?: number
   hasActiveOverrides: boolean
   setModuleAction?: React.Dispatch<React.SetStateAction<ModuleAction | null>>
   setIsManageModuleContentTrayOpen?: React.Dispatch<React.SetStateAction<boolean>>
@@ -59,7 +58,6 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
   prerequisites,
   completionRequirements,
   requirementCount = null,
-  itemCount,
   hasActiveOverrides,
   setModuleAction,
   setIsManageModuleContentTrayOpen,
@@ -104,7 +102,9 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
             renderIcon={IconPlusLine}
             withBorder={false}
             withBackground={true}
-            onClick={() => setIsAddItemOpen(true)}
+            onClick={() => {
+              setIsAddItemOpen(true)
+            }}
           />
         </Flex.Item>
         <Flex.Item>
@@ -124,6 +124,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         </Flex.Item>
       </Flex>
       <DirectShareUserModal
+        id={id}
         open={isDirectShareOpen}
         sourceCourseId={courseId}
         courseId={courseId}
@@ -146,7 +147,6 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         onRequestClose={() => setIsAddItemOpen(false)}
         moduleName={name}
         moduleId={id}
-        itemCount={itemCount || 0}
       />
       {hasActiveOverrides ? (
         <ViewAssignTo

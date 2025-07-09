@@ -21,64 +21,24 @@ import {gql} from 'graphql-tag'
 import {executeQuery} from '@canvas/graphql'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ModulesResponse, GraphQLResult} from '../../utils/types.d'
+import {ModulesResponse, GraphQLResult} from '../../utils/types'
 import {InfiniteData} from '@tanstack/react-query'
+import {MODULES, MODULES_QUERY_MAP} from '../../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
-
-const MODULES_QUERY = gql`
-  query GetModulesQuery($courseId: ID!, $cursor: String) {
-    legacyNode(_id: $courseId, type: Course) {
-      ... on Course {
-        modulesConnection(first: 100, after: $cursor) {
-          edges {
-            cursor
-            node {
-              id
-              _id
-              name
-              position
-              published
-              unlockAt
-              requirementCount
-              requireSequentialProgress
-              hasActiveOverrides
-              prerequisites {
-                id
-                name
-                type
-              }
-              completionRequirements {
-                id
-                type
-                minScore
-                minPercentage
-              }
-              progression {
-                id
-                _id
-                collapsed
-              }
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
-      }
-    }
-  }
-`
 
 async function getModules({
   queryKey,
   pageParam,
-}: {queryKey: any; pageParam?: unknown}): Promise<ModulesResponse> {
+  view,
+}: {queryKey: any; pageParam?: unknown; view: string}): Promise<ModulesResponse> {
   const [_key, courseId] = queryKey
   const cursor = pageParam ? String(pageParam) : null
+
+  const persistedQuery = MODULES_QUERY_MAP[view]
+  const query = gql`${persistedQuery}`
   try {
-    const result = await executeQuery<GraphQLResult>(MODULES_QUERY, {
+    const result = await executeQuery<GraphQLResult>(query, {
       courseId,
       cursor,
     })
@@ -97,7 +57,8 @@ async function getModules({
       const node = edge.node
       return {
         ...node,
-        moduleItems: [], // Initialize with empty items array
+        moduleItems: [],
+        moduleItemsTotalCount: node.moduleItemsTotalCount,
       }
     })
 
@@ -112,15 +73,30 @@ async function getModules({
   }
 }
 
-export function useModules(courseId: string) {
-  return useAllPages<ModulesResponse, Error, InfiniteData<ModulesResponse>, [string, string]>({
-    queryKey: ['modules', courseId],
-    queryFn: getModules,
+export function useModules(courseId: string, view: string = 'teacher') {
+  const queryResult = useAllPages<
+    ModulesResponse,
+    Error,
+    InfiniteData<ModulesResponse>,
+    [string, string]
+  >({
+    queryKey: [MODULES, courseId],
+    queryFn: ({queryKey, pageParam}) => getModules({queryKey, pageParam, view}),
     initialPageParam: undefined,
     getNextPageParam: (lastPage: ModulesResponse) =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
     refetchOnWindowFocus: true,
-    // 15 minutes, will reload on refresh because there is no persistence
     staleTime: 15 * 60 * 1000,
   })
+
+  const getModuleItemsTotalCount = (moduleId: string): number | null => {
+    const allModules = queryResult.data?.pages.flatMap(page => page.modules) ?? []
+    const module = allModules.find(m => m.id === moduleId || m._id === moduleId)
+    return module?.moduleItemsTotalCount ?? null
+  }
+
+  return {
+    ...queryResult,
+    getModuleItemsTotalCount,
+  }
 }

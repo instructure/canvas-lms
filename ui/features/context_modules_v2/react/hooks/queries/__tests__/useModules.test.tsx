@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useModulesStudent} from '../useModulesStudent'
+import {useModules} from '../useModules'
 import {renderHook} from '@testing-library/react-hooks'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import React from 'react'
@@ -26,6 +26,8 @@ import {graphql, HttpResponse} from 'msw'
 
 const node1 = {
   id: '1',
+  moduleItems: [],
+  moduleItemsTotalCount: undefined,
   name: 'Module 1',
   position: 1,
   published: true,
@@ -33,6 +35,8 @@ const node1 = {
 
 const node2 = {
   id: '2',
+  moduleItems: [],
+  moduleItemsTotalCount: undefined,
   name: 'Module 2',
   position: 2,
   published: true,
@@ -80,14 +84,14 @@ const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}})
 
 const server = setupServer()
 
-const renderUseModulesStudentHook = (courseId: string) =>
-  renderHook(() => useModulesStudent(courseId), {
+const renderUseModulesHook = (courseId: string) =>
+  renderHook(() => useModules(courseId), {
     wrapper: ({children}: {children: React.ReactNode}) => (
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
   })
 
-describe('useModulesStudent', () => {
+describe('useModules', () => {
   beforeAll(() => server.listen())
   afterEach(() => {
     server.resetHandlers()
@@ -97,7 +101,7 @@ describe('useModulesStudent', () => {
 
   it('should map the data pages correctly', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', ({variables}) => {
+      graphql.query('GetModulesQuery', ({variables}) => {
         expect(variables.courseId).toBe(courseId)
         return HttpResponse.json({
           data: {legacyNode: {...mockGqlResponseFinalPage.legacyNode}},
@@ -105,7 +109,7 @@ describe('useModulesStudent', () => {
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     expect(result.current.isLoading).toBe(true)
     await waitFor(() => {
@@ -116,7 +120,7 @@ describe('useModulesStudent', () => {
 
   it('should query for next page', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', ({variables}) => {
+      graphql.query('GetModulesQuery', ({variables}) => {
         return HttpResponse.json({
           data: {
             legacyNode: variables.cursor
@@ -127,7 +131,7 @@ describe('useModulesStudent', () => {
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     // Wait for initial loading to complete
     await waitFor(() => {
@@ -148,14 +152,14 @@ describe('useModulesStudent', () => {
 
   it('should in error state if gql query throw exception', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', () => {
+      graphql.query('GetModulesQuery', () => {
         return HttpResponse.json({
           errors: [{message: errorMsg}],
         })
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
@@ -165,14 +169,14 @@ describe('useModulesStudent', () => {
 
   it('should in error state if the result contains error', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', () => {
+      graphql.query('GetModulesQuery', () => {
         return HttpResponse.json({
           data: {errors: [{message: errorMsg}]},
         })
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
@@ -182,7 +186,7 @@ describe('useModulesStudent', () => {
 
   it('should set edges to empty array if edges is undefined', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', () => {
+      graphql.query('GetModulesQuery', () => {
         return HttpResponse.json({
           data: {
             legacyNode: {
@@ -196,7 +200,7 @@ describe('useModulesStudent', () => {
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     await waitFor(() => {
       expect(result.current.data?.pages).toEqual([{modules: [], pageInfo: endPageInfo}])
@@ -205,7 +209,7 @@ describe('useModulesStudent', () => {
 
   it('should set page info with default end page values if endPageInfo is undefined', async () => {
     server.use(
-      graphql.query('GetModulesStudentQuery', () => {
+      graphql.query('GetModulesQuery', () => {
         return HttpResponse.json({
           data: {
             legacyNode: {
@@ -219,7 +223,7 @@ describe('useModulesStudent', () => {
       }),
     )
 
-    const {result} = renderUseModulesStudentHook(courseId)
+    const {result} = renderUseModulesHook(courseId)
 
     await waitFor(() => {
       expect(result.current.data?.pages).toEqual([{modules: [], pageInfo: endPageInfo}])

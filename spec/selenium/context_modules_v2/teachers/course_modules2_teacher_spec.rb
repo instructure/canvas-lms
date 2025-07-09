@@ -46,6 +46,7 @@ describe "context modules", :ignore_js_errors do
   it "creates a screenreader alert when all module items are loaded" do
     go_to_modules
     expand_all_modules_button.click if element_exists?(expand_all_modules_button_selector)
+    wait_for_ajaximations
     expect(screenreader_alert).to include_text("All module items loaded")
   end
 
@@ -83,16 +84,15 @@ describe "context modules", :ignore_js_errors do
     def validate_text_fields_has_right_value(item)
       manage_module_item_button(item.id).click
       module_item_action_menu_link("Edit").click
-
+      wait_for_ajaximations
       item_title = item.title
-      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
-
-      expect(title.attribute("value")).to eq(item_title)
+      title = edit_item_modal_title_input_value
+      expect(title).to eq(item_title)
 
       # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
       if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
-        url = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']")
-        expect(url.attribute("value")).to eq(item.url)
+        url_value = edit_item_modal_url_value
+        expect(url_value).to eq(item.url)
 
         new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
         new_tab_value = item.new_tab.nil? ? false : item.new_tab
@@ -106,6 +106,7 @@ describe "context modules", :ignore_js_errors do
     def validate_update_module_item_title(item, new_title = "New Title")
       manage_module_item_button(item.id).click
       module_item_action_menu_link("Edit").click
+      wait_for_ajaximations
 
       title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
       replace_content(title, new_title)

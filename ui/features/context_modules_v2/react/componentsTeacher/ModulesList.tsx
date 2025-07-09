@@ -38,26 +38,31 @@ import {useContextModule} from '../hooks/useModuleContext'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ModuleAction} from '../utils/types'
+import {ModuleAction, ModuleItem} from '../utils/types'
 import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
 import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
+import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
+import {TEACHER, STUDENT, MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const MemoizedModule = memo(Module, validateModuleTeacherRenderRequirements)
 
 const ModulesList: React.FC = () => {
-  const {teacherViewEnabled, studentViewEnabled, courseId} = useContextModule()
+  const {
+    teacherViewEnabled,
+    studentViewEnabled,
+    courseId,
+    moduleCursorState,
+    setModuleCursorState,
+  } = useContextModule()
   const reorderItemsMutation = useReorderModuleItems()
   const reorderModulesMutation = useReorderModules()
   const {data, isLoading, error} = useModules(courseId || '')
-  const {moduleFetchingCount, maxFetchingCount, fetchComplete} =
-    useHowManyModulesAreFetchingItems(true)
-
+  const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const toggleCollapseMutation = useToggleCollapse(courseId || '')
   const toggleAllCollapse = useToggleAllCollapse(courseId || '')
 
@@ -110,12 +115,12 @@ const ModulesList: React.FC = () => {
   const handleTeacherChange = (
     _e: React.SyntheticEvent<Element, Event>,
     data: {value?: string | number; id?: string},
-  ) => handleModuleViewChange('teacher', setTeacherViewValue, courseId, data)
+  ) => handleModuleViewChange(TEACHER, setTeacherViewValue, courseId, data)
 
   const handleStudentChange = (
     _e: React.SyntheticEvent<Element, Event>,
     data: {value?: string | number; id?: string},
-  ) => handleModuleViewChange('student', setStudentViewValue, courseId, data)
+  ) => handleModuleViewChange(STUDENT, setStudentViewValue, courseId, data)
 
   // Set initial expanded state for modules when data is loaded
   useEffect(() => {
@@ -152,8 +157,14 @@ const ModulesList: React.FC = () => {
         }
         return initialExpandedState
       })
+
+      setModuleCursorState(
+        Object.fromEntries(
+          allModules.map(module => [module._id, moduleCursorState[module._id] ?? null]),
+        ),
+      )
     }
-  }, [data?.pages])
+  }, [data?.pages, setModuleCursorState])
 
   useEffect(() => {
     if (fetchComplete && maxFetchingCount > 1) {
@@ -174,23 +185,28 @@ const ModulesList: React.FC = () => {
     dragModuleId: string,
     hoverModuleId: string,
   ) => {
-    // Get the current data for the source module
-    const sourceModuleData = queryClient.getQueryData(['moduleItems', dragModuleId]) as any
+    const dragCursor = moduleCursorState[dragModuleId]
+    const hoverCursor = moduleCursorState[hoverModuleId]
+
+    const sourceModuleData = queryClient.getQueryData([MODULE_ITEMS, dragModuleId, dragCursor]) as {
+      moduleItems: ModuleItem[]
+    }
+
     if (!sourceModuleData?.moduleItems?.length) return
 
     // Get the item being moved
     const movedItem = sourceModuleData.moduleItems[dragIndex]
     if (!movedItem) return
 
-    // We're using the shared utility functions from dndUtils.ts
-
     // Helper to update cache and call the mutation
-    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: any[]) => {
+    const updateAndMutate = (moduleId: string, oldModuleId: string, updatedItems: ModuleItem[]) => {
       // Update cache
-      queryClient.setQueryData(['moduleItems', moduleId], {
+      const cursor = moduleCursorState[moduleId]
+
+      queryClient.setQueryData([MODULE_ITEMS, moduleId, cursor], {
         ...(moduleId === dragModuleId
           ? sourceModuleData
-          : queryClient.getQueryData(['moduleItems', moduleId])),
+          : queryClient.getQueryData([MODULE_ITEMS, moduleId, cursor])),
         moduleItems: updatedItems,
       })
 
@@ -211,16 +227,22 @@ const ModulesList: React.FC = () => {
     if (dragModuleId === hoverModuleId) {
       // Clone and update the module items
       const updatedItems = [...sourceModuleData.moduleItems]
+
       updatedItems.splice(dragIndex, 1) // Remove from old position
       updatedItems.splice(hoverIndex, 0, movedItem) // Insert at new position
 
       // Update all indexes and update cache
       updateAndMutate(dragModuleId, dragModuleId, updateIndexes(updatedItems))
-    }
-    // For cross-module movement
-    else {
-      // Get destination module data
-      const destModuleData = queryClient.getQueryData(['moduleItems', hoverModuleId]) as any
+      // For cross-module movement
+    } else {
+      const destModuleData = queryClient.getQueryData([
+        MODULE_ITEMS,
+        hoverModuleId,
+        hoverCursor,
+      ]) as {
+        moduleItems: ModuleItem[]
+      }
+
       if (!destModuleData?.moduleItems) return
 
       // Prepare source module update (remove the item)

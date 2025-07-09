@@ -30,6 +30,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {submiEditItem, prepareItemData} from '../handlers/editItemHandlers'
 import {queryClient} from '@canvas/query'
 import {ModuleItemMasterCourseRestrictionType} from '../utils/types'
+import {MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -91,7 +92,7 @@ const EditItemModal = (props: EditItemModalProps) => {
     submiEditItem(courseId, itemId, itemData)
       .then(response => {
         if (response) {
-          queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId], exact: false})
+          queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId], exact: false})
         }
       })
       .catch(_error => {

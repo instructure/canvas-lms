@@ -22,6 +22,7 @@ import {prepareModuleItemData} from '../../handlers/addItemHandlers'
 import {useInlineSubmission, submitItemData} from './useInlineSubmission'
 import {useDefaultCourseFolder} from '../../hooks/mutations/useDefaultCourseFolder'
 import type {ContentItem} from '../queries/useModuleItemContent'
+import {useModuleItemsTotalCount} from '../queries/useModuleItemsTotalCount'
 
 type ExternalUrl = {
   url: string
@@ -94,14 +95,12 @@ function reducer(state: FormState, action: Action): FormState {
 export function useAddModuleItem({
   itemType,
   moduleId,
-  itemCount,
   onRequestClose,
   contentItems = [],
   inputValue,
 }: {
   itemType: ModuleItemContentType
   moduleId: string
-  itemCount: number
   onRequestClose?: () => void
   contentItems: ContentItem[]
   inputValue: string
@@ -110,6 +109,7 @@ export function useAddModuleItem({
   const {courseId} = useContextModule()
   const {defaultFolder} = useDefaultCourseFolder()
   const submitInlineItem = useInlineSubmission()
+  const {totalCount} = useModuleItemsTotalCount(moduleId)
 
   const reset = () => dispatch({type: 'RESET'})
 
@@ -127,7 +127,7 @@ export function useAddModuleItem({
 
     const itemData = prepareModuleItemData(moduleId, {
       type: itemType,
-      itemCount,
+      itemCount: totalCount,
       indentation,
       selectedTabIndex: tabIndex,
       textHeaderValue: textHeader,

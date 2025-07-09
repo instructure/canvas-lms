@@ -71,5 +71,7 @@ export interface EnvContextModules {
   MODULE_FEATURES?: {
     STUDENT_MODULE_SELECTION: boolean
     TEACHER_MODULE_SELECTION: boolean
+    IS_PAGINATED?: boolean
+    PAGE_SIZE?: number
   }
 }

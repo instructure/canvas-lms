@@ -19,6 +19,7 @@
 import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useMutation} from '@tanstack/react-query'
+import {MODULES} from '../../utils/constants'
 
 interface ReorderModulesParams {
   courseId: string
@@ -39,7 +40,7 @@ export const useReorderModules = () => {
       return json
     },
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({queryKey: ['modules', variables?.courseId || '']})
+      queryClient.invalidateQueries({queryKey: [MODULES, variables?.courseId || '']})
     },
   })
 }

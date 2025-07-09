@@ -141,11 +141,21 @@ class ContextModulesController < ApplicationController
 
       @feature_student_module_selection = @context.account.feature_enabled?(:modules_student_module_selection)
       @feature_teacher_module_selection = @context.account.feature_enabled?(:modules_teacher_module_selection)
-
+      hash[:MODULE_FEATURES] = {}
       if @can_edit && (@feature_student_module_selection || @feature_teacher_module_selection)
-        hash[:MODULE_FEATURES] = {}
         hash[:MODULE_FEATURES][:STUDENT_MODULE_SELECTION] = true if @feature_student_module_selection
         hash[:MODULE_FEATURES][:TEACHER_MODULE_SELECTION] = true if @feature_teacher_module_selection
+      end
+
+      if @context.use_modules_rewrite_view?(@current_user, session)
+        tags_count = GuardRail.activate(:secondary) { context.module_items_visible_to(@current_user).count }
+        module_perf_threshold = Setting.get("module_perf_threshold", 100).to_i
+        module_perf_page_size = Setting.get("module_perf_page_size", 10).to_i
+        is_paginated = tags_count > module_perf_threshold
+        page_size = is_paginated ? module_perf_page_size : module_perf_threshold
+
+        hash[:MODULE_FEATURES][:PAGE_SIZE] = page_size
+        hash[:MODULE_FEATURES][:IS_PAGINATED] = is_paginated
       end
 
       append_default_due_time_js_env(@context, hash)

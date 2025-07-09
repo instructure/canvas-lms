@@ -25,6 +25,7 @@ import {InfiniteData} from '@tanstack/react-query'
 import type {ModuleItem, ModulesResponse} from '../utils/types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {MODULES} from '../utils/constants'
 
 export const handleCollapseAll = (
   data: InfiniteData<ModulesResponse> | undefined,
@@ -209,7 +210,7 @@ export const handleOpeningModuleUpdateTray = (
   const root = createRoot(mountPoint)
 
   const onCompleteFunction = () =>
-    queryClient.invalidateQueries({queryKey: ['modules', courseId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULES, courseId || '']})
   const trayProps = {
     onDismiss: () => {
       root.unmount()

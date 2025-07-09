@@ -18,14 +18,13 @@
 
 import {useEffect, useState} from 'react'
 import {useIsFetching} from '@tanstack/react-query'
+import {MODULE_ITEMS_MAP, TEACHER} from '../../utils/constants'
 
-export function useHowManyModulesAreFetchingItems(teacherMode: boolean = false) {
+export function useHowManyModulesAreFetchingItems(view: string = TEACHER) {
   const [maxFetchingCount, setMaxFetchingCount] = useState(0)
   const [prevFetchCount, setPrevFetchCount] = useState(0)
   const [fetchComplete, setFetchComplete] = useState(false)
-  const moduleFetchingCount = useIsFetching({
-    queryKey: [teacherMode ? 'moduleItems' : 'moduleItemsStudent'],
-  })
+  const moduleFetchingCount = useIsFetching({queryKey: [MODULE_ITEMS_MAP[view]]})
 
   useEffect(() => {
     if (moduleFetchingCount > 0) {

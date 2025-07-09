@@ -31,6 +31,7 @@ import {
 } from '@canvas/context-modules/differentiated-modules/utils/assignToHelper'
 // Import payload types directly in onSave function to make TypeScript happy
 import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
+import {MODULE_ITEMS} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -138,7 +139,7 @@ export const renderItemAssignToManager = (
               // On success, invalidate queries with exact module ID if available
               if (itemProps.moduleId) {
                 queryClient.invalidateQueries({
-                  queryKey: ['moduleItems', itemProps.moduleId],
+                  queryKey: [MODULE_ITEMS, itemProps.moduleId],
                   exact: true,
                 })
               }

@@ -47,7 +47,6 @@ interface AddItemModalProps {
   onRequestClose: () => void
   moduleName: string
   moduleId: string
-  itemCount: number
 }
 
 const AddItemModal: React.FC<AddItemModalProps> = ({
@@ -55,7 +54,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   onRequestClose,
   moduleName,
   moduleId,
-  itemCount,
 }) => {
   const [itemType, setItemType] = useState<ModuleItemContentType>('assignment')
   const [searchText, setSearchText] = useState('')
@@ -109,7 +107,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const {state, dispatch, handleSubmit, reset} = useAddModuleItem({
     itemType,
     moduleId,
-    itemCount,
     onRequestClose,
     contentItems,
     inputValue,

@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleHeader from '../ModuleHeader'
+import {PAGE_SIZE, MODULE_ITEMS, MODULES} from '../../utils/constants'
 
 const createQueryClient = () =>
   new QueryClient({
@@ -50,26 +51,30 @@ interface ModuleHeaderProps {
   setSourceModule?: React.Dispatch<React.SetStateAction<{id: string; title: string} | null>>
 }
 
-const buildDefaultProps = (overrides: Partial<ModuleHeaderProps> = {}): ModuleHeaderProps => ({
-  id: 'mod_1',
-  name: 'Test Module',
-  expanded: false,
-  onToggleExpand: jest.fn(),
-  published: true,
-  prerequisites: [],
-  completionRequirements: [],
-  requirementCount: 0,
-  unlockAt: null,
-  hasActiveOverrides: false,
-  itemCount: 5,
-  ...overrides,
-})
+const buildDefaultProps = (overrides: Partial<ModuleHeaderProps> = {}): ModuleHeaderProps => {
+  const id = overrides.id ?? 'mod_1'
+
+  return {
+    id,
+    name: 'Test Module',
+    expanded: false,
+    onToggleExpand: jest.fn(),
+    published: true,
+    prerequisites: [],
+    completionRequirements: [],
+    requirementCount: 0,
+    unlockAt: null,
+    hasActiveOverrides: false,
+    itemCount: 5,
+    ...overrides,
+  }
+}
 
 const setUp = (props: ModuleHeaderProps, courseId = 'test-course-id') => {
   const queryClient = createQueryClient()
 
   // Set up query data for modules
-  queryClient.setQueryData(['modules', courseId], {
+  queryClient.setQueryData([MODULES, courseId], {
     pages: [
       {
         modules: [
@@ -91,7 +96,7 @@ const setUp = (props: ModuleHeaderProps, courseId = 'test-course-id') => {
   })
 
   // Set up query data for module items
-  queryClient.setQueryData(['moduleItems', props.id], {
+  queryClient.setQueryData([MODULE_ITEMS, props.id, null, PAGE_SIZE], {
     moduleItems: [],
   })
 
