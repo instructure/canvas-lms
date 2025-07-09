@@ -25,6 +25,7 @@ import {createMockFileManagementContext} from '../../../__tests__/createMockCont
 describe('SubTableContent', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    ENV.FEATURES = {restrict_student_access: false}
   })
 
   const renderComponent = (props: SubTableContentProps) => {
@@ -79,6 +80,20 @@ describe('SubTableContent', () => {
       isEmpty: true,
       searchString: '',
       showDrop: false,
+    })
+
+    expect(container.firstChild).toBeNull()
+  })
+
+  it('does not render FileUploadDrop when student access is restricted', () => {
+    ENV.FEATURES = {restrict_student_access: true}
+    ENV.current_user_roles = ['student']
+
+    const {container} = renderComponent({
+      isLoading: false,
+      isEmpty: true,
+      searchString: '',
+      showDrop: true,
     })
 
     expect(container.firstChild).toBeNull()

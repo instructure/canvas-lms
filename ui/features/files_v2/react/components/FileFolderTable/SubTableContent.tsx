@@ -45,6 +45,8 @@ const SubTableContent = ({
   handleFileDropRef,
 }: SubTableContentProps) => {
   const {currentFolder, contextId, contextType} = useFileManagement()
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
   if (isLoading) {
     return (
       <Flex as="div" alignItems="center" justifyItems="center" padding="medium">
@@ -59,7 +61,7 @@ const SubTableContent = ({
         <NoResultsFound searchTerm={searchString} />
       </View>
     )
-  } else if (isEmpty && showDrop) {
+  } else if (isEmpty && showDrop && !isAccessRestricted) {
     return (
       <div className="FileDrag">
         <FileUploadDrop
