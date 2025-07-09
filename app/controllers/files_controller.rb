@@ -161,7 +161,7 @@ class FilesController < ApplicationController
   ]
 
   include HorizonMode
-  before_action :load_canvas_career, only: [:index, :show]
+  before_action :load_canvas_career, only: [:index]
 
   before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
