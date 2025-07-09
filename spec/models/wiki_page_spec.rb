@@ -1153,6 +1153,14 @@ describe WikiPage do
       expect(@page.reload.revised_at).to be > @old_timestamp
     end
 
+    it "changes when the page is published" do
+      @page.update!(workflow_state: "unpublished")
+      @old_timestamp = @page.reload.revised_at
+      expect(@page.unpublished?).to be true
+      @page.publish!
+      expect(@page.reload.revised_at).to be > @old_timestamp
+    end
+
     it "doesn't change when the page is touched" do
       @page.touch
       expect(@page.updated_at).to be > @old_timestamp
