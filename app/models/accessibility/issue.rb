@@ -39,7 +39,9 @@ module Accessibility
       {
         pages: generate_wiki_page_resources(skip_scan:),
         assignments: generate_assignment_resources(skip_scan:),
-        attachments: generate_attachment_resources(skip_scan:),
+        # TODO: Disable PDF Accessibility Checks Until Post-InstCon
+        # attachments: generate_attachment_resources(skip_scan:),
+        attachments: {},
         last_checked: Time.zone.now.strftime("%b %-d, %Y"),
         accessibility_scan_disabled: skip_scan
       }
