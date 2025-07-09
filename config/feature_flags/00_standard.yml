@@ -71,9 +71,7 @@ embedded_release_notes:
   type: setting
   state: allowed_on
   display_name: Embedded Release Notes
-  description: Show Instructure-provided release notes filtered by user role in the
-    Help Menu. Available to users with admin, teacher (instructor), and observer
-    roles. Applicable features for student roles are included in observer notes.
+  description: Show Instructure-provided release notes in the Help Menu.
   applies_to: Account
 encrypted_sourcedids:
   type: setting
