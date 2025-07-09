@@ -33,47 +33,46 @@ import type {EditorOptions} from '@instructure/canvas-rce/es/rce/RCEWrapperProps
 // to the underlying RCEWrapper. You probably shouldn't use it until
 // onInit has been called. Until then tinymce is not initialized.
 const CanvasRce = forwardRef(function CanvasRce(
-  {
-    autosave = true,
-    defaultContent,
-    mirroredAttrs = {},
-    readOnly = false,
-    textareaClassName = 'input-block-level',
-    textareaId,
-    height,
-    editorOptions = {},
-    onFocus = () => {},
-    onBlur = () => {},
-    onContentChange = () => {},
-    onInit = () => {},
-    resourceType,
-    resourceId,
-    features: _features = ENV?.FEATURES || {},
-    flashAlertTimeout: _flashAlertTimeout = ENV?.flashAlertTimeout || 10000,
-    timezone: _timezone = ENV?.TIMEZONE,
-    maxInitRenderedRCEs = -1,
-    ...rest
-  }: CanvasRcePropTypes,
+  props: CanvasRcePropTypes,
   _rceRef: React.ForwardedRef<RCEWrapper>,
 ) {
   const rceRef = _rceRef as MutableRefObject<RCEWrapper>
+
+  const {
+    autosave,
+    defaultContent,
+    mirroredAttrs,
+    readOnly,
+    textareaClassName,
+    textareaId,
+    height,
+    editorOptions,
+    onFocus,
+    onBlur,
+    onContentChange,
+    onInit,
+    resourceType,
+    resourceId,
+    flashAlertTimeout,
+    ...rest
+  } = props
 
   const [RCSProps] = useState(getRCSProps())
   const [tinymceConfig] = useState(() => {
     // tinymce is a global by now via import of CanvasRce importing tinyRCE
     const editorConfig = new EditorConfig(tinymce, window.INST, textareaId)
-    const config = {...editorConfig.defaultConfig(), ...editorOptions}
+    const config = {...editorConfig.defaultConfig(), ...(editorOptions ?? {})}
     if (editorOptions?.init_instance_callback) {
       // @ts-expect-error
       config.init_instance_callback = createChainedFunction(
         config.init_instance_callback,
-        editorOptions?.init_instance_callback,
+        editorOptions.init_instance_callback,
       )
     }
     return config
   })
   const [autosave_] = useState<RCEPropTypes['autosave']>({
-    enabled: autosave,
+    enabled: autosave ?? true,
     maxAge:
       Number.isNaN(ENV.rce_auto_save_max_age_ms) || ENV.rce_auto_save_max_age_ms === undefined
         ? 3600000
@@ -126,21 +125,22 @@ const CanvasRce = forwardRef(function CanvasRce(
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       // @ts-expect-error
       ltiTools={window.INST?.editorButtons}
-      maxInitRenderedRCEs={maxInitRenderedRCEs}
-      mirroredAttrs={mirroredAttrs}
-      readOnly={readOnly}
-      textareaClassName={textareaClassName}
+      maxInitRenderedRCEs={props.maxInitRenderedRCEs ?? -1}
+      mirroredAttrs={mirroredAttrs ?? {}}
+      readOnly={readOnly ?? false}
+      textareaClassName={textareaClassName ?? 'input-block-level'}
       textareaId={textareaId}
       height={height}
       // @ts-expect-error
       rcsProps={RCSProps}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      onContentChange={onContentChange}
-      onInit={onInit}
+      onFocus={onFocus ?? (() => {})}
+      onBlur={onBlur ?? (() => {})}
+      onContentChange={onContentChange ?? (() => {})}
+      onInit={onInit ?? (() => {})}
       use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
       resourceType={resourceType}
       resourceId={resourceId}
+      flashAlertTimeout={flashAlertTimeout ?? ENV?.flashAlertTimeout ?? 10000}
       // @ts-expect-error
       ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
