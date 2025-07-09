@@ -30,7 +30,7 @@ import {IssueCell} from './IssueCell'
 
 const I18n = createI18nScope('accessibility_checker')
 
-const baseCellThemeOverride: TableCellProps['themeOverride'] = (_componentTheme, currentTheme) => ({
+const baseCellThemeOverride: TableCellProps['themeOverride'] = _componentTheme => ({
   padding: '1.0625rem 0.75rem', // Make cell height a total of 3.75rem at minimum
 })
 

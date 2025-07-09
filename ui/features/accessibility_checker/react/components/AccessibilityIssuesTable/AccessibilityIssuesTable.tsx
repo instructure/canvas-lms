@@ -16,44 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useShallow} from 'zustand/react/shallow'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
+import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table, TableColHeaderProps} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
+import {IssuesTableColumns, IssuesTableColumnHeaders} from '../../constants'
 import {ContentItem} from '../../types'
+import {getSortingFunction} from '../../utils'
 import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
+import {
+  useAccessibilityCheckerStore,
+  TableSortState,
+} from '../../contexts/AccessibilityCheckerStore'
 
 const I18n = createI18nScope('accessibility_checker')
 
-export type TableSortState = {
-  sortId?: string
-  sortDirection?: TableColHeaderProps['sortDirection']
-}
-
 type Props = {
-  isLoading?: boolean
-  error?: string | null
   onRowClick?: (item: ContentItem) => void
-  onSortRequest?: (sortId?: string, sortDirection?: TableColHeaderProps['sortDirection']) => void
-  tableData?: ContentItem[]
-  tableSortState?: TableSortState
 }
 
-const headerThemeOverride: TableColHeaderProps['themeOverride'] = (
-  _componentTheme,
-  currentTheme,
-) => ({
+const headerThemeOverride: TableColHeaderProps['themeOverride'] = _componentTheme => ({
   padding: '0.875rem 0.75rem', // Make column header height 3rem
 })
 
 const renderTableData = (
-  tableData?: ContentItem[],
+  tableData?: ContentItem[] | null,
   error?: string | null,
   onRowClick?: (item: ContentItem) => void,
 ) => {
@@ -89,37 +84,55 @@ const renderLoading = () => {
   )
 }
 
-export const AccessibilityIssuesTable = ({
-  isLoading = false,
-  error,
-  onRowClick,
-  onSortRequest,
-  tableData,
-  tableSortState,
-}: Props) => {
+// If these columns are sorted, a reverse cycle is more convenient
+const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
+
+export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
+  const error = useAccessibilityCheckerStore(useShallow(state => state.error))
+  const loading = useAccessibilityCheckerStore(useShallow(state => state.loading))
+  const tableData = useAccessibilityCheckerStore(useShallow(state => state.tableData))
+  const [tableSortState, setTableSortState] = useAccessibilityCheckerStore(
+    useShallow(state => [state.tableSortState, state.setTableSortState]),
+  )
+  const [page, setPage] = useAccessibilityCheckerStore(
+    useShallow(state => [state.page, state.setPage]),
+  )
+  const pageSize = useAccessibilityCheckerStore(useShallow(state => state.pageSize))
+
+  const [orderedTableData, setOrderedTableData] = useState<ContentItem[]>([])
+
   const handleSort = useCallback(
     (_event: React.SyntheticEvent, param: {id: TableColHeaderProps['id']}) => {
-      let sortDirection: TableSortState['sortDirection'] = 'ascending'
+      let sortDirection: TableSortState['sortDirection'] = ReverseOrderingFirst.includes(param.id)
+        ? 'descending'
+        : 'ascending'
 
       if (tableSortState?.sortId === param.id) {
-        // If the same column is clicked, toggle the sort direction
-        sortDirection =
-          tableSortState?.sortDirection === 'ascending'
-            ? 'descending'
-            : tableSortState?.sortDirection === 'descending'
-              ? 'none'
-              : 'ascending'
+        if (ReverseOrderingFirst.includes(param.id)) {
+          sortDirection =
+            tableSortState?.sortDirection === 'descending'
+              ? 'ascending'
+              : tableSortState?.sortDirection === 'ascending'
+                ? 'none'
+                : 'descending'
+        } else {
+          // If the same column is clicked, cycle the sort direction
+          sortDirection =
+            tableSortState?.sortDirection === 'ascending'
+              ? 'descending'
+              : tableSortState?.sortDirection === 'descending'
+                ? 'none'
+                : 'ascending'
+        }
       }
       const newState: Partial<TableSortState> = {
         sortId: param.id,
         sortDirection,
       }
 
-      if (onSortRequest) {
-        onSortRequest(newState.sortId, newState.sortDirection)
-      }
+      setTableSortState(newState)
     },
-    [tableSortState, onSortRequest],
+    [tableSortState, setTableSortState],
   )
 
   const getCurrentSortDirection = (
@@ -131,84 +144,101 @@ export const AccessibilityIssuesTable = ({
     return 'none'
   }
 
+  useEffect(() => {
+    const newOrderedTableData: ContentItem[] = [...(tableData || [])]
+
+    if (tableSortState && tableSortState.sortId) {
+      if (
+        tableSortState.sortDirection === 'ascending' ||
+        tableSortState.sortDirection === 'descending'
+      ) {
+        const sortFn = getSortingFunction(tableSortState.sortId, tableSortState!.sortDirection)
+        newOrderedTableData.sort(sortFn)
+      }
+    }
+    setPage(0)
+    setOrderedTableData(newOrderedTableData)
+  }, [tableData, tableSortState, setPage, setOrderedTableData])
+
+  const pageCount = (pageSize && Math.ceil((tableData ?? []).length / pageSize)) || 1
+
+  const handlePageChange = (nextPage: number) => {
+    setPage(nextPage - 1)
+  }
+
+  // TODO Remove, once we are dealing with paginated and sorted data from the backend
+  const pseudoPaginatedData = useMemo(() => {
+    const startIndex = page * pageSize
+    const endIndex = startIndex + pageSize
+    const paginatedData = (orderedTableData || []).slice(startIndex, endIndex)
+
+    return paginatedData
+  }, [page, pageSize, orderedTableData])
+
   return (
-    <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">
-      <Table
-        caption={
-          <ScreenReaderContent>{I18n.t('Content with accessibility issues')}</ScreenReaderContent>
-        }
-        hover
-        data-testid="accessibility-issues-table"
-      >
-        <Table.Head
-          renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+    <View width="100%">
+      <View as="div" margin="medium 0 0 0" borderWidth="small" borderRadius="medium">
+        <Table
+          caption={
+            <ScreenReaderContent>{I18n.t('Content with accessibility issues')}</ScreenReaderContent>
+          }
+          hover
+          data-testid="accessibility-issues-table"
         >
-          <Table.Row>
-            <Table.ColHeader
-              id="artifact-name-header"
-              onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('artifact-name-header')}
-              themeOverride={headerThemeOverride}
-            >
-              <Text weight="bold">{I18n.t('Artifact Name')}</Text>
-            </Table.ColHeader>
-
-            <Table.ColHeader
-              id="issues-header"
-              onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('issues-header')}
-              themeOverride={headerThemeOverride}
-            >
-              <Text weight="bold">{I18n.t('Issues')}</Text>
-            </Table.ColHeader>
-
-            <Table.ColHeader
-              id="artifact-type-header"
-              onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('artifact-type-header')}
-              themeOverride={headerThemeOverride}
-            >
-              <Text weight="bold">{I18n.t('Artifact Type')}</Text>
-            </Table.ColHeader>
-
-            <Table.ColHeader
-              id="state-header"
-              onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('state-header')}
-              themeOverride={headerThemeOverride}
-            >
-              <Text weight="bold">{I18n.t('State')}</Text>
-            </Table.ColHeader>
-
-            <Table.ColHeader
-              id="last-edited-header"
-              onRequestSort={handleSort}
-              sortDirection={getCurrentSortDirection('last-edited-header')}
-              themeOverride={headerThemeOverride}
-            >
-              <Text weight="bold">{I18n.t('Last edited')}</Text>
-            </Table.ColHeader>
-          </Table.Row>
-        </Table.Head>
-
-        <Table.Body>
-          {error && (
-            <Table.Row data-testid="error-row">
-              <Table.Cell colSpan={5} textAlign="center">
-                <Alert variant="error">{error}</Alert>
-              </Table.Cell>
+          <Table.Head
+            renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+          >
+            <Table.Row>
+              {IssuesTableColumnHeaders.map(header => {
+                return (
+                  <Table.ColHeader
+                    key={header.id}
+                    id={header.id}
+                    onRequestSort={handleSort}
+                    sortDirection={getCurrentSortDirection(header.id)}
+                    themeOverride={headerThemeOverride}
+                  >
+                    <Text weight="bold">{header.name}</Text>
+                  </Table.ColHeader>
+                )
+              })}
             </Table.Row>
-          )}
-          {isLoading && (
-            <Table.Row data-testid="loading-row">
-              <Table.Cell colSpan={5} textAlign="center">
-                {renderLoading()}
-              </Table.Cell>
-            </Table.Row>
-          )}
-          {renderTableData(tableData, error, onRowClick)}
-        </Table.Body>
-      </Table>
+          </Table.Head>
+
+          <Table.Body>
+            {error && (
+              <Table.Row data-testid="error-row">
+                <Table.Cell colSpan={5} textAlign="center">
+                  <Alert variant="error">{error}</Alert>
+                </Table.Cell>
+              </Table.Row>
+            )}
+            {loading && (
+              <Table.Row data-testid="loading-row">
+                <Table.Cell colSpan={5} textAlign="center">
+                  {renderLoading()}
+                </Table.Cell>
+              </Table.Row>
+            )}
+            {renderTableData(pseudoPaginatedData, error, onRowClick)}
+          </Table.Body>
+        </Table>
+      </View>
+      {pageCount > 1 && (
+        <Flex.Item>
+          <Pagination
+            data-testid={`accessibility-issues-table-pagination`}
+            as="nav"
+            variant="compact"
+            labelNext={I18n.t('Next Page')}
+            labelPrev={I18n.t('Previous Page')}
+            margin="small"
+            currentPage={page + 1}
+            onPageChange={handlePageChange}
+            totalPageNumber={pageCount}
+          />
+        </Flex.Item>
+      )}
     </View>
   )
 }
