@@ -285,4 +285,13 @@ module AssignmentsCommon
     @assignment = @course.assignments.create!(title:, grading_type: type, points_possible: 20)
     @assignment
   end
+
+  def create_module_with_many_files(course:, module_name: "Multi File Module", file_name: "a_file.txt", count: 150)
+    mod = course.context_modules.create!(name: module_name)
+    file = create_file(file_name)
+    count.times do
+      mod.add_item(type: "File", id: file.id)
+    end
+    mod
+  end
 end

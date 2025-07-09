@@ -24,6 +24,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv'
 import {QueryClient} from '@tanstack/react-query'
 import type {ModuleItemContent, MasteryPathsData, ModuleAction} from '../utils/types'
 import React from 'react'
+import {MODULE_ITEMS, MODULE_ITEMS_COUNT, MOVE_MODULE_ITEM} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -58,7 +59,7 @@ export const handlePublishToggle = async (
       }),
     )
 
-    queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
   } catch (error) {
     showFlashError(
       I18n.t('Failed to change published state for %{title}', {
@@ -136,7 +137,8 @@ export const handleDuplicate = (
   })
     .then(() => {
       showFlashSuccess(I18n.t('Item duplicated successfully'))
-      queryClient.invalidateQueries({queryKey: ['moduleItems', id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, id]})
+      queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, id]})
     })
     .catch(() => {
       showFlashError(I18n.t('Failed to duplicate item'))
@@ -162,7 +164,7 @@ export const handleMoveTo = (
     setIsMenuOpen(false)
   }
 
-  setModuleAction('move_module_item')
+  setModuleAction(MOVE_MODULE_ITEM)
 
   if (content && itemId) {
     setSelectedModuleItem({
@@ -203,7 +205,7 @@ export const updateIndent = async (
 
     showFlashSuccess(I18n.t('Item indentation updated'))
 
-    queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
   } catch (error) {
     showFlashError(I18n.t('Failed to update item indentation'))
     console.error('Error updating indent:', error)
@@ -283,7 +285,8 @@ export const handleRemove = (
             title: title,
           }),
         )
-        queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS, moduleId || '']})
+        queryClient.invalidateQueries({queryKey: [MODULE_ITEMS_COUNT, moduleId]})
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to remove item'))

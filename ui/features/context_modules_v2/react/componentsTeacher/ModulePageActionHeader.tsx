@@ -22,6 +22,7 @@ import {handleOpeningModuleUpdateTray} from '../handlers/modulePageActionHandler
 import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHeader'
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
+import {MODULE_ITEMS, MODULES} from '../utils/constants'
 
 declare const ENV: {
   CONTEXT_MODULES_HEADER_PROPS: any
@@ -52,9 +53,9 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   }, [anyModuleExpanded, onCollapseAll, onExpandAll])
 
   const handlePublishComplete = useCallback(() => {
-    queryClient.invalidateQueries({queryKey: ['modules', courseId]})
+    queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     // invalidate all queries that start with 'moduleItems' in their query key
-    queryClient.invalidateQueries({queryKey: ['moduleItems']})
+    queryClient.invalidateQueries({queryKey: [MODULE_ITEMS]})
   }, [courseId])
 
   const handleAddModule = useCallback(() => {

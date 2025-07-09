@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {queryClient} from '@canvas/query'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useMutation} from '@tanstack/react-query'
 import {ModuleItem} from '../../utils/types.d'
+import {MODULES} from '../../utils/constants'
 
 interface ToggleCollapseParams {
   moduleId: string
@@ -37,6 +39,9 @@ export const useToggleCollapse = (courseId: string) => {
       })
       return json as ToggleCollapseResponse
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
+    },
   })
 }
 
@@ -51,6 +56,9 @@ export const useToggleAllCollapse = (courseId: string) => {
         },
       })
       return json
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: [MODULES, courseId]})
     },
   })
 }

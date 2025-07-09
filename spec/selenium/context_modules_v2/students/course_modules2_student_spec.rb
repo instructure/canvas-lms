@@ -113,6 +113,7 @@ describe "context modules", :ignore_js_errors do
 
       # expand all modules
       expand_all_modules_button.click
+      wait_for_ajaximations
 
       # all modules should be expanded
       expect(module_item_titles.count).to eq(8)

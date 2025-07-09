@@ -28,6 +28,7 @@ import contentSelectionShape from '../proptypes/contentSelection'
 import ConfirmActionButtonBar from './ConfirmActionButtonBar'
 import CourseAndModulePicker from './CourseAndModulePicker'
 import DirectShareOperationStatus from './DirectShareOperationStatus'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('direct_share_course_panel')
 
@@ -83,6 +84,9 @@ export default function DirectShareCoursePanel({
             insert_into_module_position: selectedPosition,
           },
         },
+      }).then(() => {
+        queryClient.invalidateQueries({queryKey: ['moduleItems', selectedModule?.id || '']})
+        queryClient.invalidateQueries({queryKey: ['modules', sourceCourseId | '']})
       }),
     )
   }

@@ -24,23 +24,23 @@ import {Flex} from '@instructure/ui-flex'
 import ModuleStudent from './ModuleStudent'
 import ModulePageActionHeaderStudent from './ModulePageActionHeaderStudent'
 import {handleCollapseAll, handleExpandAll} from '../handlers/modulePageActionHandlers'
-import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
-
+import {useHowManyModulesAreFetchingItems} from '../hooks/queries/useHowManyModulesAreFetchingItems'
 import {validateModuleStudentRenderRequirements} from '../utils/utils'
-import {useModulesStudent} from '../hooks/queriesStudent/useModulesStudent'
+import {useModules} from '../hooks/queries/useModules'
 import {useToggleCollapse, useToggleAllCollapse} from '../hooks/mutations/useToggleCollapse'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../hooks/useModuleContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {STUDENT} from '../utils/constants'
 
 const I18n = createI18nScope('context_modules_v2')
 
 const MemoizedModuleStudent = memo(ModuleStudent, validateModuleStudentRenderRequirements)
 
 const ModulesListStudent: React.FC = () => {
-  const {courseId} = useContextModule()
-  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModulesStudent(courseId)
+  const {courseId, moduleCursorState, setModuleCursorState} = useContextModule()
+  const {data, isLoading, error, isFetchingNextPage, hasNextPage} = useModules(courseId, STUDENT)
   const {moduleFetchingCount, maxFetchingCount, fetchComplete} = useHowManyModulesAreFetchingItems()
   const [expandCollapseButtonDisabled, setExpandCollapseButtonDisabled] = useState(false)
 
@@ -84,8 +84,14 @@ const ModulesListStudent: React.FC = () => {
         }
         return initialExpandedState
       })
+
+      setModuleCursorState(
+        Object.fromEntries(
+          allModules.map(module => [module._id, moduleCursorState[module._id] ?? null]),
+        ),
+      )
     }
-  }, [data?.pages])
+  }, [data?.pages, setModuleCursorState])
 
   useEffect(() => {
     setExpandCollapseButtonDisabled(moduleFetchingCount > 0)

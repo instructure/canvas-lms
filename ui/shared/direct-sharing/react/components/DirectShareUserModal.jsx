@@ -28,12 +28,14 @@ import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {captureException} from '@sentry/react'
+import {queryClient} from '@canvas/query'
 
 const I18n = createI18nScope('direct_share_user_modal')
 
 const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 
 DirectShareUserModal.propTypes = {
+  id: string,
   contentShare: shape({
     content_id: oneOfType([string, number]),
     content_type: oneOf(CONTENT_SHARE_TYPES),
@@ -41,7 +43,7 @@ DirectShareUserModal.propTypes = {
   courseId: string,
 }
 
-export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
+export default function DirectShareUserModal({id, contentShare, courseId, ...modalProps}) {
   const [selectedUsers, setSelectedUsers] = useState([])
   const [postStatus, setPostStatus] = useState(null)
   const [selectedUsersError, setSelectedUsersError] = useState(false)
@@ -96,6 +98,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   function sendSuccessful() {
     showFlashSuccess(I18n.t('Content share started successfully'))()
+    queryClient.invalidateQueries({queryKey: ['moduleItems', id || '']})
+    queryClient.invalidateQueries({queryKey: ['modules', courseId]})
     modalProps.onDismiss()
   }
 

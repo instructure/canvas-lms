@@ -1,4 +1,4 @@
-query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
+query GetModulesQuery($courseId: ID!, $cursor: String) {
   legacyNode(_id: $courseId, type: Course) {
     ... on Course {
       modulesConnection(first: 100, after: $cursor) {
@@ -8,11 +8,13 @@ query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
             id
             _id
             name
+            moduleItemsTotalCount
             position
             published
             unlockAt
             requirementCount
             requireSequentialProgress
+            hasActiveOverrides
             prerequisites {
               id
               name
@@ -27,32 +29,7 @@ query GetModulesStudentQuery($courseId: ID!, $cursor: String) {
             progression {
               id
               _id
-              workflowState
               collapsed
-              completedAt
-              completed
-              locked
-              unlocked
-              started
-              currentPosition
-              requirementsMet {
-                id
-                minPercentage
-                minScore
-                score
-                type
-              }
-              incompleteRequirements {
-                id
-                minPercentage
-                minScore
-                score
-                type
-              }
-            }
-            submissionStatistics {
-              latestDueAt
-              missingAssignmentCount
             }
             moduleItemsTotalCount
           }

@@ -17,7 +17,7 @@
  */
 
 import {createContext, useContext, useState} from 'react'
-import {ExternalTool} from '../utils/types'
+import {ExternalTool, ModuleCursorState} from '../utils/types'
 
 const ContextModule = createContext<{
   courseId: string
@@ -36,6 +36,8 @@ const ContextModule = createContext<{
   moduleIndexMenuModalTools: ExternalTool[]
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
+  moduleCursorState: ModuleCursorState
+  setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
 }>(
   {} as {
     courseId: string
@@ -54,6 +56,8 @@ const ContextModule = createContext<{
     moduleIndexMenuModalTools: ExternalTool[]
     state: Record<string, any>
     setState: (state: Record<string, any>) => void
+    moduleCursorState: ModuleCursorState
+    setModuleCursorState: React.Dispatch<React.SetStateAction<ModuleCursorState>>
   },
 )
 
@@ -98,6 +102,7 @@ export const ContextModuleProvider = ({
   moduleIndexMenuModalTools: ExternalTool[]
 }) => {
   const [state, setState] = useState({})
+  const [moduleCursorState, setModuleCursorState] = useState<ModuleCursorState>({})
 
   return (
     <ContextModule.Provider
@@ -118,6 +123,8 @@ export const ContextModuleProvider = ({
         moduleIndexMenuModalTools,
         state,
         setState,
+        moduleCursorState,
+        setModuleCursorState,
       }}
     >
       {children}
@@ -153,4 +160,6 @@ export const contextModuleDefaultProps = {
   moduleIndexMenuModalTools: [],
   state: {},
   setState: () => {},
+  moduleCursorState: {},
+  setModuleCursorState: () => {},
 }

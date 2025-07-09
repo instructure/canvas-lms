@@ -267,6 +267,18 @@ module Modules2IndexPage
     "#unpublish_module_only_menu_item"
   end
 
+  def pagination_container_selector
+    '[data-testid="pagination-container"]'
+  end
+
+  def pagination_info_text_selector
+    "#{pagination_container_selector} [data-testid='pagination-info-text']"
+  end
+
+  def pagination_page_buttons_selector
+    "#{pagination_container_selector} button"
+  end
+
   def send_to_modal_input_selector
     "#content-share-user-search"
   end
@@ -358,6 +370,14 @@ module Modules2IndexPage
 
   def edit_item_modal
     f(edit_item_modal_selector)
+  end
+
+  def edit_item_modal_title_input_value
+    edit_item_modal.find_element(:id, "title").attribute("value")
+  end
+
+  def edit_item_modal_url_value
+    edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']").attribute("value")
   end
 
   def expand_all_modules_button
@@ -572,6 +592,14 @@ module Modules2IndexPage
     f(module_unpublish_selector)
   end
 
+  def pagination_info_text
+    f(pagination_info_text_selector).text
+  end
+
+  def pagination_page_buttons
+    ff(pagination_page_buttons_selector)
+  end
+
   def send_to_form_selected_elements
     ff("button[type='button']", send_to_modal_input_container)
   end
@@ -685,6 +713,10 @@ module Modules2IndexPage
 
   def module_progression_info_text(module_id)
     element_value_for_attr(module_progression_info(module_id), "aria-valuetext")
+  end
+
+  def pagination_info_text_includes?(text)
+    pagination_info_text.include?(text)
   end
 
   def set_rewrite_flag(rewrite_status: true)

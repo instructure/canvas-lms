@@ -288,6 +288,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       ) && (
         <>
           <DirectShareUserModal
+            id={moduleId}
             open={isDirectShareOpen}
             sourceCourseId={courseId}
             courseId={courseId}

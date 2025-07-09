@@ -91,7 +91,6 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   prerequisites: [],
   completionRequirements: [],
   requirementCount: 0,
-  itemCount: 5,
   published: true,
   expanded: true,
   hasActiveOverrides: false,
