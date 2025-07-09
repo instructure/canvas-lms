@@ -43,10 +43,6 @@ module Accessibility
         I18n.t("Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table.")
       end
 
-      def self.link_text
-        I18n.t("Learn more about using captions with tables")
-      end
-
       def self.prepend(parent, child)
         if parent.first_element_child
           parent.first_element_child.add_previous_sibling(child)
@@ -58,6 +54,7 @@ module Accessibility
       def self.form(_elem)
         Accessibility::Forms::TextInputField.new(
           label: I18n.t("Table caption"),
+          undo_text: I18n.t("Caption added"),
           value: "",
           action: I18n.t("Add caption")
         )

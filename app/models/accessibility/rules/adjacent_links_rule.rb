@@ -51,10 +51,6 @@ module Accessibility
         )
       end
 
-      def self.link_text
-        I18n.t("Learn more about combining adjacent links")
-      end
-
       def self.root_node(elem)
         elem.parent_node
       end
@@ -62,7 +58,8 @@ module Accessibility
       def self.form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Merge links"),
-          value: "false"
+          value: "false",
+          undo_text: I18n.t("Link merged")
         )
       end
 

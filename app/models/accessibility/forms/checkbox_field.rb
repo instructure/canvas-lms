@@ -23,9 +23,11 @@ module Accessibility
       # @param label [String] Human-readable label displayed to the user
       # @param value [String] Optional default state for the checkbox
       def initialize(label:,
+                     undo_text:,
                      value:)
         super(
-          label:
+          label:,
+          undo_text:
         )
         @value = value
       end

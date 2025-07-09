@@ -32,6 +32,7 @@ export interface ApplyButtonHandle {
 
 interface ApplyButtonProps {
   children: string
+  undoMessage?: string
   onApply: () => void
   onUndo: () => void
   isApplied: boolean
@@ -44,6 +45,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
   children,
   onApply,
   onUndo,
+  undoMessage,
   isApplied,
   isLoading,
 }: ApplyButtonProps) => {
@@ -81,7 +83,7 @@ const ApplyButton: React.FC<ApplyButtonProps> = ({
           </PresentationContent>
         </Flex.Item>
         <Flex.Item>
-          <Text>{I18n.t('Issue fixed')}</Text>
+          <Text>{undoMessage || I18n.t('Issue fixed')}</Text>
         </Flex.Item>
         <Flex.Item>
           <CondensedButton

@@ -33,6 +33,7 @@ export enum FormType {
 export interface IssueForm {
   type: FormType
   label?: string
+  undoText?: string
   value?: string
   options?: string[]
   action?: string

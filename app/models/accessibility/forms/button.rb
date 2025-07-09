@@ -23,10 +23,9 @@ module Accessibility
       # @param label [String] Human-readable label displayed to the user
       # @param value [String] Optional default state for the button
       def initialize(label:,
+                     undo_text:,
                      value:)
-        super(
-          label:
-        )
+        super(label:, undo_text:)
         @value = value
       end
 

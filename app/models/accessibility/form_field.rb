@@ -19,11 +19,12 @@
 
 module Accessibility
   class FormField
-    attr_accessor :label
+    attr_accessor :label, :undo_text
 
     # @param label [String] Human-readable label displayed to the user
-    def initialize(label:)
+    def initialize(label:, undo_text:)
       @label = label
+      @undo_text = undo_text
     end
 
     def to_json(*options)
@@ -33,7 +34,8 @@ module Accessibility
     def to_h
       {
         type: field_type,
-        label: @label
+        undo_text:,
+        label:
       }.compact
     end
 

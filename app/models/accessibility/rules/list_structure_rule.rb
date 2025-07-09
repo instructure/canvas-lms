@@ -93,13 +93,11 @@ module Accessibility
         I18n.t("When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information.")
       end
 
-      def self.link_text
-        I18n.t("Learn more about using lists")
-      end
-
+      # TODO: define undo text
       def self.form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Format as list"),
+          undo_text: I18n.t("List structure fixed"),
           value: "false"
         )
       end

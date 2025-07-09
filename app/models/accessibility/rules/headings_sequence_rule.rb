@@ -123,6 +123,7 @@ module Accessibility
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("How would you like to proceed?"),
+          undo_text: I18n.t("Heading hierarchy is now correct"),
           value: I18n.t("Fix heading hierarchy"),
           options: [
             I18n.t("Fix heading hierarchy"),
@@ -148,10 +149,6 @@ module Accessibility
           "screen reader users may have difficulty understanding the page structure. " \
           "This creates a confusing outline of the page for assistive technology users."
         )
-      end
-
-      def self.link_text
-        I18n.t("Learn more about proper heading sequences")
       end
 
       def self.fix!(elem, value)

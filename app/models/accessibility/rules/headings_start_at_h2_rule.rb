@@ -43,13 +43,11 @@ module Accessibility
         )
       end
 
-      def self.link_text
-        I18n.t("Learn more about proper heading structure")
-      end
-
+      # TODO: define undo text
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("How would you like to proceed?"),
+          undo_text: I18n.t("Heading structure changed"),
           value: I18n.t("Change only this heading level"),
           options: [
             I18n.t("Change only this heading level"),

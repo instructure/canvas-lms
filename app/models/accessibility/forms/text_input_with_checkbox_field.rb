@@ -36,11 +36,12 @@ module Accessibility
       # @param input_value [String] Optional default value for the input field
       def initialize(checkbox_label:,
                      input_label:,
+                     undo_text:,
                      checkbox_subtext: nil,
                      input_description: nil,
                      input_max_length: nil,
                      input_value: nil)
-        super(label: input_label)
+        super(label: input_label, undo_text:)
         @checkbox_label = checkbox_label
         @checkbox_subtext = checkbox_subtext
         @input_description = input_description
