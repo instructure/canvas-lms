@@ -285,8 +285,33 @@ describe "Pages API", type: :request do
           expect(json.pluck("url")).to eq [@hidden_page.url, @front_page.url]
         end
 
-        it "sorts by updated_at" do
-          Timecop.freeze(1.hour.ago) { @hidden_page.touch }
+        it "sorts by updated_at parameter but actually uses revised_at timestamp" do
+          page1 = @course.wiki_pages.create!(title: "Page 1", body: "Content 1")
+          page2 = @course.wiki_pages.create!(title: "Page 2", body: "Content 2")
+
+          Timecop.freeze(3.hours.ago) do
+            page1.update_columns(revised_at: Time.current, updated_at: Time.current)
+          end
+
+          Timecop.freeze(2.hours.ago) do
+            page2.update_columns(revised_at: Time.current, updated_at: Time.current)
+          end
+
+          # Touch page1 to update its updated_at but not revised_at
+          # This simulates a non-content change that updates the record timestamp
+          # but doesn't affect when the page content was last revised
+          Timecop.freeze(1.hour.ago) do
+            page1.touch
+          end
+
+          # Verify the timestamps are different
+          page1.reload
+          page2.reload
+          expect(page1.updated_at).to be > page2.updated_at
+          expect(page1.revised_at).to be < page2.revised_at
+
+          # When sorting by "updated_at", it should actually use revised_at
+          # So page2 should come first (more recent revised_at) despite page1 having more recent updated_at
           json = api_call(:get,
                           "/api/v1/courses/#{@course.id}/pages?sort=updated_at&order=desc",
                           controller: "wiki_pages_api",
@@ -295,7 +320,42 @@ describe "Pages API", type: :request do
                           course_id: @course.to_param,
                           sort: "updated_at",
                           order: "desc")
-          expect(json.pluck("url")).to eq [@front_page.url, @hidden_page.url]
+
+          test_pages = json.select { |p| ["Page 1", "Page 2"].include?(p["title"]) }
+          expect(test_pages.pluck("title")).to eq ["Page 2", "Page 1"]
+        end
+
+        it "sorts by updated_at parameter correctly when revised_at timestamps are the same" do
+          page1 = @course.wiki_pages.create!(title: "Same Revised 1", body: "Content")
+          page2 = @course.wiki_pages.create!(title: "Same Revised 2", body: "Content")
+
+          same_revised_time = 2.hours.ago
+          page1.update_columns(revised_at: same_revised_time, updated_at: same_revised_time)
+          page2.update_columns(revised_at: same_revised_time, updated_at: same_revised_time)
+
+          Timecop.freeze(1.hour.ago) do
+            page2.touch
+          end
+
+          page1.reload
+          page2.reload
+          expect(page1.revised_at).to eq(page2.revised_at)
+          expect(page1.updated_at).to be < page2.updated_at
+
+          # Since revised_at is the same, the sorting should fall back to the secondary sort (id)
+          # The pages should be ordered by id (created order) since revised_at is identical
+          json = api_call(:get,
+                          "/api/v1/courses/#{@course.id}/pages?sort=updated_at&order=desc",
+                          controller: "wiki_pages_api",
+                          action: "index",
+                          format: "json",
+                          course_id: @course.to_param,
+                          sort: "updated_at",
+                          order: "desc")
+
+          test_pages = json.select { |p| p["title"].start_with?("Same Revised") }
+          # Since revised_at is the same, should be ordered by id (creation order), descending
+          expect(test_pages.pluck("title")).to eq ["Same Revised 2", "Same Revised 1"]
         end
 
         context "planner feature enabled" do

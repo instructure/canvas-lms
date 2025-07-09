@@ -312,8 +312,8 @@ class WikiPage < ActiveRecord::Base
 
   def set_revised_at
     self.revised_at ||= Time.zone.now
-    self.revised_at = Time.zone.now if body_changed? || title_changed?
-    @page_changed = body_changed? || title_changed?
+    self.revised_at = Time.zone.now if body_changed? || title_changed? || workflow_state_changed?
+    @page_changed = body_changed? || title_changed? || workflow_state_changed?
     true
   end
 

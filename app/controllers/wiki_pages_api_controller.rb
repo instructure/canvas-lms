@@ -304,8 +304,10 @@ class WikiPagesApiController < ApplicationController
       order_clause = case params[:sort]
                      when "title"
                        WikiPage.title_order_by_clause
+                     when "updated_at"
+                       # Match the behavior of the wiki_page_json method where updated_at is set to revised_at
+                       :revised_at
                      when "created_at",
-                       "updated_at",
                        "todo_date"
                        params[:sort].to_sym
                      end
