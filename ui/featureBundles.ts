@@ -144,7 +144,6 @@ const featureBundles: {
   manage_avatars: () => import('./features/manage_avatars/index'),
   manage_groups: () => import('./features/manage_groups/index'),
   media_player_iframe_content: () => import('./features/media_player_iframe_content/index'),
-  messages: () => import('./features/messages/index'),
   mobile_login: () => import('./features/mobile_login/index'),
   moderate_quiz: () => import('./features/moderate_quiz/index'),
   module_dnd: () => import('./features/module_dnd/index'),

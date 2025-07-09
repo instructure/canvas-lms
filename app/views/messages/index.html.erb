@@ -17,14 +17,11 @@
 %>
 
 <%
-  provide :page_title, t("#titles.messages", "Messages")
-  add_crumb t("#crumbs.messages", "Messages")
+  provide :page_title, t('Messages')
+  css_bundle :messages
 %>
 
-<% css_bundle :messages %>
+<div id="messages_mount_point" data-user-name="<%= @context.name %>"></div>
 
-<h1><%= t('titles.messages', 'Messages for %{name}', :name => @context.name) %></h1>
-<ol class="messages">
-  <%= render :partial => 'message', :collection => @messages %>
-</ol>
+<%= render :partial => 'message', :collection => @messages %>
 <%= will_paginate(@messages) %>
