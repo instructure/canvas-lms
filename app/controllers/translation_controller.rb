@@ -52,6 +52,7 @@ class TranslationController < ApplicationController
   end
 
   def translate_paragraph
+    start_time = Time.zone.now
     # Right now course is always undefined
     translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
     translated_text = Translation.translate_text(
