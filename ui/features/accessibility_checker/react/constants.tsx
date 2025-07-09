@@ -32,3 +32,19 @@ export const severityColors: Record<Severity, string> = {
   Medium: '#E62429', // red45
   Low: '#F06E26', // orange30
 }
+
+export const IssuesTableColumns = {
+  ResourceName: 'resource-name-header',
+  Issues: 'issues-header',
+  ResourceType: 'resource-type-header',
+  State: 'state-header',
+  LastEdited: 'last-edited-header',
+}
+
+export const IssuesTableColumnHeaders = [
+  {id: IssuesTableColumns.ResourceName, name: I18n.t('Resource Name')},
+  {id: IssuesTableColumns.Issues, name: I18n.t('Issues')},
+  {id: IssuesTableColumns.ResourceType, name: I18n.t('Resource Type')},
+  {id: IssuesTableColumns.State, name: I18n.t('State')},
+  {id: IssuesTableColumns.LastEdited, name: I18n.t('Last Edited')},
+]

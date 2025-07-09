@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {severityColors} from './constants'
+import {IssuesTableColumns, severityColors} from './constants'
 import {
   AccessibilityData,
   ContentItem,
@@ -239,5 +239,51 @@ export function getSeverityCounts(issuesData: IssueDataPoint[]) {
     high: issuesData.filter(d => d.severity === 'High').reduce((sum, d) => sum + d.count, 0),
     medium: issuesData.filter(d => d.severity === 'Medium').reduce((sum, d) => sum + d.count, 0),
     low: issuesData.filter(d => d.severity === 'Low').reduce((sum, d) => sum + d.count, 0),
+  }
+}
+
+const sortAscending = (aValue: any, bValue: any): number => {
+  if (aValue < bValue) return -1
+  if (aValue > bValue) return 1
+  return 0
+}
+
+const sortDescending = (aValue: any, bValue: any): number => {
+  if (aValue < bValue) return 1
+  if (aValue > bValue) return -1
+  return 0
+}
+
+/**
+ * TODO Remove, once the API is upgraded to support sorting.
+ */
+export const getSortingFunction = (sortId: string, sortDirection: 'ascending' | 'descending') => {
+  const sortFn = sortDirection === 'ascending' ? sortAscending : sortDescending
+
+  if (sortId === IssuesTableColumns.ResourceName) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.title, b.title)
+    }
+  }
+  if (sortId === IssuesTableColumns.Issues) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.count, b.count)
+    }
+  }
+  if (sortId === IssuesTableColumns.ResourceType) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.type, b.type)
+    }
+  }
+  if (sortId === IssuesTableColumns.State) {
+    return (a: ContentItem, b: ContentItem) => {
+      // Published items first by default
+      return sortFn(a.published ? 0 : 1, b.published ? 0 : 1)
+    }
+  }
+  if (sortId === IssuesTableColumns.LastEdited) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.updatedAt, b.updatedAt)
+    }
   }
 }

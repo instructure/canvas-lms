@@ -16,92 +16,227 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, screen} from '@testing-library/react'
+import {fireEvent, render, screen} from '@testing-library/react'
+import {act, renderHook} from '@testing-library/react-hooks'
 
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable'
 import {ContentItem, ContentItemType} from '../../../types'
+import {
+  useAccessibilityCheckerStore,
+  initialState,
+} from '../../../contexts/AccessibilityCheckerStore'
+
+const testData: ContentItem[] = [
+  {
+    id: 1,
+    title: 'Test Wiki Page 1',
+    type: ContentItemType.WikiPage,
+    published: true,
+    updatedAt: '2025-06-03T00:00:00Z',
+    count: 0,
+    url: '/wiki_page_1',
+    issues: [],
+  },
+  {
+    id: 2,
+    title: 'Test Assignment 1',
+    type: ContentItemType.Assignment,
+    published: true,
+    updatedAt: '2025-06-04T00:00:00Z',
+    count: 0,
+    url: '/assignment_1',
+    issues: [],
+  },
+  {
+    id: 3,
+    title: 'Test Assignment 2',
+    type: ContentItemType.Assignment,
+    published: false,
+    updatedAt: '2025-06-08T00:00:00Z',
+    count: 0,
+    url: '/assignment_2',
+    issues: [],
+  },
+]
 
 describe('AccessibilityIssuesTable', () => {
-  const testData: ContentItem[] = [
-    {
-      id: 1,
-      title: 'Test Wiki Page 1',
-      type: ContentItemType.WikiPage,
-      published: true,
-      updatedAt: '2025-06-03T00:00:00Z',
-      count: 0,
-      url: '/wiki_page_1',
-      issues: [],
-    },
-    {
-      id: 2,
-      title: 'Test Assignment 1',
-      type: ContentItemType.Assignment,
-      published: true,
-      updatedAt: '2025-06-04T00:00:00Z',
-      count: 0,
-      url: '/assignment_1',
-      issues: [],
-    },
-  ]
+  const mockSetLoading = jest.fn()
+  const mockSetError = jest.fn()
+  const mockSetTableSortState = jest.fn()
+  const mockSetTableData = jest.fn()
+  const mockState = {
+    ...initialState,
+    mockSetLoading,
+    mockSetError,
+    mockSetTableSortState,
+    mockSetTableData,
+  }
+
+  beforeEach(() => {
+    useAccessibilityCheckerStore.setState(mockState)
+  })
 
   it('renders empty table without crashing', () => {
-    const {rerender} = render(<AccessibilityIssuesTable isLoading={true} tableData={undefined} />)
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(true)
+      result.current.setTableData(null)
+    })
+
+    const {rerender} = render(<AccessibilityIssuesTable />)
     expect(screen.getByTestId('accessibility-issues-table')).toBeInTheDocument()
-    rerender(<AccessibilityIssuesTable isLoading={false} tableData={[]} />)
+
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData([])
+    })
+
+    rerender(<AccessibilityIssuesTable />)
     expect(screen.getByTestId(/^no-issues-row/)).toBeInTheDocument()
   })
 
   it('renders the loading state correctly', () => {
-    const {rerender} = render(<AccessibilityIssuesTable isLoading={true} tableData={undefined} />)
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(true)
+      result.current.setTableData(null)
+    })
+
+    const {rerender} = render(<AccessibilityIssuesTable />)
     expect(screen.getByTestId('loading-row')).toBeInTheDocument()
-    rerender(<AccessibilityIssuesTable isLoading={false} tableData={testData} />)
+
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+    })
+
+    rerender(<AccessibilityIssuesTable />)
     expect(screen.queryByTestId('loading-row')).not.toBeInTheDocument()
   })
 
   it('renders the correct number of rows', () => {
-    render(<AccessibilityIssuesTable tableData={testData} />)
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+    })
+
+    render(<AccessibilityIssuesTable />)
     expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(testData.length)
   })
 
   it('renders the error state correctly', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
     const errorMessage = 'An error occurred while fetching data'
-    const {rerender} = render(
-      <AccessibilityIssuesTable error={errorMessage} isLoading={false} tableData={undefined} />,
-    )
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setError(errorMessage)
+      result.current.setTableData(null)
+    })
+
+    const {rerender} = render(<AccessibilityIssuesTable />)
     expect(screen.getByTestId('error-row')).toBeInTheDocument()
     expect(screen.getByText(errorMessage)).toBeInTheDocument()
-    rerender(<AccessibilityIssuesTable error={undefined} isLoading={false} tableData={testData} />)
+
+    act(() => {
+      result.current.setError(null)
+      result.current.setTableData(testData)
+    })
+
+    rerender(<AccessibilityIssuesTable />)
     expect(screen.queryByTestId('error-row')).not.toBeInTheDocument()
     expect(screen.queryByText(errorMessage)).not.toBeInTheDocument()
   })
 
-  it('calls onSortRequest with the proper arguments when a column header is clicked', () => {
-    const mockOnSortRequest = jest.fn()
+  it('sets tableSortState with the proper values when a column header is clicked', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+    })
 
-    const {rerender} = render(
-      <AccessibilityIssuesTable onSortRequest={mockOnSortRequest} tableData={testData} />,
-    )
+    render(<AccessibilityIssuesTable />)
 
-    screen.getByText('Artifact Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'ascending')
-    rerender(
-      <AccessibilityIssuesTable
-        onSortRequest={mockOnSortRequest}
-        tableData={testData}
-        tableSortState={{sortId: 'artifact-type-header', sortDirection: 'ascending'}}
-      />,
-    )
-    screen.getByText('Artifact Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'descending')
-    rerender(
-      <AccessibilityIssuesTable
-        onSortRequest={mockOnSortRequest}
-        tableData={testData}
-        tableSortState={{sortId: 'artifact-type-header', sortDirection: 'descending'}}
-      />,
-    )
-    screen.getByText('Artifact Type').click()
-    expect(mockOnSortRequest).toHaveBeenCalledWith('artifact-type-header', 'none')
+    screen.getByText('Resource Type').click()
+
+    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
+    expect(result.current.tableSortState?.sortDirection).toBe('ascending')
+
+    screen.getByText('Resource Type').click()
+
+    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
+    expect(result.current.tableSortState?.sortDirection).toBe('descending')
+
+    screen.getByText('Resource Type').click()
+
+    expect(result.current.tableSortState?.sortId).toBe('resource-type-header')
+    expect(result.current.tableSortState?.sortDirection).toBe('none')
+  })
+
+  it('renders data and pagination correctly when there are multiple pages', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+      result.current.setPageSize(2) // Set perPage to 2 for pagination
+    })
+
+    render(<AccessibilityIssuesTable />)
+    const row1 = screen.getByText('Test Wiki Page 1')
+    const row2 = screen.getByText('Test Assignment 1')
+    const rows = screen.getAllByTestId(/^issue-row-/)
+    expect(row1).toBeInTheDocument()
+    expect(row2).toBeInTheDocument()
+    expect(rows).toHaveLength(2)
+  })
+
+  it('handles page change', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+      result.current.setPageSize(2)
+    })
+
+    render(<AccessibilityIssuesTable />)
+    const buttons = screen.getAllByText(/2/i)
+    fireEvent.click(buttons[2])
+    const row3 = screen.getByText('Test Assignment 2')
+    const rows = screen.getAllByTestId(/^issue-row-/)
+    expect(row3).toBeInTheDocument()
+    expect(rows).toHaveLength(1)
+  })
+
+  it('pagination is not rendered when not needed', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+      result.current.setPageSize(3)
+    })
+
+    render(<AccessibilityIssuesTable />)
+    const row1 = screen.getByText('Test Wiki Page 1')
+    const row2 = screen.getByText('Test Assignment 1')
+    const row3 = screen.getByText('Test Assignment 2')
+    const rows = screen.getAllByTestId(/^issue-row-/)
+    expect(row1).toBeInTheDocument()
+    expect(row2).toBeInTheDocument()
+    expect(row3).toBeInTheDocument()
+    expect(rows).toHaveLength(3)
+    expect(screen.queryByTestId('accessibility-issues-table-pagination')).not.toBeInTheDocument()
+  })
+
+  it('displays the correct number of pages', () => {
+    const {result} = renderHook(() => useAccessibilityCheckerStore())
+    act(() => {
+      result.current.setLoading(false)
+      result.current.setTableData(testData)
+      result.current.setPageSize(1)
+    })
+
+    render(<AccessibilityIssuesTable />)
+    const buttonPage3 = screen.getAllByText(/3/i)[1]
+    expect(buttonPage3).toBeInTheDocument()
   })
 })
