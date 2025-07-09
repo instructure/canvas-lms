@@ -18,7 +18,6 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {Pagination} from '@instructure/ui-pagination'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-themes'
 
@@ -38,7 +37,7 @@ import {getUniqueId} from '../../utils/fileFolderUtils'
 import {useGetFolders} from '../hooks/useGetFolders'
 import {useHandleSelections} from '../hooks/useHandleSelections'
 import {File, Folder} from '../../interfaces/File'
-import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
+import {PER_PAGE, useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
 import TopLevelButtons from './FilesHeader/TopLevelButtons'
 import Breadcrumbs from './FileFolderTable/Breadcrumbs'
@@ -47,6 +46,7 @@ import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
 import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
+import {BasicPagination} from './BasicPagination'
 
 const I18n = createI18nScope('files_v2')
 
@@ -138,11 +138,11 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       setPaginationAlert(
         I18n.t('Table page %{current} of %{total}', {
           current: page.current,
-          total: page.total,
+          total: page.totalPages,
         }),
       )
     }
-  }, [isLoading, page.current, page.total])
+  }, [isLoading, page.current, page.totalPages])
 
   const canManageFilesForContext = (permission: string) => {
     return filesEnv.userHasPermission({contextType, contextId}, permission)
@@ -243,16 +243,15 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 >
                   {paginationAlert}
                 </Alert>
-                {!isLoading && page.total > 1 && (
-                  <Pagination
-                    as="nav"
-                    labelNext={I18n.t('Next page')}
-                    labelPrev={I18n.t('Previous page')}
-                    variant="compact"
+                {!isLoading && page.totalItems > 0 && (
+                  <BasicPagination
+                    labelNext={I18n.t('Next Page')}
+                    labelPrev={I18n.t('Previous Page')}
                     currentPage={page.current}
-                    totalPageNumber={page.total}
-                    onPageChange={page.set}
-                    data-testid="files-pagination"
+                    perPage={PER_PAGE}
+                    totalItems={page.totalItems}
+                    onNext={page.next}
+                    onPrev={page.prev}
                   />
                 )}
               </>

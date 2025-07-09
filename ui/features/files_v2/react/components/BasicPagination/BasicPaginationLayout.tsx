@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useNavigate, useSearchParams} from 'react-router-dom'
-import {generateSearchNavigationUrl} from '../../utils/apiUtils'
+import {Flex} from '@instructure/ui-flex'
 
-export const useSearchTerm = () => {
-  const navigate = useNavigate()
-  const setSearchTerm = (term: string) => {
-    const encodedTerm = encodeURIComponent(term)
-    const searchUrl = generateSearchNavigationUrl(encodedTerm)
-    navigate(searchUrl)
-  }
-  const [searchParams] = useSearchParams()
-  const searchTerm = searchParams.get('search_term') || ''
+export type BasicPaginationLayoutProps = {
+  prevButton: React.ReactNode
+  nextButton: React.ReactNode
+  pageInfo: React.ReactNode
+}
 
-  return {searchTerm, urlEncodedSearchTerm: encodeURIComponent(searchTerm), setSearchTerm}
+export const BasicPaginationLayout = (props: BasicPaginationLayoutProps) => {
+  return (
+    <Flex gap="x-small" data-testid="files-pagination">
+      <Flex>{props.prevButton}</Flex>
+      <Flex>{props.pageInfo}</Flex>
+      <Flex>{props.nextButton}</Flex>
+    </Flex>
+  )
 }
