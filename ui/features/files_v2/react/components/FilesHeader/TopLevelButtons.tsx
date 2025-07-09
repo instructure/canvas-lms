@@ -104,10 +104,13 @@ const TopLevelButtons = ({
     )
   }
 
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+
   if (size === 'small') {
     return (
       <Flex as="div" gap="small" direction="column">
-        {uploadButton()}
+        {!isAccessRestricted && uploadButton()}
         {createFolderButton()}
         {allMyFilesButton()}
         {externalToolsButton()}
@@ -122,7 +125,7 @@ const TopLevelButtons = ({
       {externalToolsButton()}
       {allMyFilesButton()}
       {createFolderButton()}
-      {uploadButton()}
+      {!isAccessRestricted && uploadButton()}
     </Flex>
   )
 }
