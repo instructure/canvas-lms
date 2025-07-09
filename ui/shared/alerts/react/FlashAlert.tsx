@@ -236,6 +236,11 @@ export function showFlashAlert(args: ShowFlashAlertArgs) {
     dismissible = true,
   } = args
 
+  // Check if document is available (guard against calls after test cleanup)
+  if (typeof document === 'undefined') {
+    return
+  }
+
   function closeAlert(atNode: Element) {
     ReactDOM.unmountComponentAtNode(atNode)
     atNode.remove()
