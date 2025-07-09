@@ -22,7 +22,7 @@ require "spec_helper"
 describe Accessibility::Issue do
   let(:mock_rule) do
     Class.new do
-      def self.test(_elem) = nil
+      def self.test(_elem) = true
       def self.id = "mock-rule"
       def self.message = "No issue"
       def self.why = "Just a mock"
@@ -99,7 +99,8 @@ describe Accessibility::Issue do
       expect(result[:accessibility_scan_disabled]).to be false
     end
 
-    it "returns issues for attachments" do
+    # TODO: Disable PDF Accessibility Checks Until Post-InstCon
+    it "returns issues for attachments", skip: "Not implemented yet" do
       attachment_pdf = double("AttachmentPDF",
                               id: 3,
                               title: "Document.pdf",
