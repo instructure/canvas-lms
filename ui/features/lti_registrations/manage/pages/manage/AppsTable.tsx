@@ -284,9 +284,9 @@ const Columns: ReadonlyArray<Column> = [
                 themeOverride={DangerMenuItemThemeOverrides}
                 onClick={() => {
                   alert({
-                    message: I18n.t('This App is locked on, and cannot be deleted.'),
+                    message: I18n.t('This app is locked on by Instructure, and cannot be deleted.'),
                     title: I18n.t('Delete App'),
-                    okButtonLabel: I18n.t('Ok'),
+                    okButtonLabel: I18n.t('Close'),
                   })
                 }}
               >
