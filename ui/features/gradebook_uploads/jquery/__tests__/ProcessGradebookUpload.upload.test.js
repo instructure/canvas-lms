@@ -21,8 +21,12 @@ import {setupServer} from 'msw/node'
 import ProcessGradebookUpload from '../process_gradebook_upload'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-// Helper to wait for async operations
-const waitForAsync = () => new Promise(resolve => setTimeout(resolve, 10))
+// Mock globalUtils module
+jest.mock('@canvas/util/globalUtils', () => ({
+  windowAlert: jest.fn(),
+}))
+
+import {windowAlert} from '@canvas/util/globalUtils'
 
 // Define constants
 const oldAssignment1 = {id: 1, title: 'Old Assignment 1', points_possible: 25, published: true}
@@ -36,11 +40,9 @@ const submissionNew1Excused = {assignment_id: 0, grade: 'EX', original_grade: '2
 
 const customColumn1 = {id: 1, title: 'Notes', read_only: false}
 const progressCompleted = {id: 1, workflow_state: 'completed'}
-const progressQueued = {id: 1, workflow_state: 'queued'}
 
 describe('ProcessGradebookUpload.upload', () => {
   const server = setupServer()
-  let originalAlert
   let originalGoToGradebook
   let goToGradebookStub
 
@@ -49,9 +51,6 @@ describe('ProcessGradebookUpload.upload', () => {
   })
 
   beforeEach(() => {
-    originalAlert = window.alert
-    window.alert = jest.fn()
-
     originalGoToGradebook = ProcessGradebookUpload.goToGradebook
     goToGradebookStub = jest.fn()
     ProcessGradebookUpload.goToGradebook = goToGradebookStub
@@ -75,10 +74,13 @@ describe('ProcessGradebookUpload.upload', () => {
         return HttpResponse.json(progressCompleted)
       }),
     )
+
+    // Clear all mock function calls
+    jest.clearAllMocks()
   })
 
   afterEach(() => {
-    window.alert = originalAlert
+    windowAlert.mockClear()
     ProcessGradebookUpload.goToGradebook = originalGoToGradebook
     server.resetHandlers()
     fakeENV.teardown()
@@ -122,7 +124,7 @@ describe('ProcessGradebookUpload.upload', () => {
     await uploadPromise
 
     expect(goToGradebookStub).toHaveBeenCalled()
-    expect(window.alert).toHaveBeenCalled()
+    expect(windowAlert).toHaveBeenCalled()
   })
 
   test('handles a change to excused to a single existing assignment', async () => {
@@ -133,7 +135,7 @@ describe('ProcessGradebookUpload.upload', () => {
     await uploadPromise
 
     expect(goToGradebookStub).toHaveBeenCalled()
-    expect(window.alert).toHaveBeenCalled()
+    expect(windowAlert).toHaveBeenCalled()
   })
 
   test('handles a creation of a new assignment with no submissions', async () => {
@@ -145,7 +147,7 @@ describe('ProcessGradebookUpload.upload', () => {
 
     expect(goToGradebookStub).toHaveBeenCalled()
     // No alert because no bulk data was uploaded
-    expect(window.alert).not.toHaveBeenCalled()
+    expect(windowAlert).not.toHaveBeenCalled()
   })
 
   test('handles creation of a new assignment with a grade change', async () => {
@@ -156,7 +158,7 @@ describe('ProcessGradebookUpload.upload', () => {
     await uploadPromise
 
     expect(goToGradebookStub).toHaveBeenCalled()
-    expect(window.alert).toHaveBeenCalled()
+    expect(windowAlert).toHaveBeenCalled()
   })
 
   test('handles creation of a new assignment with a change to excused', async () => {
@@ -167,7 +169,7 @@ describe('ProcessGradebookUpload.upload', () => {
     await uploadPromise
 
     expect(goToGradebookStub).toHaveBeenCalled()
-    expect(window.alert).toHaveBeenCalled()
+    expect(windowAlert).toHaveBeenCalled()
   })
 
   test('calls uploadCustomColumnData if custom_columns is non-empty', () => {
@@ -232,7 +234,7 @@ describe('ProcessGradebookUpload.upload', () => {
     const uploadPromise = ProcessGradebookUpload.upload(gradebook)
     await uploadPromise
 
-    expect(window.alert).toHaveBeenCalled()
+    expect(windowAlert).toHaveBeenCalled()
   })
 
   test('does not show an alert if the only changes involve creating new assignments', async () => {
@@ -252,13 +254,9 @@ describe('ProcessGradebookUpload.upload', () => {
       ],
     }
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
-    // Wait for any pending promises to resolve
-    await waitForAsync()
-
-    expect(window.alert).not.toHaveBeenCalled()
+    expect(windowAlert).not.toHaveBeenCalled()
   })
 
   test('ignores override score changes if no update URL is set', () => {
