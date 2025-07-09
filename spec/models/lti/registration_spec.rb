@@ -35,6 +35,11 @@ RSpec.describe Lti::Registration do
       registration.description = nil
       expect(subject).to be true
     end
+
+    it "requires the account to be a root account" do
+      registration.account = account_model(parent_account: registration.account)
+      expect(subject).to be false
+    end
   end
 
   describe "#lti_version" do
