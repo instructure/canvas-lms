@@ -97,12 +97,4 @@ describe Accessibility::Rule do
       end
     end
   end
-
-  describe ".link_text" do
-    context "by default" do
-      it "returns an empty string" do
-        expect(described_class.link_text).to eq("")
-      end
-    end
-  end
 end

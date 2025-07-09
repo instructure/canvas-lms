@@ -59,13 +59,10 @@ module Accessibility
         )
       end
 
-      def self.link_text
-        ""
-      end
-
       def self.form(_elem)
         Accessibility::Forms::Button.new(
           label: I18n.t("Change to paragraph"),
+          undo_text: I18n.t("Formatted as paragraph"),
           value: "false"
         )
       end

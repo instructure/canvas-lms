@@ -27,12 +27,14 @@ module Accessibility
       def initialize(label:,
                      input_label:,
                      title_label:,
+                     undo_text:,
                      background_color:,
                      value:,
                      contrast_ratio:,
                      options: {})
         super(
-          label:
+          label:,
+          undo_text:
         )
         @input_label = input_label
         @title_label = title_label

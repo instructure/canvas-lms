@@ -44,13 +44,10 @@ module Accessibility
         )
       end
 
-      def self.link_text
-        I18n.t("Learn more about table headers")
-      end
-
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("Which part of the table should contain the headings?"),
+          undo_text: I18n.t("Table headings are now set up"),
           value: I18n.t("The top row"),
           options: [
             I18n.t("The top row"),

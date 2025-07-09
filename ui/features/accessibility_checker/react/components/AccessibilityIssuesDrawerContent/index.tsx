@@ -96,7 +96,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     previewRef.current?.update(
       formValue,
       () => {
-        setAssertiveAlertMessage(I18n.t('Issue fixed'))
+        setAssertiveAlertMessage(currentIssue.form.undoText || I18n.t('Issue fixed'))
         setIsRemediated(true)
         setIsFormLocked(false)
       },
@@ -230,6 +230,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               <ApplyButton
                 onApply={handleApply}
                 onUndo={handleUndo}
+                undoMessage={currentIssue.form.undoText}
                 isApplied={isRemediated}
                 isLoading={isFormLocked}
               >

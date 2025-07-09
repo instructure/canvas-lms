@@ -45,14 +45,12 @@ module Accessibility
           and computers.")
       end
 
-      def self.link_text
-        I18n.t("Learn more about using alt text for images")
-      end
-
+      # TODO: define undo text
       def self.form(_elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
+          undo_text: I18n.t("Alt text fixed"),
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: 120,

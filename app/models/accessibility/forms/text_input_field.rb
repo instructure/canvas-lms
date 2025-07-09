@@ -27,11 +27,13 @@ module Accessibility
       # @param value [String] Optional default value for the text field
       # @param action [String] Optional action text for submit button
       def initialize(label:,
+                     undo_text:,
                      value:,
                      placeholder: nil,
                      action: nil)
         super(
-          label:
+          label:,
+          undo_text:,
         )
         @value = value
         @placeholder = placeholder

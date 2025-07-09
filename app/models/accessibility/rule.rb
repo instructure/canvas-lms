@@ -91,12 +91,6 @@ module Accessibility
       def why
         raise NotImplementedError, "#{self} must implement/override why"
       end
-
-      # Gets text for the link to documentation
-      # @return [String] The link text
-      def link_text
-        ""
-      end
     end
   end
 end

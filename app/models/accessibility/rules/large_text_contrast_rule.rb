@@ -61,10 +61,6 @@ module Accessibility
         I18n.t("Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision.")
       end
 
-      def self.link_text
-        I18n.t("Learn more about large text contrast")
-      end
-
       def self.large_text?(style_str)
         font_size = extract_font_size(style_str) || 16
         font_weight = extract_font_weight(style_str) || "normal"
@@ -161,6 +157,7 @@ module Accessibility
       def self.form(_elem)
         Accessibility::Forms::ColorPickerField.new(
           label: "Change color",
+          undo_text: I18n.t("Color changed"),
           value: ""
         )
       end

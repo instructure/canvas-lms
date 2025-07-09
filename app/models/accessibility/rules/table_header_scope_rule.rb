@@ -46,13 +46,11 @@ module Accessibility
         )
       end
 
-      def self.link_text
-        I18n.t("Learn more about table header scope attributes")
-      end
-
+      # TODO: define undo text
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
           label: I18n.t("Set header scope"),
+          undo_text: I18n.t("Table header scope fixed"),
           value: I18n.t("Row"),
           options: [I18n.t("Row"), I18n.t("Column"), I18n.t("Row group"), I18n.t("Column group")]
         )

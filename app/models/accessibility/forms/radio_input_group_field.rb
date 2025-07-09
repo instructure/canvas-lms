@@ -26,10 +26,12 @@ module Accessibility
       # @param options [Array<String>] Array of options for the radio input group
       # @param value [String] Optional default value for the radio input group
       def initialize(label:,
+                     undo_text:,
                      options:,
                      value:)
         super(
-          label:
+          label:,
+          undo_text:
         )
         @options = options
         @value = value

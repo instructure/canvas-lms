@@ -30,7 +30,6 @@ RSpec.describe Accessibility::Rules::HasLangEntryRule, type: :feature do
         message: rule_class.message,
         why: rule_class.why,
         link: rule_class.link,
-        link_text: rule_class.link_text,
         data: {
           id:
         }

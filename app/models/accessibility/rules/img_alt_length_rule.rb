@@ -48,19 +48,17 @@ module Accessibility
         Unless the image conveys complex information, aim for 120 characters or fewer.")
       end
 
-      def self.link_text
-        I18n.t("Learn more about writing effective alt text for images")
-      end
-
       def self.display_name
         I18n.t("Alt text is too long")
       end
 
+      # TODO: define undo text
       def self.form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
           input_label: I18n.t("Alt text"),
+          undo_text: I18n.t("Alt text fixed"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: MAX_LENGTH,
           input_value: elem.get_attribute("alt") || ""

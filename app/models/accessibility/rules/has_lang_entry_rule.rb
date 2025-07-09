@@ -45,10 +45,6 @@ module Accessibility
           "agents need to present text and other linguistic content correctly. "
         )
       end
-
-      def self.link_text
-        I18n.t("Learn more about specifying language in PDF documents")
-      end
     end
   end
 end

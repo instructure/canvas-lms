@@ -39,7 +39,10 @@ const baseItem: ContentItem = {
       ruleId: 'adjacent-links',
       displayName: 'Adjacent links',
       message: 'This is a test issue',
-      form: {type: FormType.Button, label: 'Apply'},
+      form: {
+        type: FormType.Button,
+        label: 'Apply',
+      },
       why: '',
       element: '',
     },
