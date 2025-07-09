@@ -82,7 +82,10 @@ const DueDateLabel: React.FC<DueDateLabelProps> = ({contentTagId, content}) => {
 
   let dueDatesCount =
     content?.assignmentOverrides?.edges?.filter(({node}) => !!node.dueAt).length || 0
-  if (content?.dueAt) {
+  if (
+    content?.dueAt &&
+    !content?.assignmentOverrides?.edges?.some(({node}) => node.dueAt === content.dueAt)
+  ) {
     dueDatesCount += 1
   }
 

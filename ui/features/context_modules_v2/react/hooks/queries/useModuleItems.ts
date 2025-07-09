@@ -42,9 +42,9 @@ const MODULE_ITEMS_QUERY = gql`
               type: __typename
               pointsPossible
               graded
-              dueAt
-              lockAt
-              unlockAt
+              dueAt(applyOverrides: false)
+              lockAt(applyOverrides: false)
+              unlockAt(applyOverrides: false)
               published
               canUnpublish
               isLockedByMasterCourse

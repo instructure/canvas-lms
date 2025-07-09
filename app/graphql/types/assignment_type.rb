@@ -251,7 +251,7 @@ module Types
         MD
       end
 
-      define_method(field_name) do |apply_overrides:|
+      define_method(field_name) do |apply_overrides: true|
         load_association(:context).then do |course|
           if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
