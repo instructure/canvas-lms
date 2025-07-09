@@ -52,13 +52,17 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
 end
 
 class ModuleProgressionLoader < GraphQL::Batch::Loader
-  def initialize(user)
+  def initialize(user, session, context)
     super()
     @user = user
+    @session = session
+    @context = context
   end
 
   def perform(context_modules)
     GuardRail.activate(:secondary) do
+      context_modules.each { |m| m.evaluate_for(@user) } if is_student?
+
       progressions = ContextModuleProgression.where(
         context_module_id: context_modules.map(&:id),
         user_id: @user&.id
@@ -68,6 +72,12 @@ class ModuleProgressionLoader < GraphQL::Batch::Loader
         fulfill(context_module, progression)
       end
     end
+  end
+
+  private
+
+  def is_student?
+    @context.grants_right?(@user, @session, :participate_as_student)
   end
 end
 
@@ -162,7 +172,7 @@ module Types
 
     field :progression, Types::ModuleProgressionType, null: true, description: "The current user's progression through the module"
     def progression
-      ModuleProgressionLoader.for(current_user).load(context_module)
+      ModuleProgressionLoader.for(current_user, session, context_module.context).load(context_module)
     end
 
     field :has_active_overrides, Boolean, null: false
