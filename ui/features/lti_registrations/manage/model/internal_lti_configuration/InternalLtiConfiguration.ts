@@ -22,6 +22,7 @@ import {ZLtiScope} from '@canvas/lti/model/LtiScope'
 import {ZInternalPlacementConfiguration} from './placement_configuration/InternalPlacementConfiguration'
 import {ZPublicJwk} from './PublicJwk'
 import {ZInternalBaseLaunchSettings} from './InternalBaseLaunchSettings'
+import {ZContentMigrationSettings} from '../lti_tool_configuration/ContentMigrationSettings'
 
 export const ZInternalLtiConfiguration = z.object({
   title: z.string(),
@@ -37,7 +38,11 @@ export const ZInternalLtiConfiguration = z.object({
   public_jwk_url: z.string().nullable().optional(),
   scopes: z.array(ZLtiScope),
   redirect_uris: z.array(z.string()).nullable().optional(),
-  launch_settings: ZInternalBaseLaunchSettings.nullable().optional(),
+  launch_settings: ZInternalBaseLaunchSettings.extend({
+    content_migration: ZContentMigrationSettings.nullable().optional(),
+  })
+    .nullable()
+    .optional(),
   placements: z.array(ZInternalPlacementConfiguration),
 })
 
