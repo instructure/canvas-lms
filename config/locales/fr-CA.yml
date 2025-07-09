@@ -16298,7 +16298,7 @@ fr-CA:
   http_67e238b4: "http://demo.theme-sky.com/upstore/"
   http_73849691: http
   http_method_762f4fa2: "Méthode Http"
-  http_response_code_832d6baa: "Réponse HTTP & #160;: %{code}"
+  http_response_code_832d6baa: "Réponse HTTP : %{code}"
   https_3a02e3fb: https
   https_b8426ad8: "https://"
   https_example_com_config_xml_d3bae5e3: "https://example.com/config.xml"
