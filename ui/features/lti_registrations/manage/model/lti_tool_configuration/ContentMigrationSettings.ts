@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import * as z from 'zod'
-import {ZPlacementConfig} from './LtiPlacementConfig'
-import {ZContentMigrationSettings} from './ContentMigrationSettings'
 
-export interface PlatformSettings extends z.infer<typeof ZPlatformSettings> {}
+export interface ContentMigrationSettings extends z.infer<typeof ZContentMigrationSettings> {}
 
-export const ZPlatformSettings = z.object({
-  text: z.string().optional().nullable(),
-  icon_url: z.string().optional().nullable(),
-  platform: z.string().optional().nullable(),
-  placements: z.array(ZPlacementConfig),
-  content_migrations: ZContentMigrationSettings.optional().nullable(),
+export const ZContentMigrationSettings = z.object({
+  export_format: z.string().optional().nullable(), // Can only ever be "json"
+  import_format: z.string().optional().nullable(), // Can only ever be "json"
+  export_start_url: z.string(),
+  import_start_url: z.string(),
 })
