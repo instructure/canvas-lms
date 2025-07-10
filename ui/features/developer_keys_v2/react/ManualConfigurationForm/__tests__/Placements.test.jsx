@@ -61,6 +61,36 @@ it('generates the displayNames correctly', () => {
   expect(screen.queryByRole('combobox', {name: /Course Navigation/i})).not.toBeInTheDocument()
 })
 
+it('displays "Assignment Document Processor" for ActivityAssetProcessor placement', () => {
+  const propsWithActivityAssetProcessor = props({
+    validPlacements: ['ActivityAssetProcessor', 'account_navigation'],
+    placements: [
+      {
+        placement: 'ActivityAssetProcessor',
+        target_link_uri: 'http://example.com',
+        message_type: 'LtiResourceLinkRequest',
+      },
+    ],
+  })
+  render(<Placements {...propsWithActivityAssetProcessor} />)
+  expect(screen.getAllByText('Assignment Document Processor')).toHaveLength(2)
+})
+
+it('placementDisplayName returns correct names', () => {
+  const ref = React.createRef()
+  render(<Placements {...props({ref})} />)
+  const component = ref.current
+
+  // Test the special case
+  expect(component.placementDisplayName('ActivityAssetProcessor')).toBe(
+    'Assignment Document Processor',
+  )
+
+  // Test regular cases
+  expect(component.placementDisplayName('account_navigation')).toBe('Account Navigation')
+  expect(component.placementDisplayName('course_navigation')).toBe('Course Navigation')
+})
+
 it('adds placements', async () => {
   const ref = React.createRef()
   render(<Placements {...props({ref})} />)
