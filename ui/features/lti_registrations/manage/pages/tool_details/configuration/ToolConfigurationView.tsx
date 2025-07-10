@@ -263,26 +263,26 @@ export const ToolConfigurationView = () => {
       </Section>
 
       <Section title={I18n.t('Administration Nickname and Description')}>
-        <Flex direction="row" alignItems="end" margin="small 0 0">
+        <Flex direction="row" alignItems="center" margin="small 0 0">
           <Flex.Item margin="0 xx-small 0 0">
             <Text weight="bold">{I18n.t('Administration Nickname:')}</Text>
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item shouldShrink>
             {registration.admin_nickname ? (
-              <Text>{registration.admin_nickname}</Text>
+              <Text wrap="break-word">{registration.admin_nickname}</Text>
             ) : (
               <Text fontStyle="italic">{I18n.t('No nickname')}</Text>
             )}
           </Flex.Item>
         </Flex>
 
-        <Flex direction="row" alignItems="end" margin="small 0 0">
+        <Flex direction="column" alignItems="start" margin="small 0 0">
           <Flex.Item margin="0 xx-small 0 0">
             <Text weight="bold">{I18n.t('Description:')}</Text>
           </Flex.Item>
-          <Flex.Item>
+          <Flex.Item shouldShrink>
             {registration.overlaid_configuration.description ? (
-              <Text>{registration.overlaid_configuration.description}</Text>
+              <Text wrap="break-word">{registration.overlaid_configuration.description}</Text>
             ) : (
               <Text fontStyle="italic">{I18n.t('No description')}</Text>
             )}
@@ -293,12 +293,16 @@ export const ToolConfigurationView = () => {
           {I18n.t('Placement Names')}
         </Heading>
         {enabledPlacements.map((p, i) => (
-          <Flex direction="row" alignItems="end" margin="small 0 0" key={i}>
+          <Flex direction="row" alignItems="center" margin="small 0 0" key={i}>
             <Flex.Item margin="0 xx-small 0 0">
               <Text weight="bold">{i18nLtiPlacement(p.placement)}:</Text>
             </Flex.Item>
-            <Flex.Item>
-              {p.text ? <Text>{p.text}</Text> : <Text fontStyle="italic">{I18n.t('No text')}</Text>}
+            <Flex.Item shouldShrink>
+              {p.text ? (
+                <Text wrap="break-word">{p.text}</Text>
+              ) : (
+                <Text fontStyle="italic">{I18n.t('No text')}</Text>
+              )}
             </Flex.Item>
           </Flex>
         ))}
