@@ -109,19 +109,18 @@ module Accessibility
       def self.extract_color(style_str, property)
         return nil unless style_str
 
-        if style_str =~ /#{property}:\s*([^;]+)/
-          color = $1.strip
+        match = style_str.match(/(?:^|;)\s*#{Regexp.escape(property)}:\s*([^;]+)/)
+        return nil unless match
 
-          if color.start_with?("rgb")
-            return rgb_to_hex(color)
-          elsif color.start_with?("#")
-            return color.delete("#").upcase
-          else
-            return color.upcase
-          end
+        color = match[1].strip
+
+        if color.start_with?("rgb")
+          rgb_to_hex(color)
+        elsif color.start_with?("#")
+          color.delete_prefix("#").upcase
+        else
+          color.upcase
         end
-
-        nil
       end
 
       def self.rgb_to_hex(rgb)
@@ -132,10 +131,19 @@ module Accessibility
         "#000000"
       end
 
-      def self.form(_elem)
+      def self.form(elem)
+        style_str = elem.attribute("style")&.value.to_s
+        foreground = extract_color(style_str, "color") || "000000"
+        background = extract_color(style_str, "background-color") || "FFFFFF"
+
         Accessibility::Forms::ColorPickerField.new(
-          label: I18n.t("Change color"),
-          value: ""
+          title_label: I18n.t("Contrast Ratio"),
+          input_label: I18n.t("New Color"),
+          label: I18n.t("Change Color"),
+          options: ["normal"],
+          background_color: "##{background}",
+          value: "##{foreground}",
+          contrast_ratio: WCAGColorContrast.ratio(foreground, background)
         )
       end
 

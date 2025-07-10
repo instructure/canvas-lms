@@ -21,7 +21,9 @@ import {
   AccessibilityData,
   ContentItem,
   ContentItemType,
+  FormType,
   IssueDataPoint,
+  IssueForm,
   RawData,
   Severity,
 } from './types'

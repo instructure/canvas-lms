@@ -36,6 +36,10 @@ export interface IssueForm {
   label?: string
   value?: string
   options?: string[]
+  inputLabel?: string
+  titleLabel?: string
+  backgroundColor?: string
+  contrastRatio?: number
 }
 
 export interface AccessibilityIssue {
@@ -88,3 +92,12 @@ export type IssueDataPoint = {
 }
 
 export type RawData = Record<string, any>
+
+export type ContrastData = {
+  contrast: number
+  isValidNormalText: boolean
+  isValidLargeText: boolean
+  isValidGraphicsText: boolean
+  firstColor: string
+  secondColor: string
+}

@@ -16,24 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TextInput} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
-import {FormComponentProps} from '.'
+import React from 'react'
 
-const ColorPickerForm = ({issue, value, onChangeValue, onReload}: FormComponentProps) => {
+import {FormComponentProps} from '.'
+import ContrastRatioForm from './ContrastRatioForm'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('accessibility_checker')
+
+const ColorPickerForm = ({issue, onChangeValue}: FormComponentProps) => {
   return (
-    <View as="div" margin="small 0">
-      <TextInput
-        data-testid="color-input-form"
-        renderLabel={issue.form.label}
-        display="inline-block"
-        value={value || ''}
-        onChange={(_, newValue) => {
-          onChangeValue(newValue)
-          onReload?.(newValue)
-        }}
-      />
-    </View>
+    <ContrastRatioForm
+      label={issue?.form?.titleLabel || I18n.t('Contrast Ratio')}
+      inputLabel={issue.form.inputLabel || I18n.t('New Color')}
+      options={issue.form.options}
+      backgroundColor={issue.form.backgroundColor}
+      foregroundColor={issue.form.value}
+      contrastRatio={issue.form.contrastRatio}
+      onChange={onChangeValue}
+    />
   )
 }
 
