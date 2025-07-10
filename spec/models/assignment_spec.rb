@@ -2383,6 +2383,66 @@ describe Assignment do
         expect(representatives).not_to include @initial_student
       end
     end
+
+    context "filter SpeedGrader by student group" do
+      include GroupsCommon
+
+      before do
+        @course.account.enable_feature!(:assign_to_differentiation_tags)
+        @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+        @course.account.save!
+        @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        @course.update!(filter_speed_grader_by_student_group: true)
+        @course.account.reload
+
+        @collab_student = student_in_course(active_all: true, name: "Collab Student").user
+        @non_collab_student = student_in_course(active_all: true, name: "Non Collab Student").user
+
+        collab_group_category = @course.group_categories.create!(name: "Collab Group Set")
+        @collab_group = @course.groups.create!(name: "Collab Group", group_category: collab_group_category)
+
+        non_collab_group_category = @course.group_categories.create!(name: "Non Collab Group Set", non_collaborative: true)
+        @non_collab_group = @course.groups.create!(name: "Non Collab Group", group_category: non_collab_group_category, non_collaborative: true)
+
+        @non_collab_group.add_user(@non_collab_student)
+        @collab_group.add_user(@collab_student)
+
+        @assignment = @course.assignments.create!(
+          title: "filtering assignment",
+          submission_types: "online_text_entry",
+          grading_type: "points",
+          points_possible: 10
+        )
+      end
+
+      it "returns collaborative groups_members when asked for" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            "filter_rows_by" => {
+              "student_group_id" => @collab_group.id,
+            }
+          }
+        }
+
+        # when representatives is requested by speedgrader, it passes ignore_student_visibility: true
+        representatives = @assignment.representatives(user: @teacher, group_id: @collab_group.id, ignore_student_visibility: true)
+        expect(representatives).to contain_exactly(@collab_student)
+      end
+
+      it "returns non-collaborative groups_members when asked for" do
+        @teacher.preferences[:gradebook_settings] = {
+          @course.global_id => {
+            "filter_rows_by" => {
+              "student_group_id" => @non_collab_group.id,
+            }
+          }
+        }
+
+        # when representatives is requested by speedgrader, it passes ignore_student_visibility: true
+        representatives = @assignment.representatives(user: @teacher, group_id: @non_collab_group.id, ignore_student_visibility: true)
+        expect(representatives).to contain_exactly(@non_collab_student)
+      end
+    end
   end
 
   context "group assignments with all students assigned to a group and grade_group_students_individually set to true" do
