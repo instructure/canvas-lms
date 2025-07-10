@@ -2881,7 +2881,9 @@ class AbstractAssignment < ActiveRecord::Base
       students = student_scope.order_by_sortable_name.distinct
 
       if group_id.present?
-        students = students.joins(:group_memberships)
+        # group_memberships only contain collaborative groups, so we need to
+        # also include differentiation tags that are not collaborative groups.
+        students = students.joins("INNER JOIN #{GroupMembership.quoted_table_name} ON group_memberships.user_id = users.id")
                            .where(group_memberships: { group_id:, workflow_state: :accepted })
       end
 
