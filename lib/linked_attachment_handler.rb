@@ -37,6 +37,32 @@ module LinkedAttachmentHandler
     end
   end
 
+  # course/groups attachments cannot be copied over to another course/group so we would not allow
+  # cross-course attachment associations
+  def exclude_cross_course_attachment_association?(attachment)
+    # Only consider Course and Group contexts for cross-context rules
+    source_is_course_or_group = ["Course", "Group"].include?(attachment.context_type)
+    return false unless source_is_course_or_group
+
+    # where we're associating to
+    target_context_type, target_context_id = nil
+    if class_name == "Course" || class_name == "Group"
+      target_context_type = class_name
+      target_context_id = id
+    elsif respond_to?(:context_type) && ["Course", "Group"].include?(context_type)
+      target_context_type = context_type
+      target_context_id = context_id
+    else
+      return false
+    end
+
+    # Get global IDs for comparison due to sharding
+    source_global_id = Shard.global_id_for(attachment.context_id)
+    target_global_id = Shard.global_id_for(target_context_id)
+
+    attachment.context_type != target_context_type || source_global_id != target_global_id
+  end
+
   # NB: context_concern is a virtual subdivision of context.
   # It is on purpose not a field name as it more denotes a sub-concern of
   # the context model, not necessarily an exact field.
@@ -67,7 +93,7 @@ module LinkedAttachmentHandler
         all_attachment_associations = []
 
         Attachment.where(id: att_ids).find_each do |attachment|
-          next if !(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update)
+          next if exclude_cross_course_attachment_association?(attachment) || (!(user.nil? && skip_user_verification) && !attachment.grants_right?(user, session, :update))
 
           shard.activate do
             all_attachment_associations << {

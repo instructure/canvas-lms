@@ -50,6 +50,20 @@ describe LinkedAttachmentHandler do
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
     end
 
+    it "skips cross-course associations" do
+      html = <<~HTML
+        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+          <img id="3" src="/users/#{another_user.id}/files/#{user_attachment.id}/preview"></p>
+      HTML
+
+      course.associate_attachments_to_rce_object(html, teacher)
+      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id])
+
+      course2 = course_with_teacher(active_all: true, user: teacher).course
+      course2.associate_attachments_to_rce_object(html, teacher)
+      expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id])
+    end
+
     it "updates existing associations (delete+create)" do
       html = <<~HTML
         <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
@@ -113,13 +127,13 @@ describe LinkedAttachmentHandler do
       it "creates associations on the context's shard, not the attachment's" do
         @shard1.activate do
           account_model
-          course_model(account: @account)
-          @course.enroll_teacher(teacher)
-          attachment_model(context: @course, filename: "shard1.txt")
+          teacher2 = user_model(name: "Shard 1 Teacher")
+          course.enroll_teacher(teacher2)
+          attachment_model(context: teacher2, filename: "shard1.txt")
           html = <<~HTML
-            <p><a href="/courses/#{@course.id}/files/#{@attachment.id}/download">file</a>
+            <p><a href="/users/#{teacher2.id}/files/#{@attachment.id}/download">file</a>
           HTML
-          course.associate_attachments_to_rce_object(html, teacher, context_concern: "syllabus_body")
+          course.associate_attachments_to_rce_object(html, teacher2, context_concern: "syllabus_body")
         end
 
         aa = AttachmentAssociation.find_by(context: course, context_concern: "syllabus_body")
