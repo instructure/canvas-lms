@@ -186,7 +186,7 @@ export default function CoursesToolbar({
                         onUpdateFilters({
                           enrollment_type: isChecked ? ['student'] : null,
                           enrollment_workflow_state: isChecked
-                            ? ['active', 'invited', 'pending']
+                            ? ['active', 'invited', 'pending', 'creation_pending']
                             : null,
                         })
                       }}
