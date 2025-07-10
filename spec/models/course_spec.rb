@@ -6186,11 +6186,23 @@ describe Course do
         end
       end
 
-      describe "#with_enrollment_workflow_states" do
-        it "includes courses with enrollments in the specified workflow states" do
+      describe "#with_enrollment_workflow_states_and_types" do
+        before :once do
           @course1c = course_with_student(account: @account, course_name: "C", active_enrollment: true).course
+          @course1d = course_with_teacher(account: @account, course_name: "D").course
+          @course1d.update!(workflow_state: "completed")
+        end
 
-          expect(@account.courses.with_enrollment_workflow_states("active").sort_by(&:id)).to eq [@course1c]
+        it "includes courses with enrollments in the specified workflow states" do
+          expect(@account.courses.with_enrollment_workflow_states_and_types(states: ["active"]).sort_by(&:id)).to eq [@course1c]
+        end
+
+        it "includes courses with enrollments in the specified types" do
+          expect(@account.courses.with_enrollment_workflow_states_and_types(types: ["teacher"]).sort_by(&:id)).to eq [@course1d]
+        end
+
+        it "includes courses with enrollments in the specified workflow states and types" do
+          expect(@account.courses.with_enrollment_workflow_states_and_types(types: ["teacher"], states: ["completed"]).sort_by(&:id)).to eq [@course1d]
         end
       end
     end

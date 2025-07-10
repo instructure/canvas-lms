@@ -1004,12 +1004,19 @@ class Course < ActiveRecord::Base
   scope :with_enrollments, lambda {
     where(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
   }
-  scope :with_enrollment_types, lambda { |types|
-    types = types.map { |type| "#{type.capitalize}Enrollment" }
-    where(Enrollment.active.where("enrollments.course_id=courses.id").where(type: types).arel.exists)
-  }
-  scope :with_enrollment_workflow_states, lambda { |states|
-    where(Enrollment.where("enrollments.course_id=courses.id").where(workflow_state: states).arel.exists)
+  scope :with_enrollment_workflow_states_and_types, lambda { |states: nil, types: nil|
+    enrollment_scope = Enrollment.where("enrollments.course_id=courses.id")
+
+    if states.present?
+      enrollment_scope = enrollment_scope.where(workflow_state: states)
+    end
+
+    if types.present?
+      types = types.filter_map { |type| Enrollment::SIS_TYPES.invert[type] }
+      enrollment_scope = enrollment_scope.where(type: types)
+    end
+
+    where(enrollment_scope.arel.exists)
   }
   scope :without_enrollments, lambda {
     where.not(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
