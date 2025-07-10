@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {MockedProvider} from '@apollo/client/testing'
 import {render as realRender, act, fireEvent} from '@testing-library/react'
 import {
@@ -35,8 +34,7 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 }))
 jest.useFakeTimers()
 
-// TODO: resolve fickle tests; cf. AE-1541
-describe.skip('OutcomeMoveModal', () => {
+describe('OutcomeMoveModal', () => {
   let cache
   let onCloseHandlerMock
   let onCleanupHandlerMock
