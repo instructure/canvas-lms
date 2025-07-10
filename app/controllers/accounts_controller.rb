@@ -821,18 +821,13 @@ class AccountsController < ApplicationController
       @courses = @courses.without_enrollments
     end
 
-    if params[:enrollment_type].is_a?(Array)
-      @courses = @courses.with_enrollment_types(params[:enrollment_type])
-    end
+    enrollment_types = params[:enrollment_type] if params[:enrollment_type].is_a?(Array)
+    workflow_states = params[:enrollment_workflow_state] if params[:enrollment_workflow_state].is_a?(Array)
+    if workflow_states || enrollment_types
+      return render json: { message: "Invalid value provided to 'enrollment_workflow_state'" }, status: :bad_request if !workflow_states.nil? && (workflow_states - Enrollment::WORKFLOW_STATES).any?
+      return render json: { message: "Invalid value provided to 'enrollment_type'" }, status: :bad_request if !enrollment_types.nil? && (enrollment_types - Enrollment::SIS_TYPES.values).any?
 
-    if params.key?(:enrollment_workflow_state)
-      workflow_states = params[:enrollment_workflow_state]
-
-      if (Array(workflow_states) - Enrollment::WORKFLOW_STATES).empty?
-        @courses = @courses.with_enrollment_workflow_states(workflow_states)
-      else
-        return render json: { message: "Invalid value provided to 'enrollment_workflow_state'" }, status: :bad_request
-      end
+      @courses = @courses.with_enrollment_workflow_states_and_types(states: workflow_states, types: enrollment_types)
     end
 
     if value_to_boolean(params[:completed])
