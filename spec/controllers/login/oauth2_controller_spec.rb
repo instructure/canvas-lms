@@ -45,10 +45,22 @@ describe Login::OAuth2Controller do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
+    it "checks for a code" do
+      get :create, params: { state: "123" }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include("Missing code")
+    end
+
+    it "checks for a state" do
+      get :create, params: { code: "123" }
+      expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include("Missing state")
+    end
+
     it "checks the OAuth2 CSRF token" do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "different")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       # it could be a 422, or 0 if error handling isn't enabled properly in specs
       expect(response).to_not be_successful
       expect(response).to_not be_redirect
@@ -62,7 +74,7 @@ describe Login::OAuth2Controller do
 
       expect_any_instantiation_of(aac).not_to receive(:get_token)
       Timecop.travel(15.minutes) do
-        get :create, params: { state: }
+        get :create, params: { code: "abc", state: }
         expect(response).to redirect_to(login_url)
         expect(flash[:delegated_message]).to eq "It took too long to login. Please try again"
       end
@@ -71,7 +83,7 @@ describe Login::OAuth2Controller do
     it "does not destroy existing sessions if it's a bogus request" do
       session[:sentinel] = true
 
-      get :create, params: { state: "" }
+      get :create, params: { code: "abc", state: "" }
       expect(response).not_to be_successful
       expect(session[:sentinel]).to be true
     end
@@ -87,7 +99,7 @@ describe Login::OAuth2Controller do
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       # ensure the session was reset
       expect(session[:sentinel]).to be_nil
@@ -104,7 +116,7 @@ describe Login::OAuth2Controller do
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       # ensure the session was reset
       expect(session[:sentinel]).to be_nil
@@ -126,7 +138,7 @@ describe Login::OAuth2Controller do
       aac.pseudonyms.create!(user: @user, unique_id: "user2", account: Account.default)
 
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       expect(flash[:notice]).to eql "You are logged in at #{Account.default.name} using your credentials from #{account2.name}"
     end
@@ -144,7 +156,7 @@ describe Login::OAuth2Controller do
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_otp_url)
     end
 
@@ -162,7 +174,7 @@ describe Login::OAuth2Controller do
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       # ensure the session was reset
       expect(session[:sentinel]).to be_nil
@@ -180,8 +192,9 @@ describe Login::OAuth2Controller do
 
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include("doesn't have an account")
     end
 
     it "redirects to login if no user found" do
@@ -192,9 +205,9 @@ describe Login::OAuth2Controller do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_url)
-      expect(flash[:delegated_message]).to_not be_blank
+      expect(flash[:delegated_message]).to include("doesn't have an account")
     end
 
     it "redirects to login if no user information returned" do
@@ -205,10 +218,9 @@ describe Login::OAuth2Controller do
       session[:oauth2_nonce] = ["bob"]
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_url)
-      expect(flash[:delegated_message]).to_not be_blank
-      expect(flash[:delegated_message]).to match(/no unique ID/)
+      expect(flash[:delegated_message]).to include("no unique ID")
     end
 
     it "(safely) displays an error message from the server" do
@@ -227,7 +239,7 @@ describe Login::OAuth2Controller do
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
 
       expect(Account.default.pseudonyms.active.by_unique_id("user")).to_not be_exists
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(dashboard_url(login_success: 1))
       p = Account.default.pseudonyms.active.by_unique_id("user").first!
       expect(p.authentication_provider).to eq aac
@@ -235,26 +247,28 @@ describe Login::OAuth2Controller do
 
     it "redirects to login any time an expired token is noticed" do
       session[:oauth2_nonce] = ["bob"]
-      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::Security::TokenExpired)
+      expect(Canvas::Security).to receive(:decode_jwt).at_least(:once).and_raise(Canvas::Security::TokenExpired)
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "bob")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "took too long"
     end
 
     it "redirects to login any time an external timeout is noticed" do
       session[:oauth2_nonce] = ["fred"]
-      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff)
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff.new(1))
       user_with_pseudonym(username: "user", active_all: 1)
       @pseudonym.authentication_provider = aac
       @pseudonym.save!
       session[:sentinel] = true
       jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
-      get :create, params: { state: jwt }
+      get :create, params: { code: "abc", state: jwt }
       expect(response).to redirect_to(login_url)
+      expect(flash[:delegated_message]).to include "timeout occurred"
     end
 
     context "when the authentication provider pseudonym validation fails" do
@@ -277,7 +291,7 @@ describe Login::OAuth2Controller do
       it "redirects to the specified retry_url" do
         expect(aac).to receive(:validation_error_retry_url).and_return(retry_url)
 
-        get :create, params: { state: }
+        get :create, params: { code: "abc", state: }
         expect(response).to redirect_to(retry_url)
         expect(session[:sentinel]).to be_nil
       end
@@ -288,7 +302,7 @@ describe Login::OAuth2Controller do
         end
 
         it "redirects to the login page" do
-          get :create, params: { state: }
+          get :create, params: { code: "abc", state: }
           expect(response).to redirect_to(login_url)
           expect(session[:sentinel]).to be_nil
         end
