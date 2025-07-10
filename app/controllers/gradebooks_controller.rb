@@ -1070,6 +1070,8 @@ class GradebooksController < ApplicationController
 
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
+      multiselect_filters_enabled = Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+
       env = {
         A2_STUDENT_ENABLED: @assignment&.a2_enabled? || false,
         COMMENT_LIBRARY_FEATURE_ENABLED:
@@ -1089,6 +1091,8 @@ class GradebooksController < ApplicationController
         PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse),
         GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads),
         DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
+        MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled,
+        gradebook_section_filter_id: multiselect_filters_enabled ? gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids") : gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id"),
       }
       js_env(env)
 
