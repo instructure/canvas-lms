@@ -312,8 +312,16 @@ window.modules = (function () {
             $module.find('.context_module_items.ui-sortable').sortable('enable')
             updateModuleFileDrop($module[0])
 
-            if (originalParentModuleId !== moduleId) {
-              updateModuleFileDrop($originalParentModule[0])
+            if (originalParentModuleId != moduleId) {
+              if (ENV.FEATURE_MODULES_PERF && originalParentModuleId) {
+                decrementModuleItemsCount(originalParentModuleId)
+                if (isModuleCurrentPageEmpty($originalParentModule[0])) {
+                  loadFirstPage(originalParentModuleId)
+                } else {
+                  updateModuleFileDrop($originalParentModule[0])
+                }
+                addShowAllOrLess(moduleId)
+              }
             }
           },
           _data => {
