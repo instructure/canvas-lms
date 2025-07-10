@@ -112,6 +112,7 @@ async function speedGraderProps() {
       pendo,
       permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
       gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
+      gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
     },
     features: {
       a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
@@ -130,6 +131,7 @@ async function speedGraderProps() {
       gradingAssistanceFileUploadEnabled:
         window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
       discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
+      multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
     },
   }
 }
