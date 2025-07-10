@@ -362,7 +362,7 @@ class AuthenticationProvider
       # but long enough that we aren't polling on every login request if there's a problem
       # with their keys. Also add race_condition_ttl so we will have a value for a decent
       # period of time
-      self.jwks = self.class.jwks_cache.fetch(["jwks", jwks_uri].cache_key, expires: 15.minutes, race_condition_ttl: 12.hours) do
+      self.jwks = self.class.jwks_cache.fetch(["jwks", jwks_uri].cache_key, expires_in: 15.minutes, race_condition_ttl: 12.hours) do
         ::Canvas.timeout_protection("oidc_jwks_fetch") do
           CanvasHttp.get(jwks_uri) do |response|
             # raise error unless it's a 2xx
