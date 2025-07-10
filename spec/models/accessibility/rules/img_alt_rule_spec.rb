@@ -58,4 +58,14 @@ RSpec.describe "ImgAltRule", type: :feature do
       expect(fixed_html).to include('<img id="test-element" src="image.jpg" alt="Descriptive alt text">')
     end
   end
+
+  context "when generating form for image alt text" do
+    it "returns a TextInputWithCheckboxField with correct configuration" do
+      input_html = '<div><img src="image.jpg"></div>'
+      elem = Nokogiri::HTML.fragment(input_html).css("img").first
+      form = Accessibility::Rules::ImgAltRule.form(elem)
+
+      expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
+    end
+  end
 end

@@ -30,39 +30,49 @@ module Accessibility
         return nil unless elem.attribute?("alt")
 
         alt = elem.get_attribute("alt")
+        role = elem.attribute?("role") ? elem.get_attribute("role") : nil
+
+        return nil if alt == "" && role == "presentation"
         return nil if alt.blank?
 
-        I18n.t("Alt text is longer than %{length} characters.", { length: MAX_LENGTH }) if alt.length > MAX_LENGTH
-      end
-
-      def self.display_name
-        I18n.t("Image alt text length")
+        I18n.t("Alt text is longer than 120.") if alt.length > MAX_LENGTH
       end
 
       def self.message
-        I18n.t("Image alt text should be concise (less than %{length} characters).", { length: MAX_LENGTH })
+        I18n.t("The alt text is too long. Alt text should ideally be under 120 characters,
+        so people using screen readers can quickly understand the important content of the image.")
       end
 
       def self.why
-        I18n.t(
-          "Excessively long alt text can be overwhelming for screen reader users. " \
-          "A concise description is more effective and easier to understand."
-        )
+        I18n.t("Alt text should be concise. When it's unnecessarily long, it can break the flow of screen reader users.
+        Unless the image conveys complex information, aim for 120 characters or fewer.")
       end
 
       def self.link_text
         I18n.t("Learn more about writing effective alt text for images")
       end
 
+      def self.display_name
+        I18n.t("Alt text is too long")
+      end
+
       def self.form(elem)
-        Accessibility::Forms::TextInputField.new(
-          label: I18n.t("Change alt text"),
-          value: elem.get_attribute("alt") || ""
+        Accessibility::Forms::TextInputWithCheckboxField.new(
+          checkbox_label: I18n.t("This image is decorative"),
+          checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
+          input_label: I18n.t("Alt text"),
+          input_description: I18n.t("Describe what's on the picture."),
+          input_max_length: MAX_LENGTH,
+          input_value: elem.get_attribute("alt") || ""
         )
       end
 
       def self.fix!(elem, value)
-        raise StandardError, "Too long alt text. It should be less than #{MAX_LENGTH} characters." if value.length > MAX_LENGTH
+        if value == "" || value.nil?
+          elem["role"] = "presentation"
+        elsif value.length > MAX_LENGTH
+          raise StandardError, I18n.t("Too long alt text. It should be less than 120 characters.")
+        end
 
         return nil if elem["alt"] == value
 

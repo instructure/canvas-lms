@@ -27,7 +27,7 @@ export enum FormType {
   RadioInputGroup = 'radio_input_group',
   Button = 'button',
   ColorPicker = 'colorpicker',
-  CheckboxTextInput = 'checkboxtextinput',
+  CheckboxTextInput = 'checkbox_text_input',
 }
 
 export interface IssueForm {
@@ -40,6 +40,10 @@ export interface IssueForm {
   titleLabel?: string
   backgroundColor?: string
   contrastRatio?: number
+  checkboxLabel?: string
+  checkboxSubtext?: string
+  inputDescription?: string
+  inputMaxLength?: number
 }
 
 export interface AccessibilityIssue {

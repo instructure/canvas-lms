@@ -77,6 +77,11 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   }, 1000)
   const currentIssue = issues[currentIssueIndex]
 
+  const isApplyButtonHidden = useMemo(
+    () => [FormType.CheckboxTextInput].includes(currentIssue?.form?.type),
+    [currentIssue],
+  )
+
   const handleNext = useCallback(() => {
     setCurrentIssueIndex(prev => Math.min(prev + 1, issues.length - 1))
   }, [issues.length])
@@ -220,16 +225,18 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           <View as="section" margin="medium 0">
             <Form ref={formRef} issue={currentIssue} onReload={updatePreview} />
           </View>
-          <View as="section" margin="medium 0">
-            <ApplyButton
-              onApply={handleApply}
-              onUndo={handleUndo}
-              isApplied={isRemediated}
-              isLoading={isFormLocked}
-            >
-              {applyButtonText}
-            </ApplyButton>
-          </View>
+          {!isApplyButtonHidden && (
+            <View as="section" margin="medium 0">
+              <ApplyButton
+                onApply={handleApply}
+                onUndo={handleUndo}
+                isApplied={isRemediated}
+                isLoading={isFormLocked}
+              >
+                {applyButtonText}
+              </ApplyButton>
+            </View>
+          )}
         </Flex.Item>
         <Flex.Item as="footer">
           <AccessibilityIssuesDrawerFooter
@@ -238,7 +245,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
             onSaveAndNext={handleSaveAndNext || handleApply}
             isBackDisabled={currentIssueIndex === 0 || isFormLocked}
             isNextDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
-            isSaveAndNextDisabled={!isRemediated || isFormLocked}
+            isSaveAndNextDisabled={(!isRemediated && !isApplyButtonHidden) || isFormLocked}
           />
         </Flex.Item>
       </Flex>
