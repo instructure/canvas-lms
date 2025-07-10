@@ -7793,6 +7793,7 @@ nn:
     other: "%{count} timar sidan"
   count_images_found_for_term_a93635ed: "%{count} bilder funnet for %{term}"
   count_issues_baf25342: "%{count} feil"
+  count_issues_bd5e5674: "%{count} Feil"
   count_items_deleted_successfully_a287aa53: "%{count} element er sletta."
   count_items_found_224f86d3: 
     one: "Eit element funne"
