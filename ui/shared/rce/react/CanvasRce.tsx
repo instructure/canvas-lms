@@ -54,6 +54,7 @@ const CanvasRce = forwardRef(function CanvasRce(
     resourceType,
     resourceId,
     flashAlertTimeout,
+    features,
     ...rest
   } = props
 
@@ -141,6 +142,7 @@ const CanvasRce = forwardRef(function CanvasRce(
       resourceType={resourceType}
       resourceId={resourceId}
       flashAlertTimeout={flashAlertTimeout ?? ENV?.flashAlertTimeout ?? 10000}
+      features={features ?? window.ENV?.FEATURES ?? {}}
       // @ts-expect-error
       ai_text_tools={window.ENV?.RICH_CONTENT_AI_TEXT_TOOLS}
       externalToolsConfig={{
