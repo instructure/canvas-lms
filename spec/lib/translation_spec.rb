@@ -160,6 +160,11 @@ describe Translation do
       expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "inbox", current_user: })).to eq(result)
     end
 
+    it "raises TextTooLongError if html_string is too long" do
+      text = "a" * Translation::CHARACTER_LIMIT
+      expect { described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags) }.to raise_error(Translation::TextTooLongError)
+    end
+
     context "when target language is identical to detected source language" do
       it "raises SameLanguageTranslationError" do
         expect { described_class.translate_text(text: "Hello world", tgt_lang: "en", flags: translation_flags, options: { feature_slug: "inbox", current_user: }) }.to raise_error(Translation::SameLanguageTranslationError)
@@ -197,6 +202,11 @@ describe Translation do
 
     it "translates text when tgt_lang is provided" do
       expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "discussion", current_user: })).to eq("<p>Hola, mundo!</p>")
+    end
+
+    it "raises TextTooLongError if html_string is too long" do
+      long_html = "<p>" + ("a" * Translation::CHARACTER_LIMIT) + "</p>"
+      expect { described_class.translate_html(html_string: long_html, tgt_lang: "es", flags: translation_flags) }.to raise_error(Translation::TextTooLongError)
     end
   end
 end
