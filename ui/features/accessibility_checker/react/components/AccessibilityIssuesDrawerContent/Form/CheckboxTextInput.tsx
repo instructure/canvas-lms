@@ -15,23 +15,59 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {TextInput} from '@instructure/ui-text-input'
+import React, {useState, useEffect} from 'react'
+import {TextArea} from '@instructure/ui-text-area'
+import {Checkbox} from '@instructure/ui-checkbox'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 import {FormComponentProps} from '.'
 
 const CheckboxTextInput = ({issue, value, onChangeValue}: FormComponentProps) => {
+  const [isChecked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (isChecked && value) {
+      onChangeValue('')
+    }
+  }, [isChecked])
+
   return (
-    <View as="div" margin="small 0">
-      <TextInput
-        data-testid="checkbox-text-input-form"
-        renderLabel={issue.form.label}
-        display="inline-block"
-        width="15rem"
-        value={value || ''}
-        onChange={(_, value) => onChangeValue(value)}
-      />
-    </View>
+    <>
+      <View as="div">
+        <Checkbox
+          label={issue.form.checkboxLabel}
+          checked={isChecked}
+          onChange={() => setChecked(!isChecked)}
+        />
+      </View>
+      <View as="div" margin="small 0 medium">
+        <Text size="small" color="secondary">
+          {issue.form.checkboxSubtext}
+        </Text>
+      </View>
+      <View as="div" margin="small 0">
+        <TextArea
+          data-testid="checkbox-text-input-form"
+          label={issue.form.label}
+          disabled={isChecked}
+          value={value || ''}
+          onChange={e => onChangeValue(e.target.value)}
+        />
+      </View>
+      <Flex as="div" justifyItems="space-between" margin="small 0">
+        <Flex.Item>
+          <Text size="small" color="secondary">
+            {issue.form.inputDescription}
+          </Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Text size="small" color="secondary">
+            {value?.length || 0}/{issue.form.inputMaxLength}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    </>
   )
 }
 

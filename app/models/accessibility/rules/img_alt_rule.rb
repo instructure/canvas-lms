@@ -27,19 +27,22 @@ module Accessibility
         return nil if elem.tag_name != "img"
 
         alt = elem.attribute?("alt") ? elem.get_attribute("alt") : nil
-        I18n.t("Alt text should be present for the image.") if alt.nil?
+        role = elem.attribute?("role") ? elem.get_attribute("role") : nil
+        I18n.t("Alt text should be present for the image.") if alt.nil? && role != "presentation"
       end
 
       def self.display_name
-        I18n.t("Image alt text missing")
+        I18n.t("Alt text missing")
       end
 
       def self.message
-        I18n.t("Images should include an alt attribute describing the image content.")
+        I18n.t("Add a description for screen readers so people who are blind or have low vision can understand what's in the image.")
       end
 
       def self.why
-        I18n.t("Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image.")
+        I18n.t("Alt text is a description of an image only visible to screen readers.
+          Screen readers are software to help people who are blind or have low vision interact with websites
+          and computers.")
       end
 
       def self.link_text
@@ -47,14 +50,20 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::TextInputField.new(
-          label: I18n.t("Change alt text"),
-          value: ""
+        Accessibility::Forms::TextInputWithCheckboxField.new(
+          checkbox_label: I18n.t("This image is decorative"),
+          checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
+          input_label: I18n.t("Alt text"),
+          input_description: I18n.t("Describe what's on the picture."),
+          input_max_length: 120,
+          input_value: ""
         )
       end
 
       def self.fix!(elem, value)
-        raise StandardError, "Alt text cannot be empty." if value.blank?
+        if value == "" || value.nil?
+          elem["role"] = "presentation"
+        end
 
         return nil if elem["alt"] == value
 
