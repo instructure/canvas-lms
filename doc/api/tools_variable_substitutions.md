@@ -1308,6 +1308,28 @@ from a group assignment.
 ```
 "Group One"
 ```
+
+## com.instructure.Tag.id
+Returns the Canvas id of the differentiation tag the current user is in if launching
+from an assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *com_instructure_tag_id*
+
+```
+481
+```
+## com.instructure.Tag.name
+Returns the name of the differentiation tag the current user is in if launching
+from an assignment.
+
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *com_instructure_tag_name*  
+
+```
+"Tag One"
+```
+
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.
 

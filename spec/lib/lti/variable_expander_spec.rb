@@ -97,6 +97,34 @@ module Lti
     end
     let(:editor_contents) { "<p>This is the contents of the editor</p>" }
     let(:editor_selection) { "is the contents" }
+    let(:differentiation_tag) do
+      course.save!
+      user.save!
+
+      # Enable differentiation tags feature flag and setting on course account
+      course.account.enable_feature!(:assign_to_differentiation_tags)
+      course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      course.account.save!
+
+      # Create a non-collaborative group category (differentiation tag category)
+      tag_category = course.group_categories.create!(name: "Test Category", non_collaborative: true)
+      # Create a group (differentiation tag) in that category
+      tag = course.groups.create!(name: "Test Tag", group_category: tag_category, non_collaborative: true)
+      # Add the user to the group and ensure the membership is accepted
+      membership = tag.add_user(user)
+      membership&.update!(workflow_state: "accepted")
+      tag
+    end
+    let(:external_tool_assignment) do
+      course.save!
+      user.save!
+      assignment = course.assignments.create!(
+        name: "External Tool Assignment",
+        submission_types: "external_tool",
+        points_possible: 100
+      )
+      assignment
+    end
     let(:variable_expander) do
       VariableExpander.new(
         root_account,
@@ -125,6 +153,10 @@ module Lti
 
     before do
       root_account.disable_feature!(:refactor_custom_variables)
+      # Enable the differentiation tags feature
+      course.account.enable_feature!(:assign_to_differentiation_tags)
+      root_account.settings = { allow_assign_to_differentiation_tags: { value: true } }
+      course.account.save!
     end
 
     def self.it_expands(expansion, val = nil, &blk)
@@ -2604,6 +2636,362 @@ module Lti
         expander = VariableExpander.new(@course.root_account, @course, controller, current_user: @student, tool:)
 
         expect(expand!(subst, expander:)).to eq "string stuff: create_forum,read_forum"
+      end
+
+      context "com.instructure.Tag.id" do
+        let(:subst_name) { "$com.instructure.Tag.id" }
+
+        it "has the expansion registered" do
+          expect(VariableExpander.expansions).to have_key(:"$com.instructure.Tag.id")
+        end
+
+        it "returns the differentiation tag id when student has a tag assigned" do
+          # Ensure models are persisted before reloading
+          user.save! if user.new_record?
+          differentiation_tag.save! if differentiation_tag.new_record?
+
+          # Reload models to ensure database state is visible
+          user.reload
+          differentiation_tag.reload
+
+          # Create assignment override for the differentiation tag
+          external_tool_assignment.assignment_overrides.create!(
+            set: differentiation_tag,
+            title: differentiation_tag.name
+          )
+
+          # Create variable expander with assignment context
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: external_tool_assignment
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq differentiation_tag.id
+        end
+
+        it "returns placeholder when student has no tag assigned" do
+          # Create course, user, and assignment without tag assignment
+          course.save!
+          user.save!
+
+          assignment = course.assignments.create!(
+            name: "Assignment without tag",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+
+        it "returns placeholder when there is no assignment" do
+          variable_expander_without_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_without_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+
+        it "returns the correct tag when student has multiple tags assigned)" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting on course account
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment assigned ONLY to Tag B
+          assignment = course.assignments.create!(
+            name: "Assignment for Tag B",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          # Create assignment override for Tag B only
+          assignment.assignment_overrides.create!(
+            set: tag_b,
+            title: tag_b.name
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return Tag B's ID (not Tag A's ID) because the assignment is assigned to Tag B
+          expect(expanded).to eq tag_b.id
+        end
+
+        it "returns placeholder when student has multiple tags but none are assigned to the assignment" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment but don't assign it to any specific tag (no overrides)
+          assignment = course.assignments.create!(
+            name: "Assignment for everyone",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return placeholder since no tag is specifically assigned to this assignment
+          expect(expanded).to eq "$com.instructure.Tag.id"
+        end
+      end
+
+      context "com.instructure.Tag.name" do
+        let(:subst_name) { "$com.instructure.Tag.name" }
+
+        it "has the expansion registered" do
+          expect(VariableExpander.expansions).to have_key(:"$com.instructure.Tag.name")
+        end
+
+        it "returns the differentiation tag name when student has a tag assigned" do
+          # Ensure models are persisted before reloading
+          user.save! if user.new_record?
+          differentiation_tag.save! if differentiation_tag.new_record?
+
+          # Reload models to ensure database state is visible
+          user.reload
+          differentiation_tag.reload
+
+          # Create assignment override for the differentiation tag
+          external_tool_assignment.assignment_overrides.create!(
+            set: differentiation_tag,
+            title: differentiation_tag.name
+          )
+
+          # Create variable expander with assignment context
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment: external_tool_assignment
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq differentiation_tag.name
+        end
+
+        it "returns placeholder when student has no tag assigned" do
+          # Create course, user, and assignment without tag assignment
+          course.save!
+          user.save!
+
+          assignment = course.assignments.create!(
+            name: "Assignment without tag",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
+
+        it "returns placeholder when there is no assignment" do
+          variable_expander_without_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_without_assignment)
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
+
+        it "returns the correct tag name when student has multiple tags assigned (bug fix scenario)" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment assigned ONLY to Tag B
+          assignment = course.assignments.create!(
+            name: "Assignment for Tag B",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          # Create assignment override for Tag B only
+          assignment.assignment_overrides.create!(
+            set: tag_b,
+            title: tag_b.name
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return Tag B's name (not Tag A's name) because the assignment is assigned to Tag B
+          expect(expanded).to eq "Tag B"
+        end
+
+        it "returns placeholder when student has multiple tags but none are assigned to the assignment" do
+          course.save!
+          user.save!
+
+          # Enable differentiation tags feature flag and setting
+          course.account.enable_feature!(:assign_to_differentiation_tags)
+          course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+          course.account.save!
+
+          # Create two differentiation tag categories and tags (use group_categories, not differentiation_tag_categories)
+          tag_category_a = course.group_categories.create!(name: "Category A", non_collaborative: true)
+          tag_category_b = course.group_categories.create!(name: "Category B", non_collaborative: true)
+
+          tag_a = tag_category_a.groups.create!(
+            name: "Tag A",
+            context: course,
+            non_collaborative: true
+          )
+          tag_b = tag_category_b.groups.create!(
+            name: "Tag B",
+            context: course,
+            non_collaborative: true
+          )
+
+          # Add user to both tags
+          tag_a.add_user(user)
+          tag_b.add_user(user)
+
+          # Create assignment but don't assign it to any specific tag (no overrides)
+          assignment = course.assignments.create!(
+            name: "Assignment for everyone",
+            submission_types: "external_tool",
+            points_possible: 100
+          )
+
+          variable_expander_with_assignment = VariableExpander.new(
+            root_account,
+            course,
+            controller,
+            current_user: user,
+            tool:,
+            assignment:
+          )
+
+          expanded = expand!(subst_name, expander: variable_expander_with_assignment)
+          # Should return placeholder since no tag is specifically assigned to this assignment
+          expect(expanded).to eq "$com.instructure.Tag.name"
+        end
       end
     end
   end
