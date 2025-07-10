@@ -17,6 +17,8 @@
  */
 
 import {render, screen} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+
 import TextInputForm from '../TextInput'
 import {FormType} from '../../../../types'
 
@@ -57,5 +59,12 @@ describe('TextInputForm', () => {
     render(<TextInputForm {...propsWithValue} />)
     const input = screen.getByTestId('text-input-form')
     expect(input).toHaveValue('test value')
+  })
+
+  it('calls onChangeValue when the input value changes', async () => {
+    render(<TextInputForm {...defaultProps} />)
+    const input = screen.getByTestId('text-input-form')
+    await userEvent.type(input, 'a')
+    expect(defaultProps.onChangeValue).toHaveBeenCalledWith('a')
   })
 })

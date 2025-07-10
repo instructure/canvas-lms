@@ -16,22 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
 import {FormComponentProps} from '.'
 
-const TextInputForm = ({issue, value, onChangeValue}: FormComponentProps) => {
+const TextInputForm: React.FC<FormComponentProps> = ({issue, value, onChangeValue}) => {
   return (
-    <View as="div" margin="small 0">
-      <TextInput
-        data-testid="text-input-form"
-        renderLabel={issue.form.label}
-        display="inline-block"
-        width="15rem"
-        value={value || ''}
-        onChange={(_, value) => onChangeValue(value)}
-      />
-    </View>
+    <TextInput
+      data-testid="text-input-form"
+      renderLabel={issue.form.label}
+      value={value || ''}
+      onChange={(_, value) => onChangeValue(value)}
+    />
   )
 }
 

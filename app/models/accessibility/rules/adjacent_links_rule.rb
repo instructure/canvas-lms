@@ -61,7 +61,8 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::Button.new(
-          label: I18n.t("Merge links")
+          label: I18n.t("Merge links"),
+          value: "false"
         )
       end
 

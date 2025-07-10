@@ -20,8 +20,22 @@
 module Accessibility
   module Forms
     class Button < FormField
+      # @param label [String] Human-readable label displayed to the user
+      # @param value [String] Optional default state for the button
+      def initialize(label:,
+                     value:)
+        super(
+          label:
+        )
+        @value = value
+      end
+
       def field_type
         "button"
+      end
+
+      def to_h
+        super.merge({ value: @value }.compact)
       end
     end
   end

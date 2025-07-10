@@ -26,7 +26,6 @@ export enum FormType {
   TextInput = 'textinput',
   RadioInputGroup = 'radio_input_group',
   Button = 'button',
-  Checkbox = 'checkbox',
   ColorPicker = 'colorpicker',
   CheckboxTextInput = 'checkboxtextinput',
 }
@@ -36,6 +35,7 @@ export interface IssueForm {
   label?: string
   value?: string
   options?: string[]
+  action?: string
   inputLabel?: string
   titleLabel?: string
   backgroundColor?: string

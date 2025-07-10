@@ -82,7 +82,7 @@ module Accessibility
       end
 
       def self.display_name
-        I18n.t("List structure")
+        I18n.t("Misformatted list")
       end
 
       def self.message
@@ -98,7 +98,7 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::CheckboxField.new(
+        Accessibility::Forms::Button.new(
           label: I18n.t("Format as list"),
           value: "false"
         )

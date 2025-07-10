@@ -30,7 +30,7 @@ module Accessibility
       end
 
       def self.display_name
-        I18n.t("Table without header")
+        I18n.t("Table headers aren’t set up")
       end
 
       def self.message
