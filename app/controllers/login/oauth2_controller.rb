@@ -22,7 +22,6 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
-  rescue_from Canvas::TimeoutCutoff, with: :handle_external_timeout
 
   def new
     nonce = push_nonce
@@ -61,6 +60,12 @@ class Login::OAuth2Controller < Login::OAuthBaseController
         raise
       end
       process_token(token)
+    rescue Canvas::TimeoutCutoff
+      flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
+      increment_statsd(:failure, reason: :timeout)
+      redirect_to login_url
+      # don't re-raise; we don't actually want OAuthBaseContoller#timeout_protection to handle this,
+      # otherwise it will overwrite the flash message
     end
   end
 
@@ -98,22 +103,33 @@ class Login::OAuth2Controller < Login::OAuthBaseController
     redirect_to login_url
   end
 
-  def handle_external_timeout
-    flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
-    increment_statsd(:failure, reason: :timeout)
-    redirect_to login_url
-    false
-  end
-
   def validate_request
     if params[:error_description]
       flash[:delegated_message] = Sanitize.clean(params[:error_description])
       redirect_to login_url
       return false
     end
+    if params[:state].blank?
+      increment_statsd(:failure, reason: :missing_state)
+      flash[:delegated_message] = t("Missing state parameter from external authentication service")
+      redirect_to login_url
+      return false
+    end
+    if params[:code].blank?
+      increment_statsd(:failure, reason: :missing_code)
+      flash[:delegated_message] = t("Missing code parameter from external authentication service")
+      redirect_to login_url
+      return false
+    end
 
     begin
-      if jwt["nonce"].blank? || jwt["nonce"] != pop_nonce
+      if jwt["nonce"].blank?
+        increment_statsd(:failure, reason: :missing_nonce)
+        flash[:delegated_message] = t("Missing nonce from external authentication service")
+        redirect_to login_url
+        return false
+      end
+      if jwt["nonce"] != pop_nonce
         increment_statsd(:failure, reason: :invalid_nonce)
         raise ActionController::InvalidAuthenticityToken
       end
