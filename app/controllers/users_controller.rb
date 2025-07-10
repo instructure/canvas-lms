@@ -233,6 +233,8 @@ class UsersController < ApplicationController
   before_action :check_limited_access_for_students, only: %i[create_file set_custom_color]
   before_action :load_canvas_career, only: %i[user_dashboard]
 
+  MAX_UUIDS_IN_FILTER = 100
+
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
     @user ||= @current_user
@@ -397,6 +399,10 @@ class UsersController < ApplicationController
   #   When set to true and used with an account context, returns users who have deleted
   #   pseudonyms for the context
   #
+  # @argument uuids [Array]
+  #   When set, only return users with the specified UUIDs. UUIDs after the first 100
+  #   are ignored.
+  #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
@@ -413,6 +419,7 @@ class UsersController < ApplicationController
     includes << "deleted_pseudonyms" if include_deleted_users
 
     search_term = params[:search_term].presence
+
     if search_term
       users = UserSearch.for_user_in_context(search_term,
                                              @context,
@@ -440,6 +447,11 @@ class UsersController < ApplicationController
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
+
+    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten.take(MAX_UUIDS_IN_FILTER))
+      users = users.where(uuid: uuids)
+    end
+
     users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
