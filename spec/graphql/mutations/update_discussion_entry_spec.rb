@@ -35,7 +35,8 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     message: nil,
     remove_attachment: nil,
     file_id: nil,
-    quoted_entry_id: nil
+    quoted_entry_id: nil,
+    pin_type: nil
   )
     <<~GQL
       mutation {
@@ -45,10 +46,13 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
           #{"removeAttachment: #{remove_attachment}" unless remove_attachment.nil?}
           #{"fileId: #{file_id}" unless file_id.nil?}
           #{"quotedEntryId: #{quoted_entry_id}" unless quoted_entry_id.nil?}
+          #{"pinType: #{pin_type}" unless pin_type.nil?}
         }) {
           discussionEntry {
             _id
             message
+            pinType
+            pinnedBy
             attachment {
               _id
             }
@@ -242,6 +246,34 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to eq "Insufficient attach permissions"
       expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "attachment", "_id")).to be_nil
       expect(@entry.reload.attachment_id).to eq current_attachment_id
+    end
+  end
+
+  describe "pin_type functionality" do
+    it "allows teachers to pin a discussion entry" do
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "thread" }, @teacher)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "pinType")).to eq "thread"
+      expect(@entry.reload.pin_type).to eq "thread"
+      expect(@entry.pinned_by).to eq @teacher
+    end
+
+    it "allows teachers to unpin a discussion entry" do
+      @entry.update!(pin_type: "thread", pinned_by: @teacher)
+
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "none" }, @teacher)
+      expect(result["errors"]).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "discussionEntry", "pinType")).to be_nil
+      expect(@entry.reload.pin_type).to be_nil
+      expect(@entry.pinned_by).to be_nil
+    end
+
+    it "does not allow students to pin discussion entries" do
+      result = run_mutation({ discussion_entry_id: @entry.id, pin_type: "reply" }, @student)
+      expect(result.dig("data", "updateDiscussionEntry", "errors")).not_to be_nil
+      expect(result.dig("data", "updateDiscussionEntry", "errors", 0, "message")).to include("Insufficient pin permissions")
     end
   end
 end

@@ -43,6 +43,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   REQUIRED_CHECKPOINT_COUNT = 2
+  MAX_ENTRIES_PINNED = 10
 
   restrict_columns :content, [:title, :message]
   restrict_columns :settings, %i[require_initial_post
@@ -2264,6 +2265,10 @@ class DiscussionTopic < ActiveRecord::Base
 
   def graded?
     assignment_id.present?
+  end
+
+  def pinned_entries
+    discussion_entries.pinned
   end
 
   private
