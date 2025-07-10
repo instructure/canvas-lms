@@ -351,7 +351,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
     header: I18n.t('Nickname'),
     width: '40%',
     sortable: true,
-    render: r => (r.admin_nickname ? r.admin_nickname : null),
+    render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
   },
   {
     id: 'lti_version',

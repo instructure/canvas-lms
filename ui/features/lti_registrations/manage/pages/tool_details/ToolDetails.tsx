@@ -136,7 +136,12 @@ const HeaderDetailFields = (registration: LtiRegistrationWithAllInformation) => 
   <InstUISettingsProvider theme={headerDetailsTheme}>
     <InlineList size="small" delimiter="pipe" margin="0 0 small">
       {registration.admin_nickname ? (
-        <InlineList.Item>{`${I18n.t('Nickname')}: ${registration.admin_nickname}`}</InlineList.Item>
+        <InlineList.Item>
+          <Text
+            wrap="break-word"
+            size="small"
+          >{`${I18n.t('Nickname')}: ${registration.admin_nickname}`}</Text>
+        </InlineList.Item>
       ) : null}
       <InlineList.Item>
         {I18n.t('Installed')}
