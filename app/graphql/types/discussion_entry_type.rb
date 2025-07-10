@@ -30,6 +30,7 @@ module Types
     field :discussion_topic_id, ID, null: false
     field :edited_at, Types::DateTimeType, null: true
     field :parent_id, ID, null: true
+    field :pinned_by, ID, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :root_entry_id, ID, null: true
@@ -312,6 +313,11 @@ module Types
 
     def rich_content_attachment?
       !Api::Html::Content.collect_attachment_ids(object.message).empty?
+    end
+
+    field :pin_type, Types::DiscussionEntryPinningType, null: true
+    def pin_type
+      object.pin_type.to_s
     end
   end
 end

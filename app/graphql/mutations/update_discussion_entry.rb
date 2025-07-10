@@ -24,6 +24,7 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
   argument :discussion_entry_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("DiscussionEntry")
   argument :file_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Attachment")
   argument :message, String, required: false
+  argument :pin_type, Types::DiscussionEntryPinningType, required: false
   argument :quoted_entry_id, ID, required: false
   argument :remove_attachment, Boolean, required: false
 
@@ -32,6 +33,20 @@ class Mutations::UpdateDiscussionEntry < Mutations::BaseMutation
     entry = DiscussionEntry.find(input[:discussion_entry_id])
     raise ActiveRecord::RecordNotFound unless entry.grants_right?(current_user, session, :read)
     return validation_error(I18n.t("Insufficient Permissions")) unless entry.grants_right?(current_user, session, :update)
+
+    if input.key?(:pin_type)
+      unless entry.grants_right?(current_user, session, :pin)
+        return validation_error(I18n.t("Insufficient pin permissions"))
+      end
+
+      if input[:pin_type].nil?
+        entry.pin_type = nil
+        entry.pinned_by = nil
+      else
+        entry.pin_type = input[:pin_type].to_s
+        entry.pinned_by = current_user
+      end
+    end
 
     if input[:file_id].present? && !entry.grants_right?(current_user, session, :attach)
       return validation_error(I18n.t("Insufficient attach permissions"))
