@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, Ref, useCallback, useEffect, useRef, useState} from 'react'
+import React, {createRef, Ref, useCallback, useEffect, useRef, useState, useMemo} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -219,8 +219,9 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               isApplied={isRemediated}
               isLoading={isFormLocked}
             >
-              {currentIssue.form.type === FormType.Checkbox ||
-              currentIssue.form.type === FormType.Button
+              {[FormType.Button, FormType.Checkbox, FormType.ColorPicker].includes(
+                currentIssue.form.type,
+              )
                 ? currentIssue.form.label
                 : I18n.t('Apply')}
             </ApplyButton>
