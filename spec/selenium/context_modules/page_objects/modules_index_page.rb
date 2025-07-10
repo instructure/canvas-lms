@@ -380,6 +380,10 @@ module ModulesIndexPage
     f(pagination_selector(module_id))
   end
 
+  def pagination_page_button(module_id, page_no)
+    fj("#{pagination_selector(module_id)} button:contains('#{page_no}')")
+  end
+
   def pill_message(module_id)
     f(pill_message_selector(module_id))
   end

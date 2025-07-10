@@ -694,5 +694,60 @@ shared_examples_for "module moving items" do |context|
 
       expect(ff(module_items_selector(@module2.id)).size).to eq(1)
     end
+
+    it "drag and drops the last item from a module page" do
+      uncollapse_all_modules(@course, @user)
+      get @mod_url
+      wait_for_dom_ready
+
+      pagination_page_button(@module.id, "2").click
+      wait_for_ajaximations
+
+      module_items_elements = ff(module_items_selector(@module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      module_item_selector1 = module_item_drag_handle_selector(module_item_ids[0])
+      module_item_selector2 = module_item_drag_handle_selector(module2_item_ids[1])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+      expect(pagination_exists?(@module.id)).to be_falsey
+      expect(ff(module_items_selector(@module.id)).size).to eq(10)
+    end
+
+    it "drag and drops a new item that causes the module to have enough items to paginate" do
+      # Create a new module with exactly 10 items
+      test_module = @course.context_modules.create!(name: "Test Module With 10 Items")
+      10.times do |i|
+        test_module.add_item(type: "assignment", id: @course.assignments.create!(title: "assignment test-#{i}").id)
+      end
+
+      get @mod_url
+      wait_for_dom_ready
+      expand_module_link(test_module.id).click
+      expect(ff(module_items_selector(test_module.id)).size).to eq(10)
+      expect(pagination_exists?(test_module.id)).to be_falsey
+
+      # Get the module items from both modules
+      module_items_elements = ff(module_items_selector(test_module.id))
+      module_item_ids = module_items_elements.map { |item| item.attribute("id") }
+
+      expand_module_link(@module2.id).click
+      wait_for_ajaximations
+      module2_item_elements = ff(module_items_selector(@module2.id))
+      module2_item_ids = module2_item_elements.map { |item| item.attribute("id") }
+
+      # Drag and drop an item from module2 to test module
+      module_item_selector1 = module_item_drag_handle_selector(module2_item_ids[0])
+      module_item_selector2 = module_item_drag_handle_selector(module_item_ids[0])
+      drag_and_drop_module_item(module_item_selector1, module_item_selector2)
+      wait_for_ajaximations
+
+      # Verify the Show Less button appears in the module's header
+      expect(show_less_button(test_module)).to be_displayed
+      expect(ff(module_items_selector(test_module.id)).size).to eq(11) # Now showing all 11 items
+      expect(pagination_exists?(test_module.id)).to be_falsey # No pagination, even though there are enough items to paginate
+    end
   end
 end
