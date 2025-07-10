@@ -64,7 +64,7 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::ButtonField.new(
+        Accessibility::Forms::Button.new(
           label: I18n.t("Change to paragraph"),
           value: "false"
         )

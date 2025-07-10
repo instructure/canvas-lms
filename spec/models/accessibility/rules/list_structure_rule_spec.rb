@@ -168,4 +168,10 @@ RSpec.describe "ListStructureRule", type: :feature do
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end
   end
+
+  context "form" do
+    it "returns the proper form" do
+      expect(Accessibility::Rules::ListStructureRule.form(nil).label).to eq("Format as list")
+    end
+  end
 end

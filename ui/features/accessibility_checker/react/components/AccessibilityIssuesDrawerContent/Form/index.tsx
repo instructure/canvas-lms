@@ -59,14 +59,12 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
 
   useImperativeHandle(ref, () => ({
     getValue: () => {
-      if (issue.form.type === FormType.Checkbox || issue.form.type === FormType.Button) {
-        return issue.form.value === 'true' ? 'false' : 'true'
-      }
+      if (issue.form.type === FormType.Button) return 'true'
       return value
     },
   }))
 
-  if (issue.form.type === FormType.Checkbox || issue.form.type === FormType.Button) return null
+  if (issue.form.type === FormType.Button) return null
 
   const FormComponent = FormTypeMap[issue.form.type]
   return <FormComponent issue={issue} value={value} onChangeValue={setValue} onReload={onReload} />

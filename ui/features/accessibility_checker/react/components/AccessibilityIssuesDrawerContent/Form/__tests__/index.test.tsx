@@ -37,53 +37,6 @@ describe('Form', () => {
     },
   })
 
-  describe('getValue method for FormType.Checkbox', () => {
-    it('returns "false" when issue.form.value is "true"', () => {
-      const mockIssue = createMockIssue(FormType.Checkbox, 'true')
-      const ref = React.createRef<FormHandle>()
-
-      render(<Form issue={mockIssue} ref={ref} />)
-
-      expect(ref.current?.getValue()).toBe('false')
-    })
-
-    it('returns "true" when issue.form.value is "false"', () => {
-      const mockIssue = createMockIssue(FormType.Checkbox, 'false')
-      const ref = React.createRef<FormHandle>()
-
-      render(<Form issue={mockIssue} ref={ref} />)
-
-      expect(ref.current?.getValue()).toBe('true')
-    })
-
-    it('returns "true" when issue.form.value is undefined', () => {
-      const mockIssue = createMockIssue(FormType.Checkbox, undefined)
-      const ref = React.createRef<FormHandle>()
-
-      render(<Form issue={mockIssue} ref={ref} />)
-
-      expect(ref.current?.getValue()).toBe('true')
-    })
-
-    it('returns "true" when issue.form.value is null', () => {
-      const mockIssue = createMockIssue(FormType.Checkbox, null as any)
-      const ref = React.createRef<FormHandle>()
-
-      render(<Form issue={mockIssue} ref={ref} />)
-
-      expect(ref.current?.getValue()).toBe('true')
-    })
-
-    it('returns "true" when issue.form.value is empty string', () => {
-      const mockIssue = createMockIssue(FormType.Checkbox, '')
-      const ref = React.createRef<FormHandle>()
-
-      render(<Form issue={mockIssue} ref={ref} />)
-
-      expect(ref.current?.getValue()).toBe('true')
-    })
-  })
-
   describe('getValue method for other FormTypes', () => {
     it('returns current value for FormType.TextInput', () => {
       const mockIssue = createMockIssue(FormType.TextInput, 'initial-value')
@@ -119,6 +72,15 @@ describe('Form', () => {
       render(<Form issue={mockIssue} ref={ref} />)
 
       expect(ref.current?.getValue()).toBe('checkbox-text-value')
+    })
+
+    it('returns current value for FormType.Button', () => {
+      const mockIssue = createMockIssue(FormType.Button, 'true')
+      const ref = React.createRef<FormHandle>()
+
+      render(<Form issue={mockIssue} ref={ref} />)
+
+      expect(ref.current?.getValue()).toBe('true')
     })
   })
 })

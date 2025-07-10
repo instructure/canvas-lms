@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, Ref, useCallback, useEffect, useRef, useState, useMemo} from 'react'
+import React, {createRef, Ref, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -105,9 +105,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
 
   const handleUndo = useCallback(() => {
     setIsFormLocked(true)
-    const formValue = currentIssue.form.value
-    previewRef.current?.update(
-      formValue,
+    previewRef.current?.reload(
       () => {
         setAssertiveAlertMessage(I18n.t('Issue undone'))
         setIsRemediated(false)
@@ -119,7 +117,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
         setIsFormLocked(false)
       },
     )
-  }, [currentIssue, previewRef])
+  }, [previewRef])
 
   const handleSaveAndNext = useCallback(() => {
     if (!currentIssue) return
@@ -148,6 +146,16 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       .catch(err => console.error('Error saving accessibility issue. Error is: ' + err.message))
       .finally(() => setIsRequestInFlight(false))
   }, [currentIssue, formRef, item.id, item.type, issues])
+
+  const applyButtonText = useMemo(() => {
+    if (!currentIssue) return null
+    if (
+      currentIssue.form.type === FormType.Button ||
+      currentIssue.form.type === FormType.ColorPicker
+    )
+      return currentIssue.form.label
+    return currentIssue.form.action || I18n.t('Apply')
+  }, [currentIssue])
 
   useEffect(() => {
     setIsRemediated(false)
@@ -178,7 +186,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               onClick={onClose}
             />
           </View>
-          <View margin="large 0">
+          <View>
             <Text size="large" as="h3">
               {I18n.t('Issue %{current}/%{total}: %{message}', {
                 current: currentIssueIndex + 1,
@@ -219,11 +227,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               isApplied={isRemediated}
               isLoading={isFormLocked}
             >
-              {[FormType.Button, FormType.Checkbox, FormType.ColorPicker].includes(
-                currentIssue.form.type,
-              )
-                ? currentIssue.form.label
-                : I18n.t('Apply')}
+              {applyButtonText}
             </ApplyButton>
           </View>
         </Flex.Item>

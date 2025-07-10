@@ -32,7 +32,7 @@ module Accessibility
       end
 
       def self.display_name
-        I18n.t("Table caption missing")
+        I18n.t("Missing table caption")
       end
 
       def self.message
@@ -57,8 +57,9 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::TextInputField.new(
-          label: I18n.t("Change table caption"),
-          value: ""
+          label: I18n.t("Table caption"),
+          value: "",
+          action: I18n.t("Add caption")
         )
       end
 

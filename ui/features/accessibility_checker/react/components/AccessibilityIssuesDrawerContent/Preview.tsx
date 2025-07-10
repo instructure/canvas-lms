@@ -32,6 +32,7 @@ const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
 
 export interface PreviewHandle {
   update: (formValue: FormValue, onSuccess?: () => void, onError?: () => void) => void
+  reload: (onSuccess?: () => void, onError?: () => void) => void
 }
 
 interface PreviewProps {
@@ -86,36 +87,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useImperativeHandle(ref, () => ({
-    update: (formValue: FormValue, onSuccess?: () => void, onError?: () => void) => {
-      setIsLoading(true)
-      doFetchApi<PreviewResponse>({
-        path: window.location.href + '/preview',
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-          content_id: itemId,
-          content_type: itemType,
-          rule: issue.ruleId,
-          path: issue.path,
-          value: formValue,
-        }),
-      })
-        .then(result => result.json)
-        .then(resultJson => {
-          setContentResponse(resultJson || null)
-          setError(null)
-          onSuccess?.()
-        })
-        .catch(_ => {
-          setError(I18n.t('Error updating preview for accessibility issue'))
-          onError?.()
-        })
-        .finally(() => setIsLoading(false))
-    },
-  }))
-
-  useEffect(() => {
+  const performGetRequest = (onSuccess?: () => void, onError?: (error?: Error) => void) => {
     const params = new URLSearchParams({
       content_type: itemType,
       content_id: String(itemId),
@@ -129,9 +101,57 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
       .then(resultJson => {
         setContentResponse(resultJson || null)
         setError(null)
+        onSuccess?.()
       })
-      .catch(_ => setError(I18n.t('Error loading preview for accessibility issue')))
+      .catch(error => {
+        setError(I18n.t('Error loading preview for accessibility issue'))
+        onError?.(error)
+      })
       .finally(() => setIsLoading(false))
+  }
+
+  const performPostRequest = (
+    formValue: FormValue,
+    onSuccess?: () => void,
+    onError?: (error?: Error) => void,
+  ) => {
+    setIsLoading(true)
+    doFetchApi<PreviewResponse>({
+      path: window.location.href + '/preview',
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        content_id: itemId,
+        content_type: itemType,
+        rule: issue.ruleId,
+        path: issue.path,
+        value: formValue,
+      }),
+    })
+      .then(result => result.json)
+      .then(resultJson => {
+        setContentResponse(resultJson || null)
+        setError(null)
+        onSuccess?.()
+      })
+      .catch(error => {
+        setError(I18n.t('Error updating preview for accessibility issue'))
+        onError?.(error)
+      })
+      .finally(() => setIsLoading(false))
+  }
+
+  useImperativeHandle(ref, () => ({
+    reload: (onSuccess?: () => void, onError?: (error?: Error) => void) => {
+      performGetRequest(onSuccess, onError)
+    },
+    update: (formValue: FormValue, onSuccess?: () => void, onError?: (error?: Error) => void) => {
+      performPostRequest(formValue, onSuccess, onError)
+    },
+  }))
+
+  useEffect(() => {
+    performGetRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [issue.id, itemId])
 
