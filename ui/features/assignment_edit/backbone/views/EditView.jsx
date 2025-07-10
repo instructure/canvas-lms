@@ -761,6 +761,10 @@ function tryJsonParse(jsonStr) {
 }
 
 EditView.prototype.showExternalToolsDialog = function () {
+  const onClose = () => {
+    $('#assignment_external_tool_tag_attributes_url_find').focus()
+  }
+
   return selectContentDialog({
     dialog_title: I18n.t('select_external_tool_dialog_title', 'Configure External Tool'),
     select_button_text: I18n.t('buttons.select_url', 'Select'),
@@ -768,6 +772,7 @@ EditView.prototype.showExternalToolsDialog = function () {
     submit: data => {
       this.handleAssignmentSelectionSubmit(data)
     },
+    close: onClose,
   })
 }
 
