@@ -704,6 +704,7 @@ type AssignmentConnection {
 
 input AssignmentCreate {
   abGuid: [String!]
+  assetProcessors: [LtiAssetProcessorCreateOrUpdate!]
   assignmentGroupId: ID
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   courseId: ID!
@@ -1082,6 +1083,7 @@ input AssignmentTargetSortOrder {
 
 input AssignmentUpdate {
   abGuid: [String!]
+  assetProcessors: [LtiAssetProcessorCreateOrUpdate!]
   assignmentGroupId: ID
   assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   dueAt: DateTime
@@ -5239,6 +5241,24 @@ type LtiAssetProcessorConnection {
   pageInfo: PageInfo!
 }
 
+input LtiAssetProcessorCreateOrUpdate {
+  existingId: Int
+  newContentItem: LtiAssetProcessorDto
+}
+
+input LtiAssetProcessorDto {
+  contextExternalToolId: ID!
+  custom: StringMap
+  icon: LtiContentItemIcon
+  iframe: LtiContentItemIframe
+  report: LtiAssetProcessorReportSettings
+  text: String
+  thumbnail: LtiContentItemIcon
+  title: String
+  url: String
+  window: LtiAssetProcessorWindowSettings
+}
+
 """
 An edge in a connection.
 """
@@ -5252,6 +5272,18 @@ type LtiAssetProcessorEdge {
   The item at the end of the edge.
   """
   node: LtiAssetProcessor
+}
+
+input LtiAssetProcessorReportSettings {
+  custom: StringMap
+  url: String
+}
+
+input LtiAssetProcessorWindowSettings {
+  height: Int
+  targetName: String
+  width: Int
+  windowFeatures: String
 }
 
 type LtiAssetReport implements LegacyIDInterface {
@@ -5308,6 +5340,17 @@ type LtiAssetReportEdge {
   The item at the end of the edge.
   """
   node: LtiAssetReport
+}
+
+input LtiContentItemIcon {
+  height: Int
+  url: String!
+  width: Int
+}
+
+input LtiContentItemIframe {
+  height: Int
+  width: Int
 }
 
 """
@@ -8141,6 +8184,11 @@ type StreamSummaryItem {
   type: String
   unreadCount: Int
 }
+
+"""
+A hash with string keys and string values
+"""
+scalar StringMap
 
 """
 basic information about a students activity in a course
