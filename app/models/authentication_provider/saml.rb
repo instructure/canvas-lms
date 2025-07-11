@@ -242,7 +242,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def signing_certificates
-    settings["signing_certificates"] ||= []
+    (settings["signing_certificates"] ||= []).map do |cert|
+      OpenSSL::X509::Certificate.new(Base64.decode64(cert))
+    end
   end
 
   def sig_alg

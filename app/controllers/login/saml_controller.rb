@@ -243,8 +243,7 @@ class Login::SamlController < ApplicationController
         next unless message.is_a?(SAML2::LogoutRequest)
         next if (certificates = aac.signing_certificates).blank?
 
-        certificates.map do |cert_base64|
-          certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
+        certificates.map do |certificate|
           key = certificate.public_key
           key_to_certificate[key] = certificate
           key
