@@ -16,26 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DeleteItemError} from './DeleteItemError'
-import {type File, type Folder} from '../../../../interfaces/File'
-import {deleteItem} from '../../../queries/deleteItem'
-import {UnauthorizedError} from '../../../../utils/apiUtils'
+import {BulkItemRequestsError} from './BultItemRequestsError'
+import {type File, type Folder} from '../../interfaces/File'
+import {UnauthorizedError} from '../../utils/apiUtils'
 
-export const deleteItems = async (items: (File | Folder)[]) => {
+export const makeBulkItemRequests = async (
+  items: (File | Folder)[],
+  requestFn: (item: File | Folder) => Promise<void>,
+) => {
   const failedItems: (File | Folder)[] = []
 
   for (const item of items) {
     try {
-      await deleteItem(item)
+      await requestFn(item)
     } catch (error) {
       if (error instanceof UnauthorizedError) {
         throw error
       }
+
       failedItems.push(item)
     }
   }
 
   if (failedItems.length > 0) {
-    throw new DeleteItemError('Failed to delete some items', failedItems)
+    throw new BulkItemRequestsError('Some requests failed', failedItems)
   }
 }
