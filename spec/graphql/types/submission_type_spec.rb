@@ -1224,16 +1224,28 @@ describe Types::SubmissionType do
     context "when the current user is a student" do
       let(:current_user) { @student }
 
-      it "does not returns LTI asset reports" do
+      it "returns LTI asset reports" do
+        allow_any_instance_of(Loaders::SubmissionLtiAssetReportsStudentLoader).to receive(:raw_asset_reports).and_return([@lti_asset_report])
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to eq [@lti_asset_report.id.to_s]
+      end
+
+      it "does not return LTI asset reports" do
+        result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
+        expect(result).to be_nil
+      end
+
+      it "returns nil when student cannot read their own grade" do
+        allow_any_instance_of(Submission).to receive(:user_can_read_grade?).with(@student).and_return(false)
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
       end
     end
 
-    context "when the current user is nil" do
+    context "when the current user is a different student" do
       let(:current_user) { student_in_course(active_all: true).user }
 
-      it "returns nil when no user is provided" do
+      it "returns nil when user cannot read the submission" do
         result = submission_type.resolve("ltiAssetReportsConnection { nodes { _id } }")
         expect(result).to be_nil
       end

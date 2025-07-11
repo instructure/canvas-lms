@@ -83,6 +83,8 @@ $(() => {
   GradeSummary.renderSubmissionCommentsTray()
   if (ENV.student_grade_summary_upgrade || ENV.restrict_quantitative_data) {
     GradeSummary.renderGradeSummaryTable()
+  } else {
+    GradeSummary.addAssetProcessorToLegacyTable()
   }
   if (ENV.can_clear_badge_counts) {
     GradeSummary.renderClearBadgeCountsButton()

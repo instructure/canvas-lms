@@ -86,6 +86,7 @@ export const totalRow = (
             <Text weight="bold">{`${earnedPoints}/${totalPoints}`}</Text>
           </Table.Cell>
         )}
+      <Table.Cell textAlign="start">{/* Document processors */}</Table.Cell>
     </Table.Row>
   )
 }

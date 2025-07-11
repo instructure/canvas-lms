@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forEach, find, extend as lodashExtend} from 'lodash'
+import {forEach, extend as lodashExtend} from 'lodash'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
@@ -29,7 +29,7 @@ import {camelizeProperties} from '@canvas/convert-case'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
-import htmlEscape from '@instructure/html-escape'
+import {htmlEscape} from '@instructure/html-escape'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import round from '@canvas/round'
 import numberHelper from '@canvas/i18n/numberHelper'
@@ -42,6 +42,7 @@ import GradeSummaryManager from '../react/GradeSummary/GradeSummaryManager'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import ClearBadgeCountsButton from '../react/ClearBadgeCountsButton'
+import AssetProcessorCell from '../react/AssetProcessorCell'
 import {scoreToPercentage, scoreToScaledPoints} from '@canvas/grading/GradeCalculationHelper'
 import useStore from '../react/stores'
 import replaceTags from '@canvas/util/replaceTags'
@@ -629,7 +630,7 @@ function updateStudentGrades() {
 }
 
 function updateScoreForAssignment(assignmentId, score, workflowStateOverride) {
-  const submission = find(ENV.submissions, s => `${s.assignment_id}` === `${assignmentId}`)
+  const submission = ENV.submissions?.find(s => `${s.assignment_id}` === `${assignmentId}`)
 
   if (submission) {
     submission.score = score
@@ -722,6 +723,7 @@ let selectMenuRoot = null
 let gradeSummaryRoot = null
 let submissionCommentsTrayRoot = null
 let clearBadgeCountsRoot = null
+const assetProcessorCellRoots = new Map()
 
 function renderSelectMenuGroup() {
   const container = document.getElementById('GradeSummarySelectMenuGroup')
@@ -805,6 +807,52 @@ function renderClearBadgeCountsButton() {
   const userId = ENV.student_id
   const courseId = ENV.course_id ?? ENV.context_asset_string.replace('course_', '')
   clearBadgeCountsRoot.render(<ClearBadgeCountsButton userId={userId} courseId={courseId} />)
+}
+
+function addAssetProcessorToLegacyTable() {
+  const tableHeader = document.getElementById('asset_processors_header')
+  if (!tableHeader) {
+    return
+  }
+
+  const hasAssetReports = submission =>
+    submission.asset_reports !== null && submission.asset_reports !== undefined
+  const shouldShow = ENV.submissions?.some(hasAssetReports)
+
+  if (!shouldShow) {
+    return
+  }
+
+  tableHeader.textContent = I18n.t('Document Processors')
+
+  // Render AssetProcessorCell component in each asset processor cell
+  const assetProcessorCells = document.querySelectorAll('.asset_processors_cell')
+  assetProcessorCells.forEach(cell => {
+    const assignmentId = cell.dataset.assignmentId
+    const submissionId = cell.dataset.submissionId
+
+    if (assignmentId && submissionId) {
+      const submission = ENV.submissions.find(
+        submission => assignmentId === submission.assignment_id,
+      )
+      if (!submission) {
+        return
+      }
+      if (hasAssetReports(submission) === false) {
+        return
+      }
+      if (!assetProcessorCellRoots.has(cell)) {
+        assetProcessorCellRoots.set(cell, ReactDOM.createRoot(cell))
+      }
+      const root = assetProcessorCellRoots.get(cell)
+      root.render(
+        <AssetProcessorCell
+          assetProcessors={submission.asset_processors}
+          assetReports={submission.asset_reports}
+        />,
+      )
+    }
+  })
 }
 
 function setup() {
@@ -1045,4 +1093,5 @@ export default lodashExtend(GradeSummary, {
   updateScoreForAssignment,
   updateStudentGrades,
   bindShowAllDetailsButton,
+  addAssetProcessorToLegacyTable,
 })

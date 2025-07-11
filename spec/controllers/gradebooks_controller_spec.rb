@@ -192,6 +192,24 @@ describe GradebooksController do
                                                   })
         end
       end
+
+      describe "asset processor functionality" do
+        it "includes asset_processors in submission data" do
+          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_processors).and_return([{ id: 1, title: "Test Processor" }])
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:asset_processors)
+          expect(submission[:asset_processors]).to eq([{ id: 1, title: "Test Processor" }])
+        end
+
+        it "includes asset_reports in submission data" do
+          allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:asset_reports)
+          expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
+        end
+      end
     end
 
     context "when logged in as a teacher" do

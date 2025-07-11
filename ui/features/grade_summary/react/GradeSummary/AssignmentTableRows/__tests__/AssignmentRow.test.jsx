@@ -59,6 +59,7 @@ const setup = (props = defaultProps) => {
           props.openRubricDetailIds,
           props.setActiveWhatIfScores,
           props.activeWhatIfScores,
+          props.showDocumentProcessors,
         )}
       </Table.Body>
     </Table>,
@@ -145,6 +146,137 @@ describe('AssignmentRow', () => {
 
       const {queryByTestId} = setup({...defaultProps, assignment})
       expect(queryByTestId('rubric_detail_button_with_badge')).toBeInTheDocument()
+    })
+  })
+
+  describe('Document Processors', () => {
+    it('does not render AssetProcessorCell when showDocumentProcessors is false', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              ltiAssetReportsConnection: {
+                nodes: [
+                  {
+                    _id: '1',
+                    priority: 1,
+                  },
+                ],
+              },
+            }),
+          ],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: false}
+      const {queryByText} = setup(props)
+
+      expect(queryByText('Needs attention')).not.toBeInTheDocument()
+    })
+
+    it('render No result when showDocumentProcessors is true but asset reports array is empty', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              ltiAssetReportsConnection: {
+                nodes: [],
+              },
+            }),
+          ],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: true}
+      const {queryByText} = setup(props)
+
+      expect(queryByText('No result')).toBeInTheDocument()
+    })
+
+    it('does not render AssetProcessorCell when showDocumentProcessors is true but asset reports array is null', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              ltiAssetReportsConnection: {
+                nodes: null,
+              },
+            }),
+          ],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: true}
+      const {queryByText} = setup(props)
+
+      expect(queryByText('No result')).not.toBeInTheDocument()
+    })
+
+    it('renders AssetProcessorCell when showDocumentProcessors is true and asset reports exist', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              ltiAssetReportsConnection: {
+                nodes: [
+                  {
+                    _id: '1',
+                    priority: 1,
+                  },
+                ],
+              },
+            }),
+          ],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: true}
+      const {getByText} = setup(props)
+
+      expect(getByText('Needs attention')).toBeInTheDocument()
+    })
+
+    it('does not render AssetProcessorCell when assignment has no submissions', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: true}
+      const {container} = setup(props)
+
+      expect(
+        container.querySelector('[data-testid="asset-processor-cell"]'),
+      ).not.toBeInTheDocument()
+    })
+
+    it('passes correct props to AssetProcessorCell', () => {
+      const assignment = Assignment.mock({
+        submissionsConnection: {
+          nodes: [
+            Submission.mock({
+              ltiAssetReportsConnection: {
+                nodes: [
+                  {
+                    _id: '1',
+                    priority: 0,
+                  },
+                  {
+                    _id: '2',
+                    priority: 0,
+                  },
+                ],
+              },
+            }),
+          ],
+        },
+      })
+
+      const props = {...defaultProps, assignment, showDocumentProcessors: true}
+      const {getByText} = setup(props)
+
+      expect(getByText('All good')).toBeInTheDocument()
     })
   })
 })

@@ -44,7 +44,7 @@ export const scoreDistributionRow = (
 
   return (
     <Table.Row key={`score_distribution_${assignment._id}`}>
-      <Table.Cell colSpan="5" textAlign="center">
+      <Table.Cell colSpan="6" textAlign="center">
         <Flex direction="column" width="100%">
           <Flex.Item>
             <View as="div" margin="small" padding="0 0 small 0" borderWidth="0 0 small 0">
