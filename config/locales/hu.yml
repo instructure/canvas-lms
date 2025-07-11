@@ -5514,6 +5514,7 @@ hu:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "A hallgató feladataihoz tartozó értékelések táblázata "
   chat_2153c6b7: Csevegés
   chcp_student_activity_report_5611dd39: "CHCP hallgatói tevékenységi jelentés"
+  check_accessibility_3c78211c: "Ellenőrizze a Kisegítő lehetőségeket"
   check_back_later_c4234dbc: "Nézzen vissza később"
   check_back_later_to_view_feedback_b937200a: "Nézzen vissza később a visszajelzések megtekintéséhez."
   check_permissions_when_masquerading_as_course_admi_ded7106c: "Ellenőrizze a jogosultságokat, amikor kurzus adminisztrátornak álcázza magát"
@@ -7805,6 +7806,7 @@ hu:
       headings: 
         confirm_unenroll: "Kiiratkozás jóváhagyása"
       links: 
+        course_check_accessibility: "Ellenőrizze a Kisegítő lehetőségeket"
         course_setup: "Kurzusbeállítási ellenőrzőlista"
         drop_course: "Kiiratkozás a kurzusból"
         import: "Meglévő tartalom importálása"
