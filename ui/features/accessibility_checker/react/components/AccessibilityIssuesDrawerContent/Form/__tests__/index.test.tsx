@@ -25,6 +25,7 @@ describe('Form', () => {
   const createMockIssue = (formType: FormType, formValue?: string): AccessibilityIssue => ({
     id: '1',
     ruleId: 'test-rule',
+    displayName: 'Test rule',
     message: 'Test issue',
     why: 'Test why',
     element: 'div',

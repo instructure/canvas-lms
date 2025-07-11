@@ -44,7 +44,13 @@ module Accessibility
 
         contrast_ratio = WCAGColorContrast.ratio(foreground, background)
 
-        "Contrast ratio for small text is smaller than threshold #{CONTRAST_THRESHOLD}." if contrast_ratio < CONTRAST_THRESHOLD
+        if contrast_ratio < CONTRAST_THRESHOLD
+          I18n.t("Contrast ratio for small text is smaller than threshold %{value}.", { value: CONTRAST_THRESHOLD })
+        end
+      end
+
+      def self.display_name
+        I18n.t("Small text contrast")
       end
 
       def self.message
@@ -128,7 +134,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::ColorPickerField.new(
-          label: "Change color",
+          label: I18n.t("Change color"),
           value: ""
         )
       end

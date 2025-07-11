@@ -25,6 +25,7 @@ describe('RadioInputGroupForm', () => {
   const createMockIssue = (options?: string[]): AccessibilityIssue => ({
     id: '1',
     ruleId: 'test-rule',
+    displayName: 'Test rule',
     message: 'Test issue',
     why: '',
     element: '',

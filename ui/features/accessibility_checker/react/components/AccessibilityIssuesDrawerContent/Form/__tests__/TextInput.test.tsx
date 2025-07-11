@@ -25,6 +25,7 @@ describe('TextInputForm', () => {
     issue: {
       id: 'test-id',
       ruleId: 'test-rule',
+      displayName: 'Test rule',
       message: 'Test message',
       why: 'Test why',
       element: 'test-element',

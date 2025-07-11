@@ -74,6 +74,12 @@ module Accessibility
         raise NotImplementedError, "#{self} must implement fix"
       end
 
+      # Gets the name of this rule
+      # @return [String] The name of this rule
+      def display_name
+        raise NotImplementedError, "#{self} must implement display_name"
+      end
+
       # Gets the message for users about this rule
       # @return [String] The message about this issue
       def message

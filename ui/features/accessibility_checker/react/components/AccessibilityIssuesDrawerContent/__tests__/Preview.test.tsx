@@ -31,6 +31,7 @@ describe('Preview', () => {
   const mockIssue: AccessibilityIssue = {
     id: '1',
     ruleId: 'adjacent-links',
+    displayName: 'Adjacent links',
     path: '//div[@class="test-element"]',
     message: 'Test accessibility issue',
     why: 'This is why it is an issue',

@@ -34,25 +34,31 @@ module Accessibility
         filename = src.split("/").last.split("?").first
         filename_without_extension = filename.split(".").first
 
-        "Alt text should not be the filename of the image." if alt == filename || alt == filename_without_extension
+        I18n.t("Alt text should not be the filename of the image.") if alt == filename || alt == filename_without_extension
+      end
+
+      def self.display_name
+        I18n.t("Image alt filename")
       end
 
       def self.message
-        "Image alt text should not just be the filename."
+        I18n.t("Image alt text should not just be the filename.")
       end
 
       def self.why
-        "Using the filename as alt text does not provide meaningful information about the image content. " \
+        I18n.t(
+          "Using the filename as alt text does not provide meaningful information about the image content. " \
           "Screen reader users need descriptive alt text that explains the purpose and content of the image."
+        )
       end
 
       def self.link_text
-        "Learn more about providing meaningful alt text"
+        I18n.t("Learn more about providing meaningful alt text")
       end
 
       def self.form(elem)
         Accessibility::Forms::TextInputField.new(
-          label: "Change alt text",
+          label: I18n.t("Change alt text"),
           value: elem.get_attribute("alt") || ""
         )
       end

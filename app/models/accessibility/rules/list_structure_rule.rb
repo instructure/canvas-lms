@@ -76,9 +76,13 @@ module Accessibility
         is_element = elem.is_a?(Nokogiri::XML::Element)
         is_first = (is_element && elem.previous_element_sibling) ? !list?(elem.previous_element_sibling) : true
 
-        return "Lists shall be formatted as lists." if is_first && is_list
+        return I18n.t("Lists shall be formatted as lists.") if is_first && is_list
 
         nil
+      end
+
+      def self.display_name
+        I18n.t("List structure")
       end
 
       def self.message
@@ -95,7 +99,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::CheckboxField.new(
-          label: "Format as list",
+          label: I18n.t("Format as list"),
           value: "false"
         )
       end

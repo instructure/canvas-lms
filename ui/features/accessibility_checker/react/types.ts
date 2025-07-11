@@ -41,6 +41,7 @@ export interface IssueForm {
 export interface AccessibilityIssue {
   id: string
   ruleId: string
+  displayName: string
   message: string
   why: string
   element: string

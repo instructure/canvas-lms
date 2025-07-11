@@ -32,21 +32,27 @@ module Accessibility
         elem_href = elem.get_attribute("href")
         next_href = next_elem.get_attribute("href")
 
-        "Adjacent links contain the same URL." if elem_href == next_href
+        I18n.t("Adjacent links contain the same URL.") if elem_href == next_href
+      end
+
+      def self.display_name
+        I18n.t("Adjacent links")
       end
 
       def self.message
-        "These are two links that go to the same place. Turn them into one link to avoid repetition."
+        I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
       end
 
       def self.why
-        "When two or more links are next to each other and lead to the same destination, " \
+        I18n.t(
+          "When two or more links are next to each other and lead to the same destination, " \
           "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
           "This creates unnecessary repetition and is confusing."
+        )
       end
 
       def self.link_text
-        "Learn more about combining adjacent links"
+        I18n.t("Learn more about combining adjacent links")
       end
 
       def self.root_node(elem)
@@ -55,7 +61,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::Button.new(
-          label: "Merge links"
+          label: I18n.t("Merge links")
         )
       end
 

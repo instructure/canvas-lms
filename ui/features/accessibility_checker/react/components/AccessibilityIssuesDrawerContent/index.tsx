@@ -35,7 +35,6 @@ import {useDebouncedCallback} from 'use-debounce'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
 import {AccessibilityIssue, ContentItem, FormType, FormValue} from '../../types'
-import {ruleIdToLabelMap} from '../../constants'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
@@ -184,7 +183,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               {I18n.t('Issue %{current}/%{total}: %{message}', {
                 current: currentIssueIndex + 1,
                 total: issues.length,
-                message: currentIssue.ruleId ? ruleIdToLabelMap[currentIssue.ruleId] : '',
+                message: currentIssue.displayName,
               })}{' '}
               <WhyMattersPopover issue={currentIssue} />
             </Text>

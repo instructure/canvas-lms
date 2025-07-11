@@ -29,7 +29,6 @@ import {
   Tooltip,
   Title,
 } from 'chart.js'
-import {ruleIdToLabelMap} from '../../constants'
 import {
   getChartData,
   getChartOptions,
@@ -80,7 +79,7 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
   }, [isLoading])
 
   const issuesData: IssueDataPoint[] = useMemo(
-    () => processIssuesToChartData(accessibilityIssues, ruleIdToLabelMap),
+    () => processIssuesToChartData(accessibilityIssues),
     [accessibilityIssues],
   )
   const severityCounts = useMemo(() => getSeverityCounts(issuesData), [issuesData])

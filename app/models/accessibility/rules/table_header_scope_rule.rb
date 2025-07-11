@@ -27,47 +27,49 @@ module Accessibility
       def self.test(elem)
         return nil if elem.tag_name.downcase != "th"
 
-        "Table header shall have a valid scope associated with it." unless elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
+        I18n.t("Table header shall have a valid scope associated with it.") unless elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
+      end
+
+      def self.display_name
+        I18n.t("Table header scope")
       end
 
       def self.message
-        "Table header cells should have the scope attribute correctly set to a valid scope value."
+        I18n.t("Table header cells should have the scope attribute correctly set to a valid scope value.")
       end
 
       def self.why
-        "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
+        I18n.t(
+          "The scope attribute specifies whether a table header cell applies to a column, row, or group of columns or rows. " \
           "Without this attribute, screen readers may not correctly associate header cells with data cells, " \
           "making tables difficult to navigate and understand."
+        )
       end
 
       def self.link_text
-        "Learn more about table header scope attributes"
+        I18n.t("Learn more about table header scope attributes")
       end
 
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
-          label: "Set header scope",
-          value: "Row",
-          options: ["Row", "Column", "Row group", "Column group"]
+          label: I18n.t("Set header scope"),
+          value: I18n.t("Row"),
+          options: [I18n.t("Row"), I18n.t("Column"), I18n.t("Row group"), I18n.t("Column group")]
         )
       end
 
       def self.fix!(elem, value)
-        value_symbol = value.to_sym
-
         scope_lookup_table = {
-          Row: "row",
-          Column: "column",
-          "Row group": "rowgroup",
-          "Column group": "colgroup"
+          I18n.t("Row") => "row",
+          I18n.t("Column") => "column",
+          I18n.t("Row group") => "rowgroup",
+          I18n.t("Column group") => "colgroup"
         }
+        scope = scope_lookup_table[value]
+        if scope
+          return nil if elem["scope"] == scope
 
-        if value_symbol == :None
-          elem.remove_attribute("scope")
-        elsif scope_lookup_table.key?(value_symbol)
-          return nil if elem["scope"] == scope_lookup_table[value_symbol]
-
-          elem["scope"] = scope_lookup_table[value_symbol]
+          elem["scope"] = scope
         else
           raise StandardError, "Invalid scope value. Valid options are: #{VALID_SCOPES.join(", ")}." unless VALID_SCOPES.include?(value)
         end

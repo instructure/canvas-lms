@@ -102,26 +102,27 @@ describe('calculateTotalIssuesCount', () => {
 })
 
 describe('processIssuesToChartData', () => {
-  const ruleIdToLabelMap = {
-    'img-alt': 'Image alt text',
-    'table-caption': 'Table caption',
-  }
-
   const rawData = {
     pages: {
       1: {
         severity: 'medium',
-        issues: [{ruleId: 'img-alt'}, {ruleId: 'img-alt'}],
+        issues: [
+          {ruleId: 'img-alt', displayName: 'Image alt text'},
+          {ruleId: 'img-alt', displayName: 'Image alt text'},
+        ],
       },
     },
     attachments: {
       2: {
         severity: 'low',
-        issues: [{ruleId: 'img-alt'}, {ruleId: 'table-caption'}],
+        issues: [
+          {ruleId: 'img-alt', displayName: 'Image alt text'},
+          {ruleId: 'table-caption', displayName: 'Table caption'},
+        ],
       },
       3: {
         severity: 'high',
-        issues: [{ruleId: 'img-alt'}],
+        issues: [{ruleId: 'img-alt', displayName: 'Image alt text'}],
       },
     },
   }
@@ -142,12 +143,12 @@ describe('processIssuesToChartData', () => {
   ]
 
   it('returns empty array if input is null', () => {
-    const result = processIssuesToChartData(null, ruleIdToLabelMap)
+    const result = processIssuesToChartData(null)
     expect(result).toEqual([])
   })
 
   it('processes raw data into chart data correctly', () => {
-    const result = processIssuesToChartData(rawData, ruleIdToLabelMap)
+    const result = processIssuesToChartData(rawData)
 
     expect(result).toEqual(expect.arrayContaining(parsedData))
     expect(result).toHaveLength(2)

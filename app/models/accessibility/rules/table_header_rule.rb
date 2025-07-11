@@ -26,27 +26,37 @@ module Accessibility
       def self.test(elem)
         return nil if elem.tag_name != "table"
 
-        "Table shall have a header." if elem.query_selector("th").nil?
+        I18n.t("Table shall have a header.") if elem.query_selector("th").nil?
+      end
+
+      def self.display_name
+        I18n.t("Table without header")
       end
 
       def self.message
-        "Tables should include a caption describing the contents of the table."
+        I18n.t("Tables should include a caption describing the contents of the table.")
       end
 
       def self.why
-        "Tables without headers are difficult for screen reader users to navigate and understand. " \
+        I18n.t(
+          "Tables without headers are difficult for screen reader users to navigate and understand. " \
           "Headers provide context for the data and allow screen readers to associate data cells with their headers."
+        )
       end
 
       def self.link_text
-        "Learn more about table headers"
+        I18n.t("Learn more about table headers")
       end
 
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
-          label: "Which part of the table should contain the headings?",
-          value: "The top row",
-          options: ["The top row", "The left column", "Both"]
+          label: I18n.t("Which part of the table should contain the headings?"),
+          value: I18n.t("The top row"),
+          options: [
+            I18n.t("The top row"),
+            I18n.t("The left column"),
+            I18n.t("Both")
+          ]
         )
       end
 
@@ -55,7 +65,7 @@ module Accessibility
           th.name = "td"
         end
 
-        if ["The top row", "Both"].include?(value)
+        if [I18n.t("The top row"), I18n.t("Both")].include?(value)
           first_row = elem.query_selector("tr")
           first_row&.query_selector_all("td")&.each do |td|
             td.name = "th"
@@ -63,7 +73,7 @@ module Accessibility
           end
         end
 
-        if ["The left column", "Both"].include?(value)
+        if [I18n.t("The left column"), I18n.t("Both")].include?(value)
           elem.query_selector_all("tr").each_with_index do |row, index|
             next if index == 0 # Skip the first row
 

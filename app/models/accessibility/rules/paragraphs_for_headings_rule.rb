@@ -37,18 +37,26 @@ module Accessibility
       def self.test(elem)
         return nil unless IS_HEADING[elem.tag_name.downcase]
 
-        "Heading shall be shorter than #{MAX_HEADING_LENGTH}." if elem.text_content.length > MAX_HEADING_LENGTH
+        if elem.text_content.length > MAX_HEADING_LENGTH
+          I18n.t("Heading shall be shorter than %{value}.", { value: MAX_HEADING_LENGTH })
+        end
+      end
+
+      def self.display_name
+        I18n.t("Heading text too long")
       end
 
       def self.message
-        "This heading is very long. Is it meant to be a paragraph?"
+        I18n.t("This heading is very long. Is it meant to be a paragraph?")
       end
 
       def self.why
-        "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
+        I18n.t(
+          "Sighted users scan web pages by identifying headings. Similarly, screen reader users rely on headings" \
           "to quickly understand and navigate your content. If a heading is too long, it can be confusing to scan," \
           "harder to read aloud by assistive technology, and less effective for outlining your page. Keep headings" \
           "short, specific, and meaningful, not full sentences or paragraphs."
+        )
       end
 
       def self.link_text
@@ -57,7 +65,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::ButtonField.new(
-          label: "Change to paragraph",
+          label: I18n.t("Change to paragraph"),
           value: "false"
         )
       end

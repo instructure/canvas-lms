@@ -34,12 +34,13 @@ module Accessibility
       private
 
       def assignment_attributes(assignment)
+        resource_path = polymorphic_path([context, assignment])
         {
           title: assignment.title,
           published: assignment.published?,
           updated_at: assignment.updated_at&.iso8601 || "",
-          url: polymorphic_path([context, assignment]),
-          edit_url: "#{polymorphic_path([context, assignment])}/edit"
+          url: resource_path,
+          edit_url: "#{resource_path}/edit"
         }
       end
     end
