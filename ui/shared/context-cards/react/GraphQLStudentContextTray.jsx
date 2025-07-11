@@ -77,6 +77,20 @@ const SCC_QUERY = gql`
             override_score: overrideScore
           }
         }
+        differentiationTagsConnection(courseId: $courseId) {
+          edges {
+            node {
+              group {
+                _id
+                name
+                groupCategory {
+                  name
+                  singleTag
+                }
+              }
+            }
+          }
+        }
         analytics: summaryAnalytics(courseId: $courseId) {
           page_views: pageViews {
             total
@@ -113,11 +127,16 @@ function placeholderCourse(courseId) {
 export default props => (
   <ApolloProvider client={client}>
     <Query query={SCC_QUERY} variables={{courseId: props.courseId, studentId: props.studentId}}>
-      {({data, loading}) => {
+      {({data, loading, refetch}) => {
         const {course, user} = data || {}
         return (
           <StudentContextTray
-            data={{loading, course: course || placeholderCourse(props.courseId), user}}
+            data={{
+              loading,
+              course: course || placeholderCourse(props.courseId),
+              user,
+              refetch,
+            }}
             {...props}
           />
         )
