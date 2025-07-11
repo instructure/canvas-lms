@@ -444,29 +444,23 @@ describe DiscussionTopicsController do
       before do
         allow(InstStatsd::Statsd).to receive(:distributed_increment)
         allow(InstStatsd::Statsd).to receive(:count)
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
       end
 
       it "count discussion_topic.index.visit" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:distributed_increment).with("discussion_topic.index.visit").at_least(:once)
       end
 
       it "count number of pinned discussions discussion_topic.index.pinned" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.pinned", 0).at_least(:once)
       end
 
       it "count number of discussion_topic.index.visit.discussions" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.discussions", 0).at_least(:once)
       end
 
       it "count number of discussion_topic.index.visit.closed_for_comments" do
-        user_session(@teacher)
-        get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.closed_for_comments", 0).at_least(:once)
       end
     end
@@ -743,12 +737,15 @@ describe DiscussionTopicsController do
     end
 
     context "js_env current_page is set correctly" do
-      before do
-        user_session(@student)
+      before(:once) do
         course_topic
         41.times do |i|
           @topic.discussion_entries.create!(user: @teacher, message: (i + 1).to_s)
         end
+      end
+
+      before do
+        user_session(@student)
         participant = @topic.participant(@student)
         participant.sort_order = DiscussionTopic::SortOrder::ASC
         participant.save!
@@ -911,18 +908,18 @@ describe DiscussionTopicsController do
         end
       end
 
+      let(:discussion) { @course.discussion_topics.create!(user: @teacher, message: "hello") }
+
       it "adds differentiation tags information if account setting is on" do
         user_session(@teacher)
-        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
-        get "show", params: { course_id: @course.id, id: @discussion.id }
+        get "show", params: { course_id: @course.id, id: discussion.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
         expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be true
       end
 
       it "CAN_MANAGE_DIFFERENTIAITON_TAGS is false if user cannot manage tags" do
         user_session(@student)
-        @discussion = @course.discussion_topics.create!(user: @teacher, message: "hello")
-        get "show", params: { course_id: @course.id, id: @discussion.id }
+        get "show", params: { course_id: @course.id, id: discussion.id }
         expect(assigns[:js_env][:ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS]).to be true
         expect(assigns[:js_env][:CAN_MANAGE_DIFFERENTIATION_TAGS]).to be false
       end
@@ -2495,26 +2492,30 @@ describe DiscussionTopicsController do
         expect(DiscussionTopic.count).to eq old_count
       end
 
-      it "admins can see section-specific discussions" do
-        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
-        user_session(admin)
-        topic = @course.discussion_topics.create!
-        topic.is_section_specific = true
-        topic.course_sections << @section1
-        topic.save!
-        get "index", params: { course_id: @course.id }, format: :json
-        expect(response).to be_successful
-        expect(assigns[:topics].length).to eq(1)
-      end
+      context "with admin" do
+        let(:admin) { account_admin_user(account: @course.root_account, role: admin_role, active_user: true) }
 
-      it "admins can create section-specific discussions" do
-        admin = account_admin_user(account: @course.root_account, role: admin_role, active_user: true)
-        user_session(admin)
-        post "create",
-             params: topic_params(@course, { is_announcement: true, specific_sections: @section1.id.to_s }),
-             format: :json
-        expect(response).to be_successful
-        expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        before do
+          user_session(admin)
+        end
+
+        it "admins can see section-specific discussions" do
+          topic = @course.discussion_topics.create!
+          topic.is_section_specific = true
+          topic.course_sections << @section1
+          topic.save!
+          get "index", params: { course_id: @course.id }, format: :json
+          expect(response).to be_successful
+          expect(assigns[:topics].length).to eq(1)
+        end
+
+        it "admins can create section-specific discussions" do
+          post "create",
+               params: topic_params(@course, { is_announcement: true, specific_sections: @section1.id.to_s }),
+               format: :json
+          expect(response).to be_successful
+          expect(DiscussionTopic.last.course_sections.first).to eq @section1
+        end
       end
 
       it "creates a discussion with sections" do
@@ -2574,8 +2575,11 @@ describe DiscussionTopicsController do
     end
 
     describe "discussion anonymity" do
-      it "allows full_anonymity" do
+      before do
         user_session @teacher
+      end
+
+      it "allows full_anonymity" do
         post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
@@ -2585,7 +2589,6 @@ describe DiscussionTopicsController do
       it "returns an error for creating anonymous discussions in a Group" do
         group_category = @course.group_categories.create(name: "gc")
         group = @course.groups.create!(group_category:)
-        user_session @teacher
         post "create", params: group_topic_params(group, { anonymous_state: "full_anonymity" }), format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
@@ -2593,7 +2596,6 @@ describe DiscussionTopicsController do
 
       it "returns an error for creating anonymous discussions assigned to a Group Category in a Course" do
         group_category = @course.group_categories.create(name: "gc")
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "full_anonymity", group_category_id: group_category.id }), format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Group discussions cannot be anonymous." })
@@ -2601,14 +2603,12 @@ describe DiscussionTopicsController do
 
       it "returns an error for creating a graded anonymous discussion" do
         obj_params = topic_params(@course, { anonymous_state: "full_anonymity" }).merge(assignment_params(@course))
-        user_session(@teacher)
         post "create", params: obj_params, format: :json
         expect(response).to have_http_status :bad_request
         expect(response.parsed_body["errors"]).to include({ "anonymous_state" => "Anonymous discussions cannot be graded" })
       end
 
       it "allows partial_anonymity" do
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to eq "partial_anonymity"
@@ -2616,7 +2616,6 @@ describe DiscussionTopicsController do
       end
 
       it "nullifies anonymous_state when unaccounted for" do
-        user_session @teacher
         post "create", params: topic_params(@course, { anonymous_state: "thisisunaccountedfor" }), format: :json
         expect(response).to be_successful
         expect(DiscussionTopic.last.anonymous_state).to be_nil
@@ -2624,16 +2623,20 @@ describe DiscussionTopicsController do
       end
     end
 
-    it "requires authorization to create a discussion" do
-      @course.update_attribute(:is_public, true)
-      post "create", params: topic_params(@course, { is_announcement: false }), format: :json
-      assert_unauthorized
-    end
+    context "for public courses" do
+      before(:once) do
+        @course.update_attribute(:is_public, true)
+      end
 
-    it "requires authorization to create an announcement" do
-      @course.update_attribute(:is_public, true)
-      post "create", params: topic_params(@course, { is_announcement: true }), format: :json
-      assert_unauthorized
+      it "requires authorization to create a discussion" do
+        post "create", params: topic_params(@course, { is_announcement: false }), format: :json
+        assert_unauthorized
+      end
+
+      it "requires authorization to create an announcement" do
+        post "create", params: topic_params(@course, { is_announcement: true }), format: :json
+        assert_unauthorized
+      end
     end
 
     it "logs an asset access record for the discussion topic" do
@@ -2684,46 +2687,48 @@ describe DiscussionTopicsController do
       expect(@student.recent_stream_items.map { |item| item.data["notification_id"] }).not_to include notification.id
     end
 
-    it "does not dispatch new topic notification when hidden by selective release" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      new_section = @course.course_sections.create!
-      obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(topic).to be_published
-      expect(topic.assignment).to be_published
-      expect(@student.email_channel.messages).to be_empty
-      expect(@student.recent_stream_items.map(&:data)).not_to include topic
-    end
+    context "with notification and active communication channel" do
+      before(:once) do
+        Notification.create(name: "New Discussion Topic", category: "TestImmediately")
+        @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
+      end
 
-    it "does dispatch new topic notification when not hidden" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      obj_params = topic_params(@course, published: true)
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(topic).to be_published
-      expect(@student.email_channel.messages.map(&:context)).to include(topic)
-    end
+      before do
+        user_session(@teacher)
+      end
 
-    it "does dispatch new topic notification when published" do
-      Notification.create(name: "New Discussion Topic", category: "TestImmediately")
-      @student.communication_channels.create!(path: "student@example.com") { |cc| cc.workflow_state = "active" }
-      obj_params = topic_params(@course, published: false)
-      user_session(@teacher)
-      post "create", params: obj_params, format: :json
+      it "does not dispatch new topic notification when hidden by selective release" do
+        new_section = @course.course_sections.create!
+        obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
+        post "create", params: obj_params, format: :json
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(topic).to be_published
+        expect(topic.assignment).to be_published
+        expect(@student.email_channel.messages).to be_empty
+        expect(@student.recent_stream_items.map(&:data)).not_to include topic
+      end
 
-      json = response.parsed_body
-      topic = DiscussionTopic.find(json["id"])
-      expect(@student.email_channel.messages).to be_empty
+      it "does dispatch new topic notification when not hidden" do
+        obj_params = topic_params(@course, published: true)
+        post "create", params: obj_params, format: :json
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(topic).to be_published
+        expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      end
 
-      put "update", params: { course_id: @course.id, topic_id: topic.id, title: "Updated Topic", published: true }, format: "json"
-      expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      it "does dispatch new topic notification when published" do
+        obj_params = topic_params(@course, published: false)
+        post "create", params: obj_params, format: :json
+
+        json = response.parsed_body
+        topic = DiscussionTopic.find(json["id"])
+        expect(@student.email_channel.messages).to be_empty
+
+        put "update", params: { course_id: @course.id, topic_id: topic.id, title: "Updated Topic", published: true }, format: "json"
+        expect(@student.email_channel.messages.map(&:context)).to include(topic)
+      end
     end
 
     it "dispatches an assignment stream item with the correct title" do
