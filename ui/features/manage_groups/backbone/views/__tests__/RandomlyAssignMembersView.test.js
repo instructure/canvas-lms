@@ -197,6 +197,20 @@ describe('RandomlyAssignMembersView', () => {
       scrollTop: () => 0,
       height: () => 100,
       width: () => 100,
+      show: function () {
+        this.css('display', 'block')
+        return this
+      },
+      hide: function () {
+        this.css('display', 'none')
+        return this
+      },
+      is: function (selector) {
+        if (selector === ':visible') {
+          return this.css('display') !== 'none'
+        }
+        return false
+      },
     })
 
     // Set up initial API handlers
@@ -339,5 +353,90 @@ describe('RandomlyAssignMembersView', () => {
 
     // Restore original function
     model.assignUnassignedMembers = originalAssign
+  })
+
+  describe('toggleSectionInfo', () => {
+    beforeEach(() => {
+      // Open the dialog to render the template
+      randomlyAssignView.open()
+    })
+
+    afterEach(() => {
+      randomlyAssignView.close()
+    })
+
+    it('shows info box when checkbox is checked', () => {
+      const $checkbox = randomlyAssignView.$('input[name=group_by_section]')
+      const $infoBox = randomlyAssignView.$('#group-by-section-info')
+
+      // Initially, info box should be hidden
+      expect($infoBox.css('display')).toBe('none')
+
+      // Check the checkbox and trigger change event
+      $checkbox.prop('checked', true).trigger('change')
+
+      // Info box should now be visible (display should not be 'none')
+      expect($infoBox.css('display')).not.toBe('none')
+      expect($infoBox.is(':visible')).toBe(true)
+    })
+
+    it('hides info box when checkbox is unchecked', () => {
+      const $checkbox = randomlyAssignView.$('input[name=group_by_section]')
+      const $infoBox = randomlyAssignView.$('#group-by-section-info')
+
+      // First check the checkbox to show the info box
+      $checkbox.prop('checked', true).trigger('change')
+      expect($infoBox.css('display')).not.toBe('none')
+
+      // Now uncheck the checkbox
+      $checkbox.prop('checked', false).trigger('change')
+
+      // Info box should be hidden
+      expect($infoBox.css('display')).toBe('none')
+      expect($infoBox.is(':visible')).toBe(false)
+    })
+
+    it('toggles info box visibility multiple times correctly', () => {
+      const $checkbox = randomlyAssignView.$('input[name=group_by_section]')
+      const $infoBox = randomlyAssignView.$('#group-by-section-info')
+
+      // Initially hidden
+      expect($infoBox.css('display')).toBe('none')
+
+      // Check -> should show
+      $checkbox.prop('checked', true).trigger('change')
+      expect($infoBox.css('display')).not.toBe('none')
+      expect($infoBox.is(':visible')).toBe(true)
+
+      // Uncheck -> should hide
+      $checkbox.prop('checked', false).trigger('change')
+      expect($infoBox.css('display')).toBe('none')
+      expect($infoBox.is(':visible')).toBe(false)
+
+      // Check again -> should show
+      $checkbox.prop('checked', true).trigger('change')
+      expect($infoBox.css('display')).not.toBe('none')
+      expect($infoBox.is(':visible')).toBe(true)
+    })
+
+    it('contains the correct info text', () => {
+      randomlyAssignView.open()
+      const infoBox = randomlyAssignView.$('#group-by-section-info')
+
+      expect(infoBox.text()).toContain(
+        'Students who are enrolled in multiple sections will be put in a group by themselves',
+      )
+      expect(infoBox.hasClass('alert')).toBe(true)
+      expect(infoBox.hasClass('alert-info')).toBe(true)
+    })
+
+    it('has proper accessibility attributes', () => {
+      randomlyAssignView.open()
+      const infoBox = randomlyAssignView.$('#group-by-section-info')
+      const icon = infoBox.find('i.icon-info')
+
+      expect(icon.attr('aria-hidden')).toBe('true')
+      expect(infoBox.attr('id')).toBe('group-by-section-info')
+    })
   })
 })
