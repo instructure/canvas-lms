@@ -31,7 +31,7 @@ analytics_2_lti_13_enabled:
   after_state_change_proc: analytics_2_after_state_change_hook
 hide_legacy_course_analytics:
   state: hidden
-  applies_to: Account
+  applies_to: Course
   display_name: Hide Legacy Course Analytics
   description:
     hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.

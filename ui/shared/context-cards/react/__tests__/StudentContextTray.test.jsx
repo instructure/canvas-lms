@@ -75,6 +75,7 @@ describe('StudentContextTray', () => {
     const container = document.createElement('div')
     container.id = 'fixtures'
     document.body.appendChild(container)
+    window.ENV.FEATURES = {hide_legacy_course_analytics: false}
   })
 
   afterEach(() => {
@@ -161,6 +162,14 @@ describe('StudentContextTray', () => {
     })
 
     it('does not render without analytics data', () => {
+      props.data = {loading: false, user, course}
+      const {container} = render(<StudentContextTray {...props} />)
+      const analyticsLinks = container.querySelectorAll('a[href*="analytics"]')
+      expect(analyticsLinks).toHaveLength(0)
+    })
+
+    it('does not render if analytics feature is disabled', () => {
+      window.ENV.FEATURES = {hide_legacy_course_analytics: true}
       props.data = {loading: false, user, course}
       const {container} = render(<StudentContextTray {...props} />)
       const analyticsLinks = container.querySelectorAll('a[href*="analytics"]')
