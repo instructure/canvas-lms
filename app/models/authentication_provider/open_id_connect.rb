@@ -371,6 +371,10 @@ class AuthenticationProvider
           end.body
         end
       end
+    rescue *CanvasHttp::ALL_HTTP_ERRORS, Net::HTTPExceptions
+      errors.add(:jwks_uri, t("Failed to download JWKS from %{url}", url: jwks_uri))
+    rescue JSON::ParserError
+      errors.add(:jwks_uri, t("%{url} does not refer to a JWKS", url: jwks_uri))
     end
 
     def download_discovery

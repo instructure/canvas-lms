@@ -347,6 +347,12 @@ describe AuthenticationProvider::OpenIDConnect do
       expect(subject).not_to receive(:download_jwks)
       expect(subject.jwks).to be_nil
     end
+
+    it "sets an error it the jwks_uri is invalid" do
+      subject.jwks_uri = "garbage"
+      expect(subject.save).to be false
+      expect(subject.errors[:jwks_uri]).not_to be_blank
+    end
   end
 
   describe "#jwks=" do
