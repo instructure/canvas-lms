@@ -186,11 +186,12 @@ describe "files index page" do
         end
 
         it "unpublishes and publish multiple files", priority: "1" do
-          select_item_to_edit_from_kebab_menu(1)
-          select_item_to_edit_from_kebab_menu(2)
+          select_all
+          toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:unpublished)
           all_item_unpublished?
+          select_all
           toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:published)

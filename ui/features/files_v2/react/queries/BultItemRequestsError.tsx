@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {type File, type Folder} from '../../../../interfaces/File'
+import {type File, type Folder} from '../../interfaces/File'
 
-export class DeleteItemError extends Error {
+export class BulkItemRequestsError extends Error {
   failedItems: (File | Folder)[]
 
   constructor(message: string, failedItems: (File | Folder)[]) {
     super(message)
-    this.name = 'DeleteItemError'
+    this.name = 'BulkItemRequestsError'
     this.failedItems = failedItems
   }
 }
