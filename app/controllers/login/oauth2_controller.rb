@@ -74,10 +74,10 @@ class Login::OAuth2Controller < Login::OAuthBaseController
       provider_attributes = @aac.provider_attributes(token)
       @aac = @aac.try(:alternate_provider_for_token, token) || @aac
     rescue OAuthValidationError => e
-      @aac.debug_set(:validation_error, e.message) if @aac.instance_debugging
+      @aac.debug_set(:validation_error, e.message) if @aac.try(:instance_debugging)
       return redirect_to_unknown_user_url(e.message)
     rescue => e
-      @aac.debug_set(:claims_response, e) if @aac.instance_debugging
+      @aac.debug_set(:claims_response, e) if @aac.try(:instance_debugging)
       raise
     end
 
