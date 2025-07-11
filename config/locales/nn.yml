@@ -6068,6 +6068,7 @@ nn:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "Diagram som viser studenten sine vurderingar per oppgåve"
   chat_2153c6b7: Chat
   chcp_student_activity_report_5611dd39: "CHCP aktivitetsrapport for studentar"
+  check_accessibility_3c78211c: "Sjekk tilgjengeligheit"
   check_back_later_c4234dbc: "Kom tilbake seinare"
   check_services_to_enable_8877c451: "Sjekk tenester for å aktivere"
   check_submission_file_type_b3dbf3fd: "Sjekk innleveringsfiltype"
@@ -8431,6 +8432,7 @@ nn:
       headings: 
         confirm_unenroll: "Stadfest utmelding"
       links: 
+        course_check_accessibility: "Sjekk tilgjengeligheit"
         course_setup: "Sjekkliste for emneoppsett"
         drop_course: "Vel bort dette emnet"
         import: "Importer eksisterande innhald"
