@@ -76,7 +76,7 @@ module AnnouncementsCommon
     type_in_tiny("textarea[name=message]", "file attachement discussion")
     expect_new_page_load { submit_form(".form-actions") }
     wait_for_ajaximations
-    expect(f(".zip")).to include_text(filename)
+    expect(fln(filename)).to be_displayed
   end
 
   def edit_announcement(title, message)
@@ -84,7 +84,8 @@ module AnnouncementsCommon
     replace_content(f("input[name=title]"), title)
     type_in_tiny("textarea[name=message]", message)
     expect_new_page_load { submit_form(".form-actions") }
-    expect(f("#discussion_topic .discussion-title").text).to eq title
+    # Not equal just include because of the screen reader text
+    expect(f('[data-testid="message_title"]').text).to include(title)
   end
 
   # DRY method that checks that a group member can see all announcements created within a group
@@ -101,8 +102,8 @@ module AnnouncementsCommon
 
   # Clicks edit button on Announcement show page
   def click_edit_btn
-    f(".edit-btn").click
-    wait_for_ajaximations
+    f('[data-testid="discussion-post-menu-trigger"]').click
+    expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
   end
 
   # sets the course setting checkbox for 'Disable comments on announcements'

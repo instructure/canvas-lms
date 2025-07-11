@@ -293,17 +293,19 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "shows student progress once discussion-contribute requirement is met", priority: "1" do
-      skip "Will be fixed in VICE-5209"
+    it "shows student progress once discussion-contribute requirement is met", :ignore_js_errors, priority: "1" do
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({ id: @discussion_1.id, type: "assignment" })
       add_requirement({ tag.id => { type: "must_contribute" } })
       wait_for_ajaximations
       fln("Discuss!").click
       wait_for_ajaximations
-      f(".discussion-reply-action").click
-      type_in_tiny "textarea", "something to submit"
-      f('button[type="submit"]').click
+      f('[data-testid="discussion-topic-reply"]').click
+      wait_for_ajaximations
+      wait_for_rce
+      type_in_tiny("textarea", "stuff and things")
+      f('[data-testid="DiscussionEdit-submit"]').click
+      wait_for_ajaximations
       validate_access_to_module
     end
 

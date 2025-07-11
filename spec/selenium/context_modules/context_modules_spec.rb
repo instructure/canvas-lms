@@ -19,6 +19,7 @@
 
 require_relative "../helpers/context_modules_common"
 require_relative "../helpers/public_courses_context"
+require_relative "../helpers/announcements_common"
 require_relative "page_objects/modules_index_page"
 require_relative "page_objects/modules_settings_tray"
 
@@ -27,6 +28,7 @@ describe "context modules" do
   include ContextModulesCommon
   include ModulesIndexPage
   include ModulesSettingsTray
+  include AnnouncementsCommon
 
   context "adds existing items to modules" do
     before(:once) do
@@ -225,14 +227,13 @@ describe "context modules" do
     end
 
     it "edits available/until dates on a ungraded discussion in a module", priority: "2" do
-      skip "Will be fixed in VICE-5209"
       available_from = 2.days.from_now
       available_until = 4.days.from_now
       @discussion = @course.discussion_topics.create!(title: "Non-graded Published Discussion")
       @mod.add_item(type: "discussion_topic", id: @discussion.id)
       go_to_modules
       fln("Non-graded Published Discussion").click
-      f(".edit-btn").click
+      click_edit_btn
       replace_content(f('input[type=text][name="delayed_post_at"]'), format_date_for_view(available_from), tab_out: true)
       replace_content(f('input[type=text][name="lock_at"]'), format_date_for_view(available_until), tab_out: true)
       expect_new_page_load { f(".form-actions button[type=submit]").click }

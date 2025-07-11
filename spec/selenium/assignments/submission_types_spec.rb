@@ -46,13 +46,12 @@ describe "assignments" do
     end
 
     it "validates an assignment created with the type of discussion" do
-      skip "Will be fixed in VICE-5209"
       @assignment.update(submission_types: "discussion_topic")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(driver.current_url).to match %r{/courses/\d+/discussion_topics/\d+}
-      expect(f("h1.discussion-title")).to include_text(@assignment.title)
+      expect(f('[data-testid="message_title"]')).to include_text(@assignment.title)
     end
 
     it "validates an assignment created with the type of not graded" do
