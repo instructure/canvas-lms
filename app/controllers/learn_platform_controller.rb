@@ -95,7 +95,7 @@ class LearnPlatformController < ApplicationController
 
   # Set the translate_lang option if needed.
   def configure_translation_lang(options)
-    if Account.site_admin.feature_enabled?(:lti_apps_page_ai_translation) && I18n.locale.present? && I18n.locale != :en
+    if @domain_root_account.feature_enabled?(:lti_apps_page_ai_translation) && I18n.locale.present? && I18n.locale != :en
       options[:translate_lang] = I18n.locale.to_s
     end
   end
