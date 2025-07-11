@@ -20,15 +20,23 @@ import {type File, type Folder} from '../../interfaces/File'
 import {doFetchApiWithAuthCheck} from '../../utils/apiUtils'
 import {isFile} from '../../utils/fileFolderUtils'
 
-const deletePath = (item: File | Folder) => {
-  const params = new URLSearchParams({force: 'true'})
-  return `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}?${params}`
+export type UpdatePermissionBody = {
+  hidden: boolean
+  locked: boolean
+  unlock_at: string
+  lock_at: string
+  visibility_level?: string
 }
 
-export const deleteItem = async (item: File | Folder) => {
+const updatePermissionPath = (item: File | Folder) => {
+  return `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}`
+}
+
+export const updatePermissionForItem = async (item: File | Folder, body: UpdatePermissionBody) => {
   await doFetchApiWithAuthCheck<File | Folder>({
-    path: deletePath(item),
-    method: 'DELETE',
+    path: updatePermissionPath(item),
+    method: 'PUT',
     headers: {'Content-Type': 'application/json'},
+    body: body,
   })
 }

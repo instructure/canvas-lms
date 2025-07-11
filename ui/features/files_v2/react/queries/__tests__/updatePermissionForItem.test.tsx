@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {deleteItem} from '../deleteItem'
+import {updatePermissionForItem, UpdatePermissionBody} from '../updatePermissionForItem'
 import {doFetchApiWithAuthCheck} from '../../../utils/apiUtils'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../fixtures/fakeData'
 
@@ -29,9 +29,16 @@ const mockDoFetchApiWithAuthCheck = doFetchApiWithAuthCheck as jest.MockedFuncti
   typeof doFetchApiWithAuthCheck
 >
 
-describe('deleteItem', () => {
+describe('updatePermissionForItem', () => {
   const mockFile = FAKE_FILES[0]
   const mockFolder = FAKE_FOLDERS[0]
+
+  const permissionData: UpdatePermissionBody = {
+    hidden: false,
+    locked: false,
+    unlock_at: '',
+    lock_at: '',
+  }
 
   beforeEach(() => {
     mockDoFetchApiWithAuthCheck.mockResolvedValue({
@@ -48,25 +55,27 @@ describe('deleteItem', () => {
     mockDoFetchApiWithAuthCheck.mockReset()
   })
 
-  describe('successful deletion', () => {
+  describe('successful permission update', () => {
     it('should call doFetchApiWithAuthCheck with correct path and options for a file', async () => {
-      await deleteItem(mockFile)
+      await updatePermissionForItem(mockFile, permissionData)
 
       expect(mockDoFetchApiWithAuthCheck).toHaveBeenCalledWith({
-        path: `/api/v1/files/${mockFile.id}?force=true`,
-        method: 'DELETE',
+        path: `/api/v1/files/${mockFile.id}`,
+        method: 'PUT',
         headers: {'Content-Type': 'application/json'},
+        body: permissionData,
       })
     })
+  })
 
-    it('should call doFetchApiWithAuthCheck with correct path and options for a folder', async () => {
-      await deleteItem(mockFolder)
+  it('should call doFetchApiWithAuthCheck with correct path and options for a folder', async () => {
+    await updatePermissionForItem(mockFolder, permissionData)
 
-      expect(mockDoFetchApiWithAuthCheck).toHaveBeenCalledWith({
-        path: `/api/v1/folders/${mockFolder.id}?force=true`,
-        method: 'DELETE',
-        headers: {'Content-Type': 'application/json'},
-      })
+    expect(mockDoFetchApiWithAuthCheck).toHaveBeenCalledWith({
+      path: `/api/v1/folders/${mockFolder.id}`,
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json'},
+      body: permissionData,
     })
   })
 
@@ -75,7 +84,7 @@ describe('deleteItem', () => {
       const error = new Error('Network error')
       mockDoFetchApiWithAuthCheck.mockRejectedValueOnce(error)
 
-      await expect(deleteItem(mockFile)).rejects.toThrow(error)
+      await expect(updatePermissionForItem(mockFile, permissionData)).rejects.toThrow(error)
     })
   })
 })

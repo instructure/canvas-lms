@@ -81,6 +81,7 @@ describe('PermissionsModal', () => {
         },
         method: 'PUT',
         path: '/api/v1/files/178',
+        headers: {'Content-Type': 'application/json'},
       })
     })
   })
@@ -108,6 +109,7 @@ describe('PermissionsModal', () => {
         },
         method: 'PUT',
         path: '/api/v1/files/178',
+        headers: {'Content-Type': 'application/json'},
       })
     })
   })
