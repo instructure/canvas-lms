@@ -28,7 +28,11 @@ module Accessibility
 
         caption = elem.query_selector("caption")
 
-        "Table caption should be present." if !caption || caption.text_content.gsub(/\s/, "") == ""
+        I18n.t("Table caption should be present.") if !caption || caption.text_content.gsub(/\s/, "") == ""
+      end
+
+      def self.display_name
+        I18n.t("Table caption missing")
       end
 
       def self.message
@@ -53,7 +57,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::TextInputField.new(
-          label: "Change table caption",
+          label: I18n.t("Change table caption"),
           value: ""
         )
       end

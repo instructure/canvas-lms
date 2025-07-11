@@ -27,7 +27,11 @@ module Accessibility
         return nil if elem.tag_name != "img"
 
         alt = elem.attribute?("alt") ? elem.get_attribute("alt") : nil
-        "Alt text should be present for the image." if alt.nil?
+        I18n.t("Alt text should be present for the image.") if alt.nil?
+      end
+
+      def self.display_name
+        I18n.t("Image alt text missing")
       end
 
       def self.message
@@ -44,7 +48,7 @@ module Accessibility
 
       def self.form(_elem)
         Accessibility::Forms::TextInputField.new(
-          label: "Change alt text",
+          label: I18n.t("Change alt text"),
           value: ""
         )
       end

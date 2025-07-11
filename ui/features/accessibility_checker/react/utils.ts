@@ -115,15 +115,12 @@ export const convertKeysToCamelCase = function (input: any): object | boolean {
   return input !== null && input !== undefined ? input : {}
 }
 
-export function processIssuesToChartData(
-  raw: RawData | null,
-  ruleIdToLabelMap: Record<string, string>,
-): IssueDataPoint[] {
+export function processIssuesToChartData(raw: RawData | null): IssueDataPoint[] {
   if (!raw || typeof raw !== 'object') {
     return []
   }
 
-  const grouped: Record<string, {count: number; severity: Severity}> = {}
+  const grouped: Record<string, {count: number; displayName: string; severity: Severity}> = {}
 
   const rootSeverityMap: Record<string, Severity> = {
     low: 'Low',
@@ -143,6 +140,7 @@ export function processIssuesToChartData(
           grouped[ruleId] = {
             count: 1,
             severity: itemRootSeverity,
+            displayName: issue.displayName,
           }
         } else {
           grouped[ruleId].count += 1
@@ -152,14 +150,12 @@ export function processIssuesToChartData(
     })
   })
 
-  const result: IssueDataPoint[] = Object.entries(grouped).map(([ruleId, data]) => ({
+  return Object.entries(grouped).map(([ruleId, data]) => ({
     id: ruleId.replace(/-/g, '_'),
-    issue: ruleIdToLabelMap[ruleId] || ruleId, // fallback to ruleId itself if not found
+    issue: data.displayName,
     count: data.count,
     severity: data.severity,
   }))
-
-  return result
 }
 
 function prioritizeSeverity(a: Severity, b: Severity): Severity {

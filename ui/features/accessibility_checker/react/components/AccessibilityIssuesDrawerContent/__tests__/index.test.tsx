@@ -37,6 +37,7 @@ const baseItem: ContentItem = {
       id: 'issue-1',
       path: '/html/body/div[1]',
       ruleId: 'adjacent-links',
+      displayName: 'Adjacent links',
       message: 'This is a test issue',
       form: {type: FormType.Checkbox, label: 'checkbox A'},
       why: '',
@@ -46,6 +47,7 @@ const baseItem: ContentItem = {
       id: 'issue-2',
       path: '/html/body/div[2]',
       ruleId: 'headings-sequence',
+      displayName: 'Heading sequence',
       message: 'Second issue',
       form: {
         type: FormType.RadioInputGroup,

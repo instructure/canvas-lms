@@ -68,6 +68,16 @@ describe Accessibility::Rule do
     end
   end
 
+  describe ".display_name" do
+    context "when not overridden" do
+      it "raises NotImplementedError" do
+        expect do
+          described_class.display_name
+        end.to raise_error(NotImplementedError, "#{described_class} must implement display_name")
+      end
+    end
+  end
+
   describe ".message" do
     context "when not overridden" do
       it "raises NotImplementedError" do

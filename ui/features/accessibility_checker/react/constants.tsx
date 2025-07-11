@@ -27,23 +27,6 @@ export const TypeToKeyMap: Record<ContentItemType, 'pages' | 'assignments' | 'at
   [ContentItemType.Attachment]: 'attachments',
 }
 
-export const ruleIdToLabelMap: Record<string, string> = {
-  'adjacent-links': I18n.t('Adjacent links'),
-  'headings-sequence': I18n.t('Skipped heading level'),
-  'has-lang-entry': I18n.t('PDF language entry'),
-  'headings-start-at-h2': I18n.t('Headings start at H2'),
-  'img-alt': I18n.t('Image alt text missing'),
-  'img-alt-filename': I18n.t('Image alt filename'),
-  'img-alt-length': I18n.t('Image alt text length'),
-  'large-text-contrast': I18n.t('Large text contrast'),
-  'small-text-contrast': I18n.t('Small text contrast'),
-  'list-structure': I18n.t('List structure'),
-  'paragraphs-for-headings': I18n.t('Heading is too long'),
-  'table-caption': I18n.t('Table caption'),
-  'table-header': I18n.t('Table headers aren’t set up'),
-  'table-header-scope': I18n.t('Table header scope'),
-}
-
 export const severityColors: Record<Severity, string> = {
   High: '#9B181C', // Red82
   Medium: '#E62429', // red45

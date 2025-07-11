@@ -27,21 +27,27 @@ module Accessibility
         info = elem.info || {}
 
         # Language can be stored in different fields depending on the PDF creator
-        "PDF does not contain language." if info.values_at(:Lang, :Language, "Lang", "Language").none?
+        I18n.t("PDF does not contain language.") if info.values_at(:Lang, :Language, "Lang", "Language").none?
+      end
+
+      def self.display_name
+        I18n.t("Language missing")
       end
 
       def self.message
-        "PDF language is not specified in the document properties."
+        I18n.t("PDF language is not specified in the document properties.")
       end
 
       def self.why
-        "The objective of this technique is to specify the language of a passage, phrase, " \
+        I18n.t(
+          "The objective of this technique is to specify the language of a passage, phrase, " \
           "or word using the /Lang entry to provide information in the PDF document that user " \
           "agents need to present text and other linguistic content correctly. "
+        )
       end
 
       def self.link_text
-        "Learn more about specifying language in PDF documents"
+        I18n.t("Learn more about specifying language in PDF documents")
       end
     end
   end

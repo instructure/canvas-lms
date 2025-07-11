@@ -24,36 +24,45 @@ module Accessibility
       self.link = "https://www.w3.org/WAI/tutorials/page-structure/headings/"
 
       def self.test(elem)
-        "Document shall not contain a H1 element." if elem.tag_name == "h1"
+        I18n.t("Document shall not contain a H1 element.") if elem.tag_name == "h1"
+      end
+
+      def self.display_name
+        I18n.t("Headings start at H2")
       end
 
       def self.message
-        "Headings should start at level 2 (h2)."
+        I18n.t("Headings should start at level 2 (h2).")
       end
 
       def self.why
-        "In most content areas of Canvas, the page title is already an h1. " \
+        I18n.t(
+          "In most content areas of Canvas, the page title is already an h1. " \
           "Using h1 in your content creates an incorrect document structure and " \
           "makes navigation confusing for screen reader users."
+        )
       end
 
       def self.link_text
-        "Learn more about proper heading structure"
+        I18n.t("Learn more about proper heading structure")
       end
 
       def self.form(_elem)
         Accessibility::Forms::RadioInputGroupField.new(
-          label: "How would you like to proceed?",
-          value: "Change only this heading level",
-          options: ["Change only this heading level", "Remove heading style"]
+          label: I18n.t("How would you like to proceed?"),
+          value: I18n.t("Change only this heading level"),
+          options: [
+            I18n.t("Change only this heading level"),
+            I18n.t("Remove heading style")
+          ]
         )
       end
 
       def self.fix!(elem, value)
         case value
-        when "Change only this heading level"
+        when I18n.t("Change only this heading level")
           elem.name = "h2"
-        when "Remove heading style"
+        when I18n.t("Remove heading style")
           elem.name = "p"
         else
           raise ArgumentError, "Invalid value for form: #{value}"

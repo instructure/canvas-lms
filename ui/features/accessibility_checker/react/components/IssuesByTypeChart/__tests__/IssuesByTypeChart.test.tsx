@@ -34,17 +34,23 @@ const sampleData: AccessibilityData = {
   pages: {
     1: {
       severity: 'Medium' as Severity,
-      issues: [{ruleId: 'img-alt'}, {ruleId: 'img-alt'}],
+      issues: [
+        {ruleId: 'img-alt', displayName: 'Image alt text'},
+        {ruleId: 'img-alt', displayName: 'Image alt text'},
+      ],
     } as ContentItem,
   },
   attachments: {
     2: {
       severity: 'Low',
-      issues: [{ruleId: 'img-alt'}, {ruleId: 'table-caption'}],
+      issues: [
+        {ruleId: 'img-alt', displayName: 'Image alt text'},
+        {ruleId: 'table-caption', displayName: 'Table caption'},
+      ],
     } as ContentItem,
     3: {
       severity: 'High',
-      issues: [{ruleId: 'img-alt'}],
+      issues: [{ruleId: 'img-alt', displayName: 'Image alt text'}],
     } as ContentItem,
   },
 }

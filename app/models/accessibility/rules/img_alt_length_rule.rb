@@ -32,25 +32,31 @@ module Accessibility
         alt = elem.get_attribute("alt")
         return nil if alt.blank?
 
-        "Alt text is longer than #{MAX_LENGTH}." if alt.length > MAX_LENGTH
+        I18n.t("Alt text is longer than %{length} characters.", { length: MAX_LENGTH }) if alt.length > MAX_LENGTH
+      end
+
+      def self.display_name
+        I18n.t("Image alt text length")
       end
 
       def self.message
-        "Image alt text should be concise (less than #{MAX_LENGTH} characters)."
+        I18n.t("Image alt text should be concise (less than %{length} characters).", { length: MAX_LENGTH })
       end
 
       def self.why
-        "Excessively long alt text can be overwhelming for screen reader users. " \
+        I18n.t(
+          "Excessively long alt text can be overwhelming for screen reader users. " \
           "A concise description is more effective and easier to understand."
+        )
       end
 
       def self.link_text
-        "Learn more about writing effective alt text for images"
+        I18n.t("Learn more about writing effective alt text for images")
       end
 
       def self.form(elem)
         Accessibility::Forms::TextInputField.new(
-          label: "Change alt text",
+          label: I18n.t("Change alt text"),
           value: elem.get_attribute("alt") || ""
         )
       end
