@@ -28,6 +28,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {bool, func, string} from 'prop-types'
 import {GroupContext} from './context'
 import SelfSignupEndDate from './SelfSignupEndDate'
+import SameSectionInfoAlert from './SameSectionInfoAlert'
 
 const I18n = createI18nScope('groups')
 
@@ -48,9 +49,12 @@ export const SelfSignup = ({
       </p>
       <p>
         {selfSignupEndDateEnabled
-          ? I18n.t('With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.')
-          : I18n.t('Note that as long as this option is enabled, students can move themselves from one group to another.')
-        }
+          ? I18n.t(
+              'With this option enabled, students can move themselves from one group to another. However, you can set an end date to close self sign-up to prevent students from joining or changing groups after a certain date.',
+            )
+          : I18n.t(
+              'Note that as long as this option is enabled, students can move themselves from one group to another.',
+            )}
       </p>
     </div>
   )
@@ -103,6 +107,7 @@ export const SelfSignup = ({
               handleChange('bySection', e.target.checked)
             }}
           />
+          {bySection && selfSignup && <SameSectionInfoAlert />}
         </View>
         {selfSignup && selfSignupEndDateEnabled && (
           <View display="block" padding="x-small x-small">

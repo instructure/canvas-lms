@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {func, string} from 'prop-types'
 import {GroupContext, formatMessages, SPLIT} from './context'
 import {handleKeyPress} from './utils'
+import SameSectionInfoAlert from './SameSectionInfoAlert'
 
 const I18n = createI18nScope('groups')
 
@@ -233,14 +234,17 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
       </Select>
       {showSupplementalSelect()}
       {splitGroups !== SPLIT.off && (
-        <Checkbox
-          checked={bySection}
-          data-testid="require-same-section-auto-assign"
-          label={I18n.t('Require group members to be in the same section')}
-          onChange={e => {
-            onChange('bySection', e.target.checked)
-          }}
-        />
+        <>
+          <Checkbox
+            checked={bySection}
+            data-testid="require-same-section-auto-assign"
+            label={I18n.t('Require group members to be in the same section')}
+            onChange={e => {
+              onChange('bySection', e.target.checked)
+            }}
+          />
+          {bySection && <SameSectionInfoAlert />}
+        </>
       )}
     </FormFieldGroup>
   )
