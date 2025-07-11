@@ -77,7 +77,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   }
 
   const currentFolder = folders[folders.length - 1]
-  const folderId = currentFolder.id.toString()
+  const folderId = currentFolder.id
   const contextId = currentFolder.context_id
   const contextType = currentFolder.context_type.toLowerCase()
 

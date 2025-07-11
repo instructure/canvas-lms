@@ -17,15 +17,16 @@
  */
 
 import React, {useState, useCallback} from 'react'
+import {captureException} from '@sentry/react'
 import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {DeleteItemError} from './DeleteItemError'
+import {deleteItems} from './deleteItems'
 import {type File, type Folder} from '../../../../interfaces/File'
-import {isFile} from '../../../../utils/fileFolderUtils'
-import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
-import getCookie from '@instructure/get-cookie'
+import {showFlashSuccess, showFlashError, showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 import {UnauthorizedError} from '../../../../utils/apiUtils'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
@@ -50,32 +51,52 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
   const {setRowToFocus} = useRowFocus()
   const {setSessionExpired} = useRows()
 
+  const handleError = useCallback(
+    async (error: unknown) => {
+      if (error instanceof UnauthorizedError) {
+        setSessionExpired(true)
+        return
+      }
+
+      if (error instanceof DeleteItemError) {
+        const failedItems = error.failedItems
+        let errorMessage = ''
+        if (failedItems.length === 1 && items.length === 1) {
+          errorMessage = I18n.t('Failed to delete the selected item. Please try again.')
+        } else {
+          errorMessage =
+            failedItems.length === items.length
+              ? I18n.t('Failed to delete all selected items. Please try again.')
+              : I18n.t(
+                  'Failed to delete %{failedItems} of the %{selectedItems} selected items. Please try again.',
+                  {
+                    failedItems: failedItems.length,
+                    selectedItems: items.length,
+                  },
+                )
+        }
+
+        if (failedItems.length === items.length) {
+          showFlashError(errorMessage)()
+        } else {
+          showFlashWarning(errorMessage)()
+          queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
+          await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        }
+      } else {
+        // Impossible branch, deleteItems should always throw either UnauthorizedError or DeleteItemError
+        const errorMessage = I18n.t('An error occurred while deleting the items. Please try again.')
+        showFlashError(errorMessage)()
+        captureException(error)
+      }
+    },
+    [setSessionExpired, items],
+  )
+
   const handleConfirmDelete = useCallback(async () => {
     setIsDeleting(true)
     try {
-      const deletePromises = items.filter(Boolean).map(async (item: File | Folder) => {
-        const response = await fetch(
-          `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}?force=true`,
-          {
-            method: 'DELETE',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-Token': getCookie('_csrf_token'),
-            },
-          },
-        )
-
-        if (response.status === 401) {
-          throw new UnauthorizedError()
-        }
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(`Failed to delete ${item.id}: ${response.status} - ${errorText}`)
-        }
-      })
-
-      await Promise.all(deletePromises)
+      await deleteItems(items)
 
       const successMessage = isMultiple
         ? I18n.t('%{count} items deleted successfully.', {count: items.length})
@@ -85,17 +106,12 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
       queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
       await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
     } catch (error) {
-      if (error instanceof UnauthorizedError) {
-        setSessionExpired(true)
-        return
-      }
-      const errorMessage = I18n.t('Failed to delete items. Please try again.')
-      showFlashError(errorMessage)
+      handleError(error)
     } finally {
       onClose()
       setRowToFocus(rowIndex ?? SELECT_ALL_FOCUS_STRING)
     }
-  }, [items, isMultiple, onClose, rowIndex, setRowToFocus])
+  }, [items, isMultiple, onClose, rowIndex, setRowToFocus, handleError])
 
   return (
     <Modal

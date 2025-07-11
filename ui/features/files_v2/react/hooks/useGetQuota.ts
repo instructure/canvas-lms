@@ -17,17 +17,19 @@
  */
 
 import {useQuery} from '@tanstack/react-query'
-import {generateFilesQuotaUrl, UnauthorizedError} from '../../utils/apiUtils'
+import {doFetchApiWithAuthCheck, generateFilesQuotaUrl} from '../../utils/apiUtils'
+
+interface QuotaResponse {
+  quota_used: number
+  quota: number
+}
 
 const fetchQuota = async (contextType: string, contextId: string) => {
-  const response = await fetch(generateFilesQuotaUrl(contextType, contextId))
-  if (response.status === 401) {
-    throw new UnauthorizedError()
-  }
-  if (!response.ok) {
-    throw new Error()
-  }
-  return response.json()
+  const {json} = await doFetchApiWithAuthCheck<QuotaResponse>({
+    path: generateFilesQuotaUrl(contextType, contextId),
+  })
+
+  return json
 }
 
 const queryFn = ({queryKey}: {queryKey: [string, string, string]}) => {

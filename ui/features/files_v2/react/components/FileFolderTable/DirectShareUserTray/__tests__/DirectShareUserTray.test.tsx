@@ -127,12 +127,12 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: 178,
+          content_id: '178',
         },
       })
 
-      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(await screen.getAllByText(/success/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/success/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).toHaveBeenCalled()
     })
 
@@ -156,12 +156,12 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: 178,
+          content_id: '178',
         },
       })
 
-      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(await screen.getAllByText(/error/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/error/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).not.toHaveBeenCalled()
     })
   })

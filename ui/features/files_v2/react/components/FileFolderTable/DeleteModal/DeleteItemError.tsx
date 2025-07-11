@@ -16,29 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const file = {
-  id: '1',
-  folder_id: 'folder-1',
-  display_name: 'example.pdf',
-  filename: 'example.pdf',
-  upload_status: 'uploaded',
-  'content-type': 'application/pdf',
-  url: 'http://example.com/example.pdf',
-  size: 1024,
-  created_at: '2025-01-01T00:00:00Z',
-  updated_at: '2025-01-01T00:00:00Z',
-  unlock_at: null,
-  locked: false,
-  hidden: false,
-  lock_at: null,
-  hidden_for_user: false,
-  thumbnail_url: null,
-  modified_at: '2025-01-01T00:00:00Z',
-  mime_class: 'pdf',
-  media_entry_id: null,
-  category: 'document',
-  locked_for_user: false,
-  visibility_level: 'public',
-  preview_url: 'http://example.com/preview/example.pdf',
-  context_asset_string: 'context-1',
+import {type File, type Folder} from '../../../../interfaces/File'
+
+export class DeleteItemError extends Error {
+  failedItems: (File | Folder)[]
+
+  constructor(message: string, failedItems: (File | Folder)[]) {
+    super(message)
+    this.name = 'DeleteItemError'
+    this.failedItems = failedItems
+  }
 }

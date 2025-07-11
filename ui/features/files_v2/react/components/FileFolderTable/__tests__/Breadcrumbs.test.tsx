@@ -34,7 +34,7 @@ jest.mock('@canvas/util/globalUtils', () => ({
 }))
 
 const rootCourseFolder = {
-  id: 1,
+  id: '1',
   name: 'course files',
   full_name: 'course files',
   context_id: '2',
@@ -58,7 +58,7 @@ const rootCourseFolder = {
 }
 
 const childCourseFolder = {
-  id: 2,
+  id: '2',
   name: 'Documents',
   full_name: 'course files/Documents',
   context_id: '2',
@@ -82,7 +82,7 @@ const childCourseFolder = {
 }
 
 const child2CourseFolder = {
-  id: 3,
+  id: '3',
   name: 'PDFs',
   full_name: 'course files/Documents/PDFs',
   context_id: '2',

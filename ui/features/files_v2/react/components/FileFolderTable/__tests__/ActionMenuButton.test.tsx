@@ -36,7 +36,7 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {downloadZip} from '../../../../utils/downloadUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
+  showFlashError: jest.fn().mockReturnValue(() => {}),
 }))
 
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -404,7 +404,9 @@ describe('ActionMenuButton', () => {
       await user.click(confirmButton)
 
       await waitFor(() => {
-        expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
+        expect(showFlashError).toHaveBeenCalledWith(
+          'An error occurred while deleting the items. Please try again.',
+        )
       })
     })
 
