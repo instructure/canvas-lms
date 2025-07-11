@@ -234,7 +234,8 @@ describe AssetProcessorStudentHelper do
     end
 
     it "returns nil if lti_asset_processor feature flag is disabled" do
-      @domain_root_account.disable_feature!(:lti_asset_processor)
+      @submission.root_account.disable_feature!(:lti_asset_processor)
+
       reports = asset_reports(submission: @submission)
       expect(reports).to be_nil
     end

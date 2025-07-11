@@ -85,6 +85,18 @@ export const Assignment = {
       rubricAssociation {
         ...RubricAssociation
       }
+      ltiAssetProcessorsConnection(first: 20) {
+        nodes {
+          _id
+          externalTool {
+            _id
+            name
+          }
+          iconOrToolIconUrl
+          text
+          title
+        }
+      }
     }
     ${GradingStandard.fragment}
     ${Rubric.fragment}
@@ -144,6 +156,18 @@ export const Assignment = {
     }),
     rubric: Rubric.shape,
     rubricAssociation: RubricAssociation.shape,
+    ltiAssetProcessorsConnection: {
+      nodes: arrayOf({
+        _id: string,
+        externalTool: {
+          _id: string,
+          name: string,
+        },
+        iconOrToolIconUrl: string,
+        text: string,
+        title: string,
+      }),
+    },
   },
   mock: ({
     _id = '1',
@@ -201,6 +225,9 @@ export const Assignment = {
     ],
     rubric = Rubric.mock(),
     rubricAssociation = RubricAssociation.mock(),
+    ltiAssetProcessorsConnection = {
+      nodes: [],
+    },
   } = {}) => ({
     _id,
     allowedAttempts,
@@ -230,5 +257,6 @@ export const Assignment = {
     modules,
     rubric,
     rubricAssociation,
+    ltiAssetProcessorsConnection,
   }),
 }

@@ -81,6 +81,7 @@ export const gradingPeriodRow = (
       <Table.Cell textAlign="center">
         <Text weight="bold">{ENV.restrict_quantitative_data ? letterGrade : formattedScore}</Text>
       </Table.Cell>
+      <Table.Cell>{/* Document processors */}</Table.Cell>
     </Table.Row>
   )
 }

@@ -42,12 +42,21 @@ import {rubricRow} from './AssignmentTableRows/RubricRow'
 
 const I18n = createI18nScope('grade_summary')
 
-const headers = [
-  {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
-  {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
-  {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '15%'},
-  {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
-]
+function createHeaders(showDocumentProcessors) {
+  return [
+    {key: 'name', value: I18n.t('Name'), id: nanoid(), alignment: 'start', width: '30%'},
+    {key: 'dueAt', value: I18n.t('Due Date'), id: nanoid(), alignment: 'start', width: '20%'},
+    {key: 'status', value: I18n.t('Status'), id: nanoid(), alignment: 'center', width: '15%'},
+    {key: 'score', value: I18n.t('Score'), id: nanoid(), alignment: 'center', width: '10%'},
+    {
+      key: 'assetReports',
+      value: showDocumentProcessors ? I18n.t('Document Processors') : '',
+      id: nanoid(),
+      alignment: 'start',
+      width: showDocumentProcessors ? null : '0',
+    },
+  ]
+}
 
 const getCurrentOrFinalGrade = (
   allGradingPeriods,
@@ -60,6 +69,31 @@ const getCurrentOrFinalGrade = (
   } else {
     return current
   }
+}
+
+const hasAssetReports = submission => {
+  const nodes = submission?.ltiAssetReportsConnection?.nodes
+  return nodes !== undefined && nodes !== null
+}
+
+const shouldShowDocumentProcessorsColumn = assignmentsData => {
+  if (!assignmentsData?.assignments) {
+    return false
+  }
+
+  if (
+    !assignmentsData.assignments.some(
+      assignment =>
+        assignment?.ltiAssetProcessorsConnection &&
+        assignment.ltiAssetProcessorsConnection.nodes.length > 0,
+    )
+  ) {
+    return false
+  }
+
+  return assignmentsData.assignments.some(assignment =>
+    assignment?.submissionsConnection?.nodes?.some(hasAssetReports),
+  )
 }
 
 const AssignmentTable = ({
@@ -87,8 +121,12 @@ const AssignmentTable = ({
       activeWhatIfScores,
     ),
   )
+
   const overrideGrade =
     queryData?.usersConnection?.nodes[0]?.enrollments[0]?.grades?.overrideGrade || null
+
+  const showDocumentProcessors = shouldShowDocumentProcessorsColumn(assignmentsData)
+  const headers = createHeaders(showDocumentProcessors)
 
   useEffect(() => {
     const grades = calculateCourseGrade(
@@ -143,12 +181,12 @@ const AssignmentTable = ({
         <Table.Row>
           {(headers || []).map(header => (
             <Table.ColHeader
-              key={header?.key}
-              id={header?.id}
-              textAlign={header?.alignment}
-              width={header?.width}
+              key={header.key}
+              id={header.id}
+              textAlign={header.alignment}
+              width={header.width}
             >
-              {header?.value}
+              {header.value}
             </Table.ColHeader>
           ))}
         </Table.Row>
@@ -179,6 +217,7 @@ const AssignmentTable = ({
                 openRubricDetailIds,
                 setActiveWhatIfScores,
                 activeWhatIfScores,
+                showDocumentProcessors,
               ),
               openAssignmentDetailIds.includes(modifiedAssignment._id) &&
               modifiedAssignment?.scoreStatistic

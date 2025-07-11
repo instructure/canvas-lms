@@ -39,6 +39,7 @@ import {View} from '@instructure/ui-view'
 
 import WhatIfGrade from '../WhatIfGrade'
 import {getDisplayStatus, getDisplayScore, submissionCommentsPresent} from '../utils'
+import AssetProcessorCell from '../../AssetProcessorCell'
 
 const I18n = createI18nScope('grade_summary')
 
@@ -92,6 +93,7 @@ export const assignmentRow = (
   openRubricDetailIds,
   setActiveWhatIfScores,
   activeWhatIfScores,
+  showDocumentProcessors = false,
 ) => {
   const handleAssignmentDetailOpen = () => {
     if (!openAssignmentDetailIds.includes(assignment._id)) {
@@ -154,6 +156,8 @@ export const assignmentRow = (
       </IconButton>
     )
   }
+
+  const reports = assignment?.submissionsConnection?.nodes[0]?.ltiAssetReportsConnection?.nodes
 
   return (
     <Table.Row
@@ -258,6 +262,14 @@ export const assignmentRow = (
                 </Flex.Item>
               )}
           </Flex>
+        )}
+      </Table.Cell>
+      <Table.Cell textAlign="start">
+        {showDocumentProcessors && reports !== undefined && reports !== null && (
+          <AssetProcessorCell
+            assetProcessors={assignment?.ltiAssetProcessorsConnection?.nodes || []}
+            assetReports={reports}
+          />
         )}
       </Table.Cell>
       <Table.Cell textAlign="end">

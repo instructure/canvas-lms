@@ -647,10 +647,15 @@ module Types
     field :lti_asset_processors_connection, LtiAssetProcessorType.connection_type, null: true
     def lti_asset_processors_connection
       load_association(:context).then do |course|
-        # In the future we may need this for students, but for now
-        # this is safest
-        if course.root_account.feature_enabled?(:lti_asset_processor) && course.grants_right?(current_user, :manage_grades)
+        next unless course.root_account.feature_enabled?(:lti_asset_processor)
+
+        # Check if user has manage_grades permission or if student can read their own grade
+        if course.grants_right?(current_user, :manage_grades)
           load_association(:lti_asset_processors)
+        elsif current_user && (submission = assignment.submissions.find_by(user: current_user))
+          if submission.user_can_read_grade?(current_user)
+            load_association(:lti_asset_processors)
+          end
         end
       end
     end
