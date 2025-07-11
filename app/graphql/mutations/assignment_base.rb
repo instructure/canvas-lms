@@ -53,8 +53,16 @@ class Mutations::AssignmentBase::AssignmentPeerReviewsUpdate < GraphQL::Schema::
   argument :intra_reviews, Boolean, required: false
 end
 
+class Mutations::AssignmentBase::LtiAssetProcessorCreateOrUpdate < GraphQL::Schema::InputObject
+  # Structure should match up with UI's AttachedAssetProcessorDto
+  argument :existing_id, Int, required: false
+  # OR:
+  argument :new_content_item, Mutations::LtiContentItems::LtiAssetProcessorDto, required: false
+end
+
 class Mutations::AssignmentBase::AssignmentInputBase < GraphQL::Schema::InputObject
   argument :ab_guid, [String], required: false
+  argument :asset_processors, [Mutations::AssignmentBase::LtiAssetProcessorCreateOrUpdate], required: false
   argument :assignment_group_id, ID, required: false
   argument :assignment_overrides, [Mutations::AssignmentBase::AssignmentOverrideCreateOrUpdate], required: false
   argument :due_at, Types::DateTimeType, required: false

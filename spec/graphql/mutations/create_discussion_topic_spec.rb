@@ -1047,6 +1047,126 @@ describe Mutations::CreateDiscussionTopic do
       end
     end
 
+    it "successfully creates a graded discussion topic with new LTI Asset Processors" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: Course
+        title: "Discussion"
+        assignment: {
+          courseId: "#{@course.id}"
+          name: "Discussion"
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: #{tool.id}
+                url: "https://example.com/lti-tool"
+                title: "My AP"
+                text: "My AP Text"
+                icon: { url: "https://example.com/icon.png", width: 50, height: 50 }
+                thumbnail: { url: "https://example.com/thumbnail.png", width: 50, height: 50 }
+                window: { targetName: "_blank", width: 800, height: 600, windowFeatures: "popup=true,left=0" }
+                iframe: { width: 800, height: 600 }
+                custom: { custom_param_1: "custom_value_1", custom_param_2: "custom_value_2" }
+                report: {
+                  url: "https://example.com/report-url"
+                  custom: { report_param_1: "report_value_1" }
+                }
+              }
+            }
+            {
+              newContentItem: {
+                contextExternalToolId: #{tool.id}
+                title: "My AP2"
+              }
+            }
+          ]
+        }
+      GQL
+
+      result = execute_with_input_with_assignment(query)
+      expect(result.dig("data", "createDiscussionTopic", "errors")).to be_nil
+      assignment = Assignment.last
+      expect(assignment.lti_asset_processors.count).to eq 2
+      aggregate_failures do
+        expect(result.dig("data", "createDiscussionTopic", "errors")).to be_nil
+        ap1 = assignment.lti_asset_processors.first
+        ap2 = assignment.lti_asset_processors.last
+        expect(ap1.context_external_tool_id).to eq tool.id
+        expect(ap1.url).to eq "https://example.com/lti-tool"
+        expect(ap1.title).to eq "My AP"
+        expect(ap1.text).to eq "My AP Text"
+        expect(ap1.icon).to eq({ "url" => "https://example.com/icon.png", "width" => 50, "height" => 50 })
+        # thumbnail accepted, but ignored
+        expect(ap1.window).to eq({ "targetName" => "_blank", "width" => 800, "height" => 600, "windowFeatures" => "popup=true,left=0" })
+        expect(ap1.iframe).to eq({ "width" => 800, "height" => 600 })
+        expect(ap1.custom).to eq({ "custom_param_1" => "custom_value_1", "custom_param_2" => "custom_value_2" })
+        expect(ap1.report).to eq({ "url" => "https://example.com/report-url", "custom" => { "report_param_1" => "report_value_1" } })
+        expect(ap2.context_external_tool_id).to eq tool.id
+        expect(ap2.title).to eq "My AP2"
+        expect(ap2.text).to be_nil
+      end
+    end
+
+    it "requires custom parameters values to be strings for LTI Asset Processors" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: Course
+        title: "Discussion"
+        assignment: {
+          courseId: "#{@course.id}"
+          name: "Discussion"
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: #{tool.id}
+                custom: { custom_param_1: 123, custom_param_2: true }
+                report: {
+                  custom: { report_param_1: { foo: "bar" } }
+                }
+              }
+            }
+          ]
+        }
+      GQL
+      expect do
+        result = execute_with_input_with_assignment(query)
+        expect(result["errors"]).not_to be_nil
+        expect(result["errors"][0]["message"]).to match(/custom_param_1.*StringMap/)
+        expect(result["errors"][1]["message"]).to match(/report_param_1.*StringMap/)
+      end.not_to change { Assignment.count }
+    end
+
+    it "does not create LTI asset processors if the feature flag is disabled" do
+      @course.account.disable_feature!(:lti_asset_processor_discussions)
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+
+      query = <<~GQL
+        contextId: "#{@course.id}"
+        contextType: Course
+        title: "Discussion"
+        assignment: {
+          courseId: "#{@course.id}"
+          name: "Discussion"
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: #{tool.id}
+              }
+            }
+          ]
+        }
+      GQL
+      expect do
+        result = execute_with_input_with_assignment(query)
+        expect(result["errors"]).to be_nil
+        expect(Assignment.last.lti_asset_processors.count).to eq 0
+      end.to change { Assignment.count }.by(1)
+    end
+
     it "student fails to create graded discussion topic" do
       context_type = "Course"
       title = "Graded Discussion"

@@ -1130,7 +1130,7 @@ module Api::V1::Assignment
 
     apply_external_tool_settings(assignment, assignment_params)
     begin
-      apply_asset_processor_settings(assignment, assignment_params) if assignment.root_account.feature_enabled?(:lti_asset_processor)
+      apply_asset_processor_settings_if_updated(assignment, assignment_params)
     rescue Schemas::Base::InvalidSchema
       assignment.errors.add("asset_processors", I18n.t("The document processing app is invalid. Please contact the tool provider"))
       return invalid
@@ -1276,23 +1276,36 @@ module Api::V1::Assignment
     end
   end
 
-  def apply_asset_processor_settings(assignment, assignment_params)
-    # Ignore unless truly an edit (e.g. ignore publish/unpublish, which should really be a PATCH, but the API doesn't work that way...)
-    submission_types = assignment_params["submission_types"]
-    return unless submission_types.present?
+  def apply_asset_processor_settings_if_updated(assignment, assignment_params)
+    return unless assignment.root_account.feature_enabled?(:lti_asset_processor)
 
-    if asset_processor_capable?(submission_types:)
-      add_or_remove_asset_processors(assignment, assignment_params)
-    elsif asset_processor_capable?(submission_types: assignment.submission_types_array)
-      # Remove APs if the assignment is no longer capable.
+    # Submission types and asset processors set in the API call
+    # "new_asset_processors" is an array of hashes with either "existing_id" or "new_content_item"
+    will_be_ap_capable = asset_processor_capable?(
+      assignment:,
+      submission_types: assignment_params["submission_types"] || assignment.submission_types_array
+    )
+    was_ap_capable = asset_processor_capable?(
+      assignment:,
+      submission_types: assignment.submission_types_array
+    )
+
+    asset_processors_from_params = assignment_params["asset_processors"]
+    if will_be_ap_capable && !asset_processors_from_params.nil?
+      # Don't change asset processors if asset_processors is nil or wasn't
+      # given in the API call. Still handle the case where asset_processors is
+      # [] (meaning, delete all processors).
+      sync_asset_processors(assignment, asset_processors_from_params:)
+    end
+
+    if was_ap_capable && !will_be_ap_capable
       assignment.lti_asset_processors.destroy_all
     end
   end
 
-  def add_or_remove_asset_processors(assignment, assignment_params)
-    asset_processors = assignment_params["asset_processors"] || []
-    existing_ids_to_keep = asset_processors.filter_map { |ap| ap["existing_id"] }
-    content_items_to_create = asset_processors.filter_map { |ap| ap["new_content_item"] }
+  def sync_asset_processors(assignment, asset_processors_from_params:)
+    existing_ids_to_keep = asset_processors_from_params.filter_map { |ap| ap["existing_id"] }
+    content_items_to_create = asset_processors_from_params.filter_map { |ap| ap["new_content_item"] }
 
     assignment.lti_asset_processors.where.not(id: existing_ids_to_keep).destroy_all
     assignment.lti_asset_processors += content_items_to_create.filter_map do |content_item|
@@ -1330,9 +1343,18 @@ module Api::V1::Assignment
       assignment_params["submission_types"].include?("online_text_entry"))
   end
 
-  def asset_processor_capable?(submission_types:)
-    submission_types.presence&.include?("online_upload") ||
-      submission_types.presence&.include?("online_text_entry")
+  def asset_processor_capable?(assignment:, submission_types:)
+    return true if submission_types.presence&.include?("online_upload")
+    return true if submission_types.presence&.include?("online_text_entry")
+
+    return false unless assignment.root_account.feature_enabled?(:lti_asset_processor_discussions)
+
+    submission_types == ["discussion_topic"] ||
+      (
+        # This case happens when creating a discussion topic:
+        submission_types.blank? && assignment.submission_types.blank? &&
+        assignment.discussion_topic.present?
+      )
   end
 
   def submissions_download_url(context, assignment)

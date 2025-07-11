@@ -1477,7 +1477,8 @@ EditView.prototype.getFormData = function () {
     )
   }
 
-  data.asset_processors = data.asset_processors?.map(tryJsonParse)
+  // Important to set to empty array if not present so the APs are cleared
+  data.asset_processors = data.asset_processors?.map(tryJsonParse) || []
 
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)

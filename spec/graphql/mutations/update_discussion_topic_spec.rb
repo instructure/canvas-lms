@@ -172,8 +172,22 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
     args << "forCheckpoints: #{assignment[:forCheckpoints]}" if assignment[:forCheckpoints]
     args << "lockAt: \"#{assignment[:lockAt]}\"" if assignment[:lockAt]
     args << "unlockAt: \"#{assignment[:unlockAt]}\"" if assignment[:unlockAt]
+    args << "assetProcessors: #{to_gql(assignment[:assetProcessors])}" if assignment[:assetProcessors]
 
     "assignment: { #{args.join(", ")} }"
+  end
+
+  def to_gql(obj)
+    case obj
+    when Array
+      "[#{obj.map { |item| to_gql(item) }.join(", ")}]"
+    when Hash
+      "{ #{obj.map { |k, v| "#{k}: #{to_gql(v)}" }.join(", ")} }"
+    when String, Numeric, TrueClass, FalseClass, NilClass
+      obj.to_json
+    else
+      raise ArgumentError, "Unsupported type: #{obj.class}"
+    end
   end
 
   def checkpoints_str(checkpoints)
@@ -702,6 +716,99 @@ RSpec.describe Mutations::UpdateDiscussionTopic do
 
       # Verify that a new DiscussionTopic wasn't created
       expect(DiscussionTopic.last.id).to eq(@topic.id)
+    end
+
+    it "can add asset processors to a new assignment" do
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+      result = run_mutation(
+        id: @topic.id,
+        assignment: {
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: tool.id,
+                url: "https://example.com/lti-tool",
+                title: "My AP",
+                text: "My AP Text",
+                icon: { url: "https://example.com/icon.png", width: 50, height: 50 },
+                window: { targetName: "_blank", width: 800, height: 600, windowFeatures: "width=800,height=600" },
+                iframe: { width: 800, height: 600 },
+                custom: { custom_param_1: "custom_value_1", custom_param_2: "custom_value_2" },
+                report: {
+                  url: "https://example.com/report-url",
+                  custom: { report_param_1: "report_value_1" }
+                }
+              }
+            },
+          ]
+        }
+      )
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.assignment.lti_asset_processors.count).to eq 1
+      asset_processor = @topic.assignment.lti_asset_processors.first
+      expect(asset_processor.context_external_tool_id).to eq tool.id
+      expect(asset_processor.url).to eq "https://example.com/lti-tool"
+      expect(asset_processor.title).to eq "My AP"
+      expect(asset_processor.text).to eq "My AP Text"
+      expect(asset_processor.icon).to eq({
+                                           "url" => "https://example.com/icon.png",
+                                           "width" => 50,
+                                           "height" => 50
+                                         })
+      expect(asset_processor.window).to eq({
+                                             "targetName" => "_blank",
+                                             "windowFeatures" => "width=800,height=600",
+                                             "width" => 800,
+                                             "height" => 600
+                                           })
+      expect(asset_processor.custom).to eq({ "custom_param_1" => "custom_value_1", "custom_param_2" => "custom_value_2" })
+      expect(asset_processor.report).to eq({
+                                             "url" => "https://example.com/report-url",
+                                             "custom" => { "report_param_1" => "report_value_1" }
+                                           })
+    end
+
+    it "deletes the asset processors when the group is no longer graded" do
+      assignment = @topic.assignment
+      tool = lti_registration_with_tool(account: @course.account).deployments.first
+      ap = lti_asset_processor_model(assignment:, context_external_tool: tool)
+
+      result = run_mutation(id: @topic.id, assignment: { setAssignment: false })
+      expect(result["errors"]).to be_nil
+
+      expect(Assignment.find(@discussion_assignment.id).workflow_state).to eq "deleted"
+      expect(ap.reload.workflow_state).to eq "deleted"
+    end
+
+    it "can add, retain, and delete asset processors for an existing assignment" do
+      assignment = @topic.assignment
+      tool1 = lti_registration_with_tool(account: @course.account).deployments.first
+      tool2 = lti_registration_with_tool(account: @course.account).deployments.first
+
+      ap1 = lti_asset_processor_model(assignment:, context_external_tool: tool1)
+      ap2 = lti_asset_processor_model(assignment:, context_external_tool: tool2)
+
+      result = run_mutation(
+        id: @topic.id,
+        assignment: {
+          assetProcessors: [
+            {
+              newContentItem: {
+                contextExternalToolId: ap1.context_external_tool_id,
+                title: "Episode IV: A New AP",
+              }
+            },
+            { existingId: ap2.id }
+          ]
+        }
+      )
+      expect(result["errors"]).to be_nil
+      expect(@topic.reload.assignment.lti_asset_processors.count).to eq 2
+      asset_processors = @topic.assignment.lti_asset_processors
+      expect(asset_processors.map(&:id)).to include(ap2.id)
+      expect(asset_processors.map(&:id)).to_not include(ap1.id)
+      expect(asset_processors.map(&:title)).to include("Episode IV: A New AP", ap2.title)
+      expect(ap1.reload.workflow_state).to eq "deleted"
     end
 
     it "updates the group category id" do

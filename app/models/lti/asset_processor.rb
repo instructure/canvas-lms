@@ -43,6 +43,7 @@ class Lti::AssetProcessor < ApplicationRecord
   end
 
   # Should match up with UI's AssetProcessorContentItemDto
+  # and class Mutations::LtiContentItems::LtiAssetProcessorDto < GraphQL::Schema::InputObject
   def self.build_for_assignment(content_item:, context:)
     # Check tool is in the course or account:
     tool = Lti::ToolFinder.from_id(content_item["context_external_tool_id"], context)
