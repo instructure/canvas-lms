@@ -39,23 +39,20 @@ describe Lti::ListRegistrationService do
 
     context "with registrations" do
       let_once(:site_admin_registration) do
-        lti_tool_configuration_model(account: site_admin).lti_registration
+        lti_registration_with_tool(account: site_admin)
       end
       let_once(:registration) do
-        lti_tool_configuration_model(account:).lti_registration
+        lti_registration_with_tool(account:)
       end
       let_once(:site_admin_binding) do
-        binding = Lti::RegistrationAccountBinding.create!(registration: site_admin_registration, account: Account.site_admin, workflow_state: "on")
+        binding = Lti::RegistrationAccountBinding.find_by!(registration: site_admin_registration, account: Account.site_admin)
+        binding.update!(workflow_state: "on")
         binding
       end
       let_once(:registration_binding) do
-        binding = Lti::RegistrationAccountBinding.create!(registration:, account:, workflow_state: "on")
+        binding = Lti::RegistrationAccountBinding.find_by!(registration:, account:)
+        binding.update!(workflow_state: "on")
         binding
-      end
-
-      before do
-        site_admin_binding
-        registration_binding
       end
 
       it "returns the registrations" do
@@ -63,6 +60,8 @@ describe Lti::ListRegistrationService do
       end
 
       it "preloads the associations" do
+        expect(subject[:registrations][0].association(:created_by)).to be_loaded
+        expect(subject[:registrations][0].association(:updated_by)).to be_loaded
         expect(subject[:preloaded_associations]).to eq({
                                                          registration.global_id => { account_binding: registration_binding },
                                                          site_admin_registration.global_id => { account_binding: site_admin_binding }
