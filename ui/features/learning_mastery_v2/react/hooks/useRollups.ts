@@ -31,7 +31,7 @@ import {
   StudentRollupData,
   Pagination,
 } from '../types/rollup'
-import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../utils/constants'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy} from '../utils/constants'
 import {Sorting} from '../types/shapes'
 
 const I18n = createI18nScope('OutcomeManagement')
@@ -115,6 +115,7 @@ export default function useRollups({
   })
   const [studentsPerPage, setStudentsPerPage] = useState<number>(DEFAULT_STUDENTS_PER_PAGE)
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.SortableName)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -129,6 +130,7 @@ export default function useRollups({
           currentPage,
           studentsPerPage,
           sortOrder,
+          sortBy,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         const students = getStudents(data.rollups, fetchedUsers)
@@ -159,6 +161,7 @@ export default function useRollups({
     currentPage,
     studentsPerPage,
     sortOrder,
+    sortBy,
   ])
 
   return {
@@ -174,6 +177,8 @@ export default function useRollups({
     sorting: {
       sortOrder,
       setSortOrder,
+      sortBy,
+      setSortBy,
     },
   }
 }

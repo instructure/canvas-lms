@@ -1985,18 +1985,46 @@ describe OutcomeResultsController do
       end
 
       context "by student" do
-        it "sorts rollups by ascending student name" do
+        it "sorts rollups by ascending student sortable name" do
           get_rollups(sort_by: "student")
           expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json["rollups"], [@student1, @student2, @student3])
         end
 
-        it "sorts rollups by descending student name" do
+        it "sorts rollups by descending student sortable name" do
           get_rollups(sort_by: "student", sort_order: "desc")
           expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json["rollups"], [@student3, @student2, @student1])
+        end
+
+        it "sorts rollups by ascending student name" do
+          get_rollups(sort_by: "student_name", sort_order: "asc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
+        end
+
+        it "sorts rollups by ascending student sis id" do
+          get_rollups(sort_by: "student_sis_id", sort_order: "asc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
+        end
+
+        it "sorts rollups by ascending student integration id" do
+          get_rollups(sort_by: "student_integration_id", sort_order: "asc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
+        end
+
+        it "sorts rollups by ascending student login id" do
+          get_rollups(sort_by: "student_login_id", sort_order: "asc")
+          expect(response).to be_successful
+          json = parse_response(response)
+          expect_user_order(json["rollups"], [@student1, @student2, @student3])
         end
 
         context "with teachers who have limited privilege" do
