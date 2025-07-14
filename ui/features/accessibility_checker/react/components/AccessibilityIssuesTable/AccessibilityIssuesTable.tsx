@@ -103,7 +103,10 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
   )
   const pageSize = useAccessibilityCheckerStore(useShallow(state => state.pageSize))
 
-  const [orderedTableData, setOrderedTableData] = useState<ContentItem[]>([])
+  const setOrderedTableData = useAccessibilityCheckerStore(
+    useShallow(state => state.setOrderedTableData),
+  )
+  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
 
   const handleSort = useCallback(
     (_event: React.SyntheticEvent, param: {id: TableColHeaderProps['id']}) => {
