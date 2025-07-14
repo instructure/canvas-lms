@@ -97,6 +97,8 @@ const BulkActionButtons = ({
   const handleDownload = useCallback(() => downloadZip(selectedRows), [selectedRows])
 
   const selectedItems = rows.filter(row => selectedRows.has(getUniqueId(row)))
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
 
   const buildModals = useCallback(
     () => (
@@ -244,7 +246,7 @@ const BulkActionButtons = ({
                       </Flex>
                     </Menu.Item>
                   )}
-                  {userCanEditFilesForContext && (
+                  {userCanEditFilesForContext && !isAccessRestricted && (
                     <Menu.Item
                       disabled={containsLockedBPItems}
                       data-testid="bulk-actions-move-button"

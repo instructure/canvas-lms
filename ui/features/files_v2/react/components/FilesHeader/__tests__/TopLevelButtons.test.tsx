@@ -49,6 +49,16 @@ const renderComponent = (props?: any, context: Partial<FileManagementContextProp
 }
 
 describe('TopLevelButtons', () => {
+  let originalENV: typeof ENV
+
+  beforeEach(() => {
+    originalENV = {...window.ENV}
+  })
+
+  afterEach(() => {
+    Object.assign(ENV, originalENV)
+  })
+
   it('renders "All My Files" button when isUserContext is false', () => {
     renderComponent()
 

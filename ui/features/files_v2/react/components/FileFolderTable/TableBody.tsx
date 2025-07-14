@@ -251,6 +251,9 @@ const TableBody: React.FC<TableBodyProps> = ({
     )
   }
 
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+
   return (
     <>
       {rows.map((row, index) => {
@@ -319,7 +322,7 @@ const TableBody: React.FC<TableBodyProps> = ({
         return (
           <Table.Row
             draggable
-            onDragStart={e => handleDragStart(e, row)}
+            onDragStart={e => !isAccessRestricted && handleDragStart(e, row)}
             onDrop={e => handleDrop(e, row)}
             onDragEnd={handleDragEnd}
             onDragEnter={e => handleDragEnter(e, index, row)}
