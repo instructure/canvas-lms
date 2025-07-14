@@ -1463,6 +1463,12 @@ describe Account do
       manual_course_account = acct.manually_created_courses_account
       expect(manual_course_account.id).not_to eq bad_acct.id
     end
+
+    it "works if the account model has changes" do
+      acct = Account.default
+      acct.name = "changed"
+      expect(acct.manually_created_courses_account).to be_present
+    end
   end
 
   describe "account_users_for" do
