@@ -1049,6 +1049,114 @@ describe GroupCategoriesController do
     end
   end
 
+  describe "POST import_tags" do
+    before :once do
+      @course.account.enable_feature! :assign_to_differentiation_tags
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: true }
+      @course.account.save!
+      @course.account.reload
+
+      1.upto(5) do |n|
+        @course.enroll_user(user_with_pseudonym(username: "user#{n}"), "StudentEnrollment", enrollment_state: "active")
+      end
+    end
+
+    def expect_imported_tags
+      tag_1 = Group.where(name: "tag1", non_collaborative: true).first
+      expect(tag_1).not_to be_nil
+      expect(tag_1.users.count).to eq 2
+      expect(tag_1.users).to include(Pseudonym.where(unique_id: "user1").first.user)
+      expect(tag_1.users).to include(Pseudonym.where(unique_id: "user2").first.user)
+
+      tag_2 = Group.where(name: "tag2", non_collaborative: true).first
+      expect(tag_2).not_to be_nil
+      expect(tag_2.users.count).to eq 2
+      expect(tag_2.users).to include(Pseudonym.where(unique_id: "user3").first.user)
+      expect(tag_2.users).to include(Pseudonym.where(unique_id: "user4").first.user)
+
+      tag_3 = Group.where(name: "tag3", non_collaborative: true).first
+      expect(tag_3).not_to be_nil
+      expect(tag_3.users.count).to eq 1
+      expect(tag_3.users).to include(Pseudonym.where(unique_id: "user5").first.user)
+    end
+
+    it "requires authorization" do
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+      assert_unauthorized
+    end
+
+    it "allows teachers with manage_tags_add permission to import differentiation tags" do
+      user_session(@teacher)
+
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+      expect(response).to be_successful
+
+      json = response.parsed_body
+      expect(json["context_type"]).to eq "Course"
+      expect(json["tag"]).to eq "course_group_import"
+      expect(json["completion"]).to eq 0
+    end
+
+    it "prevents importing when manage_tags_add permission is revoked" do
+      @course.account.role_overrides.create!(
+        permission: :manage_tags_add,
+        role: teacher_role,
+        enabled: false
+      )
+      user_session(@teacher)
+
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+      assert_unauthorized
+    end
+
+    it "creates differentiation tags and adds users as specified in the csv" do
+      user_session(@teacher)
+
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+      expect(response).to be_successful
+
+      run_jobs
+      expect_imported_tags
+    end
+
+    it "fails if the feature flag is disabled" do
+      @course.account.disable_feature! :assign_to_differentiation_tags
+      user_session(@teacher)
+
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+
+      assert_unauthorized
+    end
+
+    it "fails if the account settings is disabled" do
+      @course.account.settings[:allow_assign_to_differentiation_tags] = { value: false }
+      @course.account.save!
+      user_session(@teacher)
+
+      post "import_tags", params: {
+        course_id: @course.id,
+        attachment: fixture_file_upload("group_categories/test_tag_import.csv", "text/csv")
+      }
+
+      assert_unauthorized
+    end
+  end
+
   describe "GET index" do
     it "returns only collaborative group categories when differentiation tag FF is off" do
       user_session(@teacher)

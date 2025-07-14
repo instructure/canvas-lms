@@ -97,7 +97,7 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :require_context, only: [:create, :index]
+  before_action :require_context, only: %i[create index import_tags]
   before_action :get_category_context, only: %i[show update destroy groups users assign_unassigned_members import export]
 
   include Api::V1::Attachment
@@ -423,6 +423,68 @@ class GroupCategoriesController < ApplicationController
     render json: { errors: e.message }, status: :bad_request
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: e.message }, status: :not_found
+  end
+
+  # @API Import differentiation tags
+  #
+  # Create Differentiation Tags through a CSV import
+  #
+  # For more information on the format that's expected here, please see the
+  # "Differentiation Tag CSV" section in the API docs.
+  #
+  # @argument attachment
+  #   There are two ways to post differentiation tag import data - either via a
+  #   multipart/form-data form-field-style attachment, or via a non-multipart
+  #   raw post request.
+  #
+  #   'attachment' is required for multipart/form-data style posts. Assumed to
+  #   be tag data from a file upload form field named 'attachment'.
+  #
+  #   Examples:
+  #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories/import_tags'
+  #
+  #   If you decide to do a raw post, you can skip the 'attachment' argument,
+  #   but you will then be required to provide a suitable Content-Type header.
+  #   You are encouraged to also provide the 'extension' argument.
+  #
+  #   Examples:
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
+  #         -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories_tags'
+  #
+  # @example_response
+  #    # Progress (default)
+  #    {
+  #        "completion": 0,
+  #        "context_id": 20,
+  #        "context_type": "Course",
+  #        "created_at": "2013-07-05T10:57:48-06:00",
+  #        "id": 2,
+  #        "message": null,
+  #        "tag": "course_tag_import",
+  #        "updated_at": "2013-07-05T10:57:48-06:00",
+  #        "user_id": null,
+  #        "workflow_state": "running",
+  #        "url": "http://localhost:3000/api/v1/progress/2"
+  #    }
+  #
+  # @returns Progress
+  def import_tags
+    return unless check_group_authorization(context: @context, current_user: @current_user, action_category: :add, non_collaborative: true)
+
+    unless @context.account.feature_enabled?(:assign_to_differentiation_tags) && @context.account.allow_assign_to_differentiation_tags?
+      return render(json: { "status" => "unauthorized" }, status: :unauthorized)
+    end
+
+    file_obj = if params.key?(:attachment)
+                 params[:attachment]
+               else
+                 body_file
+               end
+
+    progress = GroupAndMembershipImporter.create_import_with_attachment(@context, file_obj)
+    render(json: progress_json(progress, @current_user, session))
   end
 
   # @API Import category groups

@@ -39,6 +39,7 @@ function DifferentiationTagTrayContainer(props: DifferentiationTagTrayManagerPro
     data: differentiationTagCategories,
     isLoading: isHookLoading,
     error: hookError,
+    refetch,
   } = useDifferentiationTagCategoriesIndex(courseID, {
     includeDifferentiationTags: true,
     enabled: hasValidCourseID,
@@ -54,6 +55,7 @@ function DifferentiationTagTrayContainer(props: DifferentiationTagTrayManagerPro
       differentiationTagCategories={differentiationTagCategories || []}
       isLoading={isLoading}
       error={error}
+      refetchDiffTags={() => refetch()}
     />
   )
 }
