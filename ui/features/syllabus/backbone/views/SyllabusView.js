@@ -28,9 +28,6 @@ import {reduce, each} from 'lodash'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 import {fudgeDateForProfileTimezone} from '@instructure/moment-utils'
-import {useScope as createI18nScope} from '@canvas/i18n'
-
-const I18n = createI18nScope('syllabus')
 
 function assignmentSubType(json) {
   if (/discussion/.test(json.submission_types)) return 'discussion_topic'
@@ -133,17 +130,7 @@ export default class SyllabusView extends Backbone.View {
         html_url = json.html_url
       }
 
-      let title = json.title
-      if (json.type === 'sub_assignment') {
-        const subAssignmentTag = json?.sub_assignment?.sub_assignment_tag
-        const numReplies =
-          json?.sub_assignment?.discussion_topic?.reply_to_entry_required_count || 1
-        if (subAssignmentTag === 'reply_to_topic') {
-          title = I18n.t('%{title} Reply to Topic', {title})
-        } else if (subAssignmentTag === 'reply_to_entry') {
-          title = I18n.t('%{title} Required Replies (%{numReplies})', {title, numReplies})
-        }
-      }
+      const title = json.title
 
       if (json.start_at) {
         start_at = fudgeDateForProfileTimezone(json.start_at)

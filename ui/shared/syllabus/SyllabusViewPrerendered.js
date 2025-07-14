@@ -231,7 +231,7 @@ export default {
   sub_assignments: [
     {
       id: 'sub_assignment_1',
-      title: 'Graded Discussion with Checkpoints 1',
+      title: 'Graded Discussion with Checkpoints 1 Reply to Topic',
       workflow_state: 'published',
       start_at: '2012-01-31T20:00:00-07:00',
       end_at: '2012-01-31T20:00:00-07:00',
@@ -241,7 +241,7 @@ export default {
       html_url: 'http://localhost/courses/1/assignments/1',
       sub_assignment: {
         id: '1',
-        name: 'Graded Discussion with Checkpoints 1',
+        name: 'Graded Discussion with Checkpoints 1 Reply to Topic',
         sub_assignment_tag: 'reply_to_topic',
         workflow_state: 'published',
         discussion_topic: {
@@ -254,7 +254,7 @@ export default {
     },
     {
       id: 'sub_assignment_2',
-      title: 'Graded Discussion with Checkpoints 1',
+      title: 'Graded Discussion with Checkpoints 1 Required Replies (3)',
       workflow_state: 'published',
       start_at: '2012-01-31T20:00:00-07:00',
       end_at: '2012-01-31T20:00:00-07:00',
@@ -264,7 +264,7 @@ export default {
       html_url: 'http://localhost/courses/1/assignments/1',
       sub_assignment: {
         id: '2',
-        name: 'Graded Discussion with Checkpoints 1',
+        name: 'Graded Discussion with Checkpoints 1 Required Replies (3)',
         sub_assignment_tag: 'reply_to_entry',
         workflow_state: 'published',
         discussion_topic: {
