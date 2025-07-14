@@ -22,6 +22,7 @@ export interface AccountReport {
   status: 'created' | 'running' | 'compiling' | 'complete' | 'error' | 'aborted'
   created_at: string
   progress: number
+  run_time: number
   file_url?: string
   message?: string
   parameters?: {

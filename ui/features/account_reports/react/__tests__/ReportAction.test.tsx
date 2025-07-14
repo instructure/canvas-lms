@@ -22,6 +22,13 @@ import userEvent from '@testing-library/user-event'
 import ReportAction from '../components/ReportAction'
 import {AccountReportInfo, AccountReport} from '@canvas/account_reports/types'
 import fetchMock from 'fetch-mock'
+import {QueryClient} from '@tanstack/react-query'
+import {MockedQueryClientProvider} from '@canvas/test-utils/query'
+
+function renderWithQueryClient(ui: React.ReactElement) {
+  const client = new QueryClient()
+  return render(<MockedQueryClientProvider client={client}>{ui}</MockedQueryClientProvider>)
+}
 
 const reportWithoutParameters: AccountReportInfo = {
   report: 'report_1',
@@ -42,6 +49,7 @@ const runningReport: AccountReport = {
   status: 'running',
   created_at: '2025-01-02T00:00:00Z',
   progress: 69,
+  run_time: 1.1,
   parameters: {
     extra_text: 'foo: true',
   },
@@ -54,6 +62,7 @@ const completeReport: AccountReport = {
   created_at: '2025-01-01T00:00:00Z',
   file_url: 'https://example.com/report_1.csv',
   progress: 100,
+  run_time: 33.3,
   parameters: {
     extra_text: 'foo: true',
   },
@@ -65,6 +74,7 @@ const canceledReport: AccountReport = {
   status: 'aborted',
   created_at: '2025-01-01T00:00:00Z',
   progress: 100,
+  run_time: 10,
   parameters: {
     extra_text: 'foo: true',
   },
@@ -86,7 +96,7 @@ describe('ReportAction', () => {
       const spy = jest.fn()
       const user = userEvent.setup()
 
-      const {getByText, getByLabelText} = render(
+      const {getByText, getByLabelText} = renderWithQueryClient(
         <ReportAction accountId="123" report={reportWithParameters} onStateChange={spy} />,
       )
       const button = getByText('Configure Run...').closest('button')
@@ -108,7 +118,7 @@ describe('ReportAction', () => {
       const spy = jest.fn()
       const user = userEvent.setup()
 
-      const {getByText} = render(
+      const {getByText} = renderWithQueryClient(
         <ReportAction accountId="123" report={reportWithoutParameters} onStateChange={spy} />,
       )
 
@@ -128,7 +138,7 @@ describe('ReportAction', () => {
       status: 200,
     })
 
-    const {container} = render(
+    const {container} = renderWithQueryClient(
       <ReportAction
         accountId="123"
         report={reportWithParameters}
@@ -153,7 +163,7 @@ describe('ReportAction', () => {
       status: 200,
     })
 
-    const {getByText} = render(
+    const {getByText} = renderWithQueryClient(
       <ReportAction
         accountId="123"
         report={reportWithParameters}
