@@ -749,7 +749,7 @@ RSpec.describe Lti::RegistrationsController do
 
     context "for nonexistent registration" do
       it "returns 404" do
-        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id + 1}"
+        get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id + 1_000}"
         expect(response).to be_not_found
       end
     end
