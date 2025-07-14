@@ -161,22 +161,23 @@ const BulkActionButtons = ({
           {ENV.BLUEPRINT_COURSES_DATA?.isChildCourse && <DisabledActionsInfoButton size={size} />}
         </Flex>
         <Flex gap="small" direction={direction}>
-          {renderTooltip(
-            <Button
-              data-testid="bulk-actions-download-button"
-              disabled={!isEnabled}
-              renderIcon={<IconDownloadLine />}
-              onClick={handleDownload}
-              display={buttonDisplay}
-            >
-              {isSmallScreen ? (
-                I18n.t('Download')
-              ) : (
-                <ScreenReaderContent>{I18n.t('Download')}</ScreenReaderContent>
-              )}
-            </Button>,
-            !isEnabled,
-          )}
+          {!isAccessRestricted &&
+            renderTooltip(
+              <Button
+                data-testid="bulk-actions-download-button"
+                disabled={!isEnabled}
+                renderIcon={<IconDownloadLine />}
+                onClick={handleDownload}
+                display={buttonDisplay}
+              >
+                {isSmallScreen ? (
+                  I18n.t('Download')
+                ) : (
+                  <ScreenReaderContent>{I18n.t('Download')}</ScreenReaderContent>
+                )}
+              </Button>,
+              !isEnabled,
+            )}
           {userCanDeleteFilesForContext &&
             renderTooltip(
               <Button

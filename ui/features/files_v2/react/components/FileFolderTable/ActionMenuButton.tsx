@@ -188,6 +188,7 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
+              visible: !isAccessRestricted,
               onClick: () => downloadFile(row.url),
             },
             {
@@ -248,7 +249,8 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
-              onClick: () => downloadZip(new Set([`folder-${row.id}`])),
+              visible: !isAccessRestricted,
+              onClick: () => downloadZip(new Set([`folder-${row.id.toString()}`])),
             },
             {
               icon: IconPermissionsLine,

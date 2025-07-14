@@ -28,6 +28,8 @@ import type {File} from '../../../interfaces/File'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
 const I18n = createI18nScope('files_v2')
+const isStudent = (ENV?.current_user_roles || []).includes('student')
+const userCanDownloadFilesForContext = !(ENV?.FEATURES?.restrict_student_access && isStudent)
 
 const NoFilePreviewAvailable = ({item}: {item: File}) => (
   <Flex height="100%" alignItems="center" justifyItems="center" id="file-preview">
@@ -68,11 +70,13 @@ const NoFilePreviewAvailable = ({item}: {item: File}) => (
               )}
             </Flex>
           </Flex.Item>
-          <Flex.Item padding="x-small">
-            <Button renderIcon={<IconDownloadSolid />} href={item.url} id="download-button">
-              {I18n.t('Download')}
-            </Button>
-          </Flex.Item>
+          {userCanDownloadFilesForContext && (
+            <Flex.Item padding="x-small">
+              <Button renderIcon={<IconDownloadSolid />} href={item.url} id="download-button">
+                {I18n.t('Download')}
+              </Button>
+            </Flex.Item>
+          )}
         </Flex>
       </View>
     </Flex.Item>
