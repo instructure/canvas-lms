@@ -6028,6 +6028,7 @@ nn:
   cell_number_is_required_2edcee60: "Mobiltelefonnummer er obligatorisk."
   certificate_fingerprint_b376df90: "Digitalt fingeravtrykk"
   certificate_is_not_a_ca_9ec5d574: "Sertifikat er ikkje eit CA"
+  change_alt_text_92654906: "Endre alternativ tekst"
   change_applied_89d1aa5a: "Endring utført"
   change_beginning_date_to_39dbd06e: "Endre startdato til"
   change_c5a551eb: Endre
@@ -6399,6 +6400,7 @@ nn:
   color_color_for_mastery_level_position_35079de: "Farge %{color} for ekspertisenivå %{position}"
   color_overlay_fb5ecce7: Fargelag
   column_e1ae5c64: kollonne
+  column_group_1c062368: kollonnegruppe
   columns_464bd055: Kolonnar
   come_back_later_5eab7dba: "Kom tilbake seinare"
   coming_soon_79d46687: "KJEM SNART"
@@ -11938,6 +11940,7 @@ nn:
   first_name_d5c12500: Fornamn
   first_reviewer_9ea05caa: "Fyrste korrekturlesar"
   first_reviewer_sortorder_e2184140: "Første fagfellevurderar %{sortOrder}"
+  fix_heading_hierarchy_f60884c4: "Fiks overskriftshierarkiet"
   fix_missing_policy_grade_change_records_c404507c: "Fiks manglande retningslinje for vurderingsendringsoversikt"
   flagged_as_possible_spam_ebbc4683: "Flagg som mogleg søppelpost"
   flags_ce30e8e3: Flagg
@@ -14931,6 +14934,7 @@ nn:
   learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "Lær korleis du kan bruke Microsoft Teams i Canvas"
   learn_more_about_collaborations_2978f66d: "Lær meir om samarbeid"
   learn_more_about_quiz_statistics_315a378: "Lær meir om quiz-statistikk"
+  learn_more_about_table_headers_5f5ee13: "Lær meir om tabelloverskrifter"
   learn_more_about_the_differences_a1217479: "Lær meir om skilnadene."
   learn_more_about_using_alt_text_for_images_5698df9a: "Lær meir om bruk av alternativ tekst til bilder"
   learn_more_about_using_captions_with_tables_36fe496f: "Lær meir om bruk av tabelltitlar"
@@ -15835,6 +15839,7 @@ nn:
   menu_for_group_title_fbf60567: "Meny for gruppe %{title}"
   menu_for_outcome_title_1d93378d: "Meny for læringsmål %{title}"
   menu_options_9b6b0b5c: Menyval
+  merge_links_2478df96: "Slå saman lenker"
   merge_user_accounts_a49e8fb1: "Slå saman brukarkontoar"
   mesa_public_course_syllabus_52282dd3: "Mesa offentleg emneoversikt"
   mesa_public_user_inactivity_report_a6792ccf: "Rapport over offentlege inaktive Mesa brukarar"
@@ -22547,6 +22552,7 @@ nn:
   remove_grading_scheme_title_d3942a08: "Fjern vurderingsskjema %{title}"
   remove_group_5d2f2f2d: "Fjern gruppe"
   remove_group_981d6a02: "Fjern gruppe?"
+  remove_heading_style_5fdc8855: "Fjern stil på overskrift"
   remove_icon_a4646413: "fjern ikon"
   remove_image_341340b3: "Fjern bilde"
   remove_label_11d96b8f: "Fjern %{label}"
@@ -23008,6 +23014,7 @@ nn:
     filter_no_users_found: "Finn ikkje samsvarande brukarar."
     filter_one_user_found: "Funne 1 brukar."
   row_fc0944a7: Rad
+  row_group_979f5528: Radgruppe
   row_row_message_e369e49e: "Rad %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256
