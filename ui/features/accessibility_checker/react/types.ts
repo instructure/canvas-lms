@@ -22,6 +22,12 @@ export enum ContentItemType {
   Attachment = 'attachment',
 }
 
+export const ContentTypeToKey = {
+  [ContentItemType.WikiPage]: 'pages',
+  [ContentItemType.Assignment]: 'assignments',
+  [ContentItemType.Attachment]: 'attachments',
+} as const
+
 export enum FormType {
   TextInput = 'textinput',
   RadioInputGroup = 'radio_input_group',

@@ -17,6 +17,7 @@
  */
 
 import React, {createRef, Ref, useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {useShallow} from 'zustand/react/shallow'
 
 import {Alert} from '@instructure/ui-alerts'
 import {View} from '@instructure/ui-view'
@@ -34,11 +35,12 @@ import {useDebouncedCallback} from 'use-debounce'
 
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
-import {AccessibilityIssue, ContentItem, FormType, FormValue} from '../../types'
+import {AccessibilityIssue, ContentItem, ContentTypeToKey, FormType, FormValue} from '../../types'
 import {stripQueryString} from '../../utils'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
+import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -67,6 +69,15 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
   const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string>('')
+  const [accessibilityIssues, setAccessibilityIssues, tableData, setTableData] =
+    useAccessibilityCheckerStore(
+      useShallow(state => [
+        state.accessibilityIssues,
+        state.setAccessibilityIssues,
+        state.tableData,
+        state.setTableData,
+      ]),
+    )
 
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
   const formRef: Ref<FormHandle> = createRef<FormHandle>()
@@ -125,6 +136,47 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     )
   }, [previewRef])
 
+  const updateTableData = useCallback(
+    (updatedIssues: AccessibilityIssue[]) => {
+      if (!tableData) return
+      const updatedTableData = tableData.map(contentItem => {
+        if (contentItem.id === item.id && contentItem.type === item.type) {
+          return {...contentItem, count: updatedIssues.length}
+        }
+        return contentItem
+      })
+      setTableData(updatedTableData)
+    },
+    [tableData, item, setTableData],
+  )
+
+  const updateAccessibilityIssues = useCallback(
+    (updatedIssues: AccessibilityIssue[]) => {
+      if (!accessibilityIssues) return
+
+      const key = ContentTypeToKey[item.type]
+      const collection = accessibilityIssues[key]
+      const target = collection?.[item.id]
+
+      if (!target) return
+
+      const updated = {
+        ...accessibilityIssues,
+        [key]: {
+          ...collection,
+          [item.id]: {
+            ...target,
+            issues: updatedIssues,
+            count: updatedIssues.length,
+          },
+        },
+      }
+
+      setAccessibilityIssues(updated)
+    },
+    [accessibilityIssues, item.id, item.type, setAccessibilityIssues],
+  )
+
   const handleSaveAndNext = useCallback(() => {
     if (!currentIssue) return
 
@@ -147,11 +199,21 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       .then(() => {
         const updatedIssues = issues.filter(issue => issue.id !== issueId)
         setIssues(updatedIssues)
+        updateTableData(updatedIssues)
+        updateAccessibilityIssues(updatedIssues)
         setCurrentIssueIndex(prev => Math.max(0, Math.min(prev, updatedIssues.length - 1)))
       })
       .catch(err => console.error('Error saving accessibility issue. Error is: ' + err.message))
       .finally(() => setIsRequestInFlight(false))
-  }, [currentIssue, formRef, item.id, item.type, issues])
+  }, [
+    currentIssue,
+    formRef,
+    item.type,
+    item.id,
+    issues,
+    updateTableData,
+    updateAccessibilityIssues,
+  ])
 
   const applyButtonText = useMemo(() => {
     if (!currentIssue) return null
