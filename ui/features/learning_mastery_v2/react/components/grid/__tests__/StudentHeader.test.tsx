@@ -19,13 +19,15 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {StudentHeader, StudentHeaderProps} from '../StudentHeader'
-import {SortOrder} from '../../../utils/constants'
+import {SortOrder, SortBy} from '../../../utils/constants'
 
 const makeProps = (props = {}): StudentHeaderProps => {
   return {
     sorting: {
       sortOrder: SortOrder.ASC,
       setSortOrder: jest.fn(),
+      sortBy: SortBy.Name,
+      setSortBy: jest.fn(),
     },
     ...props,
   }
@@ -40,9 +42,20 @@ describe('StudentHeader', () => {
   it('renders a menu with various sorting options', () => {
     const {getByText} = render(<StudentHeader {...makeProps()} />)
     fireEvent.click(getByText('Sort Students'))
-    expect(getByText('Sort')).toBeInTheDocument()
+    expect(getByText('Sort Order')).toBeInTheDocument()
     expect(getByText('Ascending')).toBeInTheDocument()
     expect(getByText('Descending')).toBeInTheDocument()
+  })
+
+  it('renders sorting options for student attributes', () => {
+    const {getByText} = render(<StudentHeader {...makeProps()} />)
+    fireEvent.click(getByText('Sort Students'))
+    expect(getByText('Sort By')).toBeInTheDocument()
+    expect(getByText('Name')).toBeInTheDocument()
+    expect(getByText('Sortable Name')).toBeInTheDocument()
+    expect(getByText('SIS ID')).toBeInTheDocument()
+    expect(getByText('Integration ID')).toBeInTheDocument()
+    expect(getByText('Login ID')).toBeInTheDocument()
   })
 
   it('calls setSortOrder when a sorting option is selected', () => {
@@ -59,5 +72,30 @@ describe('StudentHeader', () => {
     fireEvent.click(getByText('Sort Students'))
     fireEvent.click(getByText('Descending'))
     expect(props.sorting.setSortOrder).toHaveBeenCalledWith(SortOrder.DESC)
+  })
+
+  it('calls setSortBy when a sort by option is selected', () => {
+    const props = makeProps()
+    const {getByText} = render(<StudentHeader {...props} />)
+    const menu = getByText('Sort Students')
+    fireEvent.click(menu)
+    fireEvent.click(getByText('Name'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.Name)
+
+    fireEvent.click(menu)
+    fireEvent.click(getByText('Sortable Name'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.SortableName)
+
+    fireEvent.click(menu)
+    fireEvent.click(getByText('SIS ID'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.SisId)
+
+    fireEvent.click(menu)
+    fireEvent.click(getByText('Integration ID'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.IntegrationId)
+
+    fireEvent.click(menu)
+    fireEvent.click(getByText('Login ID'))
+    expect(props.sorting.setSortBy).toHaveBeenCalledWith(SortBy.LoginId)
   })
 })

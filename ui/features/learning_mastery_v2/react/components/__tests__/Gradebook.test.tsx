@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {Gradebook, GradebookProps} from '../Gradebook'
-import {SortOrder} from '../../utils/constants'
+import {SortOrder, SortBy} from '../../utils/constants'
 
 describe('Gradebook', () => {
   const defaultProps = (props = {}): GradebookProps => {
@@ -79,6 +79,8 @@ describe('Gradebook', () => {
       sorting: {
         sortOrder: SortOrder.ASC,
         setSortOrder: jest.fn(),
+        sortBy: SortBy.SortableName,
+        setSortBy: jest.fn(),
       },
       ...props,
     }

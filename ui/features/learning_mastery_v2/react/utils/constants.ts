@@ -30,3 +30,11 @@ export enum SortOrder {
   ASC = 'asc',
   DESC = 'desc',
 }
+
+export enum SortBy {
+  Name = 'student_name',
+  SortableName = 'student',
+  SisId = 'student_sis_id',
+  IntegrationId = 'student_integration_id',
+  LoginId = 'student_login_id',
+}
