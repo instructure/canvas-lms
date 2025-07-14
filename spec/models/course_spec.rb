@@ -6877,6 +6877,47 @@ describe Course do
         expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
       end
     end
+
+    context "student module selection feature" do
+      before :once do
+        @course.account.enable_feature!(:modules_student_module_selection)
+      end
+
+      it "shows only the specified module to students when show_student_only_module_id is set" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 2")
+      end
+
+      it "shows all modules to students when show_student_only_module_id is not set" do
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
+      end
+
+      it "shows all modules to teachers regardless of show_student_only_module_id setting" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+
+      it "shows all modules to students when feature is disabled" do
+        @course.account.disable_feature!(:modules_student_module_selection)
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
+      end
+
+      it "shows all modules to teachers even when course is concluded and manage_course_content_edit is false" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        @course.complete!
+        expect(@course.grants_right?(@teacher, :manage_course_content_edit)).to be(false)
+        expect(@course.user_has_been_admin?(@teacher)).to be(true)
+        expect(@course.user_has_been_teacher?(@teacher)).to be(true)
+        expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+
+      it "shows all modules to site admins regardless of show_student_only_module_id setting" do
+        site_admin_user = site_admin_user()
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(site_admin_user).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+    end
   end
 
   describe "#module_items_visible_to" do

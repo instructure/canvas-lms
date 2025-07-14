@@ -31,6 +31,7 @@ import moment from 'moment'
 
 const I18n = createI18nScope('context_modules_v2')
 const pixelOffset = 20
+export const ALL_MODULES = '0'
 
 export const INDENT_LOOKUP: Record<number, string> = {
   0: `${pixelOffset * 0}px`,

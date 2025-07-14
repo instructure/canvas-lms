@@ -42,7 +42,7 @@ import {ModuleAction} from '../utils/types'
 import {updateIndexes, getItemIds, handleDragEnd as dndHandleDragEnd} from '../utils/dndUtils'
 import ModuleFilterHeader from './ModuleFilterHeader'
 import {useCourseTeacher} from '../hooks/queriesTeacher/useCourseTeacher'
-import {validateModuleTeacherRenderRequirements} from '../utils/utils'
+import {validateModuleTeacherRenderRequirements, ALL_MODULES} from '../utils/utils'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useHowManyModulesAreFetchingItems} from '../hooks/queriesStudent/useHowManyModulesAreFetchingItems'
 
@@ -50,7 +50,6 @@ const I18n = createI18nScope('context_modules_v2')
 
 const MemoizedModule = memo(Module, validateModuleTeacherRenderRequirements)
 
-const ALL_MODULES = 'all'
 const ModulesList: React.FC = () => {
   const {teacherViewEnabled, studentViewEnabled, courseId} = useContextModule()
   const reorderItemsMutation = useReorderModuleItems()
