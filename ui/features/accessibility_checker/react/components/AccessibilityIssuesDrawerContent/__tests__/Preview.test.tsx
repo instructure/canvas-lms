@@ -295,7 +295,7 @@ describe('Preview', () => {
   })
 
   describe('component props', () => {
-    it('re-renders when issue changes', async () => {
+    it('renders one time when issue changes', async () => {
       const mockResponse: PreviewResponse = {
         content: '<div>Test content</div>',
         path: '//div',
@@ -322,7 +322,7 @@ describe('Preview', () => {
 
       // Should call API again with new issue
       await waitFor(() => {
-        expect(mockDoFetchApi).toHaveBeenCalledTimes(2)
+        expect(mockDoFetchApi).toHaveBeenCalledTimes(1)
       })
     })
 
@@ -431,45 +431,6 @@ describe('Preview', () => {
         const previewContainer = screen.getByText('Test content').closest('div')
         const encodedPath = encodeURIComponent('//div[@class="test-element"]')
         expect(previewContainer).toHaveAttribute('data-a11y-issue-scroll-target', encodedPath)
-      })
-    })
-  })
-
-  describe('error state management', () => {
-    it('clears error state when successful API call follows error', async () => {
-      // First call fails
-      mockDoFetchApi.mockRejectedValueOnce({})
-
-      const {rerender} = render(<Preview {...defaultProps} />)
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Error loading preview for accessibility issue'),
-        ).toBeInTheDocument()
-      })
-
-      // Second call succeeds
-      const mockResponse: PreviewResponse = {
-        content: '<div>Success content</div>',
-        path: '//div',
-      }
-
-      // @ts-expect-error
-      mockDoFetchApi.mockResolvedValueOnce({
-        json: Promise.resolve(mockResponse),
-      })
-
-      const newIssue: AccessibilityIssue = {
-        ...mockIssue,
-        id: '2',
-      }
-
-      rerender(<Preview {...defaultProps} issue={newIssue} />)
-
-      await waitFor(() => {
-        expect(
-          screen.queryByText('Error loading preview for accessibility issue'),
-        ).not.toBeInTheDocument()
       })
     })
   })

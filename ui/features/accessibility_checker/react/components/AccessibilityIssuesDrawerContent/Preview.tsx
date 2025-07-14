@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {forwardRef, useEffect, useImperativeHandle, useState} from 'react'
+import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 'react'
 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -88,28 +88,33 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const performGetRequest = (onSuccess?: () => void, onError?: (error?: Error) => void) => {
-    const params = new URLSearchParams({
-      content_type: itemType,
-      content_id: String(itemId),
-    })
-    setIsLoading(true)
-    doFetchApi<PreviewResponse>({
-      path: `${stripQueryString(window.location.href)}/preview?${params.toString()}`,
-      method: 'GET',
-    })
-      .then(result => result.json)
-      .then(resultJson => {
-        setContentResponse(resultJson || null)
-        setError(null)
-        onSuccess?.()
+  const performGetRequest = useCallback(
+    (onSuccess?: () => void, onError?: (error?: Error) => void) => {
+      const params = new URLSearchParams({
+        content_type: itemType,
+        content_id: String(itemId),
       })
-      .catch(error => {
-        setError(I18n.t('Error loading preview for accessibility issue'))
-        onError?.(error)
+
+      setIsLoading(true)
+
+      doFetchApi<PreviewResponse>({
+        path: `${stripQueryString(window.location.href)}/preview?${params.toString()}`,
+        method: 'GET',
       })
-      .finally(() => setIsLoading(false))
-  }
+        .then(result => result.json)
+        .then(resultJson => {
+          setContentResponse(resultJson || null)
+          setError(null)
+          onSuccess?.()
+        })
+        .catch(error => {
+          setError(I18n.t('Error loading preview for accessibility issue'))
+          onError?.(error)
+        })
+        .finally(() => setIsLoading(false))
+    },
+    [itemId, itemType],
+  )
 
   const performPostRequest = (
     formValue: FormValue,
@@ -153,8 +158,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
 
   useEffect(() => {
     performGetRequest()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [issue.id, itemId])
+  }, [itemId, performGetRequest])
 
   if (isLoading) {
     return (

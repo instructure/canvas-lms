@@ -62,7 +62,11 @@ const renderTableData = (
         </Table.Row>
       ) : (
         tableData.map(item => (
-          <AccessibilityIssuesTableRow key={`${item.id}`} item={item} onRowClick={onRowClick} />
+          <AccessibilityIssuesTableRow
+            key={`${item.type}-${item.id}`}
+            item={item}
+            onRowClick={onRowClick}
+          />
         ))
       )}
     </>
