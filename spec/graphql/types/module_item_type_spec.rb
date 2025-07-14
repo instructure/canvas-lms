@@ -68,6 +68,64 @@ describe Types::ModuleItemType do
     end
   end
 
+  context "can_unpublish field" do
+    let_once(:wiki_page) { course.wiki.wiki_pages.create!(title: "Test Page", body: "Content", context: course) }
+    let_once(:front_page) { course.wiki.wiki_pages.create!(title: "Front Page", body: "Front content", context: course) }
+    let_once(:wiki_item) { module1.add_item({ type: "wiki_page", id: wiki_page.id }, nil, position: 2) }
+    let_once(:front_page_item) { module1.add_item({ type: "wiki_page", id: front_page.id }, nil, position: 3) }
+
+    before(:once) do
+      course.wiki.set_front_page_url!(front_page.url)
+    end
+
+    it "returns true for regular wiki pages" do
+      resolver = GraphQLTypeTester.new(wiki_item, current_user: @teacher)
+      expect(resolver.resolve("content { canUnpublish }")).to be(true)
+    end
+
+    it "returns false for front page wiki pages" do
+      resolver = GraphQLTypeTester.new(front_page_item, current_user: @teacher)
+      expect(resolver.resolve("content { canUnpublish }")).to be(false)
+    end
+
+    it "returns true for assignments" do
+      resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+      expect(resolver.resolve("content { canUnpublish }")).to be(true)
+    end
+
+    it "correctly resolves canUnpublish for multiple wiki pages" do
+      wiki_page2 = course.wiki.wiki_pages.create!(title: "Test Page 2", body: "Content 2", context: course)
+      wiki_item2 = module1.add_item({ type: "wiki_page", id: wiki_page2.id }, nil, position: 4)
+
+      resolver1 = GraphQLTypeTester.new(wiki_item, current_user: @teacher)
+      resolver2 = GraphQLTypeTester.new(wiki_item2, current_user: @teacher)
+      resolver3 = GraphQLTypeTester.new(front_page_item, current_user: @teacher)
+
+      # Test that all resolve correctly
+      expect(resolver1.resolve("content { canUnpublish }")).to be(true)
+      expect(resolver2.resolve("content { canUnpublish }")).to be(true)
+      expect(resolver3.resolve("content { canUnpublish }")).to be(false)
+    end
+
+    context "with different content types" do
+      let_once(:quiz) { course.quizzes.create!(title: "Test Quiz") }
+      let_once(:discussion) { course.discussion_topics.create!(title: "Test Discussion") }
+      let_once(:quiz_item) { module1.add_item({ type: "quiz", id: quiz.id }, nil, position: 5) }
+      let_once(:discussion_item) { module1.add_item({ type: "discussion_topic", id: discussion.id }, nil, position: 6) }
+
+      it "handles mixed content types correctly" do
+        # Test that wiki pages use the loader while other types use their own logic
+        resolver_wiki = GraphQLTypeTester.new(wiki_item, current_user: @teacher)
+        resolver_quiz = GraphQLTypeTester.new(quiz_item, current_user: @teacher)
+        resolver_discussion = GraphQLTypeTester.new(discussion_item, current_user: @teacher)
+
+        expect(resolver_wiki.resolve("content { canUnpublish }")).to be(true)
+        expect(resolver_quiz.resolve("content { canUnpublish }")).to be(true)
+        expect(resolver_discussion.resolve("content { canUnpublish }")).to be(true)
+      end
+    end
+  end
+
   context "Module Progressions" do
     let_once(:assign2) { course.assignments.create(title: "a2", workflow_state: "published") }
     let_once(:assign3) { course.assignments.create(title: "a3", workflow_state: "published") }

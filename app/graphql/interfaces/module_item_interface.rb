@@ -106,7 +106,13 @@ module Interfaces::ModuleItemInterface
     description "Whether the module item can be unpublished"
   end
   def can_unpublish
-    object.respond_to?(:can_unpublish?) ? object.can_unpublish? : true
+    if object.is_a?(WikiPage)
+      Loaders::WikiPageLoaders::CanUnpublishLoader.for(object.context).load(object.id)
+    elsif object.respond_to?(:can_unpublish?)
+      object.can_unpublish?
+    else
+      true
+    end
   end
 
   field :graded, Boolean, null: true
