@@ -12892,4 +12892,78 @@ describe Assignment do
       end
     end
   end
+
+  describe "#restore_module_content_tags_to" do
+    before do
+      @original_course = Course.create!
+      @original_module = @original_course.context_modules.create!(name: "test module")
+      @original_assignment = @original_course.assignments.create!(title: "Blueprint Assignment", workflow_state: "active")
+      @original_module_item = @original_module.add_item(type: "assignment", id: @original_assignment.id)
+
+      @course = Course.create!
+      @module = @course.context_modules.create!(name: "test module")
+      @failed_to_duplicate_assignment = @course.assignments.create!(title: "Associated Assignment", duplicate_of_id: @original_assignment.id, workflow_state: "active")
+      @failed_to_duplicate_assignment_module_item = @module.add_item(type: "assignment", id: @failed_to_duplicate_assignment.id)
+      @failed_to_duplicate_assignment.update(workflow_state: "failed_to_duplicate")
+      @new_assignment = @course.assignments.create!(title: "New Assignment", duplicate_of_id: @original_assignment.id, workflow_state: "active")
+    end
+
+    it "restores module content tags to the new assignment" do
+      expect do
+        @failed_to_duplicate_assignment.restore_module_content_tags_to(new_assignment: @new_assignment)
+      end.not_to change { ContentTag.count }
+
+      restored_tag = ContentTag.where(content_id: @new_assignment.id).first
+      expect(restored_tag).to be_present
+      expect(restored_tag.content_type).to eq("Assignment")
+      expect(restored_tag.context_id).to eq(@course.id)
+      expect(restored_tag.context_type).to eq("Course")
+      expect(restored_tag.tag_type).to eq("context_module")
+      expect(restored_tag.workflow_state).to eq("active")
+    end
+
+    it "does not restore module content tags if the original assignment is not found" do
+      course = Course.create!
+      assignment = Assignment.create!(title: "Copy", context: course)
+
+      allow(assignment).to receive(:duplicate_of_id).and_return(999)
+      expect(Assignment).to receive(:unscoped).and_return(Assignment)
+      expect(Assignment).to receive(:find_by).with(id: 999).and_return(nil)
+
+      expect { assignment.restore_module_content_tags_to(new_assignment: assignment) }.not_to raise_error
+    end
+
+    it "does not restore the tags when the new assignment is nil" do
+      expect do
+        @failed_to_duplicate_assignment.restore_module_content_tags_to(new_assignment: nil)
+      end.not_to change { ContentTag.count }
+    end
+
+    it "does not restore tags when the new assignment's duplicate_of_id doesn't match" do
+      @failed_to_duplicate_assignment.update(duplicate_of_id: nil)
+      expect do
+        @failed_to_duplicate_assignment.restore_module_content_tags_to(new_assignment: @new_assignment)
+      end.not_to change { ContentTag.count }
+    end
+
+    it "does not restore tags when the context type is not Course" do
+      assignment = Assignment.new
+      allow(assignment).to receive(:context_type).and_return("Account")
+      expect do
+        assignment.restore_module_content_tags_to(new_assignment: @new_assignment)
+      end.not_to change { ContentTag.count }
+    end
+
+    it "does nothing when the assignment has no module content tags" do
+      other_assignment = @course.assignments.create!(title: "other assignment")
+      other_duplicate = @course.assignments.create!(
+        title: "other duplicate",
+        duplicate_of_id: other_assignment.id
+      )
+
+      expect do
+        other_assignment.restore_module_content_tags_to(new_assignment: other_duplicate)
+      end.not_to change { ContentTag.count }
+    end
+  end
 end
