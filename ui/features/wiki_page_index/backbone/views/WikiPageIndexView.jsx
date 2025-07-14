@@ -272,11 +272,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       ev.preventDefault()
     }
 
-    if (editor === 'canvas_content_builder') {
-      window.location.href = ENV.NEW_PAGE_URL
-      return
-    }
-
     this.$el.hide()
     $('body').removeClass('index')
     $('body').addClass('edit')
@@ -286,7 +281,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         editing_roles: this.default_editing_roles,
         editor,
         block_editor_attributes:
-          editor !== 'rce'
+          editor === 'block_editor'
             ? {
                 version: '0.2',
                 blocks: undefined,
