@@ -65,6 +65,11 @@
 #           "example": "2013-12-02T00:03:21-06:00",
 #           "type": "datetime"
 #         },
+#         "run_time": {
+#           "description": "The time (in seconds) the report has been waiting to run, has been running so far, or took to run to completion, depending on its current state.",
+#           "example": 33.3,
+#           "type": "number"
+#         },
 #         "parameters": {
 #           "description": "The report parameters",
 #           "example": {"course_id": 2, "start_at": "2012-07-13T10:55:20-06:00", "end_at": "2012-07-13T10:55:20-06:00"},
