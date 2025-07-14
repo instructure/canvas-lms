@@ -108,7 +108,7 @@ describe('CoursesToolbar', () => {
       enrollCheck.click()
       expect(props.onUpdateFilters).toHaveBeenCalledWith({
         enrollment_type: ['student'],
-        enrollment_workflow_state: ['active', 'invited', 'pending'],
+        enrollment_workflow_state: ['active', 'invited', 'pending', 'creation_pending'],
       })
     })
 
