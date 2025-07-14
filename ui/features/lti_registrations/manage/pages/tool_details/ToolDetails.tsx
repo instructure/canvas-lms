@@ -274,6 +274,13 @@ export const ToolDetailsInner = ({
     [registration],
   )
 
+  React.useEffect(() => {
+    document.getElementById('drawer-layout-content')?.scrollTo({
+      top: 0,
+      behavior: 'instant',
+    })
+  }, [])
+
   return (
     <Flex direction="column">
       <View
