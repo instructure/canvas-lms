@@ -355,6 +355,22 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def increment_unread_counts_after_restore
+    transaction do
+      # get a list of users who have not read the entry yet
+      DiscussionTopicParticipant.where(discussion_topic_id:)
+                                .where.not(user_id: discussion_entry_participants.read.pluck(:user_id))
+                                .update_all("unread_entry_count = unread_entry_count + 1")
+      # users = discussion_topic.discussion_topic_participants
+      #                         .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
+      # # increment unread_entry_count for topic participants
+      # if users.present?
+      #   DiscussionTopicParticipant.where(discussion_topic_id:, user_id: users)
+      #                             .update_all("unread_entry_count = unread_entry_count + 1")
+      # end
+    end
+  end
+
   def update_topic_subscription
     discussion_topic.user_ids_who_have_posted_and_admins
     unless discussion_topic.user_can_see_posts?(user)
@@ -801,5 +817,10 @@ class DiscussionEntry < ActiveRecord::Base
     return self if parent_entry.nil?
 
     parent_entry.highest_level_parent_or_self
+  end
+
+  def restore
+    update(workflow_state: "active", deleted_at: nil)
+    increment_unread_counts_after_restore
   end
 end
