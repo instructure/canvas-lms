@@ -387,7 +387,6 @@ module ApplicationHelper
 
   def license_help_link
     @include_license_dialog = true
-    css_bundle("license_help")
     js_bundle("license_help")
     icon = safe_join ["<i class='icon-question' aria-hidden='true'></i>".html_safe]
     link_to(
