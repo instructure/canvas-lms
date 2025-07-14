@@ -2434,6 +2434,7 @@ CanvasRails::Application.routes.draw do
       get "group_categories/:group_category_id/export", action: :export, as: "group_category_export", defaults: { format: :csv }
       post "group_categories/:group_category_id/assign_unassigned_members", action: "assign_unassigned_members", as: "group_category_assign_unassigned_members"
       post "courses/:course_id/group_categories/bulk_manage_differentiation_tag", action: :bulk_manage_differentiation_tag
+      post "courses/:course_id/group_categories/import_tags", action: :import_tags
     end
 
     scope(controller: :progress) do
