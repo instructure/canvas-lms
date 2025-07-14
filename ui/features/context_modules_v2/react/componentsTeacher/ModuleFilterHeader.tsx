@@ -21,6 +21,7 @@ import {IconCheckSolid} from '@instructure/ui-icons'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
+import {ALL_MODULES} from '../utils/utils'
 
 interface ModuleOption {
   id: string
@@ -46,8 +47,6 @@ interface ModuleFilterHeaderProps {
   studentViewEnabled: boolean
   disabled: boolean
 }
-
-const ALL_MODULES = 'all'
 
 const ModuleFilterHeader: React.FC<ModuleFilterHeaderProps> = ({
   moduleOptions,

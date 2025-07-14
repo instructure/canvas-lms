@@ -186,13 +186,13 @@ describe ContextModulesController do
             expect(response.body).to_not be_empty
           end
 
-          it "has the @module_show_setting with show_student_only_module_id" do
+          it "does not apply show_student_only_module_id to teachers" do
             ref_id = 111
             @course.account.enable_feature!(:modules_student_module_selection)
             @course.update!(show_student_only_module_id: ref_id)
 
             subject
-            expect(assigns(:module_show_setting)).to eql(ref_id)
+            expect(assigns(:module_show_setting)).to be_nil
           end
 
           it "has the @module_show_setting with show_teacher_only_module_id" do
