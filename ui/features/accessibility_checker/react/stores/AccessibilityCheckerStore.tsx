@@ -22,6 +22,11 @@ import {devtools} from 'zustand/middleware'
 
 import {AccessibilityData, ContentItem} from '../types'
 
+export type NextResource = {
+  index: number
+  item?: ContentItem | null
+}
+
 export type TableSortState = {
   sortId?: string | null
   sortDirection?: TableColHeaderProps['sortDirection'] | null
@@ -44,6 +49,8 @@ export type AccessibilityCheckerState = {
   accessibilityScanDisabled: boolean
   tableSortState?: TableSortState | null
   tableData: ContentItem[] | null // TODO convert items to ContentItemForDisplay[]
+  orderedTableData: ContentItem[] | null
+  nextResource: NextResource
   search?: string | null
 }
 
@@ -57,8 +64,12 @@ export type AccessibilityCheckerActions = {
   setAccessibilityScanDisabled: (accessibilityScanDisabled: boolean) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
   setTableData: (tableData: ContentItem[] | null) => void
+  setOrderedTableData: (paginatedData: ContentItem[] | null) => void
+  setNextResource: (nextResource: NextResource) => void
   setSearch: (search: string | null) => void
 }
+
+export const defaultNextResource: NextResource = {index: -1, item: null}
 
 export const initialState: AccessibilityCheckerState = {
   page: 0,
@@ -70,6 +81,8 @@ export const initialState: AccessibilityCheckerState = {
   accessibilityScanDisabled: false,
   tableSortState: null,
   tableData: null,
+  orderedTableData: null,
+  nextResource: defaultNextResource,
   search: null,
 }
 
@@ -96,6 +109,8 @@ export const useAccessibilityCheckerStore = create<
       setAccessibilityScanDisabled: accessibilityScanDisabled => set({accessibilityScanDisabled}),
       setTableSortState: tableSortState => set({tableSortState}),
       setTableData: tableData => set({tableData}),
+      setOrderedTableData: orderedTableData => set({orderedTableData}),
+      setNextResource: nextResource => set({nextResource}),
       setSearch: search => set({search}),
     }),
     {

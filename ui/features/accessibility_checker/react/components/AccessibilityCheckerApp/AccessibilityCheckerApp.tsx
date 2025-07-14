@@ -33,6 +33,7 @@ import {ContentItem} from '../../types'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {useAccessibilityFetchUtils} from './useAccessibilityFetchUtils'
+import {useNextResource} from '../../hooks/useNextResource'
 
 import SearchIssue from './Search/SearchIssue'
 
@@ -53,6 +54,9 @@ export const AccessibilityCheckerApp: React.FC = () => {
         state.setSearch,
       ]),
     )
+  const {getNextResource} = useNextResource()
+  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
+  const setNextResource = useAccessibilityCheckerStore(useShallow(state => state.setNextResource))
 
   useEffect(() => {
     doFetchAccessibilityIssues(parseFetchParams())
@@ -66,14 +70,20 @@ export const AccessibilityCheckerApp: React.FC = () => {
       const contentItem = accessibilityIssues?.[typeKey]?.[item.id]
         ? structuredClone(accessibilityIssues[typeKey]?.[item.id])
         : undefined
-
-      setSelectedItem({
+      const updatedItem = {
         ...item,
         issues: contentItem?.issues || [],
-      })
+      }
+      setSelectedItem(updatedItem)
       setIsTrayOpen(true)
+      if (orderedTableData) {
+        const nextResource = getNextResource(orderedTableData, updatedItem)
+        if (nextResource) {
+          setNextResource(nextResource)
+        }
+      }
     },
-    [accessibilityIssues, setSelectedItem, setIsTrayOpen],
+    [accessibilityIssues, setSelectedItem, setIsTrayOpen, orderedTableData],
   )
 
   const handleSearchChange = useCallback(
