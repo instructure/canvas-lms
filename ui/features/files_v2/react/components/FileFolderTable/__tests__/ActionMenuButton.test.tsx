@@ -121,13 +121,28 @@ describe('ActionMenuButton', () => {
       await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
-        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.queryByText('Download')).toBeNull()
         expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
         expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
         expect(screen.getByText('Send To...')).toBeInTheDocument()
         expect(screen.getByText('Copy To...')).toBeInTheDocument()
         expect(screen.queryByText('Move To...')).toBeNull()
         expect(screen.getByText('Delete')).toBeInTheDocument()
+      })
+    })
+
+    it('does not render download button for file when student access is restricted', async () => {
+      ENV.FEATURES = {restrict_student_access: true}
+      ENV.current_user_roles = ['student']
+
+      const user = userEvent.setup()
+      renderComponent()
+
+      const button = screen.getByTestId('action-menu-button-large')
+      await user.click(button)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Download')).toBeNull()
       })
     })
 
@@ -363,7 +378,7 @@ describe('ActionMenuButton', () => {
       await user.click(button)
       await waitFor(() => {
         expect(screen.getByText('Rename')).toBeInTheDocument()
-        expect(screen.getByText('Download')).toBeInTheDocument()
+        expect(screen.queryByText('Download')).toBeNull()
         expect(screen.getByText('Edit Permissions')).toBeInTheDocument()
         expect(screen.getByText('Manage Usage Rights')).toBeInTheDocument()
         expect(screen.queryByText('Move To...')).toBeNull()
