@@ -322,7 +322,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
     sortable: true,
     render: r => {
       const appName = (
-        <Flex>
+        <Flex display="inline-flex">
           <ToolIconOrDefault
             iconUrl={r.icon_url}
             toolId={r.id}
