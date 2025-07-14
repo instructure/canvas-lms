@@ -74,6 +74,11 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
     setFileOptions(FileOptionsCollection.getState())
   }, [])
 
+  const handleClose = useCallback(() => {
+    onDismiss()
+    queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+  }, [onDismiss])
+
   const resolveCollisions = useCallback(
     (nameCollisions: FileOptions[]) => {
       if (nameCollisions.length > 0) {
@@ -297,7 +302,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
           data-testid="move-cancel-button"
           margin="0 x-small 0 0"
           disabled={postStatus}
-          onClick={onDismiss}
+          onClick={handleClose}
         >
           {I18n.t('Cancel')}
         </Button>
@@ -311,7 +316,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
         </Button>
       </>
     )
-  }, [handleMoveClick, onDismiss, postStatus])
+  }, [handleMoveClick, handleClose, postStatus])
 
   // Reset the state when the open prop changes so we don't carry over state
   // from the previously opened modal
@@ -326,7 +331,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
       {!fixingNameCollisions && (
         <Modal
           open={open}
-          onDismiss={onDismiss}
+          onDismiss={handleClose}
           size="small"
           label={I18n.t('Copy')}
           shouldCloseOnDocumentClick={false}
