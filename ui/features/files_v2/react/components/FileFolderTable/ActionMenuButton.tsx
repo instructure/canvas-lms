@@ -171,6 +171,8 @@ const ActionMenuButton = ({
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
 
   const filteredItems = useMemo(
     () =>
@@ -215,7 +217,7 @@ const ActionMenuButton = ({
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
-              visible: rename_move_permissions,
+              visible: rename_move_permissions && !isAccessRestricted,
               onClick: createSetModalOrTrayCallback('move-to'),
             },
             ...fileMenuTools.map(tool => {
@@ -263,7 +265,7 @@ const ActionMenuButton = ({
             {
               icon: IconExpandItemsLine,
               text: I18n.t('Move To...'),
-              visible: rename_move_permissions,
+              visible: rename_move_permissions && !isAccessRestricted,
               onClick: createSetModalOrTrayCallback('move-to'),
             },
             {separator: true, visible: delete_permissions},
@@ -285,6 +287,7 @@ const ActionMenuButton = ({
       fileMenuTools,
       delete_permissions,
       iconForTrayTool,
+      isAccessRestricted,
     ],
   )
 

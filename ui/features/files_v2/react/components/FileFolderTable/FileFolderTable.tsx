@@ -158,13 +158,15 @@ const FileFolderTable = ({
 
   const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
   const isEmpty = rows.length === 0 && !isLoading
+  const isStudent = (ENV?.current_user_roles || []).includes('student')
+  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
 
   return (
     <>
       {renderModals()}
       <Flex direction="column">
         <DragAndDropWrapper
-          enabled={!isEmpty && showDrop && !!currentFolder}
+          enabled={!isEmpty && showDrop && !!currentFolder && !isAccessRestricted}
           minHeight={420}
           currentFolder={currentFolder!}
           contextId={contextId}
