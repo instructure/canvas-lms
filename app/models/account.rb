@@ -2348,6 +2348,7 @@ class Account < ActiveRecord::Base
     acct = manually_created_courses_account_from_settings
     if acct.blank?
       GuardRail.activate(:primary) do
+        save! if changed?
         transaction do
           lock!
           acct = manually_created_courses_account_from_settings
