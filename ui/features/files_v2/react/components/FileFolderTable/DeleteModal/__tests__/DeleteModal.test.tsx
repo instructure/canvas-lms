@@ -27,8 +27,9 @@ import {DeleteModal} from '../DeleteModal'
 import {resetAndGetFilesEnv} from '../../../../../utils/filesEnvUtils'
 import {createFilesContexts} from '../../../../../fixtures/fileContexts'
 import {mockRowFocusContext, mockRowsContext} from '../../__tests__/testUtils'
-import {DeleteItemError} from '../DeleteItemError'
-import {deleteItems} from '../deleteItems'
+import {BulkItemRequestsError} from '../../../../queries/BultItemRequestsError'
+import {makeBulkItemRequests} from '../../../../queries/makeBulkItemRequests'
+import {deleteItem} from '../../../../queries/deleteItem'
 import {UnauthorizedError} from '../../../../../utils/apiUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
@@ -39,9 +40,9 @@ jest.mock('@canvas/alerts/react/FlashAlert', () => ({
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-// Mock deleteItems function
-jest.mock('../deleteItems', () => ({
-  deleteItems: jest.fn(),
+// Mock makeBulkItemRequests function
+jest.mock('../../../../queries/makeBulkItemRequests', () => ({
+  makeBulkItemRequests: jest.fn(),
 }))
 
 // Mock Sentry
@@ -49,7 +50,9 @@ jest.mock('@sentry/react', () => ({
   captureException: jest.fn(),
 }))
 
-const mockDeleteItems = deleteItems as jest.MockedFunction<typeof deleteItems>
+const mockMakeBulkItemRequests = makeBulkItemRequests as jest.MockedFunction<
+  typeof makeBulkItemRequests
+>
 const mockFlashAlerts = require('@canvas/alerts/react/FlashAlert')
 const {captureException} = require('@sentry/react')
 
@@ -101,7 +104,7 @@ describe('DeleteModal', () => {
 
   beforeEach(() => {
     user = userEvent.setup()
-    mockDeleteItems.mockReset()
+    mockMakeBulkItemRequests.mockReset()
     jest.clearAllMocks()
   })
 
@@ -138,7 +141,7 @@ describe('DeleteModal', () => {
   })
 
   it('disables delete button and renders spinner while deleting', async () => {
-    mockDeleteItems.mockImplementation(() => new Promise(() => {})) // Never resolves to keep loading state
+    mockMakeBulkItemRequests.mockImplementation(() => new Promise(() => {})) // Never resolves to keep loading state
     renderComponent()
 
     const deleteButton = await clickDeleteButton()
@@ -149,15 +152,15 @@ describe('DeleteModal', () => {
   })
 
   describe('successful deletion', () => {
-    it('calls deleteItems and shows success message for multiple items', async () => {
+    it('calls makeBulkItemRequests and shows success message for multiple items', async () => {
       const onCloseMock = jest.fn()
-      mockDeleteItems.mockResolvedValue(undefined)
+      mockMakeBulkItemRequests.mockResolvedValue(undefined)
 
       renderComponent({onClose: onCloseMock})
 
       await clickDeleteButton()
 
-      expect(mockDeleteItems).toHaveBeenCalledWith(FAKE_FOLDERS_AND_FILES)
+      expect(mockMakeBulkItemRequests).toHaveBeenCalledWith(FAKE_FOLDERS_AND_FILES, deleteItem)
       expect(mockFlashAlerts.showFlashSuccess).toHaveBeenCalledWith(
         `${FAKE_FOLDERS_AND_FILES.length} items deleted successfully.`,
       )
@@ -165,7 +168,7 @@ describe('DeleteModal', () => {
     })
 
     it('shows success message for single item deletion', async () => {
-      mockDeleteItems.mockResolvedValue(undefined)
+      mockMakeBulkItemRequests.mockResolvedValue(undefined)
 
       renderComponent({items: [FAKE_FILES[0]]})
 
@@ -183,7 +186,7 @@ describe('DeleteModal', () => {
         setSessionExpired: mockSetSessionExpired,
       }
 
-      mockDeleteItems.mockRejectedValue(new UnauthorizedError())
+      mockMakeBulkItemRequests.mockRejectedValue(new UnauthorizedError())
 
       renderComponentWithCustomContexts({}, undefined, mockRowsContextWithExpired)
 
@@ -194,9 +197,9 @@ describe('DeleteModal', () => {
 
     it('shows error message when all items fail to delete', async () => {
       const failedItems = [FAKE_FILES[0], FAKE_FOLDERS[0]]
-      const deleteError = new DeleteItemError('Failed to delete some items', failedItems)
+      const deleteError = new BulkItemRequestsError('Failed to delete some items', failedItems)
 
-      mockDeleteItems.mockRejectedValue(deleteError)
+      mockMakeBulkItemRequests.mockRejectedValue(deleteError)
       renderComponent({items: failedItems})
 
       await clickDeleteButton()
@@ -208,9 +211,9 @@ describe('DeleteModal', () => {
     it('shows warning message when some items fail to delete', async () => {
       const allItems = [FAKE_FILES[0], FAKE_FOLDERS[0], FAKE_FILES[1]]
       const failedItems = [FAKE_FILES[0]] // Only one item fails
-      const deleteError = new DeleteItemError('Failed to delete some items', failedItems)
+      const deleteError = new BulkItemRequestsError('Failed to delete some items', failedItems)
 
-      mockDeleteItems.mockRejectedValue(deleteError)
+      mockMakeBulkItemRequests.mockRejectedValue(deleteError)
       renderComponent({items: allItems})
 
       await clickDeleteButton()
@@ -222,7 +225,7 @@ describe('DeleteModal', () => {
     it('handles unexpected errors and captures them in Sentry', async () => {
       const unexpectedError = new Error('Network error')
 
-      mockDeleteItems.mockRejectedValue(unexpectedError)
+      mockMakeBulkItemRequests.mockRejectedValue(unexpectedError)
       renderComponent()
 
       await clickDeleteButton()
@@ -241,7 +244,7 @@ describe('DeleteModal', () => {
         setRowToFocus: mockSetRowToFocus,
       }
 
-      mockDeleteItems.mockRejectedValue(new Error('Some error'))
+      mockMakeBulkItemRequests.mockRejectedValue(new Error('Some error'))
 
       renderComponentWithCustomContexts(
         {onClose: onCloseMock, rowIndex: 5},

@@ -23,11 +23,12 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {DeleteItemError} from './DeleteItemError'
-import {deleteItems} from './deleteItems'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {showFlashSuccess, showFlashError, showFlashWarning} from '@canvas/alerts/react/FlashAlert'
 import {UnauthorizedError} from '../../../../utils/apiUtils'
+import {deleteItem} from '../../../queries/deleteItem'
+import {BulkItemRequestsError} from '../../../queries/BultItemRequestsError'
+import {makeBulkItemRequests} from '../../../queries/makeBulkItemRequests'
 import {queryClient} from '@canvas/query'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -58,7 +59,7 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
         return
       }
 
-      if (error instanceof DeleteItemError) {
+      if (error instanceof BulkItemRequestsError) {
         const failedItems = error.failedItems
         let errorMessage = ''
         if (failedItems.length === 1 && items.length === 1) {
@@ -84,7 +85,7 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
           await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
         }
       } else {
-        // Impossible branch, deleteItems should always throw either UnauthorizedError or DeleteItemError
+        // Impossible branch, makeBulkItemRequests should always throw either UnauthorizedError or BulkItemRequestsError
         const errorMessage = I18n.t('An error occurred while deleting the items. Please try again.')
         showFlashError(errorMessage)()
         captureException(error)
@@ -96,7 +97,7 @@ export function DeleteModal({open, items, onClose, rowIndex}: DeleteModalProps) 
   const handleConfirmDelete = useCallback(async () => {
     setIsDeleting(true)
     try {
-      await deleteItems(items)
+      await makeBulkItemRequests(items, deleteItem)
 
       const successMessage = isMultiple
         ? I18n.t('%{count} items deleted successfully.', {count: items.length})
