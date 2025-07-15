@@ -5215,4 +5215,101 @@ describe CoursesController do
       include_examples "youtube migration protection"
     end
   end
+
+  context "attachments to syllabus body with location tagging" do
+    def file_params(atta)
+      {
+        course_id: @course.id,
+        id: atta.id,
+        download: 1,
+        location: "course_syllabus_#{@course.id}"
+      }
+    end
+
+    before do
+      course_with_teacher_and_student_enrolled
+      @account = @course.account
+      @unrelated_user = user_factory
+      @account.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      @aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @course)
+
+      @course.syllabus_body = @aa_test_data.base_html
+      @course.saving_user = @teacher
+      @course.public_syllabus = false
+      @course.files_visibility = "course"
+      @course.save!
+
+      @old_controller = @controller
+      @controller = FilesController.new
+    end
+
+    after do
+      @controller = @old_controller
+    end
+
+    context "with a private syllabus" do
+      it "fetches the attachment for an enrolled student" do
+        user_session(@student)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "fetches the attachment for the teacher" do
+        user_session(@teacher)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "does not fetch the attachment for an unrelated user" do
+        user_session(@unrelated_user)
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "does not fetch the attachment for an anonymous user" do
+        remove_user_session
+        get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context "with a public syllabus" do
+      before do
+        @course.public_syllabus = true
+        @course.save!
+      end
+
+      context "for attached files" do
+        it "fetches the attachment for unrelated user" do
+          user_session(@unrelated_user)
+          get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+          expect(response).to have_http_status(:found)
+          expect(response.headers["location"]).to include("download_frd")
+        end
+
+        it "fetches the attachment for anonymous users" do
+          remove_user_session
+          get "show", params: file_params(@aa_test_data.attachment1), format: "json"
+          expect(response).to have_http_status(:found)
+          expect(response.headers["location"]).to include("download_frd")
+        end
+      end
+
+      context "for unrelated attachments" do
+        it "does not fetch unrelated attachment for unrelated user" do
+          user_session(@unrelated_user)
+          get "show", params: file_params(@aa_test_data.attachment2), format: "json"
+          expect(response).to have_http_status(:forbidden)
+        end
+
+        it "does not fetch unrelated attachment for anonymous" do
+          remove_user_session
+          get "show", params: file_params(@aa_test_data.attachment2), format: "json"
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+    end
+  end
 end

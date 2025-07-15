@@ -103,6 +103,19 @@ module Factories
     @enrollment
   end
 
+  def course_with_teacher_and_student_enrolled(opts = {})
+    course_with_user("TeacherEnrollment", opts.merge(active_all: true))
+    @teacher = @user
+    @teacher_enrollment = @enrollment
+    @student = @course.shard.activate { user_factory }
+    @student_enrollment = @course.enroll_user(@student, "StudentEnrollment", opts)
+    @student.save!
+    @student_enrollment.workflow_state = "active"
+    @student_enrollment.course = @course
+    @student_enrollment.save!
+    @course.reload
+  end
+
   def course_with_designer(opts = {})
     course_with_user("DesignerEnrollment", opts)
     @designer = @user

@@ -60,12 +60,10 @@ class AttachmentAssociation < ActiveRecord::Base
     context_id = splat.pop
     context_type = splat.join("_").camelize
     context_concern = nil
-    right_to_check = :read
 
     if context_type == "CourseSyllabus"
       context_concern = "syllabus_body"
       context_type = "Course"
-      right_to_check = :read_syllabus
     end
 
     association = Shard.shard_for(context_id).activate do
@@ -76,7 +74,7 @@ class AttachmentAssociation < ActiveRecord::Base
 
     feature_is_on = association.context.attachment_associations_enabled?
 
-    feature_is_on && association.context&.grants_right?(user, session, right_to_check)
+    feature_is_on && association.context&.access_for_attachment_association?(user, session, location_param)
   end
 
   def self.copy_associations(source, targets, context_concern = nil)
