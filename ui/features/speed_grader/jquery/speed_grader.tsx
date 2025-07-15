@@ -73,7 +73,7 @@ import ScreenCaptureIcon from '../react/ScreenCaptureIcon'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderStatusMenu from '../react/SpeedGraderStatusMenu'
-import {LtiAssetReportsWrapper} from '../../../shared/lti/react/LtiAssetReportsWrapper'
+import {LtiAssetReportsWrapper} from '@canvas/lti-asset-processor/react/LtiAssetReportsWrapper'
 import useStore from '../stores/index'
 import type {
   Attachment,

@@ -18,7 +18,7 @@
 
 import StudentAssetReportModal from '../StudentAssetReportModal'
 import {render, screen} from '@testing-library/react'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 
 describe('StudentAssetReportModal', () => {
   const createBaseReport = (

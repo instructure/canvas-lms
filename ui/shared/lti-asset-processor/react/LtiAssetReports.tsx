@@ -27,7 +27,10 @@ import {
   buildAPDisplayTitle,
   type ExistingAttachedAssetProcessor,
 } from '@canvas/lti/model/AssetProcessor'
-import type {LtiAssetReport, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
+import type {
+  LtiAssetReport,
+  SpeedGraderLtiAssetReports,
+} from '@canvas/lti-asset-processor/model/AssetReport'
 import {
   LtiAssetReportsCard,
   LtiAssetReportsMissingReportsCard,

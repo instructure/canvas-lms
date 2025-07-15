@@ -28,7 +28,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 // Canvas-specific imports:
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {LtiAssetReport} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReport} from '@canvas/lti-asset-processor/model/AssetReport'
 
 const I18n = createI18nScope('speed_grader')
 const t = I18n.t.bind(I18n)

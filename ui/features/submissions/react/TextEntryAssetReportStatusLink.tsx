@@ -18,14 +18,14 @@
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
-import {filterReportsByAttempt} from '@canvas/lti/react/AssetProcessorHelper'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
+import {filterReportsByAttempt} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {ViewOwnProps} from '@instructure/ui-view'
 import {useMemo, useState} from 'react'
-import AssetReportStatus from '../../../shared/lti/react/AssetReportStatus'
-import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
+import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 
 export const ASSET_REPORT_MODAL_EVENT = 'openAssetReportModal'
 const I18n = createI18nScope('text_entry_asset_report_status_link')

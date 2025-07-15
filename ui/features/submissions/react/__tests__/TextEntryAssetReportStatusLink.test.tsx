@@ -17,7 +17,7 @@
  */
 
 import TextEntryAssetReportStatusLink from '../TextEntryAssetReportStatusLink'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 

@@ -17,7 +17,7 @@
  */
 
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 
 declare const ENV: {
   ASSET_REPORTS?: LtiAssetReportWithAsset[]

@@ -22,7 +22,7 @@ import {
   filterReportsByAttempt,
   shouldRenderAssetProcessorData,
 } from '../AssetProcessorHelper'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 
 declare const window: {
   ENV: {

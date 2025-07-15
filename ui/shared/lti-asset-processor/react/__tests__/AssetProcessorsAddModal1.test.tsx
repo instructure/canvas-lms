@@ -21,9 +21,7 @@ import {render} from '@testing-library/react'
 import {AssetProcessorsAddModal} from '../AssetProcessorsAddModal'
 import {QueryClient} from '@tanstack/react-query'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
-import {act, renderHook} from '@testing-library/react-hooks'
 import {mockDoFetchApi, mockTools as tools} from './assetProcessorsTestHelpers'
-import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
