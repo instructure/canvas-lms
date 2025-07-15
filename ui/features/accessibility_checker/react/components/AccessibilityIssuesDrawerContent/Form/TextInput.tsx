@@ -16,19 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {TextInput} from '@instructure/ui-text-input'
-import {FormComponentProps} from '.'
+import React, {forwardRef, useImperativeHandle, useRef} from 'react'
 
-const TextInputForm: React.FC<FormComponentProps> = ({issue, value, onChangeValue}) => {
-  return (
-    <TextInput
-      data-testid="text-input-form"
-      renderLabel={issue.form.label}
-      value={value || ''}
-      onChange={(_, value) => onChangeValue(value)}
-    />
+import {TextInput} from '@instructure/ui-text-input'
+
+import {FormComponentProps, FormComponentHandle} from '.'
+
+const TextInputForm: React.FC<FormComponentProps & React.RefAttributes<FormComponentHandle>> =
+  forwardRef<FormComponentHandle, FormComponentProps>(
+    ({issue, error, value, onChangeValue}: FormComponentProps, ref) => {
+      const inputRef = useRef<HTMLInputElement | null>(null)
+
+      useImperativeHandle(ref, () => ({
+        focus: () => {
+          inputRef.current?.focus()
+        },
+      }))
+
+      return (
+        <TextInput
+          data-testid="text-input-form"
+          renderLabel={issue.form.label}
+          value={value || ''}
+          onChange={(_, value) => onChangeValue(value)}
+          inputRef={el => (inputRef.current = el)}
+          messages={error ? [{text: error, type: 'newError'}] : []}
+        />
+      )
+    },
   )
-}
 
 export default TextInputForm

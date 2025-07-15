@@ -19,50 +19,20 @@
 import {render, screen, fireEvent, waitFor} from '@testing-library/react'
 
 import AccessibilityIssuesDrawerContent from '..'
-import {ContentItem, ContentItemType, FormType} from '../../../types'
+import userEvent from '@testing-library/user-event'
+import doFetchApiEffect from '@canvas/do-fetch-api-effect'
+import {
+  multiIssueItem,
+  buttonRuleItem,
+  checkboxTextInputRuleItem,
+  colorPickerRuleItem,
+  radioInputGroupRuleItem,
+  textInputRuleItem,
+} from './__mocks__'
 
 const mockClose = jest.fn()
 
-const baseItem: ContentItem = {
-  id: 1,
-  title: 'Sample Page',
-  type: ContentItemType.WikiPage,
-  url: 'http://test.com/page',
-  editUrl: 'http://test.com/page/edit',
-  published: true,
-  updatedAt: '2024-07-01T00:00:00Z',
-  count: 2,
-  issues: [
-    {
-      id: 'issue-1',
-      path: '/html/body/div[1]',
-      ruleId: 'adjacent-links',
-      displayName: 'Adjacent links',
-      message: 'This is a test issue',
-      form: {
-        type: FormType.Button,
-        label: 'Apply',
-      },
-      why: '',
-      element: '',
-    },
-    {
-      id: 'issue-2',
-      path: '/html/body/div[2]',
-      ruleId: 'headings-sequence',
-      displayName: 'Heading sequence',
-      message: 'Second issue',
-      form: {
-        type: FormType.RadioInputGroup,
-        label: 'Choose one',
-        options: ['One', 'Two'],
-        value: 'One',
-      },
-      why: '',
-      element: '',
-    },
-  ],
-}
+const baseItem = multiIssueItem
 
 jest.mock('@canvas/do-fetch-api-effect', () => ({
   __esModule: true,
@@ -77,6 +47,11 @@ jest.mock('@canvas/do-fetch-api-effect', () => ({
   }),
 }))
 
+jest.mock('use-debounce', () => ({
+  __esModule: true,
+  useDebouncedCallback: jest.fn((callback, _delay) => callback),
+}))
+
 describe('AccessibilityIssuesDrawerContent', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -84,7 +59,7 @@ describe('AccessibilityIssuesDrawerContent', () => {
 
   it('renders the title and issue counter', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
-    expect(await screen.findByText('Sample Page')).toBeInTheDocument()
+    expect(await screen.findByText('Multi Issue Test Page')).toBeInTheDocument()
     expect(screen.getByText(/Issue 1\/2:/)).toBeInTheDocument()
   })
 
@@ -131,8 +106,14 @@ describe('AccessibilityIssuesDrawerContent', () => {
   it('renders Open Page and Edit Page links', async () => {
     render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
 
-    expect(await screen.findByText('Open Page')).toHaveAttribute('href', baseItem.url)
-    expect(screen.getByText('Edit Page')).toHaveAttribute('href', baseItem.editUrl)
+    expect(await screen.findByText('Open Page')).toHaveAttribute(
+      'href',
+      'http://test.com/multi-issue-page',
+    )
+    expect(screen.getByText('Edit Page')).toHaveAttribute(
+      'href',
+      'http://test.com/multi-issue-page/edit',
+    )
   })
 
   it('calls onClose when close button is clicked', async () => {
@@ -144,5 +125,146 @@ describe('AccessibilityIssuesDrawerContent', () => {
     fireEvent.click(closeButton)
 
     expect(mockClose).toHaveBeenCalledTimes(1)
+  })
+
+  describe('Save and Next button', () => {
+    describe('is enabled', () => {
+      it('when the issue is remediated', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeDisabled()
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+        expect(saveAndNext).toBeEnabled()
+      })
+
+      it('when the form type is CheckboxTextInput (apply button hidden)', () => {
+        render(
+          <AccessibilityIssuesDrawerContent item={checkboxTextInputRuleItem} onClose={mockClose} />,
+        )
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeEnabled()
+      })
+    })
+
+    describe('is disabled', () => {
+      it('when the issue is not remediated', () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeDisabled()
+      })
+
+      it('when the form is locked during apply operation', () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const apply = screen.getByTestId('apply-button')
+
+        // Use fireEvent to simulate the click event without waiting for load state
+        fireEvent.click(apply)
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeDisabled()
+      })
+
+      it('when the form is locked during undo operation', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeEnabled()
+
+        const undo = screen.getByTestId('undo-button')
+        await userEvent.click(undo)
+
+        expect(saveAndNext).toBeDisabled()
+      })
+
+      it('when there is a form error', async () => {
+        render(<AccessibilityIssuesDrawerContent item={baseItem} onClose={mockClose} />)
+
+        // Mock the doFetchApiEffect to return an error
+        ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+        const apply = screen.getByTestId('apply-button')
+        await userEvent.click(apply)
+
+        const saveAndNext = screen.getByTestId('save-and-next-button')
+        expect(saveAndNext).toBeDisabled()
+      })
+    })
+  })
+
+  describe('show errors on apply', () => {
+    it('for FormType.Button', async () => {
+      render(<AccessibilityIssuesDrawerContent item={buttonRuleItem} onClose={mockClose} />)
+
+      // Mock the doFetchApiEffect to return an error
+      ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
+
+      expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()
+    })
+
+    it('for FormType.CheckboxTextInput', async () => {
+      render(
+        <AccessibilityIssuesDrawerContent item={checkboxTextInputRuleItem} onClose={mockClose} />,
+      )
+
+      // Mock the doFetchApiEffect to return an error
+      ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+      const textarea = screen.getByTestId('checkbox-text-input-form')
+      await userEvent.type(textarea, '1')
+
+      await waitFor(() => {
+        expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()
+      })
+    })
+
+    it('for FormType.ColorPicker', async () => {
+      render(<AccessibilityIssuesDrawerContent item={colorPickerRuleItem} onClose={mockClose} />)
+
+      // Mock the doFetchApiEffect to return an error
+      ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
+
+      expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()
+    })
+
+    it('for FormType.RadioInputGroup', async () => {
+      render(
+        <AccessibilityIssuesDrawerContent item={radioInputGroupRuleItem} onClose={mockClose} />,
+      )
+
+      // Mock the doFetchApiEffect to return an error
+      ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
+
+      expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()
+    })
+
+    it('for FormType.TextInput', async () => {
+      render(<AccessibilityIssuesDrawerContent item={textInputRuleItem} onClose={mockClose} />)
+
+      // Mock the doFetchApiEffect to return an error
+      ;(doFetchApiEffect as jest.Mock).mockRejectedValueOnce(new Error('Test error'))
+
+      const apply = screen.getByTestId('apply-button')
+      await userEvent.click(apply)
+
+      expect(screen.getAllByText('Test error')[0]).toBeInTheDocument()
+    })
   })
 })

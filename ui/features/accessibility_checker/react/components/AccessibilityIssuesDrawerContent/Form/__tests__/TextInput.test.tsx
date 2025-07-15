@@ -67,4 +67,21 @@ describe('TextInputForm', () => {
     await userEvent.type(input, 'a')
     expect(defaultProps.onChangeValue).toHaveBeenCalledWith('a')
   })
+
+  it('displays the error message when an error is provided', () => {
+    const propsWithError = {
+      ...defaultProps,
+      error: 'Error message',
+    }
+    render(<TextInputForm {...propsWithError} />)
+    expect(screen.getByText('Error message')).toBeInTheDocument()
+  })
+
+  it('focuses the input when the form is refocused', () => {
+    const {container} = render(<TextInputForm {...defaultProps} />)
+    const input = container.querySelector('input')
+    expect(input).not.toHaveFocus()
+    input?.focus()
+    expect(input).toHaveFocus()
+  })
 })
