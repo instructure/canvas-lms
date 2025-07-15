@@ -913,6 +913,87 @@ describe Types::SubmissionType do
         submission_type.resolve("rubricAssessmentsConnection(filter: {forAllAttempts: true}) { nodes { _id } }")
       ).to eq [@rubric_assessment.id.to_s]
     end
+
+    describe "with provisional assessments" do
+      before(:once) do
+        @final_grader = @teacher
+        @moderated_assignment = @course.assignments.create!(
+          due_at: 2.years.from_now,
+          final_grader: @final_grader,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10,
+          submission_types: :online_text_entry,
+          title: "Moderated Assignment"
+        )
+        rubric_for_course
+        rubric_association_model(
+          context: @course,
+          rubric: @rubric,
+          association_object: @moderated_assignment,
+          purpose: "grading"
+        )
+        @submission = @moderated_assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
+
+        moderator_provisional_grade = @submission.find_or_create_provisional_grade!(@final_grader)
+        @moderator_provisional_assessment = @rubric_association.assess({
+                                                                         user: @student,
+                                                                         assessor: @final_grader,
+                                                                         artifact: moderator_provisional_grade,
+                                                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                       })
+
+        @provisional_grader = user_factory(active_all: true)
+        @course.enroll_ta(@provisional_grader, enrollment_state: "active")
+
+        provisional_grade = @submission.find_or_create_provisional_grade!(@provisional_grader)
+        @provisional_assessment = @rubric_association.assess({
+                                                               user: @student,
+                                                               assessor: @provisional_grader,
+                                                               artifact: provisional_grade,
+                                                               assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                             })
+      end
+
+      it "excludes provisional assessments by default" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @provisional_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection { nodes { _id } }")
+        ).to eq []
+      end
+
+      it "includes provisional assessments when include_provisional_assessments is true" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @provisional_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(@provisional_assessment.id.to_s)
+      end
+
+      it "allows moderators to see all provisional assessments" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @final_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(@moderator_provisional_assessment.id.to_s, @provisional_assessment.id.to_s)
+      end
+
+      it "allows provisional graders to see only their own provisional assessments" do
+        other_grader = user_factory(active_all: true)
+        @course.enroll_ta(other_grader, enrollment_state: "active")
+
+        other_provisional_grade = @submission.find_or_create_provisional_grade!(other_grader)
+        other_assessment = @rubric_association.assess({
+                                                        user: @student,
+                                                        assessor: other_grader,
+                                                        artifact: other_provisional_grade,
+                                                        assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                      })
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: other_grader)
+        expect(
+          submission_type.resolve("rubricAssessmentsConnection(filter: {includeProvisionalAssessments: true}) { nodes { _id } }")
+        ).to contain_exactly(other_assessment.id.to_s)
+      end
+    end
   end
 
   describe "comments_connection" do

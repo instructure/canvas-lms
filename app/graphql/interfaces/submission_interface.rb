@@ -79,6 +79,12 @@ module Types
       it will return all rubric assessments for the current submission
       or submission history.
     MD
+    argument :include_provisional_assessments, Boolean, <<~MD, required: false, default_value: false
+      When true, provisional rubric assessments that the current user has permission to see will be returned.
+      The Moderator has permission to see all provisional rubric assessments.
+      Provisional Graders only have permission to view their own provisional rubric assessments.
+      Default behavior is to omit provisional assessments entirely.
+    MD
   end
 
   class SubmissionCommentsSortOrderType < Types::BaseEnum
@@ -519,6 +525,7 @@ module Interfaces::SubmissionInterface
   def rubric_assessments_connection(filter:)
     filter = filter.to_h
     target_attempt = filter[:for_all_attempts] ? nil : (filter[:for_attempt] || object.attempt)
+    include_provisional = filter.fetch(:include_provisional_assessments, false)
 
     Promise
       .all([load_association(:assignment), load_association(:rubric_assessments)])
@@ -540,6 +547,29 @@ module Interfaces::SubmissionInterface
               .load_many(assessments_needing_versions_loaded)
           end
 
+        provisional_loader_promise = if include_provisional
+                                       Loaders::AssociationLoader
+                                         .for(Submission, :provisional_grades)
+                                         .load(submission)
+                                         .then do |provisional_grades|
+                                           if provisional_grades.present?
+                                             RubricAssessment
+                                               .where(
+                                                 artifact_type: "ModeratedGrading::ProvisionalGrade",
+                                                 artifact_id: provisional_grades.map(&:id)
+                                               )
+                                               .preload(:rubric_association, :assessor, :user)
+                                               .then do |provisional_rubric_assessments|
+                                                 provisional_rubric_assessments
+                                               end
+                                           else
+                                             Promise.resolve(nil)
+                                           end
+                                         end
+                                     else
+                                       Promise.resolve(nil)
+                                     end
+
         Promise
           .all(
             [
@@ -549,10 +579,19 @@ module Interfaces::SubmissionInterface
                 .load(submission.assignment),
               Loaders::AssociationLoader
                 .for(RubricAssessment, :rubric_association)
-                .load_many(submission.rubric_assessments)
+                .load_many(submission.rubric_assessments),
+              provisional_loader_promise
             ]
           )
-          .then { submission.visible_rubric_assessments_for(current_user, attempt: target_attempt) }
+          .then do |results|
+            provisional_assessments = results.last || []
+            submission.visible_rubric_assessments_for(
+              current_user,
+              attempt: target_attempt,
+              include_provisional:,
+              provisional_assessments:
+            )
+          end
       end
   end
 
