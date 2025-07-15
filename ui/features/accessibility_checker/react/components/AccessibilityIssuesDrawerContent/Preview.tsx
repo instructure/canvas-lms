@@ -159,7 +159,11 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   if (isLoading) {
     return (
       <View as="div" textAlign="center" width="100%">
-        <Spinner renderTitle={I18n.t('Loading preview...')} size="small" />
+        <Spinner
+          data-testid="spinner-loader"
+          renderTitle={I18n.t('Loading preview...')}
+          size="small"
+        />
       </View>
     )
   }
