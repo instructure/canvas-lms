@@ -54,48 +54,55 @@ const assignmentGroups = new AssignmentGroupCollection([], {
   courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
 })
 
-const assignmentGroupsView = new AssignmentGroupListView({
-  collection: assignmentGroups,
-  sortURL: ENV.URLS.sort_url,
-  assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
-  course,
-  userIsAdmin,
-})
+let assignmentGroupsView
 
 let assignmentSettingsView = false
 let assignmentSyncSettingsView = false
 let createGroupView = false
 let showByView = false
 
-if (ENV.PERMISSIONS.manage_assignments_edit) {
-  assignmentSettingsView = new AssignmentSettingsView({
-    model: course,
-    assignmentGroups,
-    weightsView: AssignmentGroupWeightsView,
-    userIsAdmin,
-  })
-
-  assignmentSyncSettingsView = new AssignmentSyncSettingsView({
-    collection: assignmentGroups,
-    model: course,
-    sisName: ENV.SIS_NAME,
-  })
-}
-if (ENV.PERMISSIONS.manage_assignments_add) {
-  createGroupView = new CreateGroupView({
-    assignmentGroups,
-    course,
-    userIsAdmin,
-  })
-}
-if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
-  showByView = new ToggleShowByView({
-    course,
-    assignmentGroups,
-  })
-}
+// Views will be created inside ready() to ensure translations are available
 
 ready(() => {
+  // Create views after DOM is ready to ensure translations are available
+  assignmentGroupsView = new AssignmentGroupListView({
+    collection: assignmentGroups,
+    sortURL: ENV.URLS.sort_url,
+    assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
+    course,
+    userIsAdmin,
+  })
+
+  if (ENV.PERMISSIONS.manage_assignments_edit) {
+    assignmentSettingsView = new AssignmentSettingsView({
+      model: course,
+      assignmentGroups,
+      weightsView: AssignmentGroupWeightsView,
+      userIsAdmin,
+    })
+
+    assignmentSyncSettingsView = new AssignmentSyncSettingsView({
+      collection: assignmentGroups,
+      model: course,
+      sisName: ENV.SIS_NAME,
+    })
+  }
+
+  if (ENV.PERMISSIONS.manage_assignments_add) {
+    createGroupView = new CreateGroupView({
+      assignmentGroups,
+      course,
+      userIsAdmin,
+    })
+  }
+
+  if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
+    showByView = new ToggleShowByView({
+      course,
+      assignmentGroups,
+    })
+  }
+
   const indexEl =
     window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 
