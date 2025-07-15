@@ -397,6 +397,7 @@ const ModulesList: React.FC = () => {
                                 prerequisites={module.prerequisites}
                                 completionRequirements={module.completionRequirements}
                                 requirementCount={module.requirementCount}
+                                unlockAt={module.unlockAt}
                                 expanded={!!expandedModules.get(module._id)}
                                 hasActiveOverrides={module.hasActiveOverrides}
                                 onToggleExpand={onToggleExpandRef}

@@ -31,6 +31,7 @@ export interface ModuleProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount?: number
+  unlockAt: string | null
   dragHandleProps?: any
   expanded?: boolean
   hasActiveOverrides: boolean
@@ -48,6 +49,7 @@ const Module: React.FC<ModuleProps> = ({
   prerequisites,
   completionRequirements,
   requirementCount,
+  unlockAt,
   dragHandleProps,
   expanded: propExpanded,
   hasActiveOverrides,
@@ -100,6 +102,7 @@ const Module: React.FC<ModuleProps> = ({
             prerequisites={prerequisites}
             completionRequirements={completionRequirements}
             requirementCount={requirementCount || 0}
+            unlockAt={unlockAt}
             dragHandleProps={dragHandleProps}
             itemCount={data?.moduleItems?.length || 0}
             hasActiveOverrides={hasActiveOverrides}

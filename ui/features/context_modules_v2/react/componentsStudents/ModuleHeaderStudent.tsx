@@ -36,6 +36,8 @@ import {ModuleHeaderSupplementalInfoStudent} from './ModuleHeaderSupplementalInf
 import {ModuleHeaderCompletionRequirement} from './ModuleHeaderCompletionRequirement'
 import {ModuleHeaderMissingCount} from './ModuleHeaderMissingCount'
 import {Pill} from '@instructure/ui-pill'
+import ModuleHeaderUnlockAt from '../components/ModuleHeaderUnlockAt'
+import {isModuleUnlockAtDateInTheFuture} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -48,6 +50,7 @@ export interface ModuleHeaderStudentProps {
   completionRequirements?: CompletionRequirement[]
   prerequisites?: Prerequisite[]
   requirementCount?: number
+  unlockAt: string | null
   submissionStatistics?: ModuleStatistics
   smallScreen?: boolean
 }
@@ -61,6 +64,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   completionRequirements,
   prerequisites,
   requirementCount,
+  unlockAt,
   submissionStatistics,
   smallScreen = false,
 }) => {
@@ -129,22 +133,6 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             <Flex.Item overflowX="hidden" overflowY="hidden" margin="small 0 0 0">
               <ModuleHeaderSupplementalInfoStudent submissionStatistics={submissionStatistics} />
             </Flex.Item>
-            {prerequisites?.length && (
-              <Flex.Item>
-                <Text size="small" color="secondary" data-testid="module-header-prerequisites">
-                  {I18n.t(
-                    {
-                      one: 'Prerequisite: %{prerequisiteName}',
-                      other: 'Prerequisites: %{prerequisiteName}',
-                    },
-                    {
-                      count: prerequisites?.length || 0,
-                      prerequisiteName: prerequisites?.map?.(p => p.name).join(', ') || '',
-                    },
-                  )}
-                </Text>
-              </Flex.Item>
-            )}
             {completionRequirements?.length && (
               <Flex.Item>
                 <ModuleProgressionStatusBar
@@ -155,6 +143,42 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                 />
               </Flex.Item>
             )}
+            <Flex.Item margin="none">
+              <Flex gap="xx-small" alignItems="center">
+                {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
+                  <Flex.Item>
+                    <ModuleHeaderUnlockAt unlockAt={unlockAt} />
+                  </Flex.Item>
+                )}
+                {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && prerequisites?.length && (
+                  <Flex.Item>
+                    <Text size="x-small" color="secondary" as="span">
+                      |
+                    </Text>
+                  </Flex.Item>
+                )}
+                {prerequisites?.length && (
+                  <Flex.Item>
+                    <Text
+                      size="x-small"
+                      color="secondary"
+                      data-testid="module-header-prerequisites"
+                    >
+                      {I18n.t(
+                        {
+                          one: 'Prerequisite: %{prerequisiteName}',
+                          other: 'Prerequisites: %{prerequisiteName}',
+                        },
+                        {
+                          count: prerequisites.length,
+                          prerequisiteName: prerequisites.map(p => p.name).join(', '),
+                        },
+                      )}
+                    </Text>
+                  </Flex.Item>
+                )}
+              </Flex>
+            </Flex.Item>
           </Flex>
         </Flex.Item>
         <Flex.Item>
