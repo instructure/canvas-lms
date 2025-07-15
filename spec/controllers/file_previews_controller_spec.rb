@@ -69,6 +69,7 @@ describe FilePreviewsController do
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response).to have_http_status :unauthorized
+    expect(response).to render_template "unauthorized_preview"
   end
 
   it "accepts a valid verifier token" do
