@@ -2457,7 +2457,15 @@ describe FilesController do
       expect(controller.send(:process_content_type_from_instfs, "application/x-cfb", "file.msi")).to eq "application/x-cfb"
     end
 
-    it "leaves non-CFB types alone" do
+    it "fixes kml files" do
+      expect(controller.send(:process_content_type_from_instfs, "application/xml", "file.kml")).to eq "application/vnd.google-earth.kml+xml"
+    end
+
+    it "leaves other XML files alone" do
+      expect(controller.send(:process_content_type_from_instfs, "application/xml", "file.xml")).to eq "application/xml"
+    end
+
+    it "leaves other content types alone" do
       expect(controller.send(:process_content_type_from_instfs, "application/pdf", "file.pdf")).to eq "application/pdf"
     end
   end
