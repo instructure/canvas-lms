@@ -18,6 +18,7 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
+import $ from 'jquery'
 import ProcessGradebookUpload from '../process_gradebook_upload'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -60,6 +61,7 @@ describe('ProcessGradebookUpload.upload', () => {
       bulk_update_path: '/bulk_update_path/url',
       bulk_update_override_scores_path: null, // Disable by default
       custom_grade_statuses: [],
+      gradebook_path: '/gradebook',
     })
 
     // Reset handlers
@@ -77,6 +79,7 @@ describe('ProcessGradebookUpload.upload', () => {
 
     // Clear all mock function calls
     jest.clearAllMocks()
+    windowAlert.mockClear()
   })
 
   afterEach(() => {
@@ -139,11 +142,10 @@ describe('ProcessGradebookUpload.upload', () => {
   })
 
   test('handles a creation of a new assignment with no submissions', async () => {
-    const student = {previous_id: 1, submissions: []}
+    const student = {id: 1, previous_id: 1, submissions: []}
     const gradebook = {students: [student], assignments: [newAssignment1]}
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(goToGradebookStub).toHaveBeenCalled()
     // No alert because no bulk data was uploaded
@@ -172,8 +174,8 @@ describe('ProcessGradebookUpload.upload', () => {
     expect(windowAlert).toHaveBeenCalled()
   })
 
-  test('calls uploadCustomColumnData if custom_columns is non-empty', () => {
-    const uploadCustomColumnDataStub = jest.fn()
+  test('calls uploadCustomColumnData if custom_columns is non-empty', async () => {
+    const uploadCustomColumnDataStub = jest.fn().mockResolvedValue($.Deferred().resolve())
     const originalUploadCustomColumnData = ProcessGradebookUpload.uploadCustomColumnData
     ProcessGradebookUpload.uploadCustomColumnData = uploadCustomColumnDataStub
 
@@ -186,14 +188,14 @@ describe('ProcessGradebookUpload.upload', () => {
       assignments: [oldAssignment1],
       custom_columns: [customColumn1],
     }
-    ProcessGradebookUpload.upload(gradebook)
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(uploadCustomColumnDataStub).toHaveBeenCalledTimes(1)
 
     ProcessGradebookUpload.uploadCustomColumnData = originalUploadCustomColumnData
   })
 
-  test('does not call uploadCustomColumnData if custom_columns is empty', () => {
+  test('does not call uploadCustomColumnData if custom_columns is empty', async () => {
     const uploadCustomColumnDataStub = jest.fn()
     const originalUploadCustomColumnData = ProcessGradebookUpload.uploadCustomColumnData
     ProcessGradebookUpload.uploadCustomColumnData = uploadCustomColumnDataStub
@@ -207,7 +209,7 @@ describe('ProcessGradebookUpload.upload', () => {
       assignments: [oldAssignment1],
       custom_columns: [],
     }
-    ProcessGradebookUpload.upload(gradebook)
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(uploadCustomColumnDataStub).not.toHaveBeenCalled()
 
@@ -259,7 +261,7 @@ describe('ProcessGradebookUpload.upload', () => {
     expect(windowAlert).not.toHaveBeenCalled()
   })
 
-  test('ignores override score changes if no update URL is set', () => {
+  test('ignores override score changes if no update URL is set', async () => {
     const gradebook = {
       assignments: [oldAssignment1],
       students: [
@@ -270,9 +272,14 @@ describe('ProcessGradebookUpload.upload', () => {
         },
       ],
     }
-    ProcessGradebookUpload.upload(gradebook)
+    const result = ProcessGradebookUpload.upload(gradebook)
 
     // Since no update URL is set, override scores are ignored
     expect(goToGradebookStub).not.toHaveBeenCalled()
+
+    // If result is defined, await it to ensure cleanup
+    if (result) {
+      await result
+    }
   })
 })
