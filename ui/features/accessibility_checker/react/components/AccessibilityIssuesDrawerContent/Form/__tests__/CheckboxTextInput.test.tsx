@@ -262,4 +262,18 @@ describe('CheckboxTextInput', () => {
     // Restore the original console.error
     console.error = originalConsoleError
   })
+
+  it('does not call onReload on initial mount', () => {
+    const onReload = jest.fn()
+    render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
+    expect(onReload).not.toHaveBeenCalled()
+  })
+
+  it('calls onReload when the value changes', async () => {
+    const onReload = jest.fn()
+    const {rerender} = render(<CheckboxTextInput {...defaultProps} onReload={onReload} />)
+    expect(onReload).not.toHaveBeenCalled()
+    rerender(<CheckboxTextInput {...defaultProps} onReload={onReload} value="test value" />)
+    expect(onReload).toHaveBeenCalledWith('test value')
+  })
 })

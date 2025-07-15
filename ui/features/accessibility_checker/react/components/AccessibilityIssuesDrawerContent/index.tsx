@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {createRef, Ref, useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {Ref, useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -27,6 +27,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
+import {FormFieldMessage} from '@instructure/ui-form-field'
 
 import getLiveRegion from '@canvas/instui-bindings/react/liveRegion'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -68,7 +69,8 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   const [issues, setIssues] = useState<AccessibilityIssue[]>(item.issues || [])
   const [isRemediated, setIsRemediated] = useState<boolean>(false)
   const [isFormLocked, setIsFormLocked] = useState<boolean>(false)
-  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string>('')
+  const [assertiveAlertMessage, setAssertiveAlertMessage] = useState<string | null>(null)
+  const [formError, setFormError] = useState<string | null>()
   const [accessibilityIssues, setAccessibilityIssues, tableData, setTableData] =
     useAccessibilityCheckerStore(
       useShallow(state => [
@@ -80,12 +82,26 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     )
 
   const previewRef: Ref<PreviewHandle> = useRef<PreviewHandle>(null)
-  const formRef: Ref<FormHandle> = createRef<FormHandle>()
+  const formRef: Ref<FormHandle> = useRef<FormHandle>(null)
   const regionRef = useRef<HTMLDivElement | null>(null)
 
   // This debounces the preview update to prevent excessive API calls when the user is typing.
   const updatePreview = useDebouncedCallback((formValue: FormValue) => {
-    previewRef.current?.update(formValue)
+    previewRef.current?.update(
+      formValue,
+      () => {
+        setFormError(null)
+        setAssertiveAlertMessage(null)
+        setIsRemediated(true)
+      },
+      error => {
+        if (error) {
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
+        setIsRemediated(false)
+      },
+    )
   }, 1000)
   const currentIssue = issues[currentIssueIndex]
 
@@ -108,33 +124,43 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     previewRef.current?.update(
       formValue,
       () => {
+        setFormError(null)
         setAssertiveAlertMessage(currentIssue.form.undoText || I18n.t('Issue fixed'))
         setIsRemediated(true)
         setIsFormLocked(false)
       },
-      () => {
-        setAssertiveAlertMessage(I18n.t('Error applying issue'))
+      error => {
+        if (error) {
+          formRef.current?.focus()
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
         setIsRemediated(false)
         setIsFormLocked(false)
       },
     )
-  }, [formRef, previewRef])
+  }, [formRef, previewRef, currentIssue?.form.undoText])
 
   const handleUndo = useCallback(() => {
     setIsFormLocked(true)
     previewRef.current?.reload(
       () => {
+        setFormError(null)
         setAssertiveAlertMessage(I18n.t('Issue undone'))
         setIsRemediated(false)
         setIsFormLocked(false)
       },
-      () => {
-        setAssertiveAlertMessage(I18n.t('Error undoing issue'))
+      error => {
+        if (error) {
+          formRef.current?.focus()
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
         setIsRemediated(true)
         setIsFormLocked(false)
       },
     )
-  }, [previewRef])
+  }, [formRef, previewRef])
 
   const updateTableData = useCallback(
     (updatedIssues: AccessibilityIssue[]) => {
@@ -215,6 +241,29 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     updateAccessibilityIssues,
   ])
 
+  const handleApplyAndSaveAndNext = useCallback(() => {
+    setIsFormLocked(true)
+    const formValue = formRef.current?.getValue()
+    previewRef.current?.update(
+      formValue,
+      () => {
+        setFormError(null)
+        setAssertiveAlertMessage(null)
+        setIsRemediated(true)
+        setIsFormLocked(false)
+        handleSaveAndNext()
+      },
+      error => {
+        if (error) {
+          setFormError(error)
+          setAssertiveAlertMessage(error)
+        }
+        setIsRemediated(false)
+        setIsFormLocked(false)
+      },
+    )
+  }, [handleSaveAndNext, formRef, previewRef])
+
   const applyButtonText = useMemo(() => {
     if (!currentIssue) return null
     if (
@@ -225,8 +274,15 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
     return currentIssue.form.action || I18n.t('Apply')
   }, [currentIssue])
 
+  const handleClearError = useCallback(() => {
+    setFormError(null)
+  }, [])
+
   useEffect(() => {
     setIsRemediated(false)
+    setIsFormLocked(false)
+    setAssertiveAlertMessage(null)
+    setFormError(null)
   }, [currentIssue])
 
   // TODO: This is a temporary fix to prevent the component from crashing when there are no issues.
@@ -286,7 +342,13 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
             <Text weight="weightRegular">{currentIssue.message}</Text>
           </View>
           <View as="section" margin="medium 0">
-            <Form ref={formRef} issue={currentIssue} onReload={updatePreview} />
+            <Form
+              ref={formRef}
+              issue={currentIssue}
+              error={formError}
+              onReload={updatePreview}
+              onClearError={handleClearError}
+            />
           </View>
           {!isApplyButtonHidden && (
             <View as="section" margin="medium 0">
@@ -299,6 +361,11 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               >
                 {applyButtonText}
               </ApplyButton>
+              {formError && currentIssue.form.type === FormType.Button && (
+                <View as="div" margin="x-small 0">
+                  <FormFieldMessage variant="newError">{formError}</FormFieldMessage>
+                </View>
+              )}
             </View>
           )}
         </Flex.Item>
@@ -306,15 +373,17 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           <AccessibilityIssuesDrawerFooter
             onNext={handleNext}
             onBack={handlePrevious}
-            onSaveAndNext={handleSaveAndNext || handleApply}
+            onSaveAndNext={isApplyButtonHidden ? handleApplyAndSaveAndNext : handleSaveAndNext}
             isBackDisabled={currentIssueIndex === 0 || isFormLocked}
             isNextDisabled={currentIssueIndex === issues.length - 1 || isFormLocked}
-            isSaveAndNextDisabled={(!isRemediated && !isApplyButtonHidden) || isFormLocked}
+            isSaveAndNextDisabled={
+              (!isRemediated && !isApplyButtonHidden) || isFormLocked || !!formError
+            }
           />
         </Flex.Item>
       </Flex>
       <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
-        {assertiveAlertMessage}
+        {assertiveAlertMessage || ''}
       </Alert>
     </View>
   )

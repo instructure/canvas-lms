@@ -16,7 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {forwardRef, useEffect, useImperativeHandle, useState} from 'react'
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react'
 
 import ColorPickerForm from './ColorPicker'
 import TextInputForm from './TextInput'
@@ -26,18 +33,26 @@ import {AccessibilityIssue, FormType, FormValue} from '../../../types'
 
 export interface FormHandle {
   getValue: () => FormValue
+  focus: () => void
+}
+
+export interface FormComponentHandle {
+  focus: () => void
 }
 
 export interface FormComponentProps {
   issue: AccessibilityIssue
   value: FormValue
+  error?: string | null
   onChangeValue: (formValue: FormValue) => void
   onReload?: (formValue: FormValue) => void
 }
 
 interface FormProps {
   issue: AccessibilityIssue
+  error?: string | null
   onReload?: (formValue: FormValue) => void
+  onClearError?: () => void
 }
 
 const FormTypeMap = {
@@ -50,8 +65,18 @@ const FormTypeMap = {
 const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
   FormHandle,
   FormProps
->(({issue, onReload}: FormProps, ref) => {
+>(({issue, error, onReload, onClearError}: FormProps, ref) => {
+  const formRef = useRef<FormComponentHandle>(null)
   const [value, setValue] = useState<FormValue>(issue.form.value || null)
+
+  const handleChange = useCallback(
+    (formValue: FormValue) => {
+      setValue(formValue)
+
+      if (error) onClearError?.()
+    },
+    [setValue, error, onClearError],
+  )
 
   useEffect(() => {
     setValue(issue.form.value || null)
@@ -62,12 +87,24 @@ const Form: React.FC<FormProps & React.RefAttributes<FormHandle>> = forwardRef<
       if (issue.form.type === FormType.Button) return 'true'
       return value
     },
+    focus: () => {
+      formRef.current?.focus()
+    },
   }))
 
   if (issue.form.type === FormType.Button) return null
 
   const FormComponent = FormTypeMap[issue.form.type]
-  return <FormComponent issue={issue} value={value} onChangeValue={setValue} onReload={onReload} />
+  return (
+    <FormComponent
+      ref={formRef}
+      issue={issue}
+      value={value}
+      error={error}
+      onChangeValue={handleChange}
+      onReload={onReload}
+    />
+  )
 })
 
 export default Form
