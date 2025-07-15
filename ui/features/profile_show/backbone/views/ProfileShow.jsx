@@ -46,7 +46,7 @@ export default class ProfileShow extends Backbone.View {
   initialize() {
     super.initialize(...arguments)
     this.displayAlertOnSave()
-    return new AvatarWidget('.profile-link')
+    return new AvatarWidget('.profile-edit-link')
   }
 
   renderAlert(message, container, variant) {

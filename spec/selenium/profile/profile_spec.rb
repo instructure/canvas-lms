@@ -526,7 +526,7 @@ describe "profile" do
       get "/about/#{@user.to_param}"
       wait_for_ajaximations
 
-      f(".profile-link").click
+      f(".profile-edit-link").click
       wait_for_ajaximations
 
       expect(ff(".avatar-content").length).to eq 1
