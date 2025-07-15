@@ -404,11 +404,13 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
               itemType={current.resource.type}
             />
           </View>
-          <View as="section" margin="medium 0">
-            <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
-            <br aria-hidden={true} />
-            <Text weight="weightRegular">{current.issue.message}</Text>
-          </View>
+          {current.issue.form.type !== FormType.ColorPicker && (
+            <View as="section" margin="medium 0">
+              <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+              <br aria-hidden={true} />
+              <Text weight="weightRegular">{current.issue.message}</Text>
+            </View>
+          )}
           <View as="section" margin="medium 0">
             <Form
               ref={formRef}

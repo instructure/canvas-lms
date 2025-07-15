@@ -18,13 +18,10 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
-import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {ColorPicker} from '@instructure/ui-color-picker'
-import {Pill} from '@instructure/ui-pill'
+import {ColorPicker, ColorContrast} from '@instructure/ui-color-picker'
 import {FormMessage} from '@instructure/ui-form-field'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ContrastData} from '../../../types'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -35,94 +32,33 @@ interface ContrastRatioFormProps {
   messages?: FormMessage[]
   backgroundColor?: string
   foregroundColor?: string
-  contrastRatio?: number
+  description?: string
   onChange: (value: string) => void
   inputRef?: (inputElement: HTMLInputElement | null) => void
 }
 
-const optionMap: Record<string, keyof ContrastData> = {
-  normal: 'isValidNormalText',
-  large: 'isValidLargeText',
-  graphics: 'isValidGraphicsText',
-}
-
+const SUGGESTION_MESSAGE = I18n.t(
+  'For text on white background we recommend that you use the black color above. This changes to white when displayed on a dark background in dark mode, so text will remain accessible.',
+)
 const SUGGESTED_COLORS = ['#000000', '#248029', '#9242B4', '#2063C1', '#B50000']
-
-const Swatch = ({
-  label,
-  color,
-}: {
-  label: string
-  color: string
-}) => (
-  <Flex alignItems="center" gap="x-small">
-    <View
-      width="1.5rem"
-      height="1.5rem"
-      borderRadius="circle"
-      borderWidth="small"
-      background="primary"
-      themeOverride={{backgroundPrimary: color}}
-      aria-label={`${label}: ${color}`}
-    />
-    <View as="div">
-      <Text as="div" size="small">
-        {label}
-      </Text>
-      <Text as="div" size="small" color="secondary">
-        {color}
-      </Text>
-    </View>
-  </Flex>
-)
-
-const ContrastOptions = ({
-  options,
-  isOptionsValid,
-  badgeColor,
-}: {
-  options: string[]
-  isOptionsValid: (option: string) => boolean
-  badgeColor: 'success' | 'danger'
-}) => (
-  <View as="div" margin="x-small 0 medium 0">
-    {options.map((option, index) => (
-      <Flex key={index} margin="0" justifyItems="space-between" width="272px">
-        <Text
-          color={isOptionsValid(option) ? 'success' : 'danger'}
-          themeOverride={{dangerColor: '#E62429'}}
-          size="small"
-          weight="bold"
-        >
-          {I18n.t(`%{option} TEXT`, {option: option.toUpperCase()})}
-        </Text>
-        <Pill color={badgeColor} margin="xx-small">
-          {isOptionsValid(option) ? I18n.t('PASS') : I18n.t('FAIL')}
-        </Pill>
-      </Flex>
-    ))}
-  </View>
-)
 
 const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
   label,
   backgroundColor = '#FFFFFF',
   foregroundColor = '#000000',
-  contrastRatio = 1,
   onChange,
   inputLabel,
+  description,
   options = [],
   messages = [],
   inputRef,
 }: ContrastRatioFormProps) => {
   const [selectedColor, setSelectedColor] = useState(foregroundColor)
-  const [tempContrastData, setTempContrastData] = useState<ContrastData | null>(null)
-  const [contrastData, setContrastData] = useState<ContrastData | null>(null)
   const pickerRef = useRef<HTMLDivElement | null>(null)
+  const contrastForm = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setSelectedColor(foregroundColor)
-    setContrastData(null)
   }, [foregroundColor])
 
   useEffect(() => {
@@ -134,36 +70,68 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
     }
   }, [])
 
-  const badgeColor = contrastData?.isValidNormalText ? 'success' : 'danger'
+  useEffect(() => {
+    const wrapper = contrastForm.current as HTMLDivElement | null
+    if (!wrapper) return
 
-  const isOptionsValid = (option: string): boolean => {
-    const key = optionMap[option]
-    return !!(key && contrastData && contrastData[key])
-  }
+    const topLevelDivs = Array.from(wrapper.children).filter(
+      el => el.tagName.toUpperCase() === 'DIV',
+    )
+    const statusWrappers = topLevelDivs.filter(div => div.textContent?.match(/(pass|fail|AAA|AA)/i))
+    if (statusWrappers.length === 0) return
+    const optionIndexMap: Record<string, number> = {
+      normal: 0,
+      large: 1,
+      graphics: 2,
+    }
+    Object.entries(optionIndexMap).forEach(([key, index]) => {
+      const el = statusWrappers[index] as HTMLElement
+      if (!el) return
+
+      if (options.includes(key)) {
+        el.style.fontWeight = '700'
+        const pillWrapper = el.children[1]
+        const pill = pillWrapper.querySelector('span div > div') as HTMLElement // fallback if pill is inside a span
+        if (pill) {
+          pill.style.fontWeight = '700'
+        }
+      } else {
+        el.style.display = 'none'
+      }
+    })
+  }, [options])
 
   const handleColorChange = (newColor: string) => {
     setSelectedColor(newColor)
     onChange(newColor)
-    if (tempContrastData) {
-      setContrastData(tempContrastData)
-    }
   }
 
   return (
     <View as="div" margin="0 0 large 0" data-testid="contrast-ratio-form">
-      <Text weight="bold" size="medium">
-        {label}
-      </Text>
-      <Text as="div" size="x-large" color="primary">
-        {`${contrastData?.contrast || contrastRatio?.toFixed(2)}:1`}
-      </Text>
-
-      <Flex margin="x-small 0 medium 0" justifyItems="space-between" width="272px">
-        <Swatch label="Background" color={backgroundColor} />
-        <Swatch label="Foreground" color={selectedColor} />
-      </Flex>
-      <ContrastOptions options={options} isOptionsValid={isOptionsValid} badgeColor={badgeColor} />
-      <View margin="medium 0">
+      <ColorContrast
+        firstColor={backgroundColor}
+        secondColor={selectedColor}
+        label={label}
+        successLabel={I18n.t('PASS')}
+        failureLabel={I18n.t('FAIL')}
+        normalTextLabel={I18n.t('NORMAL TEXT')}
+        largeTextLabel={I18n.t('LARGE TEXT')}
+        graphicsTextLabel={I18n.t('GRAPHICS TEXT')}
+        firstColorLabel={I18n.t('Background')}
+        secondColorLabel={I18n.t('Foreground')}
+        elementRef={r => {
+          if (r instanceof HTMLDivElement || r === null) {
+            contrastForm.current = r
+          }
+        }}
+      />
+      <View as="section" margin="medium 0 large 0">
+        <View as="div" margin="x-small 0">
+          <Text weight="weightImportant">{I18n.t('Issue description')}</Text>
+        </View>
+        <Text weight="weightRegular">{description}</Text>
+      </View>
+      <View as="div" margin="medium 0">
         <ColorPicker
           id="a11y-color-picker"
           data-testid="color-picker"
@@ -211,14 +179,13 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
               successLabel: I18n.t('PASS'),
               failureLabel: I18n.t('FAIL'),
               firstColor: backgroundColor,
-              onContrastChange: (data: ContrastData) => {
-                setTempContrastData(data)
-                return null
-              },
             },
           }}
         />
       </View>
+      {backgroundColor.toUpperCase() === '#FFFFFF' && (
+        <Text data-testid="suggestion-message">{SUGGESTION_MESSAGE}</Text>
+      )}
     </View>
   )
 }
