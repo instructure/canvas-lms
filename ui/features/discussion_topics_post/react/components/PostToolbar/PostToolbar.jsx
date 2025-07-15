@@ -170,6 +170,7 @@ const ToolbarMenu = props => {
   }
   return (
     <Menu
+      id="discussion-post-menu"
       trigger={
         <span className="discussion-post-manage-discussion">
           <IconButton

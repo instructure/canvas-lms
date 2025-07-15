@@ -81,11 +81,11 @@ module DiscussionsCommon
   end
 
   def edit_topic(discussion_name, message)
-    wait_for_tiny(f("textarea[name=message]"))
+    wait_for_rce
     replace_content(f("input[name=title]"), discussion_name)
     type_in_tiny("textarea[name=message]", message)
     expect_new_page_load { submit_form(".form-actions") }
-    expect(f("#discussion_topic .discussion-title").text).to eq discussion_name
+    expect(f('[data-testid="message_title"]')).to include_text(discussion_name)
   end
 
   def edit_entry(entry, text)
@@ -215,7 +215,7 @@ module DiscussionsCommon
     replace_content(f("input[name=title]"), title)
     type_in_tiny("textarea[name=message]", message)
     expect_new_page_load { submit_form(".form-actions") }
-    expect(f("#discussion_topic .discussion-title")).to include_text(title)
+    expect(f('[data-testid="message_title"]')).to include_text(title)
   end
 
   def topic_index_element(topic)

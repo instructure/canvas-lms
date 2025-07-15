@@ -280,18 +280,6 @@ describe "discussions" do
           expect_new_page_load { submit_form(".form-actions") }
         end
       end
-
-      context "when react_discussions_post feature_flag is off" do
-        before do
-          course.disable_feature! :react_discussions_post
-        end
-
-        it "does not show anonymous discussion options" do
-          skip "Will be fixed in VICE-5209"
-          get url
-          expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
-        end
-      end
     end
 
     context "as a student" do
@@ -373,22 +361,6 @@ describe "discussions" do
         end
       end
 
-      it "creates a delayed discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
-        get url
-        wait_for_tiny(f("textarea[name=message]"))
-        replace_content(f("input[name=title]"), "Student Delayed")
-        type_in_tiny("textarea[name=message]", "This is the discussion description.")
-        target_time = 1.day.from_now
-        unlock_text = format_time_for_view(target_time)
-        unlock_text_index_page = format_date_for_view(target_time, :short)
-        replace_content(f("#delayed_post_at"), unlock_text, tab_out: true)
-        expect_new_page_load { submit_form(".form-actions") }
-        expect(f(".entry-content").text).to include("This topic is locked until #{unlock_text}")
-        expect_new_page_load { f("#section-tabs .discussions").click }
-        expect(f(".discussion-availability").text).to include("Not available until #{unlock_text_index_page}")
-      end
-
       it "gives error if Until date isn't after Available From date", :ignore_js_errors, priority: "1" do
         get url
         wait_for_tiny(f("textarea[name=message]"))
@@ -402,19 +374,6 @@ describe "discussions" do
         expect(
           fj("div.error_text:contains('Date must be after date available')")
         ).to be_present
-      end
-
-      it "allows a student to create a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
-        skip_if_firefox("known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085")
-        get url
-        wait_for_tiny(f("textarea[name=message]"))
-        replace_content(f("input[name=title]"), "Student Discussion")
-        type_in_tiny("textarea[name=message]", "This is the discussion description.")
-        expect(f("#discussion-edit-view")).to_not contain_css("#has_group_category")
-        expect_new_page_load { submit_form(".form-actions") }
-        expect(f(".discussion-title").text).to eq "Student Discussion"
-        expect(f("#content")).not_to contain_css("#topic_publish_button")
       end
 
       it "does not show file attachment if allow_student_forum_attachments is not true", :ignore_js_errors, priority: "2" do
