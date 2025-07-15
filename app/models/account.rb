@@ -2501,7 +2501,7 @@ class Account < ActiveRecord::Base
     terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.key?(:passive)
 
     if terms.custom?
-      TermsOfServiceContent.ensure_content_for_account(self)
+      TermsOfServiceContent.ensure_content_for_account(self, saving_user)
       terms_of_service_content.saving_user = saving_user
       terms_of_service_content.update_attribute(:content, terms_params[:content]) if terms_params[:content]
     end

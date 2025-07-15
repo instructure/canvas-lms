@@ -78,16 +78,6 @@ describe LinkedAttachmentHandler do
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment3.id])
     end
 
-    it "removes all associations" do
-      html = <<~HTML
-        <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
-          <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
-      HTML
-      course.associate_attachments_to_rce_object(html, teacher)
-      course.associate_attachments_to_rce_object("", teacher)
-      expect(fetch_list_with_field_name(nil)).to be_empty
-    end
-
     it "does not allow associations to files the editing user doesn't have access to" do
       html = <<~HTML
         <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
@@ -119,6 +109,40 @@ describe LinkedAttachmentHandler do
       course.associate_attachments_to_rce_object(html2, teacher, context_concern: "syllabus_body")
       expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
       expect(fetch_list_with_field_name("syllabus_body")).to match_array([course_attachment3.id])
+    end
+
+    context "deleting associations" do
+      it "removes all associations" do
+        html = <<~HTML
+          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+            <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
+        HTML
+        course.associate_attachments_to_rce_object(html, teacher)
+        course.associate_attachments_to_rce_object("", teacher)
+        expect(fetch_list_with_field_name(nil)).to be_empty
+      end
+
+      it "keeps wiki page associations" do
+        wiki_page = course.wiki_pages.create!(title: "Test Page")
+        html = <<~HTML
+          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+            <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
+        HTML
+        wiki_page.associate_attachments_to_rce_object(html, teacher)
+        wiki_page.associate_attachments_to_rce_object("", teacher)
+        associations = AttachmentAssociation.where(context: wiki_page).pluck(:attachment_id)
+        expect(associations).to match_array([course_attachment.id, course_attachment2.id])
+      end
+
+      it "keeps association if the user doesn't have manage access to the file" do
+        html = <<~HTML
+          <p><a href="/courses/#{course.id}/files/#{course_attachment.id}/download">file 1</a>
+            <img id="3" src="/courses/#{course.id}/files/#{course_attachment2.id}/preview"></p>
+        HTML
+        course.associate_attachments_to_rce_object(html, teacher)
+        course.associate_attachments_to_rce_object("", student)
+        expect(fetch_list_with_field_name(nil)).to match_array([course_attachment.id, course_attachment2.id])
+      end
     end
 
     context "with sharding" do
