@@ -47,6 +47,10 @@ class TermsOfServiceContent < ActiveRecord::Base
     end
   end
 
+  def access_for_attachment_association?(_user, _session, _location_param)
+    true
+  end
+
   def ensure_terms_updated_at
     self.terms_updated_at ||= Time.now.utc
   end

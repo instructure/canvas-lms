@@ -1492,6 +1492,62 @@ describe AccountsController do
       expect(response.body).to match(/"content":"custom content"/)
     end
 
+    context "attachments to terms of service with location tagging" do
+      before do
+        @aa_test_data = AttachmentAssociationsSpecHelper.new(@account, @user)
+        @account.update_terms_of_service({ terms_type: "custom", content: @aa_test_data.added_html }, @user)
+        @old_controller = @controller
+        @controller = FilesController.new
+      end
+
+      after do
+        @controller = @old_controller
+      end
+
+      it "fetches the attachment for logged in user" do
+        admin_logged_in(@account)
+        get "show",
+            params: {
+              user_id: @user.id,
+              id: @aa_test_data.attachment1.id,
+              download: 1,
+              location: "terms_of_service_content_#{@account.terms_of_service_content.id}"
+            },
+            format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "fetches the attachment for unrelated users" do
+        unrelated_user = user_factory
+        user_session(unrelated_user)
+        get "show",
+            params: {
+              user_id: @user.id,
+              id: @aa_test_data.attachment1.id,
+              download: 1,
+              location: "terms_of_service_content_#{@account.terms_of_service_content.id}"
+            },
+            format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+
+      it "fetches the attachment for anonymous users" do
+        remove_user_session
+        get "show",
+            params: {
+              user_id: @user.id,
+              id: @aa_test_data.attachment1.id,
+              download: 1,
+              location: "terms_of_service_content_#{@account.terms_of_service_content.id}"
+            },
+            format: "json"
+        expect(response).to have_http_status(:found)
+        expect(response.headers["location"]).to include("download_frd")
+      end
+    end
+
     it "returns the terms of service content as teacher" do
       user_session(@teacher)
       @account.update_terms_of_service({ terms_type: "custom", content: "custom content" }, @teacher)

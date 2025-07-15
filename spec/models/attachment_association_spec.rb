@@ -70,17 +70,17 @@ describe AttachmentAssociation do
 
     it "returns false if the attachment is not associated with the context" do
       make_associations
-      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment3.id, teacher)).to be_falsey
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment2.id, teacher)).to be_falsey
     end
 
     it "returns false if the user is not allowed to read the context" do
       make_associations
-      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment.id, another_user)).to be_falsey
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment.id, another_user)).to be_falsey
     end
 
     it "returns true if the attachment is associated with the context and the user has read rights to the context" do
       make_associations
-      expect(AttachmentAssociation.verify_access("course_#{course.id}", course_attachment.id, teacher)).to be_truthy
+      expect(AttachmentAssociation.verify_access("course_syllabus_#{course.id}", course_attachment.id, teacher)).to be_truthy
     end
 
     context "with a syllabus body attachment" do
