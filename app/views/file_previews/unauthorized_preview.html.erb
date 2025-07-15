@@ -1,0 +1,28 @@
+<%
+# Copyright (C) 2025 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% provide :head, include_common_stylesheets %>
+<%= render :partial => "layouts/head" %>
+<body style="margin:0; padding: 0; background: transparent;">
+  <div id="content" class="file_preview_container" style="margin:0; padding: 0; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%); color: white; text-align: center;">
+    <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
+    <h2><%= t("Access Denied") %></h2>
+    <div><%= t("You don't have access to view this resource.") %></div>
+  </div>
+  <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+</body>
