@@ -20,6 +20,8 @@
 module Accessibility
   module Rules
     class LargeTextContrastRule < Accessibility::Rule
+      extend Accessibility::CssAttributesHelper
+
       self.id = "large-text-contrast"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
 
@@ -74,61 +76,6 @@ module Accessibility
                      end
       end
 
-      def self.extract_font_size(style_str)
-        return nil unless style_str
-
-        if style_str =~ /font-size:\s*([^;]+)/
-          size_str = $1.strip
-
-          if size_str.end_with?("px")
-            return size_str.to_f
-          elsif size_str.end_with?("pt")
-            return size_str.to_f * 1.333
-          elsif size_str.end_with?("em", "rem")
-            return size_str.to_f * 16 # Assume 1em = 16px
-          end
-        end
-
-        nil
-      end
-
-      def self.extract_font_weight(style_str)
-        return nil unless style_str
-
-        if style_str =~ /font-weight:\s*([^;]+)/
-          $1.strip
-        else
-          nil
-        end
-      end
-
-      def self.extract_color(style_str, property)
-        return nil unless style_str
-
-        if style_str =~ /#{property}:\s*([^;]+)/
-          color = $1.strip
-
-          # Convert rgb() format to hex
-          if color.start_with?("rgb")
-            return rgb_to_hex(color).upcase
-          elsif color.start_with?("#")
-            return color.delete("#").upcase
-          else
-            return color.upcase
-          end
-        end
-
-        nil
-      end
-
-      def self.rgb_to_hex(rgb)
-        if rgb =~ /rgb\((\d+),\s*(\d+),\s*(\d+)\)/
-          r, g, b = $1.to_i, $2.to_i, $3.to_i
-          return format("#%02X%02X%02X", r, g, b)
-        end
-        "000000"
-      end
-
       def self.update_style(style_str, property, value)
         style_str ||= ""
 
@@ -154,11 +101,20 @@ module Accessibility
         { foreground: new_foreground, background: }
       end
 
-      def self.form(_elem)
+      def self.form(elem)
+        style_str = elem.attribute("style")&.value.to_s
+        foreground = extract_color(style_str, "color") || "000000"
+        background = extract_color(style_str, "background-color") || "FFFFFF"
+
         Accessibility::Forms::ColorPickerField.new(
-          label: "Change color",
+          title_label: I18n.t("Contrast Ratio"),
+          input_label: I18n.t("New text color"),
+          label: I18n.t("Change text color"),
           undo_text: I18n.t("Color changed"),
-          value: ""
+          options: ["large"],
+          background_color: "##{background}",
+          value: "##{foreground}",
+          contrast_ratio: WCAGColorContrast.ratio(foreground, background)
         )
       end
 
