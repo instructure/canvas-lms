@@ -721,12 +721,7 @@
 #         "visibility": {
 #           "description": "Specifies types of users that can see this placement. Only valid for some placements like course_navigation.",
 #           "example": "admins",
-#           "type": "string",
-#           "enum": [
-#             "admins",
-#             "members",
-#             "public"
-#           ]
+#           "type": "string"
 #         },
 #         "prefer_sis_email": {
 #           "description": "1.1 specific. If true, the tool will send the SIS email in the lis_person_contact_email_primary launch property",
@@ -734,7 +729,7 @@
 #           "type": "boolean"
 #         },
 #         "oauth_compliant": {
-#           "description": "(Only applies to 1.1) If true, Canvas will not copy launch URL query parameters to the POST body.",
+#           "description": "1.1 specific. If true, query parameters from the launch URL will not be copied to the POST body.",
 #           "example": true,
 #           "type": "boolean"
 #         },
@@ -825,6 +820,59 @@
 #           "example": { "course_navigation": { "$ref": "Lti::Placement" } },
 #           "type": "object",
 #           "items": { "$ref": "Lti::PlacementOverlay" }
+#         }
+#       }
+#     }
+#
+# @model Lti::OverlayVersion
+#     {
+#       "id": "Lti::OverlayVersion",
+#       "description": "A single version of a tool's configuration overlay",
+#       "properties": {
+#         "root_account_id": {
+#           "description": "The Canvas id of the root account",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "created_at": {
+#           "description": "Timestamp of the version's creation",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "updated_at": {
+#           "description": "Timestamp of the version's last update",
+#           "example": "2024-01-01T00:00:00Z",
+#           "type": "string"
+#         },
+#         "caused_by_reset": {
+#           "description": "Whether or not this change was caused by a reset of the tool's configuration",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "created_by": {
+#           "description": "The user that created this version. If a string, this registration was created by Instructure.",
+#           "example": { "type": "User" },
+#           "type": "string|User",
+#           "$ref": "User"
+#         },
+#         "diff": {
+#           "description": "A list of changes made in this version compared to the previous version",
+#           "example": [["+", "disabled_placements[0]", "top_navigation"]],
+#           "type": "array",
+#           "items": {
+#             "type": "array",
+#             "items": {"type": "object"}
+#           }
+#         },
+#         "lti_overlay_id": {
+#           "description": "The id of the overlay this version is for",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "account_id": {
+#           "description": "The id of the account this version is for",
+#           "example": 1,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -990,7 +1038,7 @@
 class Lti::RegistrationsController < ApplicationController
   before_action :require_root_account_instrumented
   before_action :require_feature_flag
-  before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search]
+  before_action :require_lti_registrations_next_feature_flag, only: %i[reset context_search overlay_history]
   before_action :require_manage_lti_registrations
   before_action :validate_workflow_state, only: %i[bind create update]
   before_action :validate_list_params, only: :list
@@ -1561,6 +1609,38 @@ class Lti::RegistrationsController < ApplicationController
     }
   end
 
+  # @API Get LTI Registration Overlay History
+  # Returns the overlay history items for the specified LTI registration.
+  #
+  # @argument limit [Optional, Integer] The maximum number of history items to return. Defaults to 101. Maximum allowed is 500.
+  #
+  # @returns [Lti::OverlayVersion]
+  #
+  # @example_request
+  #
+  #   This would return the overlay history for the specified LTI registration
+  #   curl -X GET 'https://<canvas>/api/v1/accounts/<account_id>/lti_registrations/<registration_id>/overlay_history?limit=50' \
+  #        -H "Authorization: Bearer <token>"
+  def overlay_history
+    GuardRail.activate(:secondary) do
+      registration = Lti::Registration.active.find(params[:id])
+      overlay = registration.overlay_for(@context)
+
+      if overlay
+        limit = validate_limit_param(params[:limit])
+        history_items = overlay.lti_overlay_versions.limit(limit)
+        render json: history_items.map { |version|
+          lti_overlay_version_json(version, @current_user, session, @context)
+        }
+      else
+        render json: []
+      end
+    end
+  rescue => e
+    report_error(e)
+    raise e
+  end
+
   private
 
   def render_configuration_errors(errors)
@@ -1739,5 +1819,22 @@ class Lti::RegistrationsController < ApplicationController
     remote_env({
                  ltiUsage: DynamicSettings.find("lti")["canvas_apps_lti_usage_url", failsafe: nil]
                })
+  end
+
+  def validate_limit_param(limit_param)
+    return 101 if limit_param.blank?
+
+    limit = limit_param.to_i
+    if limit <= 0
+      render_error(:invalid_limit, "limit must be a positive integer")
+      return
+    end
+
+    if limit > 101
+      render_error(:invalid_limit, "limit cannot exceed 101")
+      return
+    end
+
+    limit
   end
 end
