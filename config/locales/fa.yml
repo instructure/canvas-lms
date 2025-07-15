@@ -6113,6 +6113,7 @@ fa:
       home_page: "صفحه اصلی"
   content_item_title_96079d16: "عنوان آیتم محتوا"
   content_items_with_errors_a9438fdb: "موارد محتوای دارای خطا"
+  content_licensing_help_3d15e649: "راهنمای مجوز دادن به محتوا"
   content_link_error_assignment_name_course_name_b8be789a: "خطای پیوند محتوا - %{assignment_name}، %{course_name}"
   content_locks: 
     buttons: 
