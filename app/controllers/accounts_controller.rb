@@ -1202,6 +1202,12 @@ class AccountsController < ApplicationController
   # @argument account[settings][conditional_release][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument account[settings][enable_course_paces][value] [Boolean]
+  #   Enable or disable course pacing
+  #
+  # @argument account[settings][enable_course_paces][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
   # @argument account[settings][password_policy] [Hash]
   #   Hash of optional password policy configuration parameters for a root account
   #
@@ -2229,6 +2235,7 @@ class AccountsController < ApplicationController
                                    :students_can_create_courses_anywhere,
                                    { default_due_time: [:value] }.freeze,
                                    { conditional_release: [:value, :locked] }.freeze,
+                                   { enable_course_paces: [:value, :locked] }.freeze,
                                    { allow_observers_in_appointment_groups: [:value] }.freeze,
                                    :enable_inbox_signature_block,
                                    :disable_inbox_signature_block_for_students,
@@ -2272,7 +2279,8 @@ class AccountsController < ApplicationController
        restrict_quantitative_data
        lock_all_announcements
        sis_assignment_name_length_input
-       conditional_release]
+       conditional_release
+       enable_course_paces]
   end
 
   def permitted_password_policy_settings
