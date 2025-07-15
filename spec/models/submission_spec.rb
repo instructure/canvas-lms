@@ -7098,6 +7098,76 @@ describe Submission do
       end
     end
 
+    context "with provisional grades" do
+      before(:once) do
+        @final_grader = @teacher
+        @moderated_assignment = @course.assignments.create!(
+          due_at: 2.years.from_now,
+          final_grader: @final_grader,
+          grader_count: 2,
+          moderated_grading: true,
+          points_possible: 10,
+          submission_types: :online_text_entry,
+          title: "Moderated Assignment"
+        )
+        @moderated_rubric_association = rubric_association_model(
+          context: @course,
+          rubric: @rubric,
+          association_object: @moderated_assignment,
+          purpose: "grading"
+        )
+        @moderated_submission = @moderated_assignment.submit_homework(@student, body: "foo", submitted_at: 2.hours.ago)
+
+        moderator_provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@final_grader)
+        @moderator_assessment = @moderated_rubric_association.assess({
+                                                                       user: @student,
+                                                                       assessor: @final_grader,
+                                                                       artifact: moderator_provisional_grade,
+                                                                       assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                     })
+
+        @provisional_grader = user_factory(active_all: true)
+        @course.enroll_ta(@provisional_grader, enrollment_state: "active")
+        provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@provisional_grader)
+        @provisional_assessment = @moderated_rubric_association.assess({
+                                                                         user: @student,
+                                                                         assessor: @provisional_grader,
+                                                                         artifact: provisional_grade,
+                                                                         assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                       })
+        @other_grader = user_factory(active_all: true)
+        @course.enroll_ta(@other_grader, enrollment_state: "active")
+        other_provisional_grade = @moderated_submission.find_or_create_provisional_grade!(@other_grader)
+        @other_assessment = @moderated_rubric_association.assess({
+                                                                   user: @student,
+                                                                   assessor: @other_grader,
+                                                                   artifact: other_provisional_grade,
+                                                                   assessment: { assessment_type: "grading", criterion_crit1: { points: 5 } }
+                                                                 })
+        @all_provisional_assessments = [@moderator_assessment, @provisional_assessment, @other_assessment]
+      end
+
+      it "excludes provisional assessments by default" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@provisional_grader)
+        expect(assessments).to be_empty
+      end
+
+      it "includes provisional assessments when include_provisional is true" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@provisional_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@provisional_assessment)
+      end
+
+      it "allows moderators to see all provisional assessments" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@final_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@moderator_assessment, @provisional_assessment, @other_assessment)
+      end
+
+      it "allows provisional graders to see only their own provisional assessments" do
+        assessments = @moderated_submission.visible_rubric_assessments_for(@other_grader, include_provisional: true, provisional_assessments: @all_provisional_assessments)
+        expect(assessments).to contain_exactly(@other_assessment)
+      end
+    end
+
     context "anonymous peer reviews" do
       before(:once) do
         course = Course.create!

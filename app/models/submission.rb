@@ -3026,7 +3026,7 @@ class Submission < ActiveRecord::Base
     !has_submission? && !graded?
   end
 
-  def visible_rubric_assessments_for(viewing_user, attempt: nil)
+  def visible_rubric_assessments_for(viewing_user, attempt: nil, include_provisional: false, provisional_assessments: nil)
     return [] unless assignment.active_rubric_association?
 
     unless posted? || grants_right?(viewing_user, :read_grade)
@@ -3037,9 +3037,20 @@ class Submission < ActiveRecord::Base
       end
     end
 
+    can_moderate = include_provisional && assignment.permits_moderation?(viewing_user)
+    target_rubric_association = assignment.rubric_association
+
     filtered_assessments = rubric_assessments_for_attempt(attempt:).select do |a|
       a.grants_right?(viewing_user, :read) &&
-        a.rubric_association == assignment.rubric_association
+        a.rubric_association == target_rubric_association
+    end
+
+    if include_provisional && provisional_assessments.present?
+      filtered_provisional = provisional_assessments.select do |assessment|
+        can_moderate || assessment.assessor_id == viewing_user.id
+      end
+
+      filtered_assessments.concat(filtered_provisional)
     end
 
     if assignment.anonymous_peer_reviews? && !grants_right?(viewing_user, :grade)

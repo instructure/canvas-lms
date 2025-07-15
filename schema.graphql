@@ -48,6 +48,7 @@ type Account implements LegacyIDInterface & Node {
     last: Int
   ): CustomGradeStatusConnection
   id: ID!
+  instructureIdentityOrganizationId: String
   name: String
   outcomeCalculationMethod: OutcomeCalculationMethod
   outcomeProficiency: OutcomeProficiency
@@ -4260,10 +4261,6 @@ type ExternalTool implements LegacyIDInterface & ModuleItemInterface & Timestamp
   modules: [Module!]
   name: String
   pointsPossible: Float
-
-  """
-  Whether the module item is published
-  """
   published: Boolean
   settings: ExternalToolSettings
   state: ExternalToolState
@@ -5879,6 +5876,11 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
   estimatedDuration: ISO8601Duration
   id: ID!
   indent: Int
+
+  """
+  Restrictions from master courses for this module item
+  """
+  masterCourseRestrictions: ModuleItemMasterCourseRestriction
   module: Module
   next: ModuleItem
 
@@ -5933,6 +5935,7 @@ type ModuleItem implements LegacyIDInterface & Node & Timestamped {
     """
     last: Int
   ): ModuleItemConnection
+  title: String
   updatedAt: DateTime
   url: URL
 }
@@ -6010,6 +6013,41 @@ interface ModuleItemInterface {
   published: Boolean
   title: String
   type: String
+}
+
+"""
+Restrictions for a module item defined in a blueprint course
+"""
+type ModuleItemMasterCourseRestriction {
+  """
+  Whether all aspects are restricted
+  """
+  all: Boolean
+
+  """
+  Whether availability dates are restricted
+  """
+  availabilityDates: Boolean
+
+  """
+  Whether content is restricted
+  """
+  content: Boolean
+
+  """
+  Whether due dates are restricted
+  """
+  dueDates: Boolean
+
+  """
+  Whether points are restricted
+  """
+  points: Boolean
+
+  """
+  Whether settings are restricted
+  """
+  settings: Boolean
 }
 
 type ModulePrerequisite {
@@ -8493,6 +8531,15 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     includeDraftComments: Boolean = false
 
     """
+    When true, provisional comments that the current user has permission to see will be returned.
+    The Moderator has permission to see all provisional comments.
+    Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
+    Otherwise, Provisional Graders can only see their own comments.
+    Students cannot see provisional comments.
+    """
+    includeProvisionalComments: Boolean = false
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
@@ -8886,6 +8933,15 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     includeDraftComments: Boolean = false
 
     """
+    When true, provisional comments that the current user has permission to see will be returned.
+    The Moderator has permission to see all provisional comments.
+    Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
+    Otherwise, Provisional Graders can only see their own comments.
+    Students cannot see provisional comments.
+    """
+    includeProvisionalComments: Boolean = false
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
@@ -9092,6 +9148,15 @@ interface SubmissionInterface {
     includeDraftComments: Boolean = false
 
     """
+    When true, provisional comments that the current user has permission to see will be returned.
+    The Moderator has permission to see all provisional comments.
+    Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
+    Otherwise, Provisional Graders can only see their own comments.
+    Students cannot see provisional comments.
+    """
+    includeProvisionalComments: Boolean = false
+
+    """
     Returns the last _n_ elements from the list.
     """
     last: Int
@@ -9223,6 +9288,14 @@ input SubmissionRubricAssessmentFilterInput {
   or submission history.
   """
   forAttempt: Int = null
+
+  """
+  When true, provisional rubric assessments that the current user has permission to see will be returned.
+  The Moderator has permission to see all provisional rubric assessments.
+  Provisional Graders only have permission to view their own provisional rubric assessments.
+  Default behavior is to omit provisional assessments entirely.
+  """
+  includeProvisionalAssessments: Boolean = false
 }
 
 input SubmissionSearchFilterInput {
@@ -10272,6 +10345,8 @@ type User implements LegacyIDInterface & Node & Timestamped {
   htmlUrl(courseId: ID): URL
   id: ID!
   inboxLabels: [String!]
+  instructureIdentityGlobalUserId: String
+  instructureIdentityOrganizationUserId: String
   integrationId: String
   lastName: HtmlEncodedString
   loginId: String
