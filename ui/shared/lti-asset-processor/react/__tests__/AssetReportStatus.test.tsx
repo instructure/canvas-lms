@@ -18,7 +18,7 @@
 
 import AssetReportStatus from '../AssetReportStatus'
 import {render, screen, fireEvent} from '@testing-library/react'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 
 describe('AssetReportStatus', () => {
   const createReport = (

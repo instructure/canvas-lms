@@ -52,7 +52,7 @@ jest.mock('jquery-ui', () => {
   return $
 })
 
-jest.mock('../../../react/AssetProcessors', () => ({
+jest.mock('@canvas/lti-asset-processor/react/AssetProcessors', () => ({
   attach: ({container, initialAttachedProcessors, courseId, secureParams}) => {
     const initialJson = JSON.stringify(initialAttachedProcessors)
     const el = (

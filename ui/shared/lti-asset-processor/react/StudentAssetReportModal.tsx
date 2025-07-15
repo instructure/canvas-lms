@@ -20,9 +20,15 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {CloseButton} from '@instructure/ui-buttons'
-import {LtiAssetReportWithAsset, SpeedGraderLtiAssetReports} from '@canvas/lti/model/AssetReport'
+import {
+  LtiAssetReportWithAsset,
+  SpeedGraderLtiAssetReports,
+} from '@canvas/lti-asset-processor/model/AssetReport'
 import groupBy from 'lodash/groupBy'
-import {LtiAssetReports, LtiAssetReportsProps} from '../../../shared/lti/react/LtiAssetReports'
+import {
+  LtiAssetReports,
+  LtiAssetReportsProps,
+} from '@canvas/lti-asset-processor/react/LtiAssetReports'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {Flex, FlexItem} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'

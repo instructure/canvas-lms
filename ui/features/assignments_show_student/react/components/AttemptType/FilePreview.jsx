@@ -20,10 +20,13 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import AssetReportStatus from '@canvas/lti/react/AssetReportStatus'
-import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
+import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
+import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {filterReports, shouldRenderAssetProcessorData} from '@canvas/lti/react/AssetProcessorHelper'
+import {
+  filterReports,
+  shouldRenderAssetProcessorData,
+} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'

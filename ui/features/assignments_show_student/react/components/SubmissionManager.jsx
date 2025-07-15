@@ -37,7 +37,7 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {clearAssetProcessorReports} from '@canvas/lti/react/AssetProcessorHelper'
+import {clearAssetProcessorReports} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'

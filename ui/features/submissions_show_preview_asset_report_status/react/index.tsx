@@ -17,7 +17,7 @@
  */
 
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import ready from '@instructure/ready'
 import {createRoot} from 'react-dom/client'
 import OnlineUploadAssetReportStatusLink from './OnlineUploadAssetReportStatusLink'

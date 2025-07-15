@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {LtiAssetReportWithAsset} from '@canvas/lti/model/AssetReport'
+import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetReport'
 import {colors} from '@instructure/canvas-theme'
 import {IconCompleteSolid, IconWarningSolid} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
