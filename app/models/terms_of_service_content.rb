@@ -55,10 +55,10 @@ class TermsOfServiceContent < ActiveRecord::Base
     self.terms_updated_at = Time.now.utc if content_changed?
   end
 
-  def self.ensure_content_for_account(account)
+  def self.ensure_content_for_account(account, saving_user)
     unique_constraint_retry do |retry_count|
       account.reload_terms_of_service_content if retry_count > 0
-      account.terms_of_service_content || account.create_terms_of_service_content!(content: "")
+      account.terms_of_service_content || account.create_terms_of_service_content!(content: "", saving_user:)
     end
   end
 
