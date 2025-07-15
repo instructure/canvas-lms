@@ -39,3 +39,9 @@ course_pace_allow_bulk_pace_assign:
   applies_to: RootAccount
   display_name: Allow bulk pace assignment to multiple students
   description: Allows for selecting various students and applying a bulk pace to all of them
+
+course_pace_enable_from_account_setting:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Account Setting to enable or disable course paces
+  description: Allows controlling whether the course pacing feature is enabled from an account setting
