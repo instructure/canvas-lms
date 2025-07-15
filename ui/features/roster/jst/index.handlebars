@@ -14,19 +14,25 @@
   </div>
   {{/if}}
   <div id="tab-0" class="roster-tab tab-panel ui-tabs-panel form-inline" style="min-height: 800px;">
-    <span id="search_input_container"></span>
-    <input
-      type="hidden"
-      name="search_term"
-      data-view="inputFilter"
-      placeholder='{{#t "search_people"}}Search people{{/t}}'
-      aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
-      >
-    <select
-      name="enrollment_role_id"
-      data-view="roleSelect"
-      aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
-      ></select>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.4em; align-items: stretch; margin-bottom: 0.5em;">
+      <span id="search_input_container"></span>
+      <input
+        type="hidden"
+        name="search_term"
+        data-view="inputFilter"
+        placeholder='{{#t "search_people"}}Search people{{/t}}'
+        aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
+        >
+      {{#ifAll permissions.can_manage_differentiation_tags permissions.allow_assign_to_differentiation_tags}}
+      <div id="peopleFilterContainer"></div>
+      {{else}}
+      <select
+        name="enrollment_role_id"
+        data-view="roleSelect"
+        aria-label='{{#t "role_to_search"}}Limit search to role{{/t}}'
+        ></select>
+      {{/ifAll}}
+    </div>
     {{#if permissions.add_users_to_course}}
     {{#if course.concluded}}
     <a

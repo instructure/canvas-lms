@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as createI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
+import $, {event} from 'jquery'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/index.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin'
@@ -29,6 +29,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import UserDifferentiationTagManager from '@canvas/differentiation-tags/react/UserDifferentiationTagManager/UserDifferentiationTagManager'
 import AlertManager from '@canvas/alerts/react/AlertManager'
+import PeopleFilter from '@canvas/differentiation-tags/react/PeopleFilter/PeopleFilter'
 import MessageBus from '@canvas/util/MessageBus'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from '@canvas/query'
@@ -44,7 +45,12 @@ export default class RosterView extends Backbone.View {
 
     this.child('inputFilterView', '[data-view=inputFilter]')
 
-    this.child('roleSelectView', '[data-view=roleSelect]')
+    if (
+      !ENV.permissions.can_manage_differentiation_tags ||
+      !ENV.permissions.allow_assign_to_differentiation_tags
+    ) {
+      this.child('roleSelectView', '[data-view=roleSelect]')
+    }
 
     this.child('resendInvitationsView', '[data-view=resendInvitations]')
 
@@ -184,6 +190,7 @@ export default class RosterView extends Backbone.View {
 
     this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
     this.mountUserDiffTagManager([])
+    this.mountPeopleFilter()
     const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
     const canAddUser = role => role.addable_by_user
 
@@ -202,6 +209,8 @@ export default class RosterView extends Backbone.View {
     MessageBus.on('userSelectionChanged', this.HandleUserSelected, this)
     MessageBus.on('removeUserTagIcon', this.removeTagIcon, this)
     MessageBus.on('reloadUsersTable', this.reloadUsersTable, this)
+    MessageBus.on('peopleFilterChange', this.updatePeopleFilter, this)
+
     return this.collection.on('setParam deleteParam', this.fetch, this)
   }
 
@@ -218,6 +227,17 @@ export default class RosterView extends Backbone.View {
 
     this.collection.fetch()
     $('.select-user-checkbox').prop('checked', false).trigger('change')
+  }
+  updatePeopleFilter(event) {
+    this.collection?.off('setParam deleteParam')
+    this.collection?.deleteParam('differentiation_tag_id')
+    this.collection?.deleteParam('enrollment_role_id')
+    this.collection?.on('setParam deleteParam', this.fetch, this)
+    if (!event || (typeof event === 'object' && Object.keys(event).length === 0)) {
+      this.fetch()
+      return
+    }
+    this.collection?.setParams(event)
   }
 
   fetchOnCreateUsersClose() {
@@ -286,6 +306,20 @@ export default class RosterView extends Backbone.View {
           </AlertManager>
         </QueryClientProvider>,
       )
+    }
+  }
+
+  mountPeopleFilter() {
+    const peopleFilter = this.$el.find('#peopleFilterContainer')[0]
+    if (
+      peopleFilter &&
+      ENV.permissions.can_manage_differentiation_tags &&
+      ENV.permissions.allow_assign_to_differentiation_tags
+    ) {
+      if (!this.peopleFilter) {
+        this.peopleFilter = createRoot(peopleFilter)
+      }
+      this.peopleFilter.render(<PeopleFilter courseId={ENV.course.id} />)
     }
   }
 

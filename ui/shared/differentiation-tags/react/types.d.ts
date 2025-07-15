@@ -41,3 +41,14 @@ export interface UserTags {
   groupCategoryName: string
   isSingleTag: boolean
 }
+
+export interface AllRolesOption {
+  id: string
+  name: string
+}
+
+export interface RoleOption {
+  id: string
+  name: string
+  count: number
+}
