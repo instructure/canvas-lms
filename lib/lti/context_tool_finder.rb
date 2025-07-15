@@ -187,6 +187,7 @@ module Lti
         scope = scope.placements(*placements)
         scope = scope.selectable if Canvas::Plugin.value_to_boolean(@selectable)
         scope = scope.where(tool_id: @tool_ids) if @tool_ids.present?
+        scope = scope.preload(:context_external_tool_placements)
         scope = Lti::ToolFinder.filter_by_unavailable_context_controls(scope, context)
 
         if Canvas::Plugin.value_to_boolean(@only_visible)

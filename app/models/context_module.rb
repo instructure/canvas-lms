@@ -954,6 +954,10 @@ class ContextModule < ActiveRecord::Base
 
     shard.activate do
       GuardRail.activate(:primary) do
+        # Check if progression already exists to avoid redundant enrollment check
+        existing_progression = ContextModuleProgression.find_by(user:, context_module: self)
+        return existing_progression if existing_progression
+
         if context.enrollments.except(:preload).where(user_id: user).exists?
           ContextModuleProgression.create_and_ignore_on_duplicate(user:, context_module: self)
         end
