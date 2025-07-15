@@ -38,7 +38,7 @@ describe('RevertAccount', () => {
     setup()
 
     const revertButton = screen
-      .getAllByText('Revert Sub Account')
+      .getAllByText('Revert Account')
       .find(element => element.tagName === 'SPAN')
 
     expect(revertButton).not.toBeUndefined()
@@ -60,16 +60,14 @@ describe('RevertAccount', () => {
     setup()
 
     const revertButton = screen
-      .getAllByText('Revert Sub Account')
+      .getAllByText('Revert Account')
       .find(element => element.tagName === 'SPAN')
 
     expect(revertButton).not.toBeUndefined()
     fireEvent.click(revertButton!)
 
     waitFor(() => {
-      expect(
-        screen.getByText('Failed to revert sub-account. Please try again.'),
-      ).toBeInTheDocument()
+      expect(screen.getByText('Failed to revert account. Please try again.')).toBeInTheDocument()
     })
   })
 })
