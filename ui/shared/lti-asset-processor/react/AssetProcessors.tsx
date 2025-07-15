@@ -17,116 +17,72 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
-import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
-import {createRoot} from 'react-dom/client'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 import {Flex} from '@instructure/ui-flex'
-import {useEffect} from 'react'
 import {AssetProcessorsAddModal} from './AssetProcessorsAddModal'
 import {AssetProcessorsAttachedProcessorCard} from './AssetProcessorsCards'
 import {useAssetProcessorsAddModalState} from './hooks/AssetProcessorsAddModalState'
 import {useAssetProcessorsState} from './hooks/AssetProcessorsState'
 import {useAssetProcessorsToolsList} from './hooks/useAssetProcessorsToolsList'
-import {buildAPDisplayTitle, ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
+import {buildAPDisplayTitle} from '@canvas/lti/model/AssetProcessor'
 
 const I18n = createI18nScope('asset_processors_selection')
-
-const queryClient = new QueryClient()
 
 export type AssetProcessorsProps = {
   courseId: number
   secureParams: string
-  initialAttachedProcessors: ExistingAttachedAssetProcessor[]
-  hideErrors: () => void
+  hideErrors?: () => void
 }
 
 /**
  * AssetProcessors allows the user to attach Asset Processor(s) for an
- * assignment/activity. The user chooses the tool (with the ActivityAssetProcessor)
- * placement; we then launch the tool and handle the Deep Linking response to
- * keep track of the attached processors.
- *
- * This method is a shim to mount the React component to integrate it with the
- * EditView backbone code
+ * assignment or discussion. The user chooses the tool (with the
+ * appropriate asset processor placement); we then launch the tool and handle
+ * the Deep Linking response to keep track of the attached processors.
  */
-export function attach({
-  container,
-  ...elemParams
-}: {container: HTMLElement} & AssetProcessorsProps) {
-  createRoot(container).render(
-    <QueryClientProvider client={queryClient}>
-      <AssetProcessors {...elemParams} />
-    </QueryClientProvider>,
-  )
-}
-
 export function AssetProcessors(props: AssetProcessorsProps) {
   const openAddDialog = useAssetProcessorsAddModalState(s => s.actions.showToolList)
   const toolsAvailable = !!useAssetProcessorsToolsList(props.courseId).data?.length
-  const {
-    attachedProcessors,
-    addAttachedProcessors,
-    deleteAttachedProcessor,
-    setFromExistingAttachedProcessors,
-  } = useAssetProcessorsState(s => s)
-
-  useEffect(() => {
-    // Neither of the deps will change, so this should only run once
-    setFromExistingAttachedProcessors(props.initialAttachedProcessors)
-  }, [props.initialAttachedProcessors, setFromExistingAttachedProcessors])
-
-  if (!toolsAvailable && !attachedProcessors.length) {
-    // No tools available, or we are still loading, or there was an error fetching
-    return null
-  }
+  const {attachedProcessors, addAttachedProcessors, deleteAttachedProcessor} =
+    useAssetProcessorsState(s => s)
 
   return (
-    <div>
-      <div className="form-column-left">{I18n.t('Document processing apps')}</div>
-      <div className="form-column-right">
-        <div className="border border-trbl border-round">
-          <Flex direction="column" gap="small">
-            {attachedProcessors.map((processor, index) => (
-              <AssetProcessorsAttachedProcessorCard
-                assetProcessorId={processor.id}
-                key={index}
-                icon={{
-                  toolId: processor.toolId,
-                  toolName: processor.toolName || '',
-                  url: processor.iconOrToolIconUrl,
-                }}
-                title={buildAPDisplayTitle(processor)}
-                description={processor.text}
-                windowSettings={processor.window}
-                iframeSettings={processor.iframe}
-                onDelete={() => deleteAttachedProcessor(index, props.hideErrors)}
-              >
-                <input
-                  data-testid={`asset_processors[${index}]`}
-                  type="hidden"
-                  name={`asset_processors[${index}]`}
-                  value={processor.dtoJson}
-                />
-              </AssetProcessorsAttachedProcessorCard>
-            ))}
-            <span
-              data-testid="asset-processor-errors"
-              id="asset_processors_errors"
-              className="error-message"
-            />
-            <span>
-              <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
-                {I18n.t('Add Document Processing App')}
-              </Button>
-            </span>
-          </Flex>
-          {toolsAvailable && (
-            <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
-          )}
-        </div>
-      </div>
-    </div>
+    <>
+      {toolsAvailable && (
+        <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
+      )}
+      <Flex direction="column" gap="small">
+        {attachedProcessors.map((processor, index) => (
+          <AssetProcessorsAttachedProcessorCard
+            assetProcessorId={processor.id}
+            key={index}
+            icon={{
+              toolId: processor.toolId,
+              toolName: processor.toolName || '',
+              url: processor.iconOrToolIconUrl,
+            }}
+            title={buildAPDisplayTitle(processor)}
+            description={processor.text}
+            windowSettings={processor.window}
+            iframeSettings={processor.iframe}
+            onDelete={() => deleteAttachedProcessor(index, props.hideErrors)}
+          ></AssetProcessorsAttachedProcessorCard>
+        ))}
+        <span
+          data-testid="asset-processor-errors"
+          id="asset_processors_errors"
+          className="error-message"
+        />
+        {toolsAvailable && (
+          <span>
+            <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
+              {I18n.t('Add Document Processing App')}
+            </Button>
+          </span>
+        )}
+      </Flex>
+    </>
   )
 }

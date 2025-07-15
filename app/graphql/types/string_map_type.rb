@@ -25,6 +25,10 @@ module Types
     def self.coerce_input(input_value, _context)
       return nil if input_value.nil?
 
+      if input_value.is_a?(ActionController::Parameters)
+        input_value = input_value.to_unsafe_h
+      end
+
       unless input_value.is_a?(Hash) && input_value.all? { |k, v| k.is_a?(String) && v.is_a?(String) }
         raise GraphQL::CoercionError, "#{input_value.inspect} is not a valid StringMap"
       end

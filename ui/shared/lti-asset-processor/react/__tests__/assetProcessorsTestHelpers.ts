@@ -17,6 +17,7 @@
  */
 
 import {DeepLinkResponse} from '@canvas/deep-linking/DeepLinkResponse'
+import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
 
 function makeMockTool({
@@ -88,6 +89,14 @@ export function mockDoFetchApi(expectedPath: string, doFetchApi: jest.Mock) {
 
 export const mockTools = makeMockTools()
 
+// To be used with:
+// useAssetProcessorsToolsList.mockReturnValue(makeMockAssetProcessorsToolsListQuery())
+export const mockAssetProcessorsToolsListQuery = {
+  data: mockTools,
+  loading: false,
+  error: null,
+}
+
 export const mockDeepLinkResponse: DeepLinkResponse = {
   content_items: [
     {
@@ -97,9 +106,7 @@ export const mockDeepLinkResponse: DeepLinkResponse = {
       title: 'Lti 1.3 Tool Title',
     },
   ],
-  ltiEndpoint: 'http://canvas-web.inseng.test/courses/1/external_tools/retrieve',
   reloadpage: false,
-  replaceEditorContents: false,
   tool_id: '22',
 }
 
@@ -117,8 +124,20 @@ export const mockInvalidDeepLinkResponse: any = {
       title: 'Lti 1.3 Tool Title',
     },
   ],
-  ltiEndpoint: 'http://canvas-web.inseng.test/courses/1/external_tools/retrieve',
   reloadpage: false,
-  replaceEditorContents: false,
   tool_id: '44',
+}
+
+export const mockExistingAttachedAssetProcessor: ExistingAttachedAssetProcessor = {
+  id: 1,
+  tool_id: 2,
+  tool_name: 'tool name',
+  tool_placement_label: 'tool label',
+  title: 'ap title',
+  text: 'ap text',
+  icon_or_tool_icon_url: 'http://instructure.com/icon.png',
+  iframe: {
+    width: 600,
+    height: 500,
+  },
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { useContext } from 'react'
+import React, {useContext} from 'react'
 
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,7 +31,8 @@ import {Text} from '@instructure/ui-text'
 import {ItemAssignToTrayWrapper} from './ItemAssignToTrayWrapper'
 import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import MasteryPathToggle from '@canvas/mastery-path-toggle/react/MasteryPathToggle'
-import { DiscussionDueDatesContext } from '../../util/constants'
+import {DiscussionDueDatesContext} from '../../util/constants'
+import {AssetProcessorsForDiscussion} from './AssetProcessorsForDiscussion'
 
 type Props = {
   assignmentGroups: [{_id: string; name: string}]
@@ -83,12 +84,10 @@ export const GradedDiscussionOptions = ({
   canManageAssignTo,
 }: Props) => {
   const isPacedDiscussion = ENV.IN_PACED_COURSE
-  const isPacedWithMasteryPaths = ENV.FEATURES.course_pace_pacing_with_mastery_paths && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
+  const isPacedWithMasteryPaths =
+    ENV.FEATURES.course_pace_pacing_with_mastery_paths && ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
 
-    const {
-      assignedInfoList,
-      setAssignedInfoList,
-    } = useContext(DiscussionDueDatesContext)
+  const {assignedInfoList, setAssignedInfoList} = useContext(DiscussionDueDatesContext)
 
   const renderDiffModulesAssignTo = () => {
     if (!canManageAssignTo) {
@@ -96,23 +95,23 @@ export const GradedDiscussionOptions = ({
     }
     return (
       <>
-        <Text size="large" as="h2">{I18n.t('Assignment Settings')}</Text>
+        <Text size="large" as="h2">
+          {I18n.t('Assignment Settings')}
+        </Text>
         {isPacedDiscussion ? (
           <>
             <CoursePacingNotice courseId={ENV.COURSE_ID} />
-            {
-              isPacedWithMasteryPaths && (
-                <MasteryPathToggle
-                  courseId={ENV.COURSE_ID}
-                  fetchOwnOverrides={false}
-                  overrides={assignedInfoList}
-                  useCards={false}
-                  onSync={setAssignedInfoList}
-                  itemType="discussionTopic"
-                  itemContentId={undefined}
-                />
-              )
-            }
+            {isPacedWithMasteryPaths && (
+              <MasteryPathToggle
+                courseId={ENV.COURSE_ID}
+                fetchOwnOverrides={false}
+                overrides={assignedInfoList}
+                useCards={false}
+                onSync={setAssignedInfoList}
+                itemType="discussionTopic"
+                itemContentId={undefined}
+              />
+            )}
           </>
         ) : (
           <ItemAssignToTrayWrapper />
@@ -172,9 +171,15 @@ export const GradedDiscussionOptions = ({
           setIntraGroupPeerReviews={setIntraGroupPeerReviews}
         />
       </View>
+      {ENV.FEATURES.lti_asset_processor_discussions && (
+        <AssetProcessorsForDiscussion
+          courseId={parseInt(ENV.COURSE_ID!)}
+          secureParams={'' /* TODO in another commit */}
+        />
+      )}
       {isCheckpoints && <CheckpointsSettings />}
       <View as="div" margin="medium 0">
-          {renderDiffModulesAssignTo()}
+        {renderDiffModulesAssignTo()}
       </View>
     </View>
   )
