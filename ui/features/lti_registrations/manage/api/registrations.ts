@@ -39,6 +39,7 @@ import {
 import type {LtiConfigurationOverlay} from '../model/internal_lti_configuration/LtiConfigurationOverlay'
 import type {DeveloperKeyId} from '../model/developer_key/DeveloperKeyId'
 import {compact} from '../../common/lib/compact'
+import {LtiOverlayVersion, ZLtiOverlayVersion} from '../model/LtiOverlayVersion'
 
 export type AppsSortProperty =
   | 'name'
@@ -131,13 +132,10 @@ export const resetLtiRegistration: FetchLtiRegistration = (
   ltiRegistrationId: LtiRegistrationId,
 ) =>
   parseFetchResult(ZLtiRegistrationWithConfiguration)(
-    fetch(
-      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
-      {
-        method: 'PUT',
-        ...defaultFetchOptions(),
-      },
-    ),
+    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`, {
+      method: 'PUT',
+      ...defaultFetchOptions(),
+    }),
   )
 
 export type FetchThirdPartyToolConfiguration = (
@@ -342,5 +340,17 @@ export const fetchLtiRegistration: FetchLtiRegistration = (
       {
         ...defaultFetchOptions(),
       },
+    ),
+  )
+
+export const fetchLtiRegistrationOverlayHistory = (
+  accountId: AccountId,
+  ltiRegistrationId: LtiRegistrationId,
+  limit: number,
+): Promise<ApiResult<LtiOverlayVersion[]>> =>
+  parseFetchResult(z.array(ZLtiOverlayVersion))(
+    fetch(
+      `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/overlay_history?limit=${limit}`,
+      defaultFetchOptions(),
     ),
   )
