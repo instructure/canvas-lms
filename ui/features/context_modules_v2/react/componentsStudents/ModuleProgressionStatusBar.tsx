@@ -92,14 +92,14 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
                 {progressBarView}
               </Flex.Item>
               <Flex.Item margin="0 0 0 xx-small" padding="xxx-small 0">
-                <Text size="x-small" weight="normal">
+                <Text size="x-small" weight="normal" color="secondary">
                   {completionPercentage}%
                 </Text>
               </Flex.Item>
             </Flex>
           </Flex.Item>
           <Flex.Item>
-            <Text size="x-small" weight="normal">
+            <Text size="x-small" weight="normal" color="secondary">
               {completionText}
             </Text>
           </Flex.Item>
@@ -115,12 +115,12 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
           {progressBarView}
         </Flex.Item>
         <Flex.Item margin="0 0 0 x-small">
-          <Text size="x-small" weight="normal">
+          <Text size="x-small" weight="normal" color="secondary">
             {completionPercentage}%
           </Text>
         </Flex.Item>
         <Flex.Item margin="0 0 0 small">
-          <Text size="x-small" weight="normal">
+          <Text size="x-small" weight="normal" color="secondary">
             {completionText}
           </Text>
         </Flex.Item>

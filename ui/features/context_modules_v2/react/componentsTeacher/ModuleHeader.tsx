@@ -30,6 +30,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
 import {CompletionRequirement, Prerequisite, ModuleAction} from '../utils/types'
 import {Text} from '@instructure/ui-text'
+import ModuleHeaderUnlockAt from '../components/ModuleHeaderUnlockAt'
+import {isModuleUnlockAtDateInTheFuture} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -42,6 +44,7 @@ interface ModuleHeaderProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount: number
+  unlockAt: string | null
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   hasActiveOverrides: boolean
   itemCount: number
@@ -59,6 +62,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   prerequisites,
   completionRequirements,
   requirementCount,
+  unlockAt,
   dragHandleProps,
   itemCount,
   hasActiveOverrides,
@@ -93,11 +97,24 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
               />
             </Flex.Item>
             <Flex.Item padding="0 0 x-small 0">
-              <Heading level="h2">
-                <Text size="medium" weight="bold" wrap="break-word">
-                  {name}
-                </Text>
-              </Heading>
+              <Flex direction="column" as="div" margin="none">
+                <Flex.Item margin="none">
+                  <Heading level="h2">
+                    <Text size="medium" weight="bold" wrap="break-word">
+                      {name}
+                    </Text>
+                  </Heading>
+                </Flex.Item>
+                {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
+                  <Flex.Item margin="none">
+                    <Flex gap="small">
+                      <Flex.Item>
+                        <ModuleHeaderUnlockAt unlockAt={unlockAt} />
+                      </Flex.Item>
+                    </Flex>
+                  </Flex.Item>
+                )}
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>

@@ -42,6 +42,7 @@ export interface ModuleStudentProps {
   requireSequentialProgress?: boolean
   progression?: ModuleProgression
   requirementCount?: number
+  unlockAt: string | null
   submissionStatistics?: ModuleStatistics
 }
 
@@ -55,6 +56,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
   requireSequentialProgress,
   progression,
   requirementCount,
+  unlockAt,
   submissionStatistics,
 }) => {
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
@@ -106,6 +108,7 @@ const ModuleStudent: React.FC<ModuleStudentProps> = ({
                   completionRequirements={completionRequirements}
                   prerequisites={prerequisites}
                   requirementCount={requirementCount}
+                  unlockAt={unlockAt}
                   submissionStatistics={submissionStatistics}
                   smallScreen={smallScreen}
                 />

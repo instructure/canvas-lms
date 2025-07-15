@@ -208,6 +208,7 @@ const ModulesListStudent: React.FC = () => {
                   expanded={!!expandedModules.get(module._id)}
                   onToggleExpand={handleToggleExpandRef}
                   requirementCount={module.requirementCount}
+                  unlockAt={module.unlockAt}
                   submissionStatistics={module.submissionStatistics}
                 />
               ))
