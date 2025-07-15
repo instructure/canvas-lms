@@ -34,6 +34,17 @@ describe Accessibility::Rules::TableCaptionRule do
       end
     end
 
+    it "calls the correct method on caption" do
+      elem = double("Element", tag_name: "table")
+      caption = double("Caption", text: "Valid Caption")
+      allow(elem).to receive(:query_selector).with("caption").and_return(caption)
+
+      expect(caption).to receive(:text).and_return("Valid Caption")
+      expect(caption).not_to receive(:text_content)
+
+      Accessibility::Rules::TableCaptionRule.test(elem)
+    end
+
     it "maintains resource-specific isolation between content types" do
       input_html = "<table><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
 
@@ -47,14 +58,25 @@ describe Accessibility::Rules::TableCaptionRule do
         expect(file_issues.first[:data][:id]).to include("file-789")
       end
     end
+  end
 
-    it "fixes tables without captions by adding a caption" do
+  context "when fixing table captions" do
+    it "adds a caption to a table without one" do
       input_html = "<table><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
       expected_html = "<table><caption>Table description</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
 
       fixed_html = fix_issue(:table_caption, input_html, "./*", "Table description")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "updates the caption of a table with an existing caption" do
+      input_html = "<table><caption>Table description</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+      expected_html = "<table><caption>Updated description</caption><tr><th>Header 1</th><th>Header 2</th></tr><tr><td>Data 1</td><td>Data 2</td></tr></table>"
+
+      updated_html = fix_issue(:table_caption, input_html, "./*", "Updated description")
+
+      expect(updated_html.delete("\n")).to eq(expected_html)
     end
   end
 

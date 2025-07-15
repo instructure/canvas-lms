@@ -28,7 +28,7 @@ module Accessibility
 
         caption = elem.query_selector("caption")
 
-        I18n.t("Table caption should be present.") if !caption || caption.text_content.gsub(/\s/, "") == ""
+        I18n.t("Table caption should be present.") if !caption || caption.text.gsub(/\s/, "") == ""
       end
 
       def self.display_name
