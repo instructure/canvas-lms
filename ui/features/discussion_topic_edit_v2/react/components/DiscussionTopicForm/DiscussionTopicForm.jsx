@@ -87,6 +87,8 @@ import {SendEditNotificationModal} from '../SendEditNotificationModal'
 import {Views, DiscussionTopicFormViewSelector} from './DiscussionTopicFormViewSelector'
 import {MasteryPathsReactWrapper} from '@canvas/conditional-release-editor/react/MasteryPathsReactWrapper'
 import {showPostToSisFlashAlert} from '@canvas/due-dates/util/differentiatedModulesUtil'
+import {existingAttachedAssetProcessorFromGraphql} from '../../util/assetProcessorGraphqlTypes'
+import {useAssetProcessorsState} from '@canvas/lti-asset-processor/react/hooks/AssetProcessorsState'
 
 const I18n = createI18nScope('discussion_create')
 
@@ -279,6 +281,16 @@ function DiscussionTopicForm({
   const [pointsPossible, setPointsPossible] = useState(
     currentDiscussionTopic?.assignment?.pointsPossible || 0,
   )
+
+  const assetProcessors = useAssetProcessorsState(s => s.attachedProcessors)
+  const setFromExistingAttachedProcessors = useAssetProcessorsState(
+    s => s.setFromExistingAttachedProcessors,
+  )
+  useEffect(() => {
+    const graphqlAps = currentDiscussionTopic?.assignment?.ltiAssetProcessorsConnection?.nodes || []
+    setFromExistingAttachedProcessors(graphqlAps.map(existingAttachedAssetProcessorFromGraphql))
+  }, [currentDiscussionTopic?.assignment?.assetProcessors, setFromExistingAttachedProcessors])
+
   const [displayGradeAs, setDisplayGradeAs] = useState(
     currentDiscussionTopic?.assignment?.gradingType || 'points',
   )
@@ -572,6 +584,7 @@ function DiscussionTopicForm({
         isCheckpoints,
         currentDiscussionTopic?.assignment,
         suppressedAssignment,
+        assetProcessors,
       ),
       checkpoints: prepareCheckpointsPayload(
         assignedInfoList,
@@ -863,6 +876,8 @@ function DiscussionTopicForm({
               setIntraGroupPeerReviews={setIntraGroupPeerReviews}
               isCheckpoints={isCheckpoints && ENV.DISCUSSION_CHECKPOINTS_ENABLED}
               canManageAssignTo={ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_GRADED}
+              // assetProcessors are managed in Zustand store used here and by
+              // AssetProcessors component, no need to pass them down
             />
           </DiscussionDueDatesContext.Provider>
         </View>
@@ -900,6 +915,7 @@ function DiscussionTopicForm({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    assetProcessors,
     assignmentDueDateContext,
     assignmentGroup,
     assignmentGroups,

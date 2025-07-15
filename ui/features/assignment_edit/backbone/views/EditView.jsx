@@ -49,7 +49,7 @@ import {AssignmentSubmissionTypeContainer} from '../../react/AssignmentSubmissio
 import DefaultToolForm from '../../react/DefaultToolForm'
 import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSelectBox'
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
-import {attach as assetProcessorsAttach} from '@canvas/lti-asset-processor/react/AssetProcessors'
+import {attach as assetProcessorsAttach} from '../../react/AssetProcessorsForAssignment'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import * as returnToHelper from '@canvas/util/validateReturnToURL'
 import setUsageRights from '@canvas/files/util/setUsageRights'

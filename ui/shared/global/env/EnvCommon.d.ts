@@ -339,6 +339,7 @@ export type RootAccountFeatureId =
   | 'course_pace_pacing_with_mastery_paths'
   | 'modules_requirements_allow_percentage'
   | 'lti_asset_processor'
+  | 'lti_asset_processor_discussions'
   | 'course_pace_weighted_assignments'
   | 'course_pace_allow_bulk_pace_assign'
   | 'disable_iframe_sandbox_file_show'

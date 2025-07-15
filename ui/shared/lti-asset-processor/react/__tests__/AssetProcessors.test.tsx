@@ -30,7 +30,12 @@ import {
 import {useAssetProcessorsAddModalState} from '../hooks/AssetProcessorsAddModalState'
 import {useAssetProcessorsState} from '../hooks/AssetProcessorsState'
 import {ExistingAttachedAssetProcessor} from '@canvas/lti/model/AssetProcessor'
-import {mockDeepLinkResponse, mockDoFetchApi, mockTools} from './assetProcessorsTestHelpers'
+import {
+  mockDeepLinkResponse,
+  mockDoFetchApi,
+  mockExistingAttachedAssetProcessor,
+  mockTools,
+} from './assetProcessorsTestHelpers'
 
 jest.mock('@canvas/do-fetch-api-effect')
 jest.mock('@canvas/external-tools/messages')
@@ -53,19 +58,7 @@ describe('AssetProcessors', () => {
   let state: ReturnType<typeof useAssetProcessorsState.getState>
 
   const initialAttachedProcessors = (): ExistingAttachedAssetProcessor[] => [
-    {
-      id: 1,
-      tool_id: 2,
-      tool_name: 'tool name',
-      tool_placement_label: 'tool label',
-      title: 'ap title',
-      text: 'ap text',
-      icon_or_tool_icon_url: 'http://instructure.com/icon.png',
-      iframe: {
-        width: 600,
-        height: 500,
-      },
-    },
+    mockExistingAttachedAssetProcessor,
   ]
 
   const processorWithWindowSettings = (): ExistingAttachedAssetProcessor[] => [
@@ -101,10 +94,10 @@ describe('AssetProcessors', () => {
   })
 
   function renderAssetProcessors(aps = initialAttachedProcessors()) {
+    useAssetProcessorsState.getState().setFromExistingAttachedProcessors(aps)
     return render(
       <MockedQueryClientProvider client={queryClient}>
         <AssetProcessors
-          initialAttachedProcessors={aps}
           courseId={123}
           secureParams="my-secure-params"
           hideErrors={hideErrorsMocked}
@@ -121,6 +114,16 @@ describe('AssetProcessors', () => {
     addButton.click()
     tag = renderHook(() => useAssetProcessorsAddModalState(s => s.state.tag)).result.current
     expect(tag).toBe('toolList')
+  })
+
+  it("doesn't show the Add button when there are no tools available", () => {
+    queryClient.setQueryData(['assetProcessors', 123], [])
+    const {queryByText} = render(
+      <MockedQueryClientProvider client={queryClient}>
+        <AssetProcessors courseId={123} secureParams="my-secure-params" />
+      </MockedQueryClientProvider>,
+    )
+    expect(queryByText('Add Document Processing App')).not.toBeInTheDocument()
   })
 
   it('shows the initial attached processors', () => {

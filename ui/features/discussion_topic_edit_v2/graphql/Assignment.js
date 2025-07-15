@@ -19,6 +19,7 @@ import {gql} from '@apollo/client'
 import {arrayOf, bool, number, shape, string} from 'prop-types'
 import {AssignmentGroup} from './AssignmentGroup'
 import {AssignmentOverride} from './AssignmentOverride'
+import {LtiAssetProcessor} from './LtiAssetProcessor'
 
 export const Assignment = {
   fragment: gql`
@@ -72,9 +73,15 @@ export const Assignment = {
       }
       hasSubmittedSubmissions
       suppressAssignment
+      ltiAssetProcessorsConnection {
+        nodes {
+          ...LtiAssetProcessor
+        }
+      }
     }
     ${AssignmentGroup.fragment}
     ${AssignmentOverride.fragment}
+    ${LtiAssetProcessor.fragment}
   `,
 
   shape: shape({
@@ -113,6 +120,9 @@ export const Assignment = {
       }),
     ),
     hasSubmittedSubmissions: bool,
+    ltiAssetProcessorsConnection: shape({
+      nodes: arrayOf(LtiAssetProcessor.shape()),
+    }),
   }),
 
   mock: ({
@@ -134,6 +144,7 @@ export const Assignment = {
     hasSubAssignments = false,
     checkpoints = [],
     hasSubmittedSubmissions = false,
+    assetProcessors = [LtiAssetProcessor.mock()],
   } = {}) => ({
     id,
     _id,
@@ -153,6 +164,7 @@ export const Assignment = {
     hasSubAssignments,
     checkpoints,
     hasSubmittedSubmissions,
+    ltiAssetProcessorsConnection: {nodes: assetProcessors},
     __typename: 'Assignment',
   }),
 }

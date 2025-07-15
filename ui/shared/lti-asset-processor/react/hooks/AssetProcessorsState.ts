@@ -36,6 +36,7 @@ import {IframeDimensions} from '@canvas/lti/model/common'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 import {LtiLaunchDefinition} from '@canvas/select-content-dialog/jquery/select_content_dialog'
+import {useAssetProcessorsToolsList} from './useAssetProcessorsToolsList'
 
 const I18n = createI18nScope('asset_processors_selection')
 
@@ -43,7 +44,7 @@ export type AssetProcessorsState = {
   attachedProcessors: AttachedAssetProcessor[]
 
   addAttachedProcessors: ({tool, data}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
-  deleteAttachedProcessor: (index: number, onDelete: () => void) => Promise<void>
+  deleteAttachedProcessor: (index: number, onDelete?: () => void) => Promise<void>
   setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
 
@@ -51,16 +52,13 @@ export type AssetProcessorsState = {
  * Object sent to server when saving (creating/updating) an assignment. Needs to match up
  * with the format expected by the ruby code.
  */
-type AttachedAssetProcessorDto =
+export type AttachedAssetProcessorDto =
   | {
       existing_id: number
     }
   | {
       new_content_item: AssetProcessorContentItemDto
     }
-
-// Ensure types, while avoiding serializing JSON every render
-const jsonStringifyDto: (blob: AttachedAssetProcessorDto) => string = JSON.stringify
 
 /*
  * Info needed to render an attached asset processor, whether it come from
@@ -78,8 +76,9 @@ export type AttachedAssetProcessor = {
   window?: AssetProcessorWindowSettings
   iframe?: IframeDimensions
 
-  // JSON-serialized Asset Processor (AttachedAssetProcessorDto) to be sent to server
-  dtoJson: string
+  // Asset Processor (AttachedAssetProcessorDto) to be sent to server
+  // (non-graphql API -- assignment edit page)
+  dto: AttachedAssetProcessorDto
 }
 
 function newAttachedAssetProcessor({
@@ -97,9 +96,9 @@ function newAttachedAssetProcessor({
     title: contentItem.title,
     iframe: contentItem.iframe,
     window: contentItem.window,
-    dtoJson: jsonStringifyDto({
+    dto: {
       new_content_item: assetProcessorContentItemToDto(contentItem, tool.definition_id),
-    }),
+    },
   }
 }
 
@@ -116,7 +115,7 @@ function existingAttachedAssetProcessor(
     text: processor.text,
     iframe: processor.iframe,
     window: processor.window,
-    dtoJson: jsonStringifyDto({existing_id: processor.id}),
+    dto: {existing_id: processor.id},
   }
 }
 
@@ -150,13 +149,11 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
   addAttachedProcessors({tool, data}) {
     showFlashMessagesFromDeepLinkingResponse(data)
 
-    const items = data.content_items.filter(item => item.type === 'ltiAssetProcessor')
+    const newProcessors = data.content_items
+      .filter(item => item.type === 'ltiAssetProcessor')
+      .map(item => ZAssetProcessorContentItem.parse(item))
+      .map(contentItem => newAttachedAssetProcessor({tool, contentItem}))
 
-    items.forEach(item => ZAssetProcessorContentItem.parse(item))
-
-    const newProcessors: AttachedAssetProcessor[] = items.map(contentItem =>
-      newAttachedAssetProcessor({tool, contentItem}),
-    )
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
   },
 
@@ -187,3 +184,13 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
   setFromExistingAttachedProcessors: processors =>
     set({attachedProcessors: processors.map(existingAttachedAssetProcessor)}),
 }))
+
+/**
+ * Returns true if there are any asset processors attached to the assignment or
+ * discussion, or if there are tools available to attach.
+ */
+export function useShouldShowAssetProcessors(courseId: number): boolean {
+  const attachedProcessors = useAssetProcessorsState(s => s.attachedProcessors)
+  const toolsAvailable = !!useAssetProcessorsToolsList(courseId).data?.length
+  return toolsAvailable || attachedProcessors.length > 0
+}

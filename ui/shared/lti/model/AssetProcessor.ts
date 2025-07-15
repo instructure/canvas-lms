@@ -68,7 +68,7 @@ export function buildAPDisplayTitle({
  * Data sent by tool in deep linking response content item.
  */
 export const ZImageUrlWithDimensions = z.object({
-  url: z.string().optional(),
+  url: z.string(),
   width: z.number().int().nonnegative().optional(),
   height: z.number().int().nonnegative().optional(),
 })

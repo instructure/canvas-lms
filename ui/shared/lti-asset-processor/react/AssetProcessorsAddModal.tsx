@@ -185,6 +185,8 @@ function AssetProcessorsAddModalBodyToolLaunch(
           try {
             tool && onProcessorResponse({tool, data})
           } catch (e) {
+            // Provide debugging output for tool developers to help figure out the problem:
+            console.error(e)
             showInvlidDeepLinkingResponse(tool)
             return
           }
