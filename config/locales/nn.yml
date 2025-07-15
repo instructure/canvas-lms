@@ -6871,6 +6871,7 @@ nn:
       home_page: Startside
   content_item_title_96079d16: "Tittel på innhaldselement"
   content_items_with_errors_a9438fdb: "Innhaldselement med feil"
+  content_licensing_help_3d15e649: "Hjelp til lisensiering av innhald"
   content_link_error_assignment_name_course_name_b8be789a: "Feil ved innhaldslenke - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
