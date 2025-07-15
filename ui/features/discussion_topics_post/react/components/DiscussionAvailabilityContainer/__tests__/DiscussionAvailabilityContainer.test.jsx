@@ -92,6 +92,30 @@ describe('DiscussionAvailabilityContainer', () => {
       const {queryByText} = setup()
       expect(queryByText('View Availability')).toBeInTheDocument()
     })
+    it('displays assignment lock data when assignment is present', () => {
+      const {queryByText} = setup({
+        groupSet: null,
+        courseSections: [],
+        assignment: {lockAt: '2024-06-15T23:59:59-07:00', unlockAt: '2024-05-15T00:00:00-07:00'},
+        delayedPostAt: mockDelayedPost,
+        lockAt: mockLockAt,
+      })
+      expect(
+        queryByText('All Sections Available from May 15, 2024 7am until Jun 16, 2024 6:59am'),
+      ).toBeInTheDocument()
+    })
+    it('displays prop lock data when no assignment is present', () => {
+      const {queryByText} = setup({
+        groupSet: null,
+        courseSections: [],
+        assignment: null,
+        delayedPostAt: mockDelayedPost,
+        lockAt: mockLockAt,
+      })
+      expect(
+        queryByText('All Sections Available from Jan 12, 2022 7am until Jan 20, 2022 6:59am'),
+      ).toBeInTheDocument()
+    })
     it('displays anonymous discussion when anonymous', () => {
       const {queryByText} = setup({anonymousState: 'full_anonymity'})
       expect(queryByText('Anonymous Discussion')).toBeInTheDocument()
