@@ -28,6 +28,7 @@ import {mockRegistrationWithAllInformation} from '../../../manage/__tests__/help
 import {renderAppWithRegistration} from '../../configuration/__tests__/helpers'
 import {ToolAvailability} from '../ToolAvailability'
 import {mockContextControl, mockDeployment} from './helpers'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => {
   return {
@@ -113,6 +114,16 @@ const page2Deployments = [
 ]
 
 describe('ToolAvailability', () => {
+  beforeAll(() => {
+    fakeENV.setup({
+      ACCOUNT_ID: '1',
+    })
+  })
+
+  afterAll(() => {
+    fakeENV.teardown()
+  })
+
   it('renders the header text', async () => {
     const reg = mockRegistrationWithAllInformation({
       n: 'Test App',

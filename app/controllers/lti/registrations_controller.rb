@@ -1479,10 +1479,12 @@ class Lti::RegistrationsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def context_search
-    registration = Lti::Registration.active.find_by(id: params[:registration_id], account: @account)
+    # can be cross-shard (at least for now)
+    registration = Lti::Registration.active.find_by(id: params[:registration_id])
     raise ActiveRecord::RecordNotFound unless registration
 
-    deployment = ContextExternalTool.active.find_by(id: params[:deployment_id], lti_registration: registration)
+    # must always be in the root account on current shard
+    deployment = ContextExternalTool.active.find_by(id: params[:deployment_id], lti_registration: registration, root_account_id: @context.id)
     raise ActiveRecord::RecordNotFound unless deployment
 
     if deployment.context_type != "Account"
