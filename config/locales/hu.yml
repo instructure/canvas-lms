@@ -6332,6 +6332,7 @@ hu:
       home_page: Főoldal
   content_item_title_96079d16: "Tartalomelem címe"
   content_items_with_errors_a9438fdb: "Hibás tartalomelemek"
+  content_licensing_help_3d15e649: "Segítség a tartalom licenceléshez"
   content_link_error_assignment_name_course_name_b8be789a: "Tartalom Hivatkozás Hiba - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 

@@ -4989,6 +4989,7 @@ tr:
       importing_button: "İçe aktarılıyor... bu biraz zaman alabilir"
     titles: 
       home_page: "Ana Sayfa"
+  content_licensing_help_3d15e649: "İçerik Lisanslama Yardımı"
   content_link_error_assignment_name_course_name_b8be789a: "İçerik Bağlantı Hatası - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
