@@ -420,9 +420,11 @@ rubric_assessment_imports_exports:
   description: This feature allows users to import and export rubrics assessments from Gradebook in a CSV format. This feature is dependent on Enhanced Rubrics feature.
   environments:
     ci:
-      state: allowed
+      state: on
     development:
-      state: allowed
+      state: on
+    test:
+      state: on
 rubric_self_assessment:
   state: hidden
   applies_to: RootAccount
