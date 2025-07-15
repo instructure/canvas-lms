@@ -26,19 +26,22 @@ import tzInTest from '@instructure/moment-utils/specHelpers'
 import timezone from 'timezone'
 import detroit from 'timezone/America/Detroit'
 import {getI18nFormats} from '@canvas/datetime/configureDateTime'
-
-const nextYear = new Date().getFullYear() + 1
-const unfudged_start = tz.parse(`${nextYear}-02-03T12:32:00Z`)
-const unfudged_end = tz.parse(`${nextYear}-02-03T17:32:00Z`)
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 describe('TimeBlockRow', () => {
   let timeBlockList
   let $holder
   let start
   let end
+  let fcUtilNowSpy
+  let originalErrorBox
+  let $fixturesDiv
+  let unfudged_start
+  let unfudged_end
 
   const mockErrorBox = () => {
     const $errorBox = $('<div class="error_box" style="display: block" />')
+    originalErrorBox = $.fn.errorBox
     $.fn.errorBox = function () {
       this.data('associated_error_box', $errorBox)
       return $errorBox
@@ -47,6 +50,12 @@ describe('TimeBlockRow', () => {
   }
 
   beforeEach(() => {
+    fakeENV.setup()
+
+    // Remove any existing fixtures div and create fresh
+    $('#fixtures').remove()
+    $fixturesDiv = $('<div id="fixtures" />').appendTo(document.body)
+
     tzInTest.configureAndRestoreLater({
       tz: timezone(detroit, 'America/Detroit'),
       tzData: {
@@ -55,9 +64,14 @@ describe('TimeBlockRow', () => {
       formats: getI18nFormats(),
     })
 
+    // Use dates far in the future to ensure they're always valid
+    const futureYear = new Date().getFullYear() + 10
+    unfudged_start = tz.parse(`${futureYear}-02-03T12:32:00Z`)
+    unfudged_end = tz.parse(`${futureYear}-02-03T17:32:00Z`)
+
     start = fcUtil.wrap(unfudged_start)
     end = fcUtil.wrap(unfudged_end)
-    $holder = $('<table />').appendTo(document.getElementById('fixtures'))
+    $holder = $('<table />').appendTo($fixturesDiv)
     timeBlockList = new TimeBlockList($holder)
 
     jest.useFakeTimers()
@@ -65,13 +79,46 @@ describe('TimeBlockRow', () => {
   })
 
   afterEach(() => {
-    jest.advanceTimersByTime(250) // advance past any errorBox fade-ins
+    jest.runAllTimers()
     jest.useRealTimers()
-    $holder.detach()
-    $('#fixtures').empty()
+
+    // Clean up DOM
+    if ($holder) {
+      $holder.remove()
+      $holder = null
+    }
+    if ($fixturesDiv) {
+      $fixturesDiv.remove()
+      $fixturesDiv = null
+    }
     $('.ui-tooltip').remove()
     $('.error_box').remove()
+    $('.datetime_suggest').remove()
+
+    // Restore timezone
     tzInTest.restore()
+
+    // Restore any mocks that might have been created
+    if (fcUtilNowSpy) {
+      fcUtilNowSpy.mockRestore()
+      fcUtilNowSpy = null
+    }
+
+    // Restore original errorBox function
+    if (originalErrorBox) {
+      $.fn.errorBox = originalErrorBox
+      originalErrorBox = null
+    }
+
+    // Reset all variables
+    timeBlockList = null
+    start = null
+    end = null
+    unfudged_start = null
+    unfudged_end = null
+
+    // Tear down fake ENV
+    fakeENV.teardown()
   })
 
   it('initializes properly', () => {
@@ -123,11 +170,13 @@ describe('TimeBlockRow', () => {
     })
 
     it('fails validation for time in past', () => {
-      const fudgedMidnight = fcUtil.now().minutes(0).hours(0)
-      const fudgedEnd = fcUtil.clone(fudgedMidnight)
-      fudgedEnd.minutes(1)
+      const mockNow = fcUtil.wrap(new Date('2020-01-01T12:00:00Z'))
+      fcUtilNowSpy = jest.spyOn(fcUtil, 'now').mockReturnValue(mockNow)
 
-      const timeBlockRow = new TimeBlockRow(timeBlockList, {start: fudgedMidnight, end: fudgedEnd})
+      const pastStart = fcUtil.wrap(new Date('2020-01-01T10:00:00Z'))
+      const pastEnd = fcUtil.wrap(new Date('2020-01-01T11:00:00Z'))
+
+      const timeBlockRow = new TimeBlockRow(timeBlockList, {start: pastStart, end: pastEnd})
 
       expect(timeBlockRow.validate()).toBeFalsy()
       expect(timeBlockRow.$end_time.hasClass('error')).toBeTruthy()
