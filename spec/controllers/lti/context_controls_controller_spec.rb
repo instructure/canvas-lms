@@ -52,7 +52,7 @@ describe Lti::ContextControlsController, type: :request do
     response.parsed_body
   end
 
-  before(:once) do
+  before do
     account.enable_feature!(:lti_registrations_next)
   end
 
@@ -76,7 +76,7 @@ describe Lti::ContextControlsController, type: :request do
   end
 
   describe "GET #index" do
-    subject { get "/api/v1/lti_registrations/#{registration.id}/controls", params: }
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls", params: }
 
     let(:params) { { per_page: 15 } }
 
@@ -257,6 +257,36 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
 
+    context "with cross-shard registration" do
+      specs_require_sharding
+
+      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
+      let(:xshard_account) { @shard2.activate { account_model } }
+      let(:local_deployment) { deployment_for(account) }
+
+      before { local_deployment }
+
+      it "returns deployments and controls from current shard" do
+        subject
+        expect(response).to be_successful
+        expect(response_json.length).to eq(1)
+        expect(response_json[0]["id"]).to eq(local_deployment.id)
+        expect(response_json[0]["context_controls"].length).to eq(1)
+      end
+
+      context "when registration's account has flag off" do
+        before { xshard_account.disable_feature!(:lti_registrations_next) }
+
+        it "returns deployment and controls from current shard" do
+          subject
+          expect(response).to be_successful
+          expect(response_json.length).to eq(1)
+          expect(response_json[0]["id"]).to eq(local_deployment.id)
+          expect(response_json[0]["context_controls"].length).to eq(1)
+        end
+      end
+    end
+
     context "with no deployments" do
       before do
         registration.deployments.each(&:destroy)
@@ -302,7 +332,7 @@ describe Lti::ContextControlsController, type: :request do
   end
 
   describe "GET #show" do
-    subject { get "/api/v1/lti_registrations/#{registration.id}/controls/#{control.id}" }
+    subject { get "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/#{control.id}" }
 
     let(:deployment) { deployment_for(account) }
     let(:control) { deployment.context_controls.first }
@@ -368,7 +398,7 @@ describe Lti::ContextControlsController, type: :request do
 
   describe "POST #create" do
     subject do
-      post "/api/v1/lti_registrations/#{registration.id}/controls",
+      post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls",
            params:,
            as: :json
     end
@@ -537,6 +567,27 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
 
+    context "for account outside root account" do
+      let(:other_account) { account_model }
+      let(:params) { { account_id: other_account.id } }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
+    context "for course outside root account" do
+      let(:other_account) { account_model }
+      let(:params) { { course_id: other_course.id } }
+      let(:other_course) { course_model(account: other_account) }
+
+      it "returns 422" do
+        subject
+        expect(response).to be_unprocessable
+      end
+    end
+
     context "without user session" do
       before { remove_user_session }
 
@@ -567,7 +618,7 @@ describe Lti::ContextControlsController, type: :request do
 
   describe "POST #create_many" do
     subject do
-      post "/api/v1/lti_registrations/#{registration.id}/controls/bulk",
+      post "/api/v1/accounts/#{account.id}/lti_registrations/#{registration.id}/controls/bulk",
            params:,
            as: :json
     end
@@ -780,6 +831,23 @@ describe Lti::ContextControlsController, type: :request do
       end
     end
 
+    context "with control for a context outside the root acvcount" do
+      let(:other_account) { account_model }
+      let(:params) do
+        [
+          { account_id: other_account.id, available: true }
+        ]
+      end
+
+      it "returns 422" do
+        subject
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response_json.dig("errors", 0, "message")).to eq(
+          "Context must belong to the deployment's context"
+        )
+      end
+    end
+
     context "without root deployment" do
       let(:params) { [{ account_id: subaccount.id }] }
       let(:subaccount) { account_model(parent_account: account) }
@@ -825,7 +893,7 @@ describe Lti::ContextControlsController, type: :request do
 
   describe "PUT #update" do
     subject do
-      put "/api/v1/lti_registrations/#{registration_id}/controls/#{control_id}",
+      put "/api/v1/accounts/#{account.id}/lti_registrations/#{registration_id}/controls/#{control_id}",
           params:
     end
 
@@ -889,7 +957,7 @@ describe Lti::ContextControlsController, type: :request do
   end
 
   describe "DELETE #delete" do
-    subject { delete "/api/v1/lti_registrations/#{registration_id}/controls/#{control_id}" }
+    subject { delete "/api/v1/accounts/#{account.id}/lti_registrations/#{registration_id}/controls/#{control_id}" }
 
     let(:deployment) { deployment_for(account) }
     let(:course) { course_model(account:) }

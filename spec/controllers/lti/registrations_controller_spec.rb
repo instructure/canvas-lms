@@ -2225,6 +2225,33 @@ RSpec.describe Lti::RegistrationsController do
       end
     end
 
+    context "with cross-shard registration" do
+      specs_require_sharding
+
+      let(:registration) { @shard2.activate { lti_registration_with_tool(account: xshard_account) } }
+      let(:xshard_account) { @shard2.activate { account_model } }
+      let(:deployment) { registration.new_external_tool(account) }
+      let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
+
+      before { subaccount }
+
+      it { is_expected.to be_successful }
+
+      it "includes local contexts" do
+        subject
+        expect(response_json[:accounts].length).to eq(1)
+      end
+
+      context "with cross-shard deployment" do
+        let(:deployment) { @shard2.activate { registration.new_external_tool(xshard_account) } }
+
+        it "returns 404" do
+          subject
+          expect(response).to be_not_found
+        end
+      end
+    end
+
     context "with normal data" do
       let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
       let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101", name: "Foo") }
