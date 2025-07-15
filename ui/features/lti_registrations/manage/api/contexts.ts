@@ -42,7 +42,6 @@ export const fetchContextSearch = (
   searchTerm?: string,
   onlyChildrenOf?: AccountId,
 ): Promise<ApiResult<SearchableContexts>> => {
-  console.log('fetchContextSearch', onlyChildrenOf)
   return parseFetchResult(ZSearchableContexts)(
     fetch(
       `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/deployments/${deploymentId}/context_search?${toQueryString(

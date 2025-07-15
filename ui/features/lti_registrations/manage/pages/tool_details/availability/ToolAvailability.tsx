@@ -177,7 +177,6 @@ export const ToolAvailability = (props: ToolAvailabilityProps) => {
                           // Handle success (e.g., show a success message or refresh the deployments)
                           controlsQuery.refetch()
                         } else {
-                          console.log(result)
                           showFlashAlert({
                             type: 'error',
                             message: I18n.t('There was an error when creating the deployment.'),
