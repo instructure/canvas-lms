@@ -53,7 +53,7 @@ describe "discussions overrides" do
     end
 
     it "shows course pace notice when expanding grades in a course with pacing on" do
-      skip "Will be fixed in VICE-5209"
+      skip "Will be fixed in VICE-5411"
       @course.enable_course_paces = true
       @course.save!
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
@@ -62,7 +62,7 @@ describe "discussions overrides" do
     end
 
     it "toggles between due dates", priority: "2" do
-      skip "Will be fixed in VICE-5209"
+      skip "Will be fixed in VICE-5412"
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       f(" .toggle_due_dates").click
       wait_for_ajaximations

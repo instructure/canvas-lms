@@ -124,11 +124,11 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view, not edit or post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
-        expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f(discussion_menu)).not_to contain_css(discussion_edit_button)
       end
     end
 
@@ -158,11 +158,11 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view and post, not edit", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
-        expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f(discussion_menu)).not_to contain_css(discussion_edit_button)
       end
     end
 
@@ -197,10 +197,10 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view and edit, not post", priority: pick_priority(context, student: "1", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
         expect(f(discussion_edit_button)).to be_displayed
       end
     end
@@ -231,10 +231,10 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view, edit, and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
+        f('[data-testid="discussion-post-menu-trigger"]').click
         expect(f(discussion_edit_button)).to be_displayed
       end
     end
@@ -350,11 +350,11 @@ describe "discussion permissions" do
       end
 
       it "allows viewing discussions, not edit or post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
-        expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f(discussion_menu)).not_to contain_css(discussion_edit_button)
       end
     end
 
@@ -384,11 +384,11 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view and post, not edit", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
-        expect(f(discussion_container)).not_to contain_css(discussion_edit_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f(discussion_menu)).not_to contain_css(discussion_edit_button)
       end
     end
 
@@ -418,10 +418,10 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view and edit, not post", priority: pick_priority(context, teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_container)).not_to contain_css(discussion_reply_button)
+        f('[data-testid="discussion-post-menu-trigger"]').click
         expect(f(discussion_edit_button)).to be_displayed
       end
     end
@@ -452,10 +452,10 @@ describe "discussion permissions" do
       end
 
       it "allows discussion view, edit and post", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2") do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
+        f('[data-testid="discussion-post-menu-trigger"]').click
         expect(f(discussion_edit_button)).to be_displayed
       end
 
@@ -496,10 +496,10 @@ describe "discussion permissions" do
       end
 
       it "allows own discussion view, edit, and post with permissions off", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get discussions_topic_detail_page
         expect(fj(discussion_message)).to be_displayed
         expect(f(discussion_reply_button)).to be_displayed
+        f('[data-testid="discussion-post-menu-trigger"]').click
         expect(f(discussion_edit_button)).to be_displayed
       end
     end
