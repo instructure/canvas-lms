@@ -181,7 +181,6 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
 
   context "discussion_checkpoints" do
     before do
-      Account.site_admin.enable_feature!(:react_discussions_post)
       @course.root_account.enable_feature!(:discussion_checkpoints)
     end
 
@@ -459,7 +458,6 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
 
     context "with checkpoint submissions" do
       before do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
@@ -907,7 +905,6 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
   context "when student names hidden" do
     context "when discussion_checkpoints is off" do
       before do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.disable_feature!(:discussion_checkpoints)
       end
 
@@ -926,7 +923,6 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
       end
 
       it "hides student names and shows name of grading teacher entries on both discussion links" do
-        skip "Will be fixed in VICE-5209"
         teacher = @course.teachers.first
         teacher_message = "why did the taco cross the road?"
 
@@ -989,7 +985,6 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
 
     context "discussion_checkpoints with hide student names" do
       before do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")

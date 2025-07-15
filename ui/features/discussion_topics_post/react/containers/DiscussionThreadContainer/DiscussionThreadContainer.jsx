@@ -595,7 +595,11 @@ export const DiscussionThreadContainer = props => {
             isHighlighted={props.discussionEntry._id === props.highlightEntryId}
             discussionEntryId={props.discussionEntry._id}
           >
-            <div style={{marginLeft: responsiveProps.marginDepth}} ref={onThreadRefCurrentSet}>
+            <div
+              style={{marginLeft: responsiveProps.marginDepth}}
+              ref={onThreadRefCurrentSet}
+              data-testid="discussion-entry-container"
+            >
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer

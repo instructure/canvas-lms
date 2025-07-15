@@ -65,7 +65,6 @@ shared_examples "sync grades to sis" do |ff_enabled|
 
     describe "checkpoints" do
       it "works if has_sub_assignments is true but missing sub_assignments" do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         @course.root_account.enable_feature!(:discussion_checkpoints)
 
         @checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")

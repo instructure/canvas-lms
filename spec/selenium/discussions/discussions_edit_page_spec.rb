@@ -85,7 +85,6 @@ describe "discussions" do
 
     before do
       Account.site_admin.enable_feature!(:discussion_create)
-      Account.site_admin.enable_feature!(:react_discussions_post)
       user_session(teacher)
     end
 
@@ -1804,10 +1803,6 @@ describe "discussions" do
         end
 
         context "with course paces" do
-          before do
-            Account.site_admin.enable_feature!(:react_discussions_post)
-          end
-
           it "sets an assignment override for mastery paths when mastery path toggle is turned on" do
             course_with_teacher_logged_in
             @course.root_account.enable_feature!(:course_pace_pacing_with_mastery_paths)

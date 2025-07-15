@@ -33,7 +33,6 @@ describe "threaded discussions" do
 
   before do
     stub_rcs_config
-    Account.site_admin.enable_feature! :react_discussions_post
 
     @first_reply = @topic.discussion_entries.create!(
       user: @student,
