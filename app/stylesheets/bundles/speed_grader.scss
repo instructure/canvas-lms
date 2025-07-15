@@ -54,9 +54,11 @@ $gradebook_header_height: 3.5em;
   padding: 0.375em 0.75em;
   @include fontSize(11px);
   min-width: 960px;
+
   .ui-icon {
     background-image: $iconsActive;
   }
+
   a {
     color: var(--ic-brand-global-nav-menu-item__text-color);
   }
@@ -64,6 +66,7 @@ $gradebook_header_height: 3.5em;
   #combo_box_container {
     text-align: direction(left);
     background: transparent;
+
     select {
       width: 230px;
       z-index: 100;
@@ -88,12 +91,14 @@ $gradebook_header_height: 3.5em;
     padding: 2px 6px 2px 4px;
   }
 }
+
 .subheadContent {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: nowrap;
 }
+
 .subheadContent--flex-start {
   display: flex;
   justify-content: flex-start;
@@ -104,6 +109,7 @@ $gradebook_header_height: 3.5em;
   padding-#{direction(right)}: $ic-sp;
   overflow: hidden;
 }
+
 // little trick to make the icon-font and the icon svg match in size
 $icon-size: 1.4rem;
 
@@ -140,6 +146,7 @@ $icon-size: 1.4rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .assignmentDetails__Title {
   flex: 1;
   min-width: 0;
@@ -150,7 +157,8 @@ $icon-size: 1.4rem;
   margin: 0;
   padding: 0;
 }
-.assignmentDetails__Info{
+
+.assignmentDetails__Info {
   @include fontSize(11px);
   font-weight: $ic-font-weight;
   white-space: nowrap;
@@ -159,6 +167,7 @@ $icon-size: 1.4rem;
   margin: 0;
   padding: 0;
 }
+
 .subheadContent--flex-end {
   display: flex;
   align-items: center;
@@ -168,6 +177,7 @@ $icon-size: 1.4rem;
   min-width: 0;
   padding-#{direction(left)}: $ic-sp;
 }
+
 .statsMetric {
   display: flex;
   align-items: center;
@@ -176,6 +186,7 @@ $icon-size: 1.4rem;
   padding-#{direction(right)}: $ic-sp;
   border-#{direction(right)}: 1px dotted var(--ic-brand-global-nav-menu-item__text-color);
 }
+
 .statsMetric__Item {
   display: flex;
   flex-direction: column;
@@ -183,17 +194,21 @@ $icon-size: 1.4rem;
   white-space: nowrap;
   text-align: center;
   margin-#{direction(right)}: $ic-sp*2;
+
   &:last-of-type {
     margin-#{direction(right)}: $ic-sp;
   }
 }
+
 .statsMetric__Item-value {
   @include fontSize(16px);
 }
+
 .statsMetric__Item-label {
   @include fontSize(11px);
   font-weight: $ic-font-weight;
 }
+
 .studentSelection {
   display: flex;
   align-items: center;
@@ -201,12 +216,15 @@ $icon-size: 1.4rem;
   flex-wrap: nowrap;
   margin-#{direction(left)}: $ic-sp;
 }
+
 .gradebookMoveToNext {
   padding: 0 $ic-sp;
+
   i {
     color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
+
 .gradebookAvatar {
   height: 30px;
   max-width: 30px;
@@ -214,6 +232,7 @@ $icon-size: 1.4rem;
   overflow: hidden;
   margin-#{direction(right)}: $ic-sp;
 }
+
 #eg-canvas-logo {
   background: url(/images/canvas/header_canvas_logo.png) no-repeat;
   position: absolute;
@@ -226,6 +245,7 @@ $icon-size: 1.4rem;
 
 #settings_link {
   position: relative;
+
   .ui-icon {
     display: inline-block;
     vertical-align: top;
@@ -246,15 +266,18 @@ $icon-size: 1.4rem;
     width: calc(100% + 1px); // i.e., 100% + 8px (margin-left) - 7px (right_side width)
     overflow-x: hidden;
     margin-#{direction(left)}: -8px;
+
     #left_side_inner {
       margin-#{direction(left)}: 8px;
       width: calc(100% - 7px);
     }
   }
+
   #right_side {
     width: 7px;
     overflow: hidden;
   }
+
   #rightside_inner {
     display: none;
   }
@@ -269,16 +292,20 @@ $icon-size: 1.4rem;
   #left_side {
     width: 100%;
     margin-#{direction(left)}: -330px;
+
     #left_side_inner {
       margin-#{direction(left)}: 330px;
     }
   }
+
   #right_side {
     width: 329px;
   }
 }
 
-#enrollment_inactive_notice, #enrollment_concluded_notice, #closed_gp_notice {
+#enrollment_inactive_notice,
+#enrollment_concluded_notice,
+#closed_gp_notice {
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
   text-align: center;
@@ -291,20 +318,30 @@ $icon-size: 1.4rem;
   overflow-y: hidden;
   #{direction(left)}: 0;
   #{direction(right)}: 25%;
-  #submissions_container, #left_side_inner, iframe, #doc_preview_holder, #iframe_holder, #resize_overlay {
+
+  #submissions_container,
+  #left_side_inner,
+  iframe,
+  #doc_preview_holder,
+  #iframe_holder,
+  #resize_overlay {
     height: 100%;
     width: 100%;
     border: 0 none;
   }
+
   #resize_overlay {
     position: relative;
     top: -100%;
     z-index: 1;
   }
-  h3, .h3 {
+
+  h3,
+  .h3 {
     margin: 0;
     padding: 2em;
     text-align: center;
+
     .subheader {
       display: block;
       font-size: 0.75em;
@@ -323,6 +360,7 @@ $icon-size: 1.4rem;
   width: 7px;
   border-#{direction(right)}: 1px solid #838383;
   z-index: 2;
+
   &.highlight {
     background-color: #FBEC88;
   }
@@ -355,17 +393,21 @@ $icon-size: 1.4rem;
       margin-top: 1.375rem
     }
   }
+
   div.comment {
     padding: 8px;
     @include fontSize(14px);
     border-top: 1px dotted $ic-border-light;
     background: $ic-color-light;
+
     &:first-of-type {
       border-top: none;
     }
+
     &.draft {
       background: lighten($ic-color-alert, 55%);
     }
+
     span.draft-marker {
       color: $red;
       flex: none;
@@ -379,51 +421,67 @@ $icon-size: 1.4rem;
       font-weight: bold;
       margin-#{direction(right)}: 5px;
     }
+
     div.comment_flex {
       display: flex;
       flex-direction: row;
       margin-bottom: 0.5em;
     }
+
     span.comment {
       flex: auto;
     }
+
     span.comment h2 {
       font-weight: normal;
       font-size: 1.8em;
     }
+
     .comment_citation {
       @include fontSize(12px);
       text-align: direction(right);
     }
-    .delete_comment_link, .edit_comment_link, .submit_comment_button {
+
+    .delete_comment_link,
+    .edit_comment_link,
+    .submit_comment_button {
       flex: none;
       height: 24px;
       margin-#{direction(left)}: 0.5em;
+
       @if $use_high_contrast {
         color: lighten($ic-color-dark, 12%);
       }
+
       @else {
         color: lighten($ic-color-dark, 25%);
       }
-      &:hover, &:focus {
+
+      &:hover,
+      &:focus {
         color: $ic-font-color-dark;
       }
     }
   }
-  h2, .h2 {
+
+  h2,
+  .h2 {
     @include fontSize(14px);
     font-weight: bold;
   }
+
   .content_box {
     padding: $ic-sp*2;
     background: $ic-color-light;
     border-bottom: 1px solid $gray-lighter;
   }
+
   #rightside_inner {
     @extend %flex-1;
     overflow-y: auto;
     position: relative;
   }
+
   #not_gradeable_message {
     padding: 20px;
     font-size: 1.2em;
@@ -456,16 +514,20 @@ $icon-size: 1.4rem;
   a.big_link {
     display: none;
   }
+
   table.rubric {
     margin-top: 0;
   }
 }
+
 #submission_files_container {
   padding: $ic-sp 0;
 }
+
 #comments {
   overflow-y: auto;
   word-break: break-word;
+
   .comment {
     .avatar {
       flex-grow: 0;
@@ -482,9 +544,11 @@ $icon-size: 1.4rem;
   #media_media_recording {
     margin: 0 -2px;
   }
+
   .hidden {
     display: none;
   }
+
   #teachers_and_submitter_will_be_notified {
     color: #888;
     @include fontSize(10px);
@@ -504,9 +568,11 @@ $icon-size: 1.4rem;
     .tooltip .tooltip_wrap {
       display: none;
     }
+
     .tooltip:hover .tooltip_wrap {
       display: block;
     }
+
     /////// END: fix for chrome bug.
     .prompt {
       font-weight: bold;
@@ -514,6 +580,7 @@ $icon-size: 1.4rem;
       padding-#{direction(right)}: 4px;
       float: direction(left);
     }
+
     button {
       float: direction(left);
       margin-#{direction(right)}: 5px;
@@ -523,9 +590,11 @@ $icon-size: 1.4rem;
       flex-direction: row-reverse;
     }
   }
+
   #comment_attachments {
     padding: $ic-sp*0.5 0;
     display: block;
+
     a {
       float: direction(right);
     }
@@ -543,26 +612,32 @@ body .ui-selectmenu-dropdown {
   border-radius: 0;
   color: var(--ic-brand-global-nav-ic-icon-svg-fill) !important;
   height: 1.3125em;
-  background-color: transparent;;
+  background-color: transparent;
+  ;
   background-image: none;
   border: none;
   font-weight: normal !important;
+
   &:hover {
     text-decoration: none !important;
   }
+
   .ui-selectmenu-status {
     @include fontSize(14px);
     padding: 0 20px;
     padding: direction-sides(0 0 0 20px);
     margin: direction-sides(0 20px 0 0);
     height: 1.3125em;
+
     .ui-icon {
       top: 3px !important;
+
       &:after {
         content: "\f15c";
       }
     }
   }
+
   .ui-selectmenu-icon {
     width: 17px;
     height: 22px;
@@ -578,10 +653,11 @@ body .ui-selectmenu-dropdown {
   }
 }
 
-body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .ui-selectmenu-icon {
+body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon,
+body .ui-state-active .ui-selectmenu-icon {
   background-position: (-17px) 0;
   color: var(--ic-brand-global-nav-ic-icon-svg-fill);
-;
+  ;
 
 }
 
@@ -607,6 +683,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
       font-weight: normal;
     }
   }
+
   .ui-state-hover {
     text-decoration: underline;
     background-color: $ic-bg-light-neutral;
@@ -632,24 +709,30 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .ui-selectmenu-item-icon.speedgrader-selectmenu-icon {
   position: absolute;
   #{direction(left)}: 0px;
+
   .ui-selectmenu-status & {
     top: (-0.5px) !important;
     #{direction(left)}: 4px;
   }
+
   .not_graded & {
     font-size: 1.7em;
     color: $orange;
   }
+
   .resubmitted & {
     font-size: 1.7em;
     color: $orange;
   }
+
   .not_gradeable & {
     font-size: 1.7em;
     color: lighten($ic-color-dark, 50%);
   }
+
   .graded & {
     color: $ic-color-success;
+
     i {
       width: 14px;
       height: 14px;
@@ -668,17 +751,19 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     @if $use_high_contrast {
       color: lighten($ic-color-dark, 20%);
     }
+
     @else {
       color: lighten($ic-color-dark, 50%);
     }
   }
+
   .ui-selectmenu-status & {
     margin-top: 1px;
     color: var(--ic-brand-global-nav-menu-item__text-color);
   }
 }
 
-.speedgrader-selectmenu-icon + .ui-selectmenu-item-header {
+.speedgrader-selectmenu-icon+.ui-selectmenu-item-header {
   margin-#{direction(left)}: 5px;
 }
 
@@ -698,69 +783,89 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 #submission_details {
   border-bottom: 1px solid $ic-border-light;
+
   a {
     @include fontSize(14px);
   }
+
   .on_time {
     color: #004B00;
   }
+
   .late {
     color: #d12f19;
     font-weight: bold;
     white-space: nowrap;
   }
+
   #submission_late_notice {
     color: #d12f19;
     font-weight: bold;
   }
+
   #submission_not_newest_notice {
     color: $orange;
     font-weight: bold;
     padding: $ic-sp*0.5 0;
   }
+
   .time-late-input-spacer {
     height: 58px;
   }
+
   .submission_attachment_viewed_at {
     display: inline;
   }
+
   .see-all-attempts {
     display: block;
     font-weight: bold;
   }
+
   select {
     width: 99%;
   }
+
   label {
     font-weight: bold;
   }
+
   .labelText--not-bold {
     font-weight: normal;
   }
+
   #submission_files_list {
     overflow: hidden;
+
     .submission-file {
       position: relative;
       padding: $ic-sp*0.5 0;
+
       .turnitin_score_container {
         float: direction(left);
         margin-#{direction(right)}: $ic-sp;
         margin-#{direction(left)}: 0;
       }
+
       .turnitin_score_container_caret {
         display: none;
       }
+
       .turnitin_similarity_score {
         @include fontSize(12px);
         text-align: center;
         width: 34px;
-        &.submission_error, &.submission_pending {
+
+        &.submission_error,
+        &.submission_pending {
           padding: 1px;
         }
+
         &:hover {
           @include fontSize(12px);
         }
       }
+
       .submission-file-download {
         width: 16px;
         height: 16px;
@@ -769,6 +874,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         #{direction(right)}: 1px;
         overflow: hidden;
       }
+
       .submission-file-delete {
         width: 16px;
         height: 16px;
@@ -778,12 +884,14 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         overflow: hidden;
         font-size: 0.7rem;
       }
+
       .display_name {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
     }
+
     .submission-file-selected {
       background: #DCECFB url("/images/pass.png") no-repeat center left;
       font-weight: bold;
@@ -797,6 +905,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   overflow: visible;
   border: 1px solid $ic-border-dark;
   margin-top: 14px; // to make it align properly with the student select dropdown
+
   #section-menu-link {
     display: block;
     height: 19px;
@@ -809,20 +918,24 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     font-weight: bold;
     @include fontSize(12px);
   }
+
   #section_currently_showing {
     display: inline;
   }
+
   ul {
     position: absolute;
-    top:0;
+    top: 0;
     #{direction(left)}: -200px;
     width: 200px;
     background-color: $ic-color-light;
     padding: 0;
     border-radius: 0;
+
     li {
       margin: 0;
       @include fontSize(12px);
+
       &:first-of-type {
         border-bottom: 1px solid $ic-border-light;
       }
@@ -830,13 +943,16 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
       a {
         line-height: 24px;
         color: $ic-font-color-dark;
+
         &.selected {
           font-weight: bold;
         }
+
         &:hover {
           background: $ic-bg-light-neutral;
           text-decoration: underline;
         }
+
         &.ui-state-focus {
           background: $ic-bg-light-neutral;
         }
@@ -891,6 +1007,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #grading-box-extended {
   width: 35px;
   margin-bottom: 0;
+
   &.pass_fail_grading_type {
     width: 105px;
   }
@@ -903,22 +1020,26 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
   &.hidden {
     display: none;
   }
+
   .deduction-box-labels {
     margin-#{direction(right)}: .5em;
   }
+
   .deduction-box-values {
     flex: 1
   }
+
   .error {
     color: $ic-color-danger;
     margin-#{direction(right)}: 1em;
   }
+
   .bold {
     font-weight: bold;
   }
 }
 
-#settings_form input[type=checkbox][disabled] + label {
+#settings_form input[type=checkbox][disabled]+label {
   opacity: 0.5;
 }
 
@@ -948,6 +1069,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 
 .similarity_score_container {
   i {
+
     &.icon-empty,
     &.icon-oval-half {
       color: $ic-color-danger;
@@ -1037,6 +1159,7 @@ figure {
 #new-studio-media-indicator-wrapper {
   display: flex;
   align-items: center;
+
   button {
     flex: 1 0;
     width: 37px;
