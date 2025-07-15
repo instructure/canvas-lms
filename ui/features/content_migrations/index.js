@@ -16,12 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Eventually when the feature flag is retired
-// we can divorce from these shenanigans
-if (document.getElementById('instui_content_migrations')) {
-  import('./instui_setup')
-} else {
-  import('./setup')
-}
+import ready from '@instructure/ready'
+
+ready(() => {
+  // Eventually when the feature flag is retired
+  // we can divorce from these shenanigans
+  if (document.getElementById('instui_content_migrations')) {
+    import('./instui_setup')
+  } else {
+    import('./setup')
+  }
+})
 
 export default () => {}

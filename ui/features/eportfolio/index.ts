@@ -16,4 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './jquery/index'
+import ready from '@instructure/ready'
+
+ready(() => {
+  import('./jquery/index')
+})

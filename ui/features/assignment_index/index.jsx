@@ -41,31 +41,26 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_index')
 
-const course = new Course({
-  id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
-  apply_assignment_group_weights: ENV.apply_assignment_group_weights,
-})
-course.url = ENV.URLS.course_url
-
-const userIsAdmin = ENV.current_user_is_admin
-
-const assignmentGroups = new AssignmentGroupCollection([], {
-  course,
-  courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
-})
-
-let assignmentGroupsView
-
-let assignmentSettingsView = false
-let assignmentSyncSettingsView = false
-let createGroupView = false
-let showByView = false
-
-// Views will be created inside ready() to ensure translations are available
-
 ready(() => {
-  // Create views after DOM is ready to ensure translations are available
-  assignmentGroupsView = new AssignmentGroupListView({
+  const course = new Course({
+    id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
+    apply_assignment_group_weights: ENV.apply_assignment_group_weights,
+  })
+  course.url = ENV.URLS.course_url
+
+  const userIsAdmin = ENV.current_user_is_admin
+
+  const assignmentGroups = new AssignmentGroupCollection([], {
+    course,
+    courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
+  })
+
+  let assignmentSettingsView = false
+  let assignmentSyncSettingsView = false
+  let createGroupView = false
+  let showByView = false
+
+  const assignmentGroupsView = new AssignmentGroupListView({
     collection: assignmentGroups,
     sortURL: ENV.URLS.sort_url,
     assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,

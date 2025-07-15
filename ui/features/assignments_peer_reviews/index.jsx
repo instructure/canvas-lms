@@ -38,9 +38,10 @@ import {IconWarningSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 
 const I18n = createI18nScope('assignments.peer_reviews')
-const ERROR_MESSAGE = I18n.t('Please select a student')
 
 $(document).ready(() => {
+  const ERROR_MESSAGE = I18n.t('Please select a student')
+
   const peerReviewCountContainer = document.getElementById('reviews_per_user_container')
   const redirectToEditContainer = document.getElementById('redirect_to_edit_button')
   if (peerReviewCountContainer) {
@@ -53,7 +54,7 @@ $(document).ready(() => {
     root.render(
       <View as="div" margin="medium 0 large 0">
         <ReviewsPerUserInput initialCount={initialCount} onChange={setValue} />
-      </View>
+      </View>,
     )
   }
 
@@ -62,11 +63,7 @@ $(document).ready(() => {
     const assignmentId = redirectToEditContainer.dataset.assignmentid
     const root = createRoot(redirectToEditContainer)
     const editLink = `/courses/${courseId}/assignments/${assignmentId}/edit?scrollTo=assignment_peer_reviews_fields`
-    root.render(
-      <Button href={editLink}>
-        {I18n.t('Edit Assignment')}
-      </Button>
-    )
+    root.render(<Button href={editLink}>{I18n.t('Edit Assignment')}</Button>)
   }
 
   $('.peer_review').hover(
@@ -165,7 +162,7 @@ $(document).ready(() => {
           <Text size="small" color="danger">
             {ERROR_MESSAGE}
           </Text>
-        </Flex>
+        </Flex>,
       )
       return false
     } else {
@@ -201,7 +198,7 @@ $(document).ready(() => {
             <Text size="small" color="danger">
               {ERROR_MESSAGE}
             </Text>
-          </Flex>
+          </Flex>,
         )
         return false
       }
@@ -262,7 +259,7 @@ $(document).ready(() => {
     },
     success(_data) {
       location.reload()
-    }
+    },
   })
 
   $('.remind_peer_review_link').click(function (event) {

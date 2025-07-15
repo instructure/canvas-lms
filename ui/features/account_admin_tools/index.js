@@ -27,12 +27,12 @@ import AccountUserCollection from './backbone/collections/AccountUserCollection'
 import ready from '@instructure/ready'
 import {initializeTopNavPortal} from '@canvas/top-navigation/react/TopNavPortal'
 
-const courseRestoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
-const userRestoreModel = new UserRestoreModel({account_id: ENV.ACCOUNT_ID})
-
-const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
-
 ready(() => {
+  const courseRestoreModel = new CourseRestoreModel({account_id: ENV.ACCOUNT_ID})
+  const userRestoreModel = new UserRestoreModel({account_id: ENV.ACCOUNT_ID})
+
+  const loggingUsers = new AccountUserCollection(null, {account_id: ENV.ACCOUNT_ID})
+
   initializeTopNavPortal()
 
   // Render tabs

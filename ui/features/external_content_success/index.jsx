@@ -26,112 +26,113 @@ import {createRoot} from 'react-dom/client'
 import {Alert} from '@instructure/ui-alerts'
 import replaceTags from '@canvas/util/replaceTags'
 import {postMessageExternalContentReady} from '@canvas/external-tools/messages'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('external_content.success')
 
 const ExternalContentSuccess = {}
 
-const {lti_response_messages, service_id, retrieved_data: data, service} = ENV
-const parentWindow = window.parent || window.opener
+ready(() => {
+  const {lti_response_messages, service_id, retrieved_data: data, service} = ENV
+  const parentWindow = window.parent || window.opener
 
-ExternalContentSuccess.dataReady = function (contentItems, service_id) {
-  postMessageExternalContentReady(parentWindow, {contentItems, service_id, service})
+  ExternalContentSuccess.dataReady = function (contentItems, service_id) {
+    postMessageExternalContentReady(parentWindow, {contentItems, service_id, service})
 
-  setTimeout(() => {
-    $('#dialog_message').text(
-      I18n.t('popup_success', 'Success! This popup should close on its own...'),
-    )
-  }, 1000)
-}
-
-// Handles lti 1.0 responses for Assignments 2 which expects a
-// vanilla JS event from LTI tools in the following form.
-ExternalContentSuccess.a2DataReady = function (data) {
-  parentWindow.postMessage(
-    {
-      subject: 'A2ExternalContentReady',
-      content_items: data,
-      msg: ENV.message,
-      log: ENV.log,
-      errormsg: ENV.error_message,
-      errorlog: ENV.error_log,
-      ltiEndpoint: ENV.lti_endpoint,
-    },
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
-  )
-}
-
-ExternalContentSuccess.processLtiMessages = async (messages, target) => {
-  const errorMessage = messages?.lti_errormsg
-  const message = messages?.lti_msg
-
-  if (errorMessage || message) {
-    const wrapper = document.createElement('div')
-    wrapper.setAttribute('id', 'lti_messages_wrapper')
-    target.parentNode.insertBefore(wrapper, target)
-
-    const root = createRoot(wrapper)
-    await new Promise(resolve => {
-      root.render(
-        <>
-          {[
-            [errorMessage, true],
-            [message, false],
-          ]
-            .filter(([msg, _]) => msg !== undefined)
-            .map(([msg, isError], index) => {
-              return (
-                <Alert
-                  key={index}
-                  variant={isError ? 'error' : 'info'}
-                  renderCloseButtonLabel="Close"
-                  onDismiss={() => resolve()}
-                  timeout={5000}
-                >
-                  <span id={isError ? 'lti_error_message' : 'lti_message'}>{msg}</span>
-                </Alert>
-              )
-            })}
-        </>,
+    setTimeout(() => {
+      $('#dialog_message').text(
+        I18n.t('popup_success', 'Success! This popup should close on its own...'),
       )
-    })
-    root.unmount()
+    }, 1000)
   }
-}
 
-ExternalContentSuccess.start = async function () {
-  await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
-
-  if (ENV.oembed) {
-    const url = replaceTags(
-      replaceTags(
-        $('#oembed_retrieve_url').attr('href'),
-        'endpoint',
-        encodeURIComponent(ENV.oembed.endpoint),
-      ),
-      'url',
-      encodeURIComponent(ENV.oembed.url),
+  // Handles lti 1.0 responses for Assignments 2 which expects a
+  // vanilla JS event from LTI tools in the following form.
+  ExternalContentSuccess.a2DataReady = function (data) {
+    parentWindow.postMessage(
+      {
+        subject: 'A2ExternalContentReady',
+        content_items: data,
+        msg: ENV.message,
+        log: ENV.log,
+        errormsg: ENV.error_message,
+        errorlog: ENV.error_log,
+        ltiEndpoint: ENV.lti_endpoint,
+      },
+      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     )
-    $.ajaxJSON(
-      url,
-      'GET',
-      {},
-      data => ExternalContentSuccess.dataReady(data),
-      () =>
-        $('#dialog_message').text(
-          I18n.t(
-            'oembed_failure',
-            'Content retrieval failed, please try again or notify your system administrator of the error.',
-          ),
+  }
+
+  ExternalContentSuccess.processLtiMessages = async (messages, target) => {
+    const errorMessage = messages?.lti_errormsg
+    const message = messages?.lti_msg
+
+    if (errorMessage || message) {
+      const wrapper = document.createElement('div')
+      wrapper.setAttribute('id', 'lti_messages_wrapper')
+      target.parentNode.insertBefore(wrapper, target)
+
+      const root = createRoot(wrapper)
+      await new Promise(resolve => {
+        root.render(
+          <>
+            {[
+              [errorMessage, true],
+              [message, false],
+            ]
+              .filter(([msg, _]) => msg !== undefined)
+              .map(([msg, isError], index) => {
+                return (
+                  <Alert
+                    key={index}
+                    variant={isError ? 'error' : 'info'}
+                    renderCloseButtonLabel="Close"
+                    onDismiss={() => resolve()}
+                    timeout={5000}
+                  >
+                    <span id={isError ? 'lti_error_message' : 'lti_message'}>{msg}</span>
+                  </Alert>
+                )
+              })}
+          </>,
+        )
+      })
+      root.unmount()
+    }
+  }
+
+  ExternalContentSuccess.start = async function () {
+    await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
+
+    if (ENV.oembed) {
+      const url = replaceTags(
+        replaceTags(
+          $('#oembed_retrieve_url').attr('href'),
+          'endpoint',
+          encodeURIComponent(ENV.oembed.endpoint),
         ),
-    )
-  } else {
-    ExternalContentSuccess.dataReady(data, service_id)
-    ExternalContentSuccess.a2DataReady(data)
+        'url',
+        encodeURIComponent(ENV.oembed.url),
+      )
+      $.ajaxJSON(
+        url,
+        'GET',
+        {},
+        data => ExternalContentSuccess.dataReady(data),
+        () =>
+          $('#dialog_message').text(
+            I18n.t(
+              'oembed_failure',
+              'Content retrieval failed, please try again or notify your system administrator of the error.',
+            ),
+          ),
+      )
+    } else {
+      ExternalContentSuccess.dataReady(data, service_id)
+      ExternalContentSuccess.a2DataReady(data)
+    }
   }
-}
 
-$(document).ready(() => {
   ExternalContentSuccess.start()
 })
 

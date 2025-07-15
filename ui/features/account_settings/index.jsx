@@ -35,14 +35,15 @@ import SettingsTabs from '../../shared/tabs/SettingsTabs'
 import ErrorBoundary from '@canvas/error-boundary'
 
 const I18n = createI18nScope('account_settings_jsx_bundle')
-const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
-const ErrorMessage = () => (
-  <div className="bcs_check-box">
-    <Text color="danger">{I18n.t('Unable to load this control')}</Text>
-  </div>
-)
 
 ready(() => {
+  const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
+  const ErrorMessage = () => (
+    <div className="bcs_check-box">
+      <Text color="danger">{I18n.t('Unable to load this control')}</Text>
+    </div>
+  )
+
   initializeTopNavPortal()
 
   if (document.getElementById('custom_help_link_settings')) {
