@@ -124,7 +124,7 @@ export default function SpeedGraderStatusMenu({
       </Flex>
       {selection === 'late' && (
         <>
-          <div style={{position: 'absolute', right: '24px'}}>
+          <div className="time-late-input-container">
             <TimeLateInput
               lateSubmissionInterval={lateSubmissionInterval}
               locale={locale}
