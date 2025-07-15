@@ -988,6 +988,15 @@ describe "gradebooks/grade_summary" do
       expect(response).to have_tag("#submission_#{@a2.id} td .grade_dot")
     end
 
+    it "shows the comment button if post policy is set to manual" do
+      @course.apply_post_policy!(post_manually: true)
+      @a1.submissions.first.add_comment(author: @student, comment: "Test!")
+
+      render "gradebooks/grade_summary"
+
+      expect(response).to have_tag("#assignment_comment_#{@a1.id}")
+    end
+
     context "when the feature flag is disabled" do
       before(:once) do
         course_with_student({ active_all: true })
