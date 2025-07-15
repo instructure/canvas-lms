@@ -30,38 +30,38 @@ type MediaPlayerAttributes = {
   bp_locked_attachment: boolean
 }
 
-function isConsolidatedMediaPlayerEnabled() {
-  return ENV?.FEATURES?.consolidated_media_player
-}
-
-function renderCanvasMediaPlayer(domId: string, data: MediaPlayerAttributes) {
-  $(`#${domId}`).mediaComment(
-    'show_inline',
-    data.media_entry_id || 'maybe',
-    data.type,
-    data.download_url,
-    data.attachment_id,
-    data.bp_locked_attachment,
-  )
-}
-
-function renderStudioMediaPlayer(domId: string, data: MediaPlayerAttributes) {
-  $(`#${domId}`).css({
-    color: 'unset',
-  })
-  const root = createRoot(document.getElementById(domId)!)
-  root.render(
-    <CanvasStudioPlayer
-      media_id={data.media_entry_id}
-      type={data.type === 'audio' ? 'audio' : 'video'}
-      attachment_id={data.attachment_id}
-      explicitSize={{width: 550, height: 400}}
-      hideUploadCaptions={data.bp_locked_attachment}
-    />
-  )
-}
-
 ready(() => {
+  function isConsolidatedMediaPlayerEnabled() {
+    return ENV?.FEATURES?.consolidated_media_player
+  }
+
+  function renderCanvasMediaPlayer(domId: string, data: MediaPlayerAttributes) {
+    $(`#${domId}`).mediaComment(
+      'show_inline',
+      data.media_entry_id || 'maybe',
+      data.type,
+      data.download_url,
+      data.attachment_id,
+      data.bp_locked_attachment,
+    )
+  }
+
+  function renderStudioMediaPlayer(domId: string, data: MediaPlayerAttributes) {
+    $(`#${domId}`).css({
+      color: 'unset',
+    })
+    const root = createRoot(document.getElementById(domId)!)
+    root.render(
+      <CanvasStudioPlayer
+        media_id={data.media_entry_id}
+        type={data.type === 'audio' ? 'audio' : 'video'}
+        attachment_id={data.attachment_id}
+        explicitSize={{width: 550, height: 400}}
+        hideUploadCaptions={data.bp_locked_attachment}
+      />,
+    )
+  }
+
   const domId = 'media_preview'
   const $preview = $(`#${domId}`)
   const data = $preview.data() as MediaPlayerAttributes

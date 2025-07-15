@@ -32,9 +32,9 @@ import {ContextModuleProvider} from './react/hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
-const ENV = window.ENV as GlobalEnv
-
 ready(() => {
+  const ENV = window.ENV as GlobalEnv
+
   const container = document.getElementById('content')
 
   if (!ENV.course_id) {

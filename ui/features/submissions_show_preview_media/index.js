@@ -21,22 +21,22 @@ import CanvasStudioPlayer from '@canvas/canvas-studio-player'
 import React from 'react'
 import {createRoot} from 'react-dom/client'
 
-function isConsolidatedMediaPlayerEnabled() {
-  return ENV?.FEATURES?.consolidated_media_player
-}
-
-function renderStudioMediaPlayer(domId, media_id, type) {
-  const root = createRoot(document.getElementById(domId))
-  root?.render(
-    React.createElement(CanvasStudioPlayer, {
-      media_id: media_id,
-      type: type === 'audio' ? 'audio' : 'video',
-      explicitSize: {width: 480, height: 300},
-    }),
-  )
-}
-
 $(document).ready(() => {
+  function isConsolidatedMediaPlayerEnabled() {
+    return ENV?.FEATURES?.consolidated_media_player
+  }
+
+  function renderStudioMediaPlayer(domId, media_id, type) {
+    const root = createRoot(document.getElementById(domId))
+    root?.render(
+      React.createElement(CanvasStudioPlayer, {
+        media_id: media_id,
+        type: type === 'audio' ? 'audio' : 'video',
+        explicitSize: {width: 480, height: 300},
+      }),
+    )
+  }
+
   $('.play_media_recording_link').click(function (event) {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()

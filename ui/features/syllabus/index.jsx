@@ -34,65 +34,65 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('syllabus')
 
-const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
-const immersive_reader_mobile_mount_point = () =>
-  document.getElementById('immersive_reader_mobile_mount_point')
-const showCourseSummary = !!document.getElementById('syllabusContainer')
+ready(() => {
+  const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
+  const immersive_reader_mobile_mount_point = () =>
+    document.getElementById('immersive_reader_mobile_mount_point')
+  const showCourseSummary = !!document.getElementById('syllabusContainer')
 
-let collections = []
-let deferreds
+  let collections = []
+  let deferreds
 
-// If we're in a paced course, we're not showing the assignments
-// so skip retrieving them.
-// Also, ensure 'Show Course Summary' is checked otherwise don't bother.
-if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary) {
-  // Setup the collections
-  collections = [
-    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
-    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
-    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'sub_assignment'),
-  ]
+  // If we're in a paced course, we're not showing the assignments
+  // so skip retrieving them.
+  // Also, ensure 'Show Course Summary' is checked otherwise don't bother.
+  if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary) {
+    // Setup the collections
+    collections = [
+      new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
+      new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
+      new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'sub_assignment'),
+    ]
 
-  // Don't show appointment groups for non-logged in users
-  if (ENV.current_user_id) {
-    collections.push(
-      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
-    )
-    collections.push(
-      new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
-    )
-  }
-
-  collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
-
-  // Perform a fetch on each collection
-  //   The fetch continues fetching until no next link is returned
-  deferreds = map(collections, collection => {
-    const deferred = $.Deferred()
-
-    const error = () => deferred.reject()
-
-    const success = () => {
-      if (collection.canFetch('next')) {
-        return collection.fetch({page: 'next', success, error})
-      } else {
-        return deferred.resolve()
-      }
+    // Don't show appointment groups for non-logged in users
+    if (ENV.current_user_id) {
+      collections.push(
+        new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'reservable'),
+      )
+      collections.push(
+        new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'),
+      )
     }
 
-    collection.fetch({
-      data: {
-        per_page: ENV.SYLLABUS_PER_PAGE || 50,
-      },
-      success,
-      error,
+    collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
+
+    // Perform a fetch on each collection
+    //   The fetch continues fetching until no next link is returned
+    deferreds = map(collections, collection => {
+      const deferred = $.Deferred()
+
+      const error = () => deferred.reject()
+
+      const success = () => {
+        if (collection.canFetch('next')) {
+          return collection.fetch({page: 'next', success, error})
+        } else {
+          return deferred.resolve()
+        }
+      }
+
+      collection.fetch({
+        data: {
+          per_page: ENV.SYLLABUS_PER_PAGE || 50,
+        },
+        success,
+        error,
+      })
+
+      return deferred
     })
+  }
 
-    return deferred
-  })
-}
-
-ready(() => {
   // Attach the immersive reader button if enabled
   const activeMountPoints = [
     immersive_reader_mount_point(),

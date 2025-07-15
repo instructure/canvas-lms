@@ -22,14 +22,14 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('PriorUsers')
 
-const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
-  const crumbs = getCrumbs()
-  crumbs.push({name: I18n.t('People'), url: document.referrer})
-  crumbs.push({name: I18n.t('Prior users'), url: ''})
-  setCrumbs(crumbs)
-}
-
 ready(() => {
+  const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
+    const crumbs = getCrumbs()
+    crumbs.push({name: I18n.t('People'), url: document.referrer})
+    crumbs.push({name: I18n.t('Prior users'), url: ''})
+    setCrumbs(crumbs)
+  }
+
   initializeTopNavPortalWithDefaults({
     getBreadCrumbSetter: handleBreadCrumbSetter,
     useStudentView: true,

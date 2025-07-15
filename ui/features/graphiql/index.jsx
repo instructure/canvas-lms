@@ -21,7 +21,7 @@ import {createRoot} from 'react-dom/client'
 import GraphiQLApp from './react/GraphiQLApp'
 import ready from '@instructure/ready'
 
-const root = createRoot(document.getElementById('graphiql'))
 ready(() => {
+  const root = createRoot(document.getElementById('graphiql'))
   root.render(<GraphiQLApp />)
 })
