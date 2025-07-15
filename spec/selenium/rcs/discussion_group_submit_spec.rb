@@ -50,23 +50,16 @@ describe "discussion assignments" do
     end
 
     it "creates a group discussion ungraded", priority: "1" do
-      skip "Will be fixed in VICE-5209"
       expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
-                                                         "each group has its own conversation for this topic. " \
-                                                         "Here are the ones you have access to:\nsome group")
+      expect(f('[data-testid="groups-menu-btn"]')).to be_displayed
     end
 
     it "creates a group discussion graded", priority: "1" do
-      skip "Will be fixed in VICE-5209"
-      f("#use_for_grading").click
+      fxpath("//span[text()='Graded']").click
       f("#discussion_topic_assignment_points_possible").send_keys("10")
       click_option("#assignment_group_id", "Assignment Group")
       expect_new_page_load { submit_form(".form-actions") }
-      expect(f("#discussion_container").text).to include("This is a graded discussion: 10 points possible")
-      expect(f("#discussion_container").text).to include("Since this is a group discussion, " \
-                                                         "each group has its own conversation for this topic. " \
-                                                         "Here are the ones you have access to:\nsome group")
+      expect(f('[data-testid="groups-menu-btn"]')).to be_displayed
     end
   end
 
@@ -82,20 +75,27 @@ describe "discussion assignments" do
     end
 
     it "allows the student to reply and teacher to see the unread count", :ignore_js_errors, priority: "1" do
-      skip "Will be fixed in VICE-5209"
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-      expect(f(".new-and-total-badge .new-items").text).to include ""
+      expect(f('[data-testid="discussion-topic-container"]')).not_to contain_css('[data-testid="replies-counter"]')
+      f('[data-testid="groups-menu-btn"]').click
+      wait_for_ajaximations
+      expect(f('[data-testid="groups-menu-item"]')).to include_text("0 Unread")
       user_session(@student1)
       get "/courses/#{@course.id}/discussion_topics"
       expect_new_page_load { f("[data-testid='discussion-link-#{@discussion_topic.id}']").click }
       expect(f("#breadcrumbs").text).to include("some group")
-      f(".discussion-reply-action").click
-      type_in_tiny "textarea", "something to submit"
-      f('button[type="submit"]').click
+      f('[data-testid="discussion-topic-reply"]').click
+      wait_for_ajaximations
+      wait_for_rce
+      type_in_tiny("textarea", "stuff and things")
+      f('[data-testid="DiscussionEdit-submit"]').click
       wait_for_ajaximations
       user_session(@teacher)
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-      expect(f(".new-and-total-badge .new-items").text).to include "1"
+      expect(f('[data-testid="discussion-topic-container"]')).not_to contain_css('[data-testid="replies-counter"]')
+      f('[data-testid="groups-menu-btn"]').click
+      wait_for_ajaximations
+      expect(f('[data-testid="groups-menu-item"]')).to include_text("1 Unread")
     end
   end
 end

@@ -23,10 +23,6 @@ describe "Discussion Topic Navigation Shortcuts" do
 
   context "when Discussion Replies are in 'Inline' mode" do
     before :once do
-      Account.default.enable_feature!(:react_discussions_post)
-    end
-
-    before :once do
       course_with_teacher(active_course: true, active_all: true, name: "teacher")
       @topic_title = "Our Discussion Topic"
       @topic = @course.discussion_topics.create!(

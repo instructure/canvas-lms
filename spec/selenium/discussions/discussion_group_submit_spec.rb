@@ -40,10 +40,6 @@ describe "discussion assignments" do
   end
 
   context "when discussion anonymity is allowed" do
-    before :once do
-      @course.enable_feature! :react_discussions_post
-    end
-
     context "for discussions getting created within a group's context" do
       it "does not show anonymity options" do
         get "/groups/#{@g1.id}/discussion_topics/new"

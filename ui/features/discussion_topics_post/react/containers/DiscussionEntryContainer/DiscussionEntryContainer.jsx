@@ -66,7 +66,7 @@ const DiscussionEntryContainerBase = ({breakpoints, ...props}) => {
 
       if (
         !nextEl ||
-          (!replyRefsArray.some(ref => ref === nextEl) && !event.target.contains(nextEl))
+        (!replyRefsArray.some(ref => ref === nextEl) && !event.target.contains(nextEl))
       ) {
         clearHighlighted()
       }

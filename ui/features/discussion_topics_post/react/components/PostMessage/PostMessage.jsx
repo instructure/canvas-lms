@@ -278,7 +278,9 @@ export function PostMessage({...props}) {
                   </>
                 )}
               </div>
-              <View display="block">{props.children}</View>
+              <View data-testid="post-message-container" display="block">
+                {props.children}
+              </View>
             </>
           )}
         </View>

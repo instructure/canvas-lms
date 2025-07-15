@@ -55,48 +55,45 @@ describe "discussions" do
           let(:topic) { student_topic }
 
           it "updates subscribed button when user posts to a topic", priority: "2" do
-            skip "Will be fixed in VICE-5209"
+            skip "Will be fixed in VICE-5427"
             get url
-            expect(f(".topic-subscribe-button")).to be_displayed
+            expect(f('[data-action-state="subscribeButton"]')).to be_displayed
             add_reply "student posting"
-            expect(f(".topic-unsubscribe-button")).to be_displayed
+            expect(f('[data-action-state="unsubscribeButton"]')).to be_displayed
           end
         end
       end
 
-      it "displays the current username when adding a reply", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "displays the current username when adding a reply", :ignore_js_errors, priority: "1" do
         get url
-        expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
+        expect(f('[data-testid="discussion-topic-container"]')).not_to contain_css('[data-testid="discussion-entry-container"]')
         add_reply
         expect(get_all_replies.count).to eq 1
-        expect(@last_entry.find_element(:css, ".author").text).to eq somebody.name
+        expect(@last_entry.find_element(:css, '[data-testid="author_name"]').text).to eq somebody.name
       end
 
-      context "side comments" do
+      context "sub-replies", :ignore_js_errors do
         let(:topic) { side_comment_topic }
 
-        it "adds a side comment", priority: "1" do
-          skip "Will be fixed in VICE-5209"
-          side_comment_text = "new side comment"
+        it "adds a sub-reply", priority: "1" do
+          sub_reply_text = "new sub-reply"
           get url
 
-          f(".discussion-entries .discussion-reply-action").click
+          f('[data-testid="threading-toolbar-reply"]').click
           wait_for_ajaximations
-          type_in_tiny "textarea", side_comment_text
-          submit_form(".discussion-entries .discussion-reply-form")
+          type_in_tiny "textarea", sub_reply_text
+          f('[data-testid="DiscussionEdit-submit"]').click
           wait_for_ajaximations
 
           last_entry = DiscussionEntry.last
           expect(last_entry.depth).to eq 2
-          expect(last_entry.message).to include(side_comment_text)
-          expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
+          expect(last_entry.message).to include(sub_reply_text)
+          expect(f("[data-entry-id='#{last_entry.id}']")).to include_text(sub_reply_text)
         end
 
-        it "edits a side comment", priority: "1" do
-          skip "Will be fixed in VICE-5209"
+        it "edits a sub-reply", priority: "1" do
           edit_text = "this has been edited"
-          text = "new side comment from somebody"
+          text = "new sub-reply from somebody"
           entry = topic.discussion_entries.create!(user: somebody, message: text, parent_entry: entry)
           expect(topic.discussion_entries.last.message).to eq text
           get url

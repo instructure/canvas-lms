@@ -111,8 +111,7 @@ describe "groups" do
         expect(f(".announcements-v2__wrapper")).not_to contain_css(".ic-announcement-row")
       end
 
-      it "lets teachers see announcement details" do
-        skip "Will be fixed in VICE-5209"
+      it "lets teachers see announcement details", :ignore_js_errors do
         announcement = @testgroup.first.announcements.create!(
           title: "Test Announcement",
           message: "test message",
@@ -120,12 +119,11 @@ describe "groups" do
         )
         get announcements_page
         expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement.title) }
-        expect(f(".discussion-title").text).to eq "Test Announcement"
-        expect(f(".message").text).to eq "test message"
+        expect(f('[data-testid="message_title"]')).to include_text("Test Announcement")
+        expect(f('[data-resource-type="announcement.body"]').text).to eq "test message"
       end
 
       it "edit button from announcement details works on teachers announcement" do
-        skip "Will be fixed in VICE-5209"
         announcement = @testgroup.first.announcements.create!(
           title: "Test Announcement",
           message: "test message",
@@ -136,7 +134,8 @@ describe "groups" do
           announcement
         )
         get url_base
-        expect_new_page_load { f(".edit-btn").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.current_url).to include "#{url_base}/edit"
         expect(f("#content-wrapper")).not_to contain_css("#sections_autocomplete_root input")
       end
@@ -159,7 +158,6 @@ describe "groups" do
       end
 
       it "lets teachers edit group member announcements" do
-        skip "Will be fixed in VICE-5209"
         announcement = @testgroup.first.announcements.create!(
           title: "Your Announcement",
           message: "test message",
@@ -170,7 +168,8 @@ describe "groups" do
           announcement
         )
         get url_base
-        expect_new_page_load { f(".edit-btn").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.current_url).to include "#{url_base}/edit"
         expect(f("#content-wrapper")).not_to contain_css("#sections_autocomplete_root input")
       end
@@ -220,7 +219,6 @@ describe "groups" do
       it_behaves_like "discussions_page", :teacher
 
       it "allows teachers to create discussions within a group", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         # This creates the discussion and also tests its creation
@@ -228,16 +226,14 @@ describe "groups" do
       end
 
       it "has three options when creating a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
-        expect(f("#threaded")).to be_displayed
-        expect(f("#allow_rating")).to be_displayed
-        expect(f("#podcast_enabled")).to be_displayed
+        expect(f('[name="allow_rating"]')).to be_present
+        expect(f('[name="allow_todo_date"]')).to be_present
+        expect(f('[name="podcast_enabled"]')).to be_present
       end
 
-      it "allows teachers to access a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "allows teachers to access a discussion", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: "Discussion Topic",
@@ -245,7 +241,7 @@ describe "groups" do
         get discussions_page
         # Verifies teacher can access the group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
-        expect(f(".message.user_content")).to include_text(dt.message)
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text(dt.message)
       end
 
       it "allows teachers to delete their group discussions", :ignore_js_errors, priority: "1" do

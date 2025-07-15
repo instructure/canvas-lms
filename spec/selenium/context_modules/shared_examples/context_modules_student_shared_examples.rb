@@ -329,7 +329,6 @@ shared_examples "context modules for students" do
       end
 
       before :once do
-        Account.site_admin.enable_feature!(:react_discussions_post)
         Account.site_admin.enable_feature!(:discussion_create)
       end
 

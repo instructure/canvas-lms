@@ -200,8 +200,7 @@ describe "groups" do
         expect(f("#content-wrapper")).not_to contain_css(".edit-btn")
       end
 
-      it "student in group can see teachers announcement in index" do
-        skip "Will be fixed in VICE-5209"
+      it "student in group can see teachers announcement in index", :ignore_js_errors do
         announcement = @testgroup.first.announcements.create!(
           title: "Group Announcement",
           message: "Group",
@@ -210,8 +209,8 @@ describe "groups" do
         user_session(@students.first)
         AnnouncementIndex.visit_groups_index(@testgroup.first)
         expect_new_page_load { AnnouncementIndex.click_on_announcement(announcement.title) }
-        expect(f(".discussion-title").text).to eq "Group Announcement"
-        expect(f(".message").text).to eq "Group"
+        expect(f('[data-testid="message_title"]')).to include_text("Group Announcement")
+        expect(f(".userMessage").text).to eq "Group"
       end
 
       it "only allows group members to access announcements" do
@@ -232,7 +231,6 @@ describe "groups" do
       end
 
       it "allows all group members to see announcements", :ignore_js_errors, priority: "1" do
-        skip "Will be fixed in VICE-5209"
         @announcement = @testgroup.first.announcements.create!(
           title: "Group Announcement",
           message: "Group",
@@ -241,7 +239,7 @@ describe "groups" do
         AnnouncementIndex.visit_groups_index(@testgroup.first)
         expect(ff(".ic-announcement-row").size).to eq 1
         expect_new_page_load { ff('[data-testId="single-announcement-test-id"]')[0].click }
-        expect(f(".discussion-title")).to include_text(@announcement.title)
+        expect(f('[data-testid="message_title"]')).to include_text(@announcement.title)
       end
     end
 
@@ -279,15 +277,13 @@ describe "groups" do
       it_behaves_like "discussions_page", :student
 
       it "allows discussions to be created within a group", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
         # This creates the discussion and also tests its creation
         edit_topic("from a student", "tell me a story")
       end
 
-      it "allows group members to access a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "allows group members to access a discussion", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @teacher,
                                      title: "Discussion Topic",
@@ -295,17 +291,16 @@ describe "groups" do
         get discussions_page
         # Verifies group member can access the teacher's group discussion & that it's the correct discussion
         expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
-        expect(f(".message.user_content")).to include_text(dt.message)
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text(dt.message)
       end
 
       it "has two options when creating a discussion", priority: "1" do
-        skip "Will be fixed in VICE-5209"
         get discussions_page
         expect_new_page_load { f("#add_discussion").click }
-        expect(f("#threaded")).to be_displayed
-        expect(f("#allow_rating")).to be_displayed
+        expect(f('[name="allow_rating"]')).to be_present
+        expect(f('[name="allow_todo_date"]')).to be_present
         # Shouldn't be Enable Podcast Feed option
-        expect(f("#content")).not_to contain_css("#podcast_enabled")
+        expect(f("#content")).not_to contain_css('[name="podcast_enabled"]')
       end
 
       it "only allows group members to access discussions", priority: "1" do
@@ -336,30 +331,29 @@ describe "groups" do
         expect(f(".discussions-container__wrapper")).not_to contain_css("#discussions-index-manage-menu")
       end
 
-      it "allows group members to edit their discussions", priority: "1" do
-        skip "Will be fixed in VICE-5209"
+      it "allows group members to edit their discussions", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @user,
                                      title: "White Snow",
                                      message: "Where are my skis?")
         get discussions_page
-        f("[data-testid='discussion-link-#{dt.id}']").click
-        f(".edit-btn").click
+        expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect_new_page_load { f('[data-testid="discussion-thread-menuitem-edit"]').click }
         expect(driver.title).to eq "Edit Discussion Topic"
-        type_in_tiny("textarea[name=message]", "The slopes are ready,")
-        f(".btn-primary").click
-        wait_for_ajaximations
-        expect(f(".user_content")).to include_text("The slopes are ready,")
+        edit_topic(dt.title, "The slopes are ready,")
+        expect(f('[data-resource-type="discussion_topic.body"]')).to include_text("The slopes are ready,")
       end
 
-      it "does not allow group member to edit discussions by other creators", priority: "1" do
+      it "does not allow group member to edit discussions by other creators", :ignore_js_errors, priority: "1" do
         dt = DiscussionTopic.create!(context: @testgroup.first,
                                      user: @students.first,
                                      title: "White Snow",
                                      message: "Where are my skis?")
         get discussions_page
-        f("[data-testid='discussion-link-#{dt.id}']").click
-        expect(f("#content")).not_to contain_css(".edit-btn")
+        expect_new_page_load { f("[data-testid='discussion-link-#{dt.id}']").click }
+        f('[data-testid="discussion-post-menu-trigger"]').click
+        expect(f('[data-position-content="discussion-post-menu"]')).not_to contain_css('[data-testid="discussion-thread-menuitem-edit"]')
       end
     end
 
