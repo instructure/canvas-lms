@@ -122,9 +122,9 @@ export function DiscussionAvailabilityContainer({...props}) {
               {availabilities.length === 1 ? (
                 <AssignmentAvailabilityWindow
                   availabilityWindowName={availabilities[0].name}
-                  availableDate={props.delayedPostAt}
-                  untilDate={props.lockAt}
-                  anonymousState={props.anonymousState}
+                  availableDate={availabilities[0].delayedPostAt}
+                  untilDate={availabilities[0].lockAt}
+                  anonymousState={availabilities[0].anonymousState}
                   showDateWithTime={true}
                 />
               ) : (
