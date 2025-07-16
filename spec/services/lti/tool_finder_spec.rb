@@ -214,6 +214,65 @@ describe Lti::ToolFinder do
       expect { Lti::ToolFinder.from_id!(tool.id, @account, placement: :account_navigation) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
+    context "for 1.3 tools with context controls" do
+      let!(:registration) { lti_registration_with_tool(account: @root_account) }
+      let(:deployment) { registration.deployments.first }
+
+      it "finds the tool if it is available in the account" do
+        expect(Lti::ToolFinder.from_id!(deployment.id, @root_account)).to eq(deployment)
+        expect(Lti::ToolFinder.from_id!(deployment.id, @account)).to eq(deployment)
+        expect(Lti::ToolFinder.from_id!(deployment.id, @course)).to eq(deployment)
+      end
+
+      it "raises RecordNotFound if there is an unavailable context control for the account" do
+        deployment.context_controls.first.update(available: false)
+
+        expect { Lti::ToolFinder.from_id!(deployment.id, @root_account) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "raises RecordNotFound if there is an unavailable context control in a parent account" do
+        deployment.context_controls.update(available: false)
+
+        expect { Lti::ToolFinder.from_id!(deployment.id, @account) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "raises RecordNotFound if the tool is unavailable at a lower level" do
+        Lti::ContextControl.create!(
+          account: @account,
+          deployment:,
+          registration:,
+          available: false
+        )
+
+        expect(Lti::ToolFinder.from_id!(deployment.id, @root_account)).to eq(deployment)
+
+        expect { Lti::ToolFinder.from_id!(deployment.id, @account) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { Lti::ToolFinder.from_id!(deployment.id, @course) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "does not find a deleted tool, even if there is an available context control" do
+        deployment.workflow_state = "deleted"
+        deployment.save!
+        Lti::ContextControl.create!(
+          account: @account,
+          deployment:,
+          registration:,
+          available: true
+        )
+
+        expect { Lti::ToolFinder.from_id!(deployment.id, @account) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it "is unaffected by context controls if the lti_registrations_next flag is off" do
+        @root_account.disable_feature!(:lti_registrations_next)
+
+        deployment.context_controls.first.update(available: false)
+
+        expect(Lti::ToolFinder.from_id!(deployment.id, @root_account)).to eq(deployment)
+        expect(Lti::ToolFinder.from_id!(deployment.id, @account)).to eq(deployment)
+      end
+    end
+
     context 'when the workflow state is "disabled"' do
       let(:tool) do
         tool = new_external_tool @account
@@ -283,6 +342,23 @@ describe Lti::ToolFinder do
 
       it "returns nil" do
         expect(subject).to be_nil
+      end
+    end
+
+    context "for 1.3 tools with context controls" do
+      let!(:registration) { lti_registration_with_tool(account: @root_account) }
+      let(:deployment) { registration.deployments.first }
+
+      it "finds the tool if it is available in the account" do
+        expect(Lti::ToolFinder.from_id(deployment.id, @root_account)).to eq(deployment)
+        expect(Lti::ToolFinder.from_id(deployment.id, @account)).to eq(deployment)
+        expect(Lti::ToolFinder.from_id(deployment.id, @course)).to eq(deployment)
+      end
+
+      it "returns nil if there is an unavailable context control for the account" do
+        deployment.context_controls.first.update(available: false)
+
+        expect(Lti::ToolFinder.from_id(deployment.id, @root_account)).to be_nil
       end
     end
 

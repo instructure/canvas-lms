@@ -24,10 +24,28 @@ class TermsOfServiceContent < ActiveRecord::Base
   validates :terms_updated_at, presence: true
 
   belongs_to :account
+  has_many :attachment_associations, as: :context, inverse_of: :context
 
   before_validation :ensure_terms_updated_at
   before_save :set_terms_updated_at
   after_save :clear_cache
+
+  delegate :root_account, to: :account
+  delegate :root_account_id, to: :account
+
+  include LinkedAttachmentHandler
+
+  def self.html_fields
+    %w[content]
+  end
+
+  def attachment_associations_enabled?
+    if account
+      root_account.feature_enabled?(:file_association_access)
+    else
+      %w[allowed_on on].include?(Feature.definitions["file_association_access"].state)
+    end
+  end
 
   def ensure_terms_updated_at
     self.terms_updated_at ||= Time.now.utc

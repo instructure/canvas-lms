@@ -23,21 +23,19 @@ import {
   parseLinkHeader,
   parseBookmarkFromUrl,
   generateTableUrl,
-  UnauthorizedError,
+  doFetchApiWithAuthCheck,
 } from '../../utils/apiUtils'
 import {useSearchTerm} from './useSearchTerm'
 
+export const PER_PAGE = 25
+
 const fetchFilesAndFolders = async (url: string) => {
-  const response = await fetch(url)
-  if (response.status === 401) {
-    throw new UnauthorizedError()
-  }
-  if (!response.ok) {
-    throw new Error()
-  }
+  const {json, response} = await doFetchApiWithAuthCheck<(File | Folder)[]>({
+    path: url,
+  })
   const links = parseLinkHeader(response.headers.get('Link'))
-  const rows = (await response.json()) as (File | Folder)[]
-  return {rows, links}
+  const totalItems = Number(response.headers.get('X-Total-Items')) || 0
+  return {rows: json!, links, totalItems}
 }
 
 type BookmarkByPage = {[key: number]: string}
@@ -53,35 +51,49 @@ export type PaginatedFiles = {
 }
 
 export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
-  const {searchTerm, setSearchTerm} = useSearchTerm()
+  const {searchTerm, urlEncodedSearchTerm, setSearchTerm} = useSearchTerm()
   const [sort, setSort] = useState<Sort>({
     by: 'name',
     direction: 'asc',
   })
-
+  const [totalItems, setTotalItems] = useState(0)
   const [bookmarkByPage, setBookmarkByPage] = useState<BookmarkByPage>({1: ''})
   const [currentPage, setCurrentPage] = useState(1)
   const prevState = useRef('')
 
-  const url = generateTableUrl({
-    searchTerm,
-    contextId: folder.context_id,
-    contextType: folder.context_type.toLowerCase(),
-    folderId: folder.id.toString(),
-    sortBy: sort.by,
-    sortDirection: sort.direction,
-    pageQueryParam: bookmarkByPage[currentPage],
-  })
+  const isSingleCharSearch = searchTerm?.trim().length === 1
+  const url = isSingleCharSearch
+    ? ''
+    : generateTableUrl({
+        searchTerm: urlEncodedSearchTerm,
+        contextId: folder.context_id,
+        contextType: folder.context_type.toLowerCase(),
+        folderId: folder.id,
+        sortBy: sort.by,
+        sortDirection: sort.direction,
+        pageQueryParam: bookmarkByPage[currentPage],
+        perPage: PER_PAGE,
+      })
 
   const query = useQuery({
     staleTime: 0,
     placeholderData: keepPreviousData,
     queryKey: [
       'files',
-      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage},
+      {url, folderId: folder.id, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch},
     ] as const,
     queryFn: async ({queryKey}) => {
-      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage}] = queryKey
+      const [, {url, folderId, searchTerm, sort, bookmarkByPage, currentPage, isSingleCharSearch}] =
+        queryKey
+
+      // Return empty results for single character searches
+      if (isSingleCharSearch) {
+        setBookmarkByPage({1: ''})
+        setCurrentPage(1)
+        onSettled([])
+        return []
+      }
+
       const state = JSON.stringify([folderId, searchTerm, sort])
       const {bookmarkState, pageState} =
         prevState.current !== state
@@ -91,7 +103,8 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
       setBookmarkByPage(bookmarkState)
       setCurrentPage(pageState)
 
-      const {rows, links} = await fetchFilesAndFolders(url)
+      const {rows, links, totalItems} = await fetchFilesAndFolders(url)
+      setTotalItems(totalItems)
       const bookmark = parseBookmarkFromUrl(links.next)
       if (bookmark && !bookmarkState[pageState + 1]) {
         setBookmarkByPage({
@@ -109,8 +122,10 @@ export const useGetPaginatedFiles = ({folder, onSettled}: PaginatedFiles) => {
     ...query,
     page: {
       current: currentPage,
-      total: Object.keys(bookmarkByPage).length,
-      set: setCurrentPage,
+      totalItems,
+      totalPages: Math.ceil(totalItems / PER_PAGE),
+      next: () => setCurrentPage(prev => prev + 1),
+      prev: () => setCurrentPage(prev => Math.max(prev - 1, 1)),
     },
     search: {
       term: searchTerm,

@@ -17,21 +17,19 @@
  */
 
 import Api from '../Api'
-import FakeServer, {
-  pathFromRequest,
-} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('AssessmentAuditTray Api', () => {
   let api
-  let server
+  const server = setupServer()
+
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   beforeEach(() => {
-    server = new FakeServer()
     api = new Api()
-  })
-
-  afterEach(() => {
-    server.teardown()
   })
 
   describe('#loadAssessmentAuditTrail()', () => {
@@ -70,21 +68,27 @@ describe('AssessmentAuditTray Api', () => {
     }
 
     test('sends a request to the "assessment audit events" url', async () => {
-      server
-        .for(url)
-        .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
+      let requestReceived = false
+      server.use(
+        http.get(url, () => {
+          requestReceived = true
+          return HttpResponse.json({audit_events: auditEvents, users, tools, quizzes})
+        }),
+      )
       await loadAssessmentAuditTrail()
-      const requests = server.receivedRequests.filter(request => request.url === url)
-      expect(requests).toHaveLength(1)
+      expect(requestReceived).toBe(true)
     })
 
     test('sends a GET request', async () => {
-      server
-        .for(url)
-        .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
+      let requestMethod = null
+      server.use(
+        http.all(url, ({request}) => {
+          requestMethod = request.method
+          return HttpResponse.json({audit_events: auditEvents, users, tools, quizzes})
+        }),
+      )
       await loadAssessmentAuditTrail()
-      const {method} = server.receivedRequests.find(request => pathFromRequest(request) === url)
-      expect(method).toBe('GET')
+      expect(requestMethod).toBe('GET')
     })
 
     describe('when the request succeeds', () => {
@@ -94,9 +98,11 @@ describe('AssessmentAuditTray Api', () => {
       let quiz
 
       beforeEach(async () => {
-        server
-          .for(url)
-          .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
+        server.use(
+          http.get(url, () => {
+            return HttpResponse.json({audit_events: auditEvents, users, tools, quizzes})
+          }),
+        )
 
         const returnData = await loadAssessmentAuditTrail()
         event = returnData.auditEvents[0]
@@ -188,7 +194,11 @@ describe('AssessmentAuditTray Api', () => {
 
     describe('when the request fails', () => {
       test('does not catch the failure', async () => {
-        server.for(url).respond({status: 500, body: {error: 'server error'}})
+        server.use(
+          http.get(url, () => {
+            return HttpResponse.json({error: 'server error'}, {status: 500})
+          }),
+        )
         try {
           await loadAssessmentAuditTrail()
         } catch (error) {

@@ -16,15 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const sinon = require('sinon/pkg/sinon.js')
-
 import indicate from '../../src/common/indicate'
 
 describe('indicate function', () => {
-  let clock, region, margin, indicator
+  let region, margin, indicator
 
   beforeEach(() => {
-    clock = sinon.useFakeTimers()
+    jest.useFakeTimers()
     region = {
       top: 10,
       left: 20,
@@ -37,7 +35,7 @@ describe('indicate function', () => {
   })
 
   afterEach(() => {
-    clock.restore()
+    jest.useRealTimers()
   })
 
   it('appends a div to the body', () => {
@@ -45,7 +43,7 @@ describe('indicate function', () => {
   })
 
   it('removes the div after 2 seconds', () => {
-    clock.tick(2000)
+    jest.advanceTimersByTime(2000)
     expect(indicator.parentNode).toBeNull()
   })
 
@@ -73,7 +71,7 @@ describe('indicate function', () => {
     })
 
     it('div has leave class after 900ms', () => {
-      clock.tick(900)
+      jest.advanceTimersByTime(900)
       expect(/leave/.test(indicator.className)).toBeTruthy()
     })
 

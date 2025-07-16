@@ -2551,7 +2551,7 @@ function initContextModules() {
         ),
       ).map(d => d.dataset.moduleId)
       $('#expand_all_modules_link').prop('disabled', true)
-      if (moduleIds.length) {
+      if (ENV.FEATURE_MODULES_PERF && moduleIds.length) {
         modules.lazyLoadItems(moduleIds)
       } else {
         $('#expand_collapse_all').prop('disabled', false)

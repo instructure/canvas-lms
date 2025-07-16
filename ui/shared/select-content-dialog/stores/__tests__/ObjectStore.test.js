@@ -18,11 +18,11 @@
 
 import Store from '../ObjectStore'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import {waitFor} from '@testing-library/dom'
 
 const handlers = []
-const server = mswServer(handlers)
+const server = setupServer(...handlers)
 
 describe('ObjectStore', () => {
   let testStore

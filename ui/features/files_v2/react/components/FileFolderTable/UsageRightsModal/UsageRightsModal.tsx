@@ -19,7 +19,7 @@
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {doFetchApiWithAuthCheck, UnauthorizedError} from '../../../../utils/apiUtils'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Alert} from '@instructure/ui-alerts'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -72,7 +72,7 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
     defaultCCValue(usageRight, items),
   )
 
-  const {currentRows, setCurrentRows} = useRows()
+  const {currentRows, setCurrentRows, setSessionExpired} = useRows()
 
   const showCreativeCommonsOptions = useMemo(() => usageRight === 'creative_commons', [usageRight])
   const showDifferentRightsMessage = useMemo(
@@ -95,9 +95,9 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
     const fileIds: string[] = []
     items.forEach(item => {
       if (isFile(item)) {
-        fileIds.push(item.id.toString())
+        fileIds.push(item.id)
       } else {
-        folderIds.push(item.id.toString())
+        folderIds.push(item.id)
       }
     })
 
@@ -106,7 +106,7 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
     if (usageRight) newUsageRights.use_justification = usageRight
     if (ccLicenseOption) newUsageRights.license = ccLicenseOption
 
-    return doFetchApi({
+    return doFetchApiWithAuthCheck({
       method: 'PUT',
       path: `/api/v1/${pluralizeContextTypeString(contextType)}/${contextId}/usage_rights`,
       params: {
@@ -138,7 +138,13 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
         })
         setCurrentRows(newRows)
       })
-      .catch(showFlashError(I18n.t('There was an error setting usage rights.')))
+      .catch(err => {
+        if (err instanceof UnauthorizedError) {
+          setSessionExpired(true)
+          return
+        }
+        showFlashError(I18n.t('There was an error setting usage rights.'))
+      })
       .finally(() => setIsRequestInFlight(false))
   }, [
     onDismiss,
@@ -149,6 +155,7 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
     copyrightHolder,
     currentRows,
     setCurrentRows,
+    setSessionExpired,
   ])
 
   const renderHeader = useCallback(
@@ -301,12 +308,18 @@ const UsageRightsModal = ({open, items, onDismiss}: UsageRightsModalProps) => {
 
       if (licenseOptions.length === 0) {
         setIsRequestInFlight(true)
-        doFetchApi<LicenseOption[]>({
+        doFetchApiWithAuthCheck<LicenseOption[]>({
           path: `/api/v1/${pluralizeContextTypeString(contextType)}/${contextId}/content_licenses`,
         })
           .then(response => response.json)
           .then(filterLicenseOptions)
-          .catch(() => setError('There was an error getting the content licenses.'))
+          .catch(err => {
+            if (err instanceof UnauthorizedError) {
+              setSessionExpired(true)
+              return
+            }
+            setError('There was an error getting the content licenses.')
+          })
           .finally(() => setIsRequestInFlight(false))
       }
     }

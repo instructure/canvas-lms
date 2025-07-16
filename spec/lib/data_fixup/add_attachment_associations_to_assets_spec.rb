@@ -35,6 +35,7 @@ describe DataFixup::AddAttachmentAssociationsToAssets do
       </p>
     HTML
     @course.save!
+    @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
   end
 
   it "creates attachment associations for any attachment on syllabus body" do

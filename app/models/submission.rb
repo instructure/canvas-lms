@@ -25,6 +25,7 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
+  include LinkedAttachmentHandler
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {
@@ -190,6 +191,7 @@ class Submission < ActiveRecord::Base
            class_name: "Auditors::ActiveRecord::GradeChangeRecord",
            dependent: :destroy,
            inverse_of: :submission
+  has_many :submission_texts, dependent: :destroy
 
   serialize :turnitin_data, type: Hash
 
@@ -257,8 +259,8 @@ class Submission < ActiveRecord::Base
         AND custom_grade_status_id IS NULL
         AND (late_policy_status IS DISTINCT FROM 'extended')
         AND NOT (
-          /* teacher said it's missing, 'nuff said. */
-          /* we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query */
+          /* teacher said it is missing, nuff said. */
+          /* we are doing a double NOT here to avoid ORs that could slow down the query */
           late_policy_status IS DISTINCT FROM 'missing' AND NOT
           (
             cached_due_date IS NOT NULL
@@ -347,6 +349,34 @@ class Submission < ActiveRecord::Base
     anonymized.for_assignment(assignment).pluck(:anonymous_id)
   end
 
+  def self.anonymous_id_order_clause
+    'anonymous_id COLLATE "C"'
+  end
+
+  def self.html_fields
+    %w[body]
+  end
+
+  def self.submission_status_conditions
+    <<~SQL.squish
+      CASE
+        WHEN submissions.workflow_state = 'unsubmitted'
+          OR (
+            submissions.submitted_at IS NULL
+            AND submissions.grade IS NULL
+            AND submissions.excused IS NOT TRUE
+          ) THEN 'not_submitted'
+        WHEN submissions.excused IS NOT TRUE
+          AND (
+            submissions.grade IS NULL
+            OR submissions.workflow_state = 'pending_review'
+          ) THEN 'not_graded'
+        WHEN submissions.grade_matches_current_submission IS FALSE THEN 'resubmitted'
+        ELSE 'graded'
+      END
+    SQL
+  end
+
   # see #needs_grading?
   # When changing these conditions, update index_submissions_needs_grading to
   # maintain performance.
@@ -379,7 +409,7 @@ class Submission < ActiveRecord::Base
     return false unless assignment.checkpoints_parent?
 
     Submission.active.having_submission.where(user_id:)
-              .where(assignment_id: SubAssignment.select(:id).where(parent_assignment_id: assignment_id))
+              .where(assignment_id: SubAssignment.active.select(:id).where(parent_assignment_id: assignment_id))
               .find_each do |sub_assignment_submission|
       return true if sub_assignment_submission.needs_grading?
     end
@@ -441,11 +471,11 @@ class Submission < ActiveRecord::Base
   before_save :clear_body_word_count, if: -> { body.nil? }
   before_save :set_lti_id
   after_save :update_body_word_count_later, if: -> { saved_change_to_body? && get_word_count_from_body? }
+  after_save :extract_text_from_upload_later, if: -> { extract_text_from_upload? }
   after_save :touch_user
   after_save :clear_user_submissions_cache
   after_save :touch_graders
   after_save :update_assignment
-  after_save :update_attachment_associations
   after_save :submit_attachments_to_canvadocs
   after_save :queue_websnap
   after_save :aggregate_checkpoint_submissions, if: :checkpoint_changes?
@@ -1462,23 +1492,27 @@ class Submission < ActiveRecord::Base
   def update_attachment_associations
     return if @assignment_changed_not_sub
 
-    association_ids = attachment_associations.pluck(:attachment_id)
-    ids = (attachment_ids || "").split(",").map(&:to_i)
-    ids << attachment_id if attachment_id
-    ids.uniq!
-    associations_to_delete = association_ids - ids
-    attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
-    unassociated_ids = ids - association_ids
-    return if unassociated_ids.empty?
+    if submission_type == "online_text_entry"
+      super
+    else
+      association_ids = attachment_associations.pluck(:attachment_id)
+      ids = (attachment_ids || "").split(",").map(&:to_i)
+      ids << attachment_id if attachment_id
+      ids.uniq!
+      associations_to_delete = association_ids - ids
+      attachment_associations.where(attachment_id: associations_to_delete).delete_all unless associations_to_delete.empty?
+      unassociated_ids = ids - association_ids
+      return if unassociated_ids.empty?
 
-    attachments = Attachment.where(id: unassociated_ids)
-    attachments.each do |a|
-      next unless (a.context_type == "User" && a.context_id == user_id) ||
-                  (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
-                  (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
-                  attachment_fake_belongs_to_group(a)
+      attachments = Attachment.where(id: unassociated_ids)
+      attachments.each do |a|
+        next unless (a.context_type == "User" && a.context_id == user_id) ||
+                    (a.context_type == "Group" && (a.context_id == group_id || user.membership_for_group_id?(a.context_id))) ||
+                    (a.context_type == "Assignment" && a.context_id == assignment_id && a.available?) ||
+                    attachment_fake_belongs_to_group(a)
 
-      attachment_associations.where(attachment: a).first_or_create
+        attachment_associations.where(attachment: a).first_or_create
+      end
     end
   end
 
@@ -3222,6 +3256,18 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def attachment_text
+    read_or_calc_extracted_attachment[:text]
+  end
+
+  def attachment_contains_images
+    read_or_calc_extracted_attachment[:contains_images]
+  end
+
+  def extract_text_from_upload?
+    submission_type == "online_upload" && Account.site_admin.feature_enabled?(:grading_assistance_file_uploads) && attachments.any?
+  end
+
   def effective_checkpoint_submission(sub_assignment_tag)
     return self unless sub_assignment_tag.present?
     return self unless assignment.checkpoints_parent?
@@ -3455,5 +3501,63 @@ class Submission < ActiveRecord::Base
                              time,
                              Setting.get("submission_grading_timing_sample_rate", "1.0").to_f,
                              tags: { quiz_type: (submission_type == "online_quiz") ? "classic_quiz" : "new_quiz" })
+  end
+
+  def extract_text_from_upload_later
+    return unless extract_text_from_upload?
+
+    delay(
+      n_strand: ["Submission#extract_text_from_upload", global_root_account_id],
+      singleton: "extract_text_from_upload#{global_id}-attempt#{attempt}"
+    ).extract_text_from_upload
+  end
+
+  def extract_text_from_upload
+    upsert_rows = []
+
+    attachments.find_each do |attachment|
+      result = FileTextExtractionService.new(attachment:).call
+
+      upsert_rows << {
+        submission_id: id,
+        attachment_id: attachment.id,
+        root_account_id: root_account.id,
+        text: result.text,
+        contains_images: result.contains_images,
+        attempt:,
+        updated_at: Time.current,
+        created_at: Time.current
+      }
+    end
+
+    SubmissionText.upsert_all(upsert_rows, unique_by: %i[submission_id attachment_id attempt]) if upsert_rows.any?
+  end
+
+  def read_or_calc_extracted_attachment
+    return unless extract_text_from_upload?
+
+    @read_or_calc_extracted_attachment ||= begin
+      result = read_extracted_attachment
+
+      if result[:text].blank? && !result[:contains_images]
+        extract_text_from_upload
+        result = read_extracted_attachment
+      end
+
+      result
+    end
+  end
+
+  def read_extracted_attachment
+    rows = submission_texts.where(attempt:).pluck(:text, :contains_images)
+
+    rows.each_with_object({ text: +"", contains_images: false }) do |(row_txt, has_img), result|
+      result[:text] << "\n\n" unless result[:text].empty?
+      result[:text] << row_txt.to_s
+      result[:contains_images] ||= has_img
+    end
+  rescue => e
+    Rails.logger.error("Failed to read extracted attachment for submission #{id}: #{e.message}")
+    { text: "", contains_images: false }
   end
 end

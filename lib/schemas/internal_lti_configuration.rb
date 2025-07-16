@@ -119,7 +119,7 @@ module Schemas
 
     def self.base_settings_properties
       {
-        message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
+        message_type: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENT_BASED_MESSAGE_TYPES },
         text: { type: "string" },
         labels: { type: "object" },
         custom_fields: { type: "object" },
@@ -174,17 +174,22 @@ module Schemas
               require_resource_selection: { type: "boolean" },
             },
             ActivityAssetProcessor: {
-              eula: { type: "object", properties: asset_processor_eula_properties },
+              eula: asset_processor_eula_schema,
             }
           )
         }
       }.freeze
     end
 
-    def self.asset_processor_eula_properties
+    def self.asset_processor_eula_schema
       {
-        target_link_uri: { type: "string" },
-        custom_fields: { type: "object", additionalProperties: { type: "string" } },
+        type: "object",
+        properties: {
+          enabled: { type: "boolean" },
+          target_link_uri: { type: "string" },
+          custom_fields: { type: "object", additionalProperties: { type: "string" } },
+        },
+        required: %w[enabled]
       }
     end
 

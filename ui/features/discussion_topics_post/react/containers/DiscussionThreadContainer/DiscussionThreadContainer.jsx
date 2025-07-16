@@ -35,6 +35,7 @@ import {
 } from '../../../graphql/Mutations'
 import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
+import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY} from '../../../graphql/Queries'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
 import {Flex} from '@instructure/ui-flex'
@@ -141,6 +142,15 @@ export const DiscussionThreadContainer = props => {
   }
 
   const removeRef = useHighlightStore(state => state.removeReplyRef)
+
+  useEffect(() => {
+    if (props.discussionEntry._id === props.highlightEntryId) {
+      window.top.postMessage({
+        subject: 'SG.handleHighlightedEntryChange',
+        entryTimestamp: props.discussionEntry.createdAt,
+      })
+    }
+  }, [props.highlightEntryId])
 
   useEffect(() => {
     return () => {
@@ -796,7 +806,7 @@ export const DiscussionThreadContainer = props => {
 
 DiscussionThreadContainer.propTypes = {
   discussionTopic: Discussion.shape,
-  discussionEntry: PropTypes.object.isRequired,
+  discussionEntry: DiscussionEntry.shape,
   refetchDiscussionEntries: PropTypes.func,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,

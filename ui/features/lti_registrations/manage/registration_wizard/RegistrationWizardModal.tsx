@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
+import React, {useCallback} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -27,11 +27,9 @@ import {
 } from './RegistrationWizardModalState'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
-import {ProgressBar} from '@instructure/ui-progress'
 import {DynamicRegistrationWizard} from '../dynamic_registration_wizard/DynamicRegistrationWizard'
 import type {AccountId} from '../model/AccountId'
 import type {DynamicRegistrationWizardService} from '../dynamic_registration_wizard/DynamicRegistrationWizardService'
@@ -47,7 +45,6 @@ import {isValidJson} from '../../common/lib/validators/isValidJson'
 import type {FormMessage} from '@instructure/ui-form-field'
 import type {Lti1p3RegistrationWizardService} from '../lti_1p3_registration_form/Lti1p3RegistrationWizardService'
 import {EditLti1p3RegistrationWizard} from '../lti_1p3_registration_form/EditLti1p3RegistrationWizard'
-import {Responsive} from '@instructure/ui-responsive'
 import {ResponsiveWrapper} from '../registration_wizard_forms/ResponsiveWrapper'
 import {Header} from '../registration_wizard_forms/Header'
 
@@ -76,10 +73,30 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
 
   const label = state.existingRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
 
+  const onDismiss = useCallback(() => {
+    const confirmationMessage = state.existingRegistrationId
+      ? I18n.t('Are you sure you want to stop editing? Any changes will be lost.')
+      : I18n.t('Are you sure you want to stop registering? Any progress will be lost.')
+
+    if (!state.registering) {
+      state.unregister()
+      state.close()
+    } else if (window.confirm(confirmationMessage)) {
+      state.unregister()
+      state.close()
+    }
+  }, [state])
+
   return (
     <ResponsiveWrapper
       render={modalProps => (
-        <Modal label={label} open={state.open} size={modalProps?.size || 'medium'}>
+        <Modal
+          id="registration-wizard-modal"
+          label={label}
+          open={state.open}
+          size={modalProps?.size || 'medium'}
+          onDismiss={onDismiss}
+        >
           <ModalBodyWrapper
             state={state}
             accountId={props.accountId}
@@ -250,7 +267,7 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
             name="LTI Version"
             defaultValue={props.state.lti_version || '1p3'}
           >
-            <RadioInput value="1p3" label="1.3" />
+            <RadioInput value="1p3" label="1.3" data-pendo="lti-registration-1p3-install" />
             <RadioInput value="1p1" label="1.1" data-pendo="lti-registration-1p1-interest" />
           </RadioInputGroup>
         </View>
@@ -258,6 +275,7 @@ const InitializationModal = (props: InitializationModalBodyProps) => {
           <>
             <View display="block" margin="medium 0">
               <SimpleSelect
+                id="lti-registration-install-method-selector"
                 renderLabel={I18n.t('Install Method')}
                 assistiveText="Use arrow keys to navigate options."
                 value={props.state.method}

@@ -24,8 +24,10 @@ import {
   FileManagementContextProps,
 } from '../../../contexts/FileManagementContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
+import {RowsProvider} from '../../../contexts/RowsContext'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {queryClient} from '@canvas/query'
+import {mockRowsContext} from '../../FileFolderTable/__tests__/testUtils'
 
 const defaultProps = {
   isUserContext: false,
@@ -38,7 +40,9 @@ const renderComponent = (props?: any, context: Partial<FileManagementContextProp
   return render(
     <MockedQueryClientProvider client={queryClient}>
       <FileManagementProvider value={contextValue}>
-        <TopLevelButtons {...defaultProps} {...props} />
+        <RowsProvider value={mockRowsContext}>
+          <TopLevelButtons {...defaultProps} {...props} />
+        </RowsProvider>
       </FileManagementProvider>
     </MockedQueryClientProvider>,
   )

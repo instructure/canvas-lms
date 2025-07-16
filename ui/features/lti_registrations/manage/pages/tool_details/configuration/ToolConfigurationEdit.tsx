@@ -18,7 +18,7 @@
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Spacing} from '@instructure/emotion'
+import type {Spacing} from '@instructure/emotion'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
@@ -28,7 +28,7 @@ import * as React from 'react'
 import {unstable_usePrompt, useNavigate, useOutletContext} from 'react-router-dom'
 import {formatApiResultError, isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
 import {OverrideURIsConfirmation} from '../../../../manage/registration_wizard_forms/OverrideURIsConfirmation'
-import {UpdateRegistration} from '../../../api/registrations'
+import type {UpdateRegistration} from '../../../api/registrations'
 import {convertToLtiConfigurationOverlay} from '../../../registration_overlay/Lti1p3RegistrationOverlayStateHelpers'
 import {createLti1p3RegistrationOverlayStore} from '../../../registration_overlay/Lti1p3RegistrationOverlayStore'
 import {
@@ -36,7 +36,7 @@ import {
   validateLti1p3RegistrationOverlayState,
 } from '../../../registration_overlay/validateLti1p3RegistrationOverlayState'
 import {LaunchSettingsConfirmation} from '../../../registration_wizard_forms/LaunchSettingsConfirmation'
-import {ToolDetailsOutletContext} from '../ToolDetails'
+import type {ToolDetailsOutletContext} from '../ToolDetails'
 import {IconConfirmationPerfWrapper} from './IconConfirmationPerfWrapper'
 import {NamingConfirmationPerfWrapper} from './NamingConfirmationPerfWrapper'
 import {PermissionConfirmationPerfWrapper} from './PermissionConfirmationPerfWrapper'
@@ -259,6 +259,7 @@ const Footer = React.memo(({save, isSaving}: {save: () => Promise<void>; isSavin
       <Flex direction="row" justifyItems="end" padding="0 small">
         <Flex.Item margin="small">
           <Button
+            data-pendo="lti-registrations-cancel-edit"
             color="secondary"
             onClick={() => {
               navigate(-1)
@@ -268,7 +269,12 @@ const Footer = React.memo(({save, isSaving}: {save: () => Promise<void>; isSavin
           </Button>
         </Flex.Item>
         <Flex.Item>
-          <Button color="primary" disabled={isSaving} onClick={save}>
+          <Button
+            color="primary"
+            disabled={isSaving}
+            onClick={save}
+            data-pendo="lti-registrations-update-tool-configuration"
+          >
             {I18n.t('Update Configuration')}
           </Button>
         </Flex.Item>

@@ -22,15 +22,16 @@ module Accessibility
     class TableHeaderScopeRule < Accessibility::Rule
       self.id = "table-header-scope"
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H63.html"
+      VALID_SCOPES = %w[row col rowgroup colgroup].freeze
 
       def self.test(elem)
         return true if elem.tag_name.downcase != "th"
 
-        elem.attribute?("scope")
+        elem.attribute?("scope") && VALID_SCOPES.include?(elem["scope"])
       end
 
       def self.message
-        "Table header cells should have the scope attribute."
+        "Table header cells should have the scope attribute correctly set to a valid scope value."
       end
 
       def self.why

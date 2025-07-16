@@ -62,6 +62,7 @@ const setUp = (props: TestPropsOverrides = {}) => {
       completionRequirements={completionRequirements}
       progression={progression}
       requirementCount={requirementCount}
+      smallScreen={false}
     />,
   )
 }

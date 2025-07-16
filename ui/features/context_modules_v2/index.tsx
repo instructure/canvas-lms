@@ -61,6 +61,13 @@ ready(() => {
             permissions={ENV.MODULES_PERMISSIONS}
             NEW_QUIZZES_BY_DEFAULT={ENV.NEW_QUIZZES_BY_DEFAULT}
             DEFAULT_POST_TO_SIS={ENV.DEFAULT_POST_TO_SIS}
+            teacherViewEnabled={!!ENV?.MODULE_FEATURES?.TEACHER_MODULE_SELECTION}
+            studentViewEnabled={!!ENV?.MODULE_FEATURES?.STUDENT_MODULE_SELECTION}
+            externalTools={
+              Array.isArray(ENV.MODULE_TOOLS?.module_menu_modal)
+                ? ENV.MODULE_TOOLS.module_menu_modal
+                : []
+            }
           >
             {ENV.MODULES_PERMISSIONS?.readAsAdmin ? (
               <ModulesContainer />

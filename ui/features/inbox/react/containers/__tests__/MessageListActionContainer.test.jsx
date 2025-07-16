@@ -21,7 +21,7 @@ import {ApolloProvider} from '@apollo/client'
 import {handlers} from '../../../graphql/mswHandlers'
 import MessageListActionContainer from '../MessageListActionContainer'
 import {mswClient} from '../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../util/utils'
@@ -32,7 +32,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('MessageListActionContainer', () => {
-  const server = mswServer(handlers)
+  const server = setupServer(...handlers)
 
   beforeAll(() => {
     server.listen()

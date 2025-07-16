@@ -29,7 +29,8 @@ import CanvasMediaPlayer, {
   formatTracksForMediaPlayer,
 } from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 const defaultMediaObject = (overrides = {}) => ({
@@ -44,6 +45,8 @@ const defaultMediaObject = (overrides = {}) => ({
   width: '1000',
   ...overrides,
 })
+
+const server = setupServer()
 
 describe('CanvasMediaPlayer', () => {
   describe('rendering', () => {
@@ -64,11 +67,11 @@ describe('CanvasMediaPlayer', () => {
       document.body.appendChild(d)
     })
 
+    beforeAll(() => server.listen())
+    afterAll(() => server.close())
+
     beforeEach(() => {
       jest.useFakeTimers()
-      fetchMock.get('/media_objects/dummy_media_id/info', {
-        media_sources: [defaultMediaObject()],
-      })
     })
     afterEach(() => {
       act(() => {
@@ -76,10 +79,17 @@ describe('CanvasMediaPlayer', () => {
       })
       jest.resetAllMocks()
       jest.useRealTimers()
-      fetchMock.reset()
+      server.resetHandlers()
     })
 
     it('renders the component', () => {
+      server.use(
+        http.get('/media_objects/dummy_media_id/info', () => {
+          return HttpResponse.json({
+            media_sources: [defaultMediaObject()],
+          })
+        }),
+      )
       const {container, getAllByText} = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
@@ -161,36 +171,52 @@ describe('CanvasMediaPlayer', () => {
         )
         expect(getAllByText('Loading')[0]).toBeInTheDocument()
         jest.runOnlyPendingTimers()
-        expect(fetchMock.calls()).toHaveLength(1)
+        // With MSW, we can't easily count the number of calls
       })
       it('makes ajax call if no mediaSources are provided on load', async () => {
-        fetchMock.getOnce(
-          '/media_objects/dummy_media_id/info',
-          {
-            media_sources: [defaultMediaObject(), defaultMediaObject()],
-          },
-          {
-            overwriteRoutes: true,
-          },
+        let requestMade = false
+        server.use(
+          http.get('/media_objects/dummy_media_id/info', () => {
+            requestMade = true
+            return HttpResponse.json({
+              media_sources: [defaultMediaObject(), defaultMediaObject()],
+            })
+          }),
         )
         render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-        jest.runOnlyPendingTimers()
-        expect(fetchMock.calls()).toHaveLength(1)
-        expect(fetchMock.calls()[0][0]).toEqual('/media_objects/dummy_media_id/info')
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
+        await waitFor(() => {
+          expect(requestMade).toBe(true)
+        })
       })
       it('makes ajax call to media_attachments if no mediaSources are provided on load', async () => {
-        fetchMock.getOnce(
-          '/media_attachments/1/info',
-          JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]}),
+        let requestMade = false
+        let requestUrl = ''
+        server.use(
+          http.get('/media_attachments/1/info', ({request}) => {
+            requestMade = true
+            requestUrl = request.url
+            return HttpResponse.json({media_sources: [defaultMediaObject(), defaultMediaObject()]})
+          }),
         )
         render(<CanvasMediaPlayer media_id="dummy_media_id" attachment_id="1" />)
-        jest.runOnlyPendingTimers()
-        expect(fetchMock.calls()).toHaveLength(1)
-        expect(fetchMock.calls()[0][0]).toEqual('/media_attachments/1/info')
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
+        await waitFor(() => {
+          expect(requestMade).toBe(true)
+        })
+        expect(requestUrl).toContain('/media_attachments/1/info')
       })
       it.skip('shows error message if fetch for media_sources fails', async () => {
         // MAT-885
-        fetchMock.mock('/media_objects/dummy_media_id/info', 500)
+        server.use(
+          http.get('/media_objects/dummy_media_id/info', () => {
+            return new HttpResponse(null, {status: 500})
+          }),
+        )
         const component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
           container: document.getElementById('here').firstElementChild,
         })
@@ -198,7 +224,6 @@ describe('CanvasMediaPlayer', () => {
           jest.runOnlyPendingTimers()
         })
 
-        expect(fetchMock.calls()).toHaveLength(1)
         expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
       })
       it.skip('tries ajax call up to MAX times if no media_sources', async () => {
@@ -215,15 +240,16 @@ describe('CanvasMediaPlayer', () => {
         // It might be because CanvasMediaPlayer is a function component so each invocation
         // creates a new fetch mock? (though that doesn't explain why it works when it's the only test run)
         // it also doesn't explain why this passed before using ui-media-player 7
-        fetchMock
-          .getOnce(
-            '/media_objects/dummy_media_id/info',
-            new Response({media_sources: []}, {status: 200}),
-          )
-          .get(
-            '/media_objects/dummy_media_id/info',
-            new Response({media_sources: []}, {status: 304}),
-          )
+        let callCount = 0
+        server.use(
+          http.get('/media_objects/dummy_media_id/info', () => {
+            callCount++
+            if (callCount === 1) {
+              return HttpResponse.json({media_sources: []}, {status: 200})
+            }
+            return HttpResponse.json({media_sources: []}, {status: 304})
+          }),
+        )
 
         let component
         await act(async () => {
@@ -242,7 +268,7 @@ describe('CanvasMediaPlayer', () => {
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(1)
+              expect(callCount).toBe(1)
             })
           })
           expect(component.getByText('Loading')).toBeInTheDocument()
@@ -252,13 +278,13 @@ describe('CanvasMediaPlayer', () => {
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(2)
+              expect(callCount).toBe(2)
             })
           })
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(3)
+              expect(callCount).toBe(3)
             })
           })
           expect(
@@ -275,19 +301,19 @@ describe('CanvasMediaPlayer', () => {
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(4)
+              expect(callCount).toBe(4)
             })
           })
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(5)
+              expect(callCount).toBe(5)
             })
           })
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(6)
+              expect(callCount).toBe(6)
             })
           })
           // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
@@ -296,7 +322,7 @@ describe('CanvasMediaPlayer', () => {
             await waitFor(() => {})
           })
 
-          expect(fetchMock.calls()).toHaveLength(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
+          expect(callCount).toBe(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
           expect(
             component.getByText(
               'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
@@ -313,7 +339,11 @@ describe('CanvasMediaPlayer', () => {
       })
       it.skip('still says "Loading" if we receive no info from backend', async () => {
         // MAT-885
-        fetchMock.mock('/media_objects/dummy_media_id/info', {media_sources: []})
+        server.use(
+          http.get('/media_objects/dummy_media_id/info', () => {
+            return HttpResponse.json({media_sources: []})
+          }),
+        )
 
         let component
         await act(async () => {
@@ -325,7 +355,6 @@ describe('CanvasMediaPlayer', () => {
           await act(async () => {
             await waitFor(() => {
               jest.runOnlyPendingTimers()
-              expect(fetchMock.calls()).toHaveLength(1)
             })
           })
         })

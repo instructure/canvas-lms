@@ -271,7 +271,249 @@ describe SubmissionSearch do
     expect(results).to eq []
   end
 
-  # order by username tested above
+  describe "final sort criteria (or, default sort criteria if no sorts are provided)" do
+    it "orders students by user id by default for non-anonymized assignments" do
+      results = SubmissionSearch.new(assignment, teacher, nil, {}).search
+      expect(results.map(&:user_id)).to eq assignment.submissions.pluck(:user_id).sort
+    end
+
+    it "orders students by submission anonymous name by default for anonymized assignments" do
+      assignment.update!(anonymous_grading: true)
+      results = SubmissionSearch.new(assignment, teacher, nil, {}).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 1", "Student 2", "Student 3", "Student 4", "Student 5"]
+    end
+
+    it "orders students by user id by default for assignments that are anonymous but have been posted" do
+      assignment.update!(anonymous_grading: true)
+      assignment.post_submissions
+      results = SubmissionSearch.new(assignment, teacher, nil, {}).search
+      expect(results.map(&:user_id)).to eq assignment.submissions.pluck(:user_id).sort
+    end
+  end
+
+  describe "username ordering" do
+    it "returns students ordered by their sortable name (case insensitive), ascending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+      # "Jameson, Jonah", "Jones, Amanda", "Miller, Mandy", "Peterson, James", "Piper, Peter"
+      expect(results.extract_associated(:user)).to eq [jonah, amanda, mandy, james, peter]
+    end
+
+    it "returns students ordered by their sortable name (case insensitive), descending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username", direction: "descending" }]).search
+      # "Piper, Peter", "Peterson, James", "Miller, Mandy", "Jones, Amanda", "Jameson, Jonah"
+      expect(results.extract_associated(:user)).to eq [peter, james, mandy, amanda, jonah]
+    end
+
+    it "returns students ordered by their 'anonymous name' when the assignment is anonymized, ascending" do
+      assignment.update!(anonymous_grading: true)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 1", "Student 2", "Student 3", "Student 4", "Student 5"]
+    end
+
+    it "returns students ordered by their 'anonymous name' when the assignment is anonymized, descending" do
+      assignment.update!(anonymous_grading: true)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username", direction: "descending" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 5", "Student 4", "Student 3", "Student 2", "Student 1"]
+    end
+
+    it "returns students ordered by their sortable name when the assignment is anonymous but posted, ascending" do
+      assignment.update!(anonymous_grading: true)
+      assignment.post_submissions
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username" }]).search
+      # "Jameson, Jonah", "Jones, Amanda", "Miller, Mandy", "Peterson, James", "Piper, Peter"
+      expect(results.extract_associated(:user)).to eq [jonah, amanda, mandy, james, peter]
+    end
+
+    it "returns students ordered by their sortable name when the assignment is anonymous but posted, descending" do
+      assignment.update!(anonymous_grading: true)
+      assignment.post_submissions
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username", direction: "descending" }]).search
+      # "Piper, Peter", "Peterson, James", "Miller, Mandy", "Jones, Amanda", "Jameson, Jonah"
+      expect(results.extract_associated(:user)).to eq [peter, james, mandy, amanda, jonah]
+    end
+  end
+
+  describe "username_first_last ordering" do
+    it "returns students ordered by first names (case insensitive), ascending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [amanda, james, jonah, mandy, peter]
+    end
+
+    it "returns students ordered by first names (case insensitive), descending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last", direction: "descending" }]).search
+      expect(results.extract_associated(:user)).to eq [peter, mandy, jonah, james, amanda]
+    end
+
+    it "returns students ordered by their 'anonymous name' when the assignment is anonymized, ascending" do
+      assignment.update!(anonymous_grading: true)
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 1", "Student 2", "Student 3", "Student 4", "Student 5"]
+    end
+
+    it "returns students ordered by their 'anonymous name' when the assignment is anonymized, descending" do
+      assignment.update!(anonymous_grading: true)
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last", direction: "descending" }]).search
+      anon_names = results.map { |sub| assignment.anonymous_student_identities.dig(sub.user_id, :name) }
+      expect(anon_names).to eql ["Student 5", "Student 4", "Student 3", "Student 2", "Student 1"]
+    end
+
+    it "returns students ordered by first names when the assignment is anonymous but posted, ascending" do
+      assignment.update!(anonymous_grading: true)
+      assignment.post_submissions
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [amanda, james, jonah, mandy, peter]
+    end
+
+    it "returns students ordered by first names when the assignment is anonymous but posted, descending" do
+      assignment.update!(anonymous_grading: true)
+      assignment.post_submissions
+
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "username_first_last", direction: "descending" }]).search
+      expect(results.extract_associated(:user)).to eq [peter, mandy, jonah, james, amanda]
+    end
+  end
+
+  describe "group name ordering" do
+    before do
+      @fruits = course.group_categories.create!(name: "Fruits")
+      @apples = @fruits.groups.create!(name: "apples", context: course)
+      @apples.add_user(jonah, "accepted")
+      @apples.add_user(amanda, "accepted")
+      bananas = @fruits.groups.create!(name: "Bananas", context: course)
+      bananas.add_user(peter, "accepted")
+      bananas.add_user(james, "accepted")
+      assignment.update!(group_category: @fruits)
+    end
+
+    it "returns students ordered by their group name (case insensitive, students without group always last), ascending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name" }, { field: "username_first_last" }]).search
+      # 'apples' members, then 'Bananas' members, then students without groups
+      expect(results.extract_associated(:user)).to eq [amanda, jonah, james, peter, mandy]
+    end
+
+    it "returns students ordered by their group name (case insensitive, students without group always last), descending" do
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name", direction: "descending" }, { field: "username_first_last" }]).search
+      # 'Bananas' members, then 'apples' members, then students without groups
+      expect(results.extract_associated(:user)).to eq [james, peter, amanda, jonah, mandy]
+    end
+
+    it "ignores group_name sort when the assignment is not a group assignment" do
+      assignment.update!(group_category: nil)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name" }, { field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [amanda, james, jonah, mandy, peter]
+    end
+
+    it "ignores group_name sort when the assignment's group category is soft-deleted" do
+      @fruits.update!(deleted_at: Time.zone.now)
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name" }, { field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [amanda, james, jonah, mandy, peter]
+    end
+
+    it "ignores soft-deleted groups in group_name sort" do
+      @apples.destroy # soft-deleted
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name" }, { field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [james, peter, amanda, jonah, mandy]
+    end
+
+    it "ignores soft-deleted group memberships in group_name sort" do
+      @apples.group_memberships.find_by(user: amanda).destroy # soft-deleted
+      results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "group_name" }, { field: "username_first_last" }]).search
+      expect(results.extract_associated(:user)).to eq [jonah, james, peter, amanda, mandy]
+    end
+  end
+
+  it "supports sorting submissions by whether the user is the test student, ascending" do
+    test_student = assignment.course.student_view_student
+
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "test_student" }, { field: "username" }]).search
+    expect(results.extract_associated(:user)).to eq [test_student, *students]
+  end
+
+  it "supports sorting submissions by whether the user is the test student, descending" do
+    test_student = assignment.course.student_view_student
+
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "test_student", direction: "descending" }, { field: "username" }]).search
+    expect(results.extract_associated(:user)).to eq [*students, test_student]
+  end
+
+  it "returns a random-but-consistent order when given 'random' sort order" do
+    first_result = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "random" }]).search.extract_associated(:user)
+    second_result = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: "random" }]).search.extract_associated(:user)
+    expect(first_result).to eq second_result
+  end
+
+  it "ignores direction when given 'random' sort order" do
+    asc_result = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "random", direction: "ascending" }]
+    ).search.extract_associated(:user)
+    desc_result = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "random", direction: "descending" }]
+    ).search.extract_associated(:user)
+    expect(asc_result).to eq desc_result
+  end
+
+  it "returns students ordered by who needs grading (secondary sort by user id)" do
+    assignment.submit_homework(amanda, body: "homework")
+    assignment.submit_homework(james, body: "homework")
+    assignment.submit_homework(peter, body: "homework")
+    users = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "needs_grading", direction: "ascending" }]
+    ).search.extract_associated(:user)
+    expect(users).to eq [amanda, james, peter, jonah, mandy]
+  end
+
+  it "orders students by submission status (not_graded, resubmitted, not_submitted, graded)" do
+    assignment.submit_homework(james, body: "homework") # not_graded
+    assignment.grade_student(amanda, score: 1, grader: teacher)
+    assignment.submit_homework(amanda, body: "homework") # resubmitted
+    assignment.grade_student(jonah, score: 1, grader: teacher) # graded
+    users = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "submission_status", direction: "ascending" }, { field: "username_first_last" }]
+    ).search.extract_associated(:user)
+    expect(users).to eq [james, amanda, mandy, peter, jonah]
+  end
+
+  it "handles edge cases for submission status ordering (not_graded, resubmitted, not_submitted, graded)" do
+    assignment.submit_homework(james, body: "homework")
+    assignment.grade_student(james, score: 1, grader: teacher)
+    # simulates a partially graded quiz, should be not_graded
+    assignment.submissions.find_by(user: james).update_columns(workflow_state: "pending_review")
+    assignment.grade_student(amanda, score: 5, grader: teacher)
+    # not_submitted, since teacher initially graded then wiped it out later
+    assignment.grade_student(amanda, score: nil, grader: teacher)
+    assignment.grade_student(jonah, score: 1, grader: teacher)
+    # nil should be treated as true for grade_matches_current_submission, meaning this should be considered graded, not resubmitted
+    assignment.submissions.find_by(user: jonah).update_columns(grade_matches_current_submission: nil)
+    users = SubmissionSearch.new(
+      assignment,
+      teacher,
+      nil,
+      order_by: [{ field: "submission_status", direction: "ascending" }, { field: "username_first_last" }]
+    ).search.extract_associated(:user)
+    expect(users).to eq [james, amanda, mandy, peter, jonah]
+  end
+
   it "orders by submission score" do
     assignment.grade_student(peter, score: 1, grader: teacher)
     assignment.grade_student(amanda, score: 2, grader: teacher)
@@ -358,5 +600,4 @@ describe SubmissionSearch do
   # TODO: implement
   it "filters results to assigned users if assigned_only filter is set"
   it "filters results to specified groups"
-  it "orders by submission status" # missing, late, etc.
 end

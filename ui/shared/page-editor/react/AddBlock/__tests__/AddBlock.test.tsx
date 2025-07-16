@@ -26,6 +26,10 @@ jest.mock('../../PageEditorContext', () => ({
     addBlockModal: {
       open: openMock,
     },
+    addBlock: {
+      shouldShow: true,
+      handleNodesCountChange: jest.fn(),
+    },
   })),
 }))
 

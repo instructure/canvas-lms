@@ -18,6 +18,7 @@
 
 import {getByText, queryByText, findByText, waitForElementToBeRemoved} from '@testing-library/dom'
 import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
 import Backbone from '@canvas/backbone'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import Submission from '@canvas/assignments/backbone/models/Submission'
@@ -31,9 +32,15 @@ import french from 'timezone/fr_FR'
 import I18nStubber from '@canvas/test-utils/I18nStubber'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
-import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {isAccessible} from '@canvas/test-utils/assertions'
+
+// Mock globalUtils
+jest.mock('@canvas/util/globalUtils', () => ({
+  ...jest.requireActual('@canvas/util/globalUtils'),
+  windowConfirm: jest.fn(() => true),
+}))
 
 let screenreaderText = null
 let nonScreenreaderText = null
@@ -110,7 +117,7 @@ const buildAssignment = (options = {}) => {
   }
   Object.assign(base, options)
   const ac = new AssignmentCollection([base])
-  sinon.stub(ac.at(0), 'pollUntilFinishedDuplicating')
+  ac.at(0).pollUntilFinishedDuplicating = jest.fn()
   return ac.at(0)
 }
 
@@ -184,11 +191,28 @@ const genTeardown = () => {
 
 // Begin Conversion from QUnit to Jest
 
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  server.close()
+})
+
 describe('AssignmentListItemViewSpec', () => {
-  let sandbox
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
@@ -199,15 +223,20 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
+    server.resetHandlers()
     genTeardown()
     tzInTest.restore()
     I18nStubber.clear()
   })
 
+  afterAll(() => {
+    server.close()
+  })
+
   test('should be accessible', async () => {
     const view = createView(assignment1(), {canManage: true})
-    await assertions.isAccessible(view, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   test('initializes child views if can manage', () => {
@@ -290,12 +319,13 @@ describe('AssignmentListItemViewSpec', () => {
 
   test.skip('asks for confirmation before deleting an assignment', () => {
     const view = createView(assignment1())
-    sandbox.stub(view.visibleAssignments(), 'returns').returns([])
-    sandbox.stub(window, 'confirm').returns(true)
-    sandbox.spy(view, 'delete')
+    jest.spyOn(view.visibleAssignments(), 'returns').mockReturnValue([])
+    // windowConfirm is already mocked to return true
+    jest.spyOn(view, 'delete')
     view.$(`#assignment_${assignment1().id} .delete_assignment`).click()
-    expect(window.confirm.called).toBe(true)
-    expect(view.delete.called).toBe(true)
+    const {windowConfirm} = require('@canvas/util/globalUtils')
+    expect(windowConfirm).toHaveBeenCalled()
+    expect(view.delete).toHaveBeenCalled()
   })
 
   test('does not attempt to delete an assignment due in a closed grading period', () => {
@@ -303,49 +333,48 @@ describe('AssignmentListItemViewSpec', () => {
       in_closed_grading_period: true,
     })
     const view = createView(closedGradingModel)
-    sandbox.stub(window, 'confirm').returns(true)
-    sandbox.spy(view, 'delete')
+    // windowConfirm is already mocked to return true
+    jest.spyOn(view, 'delete')
     view.$(`#assignment_${closedGradingModel.id} .delete_assignment`).click()
-    expect(window.confirm.called).toBe(false)
-    expect(view.delete.called).toBe(false)
+    const {windowConfirm} = require('@canvas/util/globalUtils')
+    expect(windowConfirm).not.toHaveBeenCalled()
+    expect(view.delete).not.toHaveBeenCalled()
   })
 
   test('delete destroys model', () => {
     const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
     const view = createView(assignment1())
-    sandbox.spy(view.model, 'destroy')
+    jest.spyOn(view.model, 'destroy')
     view.delete()
-    expect(view.model.destroy.called).toBe(true)
+    expect(view.model.destroy).toHaveBeenCalled()
     ENV.context_asset_string = old_asset_string
   })
 
-  test('delete calls screenreader message', () => {
+  test('delete calls screenreader message', async () => {
     const old_asset_string = ENV.context_asset_string
     ENV.context_asset_string = 'course_1'
-    const server = sinon.fakeServer.create()
-    server.respondWith('DELETE', '/api/v1/courses/1/assignments/1', [
-      200,
-      {'Content-Type': 'application/json'},
-      JSON.stringify({
-        description: '',
-        due_at: null,
-        grade_group_students_individually: false,
-        grading_standard_id: null,
-        grading_type: 'points',
-        group_category_id: null,
-        id: '1',
-        unpublishable: true,
-        only_visible_to_overrides: false,
-        locked_for_user: false,
+    server.use(
+      http.delete('/api/v1/courses/1/assignments/1', () => {
+        return HttpResponse.json({
+          description: '',
+          due_at: null,
+          grade_group_students_individually: false,
+          grading_standard_id: null,
+          grading_type: 'points',
+          group_category_id: null,
+          id: '1',
+          unpublishable: true,
+          only_visible_to_overrides: false,
+          locked_for_user: false,
+        })
       }),
-    ])
+    )
     const view = createView(assignment1())
+    jest.spyOn($, 'screenReaderFlashMessage')
     view.delete()
-    sandbox.spy($, 'screenReaderFlashMessage')
-    server.respond()
-    expect($.screenReaderFlashMessage.called).toBe(true)
-    server.restore()
+    await new Promise(resolve => setTimeout(resolve, 10))
+    expect($.screenReaderFlashMessage).toHaveBeenCalled()
     ENV.context_asset_string = old_asset_string
   })
 
@@ -517,9 +546,9 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_duplicate',
     })
     const view = createView(model)
-    sandbox.spy(model, 'duplicate_failed')
+    jest.spyOn(model, 'duplicate_failed')
     view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
-    expect(model.duplicate_failed.called).toBe(true)
+    expect(model.duplicate_failed).toHaveBeenCalled()
   })
 
   test('clicks on Retry button to trigger another migrating request', () => {
@@ -530,9 +559,9 @@ describe('AssignmentListItemViewSpec', () => {
       workflow_state: 'failed_to_migrate',
     })
     const view = createView(model)
-    sandbox.spy(model, 'retry_migration')
+    jest.spyOn(model, 'retry_migration')
     view.$(`#assignment_${model.id} .migrate-failed-retry`).click()
-    expect(model.retry_migration.called).toBe(true)
+    expect(model.retry_migration).toHaveBeenCalled()
   })
 
   test('cannot duplicate when user is not admin', () => {
@@ -632,7 +661,7 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('can move when canManage is true and the assignment group id is not locked', () => {
-    sandbox.stub(assignment1(), 'canMove').returns(true)
+    jest.spyOn(assignment1(), 'canMove').mockReturnValue(true)
     const view = createView(assignment1(), {
       userIsAdmin: false,
       canManage: true,
@@ -643,7 +672,7 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test.skip('cannot move when canManage is true but the assignment group id is locked', () => {
-    sandbox.stub(assignment1(), 'canMove').returns(false)
+    jest.spyOn(assignment1(), 'canMove').mockReturnValue(false)
     const view = createView(assignment1(), {
       userIsAdmin: false,
       canManage: true,
@@ -654,7 +683,7 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test('cannot move when canManage is false but the assignment group id is not locked', () => {
-    sandbox.stub(assignment1(), 'canMove').returns(true)
+    jest.spyOn(assignment1(), 'canMove').mockReturnValue(true)
     const view = createView(assignment1(), {
       userIsAdmin: false,
       canManage: false,
@@ -665,24 +694,24 @@ describe('AssignmentListItemViewSpec', () => {
   })
 
   test.skip('re-renders when assignment state changes', () => {
-    sandbox.stub(AssignmentListItemView.prototype, 'render')
+    jest.spyOn(AssignmentListItemView.prototype, 'render').mockImplementation(() => {})
     const view = createView(assignment1())
-    expect(AssignmentListItemView.prototype.render.calledOnce).toBe(true)
+    expect(AssignmentListItemView.prototype.render).toHaveBeenCalledTimes(1)
     assignment1().trigger('change:workflow_state')
-    expect(AssignmentListItemView.prototype.render.calledTwice).toBe(true)
+    expect(AssignmentListItemView.prototype.render).toHaveBeenCalledTimes(2)
   })
 
   test.skip('polls for updates if assignment is duplicating', () => {
-    sandbox.stub(assignment1(), 'isDuplicating').returns(true)
+    jest.spyOn(assignment1(), 'isDuplicating').mockReturnValue(true)
     const view = createView(assignment1())
-    expect(assignment1().pollUntilFinishedDuplicating.calledOnce).toBe(true)
+    expect(assignment1().pollUntilFinishedDuplicating).toHaveBeenCalledTimes(1)
   })
 
   test.skip('polls for updates if assignment is importing', () => {
-    sandbox.stub(assignment1(), 'isImporting').returns(true)
-    sandbox.stub(assignment1(), 'pollUntilFinishedImporting')
+    jest.spyOn(assignment1(), 'isImporting').mockReturnValue(true)
+    jest.spyOn(assignment1(), 'pollUntilFinishedImporting').mockImplementation(() => {})
     const view = createView(assignment1())
-    expect(assignment1().pollUntilFinishedImporting.calledOnce).toBe(true)
+    expect(assignment1().pollUntilFinishedImporting).toHaveBeenCalledTimes(1)
   })
 
   test('shows availability for checkpoints', () => {
@@ -750,10 +779,7 @@ describe.skip('AssignmentListItemViewSpec - opens and closes the direct share co
 // Continue with Other Modules
 
 describe('AssignmentListItemViewSpec - editing assignments', () => {
-  let sandbox
-
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
     fakeENV.setup({
       current_user_roles: ['teacher'],
       URLS: {assignment_sort_base_url: 'test'},
@@ -763,7 +789,7 @@ describe('AssignmentListItemViewSpec - editing assignments', () => {
   })
 
   afterEach(() => {
-    sandbox.restore()
+    jest.restoreAllMocks()
     genTeardown()
   })
 

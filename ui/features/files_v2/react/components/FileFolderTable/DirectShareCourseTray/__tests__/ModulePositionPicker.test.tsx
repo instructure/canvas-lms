@@ -21,6 +21,8 @@ import {render, screen} from '@testing-library/react'
 import ModulePositionPicker from '../ModulePositionPicker'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
+import {RowsProvider} from '../../../../contexts/RowsContext'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -31,7 +33,11 @@ const defaultProps = {
 }
 
 const renderComponent = (props = {}) =>
-  render(<ModulePositionPicker {...defaultProps} {...props} />)
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <ModulePositionPicker {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 
 describe('ModulePositionPicker', () => {
   beforeEach(() => {
@@ -144,7 +150,13 @@ describe('ModulePositionPicker', () => {
         {id: 'ijk', title: 'ijk', position: '4'},
       ],
     })
-    rerender(<ModulePositionPicker {...defaultProps} moduleId="2" />)
+    rerender(
+      <RowsProvider
+        value={{setCurrentRows: jest.fn(), currentRows: [], setSessionExpired: jest.fn()}}
+      >
+        <ModulePositionPicker {...defaultProps} moduleId="2" />
+      </RowsProvider>,
+    )
     expect(defaultProps.onSelectPosition).toHaveBeenCalledTimes(4)
     expect(defaultProps.onSelectPosition).toHaveBeenLastCalledWith(2)
   })

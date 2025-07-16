@@ -25,19 +25,10 @@ import {render, cleanup} from '@testing-library/react'
 import {BlockResizer, type Sz} from '../BlockResizer'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
-const user = userEvent.setup()
-
-let props: Sz = {width: 100, height: 125}
-let maintainAspectRatio = false
-
-const nodeDomNode = document.createElement('div')
-nodeDomNode.getBoundingClientRect = jest.fn(() => {
-  return {top: 0, left: 0, ...props}
-})
-
-const mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
-  callback(props)
-})
+let props: Sz
+let maintainAspectRatio: boolean
+let nodeDomNode: HTMLDivElement
+let mockSetProp: jest.Mock
 
 jest.mock('@craftjs/core', () => {
   const module = jest.requireActual('@craftjs/core')
@@ -59,36 +50,44 @@ jest.mock('@craftjs/core', () => {
 })
 
 describe('BlockResizer', () => {
-  beforeAll(() => {
-    nodeDomNode.style.width = '100px'
-    nodeDomNode.style.height = '125px'
-    document.body.appendChild(nodeDomNode)
-    const mountNode = document.createElement('div')
-    mountNode.id = 'mountNode'
-    document.body.appendChild(mountNode)
-  })
+  let mountNode: HTMLDivElement
+  let user: ReturnType<typeof userEvent.setup>
 
   beforeEach(() => {
-    fakeENV.setup()
+    fakeENV.setup({
+      flashAlertTimeout: 5000,
+    })
     props = {width: 100, height: 125}
     maintainAspectRatio = false
+
+    nodeDomNode = document.createElement('div')
+    nodeDomNode.style.width = '100px'
+    nodeDomNode.style.height = '125px'
+    nodeDomNode.getBoundingClientRect = jest.fn(() => {
+      return {top: 0, left: 0, ...props} as DOMRect
+    })
+    document.body.appendChild(nodeDomNode)
+
+    mountNode = document.createElement('div')
+    mountNode.id = 'mountNode'
+    document.body.appendChild(mountNode)
+
+    mockSetProp = jest.fn((callback: (props: Record<string, any>) => void) => {
+      callback(props)
+    })
+
+    user = userEvent.setup()
   })
 
   afterEach(() => {
-    fakeENV.teardown()
     cleanup()
-    jest.clearAllMocks()
-  })
-
-  afterAll(() => {
     document.body.innerHTML = ''
+    jest.clearAllMocks()
+    fakeENV.teardown()
   })
 
   it('renders', () => {
-    const mountNode = document.getElementById('mountNode') as HTMLElement
-    // @ts-expect-error
-
-    render(<BlockResizer mountPoint={mountNode} />)
+    render(<BlockResizer mountPoint={mountNode} sizeVariant="pixel" />)
     expect(document.querySelector('.block-resizer .moveable-nw')).toBeInTheDocument()
     expect(document.querySelector('.block-resizer .moveable-ne')).toBeInTheDocument()
     expect(document.querySelector('.block-resizer .moveable-sw')).toBeInTheDocument()
@@ -110,10 +109,7 @@ describe('BlockResizer', () => {
   })
 
   it('resizes using keyboard events', async () => {
-    const mountNode = document.getElementById('mountNode') as HTMLElement
-    // @ts-expect-error
-
-    render(<BlockResizer mountPoint={mountNode} />)
+    render(<BlockResizer mountPoint={mountNode} sizeVariant="pixel" />)
 
     await user.keyboard('{Shift>}{Alt>}{ArrowRight}')
     expect(props.width).toEqual(110)
@@ -122,9 +118,7 @@ describe('BlockResizer', () => {
 
   it('respects the aspect ratio', async () => {
     maintainAspectRatio = true
-    const mountNode = document.getElementById('mountNode') as HTMLElement
-    // @ts-expect-error
-    render(<BlockResizer mountPoint={mountNode} />)
+    render(<BlockResizer mountPoint={mountNode} sizeVariant="pixel" />)
 
     await user.keyboard('{Shift>}{Alt>}{ArrowRight}')
     const ht = 110 * (125 / 100)

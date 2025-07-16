@@ -20,9 +20,9 @@
   before_regrade ? version.score_before_regrade : version.score,
   params[:preview] ? version.points_possible_at_submission_time : @quiz.points_possible)
 %>
-<span aria-label="<%= t('score', 'Score') %>: <%= score %>">
-  <%= score %>
-</span>
+<span class="screenreader-only"><%= t 'score', 'Score' %>:</span>
+<span><%= score %></span>
 <% if version.pending_review? %>
-  <span aria-label="<%= t 'pending_review', 'Pending Review' %>">*</span>
+  <span class="screenreader-only"><%= t 'pending_review', 'Pending Review' %>:</span>
+  <span>*</span>
 <% end %>

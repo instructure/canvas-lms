@@ -53,6 +53,7 @@ describe "analytics in Canvas" do
       context "with A2 FF enabled" do
         before do
           @course.root_account.enable_feature!(:analytics_2)
+          @course.root_account.enable_feature!(:hide_legacy_course_analytics)
           user_session(@teacher)
 
           visit_course_people_page(@course.id)
@@ -68,6 +69,7 @@ describe "analytics in Canvas" do
       context "with A2 FF disabled" do
         before do
           @course.root_account.disable_feature!(:analytics_2)
+          @course.root_account.disable_feature!(:hide_legacy_course_analytics)
           user_session(@teacher)
 
           visit_course_people_page(@course.id)

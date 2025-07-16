@@ -29,6 +29,9 @@ import {ApiResultErrorPage} from './ApiResultErrorPage'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
+import {useScope as createI18nScope} from '@canvas/i18n'
+const I18n = createI18nScope('lti_registrations')
+
 export type RenderInfiniteApiResultProps<A> = {
   query: UseInfiniteQueryResult<InfiniteData<ApiResult<A[]>>>
   onError?: (error: UnsuccessfulApiResult) => JSX.Element
@@ -71,7 +74,7 @@ export const RenderInfiniteApiResult = <A,>(props: RenderInfiniteApiResultProps<
       props.onInitialLoading()
     ) : (
       <Flex direction="column" alignItems="center" padding="large 0">
-        <Spinner renderTitle="Loading" />{' '}
+        <Spinner renderTitle={I18n.t('Loading')} />{' '}
       </Flex>
     )
   }

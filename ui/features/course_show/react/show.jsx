@@ -31,11 +31,13 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
+import {createRoot} from 'react-dom/client'
 import {initializePlanner, renderToDoSidebar} from '@canvas/planner'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 import {dateString, datetimeString, timeString} from '@canvas/datetime/date-functions'
+import CourseDifferentiationTagConverterMessage from '@canvas/differentiation-tags/react/DifferentiationTagConverterMessage/course-conversion/CourseDifferentiationTagConverterMessage'
 
 const I18n = createI18nScope('courses_show')
 
@@ -138,6 +140,19 @@ $(() => {
         />
       </View>,
       observerPickerContainer,
+    )
+  }
+
+  const diffTagOverrideConversionContainer = document.getElementById(
+    'differentiation-tag-converter-message-root',
+  )
+  if (diffTagOverrideConversionContainer) {
+    const root = createRoot(diffTagOverrideConversionContainer)
+    root.render(
+      <CourseDifferentiationTagConverterMessage
+        courseId={ENV.COURSE.id}
+        activeConversionJob={ENV.ACTIVE_TAG_CONVERSION_JOB}
+      />,
     )
   }
 })

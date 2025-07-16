@@ -22,10 +22,10 @@ import QuizItemGroupView from '../QuizItemGroupView'
 import $ from 'jquery'
 import 'jquery-migrate'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import assertions from '@canvas/test-utils/assertionsSpec'
 import '@canvas/jquery/jquery.simulate'
 import 'jqueryui/tooltip'
 import {waitFor} from '@testing-library/dom'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 const createView = function (collection) {
   if (collection == null) {
@@ -58,7 +58,7 @@ describe('QuizItemGroupView', () => {
 
   it('should be accessible', async () => {
     const view = createView()
-    await assertions.isAccessible(view, {a11yReport: true})
+    await isAccessible(view, {a11yReport: true})
   })
 
   it('#isEmpty is false if any items aren’t hidden', () => {

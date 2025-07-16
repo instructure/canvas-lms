@@ -28,6 +28,8 @@ describe LearnPlatform::Api do
     default_settings["base_url"] = "http://www.example.com"
     default_settings["username"] = "user"
     default_settings["password"] = "pass"
+    default_settings["jwt_issuer"] = "service-name"
+    default_settings["jwt_secret"] = "service-secret"
     PluginSetting.create!(name: api.learnplatform.id, settings: default_settings)
   end
 

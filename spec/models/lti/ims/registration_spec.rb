@@ -444,6 +444,83 @@ module Lti::IMS
         end
       end
 
+      describe "LtiEulaRequest message type" do
+        let(:lti_tool_configuration) do
+          {
+            domain: "example.com",
+            scopes: [TokenScopes::LTI_EULA_DEPLOYMENT_SCOPE],
+            target_link_uri: "http://example.com/launch",
+            messages: [
+              eula_message,
+              {
+                type: "LtiDeepLinkingRequest",
+                placements: ["course_navigation", "ActivityAssetProcessor"],
+              }
+            ].compact,
+          }
+        end
+
+        def deep_linking_placement(placement, **kwargs)
+          {
+            "enabled" => true,
+            "message_type" => "LtiDeepLinkingRequest",
+            "placement" => placement,
+            **kwargs.transform_keys(&:to_s),
+          }
+        end
+
+        describe "when the tool does not support LtiEulaRequest" do
+          let(:eula_message) { nil }
+
+          it "does not add a eula object to the ActivityAssetProcessor placement" do
+            expect(registration.canvas_configuration["extensions"][0]["settings"]["placements"]).to match_array([
+                                                                                                                  deep_linking_placement("ActivityAssetProcessor"),
+                                                                                                                  deep_linking_placement("course_navigation")
+                                                                                                                ])
+          end
+        end
+
+        describe "when the tool supports LtiEulaRequest" do
+          let(:eula_message) do
+            { type: "LtiEulaRequest" }
+          end
+
+          let(:actual_placements) do
+            registration.canvas_configuration["extensions"][0]["settings"]["placements"]
+          end
+
+          it "adds eula: {enabled: true} to the ActivityAssetProcessor placement" do
+            eula = { enabled: true }
+            expect(actual_placements).to match_array([
+                                                       deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                       deep_linking_placement("course_navigation")
+                                                     ])
+          end
+
+          describe "when eula_message has custom_parameters and target_link_uri" do
+            let(:eula_message) do
+              {
+                type: "LtiEulaRequest",
+                target_link_uri: "http://example.com/eula",
+                custom_parameters: { "this_is_a_eula" => "yes" },
+              }
+            end
+
+            it "adds those settings to the ActivityAssetProcessor's eula settings" do
+              eula = {
+                enabled: true,
+                target_link_uri: "http://example.com/eula",
+                custom_fields: { "this_is_a_eula" => "yes" },
+              }
+              expect(actual_placements).to match_array([
+                                                         deep_linking_placement("ActivityAssetProcessor", eula:),
+                                                         deep_linking_placement("course_navigation")
+                                                       ])
+            end
+          end
+        end
+      end
+
       describe "when extension visibility is supplied" do
         let(:lti_tool_configuration) do
           {

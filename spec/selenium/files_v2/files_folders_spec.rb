@@ -188,11 +188,12 @@ describe "files index page" do
         file_name = "edit-permission-file.pdf"
         attachment_model(content_type: "application/pdf", context: @course, display_name: file_name)
         get "/courses/#{@course.id}/files"
-        get_row_header_files_table(2).click # select the file
-        select_item_to_edit_from_kebab_menu(1)
+        select_all
+        toolbox_menu_button("more-button").click
         toolbox_menu_button("edit-permissions-button").click
         edit_item_permissions(:unpublished)
         all_item_unpublished?
+        select_all
         toolbox_menu_button("more-button").click
         toolbox_menu_button("edit-permissions-button").click
         edit_item_permissions(:published)

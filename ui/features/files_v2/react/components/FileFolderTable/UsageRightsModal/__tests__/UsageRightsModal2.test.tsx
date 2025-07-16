@@ -25,6 +25,7 @@ import {createMockFileManagementContext} from '../../../../__tests__/createMockC
 import {FileManagementProvider} from '../../../../contexts/FileManagementContext'
 import {RowsProvider} from '../../../../contexts/RowsContext'
 import {parseNewRows} from '../UsageRightsModalUtils'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
@@ -80,7 +81,7 @@ const defaultProps = {
 const renderComponent = (props: any = defaultProps) =>
   render(
     <FileManagementProvider value={createMockFileManagementContext()}>
-      <RowsProvider value={{currentRows: props.items, setCurrentRows: jest.fn()}}>
+      <RowsProvider value={mockRowsContext}>
         <UsageRightsModal {...defaultProps} {...props} />
       </RowsProvider>
     </FileManagementProvider>,

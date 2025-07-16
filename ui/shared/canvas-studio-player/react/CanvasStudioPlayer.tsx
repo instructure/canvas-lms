@@ -68,6 +68,7 @@ const convertAndSortMediaSources = (sources: CanvasMediaSource[] | string) => {
 const convertMediaTracksIfNeeded = (
   tracks: MediaTrack[] | CaptionMetaData[],
 ): CaptionMetaData[] => {
+  // @ts-expect-error
   return tracks.map(track => {
     if ('src' in track) return track
     return {
@@ -76,7 +77,6 @@ const convertMediaTracksIfNeeded = (
       inherited: track.inherited,
       label: captionLanguageForLocale(track.locale),
       src: track.url,
-      type: 'srt',
     }
   })
 }

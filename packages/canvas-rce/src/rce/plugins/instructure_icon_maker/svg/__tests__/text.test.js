@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const sinon = require('sinon/pkg/sinon.js')
-
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from '../text'
 import {BASE_SIZE, DEFAULT_SETTINGS} from '../constants'
 
@@ -529,15 +527,16 @@ describe('getContainerWidth()', () => {
   })
 
   it('returns text width if is greater', () => {
-    sinon.stub(document, 'createElement').returns({
-      getContext: () => ({
-        measureText: text => ({
+    const mockCanvas = {
+      getContext: jest.fn(() => ({
+        measureText: jest.fn(text => ({
           width: text.length * 5,
-        }),
-      }),
-    })
+        })),
+      })),
+    }
+    jest.spyOn(document, 'createElement').mockReturnValue(mockCanvas)
     expect(getContainerWidth({...settings, text: 'This is a long text for testing'})).toBe(125)
-    document.createElement.reset()
+    document.createElement.mockRestore()
   })
 })
 

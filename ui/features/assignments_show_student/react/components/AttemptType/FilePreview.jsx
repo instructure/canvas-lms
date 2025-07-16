@@ -23,7 +23,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import AssetReportStatus from '@canvas/lti/react/AssetReportStatus'
 import StudentAssetReportModal from '@canvas/lti/react/StudentAssetReportModal'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
-import {filterReports, shouldRenderAssetProcessorData} from '../../helpers/AssetProcessorHelper'
+import {filterReports, shouldRenderAssetProcessorData} from '@canvas/lti/react/AssetProcessorHelper'
 import {colors, spacing} from '@instructure/canvas-theme'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -102,8 +102,9 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
             assetProcessors={ENV.ASSET_PROCESSORS}
             assignmentName={ENV.ASSIGNMENT_NAME}
             open={apModalAttachmentId !== null}
-            reports={filterReports(apModalAttachmentId)}
+            reports={filterReports(ENV.ASSET_REPORTS, apModalAttachmentId)}
             onClose={() => setApModalAttachmentId(null)}
+            submissionType={submission.submissionType}
           />
         )}
         <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
@@ -156,7 +157,7 @@ export default function FilePreview({submission, isOriginalityReportVisible}) {
                 {showDocumentProcessorsColumn && (
                   <Table.Cell themeOverride={cellTheme}>
                     <AssetReportStatus
-                      reports={filterReports(file._id)}
+                      reports={filterReports(ENV.ASSET_REPORTS, file._id)}
                       openModal={() => handleOpenModal(file._id)}
                     />
                   </Table.Cell>

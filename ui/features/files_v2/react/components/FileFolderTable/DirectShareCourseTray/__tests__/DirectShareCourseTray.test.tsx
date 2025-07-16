@@ -24,6 +24,8 @@ import {FAKE_FILES} from '../../../../../fixtures/fakeData'
 import DirectShareCourseTray from '../DirectShareCourseTray'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
+import {RowsProvider} from '../../../../contexts/RowsContext'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/direct-sharing/react/effects/useManagedCourseSearchApi')
 jest.mock('@canvas/direct-sharing/react/effects/useModuleCourseSearchApi')
@@ -40,7 +42,11 @@ const defaultProps = {
 }
 
 const renderComponent = (props = {}) =>
-  render(<DirectShareCourseTray {...defaultProps} {...props} />)
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <DirectShareCourseTray {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 
 describe('DirectShareCourseTray', () => {
   let ariaLive: HTMLElement
@@ -75,7 +81,9 @@ describe('DirectShareCourseTray', () => {
   it('shows the overwrite warning', () => {
     renderComponent()
     expect(
-      screen.getByText(/^Importing the same course content more than once/),
+      screen.getByText(
+        'Previously imported content from the same course will be replaced. Manually added content will remain.',
+      ),
     ).toBeInTheDocument()
   })
 
@@ -88,7 +96,7 @@ describe('DirectShareCourseTray', () => {
   it('starts a copy operation and reports status', async () => {
     renderComponent()
 
-    const input = await screen.getByLabelText(/select a course/i)
+    const input = screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
     await userEvent.type(input, courseA.name)
     await userEvent.click(screen.getByText(courseA.name))
@@ -99,7 +107,7 @@ describe('DirectShareCourseTray', () => {
       path: `/api/v1/courses/1/content_migrations`,
       body: {
         migration_type: 'course_copy_importer',
-        select: {attachments: [178]},
+        select: {attachments: ['178']},
         settings: {
           source_course_id: '1',
           insert_into_module_id: null,
@@ -111,8 +119,8 @@ describe('DirectShareCourseTray', () => {
       },
     })
 
-    expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-    expect(await screen.getAllByText(/success/i)[0]).toBeInTheDocument()
+    expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+    expect(screen.getAllByText(/success/i)[0]).toBeInTheDocument()
     expect(defaultProps.onDismiss).toHaveBeenCalled()
   })
 
@@ -126,29 +134,29 @@ describe('DirectShareCourseTray', () => {
 
     renderComponent()
 
-    let input = await screen.getByLabelText(/select a course/i)
+    let input = screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
     await userEvent.type(input, courseA.name)
     await userEvent.click(screen.getByText(courseA.name))
 
-    input = await screen.getByLabelText(/select a module/i)
+    input = screen.getByLabelText(/select a module/i)
     await userEvent.click(input)
     await userEvent.type(input, 'Module 1')
     await userEvent.click(screen.getByText('Module 1'))
 
-    expect(await screen.getByTestId('select-position')).toBeInTheDocument()
+    expect(screen.getByTestId('select-position')).toBeInTheDocument()
     expect(doFetchApi).toHaveBeenCalled()
     ;(useManagedCourseSearchApi as jest.Mock).mockImplementationOnce(({success}) => {
       success([courseA, courseB])
     })
     ;(doFetchApi as jest.Mock).mockClear()
 
-    input = await screen.getByLabelText(/select a course/i)
+    input = screen.getByLabelText(/select a course/i)
     await userEvent.click(input)
     await userEvent.type(input, courseB.name)
     await userEvent.click(screen.getByText(courseB.name))
 
-    expect(await screen.queryByTestId('select-position')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('select-position')).not.toBeInTheDocument()
     expect(doFetchApi).not.toHaveBeenCalled()
   })
 
@@ -163,7 +171,7 @@ describe('DirectShareCourseTray', () => {
       ;(doFetchApi as jest.Mock).mockRejectedValueOnce(() => ({}))
 
       renderComponent()
-      const input = await screen.getByLabelText(/select a course/i)
+      const input = screen.getByLabelText(/select a course/i)
       await userEvent.click(input)
       await userEvent.type(input, courseA.name)
       await userEvent.click(screen.getByText(courseA.name))
@@ -174,7 +182,7 @@ describe('DirectShareCourseTray', () => {
         path: `/api/v1/courses/1/content_migrations`,
         body: {
           migration_type: 'course_copy_importer',
-          select: {attachments: [178]},
+          select: {attachments: ['178']},
           settings: {
             source_course_id: '1',
             insert_into_module_id: null,
@@ -186,8 +194,8 @@ describe('DirectShareCourseTray', () => {
         },
       })
 
-      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(await screen.getAllByText(/failed/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/failed/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).not.toHaveBeenCalled()
     })
   })

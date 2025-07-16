@@ -129,13 +129,13 @@ function fetchLtiUsage(resolve, reject) {
 
 exports.fetchLtiUsage = fetchLtiUsage
 
-function fetchCanvasCareerApp(resolve, reject) {
+function fetchCanvasCareerLearningProviderApp(resolve, reject) {
   const script = document.createElement('script')
 
-  if (!window.REMOTES?.canvascareer) {
-    console.debug(`CanvasCareerApp remote not configured; using ${DEV_HOST}`)
+  if (!window.REMOTES?.canvas_career_learning_provider) {
+    console.debug(`canvas_career_learning_provider remote not configured; using ${DEV_HOST}`)
   }
-  script.src = window.REMOTES?.canvascareer || DEV_HOST
+  script.src = window.REMOTES?.canvas_career_learning_provider || DEV_HOST
   script.onload = () => {
     const module = {
       get: request => window.CanvasCareerLearningProvider.get(request),
@@ -143,7 +143,7 @@ function fetchCanvasCareerApp(resolve, reject) {
         try {
           return window.CanvasCareerLearningProvider.init(arg)
         } catch (e) {
-          console.warn('Remote CanvasCareerApp has already been loaded')
+          console.warn('Remote canvas_career_learning_provider has already been loaded')
         }
       },
     }
@@ -161,4 +161,38 @@ function fetchCanvasCareerApp(resolve, reject) {
   document.head.appendChild(script)
 }
 
-exports.fetchCanvasCareerApp = fetchCanvasCareerApp
+exports.fetchCanvasCareerLearningProviderApp = fetchCanvasCareerLearningProviderApp
+
+function fetchCanvasCareerLearnerApp(resolve, reject) {
+  const script = document.createElement('script')
+
+  if (!window.REMOTES?.canvas_career_learner) {
+    console.debug(`canvas_career_learner remote not configured; using ${DEV_HOST}`)
+  }
+  script.src = window.REMOTES?.canvas_career_learner || DEV_HOST
+  script.onload = () => {
+    const module = {
+      get: request => window.CanvasCareerLearner.get(request),
+      init: arg => {
+        try {
+          return window.CanvasCareerLearner.init(arg)
+        } catch (e) {
+          console.warn('Remote canvas_career_learner has already been loaded')
+        }
+      },
+    }
+    resolve(module)
+  }
+
+  script.onerror = errorEvent => {
+    const errorMessage = `Failed to load the script: ${script.src}`
+    console.error(errorMessage, errorEvent)
+    if (typeof reject === 'function') {
+      reject(new Error(errorMessage, errorEvent))
+    }
+  }
+
+  document.head.appendChild(script)
+}
+
+exports.fetchCanvasCareerLearnerApp = fetchCanvasCareerLearnerApp

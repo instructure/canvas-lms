@@ -28,6 +28,10 @@ const I18n = createI18nScope('react_files')
 
 const MIN_CRUMB_WIDTH = 80
 
+Breadcrumbs.componentWillMount = function () {
+  this.breadcrumbsRef = React.createRef()
+}
+
 Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
   const [contextType, contextId] = splitAssetString(this.props.contextAssetString, false)
   const isContextRoot =
@@ -105,7 +109,7 @@ Breadcrumbs.renderDynamicCrumbs = function () {
 
 Breadcrumbs.render = function () {
   return (
-    <nav aria-label="breadcrumbs" role="navigation" id="breadcrumbs" ref="breadcrumbs">
+    <nav aria-label="breadcrumbs" role="navigation" id="breadcrumbs" ref={this.breadcrumbsRef}>
       <ul>
         <li className="home">
           <a href="/">

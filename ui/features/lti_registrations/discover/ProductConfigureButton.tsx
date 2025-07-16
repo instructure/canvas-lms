@@ -37,6 +37,7 @@ import {
   openJsonRegistrationWizard,
   openJsonUrlRegistrationWizard,
   type JsonFetchStatus,
+  openEditManualRegistrationWizard,
 } from '../manage/registration_wizard/RegistrationWizardModalState'
 import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import type {LtiRegistrationWithConfiguration} from '../manage/model/LtiRegistration'
@@ -118,6 +119,22 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
     }
   }, [integration, setJsonFetchStatus, accountId])
 
+  const openBlankRegistrationWizard = () =>
+    openRegistrationWizard({
+      jsonUrl: '',
+      jsonCode: '',
+      unifiedToolId: undefined,
+      dynamicRegistrationUrl: '',
+      lti_version: findLtiVersion(product.tool_integration_configurations),
+      method: 'manual',
+      registering: false,
+      exitOnCancel: false,
+      onSuccessfulInstallation: () => {
+        refreshRegistrations()
+      },
+      jsonFetch: {_tag: 'initial'},
+    })
+
   return (
     <Button
       display={buttonWidth}
@@ -146,6 +163,8 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
                 ZUnifiedToolId.parse(integration.unified_tool_id),
                 onSuccessfulInstall,
               )
+            } else if (jsonFetchStatus._tag === 'loaded') {
+              openBlankRegistrationWizard()
             }
             break
           case 'lti_13_configuration':
@@ -156,23 +175,12 @@ export const ProductConfigureButton = ({buttonWidth, product, accountId}: Config
                 ZUnifiedToolId.parse(integration.unified_tool_id),
                 onSuccessfulInstall,
               )
+            } else if (jsonFetchStatus._tag === 'loaded') {
+              openBlankRegistrationWizard()
             }
             break
           case undefined:
-            openRegistrationWizard({
-              jsonUrl: '',
-              jsonCode: '',
-              unifiedToolId: undefined,
-              dynamicRegistrationUrl: '',
-              lti_version: findLtiVersion(product.tool_integration_configurations),
-              method: 'manual',
-              registering: false,
-              exitOnCancel: false,
-              onSuccessfulInstallation: () => {
-                refreshRegistrations()
-              },
-              jsonFetch: {_tag: 'initial'},
-            })
+            openBlankRegistrationWizard()
             break
         }
       }}
@@ -198,6 +206,6 @@ const buttonIsEnabled = (
   ) {
     return window.ENV.FEATURES.lti_registrations_page
   } else {
-    return false
+    return true
   }
 }

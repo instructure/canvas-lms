@@ -63,7 +63,11 @@ describe Lti::AssetProcessor do
       Lti::AssetProcessor.build_for_assignment(content_item:, context:)
     end
 
-    let(:context_external_tool) { external_tool_1_3_model(context: course_model) }
+    let(:context_external_tool) do
+      course = course_model
+      reg = lti_registration_with_tool(account: course.account)
+      reg.new_external_tool(course)
+    end
 
     let(:content_item) do
       ActionController::Parameters.new({

@@ -20,7 +20,7 @@ import {ApolloProvider} from '@apollo/client'
 import ConversationListContainer from '../ConversationListContainer'
 import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../shared/msw/mswServer'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
@@ -33,7 +33,7 @@ jest.mock('../../../util/utils', () => ({
 }))
 
 describe('ConversationListContainer', () => {
-  const server = mswServer(handlers)
+  const server = setupServer(...handlers)
   const getConversationsQuery = (scope = 'inbox', course) => {
     const nodes =
       scope === 'null_nodes'

@@ -186,11 +186,12 @@ describe "files index page" do
         end
 
         it "unpublishes and publish multiple files", priority: "1" do
-          select_item_to_edit_from_kebab_menu(1)
-          select_item_to_edit_from_kebab_menu(2)
+          select_all
+          toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:unpublished)
           all_item_unpublished?
+          select_all
           toolbox_menu_button("more-button").click
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:published)
@@ -270,6 +271,17 @@ describe "files index page" do
           expect(preview_file_header).to include_text(b_txt_file_name)
           preview_previous_button.click
           expect(preview_file_header).to include_text(a_txt_file_name)
+        end
+
+        it "returns to current folder on close" do
+          sub_folder = Folder.root_folders(@course).first.sub_folders.create!(name: "Sub", context: @course)
+          add_file(fixture_file_upload(a_txt_file_name, "text/plain"), @course, a_txt_file_name, sub_folder)
+          get "/courses/#{@course.id}/files/folder/Sub"
+
+          get_item_files_table(1, 1).click
+          expect(preview_file_header).to include_text(a_txt_file_name)
+          preview_close_button.click
+          expect(breadcrumb).to contain_css("li", text: "Sub")
         end
 
         context "with media file" do

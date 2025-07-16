@@ -268,14 +268,22 @@ export const CommonMigratorControls = ({
       <Text size="medium" color="primary">
         {I18n.t('All content')}
       </Text>
-      <br />
-      <View as="div" margin="x-small 0 0 0">
-        <Text size="small" color="primary">
-          {I18n.t(
-            'Note the following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.',
-          )}
-        </Text>
-      </View>
+      <Flex direction="column" as="div" margin="x-small 0 0 0">
+        <Flex.Item margin="none">
+          <Text size="small" color="primary">
+            {I18n.t(
+              'The following content types will be imported: Course Settings, Syllabus Body, Modules, Assignments, Quizzes, Question Banks, Discussion Topics, Pages, Announcements, Rubrics, Files, and Calendar Events.',
+            )}
+          </Text>
+        </Flex.Item>
+        <Flex.Item margin="small none">
+          <Text size="small" color="primary">
+            {I18n.t(
+              "Feature Options (like New Quizzes) aren't imported and must be enabled manually in the new course's Settings.",
+            )}
+          </Text>
+        </Flex.Item>
+      </Flex>
     </>
   )
 

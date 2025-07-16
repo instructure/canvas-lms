@@ -168,7 +168,7 @@
         "message": "Seinnteoir fuaime le haghaidh { title }"
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
-        "message": "Tá ábhar uathshábháilte ann. Ar mhaith leat an ábhar uathsábháilte a lódáil ina ionad sin?"
+        "message": "Is ann d’ábhar uathshábháilte. Ar mhaith leat an t-ábhar sin a lódáil nó é a scriosadh?"
     },
     "available_folders_694d0436": {
         "message": "Fillteáin atá ar fáil"
@@ -321,7 +321,7 @@
         "message": "Bain an comhad roghnaithe: { filename }"
     },
     "click_or_shift_click_for_the_html_editor_25d70bb4": {
-        "message": "Cliceáil nó shift-cliceáil don eagarthóir html."
+        "message": "Déan cliceáil nó cliceáil iomlaoide le haghaidh eagarthóir html."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Cliceáil chun { imageName } a leabú"
@@ -429,7 +429,7 @@
         "message": "Áireamh"
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
-        "message": "{ count, plural,\n     =0 {0 focal}\n    one {1 focal}\n  other {An líon seo focail: #}\n}"
+        "message": "{ count, plural,\n     =0 {Líon Focal: 0}\n    one {Líon Focal: 1}\n  other {Líon Focal: #}\n}"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {# mír lódáite}\n  other {# míreanna lódáilte}\n}"
@@ -519,7 +519,10 @@
         "message": "Maisiúil { TYPE_UPPER }"
     },
     "decrease_indent_d9cf469d": {
-        "message": "Laghdaigh Eangú"
+        "message": "Laghdaigh Eang"
+    },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Laghdaigh Limistéar Ábhar Saibhir"
     },
     "deep_purple_bb3e2907": {
         "message": "Dúchorcra"
@@ -579,7 +582,7 @@
         "message": "Toisí"
     },
     "directionality_26ae9e08": {
-        "message": "Treoúlacht"
+        "message": "Treo"
     },
     "directly_edit_latex_b7e9235b": {
         "message": "Cuir LaTeX in Eagar go Díreach"
@@ -789,7 +792,7 @@
         "message": "Ann"
     },
     "exit_fullscreen_b7eb0aa4": {
-        "message": "Scoir Lánscáileán"
+        "message": "Fág an Lánscáileán"
     },
     "expand_preview_by_default_2abbf9f8": {
         "message": "Leathnaigh réamhamharc de réir réamhshocraithe"
@@ -861,7 +864,7 @@
         "message": "Aimsigh"
     },
     "find_and_replace_6e345933": {
-        "message": "Aimsigh agus Athraigh"
+        "message": "Aimsigh agus Athchuir"
     },
     "finish_bc343002": {
         "message": "Críochnaigh"
@@ -897,7 +900,7 @@
         "message": "Slais Ar aghaidh"
     },
     "found_auto_saved_content_3f6e4ca5": {
-        "message": "Aimsíodh ábhar uath-shábháilte"
+        "message": "Aimsíodh ábhar uathshábháilte"
     },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Aimsíodh { count, plural,\n     =0 {# torthaí}\n    one {# toradh}\n  other {# torthaí}\n}"
@@ -912,7 +915,7 @@
         "message": "Fraincis (Ceanada)"
     },
     "fullscreen_873bf53f": {
-        "message": "Scáileán iomlán"
+        "message": "Lánscáileán"
     },
     "galician_7e4508b5": {
         "message": "Gailísis"
@@ -1152,7 +1155,10 @@
         "message": "I (Gné De)"
     },
     "increase_indent_6af90f7c": {
-        "message": "Méadaigh Eangach"
+        "message": "Méadaigh Eang"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "Méadaigh an Limistéar Ábhar Saibhir"
     },
     "indefinite_integral_6623307e": {
         "message": "Slánuimhreach Éiginnte"
@@ -1185,7 +1191,7 @@
         "message": "Réimse ionchuir le haghaidh dearg"
     },
     "insert_593145ef": {
-        "message": "Cuir isteach"
+        "message": "Ionsáigh"
     },
     "insert_link_6dc23cae": {
         "message": "Cuir Nasc Isteach"
@@ -1305,7 +1311,7 @@
         "message": "Ar chlé"
     },
     "left_align_43d95491": {
-        "message": "Ailíniú Ar Chlé "
+        "message": "Ailínigh ar Chlé"
     },
     "left_angle_bracket_c87a6d07": {
         "message": "Lúibín Uillinn Chlé"
@@ -2007,7 +2013,7 @@
         "message": "Ceart"
     },
     "right_align_39e7a32a": {
-        "message": "Ailíniú ar Dheis"
+        "message": "Ailínigh ar Dheis"
     },
     "right_angle_bracket_d704e2d6": {
         "message": "Lúibín Dronuillinn"
@@ -2184,7 +2190,7 @@
         "message": "Dath Íomhá Dath Amháin"
     },
     "size_b30e1077": {
-        "message": "Tomhas"
+        "message": "Méid"
     },
     "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
         "message": "Tá méid an chomhaid fotheidil níos mó ná an t-uasmhéid { max } kb méid comhaid ceadaithe."
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Ba chóir gur H2 an chéad cheannteideal ar leathanach."
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Tá airde an Limistéir Ábhar Saibhir laghdaithe."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Tá airde an Limistéir Ábhar Saibhir méadaithe."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Tá an t-ábhar sa fhearann poiblí"
@@ -2691,10 +2703,10 @@
         "message": "Vítneaimis"
     },
     "view_all_e13bf0a6": {
-        "message": "Féach ar Gach"
+        "message": "Gach Aip"
     },
     "view_ba339f93": {
-        "message": "Féach"
+        "message": "Amharc"
     },
     "view_description_30446afc": {
         "message": "Féach ar an gcur síos"
@@ -2757,7 +2769,7 @@
         "message": "Baile Wiki"
     },
     "word_count_c77fe3a6": {
-        "message": "Comhaireamh Focal"
+        "message": "Líon Focal"
     },
     "words_b448b7d5": {
         "message": "Focail"

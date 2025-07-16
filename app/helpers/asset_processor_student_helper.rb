@@ -23,13 +23,25 @@ module AssetProcessorStudentHelper
     return nil if submission.blank?
 
     active_ap_ids = Lti::AssetProcessor.for_assignment_id(submission.assignment_id).pluck(:id)
+    return nil if active_ap_ids.empty?
+
+    sql = [
+      "#{Lti::Asset.table_name}.submission_id = :submission_id AND
+       ((#{Lti::Asset.table_name}.attachment_id IN (:attachment_ids)) OR
+       (#{Lti::Asset.table_name}.submission_attempt = :submission_attempt))",
+      {
+        submission_id: submission.id,
+        attachment_ids: submission.attachment_associations.pluck(:attachment_id),
+        submission_attempt: submission.attempt
+      }
+    ]
 
     # Retrieve all reports regardless of processing progress
     visible_reports = Lti::AssetReport
                       .joins(:asset)
                       .preload(asset: :attachment)
                       .joins(:asset_processor)
-                      .where(asset: { submission_id: submission.id, attachment_id: submission.attachment_associations.pluck(:attachment_id) })
+                      .where(sql)
                       .where(lti_asset_processor_id: active_ap_ids)
                       .where(visible_to_owner: true)
                       .active

@@ -521,6 +521,9 @@
     "decrease_indent_d9cf469d": {
         "message": "Kurangi Indent"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Kurangi Area Rich Content"
+    },
     "deep_purple_bb3e2907": {
         "message": "Ungu Gelap"
     },
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "Tambah Indent"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "Tambah Area Rich Content"
     },
     "indefinite_integral_6623307e": {
         "message": "Integral Tidak Definit"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Heading pertama pada suatu halaman harus berupa H2."
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "Tinggi Area Rich dikurangi."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "Tinggi Area Rich ditambah."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Bahan ada di dalam domain publik"

@@ -32,12 +32,6 @@ export const template = generateActionTemplates(
   ],
   [
     {
-      title: I18n.t('Account Roles'),
-      description: I18n.t(
-        'To allow users to view multi-session activity, the "Admin - add/remove permission" and the "Permissions - manage" permission must be enabled for the Quizzes.Next Service.',
-      ),
-    },
-    {
       title: I18n.t('Quiz settings'),
       description: I18n.t(
         'Educators can enable the Detect Multiple Sessions setting on their quizzes to collect multi-session information on student submissions. This permission determines who can view this data in the activity log and moderate page.',
@@ -53,12 +47,6 @@ export const template = generateActionTemplates(
     },
   ],
   [
-    {
-      title: I18n.t('Account Roles'),
-      description: I18n.t(
-        'To allow users to view multi-session activity, the "Admin - add/remove permission" and the "Permissions - manage" permission must be enabled for the Quizzes.Next Service.',
-      ),
-    },
     {
       title: I18n.t('Quiz settings'),
       description: I18n.t(

@@ -39,6 +39,7 @@ const {
   istanbul,
   instUIWorkaround,
   webpack5Workaround,
+  yaml,
 } = require('./webpack.rules')
 
 const {
@@ -186,7 +187,7 @@ module.exports = {
 
     modules: [resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.jsx', '.ts', '.tsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.yaml', '.yml'],
   },
   module: {
     parser: {
@@ -207,6 +208,7 @@ module.exports = {
       fonts,
       ...swc,
       handlebars,
+      yaml,
     ].filter(Boolean),
   },
 

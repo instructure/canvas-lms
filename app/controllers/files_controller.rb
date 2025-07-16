@@ -142,8 +142,8 @@ class FilesController < ApplicationController
     assessment_question_show
     image_thumbnail
     show_thumbnail
+    image_thumbnail_plain
     create_pending
-    s3_success
     show
     api_create
     api_create_success
@@ -152,7 +152,6 @@ class FilesController < ApplicationController
     api_index
     destroy
     api_update
-    api_file_status
     public_url
     api_capture
     icon_metadata
@@ -162,7 +161,7 @@ class FilesController < ApplicationController
   ]
 
   include HorizonMode
-  before_action :load_canvas_career, only: [:index, :show]
+  before_action :load_canvas_career, only: [:index]
 
   before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
@@ -173,7 +172,7 @@ class FilesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
-    api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
+    api_show api_create_success api_update destroy icon_metadata reset_verifier
   ]
   before_action :check_limited_access_contexts, only: %i[index]
   before_action :check_limited_access_for_students, only: %i[api_index]
@@ -514,7 +513,7 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
-    if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download, check_submissions: false)
+    if (@submission && authorized_action(@submission, @current_user, :read)) || access_allowed(attachment: @attachment, user: @current_user, access_type: :download)
       render json: { public_url: @attachment.public_url(secure: request.ssl?, user: @current_user) }
     end
   end
@@ -724,8 +723,7 @@ class FilesController < ApplicationController
             attachment: @attachment,
             user: @current_user,
             access_type: :download,
-            no_error_on_failure: true,
-            check_submissions: false
+            no_error_on_failure: true
           )
             disable_page_views if params[:preview]
             begin
@@ -800,8 +798,7 @@ class FilesController < ApplicationController
           attachment: @attachment,
           user: @current_user,
           access_type: :download,
-          no_error_on_failure: true,
-          check_submissions: false
+          no_error_on_failure: true
         )
           # Right now we assume if they ask for json data on the attachment
           # then that means they have viewed or are about to view the file in
@@ -1122,7 +1119,7 @@ class FilesController < ApplicationController
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
 
-    overwritten_instfs_uuid = nil
+    unused_instfs_uuid = nil
     @attachment = if params.key?(:precreated_attachment_id)
                     att = Attachment.find_by(id: params[:precreated_attachment_id])
                     if att.nil?
@@ -1135,12 +1132,15 @@ class FilesController < ApplicationController
                     @context.shard.activate do
                       # avoid creating an identical Attachment
                       unless params[:on_duplicate] == "rename"
-                        att = Attachment.active.find_by(context: @context,
-                                                        folder_id: params[:folder_id],
-                                                        display_name: params[:display_name] || params[:name],
-                                                        size: params[:size],
-                                                        md5: params[:sha512])
-                        overwritten_instfs_uuid = att.instfs_uuid if att
+                        att = Attachment
+                              .active
+                              .where.not(instfs_uuid: nil)
+                              .find_by(context: @context,
+                                       folder_id: params[:folder_id],
+                                       display_name: params[:display_name] || params[:name],
+                                       size: params[:size],
+                                       md5: params[:sha512])
+                        unused_instfs_uuid = params[:instfs_uuid] if att
                       end
                       att || Attachment.where(context: @context).build
                     end
@@ -1162,7 +1162,7 @@ class FilesController < ApplicationController
     @attachment.display_name = params[:display_name] || params[:name]
     @attachment.size = params[:size]
     @attachment.content_type = process_content_type_from_instfs(params[:content_type], @attachment.display_name)
-    @attachment.instfs_uuid = params[:instfs_uuid]
+    @attachment.instfs_uuid = params[:instfs_uuid] unless unused_instfs_uuid
     @attachment.md5 = params[:sha512]
     @attachment.modified_at = Time.zone.now
     @attachment.workflow_state = "processed"
@@ -1178,8 +1178,8 @@ class FilesController < ApplicationController
     @attachment.save!
 
     # apply duplicate handling
-    if overwritten_instfs_uuid
-      @attachment.delay_if_production.safe_delete_overwritten_instfs_uuid(overwritten_instfs_uuid)
+    if unused_instfs_uuid
+      @attachment.delay_if_production.safe_delete_unused_instfs_uuid(unused_instfs_uuid)
     else
       @attachment.handle_duplicates(params[:on_duplicate])
     end
@@ -1675,17 +1675,51 @@ class FilesController < ApplicationController
     end
   end
 
+  def image_thumbnail_plain
+    cancel_cache_buster
+
+    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
+
+    # include authenticator fingerprint so we don't redirect to an
+    # authenticated thumbnail url for the wrong user
+    cache_key = ["thumbnail_url3", params[:id], params[:size], file_authenticator.fingerprint].cache_key
+    url, instfs = Rails.cache.read(cache_key)
+    if !url || no_cache
+      attachment = Attachment.active.find_by(id: params[:id]) if params[:id].present?
+      # We assume that if you can see/download the attachment, you can see/download the thumbnail
+      unless attachment && access_allowed(attachment:, user: @current_user, access_type: :download, no_error_on_failure: true)
+        redirect_to("/images/no_pic.gif")
+        return
+      end
+
+      thumb_opts = params.slice(:size)
+      url = authenticated_thumbnail_url(attachment, thumb_opts)
+      if url
+        instfs = attachment.instfs_hosted?
+        # only cache for half the time because of use_consistent_iat
+        Rails.cache.write(cache_key, [url, instfs], expires_in: (attachment.url_ttl / 2))
+      end
+    end
+
+    if url && instfs && file_location_mode?
+      render_file_location(url)
+    else
+      redirect_to(url || "/images/no_pic.gif")
+    end
+  end
+
   # when using local storage, the image_thumbnail action redirects here rather
-  # than to a s3 url
+  # than to a s3 url.
   def show_thumbnail
     if Attachment.local_storage?
       cancel_cache_buster
-      thumbnail = Thumbnail.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
+      thumbnail = Thumbnail.find_by(id: params[:id]) if params[:id].present?
+
       raise ActiveRecord::RecordNotFound unless thumbnail
 
+      return render_unauthorized_action unless authorized_action(thumbnail, @current_user, :download)
+
       safe_send_file thumbnail.full_filename, content_type: thumbnail.content_type
-    else
-      image_thumbnail
     end
   end
 

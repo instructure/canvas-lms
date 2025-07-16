@@ -160,6 +160,9 @@ class ProfileController < ApplicationController
   before_action :reject_student_view_student
   before_action :require_password_session, only: %i[communication communication_update update]
 
+  include HorizonMode
+  before_action :load_canvas_career, only: %i[show settings communication content_shares qr_mobile_login]
+
   include Api::V1::Avatar
   include Api::V1::CommunicationChannel
   include Api::V1::NotificationPolicy

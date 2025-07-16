@@ -2928,6 +2928,7 @@ hu:
   already_have_a_canvas_account_c4368ac9: "Már van Canvas-fiókja?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Vegye figyelembe azt is, hogy a Microsoft Teams nem tudja támogatni azokat a kurzusokat, amelyeknél több mint %{max_enrollments} vagy több mint %{max_owners} tulajdonos. Ha a kurzus túllépi ezeket a határokat, a szinkronizálás valószínűleg megszakad."
   alt_text_611fb322: "Alternatív szöveg"
+  alt_text_c12d1c1c: "Alternatív szöveg"
   alumno_88c80e37: Alumnus
   always_3a59e701: Mindig
   always_include_dates_1ae2935e: "Mindig tartalmazza a dátumokat"
@@ -5467,6 +5468,7 @@ hu:
   certificate_fingerprint_b376df90: "Tanúsítvány ujjlenyomata"
   certificate_is_expired_or_not_yet_valid_4a3bb8f1: "A tanúsítvány lejárt vagy még nem érvényes"
   certificate_is_not_a_ca_9ec5d574: "A tanúsítvány nem hitelesítésszolgáltató"
+  change_alt_text_92654906: "Az alternatív szöveg módosítása"
   change_applied_89d1aa5a: "Módosítás alkalmazva"
   change_beginning_date_to_39dbd06e: "Kezdődátum mósosítása"
   change_c5a551eb: "Változás:"
@@ -5514,6 +5516,7 @@ hu:
   chart_of_the_student_s_grades_on_each_assignment_a1fb1908: "A hallgató feladataihoz tartozó értékelések táblázata "
   chat_2153c6b7: Csevegés
   chcp_student_activity_report_5611dd39: "CHCP hallgatói tevékenységi jelentés"
+  check_accessibility_3c78211c: "Ellenőrizze a Kisegítő lehetőségeket"
   check_back_later_c4234dbc: "Nézzen vissza később"
   check_back_later_to_view_feedback_b937200a: "Nézzen vissza később a visszajelzések megtekintéséhez."
   check_permissions_when_masquerading_as_course_admi_ded7106c: "Ellenőrizze a jogosultságokat, amikor kurzus adminisztrátornak álcázza magát"
@@ -5874,6 +5877,7 @@ hu:
   color_overlay_fb5ecce7: "Színes réteg"
   columbia_college_chicago_custom_canvas_usage_repor_b6e2ee88: "Columbia College - Chicago Egyedi Canvas használati jelentés"
   column_e1ae5c64: Oszlop
+  column_group_1c062368: Oszlopcsoport
   columns_464bd055: Oszlopok
   come_back_later_5eab7dba: "Jöjjön vissza később!"
   coming_soon_79d46687: HAMAROSAN
@@ -6329,6 +6333,7 @@ hu:
       home_page: Főoldal
   content_item_title_96079d16: "Tartalomelem címe"
   content_items_with_errors_a9438fdb: "Hibás tartalomelemek"
+  content_licensing_help_3d15e649: "Segítség a tartalom licenceléshez"
   content_link_error_assignment_name_course_name_b8be789a: "Tartalom Hivatkozás Hiba - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -7198,6 +7203,7 @@ hu:
     other: "%{count} órával ezelőtt"
   count_images_found_for_term_a93635ed: "%{count} kép található a következőhöz: %{term}"
   count_issues_baf25342: "%{count} kérdés"
+  count_issues_bd5e5674: "%{count} Problémák"
   count_items_deleted_successfully_a287aa53: "%{count} elem sikeresen törölve."
   count_items_found_224f86d3: 
     one: "Egy elem található"
@@ -7302,6 +7308,7 @@ hu:
   count_results_9926447c: 
     one: "1 eredmény"
     other: "%{count} eredmény"
+    zero: "Nincsenek eredmények"
   count_results_displayed_ed39a0f0: 
     one: "1 megjelenített találat"
     other: "%{count} megjelenített találat"
@@ -7803,6 +7810,7 @@ hu:
       headings: 
         confirm_unenroll: "Kiiratkozás jóváhagyása"
       links: 
+        course_check_accessibility: "Ellenőrizze a Kisegítő lehetőségeket"
         course_setup: "Kurzusbeállítási ellenőrzőlista"
         drop_course: "Kiiratkozás a kurzusból"
         import: "Meglévő tartalom importálása"
@@ -11191,6 +11199,7 @@ hu:
   first_9685680a: első
   first_last_name_9820d256: "Keresztnév, családnév"
   first_name_d5c12500: Keresztnév
+  fix_heading_hierarchy_f60884c4: "Javítsa ki a címsor hierarchiáját"
   fix_missing_policy_applicator_gradebook_history_f3e62bc1: "Hiányzó Policy Applicator osztálynapló előzményeinek javítása"
   fixes_the_missing_policy_applicator_to_insert_reco_dedabe12: |-
       Javítja a hiányzó szabályzat alkalmazóját, hogy minden egyes hiányzónak jelölt beadványhoz beillessze a
@@ -13674,6 +13683,7 @@ hu:
   learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "A Microsoft Teams Canvasban történő használatának megtanulása"
   learn_more_about_collaborations_2978f66d: "Bővebben az együttműködésről"
   learn_more_about_quiz_statistics_315a378: "Tudjon meg többet a kvízstatisztikákról."
+  learn_more_about_table_headers_5f5ee13: "További információ a táblázat fejléceiről"
   learn_more_about_the_differences_a1217479: "Tudjon meg többet a különbségekről."
   learn_more_about_this_feature_in_the_course_pacing_687ceb39: "Tudjon meg többet erről a funkcióról a *kurzus ütemezés felhasználói csoportban*."
   learn_more_about_using_alt_text_for_images_5698df9a: "További információ az alternatív szövegek képekhez való használatáról"
@@ -14566,6 +14576,7 @@ hu:
   menu_for_outcome_title_1d93378d: "Menü ehhez az eredményhez: %{title}"
   menu_option_for_outcome_details_page_2dcd13d6: "Menü opció az eredmény részleteket tartalmazó oldalhoz"
   menu_options_9b6b0b5c: Menüpontok
+  merge_links_2478df96: "Hivatkozások egyesítése"
   merge_user_accounts_a49e8fb1: "Felhasználói fiókok egybevonása"
   mesa_public_course_syllabus_52282dd3: "Mesa nyilvános kurzus tanmenet"
   mesa_public_user_inactivity_report_a6792ccf: "Mesa nyilvános felhasználói inaktivitási jelentés"
@@ -21109,6 +21120,7 @@ hu:
   remove_grading_scheme_title_d3942a08: "Osztályzási rendszer eltávolítása: %{title}"
   remove_group_5d2f2f2d: "csoport eltávolítása"
   remove_group_981d6a02: "Eltávolítja a csoportot?"
+  remove_heading_style_5fdc8855: "Címsorstílus eltávolítása"
   remove_icon_a4646413: "ikon eltávolítása"
   remove_image_341340b3: "Kép eltávolítása"
   remove_label_11d96b8f: "%{label}eltávolítása"
@@ -21546,6 +21558,7 @@ hu:
     filter_no_users_found: "Egy egyező felhasználó sincs"
     filter_one_user_found: "1 talált felhasználó."
   row_fc0944a7: Sor
+  row_group_979f5528: Sorcsoport
   row_row_message_e369e49e: "Sor %{row}: %{message}"
   rsa_sha1_c457d751: RSA-SHA1
   rsa_sha256_3d41d605: RSA-SHA256
@@ -22391,6 +22404,7 @@ hu:
   set_email_address_as_default_954d284: "Beállítás alapértelmezett e-mail címként"
   set_email_as_default_5b4a28e: "Beállítás alapértelmezett e-mail címként"
   set_first_student_to_join_as_group_leader_5cfc206f: "Az első csatlakozó hallgató legyen a csoportvezető"
+  set_header_scope_8c548f40: "Fejléc hatókör beállítása"
   set_last_attended_date_8fb30092: "Utolsó részvételi dátum beállítása"
   set_name_as_leader_591c8009: "%{name} beállítása vezetőként"
   set_name_d14182d7: "Név beállítása..."
@@ -23175,6 +23189,7 @@ hu:
   showing_all_announcements_36ff0cec: "Minden hirdetmény megjelenítése"
   showing_all_discussions_7e09f4b7: "Minden fórum megjelenítése"
   showing_all_sets_of_grading_periods_6c160874: "Mutassa az összes osztályzási időszakot."
+  showing_cceab2d9: Mutat
   showing_count_account_calendars_e8266ae6: 
     one: "1 fióknaptár megjelenítése"
     other: "%{count} fiók naptár megjelenítése."

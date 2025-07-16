@@ -195,6 +195,7 @@ class UsersController < ApplicationController
   include DashboardHelper
   include Api::V1::Submission
   include ObserverEnrollmentsHelper
+  include HorizonMode
 
   before_action :require_user, only: %i[grades
                                         merge
@@ -230,6 +231,9 @@ class UsersController < ApplicationController
   skip_before_action :load_user, only: [:create_self_registered_user]
   before_action :require_self_registration, only: %i[new create create_self_registered_user]
   before_action :check_limited_access_for_students, only: %i[create_file set_custom_color]
+  before_action :load_canvas_career, only: %i[user_dashboard]
+
+  MAX_UUIDS_IN_FILTER = 100
 
   def grades
     @user = User.where(id: params[:user_id]).first if params[:user_id].present?
@@ -395,6 +399,10 @@ class UsersController < ApplicationController
   #   When set to true and used with an account context, returns users who have deleted
   #   pseudonyms for the context
   #
+  # @argument uuids [Array]
+  #   When set, only return users with the specified UUIDs. UUIDs after the first 100
+  #   are ignored.
+  #
   #  @example_request
   #    curl https://<canvas>/api/v1/accounts/self/users?search_term=<search value> \
   #       -X GET \
@@ -411,6 +419,7 @@ class UsersController < ApplicationController
     includes << "deleted_pseudonyms" if include_deleted_users
 
     search_term = params[:search_term].presence
+
     if search_term
       users = UserSearch.for_user_in_context(search_term,
                                              @context,
@@ -438,6 +447,11 @@ class UsersController < ApplicationController
                                    })
       users = users.with_last_login if params[:sort] == "last_login"
     end
+
+    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten.take(MAX_UUIDS_IN_FILTER))
+      users = users.where(uuid: uuids)
+    end
+
     users.preload(:pseudonyms) if includes.include? "deleted_pseudonyms"
 
     page_opts = { total_entries: nil }
@@ -1672,7 +1686,7 @@ class UsersController < ApplicationController
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
-  #   This is commonly done with user[skip_registration] and communication_channel[skip_confirmation]
+  #   This is commonly done with +user[skip_registration]+ and +communication_channel[skip_confirmation]+
   #   so that the default communication_channel is also restored.
   #
   # @argument destination [URL]
@@ -2149,7 +2163,7 @@ class UsersController < ApplicationController
   # @argument user[avatar][token] [String]
   #   A unique representation of the avatar record to assign as the user's
   #   current avatar. This token can be obtained from the user avatars endpoint.
-  #   This supersedes the user [avatar] [url] argument, and if both are included
+  #   This supersedes the +user[avatar][url]+ argument, and if both are included
   #   the url will be ignored. Note: this is an internal representation and is
   #   subject to change without notice. It should be consumed with this api
   #   endpoint and used in the user update endpoint, and should not be

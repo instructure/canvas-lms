@@ -52,7 +52,7 @@ export const SearchAndFilter = (props: {setIsTrayOpen: (isOpen: boolean) => void
             renderLabel={
               <ScreenReaderContent>{I18n.t('Search by app or company name')}</ScreenReaderContent>
             }
-            placeholder="Search by app or company name"
+            placeholder={I18n.t('Search by app or company name')}
             value={searchValue}
             onChange={handleSearchInputChange}
             renderBeforeInput={<IconSearchLine inline={false} />}

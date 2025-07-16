@@ -183,15 +183,39 @@ interface CoursesubmissionStatistics {
   missingSubmissionsCount: number
 }
 
+interface TeacherCourseSettings {
+  showStudentOnlyModuleId: string
+  showTeacherOnlyModuleId: string
+}
+
+interface StudentCourseSettings {
+  showStudentOnlyModuleId?: string
+}
+
 interface CourseStudentResponse {
   name?: string
   submissionStatistics?: CoursesubmissionStatistics
+  settings?: StudentCourseSettings
 }
 
 interface CourseStudentGraphQLResult {
   legacyNode?: {
     name?: string
     submissionStatistics?: CoursesubmissionStatistics
+    settings?: StudentCourseSettings
+  }
+  errors?: {message: string}[]
+}
+
+interface CourseTeacherResponse {
+  name?: string
+  settings?: TeacherCourseSettings
+}
+
+interface CourseTeacherGraphQLResult {
+  legacyNode?: {
+    name?: string
+    settings?: TeacherCourseSettings
   }
   errors?: {message: string}[]
 }

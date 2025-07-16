@@ -17,7 +17,7 @@
  */
 
 import {render} from '@testing-library/react'
-import ResultCard from '../ResultCard'
+import ResultCard, {type ResultCardProps} from '../ResultCard'
 
 const modules = [
   {
@@ -54,8 +54,7 @@ const modules = [
   },
 ]
 
-const props = {
-  courseId: '1',
+const props: ResultCardProps = {
   searchTerm: 'writing outlines',
   result: {
     content_id: '3',
@@ -70,6 +69,7 @@ const props = {
     due_date: null,
     published: true,
   },
+  resultType: 'best',
 }
 
 describe('ResultCard', () => {
@@ -90,6 +90,18 @@ describe('ResultCard', () => {
     expect(getByText('Module 2')).toBeInTheDocument()
     expect(getByText('Module 3')).toBeInTheDocument()
     expect(getByText('Module 4')).toBeInTheDocument()
+  })
+
+  it('has the correct pendo attribute for best results', () => {
+    const {container} = render(<ResultCard {...props} />)
+    const element = container.querySelector('[data-pendo="smart-search-best-result"]')
+    expect(element).toBeInTheDocument()
+  })
+
+  it('has the correct pendo attribute for similar results', () => {
+    const {container} = render(<ResultCard {...props} resultType="similar" />)
+    const element = container.querySelector('[data-pendo="smart-search-similar-result"]')
+    expect(element).toBeInTheDocument()
   })
 
   it('renders only first 5 modules and shows count of extra modules', () => {

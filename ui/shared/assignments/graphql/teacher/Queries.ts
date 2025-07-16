@@ -77,6 +77,7 @@ export const TEACHER_QUERY = gql`
       state
       needsGradingCount
       onlyVisibleToOverrides
+      suppressAssignment
       peerReviews {
         enabled
       }

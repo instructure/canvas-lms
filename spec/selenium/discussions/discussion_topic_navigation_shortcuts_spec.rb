@@ -24,11 +24,6 @@ describe "Discussion Topic Navigation Shortcuts" do
   context "when Discussion Replies are in 'Inline' mode" do
     before :once do
       Account.default.enable_feature!(:react_discussions_post)
-
-      # It should work without these flags
-      # But this makes the tasting easier
-      Account.site_admin.enable_feature!(:discussion_default_expand)
-      Account.site_admin.enable_feature!(:discussion_default_sort)
     end
 
     before :once do

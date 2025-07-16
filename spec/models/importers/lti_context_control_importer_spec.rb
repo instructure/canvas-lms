@@ -105,7 +105,9 @@ describe Importers::LtiContextControlImporter do
         registration.new_external_tool(destination_course).tap do |tool|
           # Mimic a tool that's been copied to the destination course
           # but doesn't have its context control created yet.
-          tool.context_controls.each(&:destroy_permanently!)
+          tool.context_controls.each do |control|
+            control.suspend_callbacks { control.destroy_permanently! }
+          end
         end
       end
       let(:deployment_migration_id) { "12345" }

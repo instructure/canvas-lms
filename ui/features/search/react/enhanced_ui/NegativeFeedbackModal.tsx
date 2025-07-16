@@ -23,7 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
-import {View} from '@instructure/ui-view'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = createI18nScope('SmartSearch')
 
@@ -55,23 +55,23 @@ export default function NegativeFeedbackModal(props: Props) {
           />
         </Modal.Header>
         <Modal.Body>
-          <View as="div" margin="0 0 medium 0">
+          <Flex as="div" gap="modalElements" direction="column">
             <Text>
               {I18n.t(
                 "Thank you for your feedback. We're sorry to hear that these results didn't meet your expectations. Your input is crucial for improving our semantic search algorithms, and we'll use it to enhance the accuracy and relevance of future searches.",
               )}
             </Text>
-          </View>
-          <TextArea
-            maxHeight="6em"
-            height="6em"
-            label={I18n.t('Additional Feedback')}
-            placeholder={I18n.t('Let us know how we can improve')}
-            onChange={e => setComment(e.target.value)}
-          />
+            <TextArea
+              maxHeight="6em"
+              height="6em"
+              label={I18n.t('Additional Feedback')}
+              placeholder={I18n.t('Let us know how we can improve')}
+              onChange={e => setComment(e.target.value)}
+            />
+          </Flex>
         </Modal.Body>
         <Modal.Footer>
-          <Button data-testid="nf-close" onClick={props.onClose} margin="0 x-small 0 0">
+          <Button data-testid="nf-close" onClick={props.onClose} margin="0 buttons 0 0">
             {I18n.t('Close')}
           </Button>
           <Button data-testid="nf-submit" color="primary" onClick={() => props.onSubmit(comment)}>

@@ -41,6 +41,7 @@ class Lti::ContextControl < ActiveRecord::Base
   validates :account_id, on: :update, if: -> { account_id.present? }, comparison: { equal_to: :account_id_was, message: t("cannot be changed") }
 
   before_create :set_path
+  before_destroy :prevent_primary_deletion
   after_destroy :soft_delete_child_controls
 
   scope :active, -> { where.not(workflow_state: :deleted) }
@@ -224,6 +225,16 @@ class Lti::ContextControl < ActiveRecord::Base
     end
   end
 
+  def prevent_primary_deletion
+    context_id = account_id || course_id
+    context_type = account_id ? "Account" : "Course"
+
+    if deployment.context_id == context_id && deployment.context_type == context_type
+      errors.add(:base, I18n.t("Cannot delete primary control for deployment"))
+      throw :abort
+    end
+  end
+
   def calculated_attrs
     @calculated_attrs ||= Lti::ContextControlService.preload_calculated_attrs([self])[id]
   end
@@ -234,9 +245,9 @@ class Lti::ContextControl < ActiveRecord::Base
 
   def only_one_context?
     if account.present? && course.present?
-      errors.add(:context, "must have either an account or a course, not both")
+      errors.add(:context,  I18n.t("must have either an account or a course, not both"))
     elsif account.blank? && course.blank?
-      errors.add(:context, "must have either an account or a course")
+      errors.add(:context,  I18n.t("must have either an account or a course"))
     end
   end
 end

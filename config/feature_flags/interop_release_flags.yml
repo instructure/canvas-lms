@@ -112,6 +112,17 @@ lti_target_link_uri_for_assignment_edit_view:
       state: allowed_on
     ci:
       state: allowed_on
+lti_apps_page_ai_translation:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: AI Translation for LTI Apps Discover Page
+  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 lti_apps_page_instructors:
   state: hidden
   shadow: true
@@ -129,6 +140,20 @@ lti_asset_processor:
   description: |-
     This feature enables LTI tools to create Asset Processors and use services and placements associated
     with the 1EdTech Asset Processor specifications.
+  environments:
+    development:
+      state: allowed_on
+    test:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_asset_processor_discussions:
+  state: hidden
+  shadow: true
+  applies_to: RootAccount
+  display_name: Document Processing in Discussions
+  description: |-
+    This enables support for document processing using the LTI Asset Processor specification within graded Discussions.
   environments:
     development:
       state: allowed_on
@@ -263,6 +288,17 @@ lti_registrations_usage_data:
   applies_to: RootAccount
   display_name: LTI Apps - Monitor
   description: When enabled, the Monitor tab will appear in Canvas Apps.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
+lti_registrations_usage_tab:
+  state: hidden
+  shadow: false
+  applies_to: RootAccount
+  display_name: LTI Apps - Manage Usage
+  description: When enabled, the Usage tab will appear on an app's details page in Canvas Apps.
   environments:
     development:
       state: allowed_on
@@ -408,14 +444,3 @@ tune_lti_context_id_history_query:
     improve performance. Caution: for some accounts where this query
     doesn't already time out, enabling this may cause the query to take
     much longer and even time out.
-lti_apps_page_ai_translation:
-  state: hidden
-  shadow: true
-  applies_to: RootAccount
-  display_name: AI Translation for LTI Apps Discover Page
-  description: When enabled, the LTI Apps Discover (and Tool Details) page will be translated to the user's language.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on

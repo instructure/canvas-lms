@@ -18,11 +18,11 @@
 
 import axios from '../index'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../msw/mswServer'
+import {setupServer} from 'msw/node'
 
 const ok = value => expect(value).toBeTruthy()
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('Custom Axios Tests', () => {
   beforeAll(() => {

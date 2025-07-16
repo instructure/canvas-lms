@@ -2795,6 +2795,7 @@ fa:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
   alphabetically_60ab47e4: "به ترتیب حروف الفبا"
   already_have_a_canvas_account_c4368ac9: "آیا از قبل یک حساب کانواس دارید؟"
+  alt_text_c12d1c1c: "متن جایگزین"
   alumno_88c80e37: دانشجو
   always_3a59e701: همیشه
   always_include_dates_1ae2935e: "همیشه تاریخ‌ها درج شود"
@@ -6113,6 +6114,7 @@ fa:
       home_page: "صفحه اصلی"
   content_item_title_96079d16: "عنوان آیتم محتوا"
   content_items_with_errors_a9438fdb: "موارد محتوای دارای خطا"
+  content_licensing_help_3d15e649: "راهنمای مجوز دادن به محتوا"
   content_link_error_assignment_name_course_name_b8be789a: "خطای پیوند محتوا - %{assignment_name}، %{course_name}"
   content_locks: 
     buttons: 
@@ -22497,6 +22499,7 @@ fa:
   showing_all_announcements_36ff0cec: "در حال نمایش همه اطلاعیه ها"
   showing_all_discussions_7e09f4b7: "در حال نمایش همه بحث ها"
   showing_all_sets_of_grading_periods_6c160874: "در حال نمایش همه مجموعه دوره های نمره گذاری."
+  showing_cceab2d9: "در حال نمایش"
   showing_count_results_below_61ddca33: 
     zero: "نتیجه ای یافت نشد"
   shrink_permission_74b01aed: "کوچک شدن %{permission}"

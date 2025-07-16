@@ -356,11 +356,20 @@ describe TabsController, type: :request do
           "type" => "internal"
         },
         {
+          "id" => "account_reports",
+          "html_url" => "/accounts/#{@account.id}/reports",
+          "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/reports",
+          "label" => "Reports",
+          "position" => 4,
+          "visibility" => "public",
+          "type" => "internal"
+        },
+        {
           "id" => "permissions",
           "html_url" => "/accounts/#{@account.id}/permissions",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/permissions",
           "label" => "Permissions",
-          "position" => 4,
+          "position" => 5,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -369,7 +378,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/outcomes",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/outcomes",
           "label" => "Outcomes",
-          "position" => 5,
+          "position" => 6,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -378,7 +387,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/rubrics",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/rubrics",
           "label" => "Rubrics",
-          "position" => 6,
+          "position" => 7,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -387,7 +396,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/grading_standards",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/grading_standards",
           "label" => "Grading",
-          "position" => 7,
+          "position" => 8,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -396,7 +405,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/question_banks",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/question_banks",
           "label" => "Question Banks",
-          "position" => 8,
+          "position" => 9,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -405,7 +414,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/sub_accounts",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/sub_accounts",
           "label" => "Sub-Accounts",
-          "position" => 9,
+          "position" => 10,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -414,7 +423,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/calendar_settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/calendar_settings",
           "label" => "Account Calendars",
-          "position" => 10,
+          "position" => 11,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -423,7 +432,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/terms",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/terms",
           "label" => "Terms",
-          "position" => 11,
+          "position" => 12,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -432,7 +441,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/authentication_providers",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/authentication_providers",
           "label" => "Authentication",
-          "position" => 12,
+          "position" => 13,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -441,7 +450,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/sis_import",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/sis_import",
           "label" => "SIS Import",
-          "position" => 13,
+          "position" => 14,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -450,7 +459,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/brand_configs",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/brand_configs",
           "label" => "Themes",
-          "position" => 14,
+          "position" => 15,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -459,7 +468,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/developer_keys",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/developer_keys",
           "label" => "Developer Keys",
-          "position" => 15,
+          "position" => 16,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -468,7 +477,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/analytics_hub",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/analytics_hub",
           "label" => "Analytics Hub",
-          "position" => 16,
+          "position" => 17,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -477,7 +486,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/apps",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/apps",
           "label" => "Apps",
-          "position" => 17,
+          "position" => 18,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -486,7 +495,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/admin_tools",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/admin_tools",
           "label" => "Admin Tools",
-          "position" => 18,
+          "position" => 19,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -495,7 +504,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/eportfolio_moderation",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/eportfolio_moderation",
           "label" => "ePortfolio Moderation",
-          "position" => 19,
+          "position" => 20,
           "visibility" => "public",
           "type" => "internal"
         },
@@ -504,7 +513,7 @@ describe TabsController, type: :request do
           "html_url" => "/accounts/#{@account.id}/settings",
           "full_url" => "#{HostUrl.protocol}://#{HostUrl.context_host(@account)}/accounts/#{@account.id}/settings",
           "label" => "Settings",
-          "position" => 20,
+          "position" => 21,
           "visibility" => "admins",
           "type" => "internal"
         }

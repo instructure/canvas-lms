@@ -285,6 +285,7 @@ let externalToolLaunchOptions = {singleLtiLaunch: false}
 let externalToolLoaded = false
 let provisionalGraderDisplayNames: Record<string, string | null>
 let EG: SpeedGrader
+let submittedAtText: string | null
 
 const customProvisionalGraderLabel = I18n.t('Custom')
 const anonymousAssignmentDetailedReportTooltip = I18n.t(
@@ -312,6 +313,10 @@ function setupHandleStatePopped() {
 
 function setupBeforeLeavingSpeedgrader() {
   window.addEventListener('beforeunload', EG.beforeLeavingSpeedgrader)
+}
+
+function setupHandleSGMessages() {
+  window.addEventListener('message', EG.handleSGMessages)
 }
 
 function teardownBeforeLeavingSpeedgrader() {
@@ -880,16 +885,24 @@ function renderLtiAssetReports(
 ) {
   if (!ENV.FEATURES?.lti_asset_processor) return
   if (!jsonData.lti_asset_processors) return
+  if (!historicalSubmission.attempt) return
+  if (
+    !historicalSubmission.submission_type ||
+    (historicalSubmission.submission_type !== 'online_text_entry' &&
+      historicalSubmission.submission_type !== 'online_upload')
+  )
+    return
 
   const mountPoint = document.getElementById(SPEED_GRADER_LTI_ASSET_REPORTS_MOUNT_POINT)
   if (!mountPoint) throw new Error('LTI Asset Reports mount point not found')
 
   const props = {
     versionedAttachments: historicalSubmission?.versioned_attachments,
-    reportsByAttachment: submission.lti_asset_reports?.by_attachment,
+    reports: submission.lti_asset_reports,
     assetProcessors: jsonData.lti_asset_processors,
     studentId: submission.user_id,
-    attempt: historicalSubmission.attempt,
+    attempt: historicalSubmission.attempt.toString(),
+    submissionType: historicalSubmission.submission_type,
   }
   ReactDOM.render(<LtiAssetReportsWrapper {...props} />, mountPoint)
 }
@@ -1515,6 +1528,7 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+      setupHandleSGMessages()
 
       if (ENV.student_group_reason_for_change != null) {
         SpeedGraderAlerts.showStudentGroupChangeAlert({
@@ -2801,6 +2815,7 @@ EG = {
         String($('#submission_to_view').val() || submissionHistory.length - 1),
         10,
       )
+      submittedAtText = datetimeString(s.submitted_at) || noSubmittedAt
       const templateSubmissions = map(submissionHistory, (o: unknown, i: number) => {
         // The submission objects nested in the submission_history array
         // can have two different shapes, because the `this.currentStudent.submission`
@@ -2851,7 +2866,7 @@ EG = {
           selected: selectedIndex === i,
           proxy_submitter: s.proxy_submitter,
           proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
-          submittedAt: datetimeString(s.submitted_at) || noSubmittedAt,
+          submittedAt: submittedAtText,
           grade,
         }
       })
@@ -4351,6 +4366,19 @@ EG = {
     teardownHandleStatePopped(EG)
     teardownBeforeLeavingSpeedgrader()
     return undefined
+  },
+
+  handleSGMessages(event: MessageEvent) {
+    const submittedAtLabel = document.getElementById('submitted_at_label')
+    if (!submittedAtLabel) return
+
+    if (event.data?.subject === 'SG.handleHighlightedEntryChange' && event.data?.entryTimestamp) {
+      submittedAtLabel.innerHTML = datetimeString(event.data?.entryTimestamp)
+    }
+
+    if (event.data?.subject === 'SG.switchToIndividualPosts' && submittedAtText) {
+      submittedAtLabel.innerHTML = submittedAtText
+    }
   },
 
   handleGradingError(data: GradingError = {}) {

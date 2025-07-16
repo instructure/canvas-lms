@@ -685,6 +685,10 @@ class AccountsController < ApplicationController
   #   If set, only return courses that have at least one user enrolled in
   #   in the course with one of the specified enrollment types.
   #
+  # @argument enrollment_workflow_state[] [String, "active"|"completed"|"deleted"|"invited"|"pending"|"creation_pending"|"rejected"|"inactive"]
+  #   If set, only return courses that have at least one user enrolled in
+  #   in the course with one of the specified enrollment workflow states.
+  #
   # @argument published [Boolean]
   #   If true, include only published courses.  If false, exclude published
   #   courses.  If not present, do not filter on published status.
@@ -817,8 +821,13 @@ class AccountsController < ApplicationController
       @courses = @courses.without_enrollments
     end
 
-    if params[:enrollment_type].is_a?(Array)
-      @courses = @courses.with_enrollment_types(params[:enrollment_type])
+    enrollment_types = params[:enrollment_type] if params[:enrollment_type].is_a?(Array)
+    workflow_states = params[:enrollment_workflow_state] if params[:enrollment_workflow_state].is_a?(Array)
+    if workflow_states || enrollment_types
+      return render json: { message: "Invalid value provided to 'enrollment_workflow_state'" }, status: :bad_request if !workflow_states.nil? && (workflow_states - Enrollment::WORKFLOW_STATES).any?
+      return render json: { message: "Invalid value provided to 'enrollment_type'" }, status: :bad_request if !enrollment_types.nil? && (enrollment_types - Enrollment::SIS_TYPES.values).any?
+
+      @courses = @courses.with_enrollment_workflow_states_and_types(states: workflow_states, types: enrollment_types)
     end
 
     if value_to_boolean(params[:completed])
@@ -891,8 +900,8 @@ class AccountsController < ApplicationController
           @courses.where(
             TeacherEnrollment.active.joins(:user).where(
               ActiveRecord::Base.wildcard("users.name", params[:search_term])
-            ).where(
-              "enrollments.workflow_state NOT IN ('rejected', 'inactive', 'completed', 'deleted') AND enrollments.course_id=courses.id"
+            ).active_or_pending.where(
+              "enrollments.course_id=courses.id"
             ).arel.exists
           )
       else
@@ -941,7 +950,7 @@ class AccountsController < ApplicationController
       ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
-        student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
+        student_counts = StudentEnrollment.shard(@account.shard).not_fake.active_or_pending
                                           .where(course_id: @courses).group(:course_id).distinct.count(:user_id)
         @courses.each { |c| c.student_count = student_counts[c.id] || 0 }
       end
@@ -1253,7 +1262,7 @@ class AccountsController < ApplicationController
       respond_to do |format|
         if @account.root_account?
           terms_attrs = params[:account][:terms_of_service]
-          @account.update_terms_of_service(terms_attrs) if terms_attrs.present?
+          @account.update_terms_of_service(terms_attrs, @current_user) if terms_attrs.present?
           if @account.feature_enabled?(:slack_notifications)
             slack_api_key = params[:account].dig(:slack, :slack_api_key)
             if slack_api_key.present?
@@ -1429,6 +1438,21 @@ class AccountsController < ApplicationController
       @last_complete_reports = AccountReport.last_complete_reports(account: @account)
       @last_reports = AccountReport.last_reports(account: @account)
       render layout: false
+    end
+  end
+
+  def reports
+    raise ActiveRecord::RecordNotFound unless @account.root_account.feature_enabled?(:new_account_reports_ui)
+
+    if authorized_action(@account, @current_user, :read_reports)
+      add_crumb t("Reports")
+      @page_title = join_title(t("Reports"), @account.name)
+      set_active_tab "account_reports"
+      @current_user.add_to_visited_tabs("account_reports")
+      css_bundle :reports
+      page_has_instui_topnav
+
+      render html: '<div id="reports_mount_point"></div>'.html_safe, layout: true
     end
   end
 

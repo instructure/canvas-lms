@@ -45,21 +45,28 @@ describe "calendars/show" do
   end
 
   context "js_env.SHOW_CHECKPOINTS" do
-    it "sets to true when discussion checkponts FF is enabled in the sub-account" do
+    it "is true when discussion checkpoints FF is enabled in the sub-account" do
       @sub_account.enable_feature!(:discussion_checkpoints)
+      course = course_model(account: @sub_account)
+      assign(:contexts, [course])
       render
 
       expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be true
     end
 
-    it "sets to true when discussion checkpoints FF is enabled in the root account" do
+    it "is true when discussion checkpoints FF is enabled in the root account" do
       @domain_root_account.enable_feature!(:discussion_checkpoints)
+      course = course_model(account: @domain_root_account)
+      assign(:contexts, [course])
       render
 
       expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be true
     end
 
-    it "sets to false when discussion checkpoints FF is not enabled neither in the root account nor the sub-account" do
+    it "is false when discussion checkpoints FF is disabled in both root account and sub-account" do
+      course1 = course_model(account: @sub_account)
+      course2 = course_model(account: @domain_root_account)
+      assign(:contexts, [course1, course2])
       render
 
       expect(controller.js_env[:CALENDAR][:SHOW_CHECKPOINTS]).to be false

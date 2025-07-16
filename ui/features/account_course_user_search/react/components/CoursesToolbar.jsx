@@ -180,9 +180,16 @@ export default function CoursesToolbar({
                   <Grid.Col width="auto">
                     <Checkbox
                       checked={isEqual(draftFilters.enrollment_type, ['student'])}
-                      onChange={e =>
-                        onUpdateFilters({enrollment_type: e.target.checked ? ['student'] : null})
-                      }
+                      onChange={e => {
+                        const isChecked = e.target.checked
+
+                        onUpdateFilters({
+                          enrollment_type: isChecked ? ['student'] : null,
+                          enrollment_workflow_state: isChecked
+                            ? ['active', 'invited', 'pending', 'creation_pending']
+                            : null,
+                        })
+                      }}
                       label={I18n.t('Hide courses without students')}
                     />
                   </Grid.Col>

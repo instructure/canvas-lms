@@ -17,6 +17,8 @@
  */
 
 import React from 'react'
+import $ from 'jquery'
+import '@canvas/rails-flash-notifications'
 import type {PaginatedList} from '../../api/PaginatedList'
 import type {LtiRegistration} from '../../model/LtiRegistration'
 import type {ManageSearchParams} from './ManageSearchParams'
@@ -130,16 +132,24 @@ export const mkUseManagePageState =
           setState(prev => {
             // Only apply the result if the request is still relevant
             if (prev._type === 'reloading' && requested === prev.requested) {
-              return isSuccessful(result)
-                ? {
-                    items: result.data,
-                    _type: 'loaded',
-                    lastRequested: requested,
-                  }
-                : {
-                    _type: 'error',
-                    message: formatApiResultError(result),
-                  }
+              if (isSuccessful(result)) {
+                $.screenReaderFlashMessage(
+                  I18n.t(
+                    {one: '%{count} registration found', other: '%{count} registrations found'},
+                    {count: result.data.total},
+                  ),
+                )
+                return {
+                  items: result.data,
+                  _type: 'loaded',
+                  lastRequested: requested,
+                }
+              } else {
+                return {
+                  _type: 'error',
+                  message: formatApiResultError(result),
+                }
+              }
             } else {
               return prev
             }

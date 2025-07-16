@@ -1164,7 +1164,7 @@ class SubmissionsApiController < ApplicationController
 
   # @API List gradeable students
   #
-  # A paginated list of students eligible to submit the assignment. The caller must have permission to view grades.
+  # A paginated list of gradeable students for the assignment. The caller must have permission to view grades.
   #
   # If anonymous grading is enabled for the current assignment and the allow_new_anonymous_id parameter is passed,
   # the returned data will not include any values identifying the student, but will instead include an
@@ -1567,6 +1567,10 @@ class SubmissionsApiController < ApplicationController
   # @argument grouped [Boolean]
   #   If this argument is true, the response will take into account student groups.
   #
+  # @argument include_deactivated [Boolean]
+  #   If this argument is true, the response will include deactivated students in the summary
+  #   (defaults to false).
+  #
   # @example_response
   #   {
   #     "graded": 5,
@@ -1578,6 +1582,12 @@ class SubmissionsApiController < ApplicationController
       @assignment = api_find(@context.assignments.active, params[:assignment_id])
       student_ids = if should_group?
                       @assignment.representatives(user: @current_user).map(&:id)
+                    elsif include_deactivated_students_in_summary?
+                      @context.students_visible_to(@current_user, include: :inactive)
+                              .merge(Enrollment.not_fake)
+                              .where(enrollments: { workflow_state: %i[active inactive] })
+                              .distinct
+                              .pluck(:id)
                     else
                       student_scope = @context.students_visible_to(@current_user)
                                               .where("enrollments.type<>'StudentViewEnrollment' AND enrollments.workflow_state = 'active'").distinct
@@ -1607,6 +1617,10 @@ class SubmissionsApiController < ApplicationController
   end
 
   private
+
+  def include_deactivated_students_in_summary?
+    value_to_boolean(params[:include_deactivated])
+  end
 
   def change_topic_read_state(new_state)
     @assignment = api_find(@context.assignments.active, params[:assignment_id])

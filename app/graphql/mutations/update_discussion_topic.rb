@@ -109,7 +109,7 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
     end
 
     #  we need this to be set before the process commands since those will add group_category_id from the input
-    is_already_a_group_discussion = discussion_topic.group_category_id.present?
+    discussion_topic.group_category_id.present?
 
     process_common_inputs(input, discussion_topic.is_announcement, discussion_topic)
     process_future_date_inputs(input.slice(:delayed_post_at, :lock_at), discussion_topic)
@@ -124,16 +124,6 @@ class Mutations::UpdateDiscussionTopic < Mutations::DiscussionBase
         # If discussion topic has checkpoints, the sum of possible points cannot exceed the max for the assignment
         err_message = validate_possible_points_with_checkpoints(input)
         return validation_error(err_message) unless err_message.nil?
-
-        if is_already_a_group_discussion
-          # Already a group discussion
-          if !discussion_topic.checkpoints? && !discussion_topic.context.checkpoints_group_discussions_enabled?
-            return validation_error(I18n.t("Group discussions cannot have checkpoints."))
-          end
-        elsif input[:group_category_id].present? && !discussion_topic.context.checkpoints_group_discussions_enabled?
-          # Not already a group discussion, but trying to make it one
-          return validation_error(I18n.t("Group discussions cannot have checkpoints."))
-        end
       end
     end
 

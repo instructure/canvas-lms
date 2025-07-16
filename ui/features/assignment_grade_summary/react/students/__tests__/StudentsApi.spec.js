@@ -17,21 +17,19 @@
  */
 
 import * as StudentsApi from '../StudentsApi'
-import FakeServer, {
-  paramsFromRequest,
-  pathFromRequest,
-} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('GradeSummary StudentsApi', () => {
-  let server
+  const server = setupServer()
+  let capturedRequests = []
 
-  beforeEach(() => {
-    server = new FakeServer()
-  })
-
+  beforeAll(() => server.listen())
   afterEach(() => {
-    server.teardown()
+    server.resetHandlers()
+    capturedRequests = []
   })
+  afterAll(() => server.close())
 
   describe('.loadStudents()', () => {
     const url = '/api/v1/courses/1201/assignments/2301/gradeable_students'
@@ -81,15 +79,49 @@ describe('GradeSummary StudentsApi', () => {
         {display_name: 'Dana Smith', id: '1114', provisional_grades: [provisionalGradesData[3]]},
       ]
 
-      server.for(url).respond([
-        {status: 200, body: [studentsData[0]]},
-        {status: 200, body: [studentsData[1]]},
-        {status: 200, body: studentsData.slice(2)},
-      ])
-
       loadedProvisionalGrades = []
       loadedStudents = []
     })
+
+    function setupPaginatedResponse() {
+      let requestCount = 0
+      server.use(
+        http.get(url, async ({request}) => {
+          const requestUrl = new URL(request.url)
+          capturedRequests.push({
+            url: request.url,
+            method: request.method,
+            searchParams: requestUrl.searchParams,
+          })
+
+          requestCount++
+          if (requestCount === 1) {
+            return new HttpResponse(JSON.stringify([studentsData[0]]), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: `<http://localhost${url}?page=2>; rel="next"`,
+              },
+            })
+          } else if (requestCount === 2) {
+            return new HttpResponse(JSON.stringify([studentsData[1]]), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: `<http://localhost${url}?page=3>; rel="next"`,
+              },
+            })
+          } else {
+            return new HttpResponse(JSON.stringify(studentsData.slice(2)), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+          }
+        }),
+      )
+    }
 
     async function loadStudents() {
       let resolvePromise
@@ -126,54 +158,63 @@ describe('GradeSummary StudentsApi', () => {
     }
 
     test('sends a request for students', async () => {
+      setupPaginatedResponse()
       await loadStudents()
-      const request = server.receivedRequests[0]
-      expect(pathFromRequest(request)).toBe(
+      const request = capturedRequests[0]
+      expect(new URL(request.url).pathname).toBe(
         '/api/v1/courses/1201/assignments/2301/gradeable_students',
       )
     })
 
     test('includes provisional grades', async () => {
+      setupPaginatedResponse()
       await loadStudents()
-      const request = server.receivedRequests[0]
-      expect(paramsFromRequest(request).include).toEqual(['provisional_grades'])
+      const request = capturedRequests[0]
+      expect(request.searchParams.getAll('include[]')).toEqual(['provisional_grades'])
     })
 
     test('includes allow_new_anonymous_id', async () => {
+      setupPaginatedResponse()
       await loadStudents()
-      const request = server.receivedRequests[0]
-      expect(paramsFromRequest(request).allow_new_anonymous_id).toBe('true')
+      const request = capturedRequests[0]
+      expect(request.searchParams.get('allow_new_anonymous_id')).toBe('true')
     })
 
     test('requests 50 students per page', async () => {
+      setupPaginatedResponse()
       await loadStudents()
-      const request = server.receivedRequests[0]
-      expect(paramsFromRequest(request).per_page).toBe('50')
+      const request = capturedRequests[0]
+      expect(request.searchParams.get('per_page')).toBe('50')
     })
 
     test('sends additional requests while additional pages are available', async () => {
+      setupPaginatedResponse()
       await loadStudents()
-      expect(server.receivedRequests).toHaveLength(3)
+      expect(capturedRequests).toHaveLength(3)
     })
 
     test('calls onPageLoaded for each successful request', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       expect(loadedStudents).toHaveLength(3)
     })
 
     test('includes students when calling onPageLoaded', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const studentCountPerPage = loadedStudents.map(pageStudents => pageStudents.length)
       expect(studentCountPerPage).toEqual([1, 1, 2])
     })
 
     test('normalizes student names', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const names = flatten(loadedStudents).map(student => student.displayName)
       expect(names.sort()).toEqual(['Adam Jones', 'Betty Ford', 'Charlie Xi', 'Dana Smith'])
     })
 
     test('includes ids on students', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const ids = flatten(loadedStudents).map(student => student.id)
       expect(ids.sort()).toEqual(['1111', '1112', '1113', '1114'])
@@ -184,6 +225,7 @@ describe('GradeSummary StudentsApi', () => {
         delete studentsData[i].id
         studentsData[i].anonymous_id = `abcd${i + 1}`
       }
+      setupPaginatedResponse()
       await loadStudents()
       const ids = flatten(loadedStudents).map(student => student.id)
       expect(ids.sort()).toEqual(['abcd1', 'abcd2', 'abcd3', 'abcd4'])
@@ -193,18 +235,21 @@ describe('GradeSummary StudentsApi', () => {
       for (let i = 0; i < studentsData.length; i++) {
         delete studentsData[i].display_name
       }
+      setupPaginatedResponse()
       await loadStudents()
       const names = flatten(loadedStudents).map(student => student.displayName)
       expect(names).toEqual([null, null, null, null])
     })
 
     test('includes provisional grades when calling onPageLoaded', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const gradeCountPerPage = loadedProvisionalGrades.map(pageGrades => pageGrades.length)
       expect(gradeCountPerPage).toEqual([1, 2, 1])
     })
 
     test('normalizes provisional grade grader ids', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.graderId)).toEqual(['1101', '1102', '1101', '1102'])
@@ -215,36 +260,42 @@ describe('GradeSummary StudentsApi', () => {
         delete provisionalGradesData[i].scorer_id
         provisionalGradesData[i].anonymous_grader_id = `abcd${i + 1}`
       }
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.graderId)).toEqual(['abcd1', 'abcd2', 'abcd3', 'abcd4'])
     })
 
     test('includes provisional grade ids', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.grade)).toEqual(['A', 'B', 'C', 'B-'])
     })
 
     test('includes provisional grade grades', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.grade)).toEqual(['A', 'B', 'C', 'B-'])
     })
 
     test('includes provisional grade scores', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.score)).toEqual([10, 9, 8, 8.9])
     })
 
     test('sets selection state on provisional grades', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.selected)).toEqual([false, false, true, false])
     })
 
     test('includes associated student id', async () => {
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.studentId)).toEqual(['1111', '1112', '1112', '1114'])
@@ -255,17 +306,31 @@ describe('GradeSummary StudentsApi', () => {
         delete studentsData[i].id
         studentsData[i].anonymous_id = `abcd${i + 1}`
       }
+      setupPaginatedResponse()
       await loadStudents()
       const grades = sortBy(flatten(loadedProvisionalGrades), 'id')
       expect(grades.map(grade => grade.studentId)).toEqual(['abcd1', 'abcd2', 'abcd2', 'abcd4'])
     })
 
     test('calls onFailure when a request fails', async () => {
-      server.unsetResponses(url)
-      server.for(url).respond([
-        {status: 200, body: [studentsData[0]]},
-        {status: 500, body: {error: 'server error'}},
-      ])
+      server.resetHandlers()
+      let requestCount = 0
+      server.use(
+        http.get(url, () => {
+          requestCount++
+          if (requestCount === 1) {
+            return new HttpResponse(JSON.stringify([studentsData[0]]), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: `<http://localhost${url}?page=2>; rel="next"`,
+              },
+            })
+          } else {
+            return HttpResponse.json({error: 'server error'}, {status: 500})
+          }
+        }),
+      )
 
       try {
         await loadStudents()
@@ -275,16 +340,36 @@ describe('GradeSummary StudentsApi', () => {
     })
 
     test('does not send additional requests when one fails', async () => {
-      server.unsetResponses(url)
-      server.for(url).respond([
-        {status: 200, body: [studentsData[0]]},
-        {status: 500, body: {error: 'server error'}},
-      ])
+      server.resetHandlers()
+      capturedRequests = []
+      let requestCount = 0
+      server.use(
+        http.get(url, async ({request}) => {
+          const requestUrl = new URL(request.url)
+          capturedRequests.push({
+            url: request.url,
+            method: request.method,
+            searchParams: requestUrl.searchParams,
+          })
+          requestCount++
+          if (requestCount === 1) {
+            return new HttpResponse(JSON.stringify([studentsData[0]]), {
+              status: 200,
+              headers: {
+                'Content-Type': 'application/json',
+                link: `<http://localhost${url}?page=2>; rel="next"`,
+              },
+            })
+          } else {
+            return HttpResponse.json({error: 'server error'}, {status: 500})
+          }
+        }),
+      )
 
       try {
         await loadStudents()
       } catch (e) {
-        expect(server.receivedRequests).toHaveLength(2)
+        expect(capturedRequests).toHaveLength(2)
       }
     })
   })

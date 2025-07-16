@@ -541,6 +541,8 @@ CanvasRails::Application.routes.draw do
     resources :accessibility, only: [:index] do
       collection do
         resource :issues, only: [:create, :update], module: "accessibility"
+        post "preview" => "accessibility/preview#create"
+        get "preview" => "accessibility/preview#show"
       end
     end
   end
@@ -698,6 +700,7 @@ CanvasRails::Application.routes.draw do
         delete :remove_role
       end
     end
+    get :reports
     get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
     scope(controller: :analytics_hub) do
@@ -858,8 +861,12 @@ CanvasRails::Application.routes.draw do
   end
 
   get "images/users/:user_id" => "users#avatar_image", :as => :avatar_image
-  get "images/thumbnails/:id/:uuid" => "files#image_thumbnail", :as => :thumbnail_image
+  # The following two routes are only used when local storage is enabled, which isn't the case in prod.
+  # Once we fully retire the uuids, we can remove the first route.
   get "images/thumbnails/show/:id/:uuid" => "files#show_thumbnail", :as => :show_thumbnail_image
+  get "images/thumbnails/show/:id" => "files#show_thumbnail", :as => :show_thumbnail_image_plain
+  get "images/thumbnails/:id/:uuid" => "files#image_thumbnail", :as => :thumbnail_image
+  get "images/thumbnails/:id" => "files#image_thumbnail_plain", :as => :thumbnail_image_plain
   post "images/users/:user_id/report" => "users#report_avatar_image", :as => :report_avatar_image
   put "images/users/:user_id" => "users#update_avatar_image", :as => :update_avatar_image
   get "grades" => "users#grades"
@@ -1128,10 +1135,17 @@ CanvasRails::Application.routes.draw do
   get "privacy_policy" => "legal_information#privacy_policy", :as => "privacy_policy_redirect"
 
   scope(controller: :career) do
-    get "career/courses/:course_id", action: :catch_all, as: :course_career
-    get "career/courses/:course_id/*path", action: :catch_all, as: :course_career_path
-    get "career/accounts/:account_id", action: :catch_all, as: :account_career
-    get "career/accounts/:account_id/*path", action: :catch_all, as: :account_career_path
+    # Routes for course/account are explicit so that get_context works (relies on :course_id and :account_id params)
+    get "career/courses/:course_id", action: :show
+    get "career/courses/:course_id/*path", action: :show
+    get "career/accounts/:account_id", action: :show
+    get "career/accounts/:account_id/*path", action: :show
+    get "career", action: :show, as: :canvas_career
+    get "career/*path", action: :show, as: :canvas_career_path
+  end
+
+  scope(controller: :career_experience) do
+    post "career/switch_experience", action: :switch_experience
   end
 
   scope(controller: :smart_search) do
@@ -1194,6 +1208,7 @@ CanvasRails::Application.routes.draw do
       get  "courses/:course_id/files", controller: :files, action: :api_index, as: "course_files"
       post "courses/:course_id/files", action: :create_file, as: "course_create_file"
       get "courses/:course_id/folders", controller: :folders, action: :list_all_folders, as: "course_folders"
+      get "courses/:course_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "course_folders_and_files"
       post "courses/:course_id/folders", controller: :folders, action: :create
       get "courses/:course_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "courses/:course_id/folders/by_path", controller: :folders, action: :resolve_path
@@ -1690,6 +1705,7 @@ CanvasRails::Application.routes.draw do
       post "users/:user_id/files", action: :create_file
       get  "users/:user_id/files", controller: :files, action: :api_index, as: "user_files"
       get "users/:user_id/folders", controller: :folders, action: :list_all_folders, as: "user_folders"
+      get "users/:user_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "user_folders_and_files"
       post "users/:user_id/folders", controller: :folders, action: :create
       get "users/:user_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "users/:user_id/folders/by_path", controller: :folders, action: :resolve_path
@@ -1992,6 +2008,7 @@ CanvasRails::Application.routes.draw do
 
       get "groups/:group_id/files", controller: :files, action: :api_index, as: "group_files"
       get "groups/:group_id/folders", controller: :folders, action: :list_all_folders, as: "group_folders"
+      get "groups/:group_id/folders_and_files", controller: :folders, action: :list_all_folders_and_files, as: "group_folders_and_files"
       post "groups/:group_id/folders", controller: :folders, action: :create
       get "groups/:group_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "groups/:group_id/folders/by_path", controller: :folders, action: :resolve_path
@@ -2834,6 +2851,12 @@ CanvasRails::Application.routes.draw do
       delete "courses/:course_id/block_editor_templates/:id", action: :destroy
       post "courses/:course_id/block_editor_templates/:id/publish", action: :publish
       get "courses/:course_id/block_editor_templates/can_edit", action: :can_edit
+    end
+
+    scope(controller: :career_experience) do
+      get "career/experience_summary", action: :experience_summary
+      post "career/switch_experience", action: :switch_experience
+      post "career/switch_role", action: :switch_role
     end
   end
 

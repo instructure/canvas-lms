@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useMemo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {IconExternalLinkLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
 import {ModuleItemContent} from '../utils/types'
 
 interface ModuleItemTitleProps {
@@ -30,41 +31,54 @@ interface ModuleItemTitleProps {
 }
 
 const ModuleItemTitle: React.FC<ModuleItemTitleProps> = ({content, url, onClick}) => {
-  if (content?.type === 'ExternalUrl') {
-    return (
-      <Flex direction="row" gap="small" alignItems="center" wrap="no-wrap">
-        <Flex.Item>
-          <Link href={url} isWithinText={false} onClick={onClick}>
-            <Text
-              weight={content?.newTab ? 'normal' : 'bold'}
-              color={content?.newTab ? 'brand' : 'primary'}
-            >
-              {content?.title || 'Untitled Item'}
-            </Text>
-          </Link>
-        </Flex.Item>
-        <Flex.Item padding="0 0 xxx-small 0">
-          {content?.newTab && (
-            <IconExternalLinkLine size="x-small" color="brand" data-testid="external-link-icon" />
-          )}
-        </Flex.Item>
-      </Flex>
-    )
-  } else if (content?.type === 'SubHeader') {
-    return (
-      <Text weight="bold" color="primary" data-testid="subheader-title-text">
-        {content?.title || 'Untitled Item'}
-      </Text>
-    )
-  } else {
-    return (
-      <Link href={url} isWithinText={false} onClick={onClick} data-testid="module-item-title-link">
-        <Text weight="bold" color="primary">
+  const titleText = useMemo(() => {
+    if (content?.type === 'ExternalUrl') {
+      return (
+        <Flex direction="row" gap="small" alignItems="center" wrap="no-wrap">
+          <Flex.Item>
+            <Link href={url} isWithinText={false} onClick={onClick}>
+              <Text
+                weight={content?.newTab ? 'normal' : 'bold'}
+                color={content?.newTab ? 'brand' : 'primary'}
+              >
+                {content?.title || 'Untitled Item'}
+              </Text>
+            </Link>
+          </Flex.Item>
+          <Flex.Item padding="0 0 xxx-small 0">
+            {content?.newTab && (
+              <IconExternalLinkLine size="x-small" color="brand" data-testid="external-link-icon" />
+            )}
+          </Flex.Item>
+        </Flex>
+      )
+    } else if (content?.type === 'SubHeader') {
+      return (
+        <Text weight="bold" color="primary" data-testid="subheader-title-text">
           {content?.title || 'Untitled Item'}
         </Text>
-      </Link>
-    )
-  }
+      )
+    } else {
+      return (
+        <Link
+          href={url}
+          isWithinText={false}
+          onClick={onClick}
+          data-testid="module-item-title-link"
+        >
+          <Text weight="bold" color="primary">
+            {content?.title || 'Untitled Item'}
+          </Text>
+        </Link>
+      )
+    }
+  }, [content, url, onClick])
+
+  return (
+    <View as="div" padding="xx-small">
+      {titleText}
+    </View>
+  )
 }
 
 export default ModuleItemTitle

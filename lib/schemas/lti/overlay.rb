@@ -25,7 +25,7 @@ module Schemas::Lti
       properties: {
         text: { type: "string" },
         target_link_uri: { type: "string" },
-        message_type: { type: "string", enum: ::Lti::ResourcePlacement::LTI_ADVANTAGE_MESSAGE_TYPES },
+        message_type: { type: "string", enum: ::Lti::ResourcePlacement::PLACEMENT_BASED_MESSAGE_TYPES },
         launch_height: { type: "number" },
         launch_width: { type: "number" },
         icon_url: { type: "string" },

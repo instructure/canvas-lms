@@ -17,30 +17,15 @@
  */
 
 import React from 'react'
-import {render, unmountComponentAtNode} from 'react-dom'
-import {screen} from '@testing-library/react'
+import {render, screen as testScreen} from '@testing-library/react'
 import DisabledTokenInput from '../DisabledTokenInput'
 
 describe('DisabledTokenInput', () => {
-  let wrapper = null
   const tokens = ['John Smith', 'Section 2', 'Group 1']
 
-  beforeEach(() => {
-    // Setup a DOM element as a render target
-    wrapper = document.createElement('div')
-    document.body.appendChild(wrapper)
-    render(<DisabledTokenInput tokens={tokens} />, wrapper)
-  })
-
-  afterEach(() => {
-    // Cleanup on exiting
-    unmountComponentAtNode(wrapper)
-    wrapper.remove()
-    wrapper = null
-  })
-
   it('renders a list item for each token passed in', () => {
-    const listItems = screen.getAllByRole('listitem')
+    render(<DisabledTokenInput tokens={tokens} />)
+    const listItems = testScreen.getAllByRole('listitem')
     expect(listItems.map(item => item.textContent)).toEqual(tokens)
   })
 })

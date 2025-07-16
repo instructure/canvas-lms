@@ -2181,6 +2181,7 @@ he:
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "אפשר / י תזמון של אירועים נשנים ביומן האירועים"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "אפשר / י למשתמשים עם מספר טלפון בינלאומי לקבל הודעות טקסט מקנבס."
   alphabetically_60ab47e4: "בסדר אלף בית"
+  alt_text_c12d1c1c: "טקסט חלופי"
   always_3a59e701: תמיד
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "תמיד יש לטעון את עורך התוכן העשיר והסרגל הצידי משרות התוכן העשיר של קנבס בכל המקומות"
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "התראה נוצרת עבור כל תלמיד אשר עונה כל כל הקריטריונים. הן נבדקות כל יום, והודעות ישלחו לתלמיד, למורה, ו / או למנהל המערכת עד אשר הגורם לבעיה ייפתר."
@@ -4753,6 +4754,7 @@ he:
       importing_button: "מייבא... התהליך יכול להמשך זמן מה"
     titles: 
       home_page: "דף הבית"
+  content_licensing_help_3d15e649: "עזרה ברישוי תוכן"
   content_locks: 
     buttons: 
       ok_thanks: "בסדר, תודה"
@@ -5644,6 +5646,7 @@ he:
     one: "תוצאה אחת"
     other: "%{count} תוצאות"
     two: "%{count} תוצאות"
+    zero: "אין תוצאות"
   count_results_displayed_ed39a0f0: 
     many: "%{count} תוצאות הוצגו"
     one: "תוצאה אחת הוצגה"
@@ -18549,6 +18552,7 @@ he:
   showing_all_announcements_36ff0cec: "הצגת כל ההכרזות"
   showing_all_discussions_7e09f4b7: "הצגת כל הדיונים"
   showing_all_sets_of_grading_periods_6c160874: "הצגת כל אוגדני תקופות הערכה"
+  showing_cceab2d9: מציג
   showing_count_results_below_61ddca33: 
     zero: "לא נמצאו תוצאות"
   shuffle_answers_edb602b7: "שינוי אקראי של סדר השאלות"

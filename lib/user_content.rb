@@ -21,32 +21,6 @@ require "nokogiri"
 require "ritex"
 
 module UserContent
-  def self.associate_attachments_to_rce_object(
-    html,
-    context,
-    context_field_name: nil,
-    user: @current_user,
-    session: nil,
-    blank_user: false,
-    feature_enabled: nil,
-    feature_account: nil
-  )
-    if feature_enabled.nil?
-      feature_enabled = if feature_account.nil?
-                          context&.root_account&.feature_enabled?(:file_association_access)
-                        else
-                          feature_account&.root_account&.feature_enabled?(:file_association_access)
-                        end
-    end
-
-    return unless feature_enabled
-
-    attachment_ids = Api::Html::Content.collect_attachment_ids(html) if html.present?
-    attachment_ids = [] if attachment_ids.blank?
-
-    AttachmentAssociation.update_associations(context, attachment_ids, user, session, context_field_name, blank_user:)
-  end
-
   def self.escape(
     str,
     current_host = nil,

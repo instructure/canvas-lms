@@ -49,7 +49,7 @@ describe('SimilarResults', () => {
   it('should render multiple results', () => {
     const {getByText} = render(<SimilarResults {...props} />)
 
-    expect(getByText('Similar Results')).toBeInTheDocument()
+    expect(getByText('Similar results')).toBeInTheDocument()
     expect(getByText(/While not a direct match/)).toBeInTheDocument()
     expect(getByText(/Writings of John Doe/)).toBeInTheDocument()
     expect(getByText(/Group Discussion/)).toBeInTheDocument()

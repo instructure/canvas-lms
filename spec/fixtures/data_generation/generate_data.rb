@@ -23,7 +23,7 @@
 #   script/rails runner spec/fixtures/data_generation/generate_data.rb [options]
 #
 # In docker environment, run:
-#   docker-compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
+#   docker compose run web bundle exec rails runner spec/fixtures/data_generation/generate_data.rb [options]
 
 require_relative "../../factories/course_factory"
 require_relative "../../factories/user_factory"

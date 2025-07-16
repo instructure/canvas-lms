@@ -71,7 +71,7 @@ export default function DefaultGradeInput({
   }, [gradingType])
 
   const validInput = (value: string) => {
-    if (value === "") {
+    if (value === '') {
       setTextInputMessage([
         {
           text: I18n.t('Enter a grade'),
@@ -189,14 +189,14 @@ export default function DefaultGradeInput({
               value="complete"
               data-testid="complete-dropdown-option"
             >
-              Complete
+              {I18n.t('Complete')}
             </SimpleSelectOption>
             <SimpleSelectOption
               id="incompleteOption"
               value="incomplete"
               data-testid="incomplete-dropdown-option"
             >
-              Incomplete
+              {I18n.t('Incomplete')}
             </SimpleSelectOption>
           </SimpleSelect>
         </View>

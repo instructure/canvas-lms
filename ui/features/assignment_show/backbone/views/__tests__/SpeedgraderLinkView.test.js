@@ -19,7 +19,7 @@
 import SpeedgraderLinkView from '../SpeedgraderLinkView'
 import Assignment from '@canvas/assignments/backbone/models/Assignment'
 import {cleanup} from '@testing-library/react'
-import assertions from '@canvas/test-utils/assertionsSpec'
+import {isAccessible} from '@canvas/test-utils/assertions'
 
 describe('SpeedgraderLinkView', () => {
   let model, container
@@ -48,7 +48,7 @@ describe('SpeedgraderLinkView', () => {
   it('should be accessible', async () => {
     const element = document.querySelector('#assignment-speedgrader-link')
     expect(element).not.toBeNull()
-    await assertions.isAccessible(element, {a11yReport: true})
+    await isAccessible(element, {a11yReport: true})
   })
 
   it('toggles visibility of speedgrader link on change', () => {

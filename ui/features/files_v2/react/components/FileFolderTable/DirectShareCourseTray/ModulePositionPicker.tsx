@@ -23,6 +23,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {FormMessage} from '@instructure/ui-form-field'
+import {useRows} from '../../../contexts/RowsContext'
 
 const I18n = createI18nScope('files_v2')
 
@@ -84,6 +85,8 @@ const ModulePositionPicker = ({
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
+  const {setSessionExpired} = useRows()
+
   useEffect(() => {
     setSiblingPosition(1)
     onSelectPosition(1 + offset)
@@ -104,7 +107,7 @@ const ModulePositionPicker = ({
       })
       .catch(error => {
         if (error instanceof UnauthorizedError) {
-          window.location.href = '/login'
+          setSessionExpired(true)
           return
         }
         setError(I18n.t('Error retrieving module items'))

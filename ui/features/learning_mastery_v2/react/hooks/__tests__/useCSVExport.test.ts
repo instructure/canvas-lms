@@ -42,7 +42,6 @@ describe('useCSVExport', () => {
   interface ExportProps {
     courseId: string | number
     gradebookFilters: string[]
-    [key: string]: any
   }
 
   const defaultProps = (props: Partial<ExportProps> = {}): ExportProps => {

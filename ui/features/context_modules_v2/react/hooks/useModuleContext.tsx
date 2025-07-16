@@ -17,6 +17,7 @@
  */
 
 import {createContext, useContext, useState} from 'react'
+import {ExternalTool} from '../componentsTeacher/AddItemModalComponents/ExternalToolSelector'
 
 const ContextModule = createContext<{
   courseId: string
@@ -25,6 +26,9 @@ const ContextModule = createContext<{
   permissions: Record<string, boolean>
   NEW_QUIZZES_BY_DEFAULT: boolean
   DEFAULT_POST_TO_SIS: boolean
+  teacherViewEnabled: boolean
+  studentViewEnabled: boolean
+  externalTools: ExternalTool[]
   state: Record<string, any>
   setState: (state: Record<string, any>) => void
 }>(
@@ -35,6 +39,9 @@ const ContextModule = createContext<{
     permissions: Record<string, boolean>
     NEW_QUIZZES_BY_DEFAULT: boolean
     DEFAULT_POST_TO_SIS: boolean
+    teacherViewEnabled: boolean
+    studentViewEnabled: boolean
+    externalTools: ExternalTool[]
     state: Record<string, any>
     setState: (state: Record<string, any>) => void
   },
@@ -48,6 +55,9 @@ export const ContextModuleProvider = ({
   permissions,
   NEW_QUIZZES_BY_DEFAULT,
   DEFAULT_POST_TO_SIS,
+  teacherViewEnabled,
+  studentViewEnabled,
+  externalTools,
 }: {
   children: React.ReactNode
   courseId: string
@@ -65,6 +75,9 @@ export const ContextModuleProvider = ({
     | undefined
   NEW_QUIZZES_BY_DEFAULT: boolean | undefined
   DEFAULT_POST_TO_SIS: boolean | undefined
+  teacherViewEnabled: boolean
+  studentViewEnabled: boolean
+  externalTools: ExternalTool[]
 }) => {
   const [state, setState] = useState({})
 
@@ -77,6 +90,9 @@ export const ContextModuleProvider = ({
         permissions: permissions ?? {},
         NEW_QUIZZES_BY_DEFAULT: NEW_QUIZZES_BY_DEFAULT ?? false,
         DEFAULT_POST_TO_SIS: DEFAULT_POST_TO_SIS ?? false,
+        teacherViewEnabled,
+        studentViewEnabled,
+        externalTools,
         state,
         setState,
       }}
@@ -104,6 +120,9 @@ export const contextModuleDefaultProps = {
   },
   NEW_QUIZZES_BY_DEFAULT: false,
   DEFAULT_POST_TO_SIS: false,
+  teacherViewEnabled: false,
+  studentViewEnabled: false,
+  externalTools: [],
   state: {},
   setState: () => {},
 }

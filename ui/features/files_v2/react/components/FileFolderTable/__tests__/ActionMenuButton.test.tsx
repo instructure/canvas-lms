@@ -28,7 +28,7 @@ import {
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-import {mockRowFocusContext} from './testUtils'
+import {mockRowFocusContext, mockRowsContext} from './testUtils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -36,7 +36,7 @@ import {assignLocation} from '@canvas/util/globalUtils'
 import {downloadZip} from '../../../../utils/downloadUtils'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
-  showFlashError: jest.fn(),
+  showFlashError: jest.fn().mockReturnValue(() => {}),
 }))
 
 jest.mock('@canvas/util/globalUtils', () => ({
@@ -65,7 +65,7 @@ const renderComponent = (
     <Router>
       <FileManagementProvider value={createMockFileManagementContext(context)}>
         <RowFocusProvider value={mockRowFocusContext}>
-          <RowsProvider value={{currentRows: [props.row], setCurrentRows: jest.fn()}}>
+          <RowsProvider value={mockRowsContext}>
             <ActionMenuButton {...defaultProps} {...props} />
           </RowsProvider>
         </RowFocusProvider>
@@ -404,7 +404,9 @@ describe('ActionMenuButton', () => {
       await user.click(confirmButton)
 
       await waitFor(() => {
-        expect(showFlashError).toHaveBeenCalledWith('Failed to delete items. Please try again.')
+        expect(showFlashError).toHaveBeenCalledWith(
+          'An error occurred while deleting the items. Please try again.',
+        )
       })
     })
 

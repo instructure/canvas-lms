@@ -561,7 +561,7 @@ module Api
                                        entryId: media_object_or_hash.media_id,
                                        type: "mp4",
                                        redirect: "1",
-                                       location:)
+                                       location: (location if @domain_root_account&.feature_enabled?(:file_association_access))),
     }
   end
 

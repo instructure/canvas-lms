@@ -20,6 +20,4 @@ export interface EnvDiscussions {
   DISCUSSION_TOPIC: {
     ATTRIBUTES: Record<string, any>
   }
-  DISCUSSION_DEFAULT_EXPAND_ENABLED: boolean
-  DISCUSSION_DEFAULT_SORT_ENABLED: boolean
 }

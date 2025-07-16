@@ -175,6 +175,8 @@ ready(() => {
           filterSpeedGraderByStudentGroupEnabled:
             window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
           projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
+          gradingAssistanceFileUploadEnabled:
+            window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
         },
       })
     })

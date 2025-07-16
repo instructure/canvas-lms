@@ -16,15 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ReactDOM from 'react-dom/client'
 import ready from '@instructure/ready'
-import {createRoot} from 'react-dom/client'
-import {AccessibilityChecker} from './react'
+
+import AccessibilityCheckerDrawer from './react/components/AccessibilityCheckerDrawer/AccessibilityCheckerDrawer'
 
 ready(() => {
+  const drawerLayoutMountPoint = document.getElementById('a11y-checker-drawer-layout-mount-point')
+  const topNavToolsDrawerLayoutMountPoint = document.getElementById('drawer-layout-mount-point')
+  const canvasApplicationBody = document.getElementById('application')
   const container = document.getElementById('accessibility-checker-container')
 
-  if (container) {
-    const root = createRoot(container!)
-    root.render(<AccessibilityChecker />)
+  if (!drawerLayoutMountPoint || !canvasApplicationBody || !container) {
+    return
   }
+
+  // Hides the old React root container from ui/features/top_navigation_tools/index.tsx
+  if (topNavToolsDrawerLayoutMountPoint) {
+    topNavToolsDrawerLayoutMountPoint.style.display = 'none'
+  }
+
+  const root = ReactDOM.createRoot(drawerLayoutMountPoint)
+  root.render(
+    <AccessibilityCheckerDrawer pageContent={canvasApplicationBody} container={container} />,
+  )
 })

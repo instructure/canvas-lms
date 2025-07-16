@@ -25,7 +25,7 @@ import {
 } from '@instructure/ui-icons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {type File, type Folder} from '../../../../interfaces/File'
-import {getUniqueId, isFile} from '../../../../utils/fileFolderUtils'
+import {isFile} from '../../../../utils/fileFolderUtils'
 
 const I18n = createI18nScope('files_v2')
 
@@ -173,41 +173,6 @@ export const defaultVisibilityOption = (
   return visibilityOptions.inherit
 }
 
-interface ParseNewRowsParams {
-  items: (File | Folder)[]
-  availabilityOptionId: AvailabilityOptionId
-  dateRangeType: DateRangeTypeOption | null
-  currentRows: (File | Folder)[]
-  unlockAt: string | null
-  lockAt: string | null
-}
-
-export const parseNewRows = ({
-  items,
-  availabilityOptionId,
-  dateRangeType,
-  currentRows,
-  unlockAt,
-  lockAt,
-}: ParseNewRowsParams): (File | Folder)[] => {
-  const newRows = [...currentRows]
-  items.forEach(item => {
-    const index = newRows.findIndex(row => getUniqueId(row) === getUniqueId(item))
-    if (index !== -1) {
-      newRows[index].locked = availabilityOptionId === 'unpublished'
-      newRows[index].hidden = availabilityOptionId === 'link_only'
-
-      if (availabilityOptionId === 'date_range') {
-        newRows[index].unlock_at = isStartDateRequired(dateRangeType) ? unlockAt : null
-        newRows[index].lock_at = isEndDateRequired(dateRangeType) ? lockAt : null
-      } else {
-        newRows[index].unlock_at = null
-        newRows[index].lock_at = null
-      }
-    }
-  })
-  return newRows
-}
 export const isStartDateRequired = (dateRangeType: DateRangeTypeOption | null) =>
   ['start', 'range'].includes(dateRangeType?.id || '')
 

@@ -48,7 +48,10 @@ class DifferentiationTag::Jobs::Workers::TagOverrideConverterWorker
   def self.convert_tags(course, learning_objects)
     learning_objects.each do |learning_object|
       concrete_object = get_concrete_learning_object(learning_object)
-      next unless concrete_object
+      if concrete_object.nil?
+        destroy_orphaned_tag_override(learning_object)
+        next
+      end
 
       errors = DifferentiationTag::OverrideConverterService.convert_tags_to_adhoc_overrides_for(
         learning_object: concrete_object,
@@ -71,24 +74,39 @@ class DifferentiationTag::Jobs::Workers::TagOverrideConverterWorker
 
   def self.get_concrete_learning_object(learning_object)
     if learning_object.assignment_id.present?
-      Assignment.where(id: learning_object.assignment_id).first
+      Assignment.active.where(id: learning_object.assignment_id).first
     elsif learning_object.quiz_id.present?
-      Quizzes::Quiz.where(id: learning_object.quiz_id).first
+      Quizzes::Quiz.active.where(id: learning_object.quiz_id).first
     elsif learning_object.discussion_topic_id.present?
-      DiscussionTopic.where(id: learning_object.discussion_topic_id).first
+      DiscussionTopic.active.where(id: learning_object.discussion_topic_id).first
     elsif learning_object.wiki_page_id.present?
-      WikiPage.where(id: learning_object.wiki_page_id).first
+      WikiPage.active.where(id: learning_object.wiki_page_id).first
     elsif learning_object.context_module_id.present?
-      ContextModule.where(id: learning_object.context_module_id).first
+      ContextModule.active.where(id: learning_object.context_module_id).first
     else
       nil
     end
   end
 
   def self.learning_objects_with_tag_overrides_in_course(course)
-    AssignmentOverride.joins(:group)
+    AssignmentOverride.active
+                      .joins(:group)
                       .where(groups: { context: course, non_collaborative: true })
                       .distinct
-                      .select(:assignment_id, :quiz_id, :discussion_topic_id, :wiki_page_id, :context_module_id)
+                      .select(:set_id, :assignment_id, :quiz_id, :discussion_topic_id, :wiki_page_id, :context_module_id)
+  end
+
+  def self.destroy_orphaned_tag_override(learning_object)
+    override = AssignmentOverride.active.where(
+      set_type: "Group",
+      set_id: learning_object.set_id,
+      assignment_id: learning_object.assignment_id,
+      quiz_id: learning_object.quiz_id,
+      discussion_topic_id: learning_object.discussion_topic_id,
+      wiki_page_id: learning_object.wiki_page_id,
+      context_module_id: learning_object.context_module_id
+    ).first
+
+    override&.destroy
   end
 end

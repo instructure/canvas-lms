@@ -167,7 +167,20 @@ export const RubricCriteriaRow = ({
                       </Flex>
                     </View>
                     <View as="div" data-testid="rubric-criteria-row-long-description">
-                      <Text>{longDescription}</Text>
+                      <Text
+                        /**
+                         * because the backend html sanitization adds <br/> whenever there is a newline,
+                         * but the inst-ui textarea only uses newlines (\n),
+                         * we get in this weird state where we can have both <br/> if you
+                         * load a rubric but only \n if you are creating a rubric and have not saved.
+                         * in order to cleanly solve this, we should remove all <br/>, then removing all \n
+                         * and replacing with <br />. this will make sure that we always display the proper
+                         * line breaks regardless of the longDescription having <br/> or \n
+                         */
+                        dangerouslySetInnerHTML={escapeNewLineText(
+                          longDescription?.replace(/<br\/>/g, ''),
+                        )}
+                      />
                     </View>
                   </>
                 )}

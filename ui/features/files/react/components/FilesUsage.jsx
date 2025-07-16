@@ -24,6 +24,11 @@ import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
 const I18n = createI18nScope('react_files')
 
+FilesUsage.componentWillMount = function () {
+  this.containerRef = React.createRef()
+  this.barRef = React.createRef()
+}
+
 FilesUsage.render = function () {
   if (this.state) {
     const percentUsed = Math.round((this.state.quota_used / this.state.quota) * 100)
@@ -39,13 +44,13 @@ FilesUsage.render = function () {
       <div className="grid-row ef-quota-usage" data-testid="files-usage">
         <div className="col-xs-3">
           <div
-            ref="container"
+            ref={this.containerRef}
             className="progress-bar__bar-container"
             aria-hidden={true}
             data-testid="progress-container"
           >
             <div
-              ref="bar"
+              ref={this.barRef}
               className="progress-bar__bar"
               style={{
                 width: Math.min(percentUsed, 100) + '%',

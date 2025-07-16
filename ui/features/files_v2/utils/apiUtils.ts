@@ -20,8 +20,8 @@ import {getFilesEnv} from './filesEnvUtils'
 import {windowPathname} from '@canvas/util/globalUtils'
 import doFetchApi, {type DoFetchApiOpts, type DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 
-const SEARCH_AND_ALL_QUERY_PARAMS =
-  'per_page=25&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status'
+const getQueryParams = (perPage: number) =>
+  `per_page=${perPage}&include[]=user&include[]=usage_rights&include[]=enhanced_preview_url&include[]=context_asset_string&include[]=blueprint_course_status`
 interface TableUrlParams {
   searchTerm: string
   contextType: string
@@ -30,6 +30,7 @@ interface TableUrlParams {
   sortBy: string
   sortDirection: string
   pageQueryParam?: string
+  perPage: number
 }
 
 export const generateFolderByPathUrl = (
@@ -65,10 +66,11 @@ export const generateTableUrl = ({
   sortBy,
   sortDirection,
   pageQueryParam,
+  perPage,
 }: TableUrlParams) => {
   const baseUrl = searchTerm
-    ? generateSearchUrl(contextType, contextId, searchTerm)
-    : generateFetchAllUrl(folderId)
+    ? generateSearchUrl(contextType, contextId, searchTerm, perPage)
+    : generateFetchAllUrl(folderId, perPage)
   const sortedUrl = `${baseUrl}&sort=${sortBy}&order=${sortDirection}`
   return pageQueryParam ? `${sortedUrl}&page=${pageQueryParam}` : sortedUrl
 }
@@ -106,12 +108,17 @@ export const parseBookmarkFromUrl = (url?: string) => {
   }
 }
 
-const generateSearchUrl = (singularContextType: string, contextId: string, searchTerm: string) => {
-  return `/api/v1/${singularContextType}s/${contextId}/files?search_term=${searchTerm}&${SEARCH_AND_ALL_QUERY_PARAMS}`
+const generateSearchUrl = (
+  singularContextType: string,
+  contextId: string,
+  searchTerm: string,
+  perPage: number,
+) => {
+  return `/api/v1/${singularContextType}s/${contextId}/folders_and_files?search_term=${searchTerm}&${getQueryParams(perPage)}`
 }
 
-const generateFetchAllUrl = (folderId: string) => {
-  return `/api/v1/folders/${folderId}/all?${SEARCH_AND_ALL_QUERY_PARAMS}`
+const generateFetchAllUrl = (folderId: string, perPage: number) => {
+  return `/api/v1/folders/${folderId}/all?${getQueryParams(perPage)}`
 }
 
 export class UnauthorizedError extends Error {

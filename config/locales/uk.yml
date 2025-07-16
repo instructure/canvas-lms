@@ -2014,6 +2014,7 @@ uk:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Дозволяє користувачам з міжнародними телефонними номерами отримувати текстові повідомлення від Canvas."
   alphabetically_60ab47e4: "В алфавітному порядку"
   alt_text_611fb322: "Альтернативний текст"
+  alt_text_c12d1c1c: "Альтернативний текст"
   always_3a59e701: Завжди
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту, викладачу, та/або на обліковий запис адміністратора доки проблема не буде вирішена."
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "Попередження генерується для кожного студента, який відповідає критерію. Перевірка відбувається кожного дня і повідомлення будуть надіслані студенту та/або викладачу доки проблема не буде вирішена."
@@ -4363,6 +4364,7 @@ uk:
       importing_button: "Імпортується..., це може тривати деякий час"
     titles: 
       home_page: "Домашня сторінка"
+  content_licensing_help_3d15e649: "Допомога ліцензування контенту"
   content_locks: 
     buttons: 
       ok_thanks: "Ок, дякуємо"
@@ -5188,6 +5190,7 @@ uk:
     many: "%{count} результатів"
     one: "Один результат"
     other: "%{count} результатів"
+    zero: "Немає результатів"
   count_results_displayed_ed39a0f0: 
     few: "%{count} результатів показано"
     many: "%{count} результатів показано"
@@ -16695,6 +16698,7 @@ uk:
   showing_all_announcements_36ff0cec: "Показано всі оголошення"
   showing_all_discussions_7e09f4b7: "Показано всі дискусії"
   showing_all_sets_of_grading_periods_6c160874: "Показано всі набори періодів оцінювання."
+  showing_cceab2d9: Показ
   showing_count_results_below_61ddca33: 
     zero: "Результатів не знайдено"
   shuffle_answers_edb602b7: "Випадкові відповіді"

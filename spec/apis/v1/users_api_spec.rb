@@ -1244,6 +1244,39 @@ describe "Users API", type: :request do
       expect(json.pluck("id")).to eq [@student.id]
     end
 
+    context "uuid filter" do
+      before :once do
+        @account = Account.default
+        @user1 = User.create!(name: "User 1")
+        @user1.pseudonyms.create!(unique_id: "useruuid1", account: @account) { |p| p.sis_user_id = "user1" }
+        @user2 = User.create!(name: "User 2")
+        @user2.pseudonyms.create!(unique_id: "useruuid2", account: @account) { |p| p.sis_user_id = "user2" }
+        @user3 = User.create!(name: "User 3")
+        @user3.pseudonyms.create!(unique_id: "useruuid3", account: @account) { |p| p.sis_user_id = "user3" }
+      end
+
+      it "correctly filters by user uuids" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@account.id}/users",
+                        { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+                        { uuids: [@user1.uuid, @user2.uuid] })
+
+        expect(json.count).to eq 2
+        expect(json.pluck("id")).to match_array([@user1.id, @user2.id])
+      end
+
+      it "includes only the first MAX_UUIDS_IN_FILTER uuids in the filter" do
+        stub_const("UsersController::MAX_UUIDS_IN_FILTER", 2)
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@account.id}/users",
+                        { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+                        { uuids: [@user3.uuid, @user1.uuid, @user2.uuid] })
+
+        expect(json.count).to eq 2
+        expect(json.pluck("id")).to match_array([@user3.id, @user1.id])
+      end
+    end
+
     context "includes ui_invoked" do
       let(:root_account) { Account.default }
 

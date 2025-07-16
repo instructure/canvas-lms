@@ -54,6 +54,11 @@ const MODULES_QUERY = gql`
                 minScore
                 minPercentage
               }
+              progression {
+                id
+                _id
+                collapsed
+              }
             }
           }
           pageInfo {
@@ -114,5 +119,8 @@ export function useModules(courseId: string) {
     initialPageParam: undefined,
     getNextPageParam: (lastPage: ModulesResponse) =>
       lastPage.pageInfo.hasNextPage ? lastPage.pageInfo.endCursor : undefined,
+    refetchOnWindowFocus: true,
+    // 15 minutes, will reload on refresh because there is no persistence
+    staleTime: 15 * 60 * 1000,
   })
 }

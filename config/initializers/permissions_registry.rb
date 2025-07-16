@@ -1690,8 +1690,8 @@ Rails.application.config.to_prepare do
       view_students_in_need_in_course: {
         label: -> { I18n.t("Intelligent Insights - Students in Need of Attention - Course Level") },
         available_to: %w[AccountAdmin AccountMembership TeacherEnrollment TaEnrollment],
-        true_for: %w[AccountAdmin],
-        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) && a.feature_enabled?(:students_in_need_of_attention_course_level_beta) } ## AND they are part of the beta group.
+        true_for: %w[AccountAdmin TeacherEnrollment],
+        account_allows: ->(a) { a.feature_enabled?(:k20_students_in_need_of_attention) }
       },
       view_course_readiness: {
         label: -> { I18n.t("Course Readiness") },

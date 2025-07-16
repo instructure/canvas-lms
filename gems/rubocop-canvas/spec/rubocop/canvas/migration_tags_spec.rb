@@ -17,13 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "parser/current"
-
 describe RuboCop::Canvas::MigrationTags do
   subject { Class.new.tap { |c| c.include(described_class) }.new }
 
   it "collects the list of tags for the migration" do
-    node = Parser::CurrentRuby.parse("tag :predeploy, :cassandra")
+    node = RuboCop::ProcessedSource.new("tag :predeploy, :cassandra", 3.4).ast
     subject.on_send(node)
     expect(subject.tags).to eq([:predeploy, :cassandra])
   end

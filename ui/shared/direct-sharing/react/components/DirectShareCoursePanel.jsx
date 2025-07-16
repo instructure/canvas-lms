@@ -118,7 +118,7 @@ export default function DirectShareCoursePanel({
       />
       <Alert variant="warning" hasShadow={false}>
         {I18n.t(
-          'Importing the same course content more than once will overwrite any existing content in the course.',
+          'Previously imported content from the same course will be replaced. Manually added content will remain.',
         )}
       </Alert>
       <ConfirmActionButtonBar

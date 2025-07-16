@@ -17,7 +17,7 @@
  */
 
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
 import {initialize} from '../../utilities/alertUtils'
@@ -29,7 +29,7 @@ jest.mock('../../utilities/apiUtils', () => ({
   transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`),
 }))
 
-const server = mswServer([])
+const server = setupServer()
 
 beforeAll(() => {
   const alertSpy = jest.fn()

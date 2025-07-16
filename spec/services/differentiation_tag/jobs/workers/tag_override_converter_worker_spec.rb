@@ -195,6 +195,23 @@ describe DifferentiationTag::Jobs::Workers::TagOverrideConverterWorker do
       expect(reply_to_entry.assignment_overrides.active.where(set_type: "Group").count).to eq(0)
     end
 
+    it "removes orphaned tag overrides" do
+      job_progress = Progress.create!(context_type: "Course", context_id: course.id, tag: DifferentiationTag::DELAYED_JOB_TAG)
+
+      # Delete the assignment to simulate an orphaned tag override
+      @assignment.destroy
+      expect(@assignment.assignment_overrides.active.count).to eq(2) # Should still have 2 tag overrides
+
+      described_class.perform(course)
+
+      job_progress.reload
+      expect(job_progress.workflow_state).to eq("completed")
+      expect(job_progress.completion).to eq(100)
+
+      # Check that the orphaned tag overrides were removed
+      expect(@assignment.assignment_overrides.active.count).to eq(0)
+    end
+
     it "handles errors correctly" do
       job_progress = Progress.create!(context_type: "Course", context_id: course.id, tag: DifferentiationTag::DELAYED_JOB_TAG)
 

@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import {Alert} from '@instructure/ui-alerts'
-import {Pagination} from '@instructure/ui-pagination'
 import {Responsive} from '@instructure/ui-responsive'
 import {canvas} from '@instructure/ui-themes'
 
@@ -34,9 +33,11 @@ import FilesUsageBar from './FilesUsageBar'
 import SearchBar from './SearchBar'
 import {BBFolderWrapper, FileFolderWrapper} from '../../utils/fileFolderWrappers'
 import {NotFoundError, UnauthorizedError} from '../../utils/apiUtils'
+import {getUniqueId} from '../../utils/fileFolderUtils'
 import {useGetFolders} from '../hooks/useGetFolders'
+import {useHandleSelections} from '../hooks/useHandleSelections'
 import {File, Folder} from '../../interfaces/File'
-import {useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
+import {PER_PAGE, useGetPaginatedFiles} from '../hooks/useGetPaginatedFiles'
 import {FilesLayout} from '../layouts/FilesLayout'
 import TopLevelButtons from './FilesHeader/TopLevelButtons'
 import Breadcrumbs from './FileFolderTable/Breadcrumbs'
@@ -44,6 +45,8 @@ import BulkActionButtons from './FileFolderTable/BulkActionButtons'
 import CurrentUploads from './FilesHeader/CurrentUploads'
 import CurrentDownloads from './FilesHeader/CurrentDownloads'
 import NotFoundArtwork from '@canvas/generic-error-page/react/NotFoundArtwork'
+import {FilesGenericSessionExpired} from './FilesGenericSessionExpired'
+import {BasicPagination} from './BasicPagination'
 
 const I18n = createI18nScope('files_v2')
 
@@ -60,6 +63,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   const [currentRows, setCurrentRows] = useState<(File | Folder)[]>([])
   const [paginationAlert, setPaginationAlert] = useState<string>('')
   const [rowToFocus, setRowToFocus] = useState<number | SELECT_ALL_FOCUS_STRING | null>(null)
+  const [sessionExpired, setSessionExpired] = useState(false)
   const currentFolderWrapper = useRef<BBFolderWrapper | null>(null)
   const fileDropRef = useRef<HTMLInputElement | null>(null)
   const selectAllRef = useRef<Checkbox | null>(null)
@@ -73,7 +77,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
   }
 
   const currentFolder = folders[folders.length - 1]
-  const folderId = currentFolder.id.toString()
+  const folderId = currentFolder.id
   const contextId = currentFolder.context_id
   const contextType = currentFolder.context_type.toLowerCase()
 
@@ -134,11 +138,11 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       setPaginationAlert(
         I18n.t('Table page %{current} of %{total}', {
           current: page.current,
-          total: page.total,
+          total: page.totalPages,
         }),
       )
     }
-  }, [isLoading, page.current, page.total])
+  }, [isLoading, page.current, page.totalPages])
 
   const canManageFilesForContext = (permission: string) => {
     return filesEnv.userHasPermission({contextType, contextId}, permission)
@@ -155,10 +159,13 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
     filesEnv.contextFor({contextType, contextId})?.file_index_menu_tools || []
   const fileMenuTools = filesEnv.contextFor({contextType, contextId})?.file_menu_tools || []
 
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  useEffect(() => {
-    setSelectedRows(new Set())
+  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>('')
+
+  const rowIds = useMemo(() => {
+    return rows ? rows.map(row => getUniqueId(row)) : []
   }, [rows])
+
+  const {selectedIds, selectionHandlers} = useHandleSelections(rowIds, setSelectionAnnouncement)
 
   return (
     <FileManagementProvider
@@ -174,7 +181,7 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
       }}
     >
       <RowFocusProvider value={{setRowToFocus, handleActionButtonRef}}>
-        <RowsProvider value={{setCurrentRows, currentRows}}>
+        <RowsProvider value={{setCurrentRows, currentRows, setSessionExpired}}>
           <FilesLayout
             size={size}
             title={I18n.t('Files')}
@@ -185,12 +192,14 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 shouldHideUploadButtons={!userCanAddFilesForContext || search.term.length > 0}
               />
             }
-            search={<SearchBar initialValue={search.term} onSearch={search.set} />}
+            search={
+              <SearchBar key={search.term} initialValue={search.term} onSearch={search.set} />
+            }
             breadcrumbs={<Breadcrumbs folders={folders} size={size} search={search.term} />}
             bulkActions={
               <BulkActionButtons
                 size={size}
-                selectedRows={selectedRows}
+                selectedRows={selectedIds}
                 rows={currentRows ?? []}
                 totalRows={currentRows?.length ?? 0}
                 userCanEditFilesForContext={userCanEditFilesForContext}
@@ -217,8 +226,8 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 onSortChange={sort.set}
                 sort={sort}
                 searchString={search.term}
-                selectedRows={selectedRows}
-                setSelectedRows={setSelectedRows}
+                selectedRows={selectedIds}
+                selectionHandler={selectionHandlers}
                 handleFileDropRef={handleFileDropRef}
                 selectAllRef={selectAllRef}
               />
@@ -234,23 +243,35 @@ const FilesApp = ({folders, isUserContext, size}: FilesAppProps) => {
                 >
                   {paginationAlert}
                 </Alert>
-                {!isLoading && page.total > 1 && (
-                  <Pagination
-                    as="nav"
-                    labelNext={I18n.t('Next page')}
-                    labelPrev={I18n.t('Previous page')}
-                    variant="compact"
+                {!isLoading && page.totalItems > 0 && (
+                  <BasicPagination
+                    labelNext={I18n.t('Next Page')}
+                    labelPrev={I18n.t('Previous Page')}
                     currentPage={page.current}
-                    totalPageNumber={page.total}
-                    onPageChange={page.set}
-                    data-testid="files-pagination"
+                    perPage={PER_PAGE}
+                    totalItems={page.totalItems}
+                    onNext={page.next}
+                    onPrev={page.prev}
                   />
                 )}
               </>
             }
           />
+          <FilesGenericSessionExpired
+            isOpen={sessionExpired}
+            onClose={() => setSessionExpired(false)}
+          />
         </RowsProvider>
       </RowFocusProvider>
+      {selectionAnnouncement && (
+        <Alert
+          liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+          liveRegionPoliteness="polite"
+          screenReaderOnly
+        >
+          {selectionAnnouncement}
+        </Alert>
+      )}
     </FileManagementProvider>
   )
 }

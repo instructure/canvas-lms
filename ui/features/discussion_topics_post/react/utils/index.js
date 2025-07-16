@@ -185,31 +185,28 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 
 export const addReplyToAllRootEntries = (cache, newDiscussionEntry) => {
   if (newDiscussionEntry.id === 'DISCUSSION_ENTRY_PLACEHOLDER') return
-    const options = {
-      query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
-      variables: {
-        discussionEntryID: newDiscussionEntry.rootEntryId
-      },
-    }
-    const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
-    if (rootEntry) {
-      if (
-        rootEntry.legacyNode.allRootEntries &&
-        Array.isArray(rootEntry.legacyNode.allRootEntries)
-      ) {
-        rootEntry.legacyNode.allRootEntries.push(newDiscussionEntry)
-      } else {
-        rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
-      }
-      rootEntry.legacyNode.subentriesCount = (rootEntry.legacyNode.subentriesCount || 0) + 1
-      rootEntry.legacyNode.rootEntryParticipantCounts = {
-        ...rootEntry.legacyNode.rootEntryParticipantCounts,
-        repliesCount: (rootEntry.legacyNode.rootEntryParticipantCounts?.repliesCount || 0) + 1
-      }
-      cache.writeQuery({...options, data: rootEntry})
+  const options = {
+    query: DISCUSSION_ENTRY_ALL_ROOT_ENTRIES_QUERY,
+    variables: {
+      discussionEntryID: newDiscussionEntry.rootEntryId,
+    },
+  }
+  const rootEntry = JSON.parse(JSON.stringify(cache.readQuery(options)))
+  if (rootEntry) {
+    if (rootEntry.legacyNode.allRootEntries && Array.isArray(rootEntry.legacyNode.allRootEntries)) {
+      rootEntry.legacyNode.allRootEntries.push(newDiscussionEntry)
     } else {
-      addFirstReplyToAllRootEntries(cache, newDiscussionEntry)
+      rootEntry.legacyNode.allRootEntries = [newDiscussionEntry]
     }
+    rootEntry.legacyNode.subentriesCount = (rootEntry.legacyNode.subentriesCount || 0) + 1
+    rootEntry.legacyNode.rootEntryParticipantCounts = {
+      ...rootEntry.legacyNode.rootEntryParticipantCounts,
+      repliesCount: (rootEntry.legacyNode.rootEntryParticipantCounts?.repliesCount || 0) + 1,
+    }
+    cache.writeQuery({...options, data: rootEntry})
+  } else {
+    addFirstReplyToAllRootEntries(cache, newDiscussionEntry)
+  }
 }
 
 const addFirstReplyToAllRootEntries = (cache, newDiscussionEntry) => {
@@ -217,14 +214,11 @@ const addFirstReplyToAllRootEntries = (cache, newDiscussionEntry) => {
   const discussionEntryOptions = {
     id: btoa('DiscussionEntry-' + newDiscussionEntry.parentId),
     fragment: DiscussionEntry.fragment,
-    fragmentName: 'DiscussionEntry'
+    fragmentName: 'DiscussionEntry',
   }
   const rootEntry = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
   if (rootEntry) {
-    if (
-      rootEntry.allRootEntries &&
-      Array.isArray(rootEntry.allRootEntries)
-    ) {
+    if (rootEntry.allRootEntries && Array.isArray(rootEntry.allRootEntries)) {
       rootEntry.allRootEntries.push(newDiscussionEntry)
     } else {
       rootEntry.allRootEntries = [newDiscussionEntry]
@@ -232,21 +226,20 @@ const addFirstReplyToAllRootEntries = (cache, newDiscussionEntry) => {
     rootEntry.subentriesCount = (rootEntry.subentriesCount || 0) + 1
     rootEntry.rootEntryParticipantCounts = {
       __typename: 'DiscussionEntryCounts',
-      unreadCount: (rootEntry.rootEntryParticipantCounts?.unreadCount || 0),
-      repliesCount: (rootEntry.repliesCount || 0) + 1
+      unreadCount: rootEntry.rootEntryParticipantCounts?.unreadCount || 0,
+      repliesCount: (rootEntry.repliesCount || 0) + 1,
     }
     rootEntry.lastReply = {
       createdAt: newDiscussionEntry.createdAt,
-      __typename: 'DiscussionEntry'
+      __typename: 'DiscussionEntry',
     }
 
     cache.writeFragment({
       ...discussionEntryOptions,
-      data: rootEntry
+      data: rootEntry,
     })
   }
 }
-
 
 export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
   // If the new discussion entry is a reply to a reply, update the subentries count on the parent entry.
@@ -262,12 +255,12 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
       if (data.rootEntryParticipantCounts) {
         data.lastReply = {
           createdAt: newDiscussionEntry.createdAt,
-          __typename: 'DiscussionEntry'
+          __typename: 'DiscussionEntry',
         }
         data.rootEntryParticipantCounts = {
           ...data.rootEntryParticipantCounts,
-          unreadCount: (data.rootEntryParticipantCounts?.unreadCount || 0),
-          repliesCount: (data.rootEntryParticipantCounts?.repliesCount || 0) + 1
+          unreadCount: data.rootEntryParticipantCounts?.unreadCount || 0,
+          repliesCount: (data.rootEntryParticipantCounts?.repliesCount || 0) + 1,
         }
       }
 
@@ -279,8 +272,8 @@ export const addSubentriesCountToParentEntry = (cache, newDiscussionEntry) => {
 
       cache.writeFragment({
         ...discussionEntryOptions,
-        data
-      });
+        data,
+      })
     }
   }
 }
@@ -511,9 +504,9 @@ export const getTranslation = async (text, translateTargetLanguage) => {
       path: apiPath,
       body: {
         inputs: {
-          src_lang: 'en', // TODO: detect source language.
           tgt_lang: translateTargetLanguage,
           text,
+          feature_slug: 'discussion',
         },
       },
     })

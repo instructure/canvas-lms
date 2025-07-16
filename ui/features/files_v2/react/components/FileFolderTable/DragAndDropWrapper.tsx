@@ -29,12 +29,17 @@ import {BBFolderWrapper} from '../../../utils/fileFolderWrappers'
 
 const I18n = createI18nScope('upload_drop_zone')
 
+const isInternalMove = (e: DragEvent) => {
+  // If this is an internal drag, do not treat as upload
+  return e.dataTransfer.types.includes('application/x-canvas-file')
+}
+
 export const DragAndDropWrapper = (
   props: PropsWithChildren<{
     enabled: boolean
     minHeight: number
     currentFolder: BBFolderWrapper
-    contextId: string | number
+    contextId: string
     contextType: string
   }>,
 ) => {
@@ -55,7 +60,8 @@ export const DragAndDropWrapper = (
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault()
   }
-  const onDragEnter = () => {
+  const onDragEnter = (e: DragEvent<HTMLDivElement>) => {
+    if (isInternalMove(e)) return
     counterRef.current += 1
     showOverlay()
   }
@@ -70,6 +76,8 @@ export const DragAndDropWrapper = (
     e.preventDefault()
     counterRef.current = 0
     hideOverlay()
+
+    if (isInternalMove(e)) return
 
     const fileOptions = startUpload(
       props.currentFolder,

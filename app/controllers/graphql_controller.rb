@@ -72,7 +72,12 @@ class GraphQLController < ApplicationController
   private
 
   def execute_on(schema)
-    query = params[:query]
+    query = anonymous_call? ? persisted_query["query"] : params[:query]
+
+    if params[:query] && params[:query].strip != query.strip
+      raise ActionController::BadRequest, "Requested query mismatches persisted query"
+    end
+
     variables = params[:variables] || {}
     context = {
       current_user: @current_user,
@@ -99,10 +104,21 @@ class GraphQLController < ApplicationController
 
   def require_auth?
     if action_name == "execute"
-      return !::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
+      return false if ::Account.site_admin.feature_enabled?(:disable_graphql_authentication)
+      if persisted_query
+        return !persisted_query["anonymous_access_allowed"]
+      end
     end
 
     true
+  end
+
+  def anonymous_call?
+    !@current_user && !require_auth? && persisted_query && in_app?
+  end
+
+  def persisted_query
+    @persisted_query ||= GraphQL::PersistedQuery.find(params[:operationName]) if @domain_root_account.feature_enabled?(:graphql_persisted_queries)
   end
 
   def sdl_query?

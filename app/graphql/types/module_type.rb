@@ -45,7 +45,7 @@ class ModuleProgressionLoader < GraphQL::Batch::Loader
     GuardRail.activate(:secondary) do
       progressions = ContextModuleProgression.where(
         context_module_id: context_modules.map(&:id),
-        user_id: @user.id
+        user_id: @user&.id
       ).index_by(&:context_module_id)
       context_modules.each do |context_module|
         progression = progressions[context_module.id]
@@ -93,7 +93,9 @@ module Types
 
     field :completion_requirements, [ModuleCompletionRequirementType], null: true
     def completion_requirements
-      context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+      ModuleItemsVisibleLoader.for(current_user).load(context_module).then do |_|
+        context_module.completion_requirements_visible_to(current_user, is_teacher: false)
+      end
     end
 
     field :requirement_count, Integer, null: true
@@ -108,7 +110,11 @@ module Types
 
     field :submission_statistics, Types::ModuleStatisticsType, null: true
     def submission_statistics
-      Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+      if current_user
+        Loaders::ModuleStatisticsLoader.for(current_user:).load(context_module)
+      else
+        {}
+      end
     end
 
     field :estimated_duration, GraphQL::Types::ISO8601Duration, null: true
@@ -128,10 +134,7 @@ module Types
     field :has_active_overrides, Boolean, null: false
 
     def has_active_overrides
-      AssignmentOverride.where(
-        context_module_id: object.id,
-        workflow_state: "active"
-      ).exists?
+      Loaders::ModuleActiveOverridesLoader.for.load(object)
     end
   end
 end

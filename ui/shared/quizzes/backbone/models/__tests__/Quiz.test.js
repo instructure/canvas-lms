@@ -25,11 +25,11 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import {http, HttpResponse} from 'msw'
-import {mswServer} from '../../../../msw/mswServer'
+import {setupServer} from 'msw/node'
 
 jest.mock('@canvas/panda-pub-poller')
 
-const server = mswServer([])
+const server = setupServer()
 
 describe('Quiz', () => {
   let quiz

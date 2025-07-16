@@ -32,33 +32,43 @@ class TranslationController < ApplicationController
 
   def translate
     start_time = Time.zone.now
-    improvements_enabled = @domain_root_account.feature_enabled?(:ai_translation_improvements)
     # Don't allow users that can't access, or if translation is not available
-    return render_unauthorized_action unless Translation.available?(@context, :translation, improvements_enabled) && user_can_read?
+    translation_flags = Translation.get_translation_flags(@context.feature_enabled?(:translation), @domain_root_account)
+    return render_unauthorized_action unless Translation.available?(translation_flags) && user_can_read?
 
-    if improvements_enabled
-      translated_text = Translation.translate_html(html_string: required_params[:text], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: }
+    translated_text = Translation.translate_html(html_string: required_params[:text],
+                                                 tgt_lang: required_params[:tgt_lang],
+                                                 flags: translation_flags,
+                                                 options: {
+                                                   root_account_uuid: @domain_root_account.uuid,
+                                                   feature_slug: required_params[:feature_slug]
+                                                 })
+
+    render json: { translated_text: }
+    if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
       duration = Time.zone.now - start_time
       InstStatsd::Statsd.timing("translation.discussions.duration", duration)
-    else
-      translated_text = Translation.translate_html_sagemaker(html_string: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: }
     end
   end
 
   def translate_paragraph
     start_time = Time.zone.now
-
-    if @domain_root_account.feature_enabled?(:ai_translation_improvements)
-      translated_text = Translation.translate_text(text: required_params[:text], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: }
+    # Right now course is always undefined
+    translation_flags = Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account)
+    translated_text = Translation.translate_text(
+      text: required_params[:text],
+      tgt_lang: required_params[:tgt_lang],
+      flags: translation_flags,
+      options: {
+        root_account_uuid: @domain_root_account.uuid,
+        feature_slug: required_params[:feature_slug]
+      }
+    )
+    if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
       duration = Time.zone.now - start_time
       InstStatsd::Statsd.timing("translation.inbox_compose.duration", duration)
-    else
-      translated_text = translate_large_passage(original_text: required_params[:text], src_lang: required_params[:src_lang], tgt_lang: required_params[:tgt_lang])
-      render json: { translated_text: }
     end
+    render json: { translated_text: }
   end
 
   def handle_same_language_error
@@ -67,16 +77,16 @@ class TranslationController < ApplicationController
   end
 
   def handle_generic_error(exception)
+    translation_flags = Translation.get_translation_flags(@context, @domain_root_account)
     tags = []
     case exception
     when Aws::Translate::Errors::UnsupportedLanguagePairException
-      improvements_enabled = @domain_root_account.feature_enabled?(:ai_translation_improvements)
       error_data = JSON.parse(exception.context.http_response.body.read)
       source_lang_code = error_data["SourceLanguageCode"]
       target_lang_code = error_data["TargetLanguageCode"]
       tags = ["error:unsupported_language_pair", "source_language:#{source_lang_code}", "dest_language:#{target_lang_code}"]
-      source_lang = Translation.languages(improvements_enabled).find { |lang| lang[:id] == source_lang_code }
-      target_lang = Translation.languages(improvements_enabled).find { |lang| lang[:id] == target_lang_code }
+      source_lang = Translation.languages(translation_flags).find { |lang| lang[:id] == source_lang_code }
+      target_lang = Translation.languages(translation_flags).find { |lang| lang[:id] == target_lang_code }
       message = I18n.t("Translation from %{source_lang} to %{target_lang} is not supported.", { source_lang: source_lang[:name], target_lang: target_lang[:name] })
       status = :unprocessable_entity
     when Aws::Translate::Errors::DetectedLanguageLowConfidenceException
@@ -103,26 +113,8 @@ class TranslationController < ApplicationController
 
   private
 
-  def translate_large_passage(original_text:, src_lang:, tgt_lang:)
-    # Split into paragraphs.
-    text = []
-    original_text.split("\n").map do |paragraph|
-      # Translate the paragraph
-      passage = []
-      PragmaticSegmenter::Segmenter.new(text: paragraph, language: src_lang).segment.each do |segment|
-        trans = Translation.create(tgt_lang:,
-                                   src_lang:,
-                                   text: segment)
-        passage.append(trans)
-      end
-      text.append(passage.join)
-    end
-
-    text.join("\n")
-  end
-
   def required_params
-    params.require(:inputs).permit(:src_lang, :tgt_lang, :text)
+    params.require(:inputs).permit(:src_lang, :tgt_lang, :text, :feature_slug)
   end
 
   def user_can_read?
@@ -130,6 +122,6 @@ class TranslationController < ApplicationController
   end
 
   def require_inbox_translation
-    render_unauthorized_action unless Translation.available?(@domain_root_account, :translate_inbox_messages, @domain_root_account.feature_enabled?(:ai_translation_improvements))
+    render_unauthorized_action unless Translation.available?(Translation.get_translation_flags(@domain_root_account.feature_enabled?(:translate_inbox_messages), @domain_root_account))
   end
 end

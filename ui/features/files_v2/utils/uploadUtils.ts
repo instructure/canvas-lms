@@ -21,7 +21,7 @@ import {FileOptionsResults} from '../react/components/FilesHeader/UploadButton/F
 import {BBFolderWrapper} from './fileFolderWrappers'
 
 export const queueOptionsCollectionUploads = (
-  contextId: string | number,
+  contextId: string,
   contextType: string,
   fileOptions?: FileOptionsResults | null,
   onClose?: () => void,
@@ -41,7 +41,7 @@ export const queueOptionsCollectionUploads = (
 
 export const startUpload = (
   folder: BBFolderWrapper,
-  contextId: string | number,
+  contextId: string,
   contextType: string,
   onClose: (() => void) | undefined,
   files: ArrayLike<DataTransferItem | globalThis.File>,

@@ -3546,4 +3546,55 @@ describe Attachment do
       expect(@attachment.media_object_by_media_id).to eq @media_object
     end
   end
+
+  describe "used_in_submission_history?" do
+    before do
+      course_with_student
+      @assignment = assignment_model(course: @course)
+      @att = attachment_model(context: @user)
+    end
+
+    it "returns true when the attachment is submitted" do
+      @assignment.submit_homework(
+        @user,
+        attachments: [@att],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be true
+    end
+
+    it "returns false when the attachment is not used in any submissions" do
+      other_attachment = attachment_model(context: @user)
+      @assignment.submit_homework(
+        @user,
+        attachments: [other_attachment],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be false
+    end
+
+    it "returns false when there are no submissions" do
+      expect(@att.used_in_submission_history?(@course)).to be false
+    end
+
+    it "returns true if attachment is used in an earlier version but not current submission" do
+      other_attachment = attachment_model(context: @user)
+      Timecop.freeze(1.second.ago) do
+        @assignment.submit_homework(
+          @user,
+          attachments: [@att],
+          submission_type: "online_upload"
+        )
+      end
+      @assignment.submit_homework(
+        @user,
+        attachments: [other_attachment],
+        submission_type: "online_upload"
+      )
+
+      expect(@att.used_in_submission_history?(@course)).to be true
+    end
+  end
 end

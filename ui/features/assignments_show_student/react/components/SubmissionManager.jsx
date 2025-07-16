@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {useState, useEffect, useContext, useRef} from 'react'
 import {useApolloClient, useMutation} from '@apollo/client'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   CREATE_SUBMISSION,
@@ -36,9 +36,8 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {RubricAssessmentTray} from '@canvas/rubrics/react/RubricAssessment'
 import {assignLocation} from '@canvas/util/globalUtils'
-import {clearAssetProcessorReports} from '../helpers/AssetProcessorHelper'
+import {clearAssetProcessorReports} from '@canvas/lti/react/AssetProcessorHelper'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
@@ -46,7 +45,6 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import qs from 'qs'
-import React, {useState, useEffect, useContext, useRef} from 'react'
 import {
   availableAndUnavailableCounts,
   getPeerReviewButtonText,
@@ -54,13 +52,14 @@ import {
   getPeerReviewSubHeaderText,
   getRedirectUrlToFirstPeerReview,
 } from '../helpers/PeerReviewHelpers'
-import {transformRubricAssessmentData} from '../helpers/RubricHelpers'
+import {shouldRenderSelfAssessment, transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import {
   friendlyTypeName,
   isSubmitted,
   multipleTypesDrafted,
   totalAllowedAttempts,
   activeTypeMeetsCriteria,
+  getPointsValue,
 } from '../helpers/SubmissionHelpers'
 import AttemptTab from './AttemptTab'
 import StudentViewContext from './Context'
@@ -69,6 +68,8 @@ import PeerReviewPromptModal from './PeerReviewPromptModal'
 import SimilarityPledge from '@canvas/assignments/react/SimilarityPledge'
 import StudentFooter from './StudentFooter'
 import useStore from './stores/index'
+import {SelfAssessmentButton} from './RubricSelfAssessment/SelfAssessmentButton'
+import {SelfAssessmentTrayClient} from './RubricSelfAssessment/SelfAssessmentTrayClient'
 
 const I18n = createI18nScope('assignments_2_file_upload')
 
@@ -207,7 +208,6 @@ const SubmissionManager = ({
     allowChangesToSubmission,
     latestSubmission,
     isLatestAttempt,
-    lastSubmittedSubmission,
     cancelDraftAction,
     showDraftAction,
     startNewAttemptAction,
@@ -482,18 +482,6 @@ const SubmissionManager = ({
     )
   }
 
-  const shouldRenderSelfAssessment = () => {
-    return (
-      !assignment.env.peerReviewModeEnabled &&
-      ENV.enhanced_rubrics_enabled &&
-      assignment.rubric &&
-      assignment.rubricSelfAssessmentEnabled &&
-      allowChangesToSubmission &&
-      !assignment.lockInfo.isLocked &&
-      submission.gradingStatus !== 'excused'
-    )
-  }
-
   const hasSubmittedAssessment = () => {
     const assessments = rubricData?.submission?.rubricAssessmentsConnection?.nodes?.map(
       assessment => transformRubricAssessmentData(assessment),
@@ -631,45 +619,11 @@ const SubmissionManager = ({
     useStore.setState({isSavingRubricAssessment: false})
   }
 
-  const handleSubmitSelfAssessment = async assessment => {
-    if (!isRubricComplete(assessment)) {
-      setOnFailure(I18n.t('Incomplete Self Assessment'))
-      return
-    }
-
-    try {
-      setIsSubmitting(true)
+  const handleOnSubmitSelfAssessment = (isSubmitting, assessment) => {
+    setIsSubmitting(isSubmitting)
+    if (isSubmitting) {
       useStore.setState({selfAssessment: assessment})
-      let params = assessment.data.reduce(
-        (result, item) => {
-          return {...result, ...parseCriterion(item)}
-        },
-        {
-          assessment_type: 'self_assessment',
-          user_id: ENV.current_user.id,
-        },
-      )
-      params = {
-        rubric_assessment: params,
-        _method: 'POST',
-      }
-
-      const rubricAssociation = rubricData.assignment.rubricAssociation
-      await doFetchApi({
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        path: `/courses/${ENV.COURSE_ID}/rubric_associations/${rubricAssociation._id}/assessments`,
-        body: qs.stringify(params),
-      })
-
-      setIsSelfAssessmentOpen(false)
-      showFlashSuccess(I18n.t('Self Assessment was successfully submitted'))()
-      fetchRubricData({fromCache: false})
-    } catch (error) {
-      useStore.setState({selfAssessment: null})
-      showFlashError(I18n.t('Error submitting self assessment'))()
     }
-    setIsSubmitting(false)
   }
 
   const handleSuccess = (message = I18n.t('Submission sent')) => {
@@ -869,8 +823,14 @@ const SubmissionManager = ({
       },
       {
         key: 'submit-self-assessment',
-        shouldRender: () => shouldRenderSelfAssessment(),
-        render: () => renderSelfAssessmentButton(),
+        shouldRender: () =>
+          shouldRenderSelfAssessment({assignment, submission, allowChangesToSubmission}),
+        render: () => (
+          <SelfAssessmentButton
+            isEnabled={isSubmitted(submission)}
+            onOpenSelfAssessmentTrigger={() => setIsSelfAssessmentOpen(true)}
+          />
+        ),
       },
       {
         key: 'submit-peer-review',
@@ -908,21 +868,6 @@ const SubmissionManager = ({
     )
   }
 
-  const renderSelfAssessmentButton = () => {
-    return (
-      <Button
-        id="self-assess-button"
-        data-testid="self-assess-button"
-        disabled={!isSubmitted(submission)}
-        color="primary"
-        withBackground={false}
-        onClick={() => setIsSelfAssessmentOpen(true)}
-      >
-        {I18n.t('Self-Assess')}
-      </Button>
-    )
-  }
-
   const renderSubmitPeerReviewButton = () => {
     return (
       <Button
@@ -954,40 +899,6 @@ const SubmissionManager = ({
     )
   }
 
-  const rubricTrayData = {
-    title: assignment.rubric?.title,
-    ratingOrder: assignment.rubric?.ratingOrder,
-    freeFormCriterionComments: assignment.rubric?.free_form_criterion_comments,
-    pointsPossible: assignment.rubric?.points_possible,
-    criteria: (assignment.rubric?.criteria || []).map(criterion => {
-      return {
-        ...criterion,
-        longDescription: criterion.long_description,
-        criterionUseRange: criterion.criterion_use_range,
-        learningOutcomeId: criterion.learning_outcome_id,
-        ignoreForScoring: criterion.ignore_for_scoring,
-        masteryPoints: criterion.mastery_points,
-        ratings: criterion.ratings.map(rating => {
-          return {
-            ...rating,
-            longDescription: rating.long_description,
-            points: rating.points,
-            criterionId: criterion.id,
-          }
-        }),
-      }
-    }),
-  }
-
-  const rubricAssessmentData = (selfAssessment?.data ?? []).map(data => {
-    const points = data.points
-    return {
-      ...data,
-      criterionId: data.criterion_id,
-      points: typeof points === 'number' ? points : points.value,
-    }
-  })
-
   return (
     <>
       {isSubmitting ? <LoadingIndicator /> : renderAttemptTab()}
@@ -1007,35 +918,15 @@ const SubmissionManager = ({
         onClose={() => handleClosePeerReviewPromptModal()}
         onRedirect={() => handleRedirectToFirstPeerReview()}
       />
-      <RubricAssessmentTray
+      <SelfAssessmentTrayClient
         hidePoints={rubricData?.assignment?.rubricAssociation?.hide_points}
         isOpen={isSelfAssessmentOpen}
         isPreviewMode={!!selfAssessment}
-        isSelfAssessment={shouldRenderSelfAssessment()}
-        isPeerReview={false}
         onDismiss={() => setIsSelfAssessmentOpen(false)}
-        rubricAssessmentData={rubricAssessmentData}
-        rubric={rubricTrayData}
-        viewModeOverride="horizontal"
-        onSubmit={assessment => {
-          const assessmentFormatted = {
-            score: assessment.reduce((prev, curr) => prev + (curr.points ?? 0), 0),
-            data: assessment.map(criterionAssessment => {
-              const {points} = criterionAssessment
-              const valid = !Number.isNaN(points)
-              return {
-                ...criterionAssessment,
-                criterion_id: criterionAssessment.criterionId,
-                points: {
-                  text: points?.toString(),
-                  valid,
-                  value: points,
-                },
-              }
-            }),
-          }
-          handleSubmitSelfAssessment(assessmentFormatted)
-        }}
+        rubric={assignment.rubric}
+        rubricAssociationId={rubricData?.assignment?.rubricAssociation?._id}
+        handleOnSubmitting={handleOnSubmitSelfAssessment}
+        handleOnSuccess={() => setIsSelfAssessmentOpen(false)}
       />
     </>
   )

@@ -79,7 +79,7 @@ describe('NoResultsFound', () => {
     expect(getByText('Suggestions:')).toBeInTheDocument()
     expect(getByText('Check spelling')).toBeInTheDocument()
     expect(getByText('Try different keywords')).toBeInTheDocument()
-    expect(getByText('Enter at least 3 letters in the search box')).toBeInTheDocument()
+    expect(getByText('Enter at least 2 characters in the search box')).toBeInTheDocument()
   })
 
   it('includes additional explanatory text', () => {

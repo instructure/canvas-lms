@@ -1715,6 +1715,109 @@ describe "Accounts API", type: :request do
       end
     end
 
+    describe "?enrollment_workflow_state" do
+      before :once do
+        @me = @user
+        @course_with_active_student_enrollment = course_with_student(account: @a1, course_name: "A", active_enrollment: true).course
+        @course_with_active_teacher_enrollment = course_with_teacher(account: @a1, course_name: "B", active_enrollment: true).course
+        course_with_student(account: @a1, course_name: "C").update!(workflow_state: "inactive")
+        course_with_student(account: @a1, course_name: "D").update!(workflow_state: "pending")
+        course_with_student(account: @a1, course_name: "E").update!(workflow_state: "creation_pending")
+        course_with_student(account: @a1, course_name: "F").update!(workflow_state: "deleted")
+        course_with_student(account: @a1, course_name: "G").update!(workflow_state: "completed")
+        course_with_student(account: @a1, course_name: "H").update!(workflow_state: "invited")
+        course_with_student(account: @a1, course_name: "I").update!(workflow_state: "rejected")
+        @user = @me
+      end
+
+      it "returns courses where there is at least one enrollment with the specified workflow state" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/courses",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a1.to_param,
+                          format: "json",
+                          enrollment_workflow_state: ["active"] })
+
+        expect(json.pluck("id").map(&:to_i)).to eql [@course_with_active_student_enrollment.id, @course_with_active_teacher_enrollment.id]
+      end
+
+      it "ignores non array values and returns back all courses" do
+        api_call(:get,
+                 "/api/v1/accounts/#{@a1.id}/courses",
+                 { controller: "accounts",
+                   action: "courses_api",
+                   account_id: @a1.to_param,
+                   format: "json",
+                   enrollment_workflow_state: "random_string" })
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body.count).to eq(@a1.courses.count)
+      end
+
+      it "fails gracefully if an invalid enrollment_workflow_state is provided" do
+        api_call(:get,
+                 "/api/v1/accounts/#{@a1.id}/courses",
+                 { controller: "accounts",
+                   action: "courses_api",
+                   account_id: @a1.to_param,
+                   format: "json",
+                   enrollment_workflow_state: %w[active foo bar] })
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to eq({ "message" => "Invalid value provided to 'enrollment_workflow_state'" })
+      end
+
+      it "considers the specified enrollment_type when filtering by enrollment_workflow_state" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/courses",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a1.to_param,
+                          format: "json",
+                          enrollment_type: ["student"],
+                          enrollment_workflow_state: ["active"] })
+
+        expect(json.pluck("id").map(&:to_i)).to eql [@course_with_active_student_enrollment.id]
+      end
+    end
+
+    describe "?enrollment_type" do
+      before :once do
+        @me = @user
+        @course_with_student = course_with_student(account: @a1, course_name: "A").course
+        course_with_ta(account: @a1, course_name: "C")
+        course_with_observer(account: @a1, course_name: "D")
+        course_with_designer(account: @a1, course_name: "E")
+        @user = @me
+      end
+
+      it "returns courses where there is at least one enrollment with the specified type" do
+        json = api_call(:get,
+                        "/api/v1/accounts/#{@a1.id}/courses",
+                        { controller: "accounts",
+                          action: "courses_api",
+                          account_id: @a1.to_param,
+                          format: "json",
+                          enrollment_type: ["student"] })
+
+        expect(json.pluck("id").map(&:to_i)).to eql [@course_with_student.id]
+      end
+
+      it "fails gracefully if an invalid enrollment_type is provided" do
+        api_call(:get,
+                 "/api/v1/accounts/#{@a1.id}/courses",
+                 { controller: "accounts",
+                   action: "courses_api",
+                   account_id: @a1.to_param,
+                   format: "json",
+                   enrollment_type: %w[student foo bar] })
+
+        expect(response).to have_http_status(:bad_request)
+        expect(response.parsed_body).to eq({ "message" => "Invalid value provided to 'enrollment_type'" })
+      end
+    end
+
     describe "?published" do
       before :once do
         @me = @user

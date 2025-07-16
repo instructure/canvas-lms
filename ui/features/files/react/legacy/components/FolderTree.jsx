@@ -56,7 +56,7 @@ export default {
       },
       {
         render: true,
-        element: ReactDOM.findDOMNode(this.refs.FolderTreeHolder),
+        element: ReactDOM.findDOMNode(this.folderTreeHolderRef.current),
       },
     ).index
 
@@ -73,10 +73,10 @@ export default {
 
   onClick(event, folder) {
     event.preventDefault()
-    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+    $(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
       .find(`.${this.focusStyleClass}`)
       .each((key, value) => $(value).removeClass(this.focusStyleClass))
-    $(ReactDOM.findDOMNode(this.refs.FolderTreeHolder))
+    $(ReactDOM.findDOMNode(this.folderTreeHolderRef.current))
       .find(`.${this.selectedStyleClass}`)
       .each((key, value) => $(value).removeClass(this.selectedStyleClass))
     if (folder.get('locked_for_user')) {

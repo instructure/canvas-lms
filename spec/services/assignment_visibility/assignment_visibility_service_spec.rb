@@ -559,6 +559,42 @@ describe AssignmentVisibility::AssignmentVisibilityService do
 
             ensure_user_does_not_see_assignment
           end
+
+          it "applies context module tags overrides" do
+            @course.account.enable_feature!(:assign_to_differentiation_tags)
+            @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
+            @course.account.save
+            assignment_with_false_only_visible_to_overrides
+
+            diff_tag_cat = @course.group_categories.create!(context: @course, name: "Differentiation Tags", non_collaborative: true)
+            diff_tag = @course.groups.create!(context: @course, non_collaborative: true, group_category: diff_tag_cat, name: "Differentiation Tag Group 1")
+            enroll_user_in_group(diff_tag, { user: @user })
+
+            module1 = @course.context_modules.create!(name: "Module 1")
+            module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag.id)
+
+            @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+            ensure_user_sees_assignment
+          end
+
+          it "does not show Assignment in the module if user does not belong to the tag" do
+            @course.account.enable_feature!(:assign_to_differentiation_tags)
+            @course.account.settings = { allow_assign_to_differentiation_tags: { value: true } }
+            @course.account.save
+
+            assignment_with_false_only_visible_to_overrides
+
+            diff_tag_cat = @course.group_categories.create!(context: @course, name: "Differentiation Tags", non_collaborative: true)
+            diff_tag = @course.groups.create!(context: @course, non_collaborative: true, group_category: diff_tag_cat, name: "Differentiation Tag Group 1")
+
+            module1 = @course.context_modules.create!(name: "Module 1")
+            module1.assignment_overrides.create!(set_type: "Group", set_id: diff_tag.id)
+
+            @assignment.context_module_tags.create! context_module: module1, context: @course, tag_type: "context_module"
+
+            ensure_user_does_not_see_assignment
+          end
         end
 
         context "assignments with modules" do

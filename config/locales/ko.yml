@@ -1479,6 +1479,7 @@ ko:
   allow_self_sign_up_7520f8c5: "직접 등록 허용"
   allow_threaded_replies_43b2311e: "계층 구조 답변 허용"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "달력 행사 복제 허용하기"
+  alt_text_c12d1c1c: "대체 텍스트"
   always_3a59e701: 항상
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사, 계정 관리자에게 보냅니다."
   an_alert_is_generated_for_each_student_that_meets__fcd175ac: "알림은 모든 기준을 만족하는 각 학생에게 생성됩니다. 알림은 매일 체크해서 트리거한 문제가 해결될 때까지 학생, 교사에게 보냅니다."
@@ -3345,6 +3346,7 @@ ko:
       importing_button: "가져오는 중… 이 작업은 시간이 걸릴 수 있음"
     titles: 
       home_page: "홈 페이지"
+  content_licensing_help_3d15e649: "내용 라이선싱 도움말"
   content_locks: 
     buttons: 
       ok_thanks: 감사합니다.
@@ -4061,6 +4063,8 @@ ko:
   count_points_4735a2e8: 
     one: "%{count} 점"
     other: "%{count} 점"
+  count_results_9926447c: 
+    zero: "결과 없음"
   count_sections_bf1baf0a: 
     one: "섹션 %{count}개"
     other: "섹션 %{count}개"
@@ -13298,6 +13302,7 @@ ko:
   show_concluded_enrollments_6a05544c: "종결된 등록 표시"
   show_less_f778dab5: "간단히 표시"
   show_more_fae1328: "자세히 표시"
+  showing_cceab2d9: "표시 중"
   showing_count_results_below_61ddca33: 
     zero: "결과가 없음"
   sign_in_c6858e26: 로그인

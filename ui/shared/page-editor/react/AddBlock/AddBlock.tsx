@@ -27,7 +27,10 @@ import {AddButton} from './AddButton'
 const I18n = createI18nScope('page_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal} = usePageEditorContext()
+  const {addBlockModal, addBlock} = usePageEditorContext()
+  if (!addBlock.shouldShow) {
+    return null
+  }
   return (
     <View borderWidth="small" borderRadius="medium">
       <Flex direction="column" padding="large" gap="large" alignItems="center">

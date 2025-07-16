@@ -711,7 +711,8 @@ class JobsV2Controller < ApplicationController
                   scope.where(id: shard_ids)
                 end
       end
-      scope
+      # sometimes jobs databases don't exist in test environments
+      scope.select(&:database_server)
     end
 
     def run_unstucker!(progress, shard_ids: [])

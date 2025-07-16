@@ -16,10 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ContentItemType} from './types'
+import {ContentItemType, Severity} from './types'
+import {useScope as createI18nScope} from '@canvas/i18n'
+
+const I18n = createI18nScope('accessibility_checker')
 
 export const TypeToKeyMap: Record<ContentItemType, 'pages' | 'assignments' | 'attachments'> = {
   [ContentItemType.WikiPage]: 'pages',
   [ContentItemType.Assignment]: 'assignments',
   [ContentItemType.Attachment]: 'attachments',
+}
+
+export const ruleIdToLabelMap: Record<string, string> = {
+  'adjacent-links': I18n.t('Adjacent links'),
+  'headings-sequence': I18n.t('Headings sequence'),
+  'has-lang-entry': I18n.t('PDF language entry'),
+  'headings-start-at-h2': I18n.t('Headings start at H2'),
+  'img-alt': I18n.t('Image alt text missing'),
+  'img-alt-filename': I18n.t('Image alt filename'),
+  'img-alt-length': I18n.t('Image alt text length'),
+  'large-text-contrast': I18n.t('Large text contrast'),
+  'small-text-contrast': I18n.t('Small text contrast'),
+  'list-structure': I18n.t('List structure'),
+  'paragraphs-for-headings': I18n.t('Paragraphs for headings'),
+  'table-caption': I18n.t('Table caption'),
+  'table-header': I18n.t('Table header'),
+  'table-header-scope': I18n.t('Table header scope'),
+}
+
+export const severityColors: Record<Severity, string> = {
+  High: '#9B181C', // Red82
+  Medium: '#E62429', // red45
+  Low: '#F06E26', // orange30
 }

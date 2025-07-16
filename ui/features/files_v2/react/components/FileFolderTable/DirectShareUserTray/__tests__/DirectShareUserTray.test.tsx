@@ -23,6 +23,8 @@ import useContentShareUserSearchApi from '@canvas/direct-sharing/react/effects/u
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import userEvent from '@testing-library/user-event'
 import {FAKE_FILES} from '../../../../../fixtures/fakeData'
+import {RowsProvider} from '../../../../contexts/RowsContext'
+import {mockRowsContext} from '../../__tests__/testUtils'
 
 jest.mock('@canvas/direct-sharing/react/effects/useContentShareUserSearchApi')
 jest.mock('@canvas/do-fetch-api-effect')
@@ -55,7 +57,11 @@ const defaultProps = {
 }
 
 const renderComponent = (props?: any) =>
-  render(<DirectShareUserTray {...defaultProps} {...props} />)
+  render(
+    <RowsProvider value={mockRowsContext}>
+      <DirectShareUserTray {...defaultProps} {...props} />
+    </RowsProvider>,
+  )
 
 describe('DirectShareUserTray', () => {
   let ariaLive: HTMLElement
@@ -121,12 +127,12 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: 178,
+          content_id: '178',
         },
       })
 
-      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(await screen.getAllByText(/success/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/success/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).toHaveBeenCalled()
     })
 
@@ -150,12 +156,12 @@ describe('DirectShareUserTray', () => {
         body: {
           receiver_ids: ['1'],
           content_type: 'attachment',
-          content_id: 178,
+          content_id: '178',
         },
       })
 
-      expect(await screen.getAllByText(/start/i)[0]).toBeInTheDocument()
-      expect(await screen.getAllByText(/error/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/start/i)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/error/i)[0]).toBeInTheDocument()
       expect(defaultProps.onDismiss).not.toHaveBeenCalled()
     })
   })

@@ -22,7 +22,7 @@ import {FileManagementProvider} from '../../../contexts/FileManagementContext'
 import {RowFocusProvider} from '../../../contexts/RowFocusContext'
 import {RowsProvider} from '../../../contexts/RowsContext'
 import {createMockFileManagementContext} from '../../../__tests__/createMockContext'
-import {mockRowFocusContext} from './testUtils'
+import {mockRowFocusContext, mockRowsContext} from './testUtils'
 import BulkActionButtons, {BulkActionButtonsProps} from '../BulkActionButtons'
 import {type File, Folder} from '../../../../interfaces/File'
 
@@ -34,14 +34,14 @@ const defaultProps: BulkActionButtonsProps = {
   userCanDeleteFilesForContext: true,
   userCanRestrictFilesForContext: true,
   usageRightsRequiredForContext: true,
-  rows: [{id: 1, display_name: 'File 1'} as File, {id: 2, display_name: 'File 2'} as File],
+  rows: [{id: '1', display_name: 'File 1'} as File, {id: '2', display_name: 'File 2'} as File],
 }
 
 const renderComponent = (props: BulkActionButtonsProps = {...defaultProps}) => {
   return render(
     <FileManagementProvider value={createMockFileManagementContext()}>
       <RowFocusProvider value={mockRowFocusContext}>
-        <RowsProvider value={{setCurrentRows: jest.fn(), currentRows: props.rows}}>
+        <RowsProvider value={mockRowsContext}>
           <BulkActionButtons {...defaultProps} {...props} />
         </RowsProvider>
       </RowFocusProvider>
@@ -162,8 +162,8 @@ describe('BulkActionButtons', () => {
     renderComponent({
       ...defaultProps,
       rows: [
-        {id: 1, display_name: 'File 1', restricted_by_master_course: true} as File,
-        {id: 2, display_name: 'File 2'} as File,
+        {id: '1', display_name: 'File 1', restricted_by_master_course: true} as File,
+        {id: '2', display_name: 'File 2'} as File,
       ],
     })
     const moreButton = screen.getByTestId('bulk-actions-more-button')
@@ -189,7 +189,7 @@ describe('BulkActionButtons', () => {
     beforeEach(() => {
       renderComponent({
         ...defaultProps,
-        rows: [{id: 1, name: 'Folder 1'} as Folder, {id: 2, name: 'Folder 2'} as Folder],
+        rows: [{id: '1', name: 'Folder 1'} as Folder, {id: '2', name: 'Folder 2'} as Folder],
         selectedRows: new Set(['folder-1', 'folder-2']),
       })
     })

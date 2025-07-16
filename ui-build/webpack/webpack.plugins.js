@@ -34,7 +34,8 @@ const {
   fetchSpeedGraderLibrary,
   fetchAnalyticsHub,
   fetchLtiUsage,
-  fetchCanvasCareerApp,
+  fetchCanvasCareerLearningProviderApp,
+  fetchCanvasCareerLearnerApp,
 } = require('./remotes')
 
 // determines which folder public assets are compiled to
@@ -170,7 +171,8 @@ exports.moduleFederation = new ModuleFederationPlugin({
   remotes: {
     analyticshub: `promise new Promise(${fetchAnalyticsHub.toString()})`,
     speedgrader: `promise new Promise(${fetchSpeedGraderLibrary.toString()})`,
-    canvascareer: `promise new Promise(${fetchCanvasCareerApp.toString()})`,
+    canvas_career_learning_provider: `promise new Promise(${fetchCanvasCareerLearningProviderApp.toString()})`,
+    canvas_career_learner: `promise new Promise(${fetchCanvasCareerLearnerApp.toString()})`,
     ltiusage: `promise new Promise(${fetchLtiUsage.toString()})`,
   },
   exposes: {},

@@ -18,15 +18,20 @@
 
 import Entry from '../Entry'
 import fakeENV from '@canvas/test-utils/fakeENV'
-import sinon from 'sinon'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 describe('Entry', () => {
-  let user_id, server, entry, setSpy
+  let user_id, entry, setSpy
+  const server = setupServer()
+
+  beforeAll(() => {
+    server.listen()
+  })
 
   beforeEach(() => {
     fakeENV.setup()
     user_id = 1
-    server = sinon.fakeServer.create()
     global.ENV = {
       DISCUSSION: {
         CURRENT_USER: {id: user_id},
@@ -47,11 +52,19 @@ describe('Entry', () => {
 
   afterEach(() => {
     fakeENV.teardown()
-    server.restore()
+    server.resetHandlers()
   })
 
-  test('should persist replies locally, and call provided onComplete callback', () => {
-    server.respondWith([200, {}, ''])
+  afterAll(() => {
+    server.close()
+  })
+
+  test('should persist replies locally, and call provided onComplete callback', async () => {
+    server.use(
+      http.put('*', () => {
+        return new HttpResponse('')
+      }),
+    )
     const replies = [
       new Entry({
         id: 2,
@@ -60,13 +73,13 @@ describe('Entry', () => {
       }),
     ]
     entry.set('replies', replies)
-    setSpy = sinon.spy(entry, 'set')
-    const onCompleteCallback = sinon.spy()
+    setSpy = jest.spyOn(entry, 'set')
+    const onCompleteCallback = jest.fn()
     entry.sync('update', entry, {complete: onCompleteCallback})
-    server.respond()
-    expect(setSpy.calledWith('replies', [])).toBe(true)
-    expect(setSpy.calledWith('replies', replies)).toBe(true)
-    expect(onCompleteCallback.called).toBe(true)
+    await new Promise(resolve => setTimeout(resolve, 10))
+    expect(setSpy).toHaveBeenCalledWith('replies', [])
+    expect(setSpy).toHaveBeenCalledWith('replies', replies)
+    expect(onCompleteCallback).toHaveBeenCalled()
   })
 
   test('speedgraderUrl replaces :student_id in SPEEDGRADER_URL_TEMPLATE with the user ID', () => {

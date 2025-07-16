@@ -71,7 +71,7 @@ GEM
       reline (>= 0.4.2)
     jira_ref_parser (1.0.1)
     json (2.11.3)
-    language_server-protocol (3.17.0.4)
+    language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
     loofah (2.24.0)

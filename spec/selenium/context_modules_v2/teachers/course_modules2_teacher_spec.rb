@@ -48,6 +48,8 @@ describe "context modules", :ignore_js_errors do
     context "edit assignment kebab form" do
       it "edit item form is shown" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -56,6 +58,8 @@ describe "context modules", :ignore_js_errors do
 
       it "title field has the right value" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -67,6 +71,8 @@ describe "context modules", :ignore_js_errors do
 
       it "item is updated" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Edit").click
 
@@ -125,6 +131,8 @@ describe "context modules", :ignore_js_errors do
 
       it "edit item form is shown" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Send To...").click
 
@@ -133,6 +141,8 @@ describe "context modules", :ignore_js_errors do
 
       it "module item is correctly sent" do
         go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
         manage_module_item_button(@item.id).click
         module_item_action_menu_link("Send To...").click
 
@@ -152,6 +162,34 @@ describe "context modules", :ignore_js_errors do
         expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
       end
     end
+
+    context "copy to kebab form" do
+      before do
+        course = @course
+        @other_course = course_factory(course_name: "Other Course Eh")
+        course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
+        @course = course
+      end
+
+      it "module item is correctly copied" do
+        go_to_modules
+        module_header_expand_toggles.first.click
+        wait_for_ajaximations
+        manage_module_item_button(@item.id).click
+        module_item_action_menu_link("Copy To...").click
+
+        set_value(copy_to_tray_course_select, "course")
+        option_list_id = copy_to_tray_course_select.attribute("aria-controls")
+
+        expect(option_list(option_list_id).count).to eq 1
+
+        option_list_course_option(option_list_id, @other_course.name).click
+        copy_button.click
+
+        wait_for_ajaximations
+        expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["assignments"])
+      end
+    end
   end
 
   context "course home page" do
@@ -167,6 +205,141 @@ describe "context modules", :ignore_js_errors do
       wait_for_ajaximations
 
       expect(f('[data-testid="modules-rewrite-container"]')).to be_displayed
+    end
+  end
+
+  context "module select dropdown for teacher and student views" do
+    before do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:modules_teacher_module_selection)
+      @course.root_account.enable_feature!(:modules_student_module_selection)
+    end
+
+    it "shows teacher and student dropdown with All Modules default" do
+      go_to_modules
+      student_dropdown_input = f("input[role='combobox'][title='All Modules']")
+      expect(student_dropdown_input[:value]).to eq("All Modules")
+
+      teacher_select = ff("label")[0]
+      expect(teacher_select.text).to include("Teachers View")
+
+      student_select = ff("label")[1]
+      expect(student_select.text).to include("Students View")
+    end
+
+    it "updates visible modules when selecting a specific module for teachers" do
+      go_to_modules
+
+      teacher_dropdown_input = ff("input[role='combobox'][title='All Modules']")[0]
+      teacher_dropdown_input.click
+
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      expect(first_module.text).to eq("module1")
+
+      first_module.click
+      wait_for_ajaximations
+      visible_modules = ff("div[class*='context_module'] h2")[0]
+      expect(visible_modules.text).to include("module1")
+    end
+
+    it "does not update visible module when selecting a specific module for students" do
+      go_to_modules
+
+      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
+      student_dropdown_input.click
+
+      wait_for_ajaximations
+
+      second_module = ff("[role='option']")[2]
+      expect(second_module.text).to eq("module2")
+
+      second_module.click
+      wait_for_ajaximations
+
+      visible_modules = ff("div[class*='context_module'] h2")
+      expect(visible_modules.length).to eq(2)
+      expect(visible_modules.first.text).to include("module1")
+      expect(visible_modules.last.text).to include("module2")
+    end
+
+    it "displays selected module in students view when acting as student" do
+      go_to_modules
+      student_dropdown_input = ff("input[role='combobox'][title='All Modules']")[1]
+      student_dropdown_input.click
+
+      wait_for_ajaximations
+
+      second_module = ff("[role='option']")[2]
+      expect(second_module.text).to eq("module2")
+
+      second_module.click
+      wait_for_ajaximations
+
+      student_view_toggle = f("a#easy_student_view")
+      student_view_toggle.click
+
+      visible_modules = f("span[class*='ig-header-title'] span")
+      expect(visible_modules.text).to include("module2")
+    end
+
+    it "persists selected module filter after reload" do
+      go_to_modules
+
+      teacher_dropdown_input = f("input[role='combobox'][title='All Modules']")
+      teacher_dropdown_input.click
+
+      wait_for_ajaximations
+
+      first_module = ff("[role='option']")[1]
+      first_module.click
+      wait_for_ajaximations
+
+      refresh_page
+      wait_for_ajaximations
+
+      # Ensure the same module is still selected and shown
+      visible_modules = ff("div[class*='context_module'] h2")[0]
+      expect(visible_modules.text).to include("module1")
+    end
+  end
+
+  context "empty module" do
+    before do
+      @empty_module = @course.context_modules.create!(name: "Empty Module")
+    end
+
+    it "displays the module file drop area when a module has no items" do
+      go_to_modules
+      wait_for_ajaximations
+
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+
+      expect(module_file_drop_element_exists?(@empty_module.id)).to be true
+
+      drop_area = module_file_drop_element(@empty_module.id)
+      expect(drop_area).to be_displayed
+      expect(drop_area.text).to include("Drop files here to upload")
+    end
+
+    it "hides the module file drop area after adding a file item" do
+      @assignment = @course.assignments.create!(
+        title: "File 1",
+        submission_types: "online_text_entry",
+        points_possible: 10,
+        workflow_state: "published",
+        due_at: 2.days.from_now
+      )
+      @empty_module.add_item(type: "assignment", id: @assignment.id)
+
+      go_to_modules
+      wait_for_ajaximations
+
+      module_header_expand_toggles.last.click
+      wait_for_ajaximations
+      expect(module_file_drop_element_exists?(@empty_module.id)).to be false
     end
   end
 end

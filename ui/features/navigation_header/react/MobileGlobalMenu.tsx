@@ -16,18 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useMemo} from 'react'
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Badge} from '@instructure/ui-badge'
+import HelpDialog from '@canvas/help-dialog'
+import {useScope as createI18nScope} from '@canvas/i18n'
+import {sessionStoragePersister} from '@canvas/query'
 import {Avatar} from '@instructure/ui-avatar'
-import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
-import {Heading} from '@instructure/ui-heading'
+import {Badge} from '@instructure/ui-badge'
 import {IconButton} from '@instructure/ui-buttons'
-import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconAdminLine,
+  IconArrowEndSolid,
   IconCalendarMonthLine,
   IconClockLine,
   IconCoursesLine,
@@ -40,20 +39,25 @@ import {
   IconQuestionLine,
   IconXLine,
 } from '@instructure/ui-icons'
-import {useScope as createI18nScope} from '@canvas/i18n'
-import HelpDialog from '@canvas/help-dialog'
+import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
+import {SVGIcon} from '@instructure/ui-svg-images'
+import {Text} from '@instructure/ui-text'
+import {ToggleDetails} from '@instructure/ui-toggle-details'
+import {View} from '@instructure/ui-view'
+import {useQuery} from '@tanstack/react-query'
+import {ExperienceSummary} from 'api'
+import {useMemo} from 'react'
+import AccountsList from './lists/AccountsList'
 import CoursesList from './lists/CoursesList'
 import GroupsList from './lists/GroupsList'
-import AccountsList from './lists/AccountsList'
-import ProfileTabsList from './lists/ProfileTabsList'
 import HistoryList from './lists/HistoryList'
+import ProfileTabsList from './lists/ProfileTabsList'
+import {useSwitchExperience} from './mutations/useSwitchExperience'
+import experienceSummaryQuery from './queries/experienceSummaryQuery'
 import {getUnreadCount} from './queries/unreadCountQuery'
 import {filterAndProcessTools, getExternalApps, type ProcessedTool} from './utils'
-import {SVGIcon} from '@instructure/ui-svg-images'
-import {Img} from '@instructure/ui-img'
-import {useQuery} from '@tanstack/react-query'
-import {sessionStoragePersister} from '@canvas/query'
 
 const I18n = createI18nScope('MobileGlobalMenu')
 
@@ -94,6 +98,30 @@ export default function MobileGlobalMenu(props: Props) {
     enabled: countsEnabled && !ENV.current_user_disabled_inbox,
     persister: sessionStoragePersister,
   })
+
+  const {data: hasCareerEnrollment} = useQuery({
+    queryKey: ['experience_summary'],
+    queryFn: experienceSummaryQuery,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    persister: sessionStoragePersister,
+    select: (data: ExperienceSummary) => {
+      const {available_apps} = data
+      return (
+        available_apps.includes('career_learner') ||
+        available_apps.includes('career_learning_provider')
+      )
+    },
+  })
+
+  const {mutate: switchExperience} = useSwitchExperience()
+
+  const showCareer = useMemo(() => {
+    const features = ENV.FEATURES
+    return (
+      hasCareerEnrollment &&
+      (features.horizon_learner_app || features.horizon_learning_provider_app_on_contextless_routes)
+    )
+  }, [hasCareerEnrollment])
 
   return (
     <View
@@ -337,6 +365,30 @@ export default function MobileGlobalMenu(props: Props) {
             </View>
           </ToggleDetails>
         </List.Item>
+
+        {showCareer && (
+          <List.Item>
+            <Link
+              href="/career"
+              isWithinText={false}
+              display="block"
+              role="button"
+              onClick={e => {
+                e.preventDefault()
+                switchExperience()
+              }}
+            >
+              <Flex>
+                <Flex.Item width="3rem">
+                  <IconArrowEndSolid inline={false} size="small" />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text size="medium">{I18n.t('Canvas Career')}</Text>
+                </Flex.Item>
+              </Flex>
+            </Link>
+          </List.Item>
+        )}
       </List>
     </View>
   )

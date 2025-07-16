@@ -23,46 +23,26 @@ module DataFixup::AddAttachmentAssociationsToAssets
     { Course => :syllabus_body },
   ].freeze
   def self.process_model_and_create_attachment_association(model, field, batch_ids)
-    model.where(id: batch_ids).find_each do |active_record|
-      next unless (field && active_record[field]) || active_record.is_a?(Quizzes::Quiz)
+    model.where(id: batch_ids).find_each do |object|
+      next unless (field && object[field]) || object.is_a?(Quizzes::Quiz)
 
-      if active_record.is_a?(AssessmentQuestion) || active_record.is_a?(Quizzes::QuizQuestion)
-        html = active_record.question_data.to_hash["question_text"]
-        UserContent.associate_attachments_to_rce_object(
-          html,
-          active_record,
-          blank_user: true,
-          feature_enabled: true
-        )
-      elsif active_record.is_a?(Quizzes::Quiz)
-        active_record.quiz_data & map do |question|
+      if object.is_a?(AssessmentQuestion) || object.is_a?(Quizzes::QuizQuestion)
+        html = object.question_data.to_hash["question_text"]
+        object.associate_attachments_to_rce_object(html, nil, skip_user_verification: true)
+      elsif object.is_a?(Quizzes::Quiz)
+        object.quiz_data & map do |question|
           question_html = question["question_text"]
-          UserContent.associate_attachments_to_rce_object(
-            question_html,
-            active_record,
-            blank_user: true,
-            feature_enabled: true
-          )
+          object.associate_attachments_to_rce_object(question_html, nil, skip_user_verification: true)
           next unless question["answers"]
 
           question["answers"] = question["answers"].map do |a|
             answer_html = a["text"]
-            UserContent.associate_attachments_to_rce_object(
-              answer_html,
-              active_record,
-              blank_user: true,
-              feature_enabled: true
-            )
+            object.associate_attachments_to_rce_object(answer_html, nil, skip_user_verification: true)
           end
         end
       else
-        UserContent.associate_attachments_to_rce_object(
-          active_record[field],
-          active_record,
-          context_field_name: ((field == :syllabus_body) ? "syllabus_body" : nil),
-          blank_user: true,
-          feature_enabled: true
-        )
+        context_concern = (field == :syllabus_body) ? "syllabus_body" : nil
+        object.associate_attachments_to_rce_object(object[field], nil, context_concern:, skip_user_verification: true)
       end
     end
   end

@@ -204,5 +204,6 @@ export const mockDeployment = (overrides: Partial<LtiDeployment>): LtiDeployment
   deployment_id: '1',
   registration_id: ZLtiRegistrationId.parse('1'),
   context_controls: [],
+  root_account_deployment: false,
   ...overrides,
 })

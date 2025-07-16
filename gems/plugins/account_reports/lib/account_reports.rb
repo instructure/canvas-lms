@@ -108,8 +108,10 @@ module AccountReports
 
   def self.generate_report(account_report, attempt: 1)
     account_report.capture_job_id
-    account_report.update(workflow_state: "running", start_at: Time.zone.now)
     begin
+      raise ReportHelper::ReportStopped if account_report.stopped?
+
+      account_report.update(workflow_state: "running", start_at: Time.zone.now)
       I18n.with_locale(account_report.parameters["locale"]) do
         REPORTS[account_report.report_type].proc.call(account_report)
       end

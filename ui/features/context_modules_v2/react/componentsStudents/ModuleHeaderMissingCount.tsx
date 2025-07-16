@@ -31,7 +31,7 @@ type Props = {
 export const ModuleHeaderMissingCount = ({submissionStatistics}: Props) => {
   const missingCount = submissionStatistics?.missingAssignmentCount || 0
   return (
-    <Pill color="danger">
+    <Pill data-testid="module-header-missing-count" color="danger">
       <Text size="x-small" color="danger">
         {I18n.t(
           {

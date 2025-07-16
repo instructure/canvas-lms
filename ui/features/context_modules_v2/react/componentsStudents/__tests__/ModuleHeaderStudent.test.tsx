@@ -56,6 +56,7 @@ const buildDefaultProps = (overrides = {}) => {
     },
     completionRequirements: [],
     requirementCount: 0,
+    submissionStatistics: undefined,
   }
 
   return {...defaultProps, ...overrides}
@@ -87,6 +88,34 @@ describe('ModuleHeaderStudent', () => {
     expect(getByTestId('module-header-status-icon-lock')).toBeInTheDocument()
   })
 
+  it('renders ModuleHeaderCompletionRequirement when completionRequirements is not empty', () => {
+    const {getByTestId} = setUp(
+      buildDefaultProps({
+        completionRequirements: [
+          {
+            id: '1',
+            type: 'min_percentage',
+            minPercentage: 85,
+            completed: true,
+          },
+        ],
+      }),
+    )
+    expect(getByTestId('module-completion-requirement')).toBeInTheDocument()
+  })
+
+  it('renders ModuleHeaderMissingCount when submissionStatistics is not empty', () => {
+    const {getByTestId} = setUp(
+      buildDefaultProps({
+        submissionStatistics: {
+          latestDueAt: '',
+          missingAssignmentCount: 5,
+        },
+      }),
+    )
+    expect(getByTestId('module-header-missing-count')).toBeInTheDocument()
+  })
+
   describe('prerequisites', () => {
     it('renders prerequisites when one exists', () => {
       const {getByText} = setUp(buildDefaultProps({prerequisites: [{name: 'Test Prerequisite'}]}))
@@ -107,6 +136,24 @@ describe('ModuleHeaderStudent', () => {
     it('does not render prerequisites when none exist', () => {
       const container = setUp(buildDefaultProps({prerequisites: []}))
       expect(container.queryByTestId('module-header-prerequisites')).toBeNull()
+    })
+  })
+
+  describe('Screen Reader Label is shown correctly', () => {
+    it('Module items expanded', () => {
+      const {getByTestId} = setUp(buildDefaultProps({expanded: true}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      expect(toggleButton).toHaveAttribute('aria-expanded', 'true')
+      expect(toggleButton).toHaveTextContent('Collapse "Test Module"')
+    })
+
+    it('Module items collapsed', () => {
+      const {getByTestId} = setUp(buildDefaultProps({expanded: false}))
+
+      const toggleButton = getByTestId('module-header-expand-toggle')
+      expect(toggleButton).toHaveAttribute('aria-expanded', 'false')
+      expect(toggleButton).toHaveTextContent('Expand "Test Module"')
     })
   })
 })

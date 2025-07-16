@@ -35,12 +35,32 @@ class Thumbnail < ActiveRecord::Base
   )
 
   before_save :set_namespace
+
+  set_policy do
+    given { |user, session| attachment.grants_right?(user, session, :read) }
+    can :read
+
+    given { |user, session| attachment.grants_right?(user, session, :download) }
+    can :download
+
+    given { |user| attachment.grants_right?(user, :read) }
+    can :read
+
+    given { |user| attachment.grants_right?(user, :download) }
+    can :download
+
+    given { |user, session| attachment.grants_right?(user, session, :read_as_admin) }
+    can :read_as_admin
+  end
+
   def set_namespace
     self.namespace = attachment.namespace
   end
 
   def local_storage_path(user: nil, ttl: nil)
-    "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}/#{uuid}"
+    path = "#{HostUrl.context_host(attachment.context)}/images/thumbnails/show/#{id}"
+    path = "#{path}/#{uuid}" unless attachment.root_account.feature_enabled?(:file_association_access)
+    path
   end
 
   delegate :bucket, to: :attachment

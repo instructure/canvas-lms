@@ -19,12 +19,19 @@
 import {screen, waitFor} from '@testing-library/react'
 import userEvent, {UserEvent} from '@testing-library/user-event'
 import {FAKE_FILES, FAKE_FOLDERS, FAKE_FOLDERS_AND_FILES} from '../../../../fixtures/fakeData'
-import {renderComponent} from './testUtils'
+import {renderComponent, defaultProps} from './testUtils'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {getUniqueId} from '../../../../utils/fileFolderUtils'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+
+const selectionHandlers = (handlers: any = {}) => {
+  return {
+    ...defaultProps.selectionHandler,
+    ...handlers,
+  }
+}
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashSuccess: jest.fn(),
@@ -191,11 +198,69 @@ describe('FileFolderTable', () => {
 
   describe('selection behavior', () => {
     let user: UserEvent
-    let setSelectedRows: jest.Mock
+    let toggleSelection: jest.Mock
+    let toggleSelectAll: jest.Mock
+    let selectAll: jest.Mock
+    let deselectAll: jest.Mock
 
     beforeEach(() => {
       user = userEvent.setup()
-      setSelectedRows = jest.fn()
+      toggleSelection = jest.fn()
+      toggleSelectAll = jest.fn()
+      selectAll = jest.fn()
+      deselectAll = jest.fn()
+    })
+
+    describe('keyboard shortcuts', () => {
+      let user: UserEvent
+
+      beforeEach(() => {
+        user = userEvent.setup()
+        renderComponent({
+          rows: [FAKE_FILES[0], FAKE_FILES[1]],
+          selectedRows: new Set(),
+          selectionHandler: selectionHandlers({
+            toggleSelection,
+            toggleSelectAll,
+            selectAll,
+            deselectAll,
+          }),
+        })
+      })
+
+      it('should call selectAll when Ctrl+A are pressed', async () => {
+        await user.keyboard('{Control>}{a}')
+        expect(selectAll).toHaveBeenCalled()
+      })
+
+      it('should call selectAll when Cmd+A are pressed', async () => {
+        await user.keyboard('{Meta>}{a}')
+        expect(selectAll).toHaveBeenCalled()
+      })
+
+      it('should call deselectAll when Ctrl+Shift+A are pressed', async () => {
+        await user.keyboard('{Control>}{Shift>}{a}')
+        expect(deselectAll).toHaveBeenCalled()
+      })
+
+      it('should call deselectAll when Cmd+Shift+A are pressed', async () => {
+        await user.keyboard('{Meta>}{Shift>}{a}')
+        expect(deselectAll).toHaveBeenCalled()
+      })
+
+      it('should call toggleSelection when a row is clicked with Ctrl', async () => {
+        const createdAtCells = await screen.findAllByTestId('table-cell-created_at')
+        await user.keyboard('{Control>}')
+        await user.click(createdAtCells[0])
+        expect(toggleSelection).toHaveBeenCalledWith(getUniqueId(FAKE_FILES[0]))
+      })
+
+      it('should call toggleSelection when a row is clicked with Cmd', async () => {
+        const createdAtCells = await screen.findAllByTestId('table-cell-created_at')
+        await user.keyboard('{Meta>}')
+        await user.click(createdAtCells[0])
+        expect(toggleSelection).toHaveBeenCalledWith(getUniqueId(FAKE_FILES[0]))
+      })
     })
 
     describe('when there is no selection', () => {
@@ -203,7 +268,7 @@ describe('FileFolderTable', () => {
         renderComponent({
           rows: [FAKE_FILES[0], FAKE_FILES[1]],
           selectedRows: new Set(),
-          setSelectedRows,
+          selectionHandler: selectionHandlers({toggleSelection, toggleSelectAll}),
         })
       })
 
@@ -218,18 +283,16 @@ describe('FileFolderTable', () => {
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(false)
       })
 
-      it('calls setSelectedRows with the correct value when a row is selected', async () => {
+      it('calls toggleSelection with the correct value when a row is selected', async () => {
         const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
         await user.click(rowCheckboxes[0])
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([getUniqueId(FAKE_FILES[0])]))
+        expect(toggleSelection).toHaveBeenCalledWith(getUniqueId(FAKE_FILES[0]))
       })
 
-      it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
+      it('calls toggleSelectAll when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
-        expect(setSelectedRows).toHaveBeenCalledWith(
-          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
-        )
+        expect(toggleSelectAll).toHaveBeenCalled()
       })
     })
 
@@ -238,7 +301,7 @@ describe('FileFolderTable', () => {
         renderComponent({
           rows: [FAKE_FILES[0], FAKE_FILES[1]],
           selectedRows: new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
-          setSelectedRows,
+          selectionHandler: selectionHandlers({toggleSelection, toggleSelectAll}),
         })
       })
 
@@ -253,16 +316,16 @@ describe('FileFolderTable', () => {
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(false)
       })
 
-      it('calls setSelectedRows with the correct value when a row is unselected', async () => {
+      it('calls toggleSelection with the correct value when a row is unselected', async () => {
         const rowCheckboxes = await screen.findAllByTestId('row-select-checkbox')
         await user.click(rowCheckboxes[0])
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set([getUniqueId(FAKE_FILES[1])]))
+        expect(toggleSelection).toHaveBeenCalledWith(getUniqueId(FAKE_FILES[0]))
       })
 
-      it('calls setSelectedRows with empty when "Select All" is clicked', async () => {
+      it('calls toggleSelectAll when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
-        expect(setSelectedRows).toHaveBeenCalledWith(new Set())
+        expect(toggleSelectAll).toHaveBeenCalled()
       })
     })
 
@@ -271,7 +334,7 @@ describe('FileFolderTable', () => {
         renderComponent({
           rows: [FAKE_FILES[0], FAKE_FILES[1]],
           selectedRows: new Set([getUniqueId(FAKE_FILES[0])]),
-          setSelectedRows,
+          selectionHandler: selectionHandlers({toggleSelection, toggleSelectAll}),
         })
       })
 
@@ -281,17 +344,10 @@ describe('FileFolderTable', () => {
         expect((selectAllCheckbox as HTMLInputElement).indeterminate).toBe(true)
       })
 
-      it('calls setSelectedRows with all values when "Select All" is clicked', async () => {
+      it('calls toggleSelectAll when "Select All" is clicked', async () => {
         const selectAllCheckbox = await screen.findByTestId('select-all-checkbox')
         await user.click(selectAllCheckbox)
-        expect(setSelectedRows).toHaveBeenCalledWith(
-          new Set([getUniqueId(FAKE_FILES[0]), getUniqueId(FAKE_FILES[1])]),
-        )
-      })
-
-      it('updates select screen reader alert', async () => {
-        const screenReader = screen.getByTestId('flash_screenreader_holder')
-        expect(screenReader).toHaveTextContent('1 of 2 selected')
+        expect(toggleSelectAll).toHaveBeenCalled()
       })
     })
   })

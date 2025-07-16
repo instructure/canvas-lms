@@ -216,8 +216,8 @@ module DifferentiationTag
           entry_tag_override = @reply_to_entry.assignment_overrides.active.find_by(set_type: "Group", set_id: tag.id)
 
           {
-            topic: topic_tag_override,
-            entry: entry_tag_override
+            topic: topic_tag_override || {},
+            entry: entry_tag_override || {}
           }
         end
 

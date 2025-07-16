@@ -19,7 +19,7 @@
 import {gql} from '@apollo/client'
 
 export const GET_ASSIGNMENTS_QUERY = gql`
-query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID) {
+query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID, $after: String) {
   assignmentGroup(id: $assignmentGroupId) {
     assignmentsConnection(
       filter: {
@@ -41,7 +41,7 @@ query getAssignments($assignmentGroupId: ID!, $gradingPeriodId: ID) {
         ]
       },
       first: 100,
-      after: ""
+      after: $after
     ) {
       pageInfo {
         hasNextPage

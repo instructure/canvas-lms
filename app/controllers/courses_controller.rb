@@ -367,7 +367,7 @@ class CoursesController < ApplicationController
   before_action :check_horizon_redirect, only: [:show]
 
   include HorizonMode
-  before_action :load_canvas_career, only: [:show, :settings]
+  before_action :load_canvas_career, only: %i[settings index]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -947,6 +947,7 @@ class CoursesController < ApplicationController
       end
 
       @course ||= (@sub_account || @account).courses.build(params_for_create)
+      @course.saving_user = @current_user
 
       if can_manage_sis
         @course.sis_source_id = sis_course_id
@@ -965,13 +966,6 @@ class CoursesController < ApplicationController
 
       respond_to do |format|
         if @course.save
-          UserContent.associate_attachments_to_rce_object(
-            @course.syllabus_body,
-            @course,
-            context_field_name: "syllabus_body",
-            user: @current_user,
-            feature_enabled: @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-          )
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
           @course.require_assignment_group
@@ -2239,10 +2233,8 @@ class CoursesController < ApplicationController
 
       @context ||= api_find(Course.active, params[:id])
 
-      if @context.horizon_course? && !request.path.include?("/modules") && params[:invitation].blank?
-        redirect_to course_context_modules_path(@context.id)
-        return
-      end
+      # can't run in before_action because it needs @context
+      return if load_canvas_career
 
       assign_localizer
       if request.xhr?
@@ -2348,6 +2340,19 @@ class CoursesController < ApplicationController
 
         return render_course_notification_settings if params[:view] == "notifications"
 
+        # Differentiation Tag Converter Message
+        if @context.is_a?(Course) && !@context.account.allow_assign_to_differentiation_tags? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+          tag_overrides = AssignmentOverride.active.joins(:group).where(groups: { context: @context, non_collaborative: true })
+          if tag_overrides.any?
+            @display_tag_converter_message = true
+
+            active_tag_conversion_job = @context.progresses.where(tag: DifferentiationTag::DELAYED_JOB_TAG, workflow_state: ["queued", "running"]).first
+            if active_tag_conversion_job
+              js_env(ACTIVE_TAG_CONVERSION_JOB: true)
+            end
+          end
+        end
+
         @contexts = [@context]
         case @course_home_view
         when "wiki"
@@ -2425,7 +2430,7 @@ class CoursesController < ApplicationController
           js_bundle :wiki_page_show
           css_bundle :wiki_page, :tinymce
         when "modules"
-          if (@context.grants_right?(@current_user, session, :read_as_admin) && @context.root_account.feature_enabled?(:modules_page_rewrite)) || (@is_student && @context.feature_enabled?(:modules_page_rewrite_student_view))
+          if @context.use_modules_rewrite_view?(@current_user, session)
             # Load new modules page assets
             context_modules_header_props = {
               title: t("Modules"),
@@ -2919,7 +2924,7 @@ class CoursesController < ApplicationController
   # editable through this endpoint will be "syllabus_body"
   #
   # If an account has set prevent_course_availability_editing_by_teachers, a teacher cannot change
-  # course[start_at], course[conclude_at], or course[restrict_enrollments_to_course_dates] here.
+  # +course[start_at]+, +course[conclude_at]+, or +course[restrict_enrollments_to_course_dates]+ here.
   #
   # @argument course[account_id] [Integer]
   #   The unique ID of the account to move the course to.
@@ -3445,6 +3450,7 @@ class CoursesController < ApplicationController
       disable_conditional_release if changes[:conditional_release]&.last == false
 
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes)
+      @course.saving_user = @current_user
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)
@@ -3452,13 +3458,6 @@ class CoursesController < ApplicationController
         if params[:update_default_pages]
           @course.wiki.update_default_wiki_page_roles(@course.default_wiki_editing_roles, @default_wiki_editing_roles_was)
         end
-        UserContent.associate_attachments_to_rce_object(
-          @course.syllabus_body,
-          @course,
-          context_field_name: "syllabus_body",
-          user: @current_user,
-          feature_enabled: @course.root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
-        )
         # Sync homeroom enrollments and participation if enabled and course isn't a SIS import
         if @course.can_sync_with_homeroom?
           progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)

@@ -24,7 +24,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
-import ModuleHeaderStatusIcon from './ModuleHeaderStatusIcon'
 import {
   ModuleProgression,
   CompletionRequirement,
@@ -36,6 +35,7 @@ import ModuleProgressionStatusBar from './ModuleProgressionStatusBar'
 import {ModuleHeaderSupplementalInfoStudent} from './ModuleHeaderSupplementalInfoStudent'
 import {ModuleHeaderCompletionRequirement} from './ModuleHeaderCompletionRequirement'
 import {ModuleHeaderMissingCount} from './ModuleHeaderMissingCount'
+import {Pill} from '@instructure/ui-pill'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -49,6 +49,7 @@ export interface ModuleHeaderStudentProps {
   prerequisites?: Prerequisite[]
   requirementCount?: number
   submissionStatistics?: ModuleStatistics
+  smallScreen?: boolean
 }
 
 const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
@@ -61,6 +62,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   prerequisites,
   requirementCount,
   submissionStatistics,
+  smallScreen = false,
 }) => {
   const onToggleExpandRef = useCallback(() => {
     onToggleExpand(id)
@@ -73,18 +75,22 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
   const showMissingCount =
     missingCount > 0 && (!progression?.completed || !hasCompletionRequirements)
 
+  const screenReaderLabel = expanded
+    ? I18n.t('Collapse "%{name}"', {name})
+    : I18n.t('Expand "%{name}"', {name})
+
   return (
     <View as="div" background="transparent">
       <Flex padding="small" justifyItems="space-between" direction="row">
-        <Flex.Item>
-          {progression && (completionRequirements?.length || progression.locked) ? (
-            <ModuleHeaderStatusIcon progression={progression} />
-          ) : null}
-        </Flex.Item>
         <Flex.Item shouldGrow shouldShrink margin="0 0 0 small">
           <Flex justifyItems="space-between" direction="column">
             <Flex.Item>
-              <Flex gap="small" alignItems="center" justifyItems="end">
+              <Flex
+                gap="small"
+                alignItems={smallScreen ? 'start' : 'center'}
+                justifyItems="end"
+                direction={smallScreen ? 'column' : 'row'}
+              >
                 <Flex.Item shouldShrink>
                   <Heading level="h2">
                     <Text size="large" weight="bold" wrap="break-word">
@@ -93,7 +99,16 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                   </Heading>
                 </Flex.Item>
                 <Flex.Item shouldGrow margin="0 medium 0 0">
-                  <Flex justifyItems="end" gap="small">
+                  <Flex justifyItems="end" gap="small" direction={smallScreen ? 'column' : 'row'}>
+                    {progression && progression.locked && (
+                      <Flex.Item>
+                        <Text size="x-small" color="danger">
+                          <Pill data-testid="module-header-status-icon-lock">
+                            {I18n.t('Locked')}
+                          </Pill>
+                        </Text>
+                      </Flex.Item>
+                    )}
                     {showMissingCount && (
                       <Flex.Item>
                         <ModuleHeaderMissingCount submissionStatistics={submissionStatistics} />
@@ -101,7 +116,10 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                     )}
                     {hasCompletionRequirements && (
                       <Flex.Item>
-                        <ModuleHeaderCompletionRequirement requirementCount={requirementCount} />
+                        <ModuleHeaderCompletionRequirement
+                          completed={progression?.completed}
+                          requirementCount={requirementCount}
+                        />
                       </Flex.Item>
                     )}
                   </Flex>
@@ -133,6 +151,7 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
                   requirementCount={requirementCount}
                   completionRequirements={completionRequirements}
                   progression={progression}
+                  smallScreen={smallScreen}
                 />
               </Flex.Item>
             )}
@@ -143,10 +162,11 @@ const ModuleHeaderStudent: React.FC<ModuleHeaderStudentProps> = ({
             data-testid="module-header-expand-toggle"
             size="small"
             withBorder={false}
-            screenReaderLabel={expanded ? I18n.t('Collapse module') : I18n.t('Expand module')}
+            screenReaderLabel={screenReaderLabel}
             renderIcon={expanded ? IconArrowOpenDownLine : IconArrowOpenUpLine}
             withBackground={false}
             onClick={onToggleExpandRef}
+            aria-expanded={expanded}
           />
         </Flex.Item>
       </Flex>

@@ -297,6 +297,7 @@ export type AttachmentData = Readonly<{
 }>
 
 export type Attachment = {
+  _id: string
   canvadoc_url?: string
   comment_id?: string
   content_type: string
@@ -757,4 +758,13 @@ export type SisImport = {
   change_threshold: number
   diff_row_count_threshold: number
   user: User
+}
+
+export type ExperienceSummary = {
+  current_app: string
+  available_apps: string[]
+}
+
+export type SwitchExperienceResponse = {
+  experience: string
 }

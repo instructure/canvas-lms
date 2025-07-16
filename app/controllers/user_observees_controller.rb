@@ -19,16 +19,19 @@
 #
 
 # @API User Observees
-# API for accessing information about the users a user is observing.
+# API for managing linked observers and observees
 
 class UserObserveesController < ApplicationController
   before_action :require_user
 
   before_action :self_or_admin_permission_check, except: [:update]
 
-  # @API List observees
+  # @API List linked observees
   #
-  # A paginated list of the users that the given user is observing.
+  # A paginated list of users that the given user is observing. This endpoint returns
+  # users linked to the observer at the account level (such that the observer is automatically
+  # enrolled in observees' courses); it doesn't return one-off observer enrollments from
+  # individual courses.
   #
   # *Note:* all users are allowed to list their own observees. Administrators can list
   # other users' observees.
@@ -57,8 +60,8 @@ class UserObserveesController < ApplicationController
     render json: data
   end
 
-  # @API List observers
-  # A paginated list of the observers of a given user.
+  # @API List linked observers
+  # A paginated list of observers linked to a given user.
   #
   # *Note:* all users are allowed to list their own observers. Administrators can list
   # other users' observers.

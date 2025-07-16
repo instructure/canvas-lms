@@ -31,12 +31,14 @@ interface ModuleProgressionStatusBarProps {
   requirementCount?: number
   completionRequirements: CompletionRequirement[]
   progression?: ModuleProgression
+  smallScreen?: boolean
 }
 
 const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
   requirementCount,
   completionRequirements,
   progression,
+  smallScreen = false,
 }) => {
   if (!progression || !completionRequirements.length) {
     return null
@@ -53,33 +55,64 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
     total: totalCount,
   })
 
+  const progressBarView = (
+    <View
+      as="div"
+      width="100%"
+      minWidth="100%"
+      overflowX="hidden"
+      overflowY="hidden"
+      borderRadius="large"
+      borderColor={isComplete ? 'success' : 'brand'}
+      borderWidth="small"
+    >
+      <ProgressBar
+        data-testid="module-progression-status-bar"
+        screenReaderLabel={completionText}
+        valueNow={completionPercentage}
+        valueMax={100}
+        size="small"
+        meterColor={isComplete ? 'success' : 'brand'}
+        height="0.5rem"
+        width="100%"
+        themeOverride={{
+          borderRadius: 'small',
+        }}
+      />
+    </View>
+  )
+
+  if (smallScreen) {
+    return (
+      <View as="div" margin="xx-small 0 0 0">
+        <Flex alignItems="start" direction="column">
+          <Flex.Item width="100%">
+            <Flex width="100%">
+              <Flex.Item overflowY="hidden" width="70%" margin="0 0 0 xxx-small">
+                {progressBarView}
+              </Flex.Item>
+              <Flex.Item margin="0 0 0 xx-small" padding="xxx-small 0">
+                <Text size="x-small" weight="normal">
+                  {completionPercentage}%
+                </Text>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item>
+            <Text size="x-small" weight="normal">
+              {completionText}
+            </Text>
+          </Flex.Item>
+        </Flex>
+      </View>
+    )
+  }
+
   return (
     <View as="div" margin="xx-small 0 0 0">
       <Flex alignItems="center">
         <Flex.Item overflowY="hidden" width="33%" margin="xxx-small 0 0 0">
-          <View
-            as="div"
-            width="100%"
-            minWidth="100%"
-            overflowX="hidden"
-            overflowY="hidden"
-            borderRadius="large"
-            borderColor={isComplete ? 'success' : 'brand'}
-            borderWidth="small"
-          >
-            <ProgressBar
-              screenReaderLabel={completionText}
-              valueNow={completionPercentage}
-              valueMax={100}
-              size="small"
-              meterColor={isComplete ? 'success' : 'brand'}
-              height="0.5rem"
-              width="100%"
-              themeOverride={{
-                borderRadius: 'small',
-              }}
-            />
-          </View>
+          {progressBarView}
         </Flex.Item>
         <Flex.Item margin="0 0 0 x-small">
           <Text size="x-small" weight="normal">

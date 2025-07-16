@@ -189,11 +189,12 @@ export const ContextSearch = (props: ContextSearchProps) => {
       if (!option) return // prevent selecting of empty option
       setState(state => ({
         ...state,
-        selectedOptionId: data.id,
+        selectedOptionId: undefined,
         inputValue: '',
         showingOptions: false,
         isShowingOptions: false,
       }))
+      setSearchText('')
       if (props.onSelectContext) {
         props.onSelectContext(
           option.type === 'course'
@@ -208,7 +209,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
         )
       }
     },
-    [getOptionById, props.onSelectContext],
+    [getOptionById, props.onSelectContext, setSearchTextDebounced, setState],
   )
 
   const handleInputChange = React.useCallback(
@@ -224,6 +225,13 @@ export const ContextSearch = (props: ContextSearchProps) => {
     [setSearchTextDebounced],
   )
 
+  const onRequestShowOptions = React.useCallback(() => {
+    setState(state => ({
+      ...state,
+      isShowingOptions: true,
+    }))
+  }, [setState])
+
   return (
     <View as="div">
       <Select
@@ -235,14 +243,7 @@ export const ContextSearch = (props: ContextSearchProps) => {
         isShowingOptions={state.isShowingOptions}
         onBlur={handleBlur}
         onInputChange={handleInputChange}
-        onRequestShowOptions={React.useMemo(
-          () => () =>
-            setState(state => ({
-              ...state,
-              isShowingOptions: true,
-            })),
-          [],
-        )}
+        onRequestShowOptions={onRequestShowOptions}
         onRequestHideOptions={handleHideOptions}
         onRequestHighlightOption={handleHighlightOption}
         onRequestSelectOption={handleSelectOption}

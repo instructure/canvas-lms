@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import React, {useState, useEffect, useMemo, useRef} from 'react'
+import React, {useMemo, useEffect, useState, useRef} from 'react'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -25,9 +24,6 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextInput} from '@instructure/ui-text-input'
 import {Text} from '@instructure/ui-text'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
-import {useContextModule} from '../../hooks/useModuleContext'
-import {queryClient} from '../../../../../shared/query'
 import AddItemTypeSelector from './AddItemTypeSelector'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import IndentSelector from './IndentSelector'
@@ -35,14 +31,17 @@ import {Tabs} from '@instructure/ui-tabs'
 import CreateLearningObjectForm from './CreateLearningObjectForm'
 import ExternalItemForm from './ExternalItemForm'
 import {Spinner} from '@instructure/ui-spinner'
-import {
-  createNewItem,
-  prepareModuleItemData,
-  submitModuleItem,
-} from '../../handlers/addItemHandlers'
+import {useAddModuleItem} from '../../hooks/mutations/useAddModuleItem'
+import {useModuleItemContent, ModuleItemContentType} from '../../hooks/queries/useModuleItemContent'
+import {useContextModule} from '../../hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
-
+type NewItem = {
+  name: string
+  assignmentGroup: string
+  file: File | null
+  folder: string
+}
 interface AddItemModalProps {
   isOpen: boolean
   onRequestClose: () => void
@@ -59,37 +58,13 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   itemCount,
 }) => {
   const [itemType, setItemType] = useState<ModuleItemContentType>('assignment')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [indentation, setIndentation] = useState<number>(0)
-  const [textHeaderValue, setTextHeaderValue] = useState<string>('')
-  const [externalUrlValue, setExternalUrlValue] = useState<string>('')
-  const [externalUrlName, setExternalUrlName] = useState<string>('')
-  const [externalUrlNewTab, setExternalUrlNewTab] = useState<boolean>(false)
-  const [selectedTabIndex, setSelectedTabIndex] = useState(0)
-  const [newItemName, setNewItemName] = useState<string>('')
-  const [selectedAssignmentGroup, setSelectedAssignmentGroup] = useState<string>('')
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [selectedFolder, setSelectedFolder] = useState<string>('')
-
+  const [searchText, setSearchText] = useState('')
   const [inputValue, setInputValue] = useState('')
-  const [searchText, setSearchText] = useState<string>('')
   const [debouncedSearchText, setDebouncedSearchText] = useState<string>('')
 
-  const {courseId, NEW_QUIZZES_BY_DEFAULT, DEFAULT_POST_TO_SIS} = useContextModule()
-
-  const {
-    data,
-    isLoading: isLoadingContent,
-    isError,
-  } = useModuleItemContent(
-    itemType,
-    courseId,
-    debouncedSearchText,
-    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url',
-  )
+  const {courseId} = useContextModule()
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
   useEffect(() => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
@@ -106,123 +81,45 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     }
   }, [searchText])
 
+  const {
+    data,
+    isLoading: isLoadingContent,
+    isError,
+  } = useModuleItemContent(
+    itemType,
+    courseId,
+    debouncedSearchText,
+    isOpen && itemType !== 'context_module_sub_header' && itemType !== 'external_url',
+  )
+
   useEffect(() => {
     setInputValue(data?.items?.[0]?.id || '')
   }, [data?.items])
 
-  const handleSubmit = () => {
-    setIsLoading(true)
-
+  const contentItems = useMemo(() => {
+    if (itemType === 'context_module_sub_header') {
+      return [{id: 'new_header', name: 'Create a new header'}]
+    }
     if (itemType === 'external_url') {
-      if (!externalUrlValue || !externalUrlName) {
-        setIsLoading(false)
-        return
-      }
+      return [{id: 'new_url', name: 'Create a new URL'}]
     }
+    return [...(data?.items || [])]
+  }, [itemType, data?.items])
 
-    const selectedItem = contentItems.find(item => item.id === inputValue)
-
-    const itemData = prepareModuleItemData(moduleId, {
-      type: itemType,
-      itemCount,
-      indentation,
-      selectedTabIndex,
-      textHeaderValue,
-      externalUrlName,
-      externalUrlValue,
-      externalUrlNewTab,
-      selectedItem: selectedItem || null,
-    })
-
-    if (itemType === 'context_module_sub_header' || itemType === 'external_url') {
-      // For subheaders and external URLs, we can directly submit without creating a new item first
-      submitItemData(itemData)
-    } else if (selectedTabIndex === 1) {
-      // For file uploads, validate required fields
-      if (itemType === 'file' && !selectedFile) {
-        setIsLoading(false)
-        // Could add an error message here if needed
-        return
-      }
-
-      // We need to create a new item
-      handleCreateNewItem(itemType).then(newItem => {
-        if (newItem) {
-          // Update the itemData with the newly created item's ID
-          itemData['item[id]'] = newItem.id || newItem.page_id
-          itemData['id'] = 'new'
-          itemData['item[title]'] = newItem.title || newItem.display_name || ''
-          itemData['title'] = newItem.title || newItem.display_name || ''
-          submitItemData(itemData)
-        } else {
-          setIsLoading(false)
-          console.error('Failed to create new item')
-        }
-      })
-    } else if (selectedItem) {
-      // Using an existing item
-      submitItemData(itemData)
-    } else {
-      setIsLoading(false)
-    }
-  }
-
-  const handleCreateNewItem = async (type: string) => {
-    // For file types, include the file and folder
-    if (type === 'file') {
-      return await createNewItem(
-        type,
-        courseId,
-        newItemName,
-        selectedAssignmentGroup,
-        NEW_QUIZZES_BY_DEFAULT,
-        DEFAULT_POST_TO_SIS,
-        selectedFile,
-        selectedFolder,
-      )
-    }
-
-    // For other types (quizzes, pages, etc.)
-    return await createNewItem(
-      type,
-      courseId,
-      newItemName,
-      selectedAssignmentGroup,
-      NEW_QUIZZES_BY_DEFAULT,
-      DEFAULT_POST_TO_SIS,
-    )
-  }
-
-  const submitItemData = (
-    itemData: Record<string, string | number | string[] | undefined | boolean>,
-  ) => {
-    submitModuleItem(courseId, moduleId, itemData)
-      .then(response => {
-        if (response) {
-          queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId], exact: false})
-
-          onRequestClose()
-        }
-
-        setIsLoading(false)
-      })
-      .catch(error => {
-        console.error('Error adding item to module:', error)
-        setIsLoading(false)
-      })
-  }
+  const {state, dispatch, handleSubmit, reset} = useAddModuleItem({
+    itemType,
+    moduleId,
+    itemCount,
+    onRequestClose,
+    contentItems,
+    inputValue,
+  })
 
   const handleExited = () => {
     setItemType('assignment')
-    setIndentation(0)
     setSearchText('')
-    setTextHeaderValue('')
-    setExternalUrlValue('')
-    setExternalUrlName('')
-    setExternalUrlNewTab(false)
-    setIsLoading(false)
-
     setInputValue('')
+    reset()
   }
 
   const itemTypeLabel = useMemo(() => {
@@ -247,16 +144,6 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
         return I18n.t('Item')
     }
   }, [itemType])
-
-  const contentItems = useMemo(() => {
-    if (itemType === 'context_module_sub_header') {
-      return [{id: 'new_header', name: I18n.t('Create a new header')}]
-    } else if (itemType === 'external_url') {
-      return [{id: 'new_url', name: I18n.t('Create a new URL')}]
-    } else {
-      return [...(data?.items || [])]
-    }
-  }, [itemType, data?.items])
 
   const renderContentItems = () => {
     if (isError) {
@@ -304,10 +191,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       title={I18n.t('Add an item to %{module}', {module: moduleName})}
       footer={
         <>
-          <Button onClick={onRequestClose} disabled={isLoading} margin="0 x-small 0 0">
+          <Button onClick={onRequestClose} disabled={state.isLoading} margin="0 x-small 0 0">
             {I18n.t('Cancel')}
           </Button>
-          <Button color="primary" type="submit" disabled={isLoading}>
+          <Button color="primary" type="submit" disabled={state.isLoading}>
             {I18n.t('Add Item')}
           </Button>
         </>
@@ -324,26 +211,30 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
         }
       >
         {['assignment', 'quiz', 'file', 'page', 'discussion'].includes(itemType) && (
-          <Tabs onRequestTabChange={(_event, tabData) => setSelectedTabIndex(tabData.index)}>
+          <Tabs
+            onRequestTabChange={(_event, tabData) =>
+              dispatch({type: 'SET_TAB_INDEX', value: tabData.index})
+            }
+          >
             <Tabs.Panel
               id="add-item-form"
               renderTitle={I18n.t('Add Item')}
-              isSelected={selectedTabIndex === 0}
+              isSelected={state.tabIndex === 0}
             >
               {renderContentItems()}
             </Tabs.Panel>
             <Tabs.Panel
               id="create-item-form"
               renderTitle={I18n.t('Create Item')}
-              isSelected={selectedTabIndex === 1}
+              isSelected={state.tabIndex === 1}
             >
               <CreateLearningObjectForm
                 itemType={itemType}
                 onChange={(field, value) => {
-                  if (field === 'name') setNewItemName(value)
-                  else if (field === 'assignmentGroup') setSelectedAssignmentGroup(value)
-                  else if (field === 'file') setSelectedFile(value)
-                  else if (field === 'folder') setSelectedFolder(value)
+                  const validFields = ['name', 'assignmentGroup', 'file', 'folder']
+                  if (validFields.includes(field)) {
+                    dispatch({type: 'SET_NEW_ITEM', field: field as keyof NewItem, value})
+                  }
                 }}
               />
             </Tabs.Panel>
@@ -354,24 +245,37 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
             <TextInput
               renderLabel={I18n.t('Header text')}
               placeholder={I18n.t('Enter header text')}
-              value={textHeaderValue}
-              onChange={(_e, value) => setTextHeaderValue(value)}
+              value={state.textHeader}
+              onChange={(_e, value) => dispatch({type: 'SET_TEXT_HEADER', value})}
             />
           </View>
         )}
         {['external_url', 'external_tool'].includes(itemType) && (
           <ExternalItemForm
             onChange={(field, value) => {
-              if (field === 'url') setExternalUrlValue(value)
-              if (field === 'name') setExternalUrlName(value)
-              if (field === 'newTab') setExternalUrlNewTab(value)
+              if (
+                field === 'url' ||
+                field === 'name' ||
+                field === 'newTab' ||
+                field === 'selectedToolId'
+              ) {
+                dispatch({
+                  type: 'SET_EXTERNAL',
+                  field,
+                  value,
+                })
+              }
             }}
-            externalUrlValue={externalUrlValue}
-            externalUrlName={externalUrlName}
-            newTab={externalUrlNewTab}
+            externalUrlValue={state.external.url}
+            externalUrlName={state.external.name}
+            newTab={state.external.newTab}
+            itemType={itemType}
           />
         )}
-        <IndentSelector value={indentation} onChange={setIndentation} />
+        <IndentSelector
+          value={state.indentation}
+          onChange={value => dispatch({type: 'SET_INDENTATION', value})}
+        />
       </FormFieldGroup>
     </CanvasModal>
   )

@@ -129,6 +129,7 @@ const renderBody = ({
             return (
               <Checkbox
                 data-testid={scope}
+                data-pendo="lti-permission-toggle"
                 key={scope}
                 variant="toggle"
                 label={i18nLtiScope(scope)}

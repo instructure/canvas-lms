@@ -408,6 +408,63 @@ describe "calendar2" do
         end
       end
 
+      context "discussion checkpoints in sub-accounts" do
+        before do
+          @root_account = Account.default
+          @sub_account = @root_account.sub_accounts.create!(name: "sub-account")
+          @nested_sub_account = @sub_account.sub_accounts.create!(name: "nested-sub-account")
+          course_with_teacher_logged_in(user: @teacher, account: @sub_account)
+          @course_in_sub_account = @course
+          course_with_teacher_logged_in(user: @teacher, account: @nested_sub_account)
+          @course_in_nested_sub_account = @course
+          @start_of_month = Time.zone.today.beginning_of_month
+          @root_account.allow_feature!(:discussion_checkpoints)
+          @sub_account.allow_feature!(:discussion_checkpoints)
+        end
+
+        context "when discussion checkpoints FF is enabled in the corresponding sub-account" do
+          it "displays checkpoints from sub-account" do
+            @sub_account.enable_feature!(:discussion_checkpoints)
+            graded_discussion_topic_with_checkpoints(
+              title: "Sub Account Checkpointed Discussion",
+              context: @course_in_sub_account,
+              due_date_reply_to_topic: @start_of_month + 1.day,
+              due_date_reply_to_entry: @start_of_month + 5.days
+            )
+
+            get "/calendar2"
+            wait_for_ajaximations
+
+            # Check that events are visible in the calendar
+            expect(all_events_in_month_view.length).to be > 0
+
+            # Get the event titles to verify which checkpoints are showing
+            event_titles = all_events_in_month_view.map(&:text)
+            expect(event_titles.any? { |title| title.include?("Sub Account Checkpointed Discussion") }).to be_truthy
+          end
+
+          it "displays checkpoints from nested sub-account" do
+            @nested_sub_account.enable_feature!(:discussion_checkpoints)
+            graded_discussion_topic_with_checkpoints(
+              title: "Nested Sub Account Checkpointed Discussion",
+              context: @course_in_nested_sub_account,
+              due_date_reply_to_topic: @start_of_month + 3.days,
+              due_date_reply_to_entry: @start_of_month + 8.days
+            )
+
+            get "/calendar2"
+            wait_for_ajaximations
+
+            # Check that events are visible in the calendar
+            expect(all_events_in_month_view.length).to be > 0
+
+            # Get the event titles to verify which checkpoints are showing
+            event_titles = all_events_in_month_view.map(&:text)
+            expect(event_titles.any? { |title| title.include?("Nested Sub Account Checkpointed Discussion") }).to be_truthy
+          end
+        end
+      end
+
       it "deletes an event" do
         create_middle_day_event("doomed event")
         f(".fc-event").click

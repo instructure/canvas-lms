@@ -97,7 +97,7 @@ class SubmissionLifecycleManager
     SQL_FRAGMENT
   end
 
-  def self.recompute(assignment, update_grades: false, executing_user: nil, create_sub_assignment_submissions: true)
+  def self.recompute(assignment, update_grades: false, executing_user: nil, create_sub_assignment_submissions: true, run_late_policy_applicator_for_course: false)
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.persisted? && assignment.active?
@@ -112,6 +112,7 @@ class SubmissionLifecycleManager
         max_attempts: 10
       },
       update_grades:,
+      run_late_policy_applicator_for_course:,
       create_sub_assignment_submissions:,
       original_caller: current_caller,
       executing_user:
@@ -120,7 +121,7 @@ class SubmissionLifecycleManager
     recompute_course(assignment.context, **opts)
   end
 
-  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: true)
+  def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: true, run_late_policy_applicator_for_course: false)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
@@ -130,7 +131,7 @@ class SubmissionLifecycleManager
     return if assignments_to_recompute.empty?
 
     executing_user ||= current_executing_user
-    submission_lifecycle_manager = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:, create_sub_assignment_submissions:)
+    submission_lifecycle_manager = new(course, assignments_to_recompute, update_grades:, original_caller:, executing_user:, skip_late_policy_applicator:, create_sub_assignment_submissions:, run_late_policy_applicator_for_course:)
     if run_immediately
       submission_lifecycle_manager.recompute
     else
@@ -173,7 +174,7 @@ class SubmissionLifecycleManager
     submission_lifecycle_manager.delay_if_production(**inst_jobs_opts).recompute
   end
 
-  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: false)
+  def initialize(course, assignments, user_ids = [], update_grades: false, original_caller: caller(1..1).first, executing_user: nil, skip_late_policy_applicator: false, create_sub_assignment_submissions: false, run_late_policy_applicator_for_course: false)
     @course = course
     @assignment_ids = Array(assignments).map { |a| a.is_a?(AbstractAssignment) ? a.id : a }
 
@@ -195,6 +196,7 @@ class SubmissionLifecycleManager
     @original_caller = original_caller
     @skip_late_policy_applicator = skip_late_policy_applicator
     @create_sub_assignment_submissions = create_sub_assignment_submissions
+    @run_late_policy_applicator_for_course = run_late_policy_applicator_for_course
 
     if executing_user.present?
       @executing_user_id = executing_user.is_a?(User) ? executing_user.id : executing_user
@@ -335,6 +337,8 @@ class SubmissionLifecycleManager
       assignment = @course.shard.activate { AbstractAssignment.find(@assignment_ids.first) }
 
       LatePolicyApplicator.for_assignment(assignment)
+    elsif @run_late_policy_applicator_for_course && !@skip_late_policy_applicator
+      LatePolicyApplicator.for_course(@course, @assignment_ids)
     end
   end
 

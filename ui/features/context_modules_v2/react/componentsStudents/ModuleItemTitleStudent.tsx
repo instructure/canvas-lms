@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ModuleItemContent, ModuleProgression} from '../utils/types'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {useMemo} from 'react'
+import {View} from '@instructure/ui-view'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -43,27 +43,45 @@ const ModuleItemTitleStudent = ({
   url,
   onClick,
 }: ModuleItemTitleStudentProps) => {
-  return progression?.locked ||
-    (requireSequentialProgress &&
-      progression?.currentPosition &&
-      position &&
-      progression?.currentPosition < position) ? (
-    <Flex alignItems="center">
-      <Text weight="light" color="secondary" data-testid="module-item-title-locked">
-        {content?.title || missingTitleText}
-      </Text>
-    </Flex>
-  ) : content?.type === 'SubHeader' ? (
-    <Text weight="bold" color="primary" data-testid="subheader-title-text">
-      {content?.title || missingTitleText}
-    </Text>
-  ) : (
-    <Link href={url} isWithinText={false} onClick={onClick}>
-      <Text weight="bold" color="primary" data-testid="module-item-title">
-        {content?.title || missingTitleText}
-      </Text>
-    </Link>
-  )
+  const titleText = useMemo(() => {
+    if (
+      progression?.locked ||
+      (requireSequentialProgress &&
+        progression?.currentPosition &&
+        position &&
+        progression?.currentPosition < position)
+    ) {
+      return (
+        <View as="div" padding="xx-small">
+          <Text weight="light" color="secondary" data-testid="module-item-title-locked">
+            {content?.title || missingTitleText}
+          </Text>
+        </View>
+      )
+    }
+
+    if (content?.type === 'SubHeader') {
+      return (
+        <View as="div" padding="xx-small">
+          <Text weight="bold" color="primary" data-testid="subheader-title-text">
+            {content?.title || missingTitleText}
+          </Text>
+        </View>
+      )
+    }
+
+    return (
+      <View as="div" padding="xx-small">
+        <Link href={url} variant="standalone" onClick={onClick}>
+          <Text weight="bold" color="primary" data-testid="module-item-title">
+            {content?.title || missingTitleText}
+          </Text>
+        </Link>
+      </View>
+    )
+  }, [content, progression, position, requireSequentialProgress, url, onClick])
+
+  return titleText
 }
 
 export default ModuleItemTitleStudent

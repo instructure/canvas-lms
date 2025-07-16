@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ColumnID} from '../react/components/FileFolderTable/FileFolderTableUtils'
 import {type File, type Folder} from './File'
 
 export interface ColumnHeader {
-  id: string
+  id: ColumnID
   title: string
   textAlign: 'start' | 'center' | 'end'
   width?: string

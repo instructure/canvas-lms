@@ -47,10 +47,10 @@ export function useResubmitLtiAssetReports() {
 export type ResubmitLtiAssetReportsProps = {
   processorId: string
   studentId: string
-  attempt: number | undefined | null
+  attempt: string
 }
 
 // TODO: figure out what happens for anonymous grading here
 function resubmitPath({processorId, studentId, attempt}: ResubmitLtiAssetReportsProps) {
-  return `/api/lti/asset_processors/${processorId}/notices/${encodeURIComponent(studentId)}/attempts/${attempt ?? 'latest'}`
+  return `/api/lti/asset_processors/${processorId}/notices/${encodeURIComponent(studentId)}/attempts/${attempt}`
 }

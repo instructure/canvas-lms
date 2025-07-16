@@ -27,7 +27,7 @@ import {Pill} from '@instructure/ui-pill'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
-import {View, ViewProps} from '@instructure/ui-view'
+import {View, type ViewProps} from '@instructure/ui-view'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
 import * as React from 'react'
@@ -160,11 +160,15 @@ export const ToolDetailsInner = ({
           showFlashAlert({
             type: 'info',
             message: I18n.t('Client ID copied (%{clientId})', {clientId}),
+            dismissible: false,
+            politeness: 'polite',
           })
         } catch {
           showFlashAlert({
             type: 'error',
             message: I18n.t('Unable to copy client ID to clipboard (%{clientId})', {clientId}),
+            dismissible: false,
+            politeness: 'polite',
           })
         }
       }
@@ -277,6 +281,7 @@ export const ToolDetailsInner = ({
             </Flex>
             <Flex gap="small" margin="small 0">
               <Button
+                data-pendo="lti-registrations-copy-client-id"
                 color="secondary"
                 renderIcon={<IconCopyLine />}
                 margin="0"
@@ -298,6 +303,7 @@ export const ToolDetailsInner = ({
                 }}
               >
                 <Button
+                  data-pendo="lti-registrations-delete-app"
                   color="secondary"
                   renderIcon={<IconTrashLine />}
                   margin="0"
@@ -321,7 +327,7 @@ export const ToolDetailsInner = ({
           href="/"
           renderTitle={
             <Text style={{color: 'initial', textDecoration: 'initial'}}>
-              {I18n.t('Availability & Exceptions')}
+              {I18n.t('Availability and Exceptions')}
             </Text>
           }
           themeOverride={OverflowThemeOverride}
@@ -342,7 +348,7 @@ export const ToolDetailsInner = ({
         >
           <Outlet context={outletContext} />
         </Tabs.Panel>
-        {window.ENV.FEATURES.lti_registrations_usage_data ? (
+        {window.ENV.FEATURES.lti_registrations_usage_tab ? (
           <Tabs.Panel
             isSelected={route === 'usage'}
             active={route === 'usage'}

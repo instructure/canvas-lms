@@ -44,7 +44,7 @@ export const InProgressModuleItemStatus: React.FC<InProgressModuleItemStatusProp
       case 'min_score':
         return I18n.t('Must score at least a %{score}', {score: completionRequirement.minScore})
       case 'min_percentage':
-        return I18n.t('Must score at least a %{percentage}', {
+        return I18n.t('Must score at least a %{percentage}%', {
           percentage: completionRequirement.minPercentage,
         })
       case 'must_contribute':

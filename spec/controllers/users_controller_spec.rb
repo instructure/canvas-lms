@@ -195,12 +195,26 @@ describe UsersController do
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
       let(:developer_key) { DeveloperKey.create! }
+      let(:oidc_initiation_url) { "http://lti13testtool.docker/blti_launch" }
+      let(:tool) do
+        reg = lti_registration_with_tool(
+          account:,
+          configuration_params: {
+            oidc_initiation_url:,
+            placements: [
+              {
+                placement: "user_navigation",
+                enabled: true,
+                text: "example",
+              }
+            ]
+          }
+        )
+        reg.deployments.first
+      end
 
       before do
         allow(SecureRandom).to receive(:hex).and_return(verifier)
-        tool.use_1_3 = true
-        tool.developer_key = developer_key
-        tool.save!
         get :external_tool, params: { id: tool.id, user_id: user.id }
       end
 
@@ -219,12 +233,27 @@ describe UsersController do
       end
 
       context "when lti_deployment_id_in_login_request FF is off" do
+        let(:oidc_initiation_url) { "http://lti13testtool.docker/blti_launch" }
+        let(:tool) do
+          reg = lti_registration_with_tool(
+            account:,
+            configuration_params: {
+              oidc_initiation_url:,
+              placements: [
+                {
+                  placement: "user_navigation",
+                  enabled: true,
+                  text: "example",
+                }
+              ]
+            }
+          )
+          reg.deployments.first
+        end
+
         before do
           user.account.root_account.disable_feature!(:lti_deployment_id_in_login_request)
           allow(SecureRandom).to receive(:hex).and_return(verifier)
-          tool.use_1_3 = true
-          tool.developer_key = developer_key
-          tool.save!
           get :external_tool, params: { id: tool.id, user_id: user.id }
         end
 
@@ -262,7 +291,6 @@ describe UsersController do
       end
 
       context "when the developer key has an oidc_initiation_url" do
-        let(:developer_key) { DeveloperKey.create!(oidc_initiation_url:) }
         let(:oidc_initiation_url) { "https://www.test.com/oidc/login" }
 
         it "uses the oidc_initiation_url as the resource_url" do

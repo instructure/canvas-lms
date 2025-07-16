@@ -28,6 +28,10 @@ import classnames from 'classnames'
 
 const I18n = createI18nScope('react_files')
 
+MoveDialog.componentWillMount = function () {
+  this.canvasModalRef = React.createRef()
+}
+
 MoveDialog.renderMoveButton = function () {
   const buttonClassNames = classnames({
     disabled: !this.state.destinationFolder,
@@ -64,7 +68,7 @@ MoveDialog.render = function () {
     <Modal
       className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
       overlayClassName="ReactModal__Overlay--canvas"
-      ref="canvasModal"
+      ref={this.canvasModalRef}
       isOpen={this.state.isOpen}
       title={this.getTitle()}
       onRequestClose={this.closeDialog}

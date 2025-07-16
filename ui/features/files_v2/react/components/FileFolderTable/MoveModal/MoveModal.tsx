@@ -18,7 +18,6 @@
 
 import {createRef, Ref, useCallback, useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {queryClient} from '@canvas/query'
 import {Modal} from '@instructure/ui-modal'
@@ -41,6 +40,7 @@ import {
   FileOptionsResults,
   ResolvedName,
 } from '../../FilesHeader/UploadButton/FileOptions'
+import {sendMoveRequests} from './utils'
 import {FileFolderWrapper, BBFolderWrapper} from '../../../../utils/fileFolderWrappers'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
@@ -74,68 +74,13 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
     setFileOptions(FileOptionsCollection.getState())
   }, [])
 
-  const startMoveOperation = useCallback(() => {
-    const body = {
-      parent_folder_id: selectedFolder?.id,
-    }
-    const {resolvedNames} = FileOptionsCollection.getState() as FileOptionsResults
-    const nameCollisions: FileOptions[] = []
+  const handleClose = useCallback(() => {
+    onDismiss()
+    queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+  }, [onDismiss])
 
-    showFlashAlert({message: I18n.t('Starting copy operation...')})
-    return Promise.all(
-      resolvedNames.map(options => {
-        let additionalParams
-        if (options.dup === 'overwrite') {
-          additionalParams = {
-            on_duplicate: 'overwrite',
-          }
-        } else if (options.dup === 'error' || options.dup === 'rename') {
-          if (options.name) {
-            additionalParams = {
-              display_name: options.name,
-              name: options.name,
-              on_duplicate: 'error',
-            }
-          } else {
-            additionalParams = {
-              on_duplicate: 'error',
-            }
-          }
-        }
-        const item = options.file as File | Folder
-
-        return doFetchApi<File | Folder>({
-          method: 'PUT',
-          path: `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}`,
-          body: {...body, ...additionalParams},
-        })
-          .then(response => response.json)
-          .then((responseItem?: File | Folder) => {
-            showFlashSuccess(
-              I18n.t('%{name} successfully moved to %{folderName}.', {
-                name: responseItem ? getName(responseItem) : '',
-                folderName: selectedFolder?.name,
-              }),
-            )()
-          })
-          .catch(error => {
-            if (error.response.status === 409 && isFile(item)) {
-              nameCollisions.push({
-                ...options,
-                file: options.file as globalThis.File,
-                cannotOverwrite: false,
-              })
-            } else {
-              showFlashError(
-                I18n.t('Error moving %{name} to %{folderName}.', {
-                  name: getName(item),
-                  folderName: selectedFolder?.name,
-                }),
-              )
-            }
-          })
-      }),
-    ).then(() => {
+  const resolveCollisions = useCallback(
+    (nameCollisions: FileOptions[]) => {
       if (nameCollisions.length > 0) {
         FileOptionsCollection.setState({
           nameCollisions: [...nameCollisions],
@@ -152,8 +97,13 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
         queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
         setRowToFocus(rowIndex ?? SELECT_ALL_FOCUS_STRING)
       }
-    })
-  }, [selectedFolder])
+    },
+    [fileOptions, rowIndex, setRowToFocus],
+  )
+
+  const startMoveOperation = useCallback(() => {
+    return sendMoveRequests(selectedFolder as Folder, resolveCollisions)
+  }, [selectedFolder, resolveCollisions])
 
   useEffect(() => {
     if (fileOptions.nameCollisions.length === 0 && fixingNameCollisions) {
@@ -352,7 +302,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
           data-testid="move-cancel-button"
           margin="0 x-small 0 0"
           disabled={postStatus}
-          onClick={onDismiss}
+          onClick={handleClose}
         >
           {I18n.t('Cancel')}
         </Button>
@@ -366,7 +316,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
         </Button>
       </>
     )
-  }, [handleMoveClick, onDismiss, postStatus])
+  }, [handleMoveClick, handleClose, postStatus])
 
   // Reset the state when the open prop changes so we don't carry over state
   // from the previously opened modal
@@ -381,7 +331,7 @@ const MoveModal = ({open, items, onDismiss, rowIndex}: MoveModalProps) => {
       {!fixingNameCollisions && (
         <Modal
           open={open}
-          onDismiss={onDismiss}
+          onDismiss={handleClose}
           size="small"
           label={I18n.t('Copy')}
           shouldCloseOnDocumentClick={false}

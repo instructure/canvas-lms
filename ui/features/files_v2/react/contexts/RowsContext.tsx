@@ -22,6 +22,7 @@ import {File, Folder} from '../../interfaces/File'
 type RowsContextType = {
   setCurrentRows: (rows: (File | Folder)[]) => void
   currentRows: (File | Folder)[]
+  setSessionExpired: (value: boolean) => void
 }
 
 export const RowsContext = createContext<RowsContextType | undefined>(undefined)

@@ -97,7 +97,7 @@ export const PlacementsConfirmation = React.memo(
                 appName,
                 wrappers: [
                   '<strong>$1</strong>',
-                  "<a href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
+                  "<a id='placements-documentation-link' href='https://canvas.instructure.com/doc/api/file.placements_overview.html' style='text-decoration: underline' target='_blank'>$1</a>",
                 ],
               },
             ),
@@ -150,6 +150,7 @@ const PlacementCheckbox = React.memo(
       <Flex direction="row" gap="x-small" justifyItems="start" alignItems="center" key={placement}>
         <Flex.Item>
           <Checkbox
+            data-pendo="lti-placement-checkbox"
             data-testid={`placement-checkbox-${placement}`}
             labelPlacement="end"
             label={<Text>{i18nLtiPlacement(placement)}</Text>}
@@ -227,6 +228,7 @@ const PlacementCheckbox = React.memo(
           {enabled && (
             <View padding="0 0 0 medium" display="block" as="div">
               <Checkbox
+                data-pendo="lti-course-navigation-default-checkbox"
                 checked={courseNavigationDefaultHidden}
                 label={I18n.t('Default to Hidden')}
                 onChange={() => {

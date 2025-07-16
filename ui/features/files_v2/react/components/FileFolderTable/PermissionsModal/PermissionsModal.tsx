@@ -17,15 +17,28 @@
  */
 
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {showFlashAlert, showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import {captureException} from '@sentry/react'
+import {queryClient} from '@canvas/query'
+import {
+  showFlashAlert,
+  showFlashError,
+  showFlashSuccess,
+  showFlashWarning,
+} from '@canvas/alerts/react/FlashAlert'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {getFilesEnv} from '../../../../utils/filesEnvUtils'
+import {
+  type UpdatePermissionBody,
+  updatePermissionForItem,
+} from '../../../queries/updatePermissionForItem'
+import {BulkItemRequestsError} from '../../../queries/BultItemRequestsError'
+import {makeBulkItemRequests} from '../../../queries/makeBulkItemRequests'
 import {Modal} from '@instructure/ui-modal'
 import {type File, type Folder} from '../../../../interfaces/File'
 import {isFile} from '../../../../utils/fileFolderUtils'
 import {useFileManagement} from '../../../contexts/FileManagementContext'
 import {useRows} from '../../../contexts/RowsContext'
+import {UnauthorizedError} from '../../../../utils/apiUtils'
 import type {FormMessage} from '@instructure/ui-form-field'
 import {PermissionsModalHeader} from './PermissionsModalHeader'
 import {PermissionsModalBody} from './PermissionsModalBody'
@@ -36,7 +49,6 @@ import {
   defaultDate,
   defaultDateRangeType,
   defaultVisibilityOption,
-  parseNewRows,
   type AvailabilityOptionId,
   type AvailabilityOption,
   type DateRangeTypeId,
@@ -90,7 +102,30 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   )
   const [error, setError] = useState<string | null>()
 
-  const {currentRows, setCurrentRows} = useRows()
+  const {setSessionExpired} = useRows()
+
+  const permissionRequestBody = useMemo(() => {
+    let unlock_at = null
+    let lock_at = null
+
+    if (availabilityOption.id === 'date_range') {
+      unlock_at = isStartDateRequired(dateRangeType) ? unlockAt : null
+      lock_at = isEndDateRequired(dateRangeType) ? lockAt : null
+    }
+
+    const data: UpdatePermissionBody = {
+      hidden: availabilityOption.id === 'link_only',
+      locked: availabilityOption.id === 'unpublished',
+      unlock_at: unlock_at || '',
+      lock_at: lock_at || '',
+    }
+
+    if (enableVisibility && visibilityOption) {
+      data.visibility_level = visibilityOption.id
+    }
+
+    return data
+  }, [availabilityOption, dateRangeType, lockAt, unlockAt, enableVisibility, visibilityOption])
 
   const resetState = useCallback(() => {
     setIsRequestInFlight(false)
@@ -111,43 +146,8 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
   }, [availabilityOption.id, unlockAt, lockAt])
 
   const startUpdateOperation = useCallback(() => {
-    let unlock_at = null
-    let lock_at = null
-
-    if (availabilityOption.id === 'date_range') {
-      unlock_at = isStartDateRequired(dateRangeType) ? unlockAt : null
-      lock_at = isEndDateRequired(dateRangeType) ? lockAt : null
-    }
-
-    const opts: Record<string, string | boolean> = {
-      hidden: availabilityOption.id === 'link_only',
-      unlock_at: unlock_at || '',
-      lock_at: lock_at || '',
-      locked: availabilityOption.id === 'unpublished',
-    }
-
-    if (enableVisibility && visibilityOption) {
-      opts.visibility_level = visibilityOption.id
-    }
-
-    return Promise.all(
-      items.map(item =>
-        doFetchApi<File | Folder>({
-          method: 'PUT',
-          path: `/api/v1/${isFile(item) ? 'files' : 'folders'}/${item.id}`,
-          body: opts,
-        }),
-      ),
-    )
-  }, [
-    availabilityOption.id,
-    dateRangeType,
-    enableVisibility,
-    items,
-    lockAt,
-    unlockAt,
-    visibilityOption,
-  ])
+    return makeBulkItemRequests(items, item => updatePermissionForItem(item, permissionRequestBody))
+  }, [items, permissionRequestBody])
 
   const isValidByDateRange = useCallback(() => {
     const errorMsg = I18n.t('Invalid date.')
@@ -199,7 +199,7 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
     return true
   }, [dateRangeType, lockAt, unlockAt])
 
-  const handleSaveClick = useCallback(() => {
+  const handleSaveClick = useCallback(async () => {
     if (availabilityOption.id === 'date_range') {
       if (!isValidByDateRange()) {
         return
@@ -225,37 +225,45 @@ const PermissionsModal = ({open, items, onDismiss}: PermissionsModalProps) => {
 
     setIsRequestInFlight(true)
     showFlashAlert({message: I18n.t('Starting update operation...')})
-    return startUpdateOperation()
-      .then(() => {
+    const errorMessage = I18n.t('An error occurred while setting permissions. Please try again.')
+
+    try {
+      await startUpdateOperation()
+      onDismiss()
+      showFlashSuccess(I18n.t('Permissions have been successfully set.'))()
+      queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
+      await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+    } catch (err) {
+      if (err instanceof UnauthorizedError) {
+        setSessionExpired(true)
+        return
+      } else if (err instanceof BulkItemRequestsError) {
         onDismiss()
-        showFlashSuccess(I18n.t('Permissions have been successfully set.'))()
-        const newRows = parseNewRows({
-          items,
-          availabilityOptionId: availabilityOption.id,
-          dateRangeType: dateRangeType,
-          currentRows,
-          unlockAt,
-          lockAt,
-        })
-        setCurrentRows(newRows)
-      })
-      .catch(() => {
-        showFlashError(I18n.t('An error occurred while setting permissions. Please try again.'))()
-      })
-      .finally(() => setIsRequestInFlight(false))
+
+        if (err.failedItems.length === items.length) {
+          showFlashError(errorMessage)()
+        } else {
+          showFlashWarning(errorMessage)()
+          queryClient.refetchQueries({queryKey: ['quota'], type: 'active'})
+          await queryClient.refetchQueries({queryKey: ['files'], type: 'active'})
+        }
+      } else {
+        // Impossible branch, makeBulkItemRequests should always throw either UnauthorizedError or BulkItemRequestsError
+        showFlashError(errorMessage)()
+        captureException(errorMessage)
+      }
+    } finally {
+      setIsRequestInFlight(false)
+    }
   }, [
     availabilityOption.id,
-    dateRangeType,
     contextId,
     contextType,
+    isValidByDateRange,
     items,
     onDismiss,
+    setSessionExpired,
     startUpdateOperation,
-    unlockAt,
-    lockAt,
-    currentRows,
-    setCurrentRows,
-    isValidByDateRange,
   ])
 
   const handleChangeAvailabilityOption = useCallback(

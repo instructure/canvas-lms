@@ -24,7 +24,6 @@ import {CompletionRequirement, ModuleItemContent, ModuleProgression} from '../ut
 import ModuleItemSupplementalInfoStudent from './ModuleItemSupplementalInfoStudent'
 import ModuleItemStatusIcon from './ModuleItemStatusIcon'
 import ModuleItemTitleStudent from './ModuleItemTitleStudent'
-import ModuleDiscussionCheckpointStudent from './ModuleDiscussionCheckpointStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
@@ -37,6 +36,7 @@ export interface ModuleItemStudentProps {
   onClick?: () => void
   completionRequirements?: CompletionRequirement[]
   progression?: ModuleProgression
+  smallScreen?: boolean
 }
 
 const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
@@ -49,6 +49,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   onClick,
   completionRequirements,
   progression,
+  smallScreen = false,
 }) => {
   // Hooks must be called unconditionally
   const itemIcon = useMemo(() => (content ? getItemIcon(content, true) : null), [content])
@@ -71,7 +72,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
       minHeight="5.125rem"
       display="flex"
     >
-      <Flex wrap="wrap" width="100%">
+      <Flex wrap="wrap" width="100%" direction={smallScreen ? 'column' : 'row'}>
         <Flex.Item margin={itemIcon ? '0' : `0 small 0 0`} shouldGrow>
           <div style={{padding: `0 0 0 ${itemLeftMargin}`}}>
             <Flex
@@ -114,7 +115,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
           </div>
         </Flex.Item>
         {content.type !== 'SubHeader' && (
-          <Flex.Item>
+          <Flex.Item margin={smallScreen ? 'x-small 0 0 0' : '0 0 0 small'}>
             <ModuleItemStatusIcon
               itemId={_id || ''}
               moduleCompleted={progression?.completed || false}

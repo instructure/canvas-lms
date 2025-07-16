@@ -24,23 +24,20 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {type File, type Folder} from '../../../interfaces/File'
 import {ModalOrTrayOptions, type ColumnHeader} from '../../../interfaces/FileFolderTable'
-import {getUniqueId, pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
+import {type SelectionHandler} from '../../../interfaces/SelectionHandler'
+import {pluralizeContextTypeString} from '../../../utils/fileFolderUtils'
+import {useHandleKbdShortcuts} from '../../hooks/useHandleKbdShortcuts'
 import SubTableContent from './SubTableContent'
 import renderTableHead from './RenderTableHead'
-import renderTableBody from './RenderTableBody'
+import TableBody from './TableBody'
 import {useFileManagement} from '../../contexts/FileManagementContext'
 import {Alert} from '@instructure/ui-alerts'
 import UsageRightsModal from './UsageRightsModal'
 import PermissionsModal from './PermissionsModal'
 import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
-import {
-  getColumnHeaders,
-  getSelectionScreenReaderText,
-  setColumnWidths,
-} from './FileFolderTableUtils'
+import {getColumnHeaders, setColumnWidths, type ColumnID} from './FileFolderTableUtils'
 import {DragAndDropWrapper} from './DragAndDropWrapper'
-import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 
 const I18n = createI18nScope('files_v2')
 
@@ -56,7 +53,7 @@ export interface FileFolderTableProps {
   onSortChange: (sort: Sort) => void
   searchString?: string
   selectedRows: Set<string>
-  setSelectedRows: React.Dispatch<React.SetStateAction<Set<string>>>
+  selectionHandler: SelectionHandler
   handleFileDropRef?: (el: HTMLInputElement | null) => void
   selectAllRef?: Ref<Checkbox>
 }
@@ -73,7 +70,7 @@ const FileFolderTable = ({
   onSortChange,
   searchString = '',
   selectedRows,
-  setSelectedRows,
+  selectionHandler,
   handleFileDropRef,
   selectAllRef,
 }: FileFolderTableProps) => {
@@ -86,9 +83,6 @@ const FileFolderTable = ({
     return headers
   }, [isStacked, sort.by])
 
-  const [selectionAnnouncement, setSelectionAnnouncement] = useState<string>(() => {
-    return getSelectionScreenReaderText(selectedRows.size, rows.length)
-  })
   const [modalOrTrayOptions, _setModalOrTrayOptions] = useState<ModalOrTrayOptions | null>(null)
 
   const setModalOrTrayOptions = useCallback(
@@ -96,29 +90,7 @@ const FileFolderTable = ({
     [],
   )
 
-  const toggleRowSelection = useCallback(
-    (rowId: string) => {
-      const newSet = new Set(selectedRows)
-      if (newSet.has(rowId)) {
-        newSet.delete(rowId)
-      } else {
-        newSet.add(rowId)
-      }
-      setSelectedRows(newSet)
-      setSelectionAnnouncement(getSelectionScreenReaderText(newSet.size, rows.length))
-    },
-    [selectedRows, setSelectedRows, rows.length],
-  )
-
-  const toggleSelectAll = useCallback(() => {
-    if (selectedRows.size === rows.length) {
-      setSelectedRows(new Set()) // Unselect all
-      setSelectionAnnouncement(getSelectionScreenReaderText(0, rows.length))
-    } else {
-      setSelectedRows(new Set(rows.map(row => getUniqueId(row)))) // Select all
-      setSelectionAnnouncement(getSelectionScreenReaderText(rows.length, rows.length))
-    }
-  }, [rows, selectedRows.size, setSelectedRows])
+  useHandleKbdShortcuts(selectionHandler.selectAll, selectionHandler.deselectAll)
 
   enum SortOrder {
     ASCENDING = 'asc',
@@ -126,7 +98,7 @@ const FileFolderTable = ({
   }
 
   const handleColumnHeaderClick = useCallback(
-    (columnId: string) => {
+    (columnId: ColumnID) => {
       const newCol = columnId
       const newDirection =
         columnId === sort.by
@@ -197,6 +169,7 @@ const FileFolderTable = ({
           contextType={pluralizeContextTypeString(contextType)}
         >
           <Table
+            id="files-table"
             caption={tableCaption}
             hover={true}
             layout={isStacked ? 'stacked' : 'fixed'}
@@ -210,7 +183,7 @@ const FileFolderTable = ({
                   size,
                   allRowsSelected,
                   someRowsSelected,
-                  toggleSelectAll,
+                  selectionHandler.toggleSelectAll,
                   isStacked,
                   filteredColumns,
                   sort,
@@ -220,19 +193,20 @@ const FileFolderTable = ({
               </Table.Row>
             </Table.Head>
             <Table.Body>
-              {renderTableBody(
-                rows,
-                filteredColumns,
-                selectedRows,
-                size,
-                isStacked,
-                toggleRowSelection,
-                userCanEditFilesForContext,
-                userCanDeleteFilesForContext,
-                userCanRestrictFilesForContext,
-                usageRightsRequiredForContext,
-                setModalOrTrayOptions,
-              )}
+              <TableBody
+                rows={rows}
+                columnHeaders={filteredColumns}
+                selectedRows={selectedRows}
+                size={size}
+                isStacked={isStacked}
+                toggleRowSelection={selectionHandler.toggleSelection}
+                selectRange={selectionHandler.selectRange}
+                userCanEditFilesForContext={userCanEditFilesForContext}
+                userCanDeleteFilesForContext={userCanDeleteFilesForContext}
+                userCanRestrictFilesForContext={userCanRestrictFilesForContext}
+                usageRightsRequiredForContext={usageRightsRequiredForContext}
+                setModalOrTrayOptions={setModalOrTrayOptions}
+              />
             </Table.Body>
           </Table>
         </DragAndDropWrapper>
@@ -243,15 +217,6 @@ const FileFolderTable = ({
           showDrop={showDrop}
           handleFileDropRef={handleFileDropRef}
         />
-        {selectionAnnouncement && (
-          <Alert
-            liveRegion={() => document.getElementById('flash_screenreader_holder')!}
-            liveRegionPoliteness="polite"
-            screenReaderOnly
-          >
-            {selectionAnnouncement}
-          </Alert>
-        )}
         <Alert
           liveRegion={() => document.getElementById('flash_screenreader_holder')!}
           liveRegionPoliteness="polite"

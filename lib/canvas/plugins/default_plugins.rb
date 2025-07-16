@@ -353,7 +353,7 @@ module Canvas::Plugins::DefaultPlugins
                               settings: {
                                 base_url: "https://app.learnplatform.com",
                               },
-                              encrypted_settings: [:username, :password]
+                              encrypted_settings: %i[username password jwt_issuer jwt_secret]
                             })
     Canvas::Plugin.register("pandapub", nil, {
                               name: -> { t :name, "PandaPub" },

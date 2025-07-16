@@ -25,9 +25,25 @@ import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import * as UpdateCalendarEventDialogModule from '@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog'
 import fakeENV from '@canvas/test-utils/fakeENV'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 
 jest.mock('@canvas/calendar/jquery/CommonEvent/index')
 jest.mock('@canvas/calendar/react/RecurringEvents/UpdateCalendarEventDialog')
+
+const server = setupServer()
+
+beforeAll(() => {
+  server.listen()
+})
+
+afterEach(() => {
+  server.resetHandlers()
+})
+
+afterAll(() => {
+  server.close()
+})
 
 let defaultProps = eventFormProps()
 
@@ -109,35 +125,7 @@ describe('CalendarEventDetailsForm', () => {
       },
       save: jest.fn().mockResolvedValue({}),
     }))
-    $.ajaxJSON = (_url, _method, _params, onSuccess, _onError) => {
-      const mockResponse = []
-      setTimeout(() => onSuccess(mockResponse), 0)
-
-      return {
-        abort: jest.fn(),
-        always: jest.fn(),
-        catch: jest.fn(),
-        done: jest.fn(),
-        fail: jest.fn(),
-        getAllResponseHeaders: jest.fn(),
-        getResponseHeader: jest.fn(),
-        overrideMimeType: jest.fn(),
-        pipe: jest.fn(),
-        progress: jest.fn(),
-        promise: jest.fn(),
-        readyState: 1,
-        responseJSON: mockResponse,
-        setRequestHeader: jest.fn(),
-        state: jest.fn().mockReturnValue('resolved'),
-        status: 200,
-        statusCode: jest.fn(),
-        statusText: 'OK',
-        then: jest.fn(callback => {
-          callback(mockResponse)
-          return this
-        }),
-      }
-    }
+    // MSW will handle the actual network requests
     jest
       .spyOn(UpdateCalendarEventDialogModule, 'renderUpdateCalendarEventDialog')
       .mockImplementation(() => Promise.resolve('all'))

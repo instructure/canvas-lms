@@ -149,10 +149,18 @@ export const saveRubric = async (
   const method = id ? 'PATCH' : 'POST'
 
   const criteria = rubric.criteria.map(criterion => {
+    /**
+     * remove all <br/> from the longDescription because the backend
+     * html sanitization will escape any <br/> tags
+     */
+    const longDescription = criterion.outcome
+      ? criterion.longDescription
+      : criterion.longDescription?.replace(/<br\/>/g, '')
+
     return {
       id: criterion.id,
       description: criterion.description,
-      long_description: criterion.longDescription,
+      long_description: longDescription,
       points: criterion.points,
       outcome: {
         display_name: criterion.outcome?.displayName,
@@ -247,6 +255,7 @@ export const generateCriteria = async (
         points_per_criterion: generateCriteriaProps.pointsPerCriterion,
         use_range: generateCriteriaProps.useRange,
         additional_prompt_info: generateCriteriaProps.additionalPromptInfo,
+        grade_level: generateCriteriaProps.gradeLevel,
       },
     }),
   })

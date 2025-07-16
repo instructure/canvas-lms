@@ -55,7 +55,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   const hasCompletionRequirement = !!completionRequirement
 
   return (
-    <Flex wrap="wrap" data-testid="module-item-supplemental-info">
+    <Flex wrap="wrap" data-testid="module-item-supplemental-info" padding="0 0 0 xx-small">
       {itemIcon && (
         <>
           <Flex.Item margin="0 small 0 0" aria-hidden="true">
@@ -72,7 +72,9 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
       {checkpoints && checkpoints.length > 0 ? (
         <>
           <Flex.Item padding="0 x-small">
-            <Text size="x-small">|</Text>
+            <Text size="x-small" aria-hidden="true">
+              |
+            </Text>
           </Flex.Item>
           <Flex.Item>
             <ModuleDiscussionCheckpointStudent
@@ -87,7 +89,9 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
         hasDueDate && (
           <>
             <Flex.Item padding="0 x-small">
-              <Text size="x-small">|</Text>
+              <Text size="x-small" aria-hidden="true">
+                |
+              </Text>
             </Flex.Item>
             <Flex.Item padding="0">
               <Text weight="normal" size="x-small">
@@ -107,7 +111,9 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
       {hasPointsPossible && (
         <>
           <Flex.Item padding="0 x-small">
-            <Text size="x-small">|</Text>
+            <Text size="x-small" aria-hidden="true">
+              |
+            </Text>
           </Flex.Item>
           <Flex.Item padding="0">
             <Text weight="normal" size="x-small">
@@ -120,7 +126,9 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
       {hasCompletionRequirement && (
         <>
           <Flex.Item padding="0 x-small">
-            <Text size="x-small">|</Text>
+            <Text size="x-small" aria-hidden="true">
+              |
+            </Text>
           </Flex.Item>
           <CompletionRequirementDisplay completionRequirement={completionRequirement} />
         </>

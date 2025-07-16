@@ -19,7 +19,10 @@
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
 import AutoCompleteSelect, {type AutoCompleteSelectProps} from '../AutoCompleteSelect'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('AutoCompleteSelect', () => {
   const props = {
@@ -28,9 +31,9 @@ describe('AutoCompleteSelect', () => {
     renderLabel: 'Select an option',
   } satisfies AutoCompleteSelectProps<{id: string}>
 
-  afterEach(() => fetchMock.restore())
-
-  const enhanceUrl = (searchTerm: string) => encodeURI(`${props.url}?search_term=${searchTerm}`)
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   it('should show "Type to search" when the input is focused', () => {
     render(<AutoCompleteSelect {...props} />)
@@ -59,7 +62,15 @@ describe('AutoCompleteSelect', () => {
 
       beforeEach(() => {
         const inputValue = 'AAA'
-        fetchMock.get(enhanceUrl(inputValue), options, {overwriteRoutes: true})
+        server.use(
+          http.get(props.url, ({request}) => {
+            const url = new URL(request.url)
+            const searchTerm = url.searchParams.get('search_term')
+            if (searchTerm === inputValue) {
+              return HttpResponse.json(options)
+            }
+          }),
+        )
         render(<AutoCompleteSelect {...props} />)
         const input = screen.getByLabelText(props.renderLabel)
 
@@ -90,7 +101,15 @@ describe('AutoCompleteSelect', () => {
       it('should show "No results"', async () => {
         const options: {id: string}[] = []
         const inputValue = 'AAA'
-        fetchMock.get(enhanceUrl(inputValue), options, {overwriteRoutes: true})
+        server.use(
+          http.get(props.url, ({request}) => {
+            const url = new URL(request.url)
+            const searchTerm = url.searchParams.get('search_term')
+            if (searchTerm === inputValue) {
+              return HttpResponse.json(options)
+            }
+          }),
+        )
         render(<AutoCompleteSelect {...props} />)
 
         const input = screen.getByLabelText(props.renderLabel)

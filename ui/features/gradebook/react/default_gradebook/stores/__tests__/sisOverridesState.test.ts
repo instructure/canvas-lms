@@ -18,7 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {NetworkFake} from '@canvas/network/NetworkFake/index'
+import {http, HttpResponse} from 'msw'
+import {setupServer} from 'msw/node'
 import store from '../index'
 
 const exampleAssignmentGroup = {
@@ -33,40 +34,52 @@ const exampleAssignmentGroup = {
 describe('Gradebook > store > sisOverrideState', () => {
   const courseId = store.getState().courseId
   const url = `/api/v1/courses/${courseId}/assignment_groups`
-
-  let network
+  const server = setupServer()
+  const capturedRequests: any[] = []
 
   describe('#fetchSisOverrides()', () => {
+    beforeAll(() => {
+      server.listen()
+    })
+
     beforeEach(() => {
-      network = new NetworkFake()
+      capturedRequests.length = 0
     })
 
     afterEach(() => {
-      network.restore()
+      server.resetHandlers()
     })
 
-    function resolveRequest() {
-      const [request] = getRequests()
-      request.response.setJson([exampleAssignmentGroup])
-      request.response.send()
-    }
+    afterAll(() => {
+      server.close()
+    })
 
     function getRequests() {
-      return network.getRequests(request => request.url === url)
+      return capturedRequests.filter(request => request.url.includes('/assignment_groups'))
     }
 
     test('sends the request', async () => {
-      store.getState().fetchSisOverrides()
-      await network.allRequestsReady()
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json([exampleAssignmentGroup])
+        }),
+      )
+
+      await store.getState().fetchSisOverrides()
       const requests = getRequests()
       expect(requests).toHaveLength(1)
     })
 
     test('saves sis overrides to the store', async () => {
-      const promise = store.getState().fetchSisOverrides()
-      await network.allRequestsReady()
-      resolveRequest()
-      await promise
+      server.use(
+        http.get(url, async ({request}) => {
+          capturedRequests.push({url: request.url})
+          return HttpResponse.json([exampleAssignmentGroup])
+        }),
+      )
+
+      await store.getState().fetchSisOverrides()
       expect(store.getState().sisOverrides).toStrictEqual([exampleAssignmentGroup])
     })
   })

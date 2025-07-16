@@ -31,6 +31,7 @@ class Course < ActiveRecord::Base
   include OutcomeImportContext
   include MaterialChanges
   include CopiedAssets
+  include LinkedAttachmentHandler
 
   attr_accessor :teacher_names, :master_course, :primary_enrollment_role, :saved_by
   attr_writer :student_count, :teacher_count, :primary_enrollment_type, :primary_enrollment_role_id, :primary_enrollment_rank, :primary_enrollment_state, :primary_enrollment_date, :invitation, :master_migration
@@ -1003,9 +1004,19 @@ class Course < ActiveRecord::Base
   scope :with_enrollments, lambda {
     where(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
   }
-  scope :with_enrollment_types, lambda { |types|
-    types = types.map { |type| "#{type.capitalize}Enrollment" }
-    where(Enrollment.active.where("enrollments.course_id=courses.id").where(type: types).arel.exists)
+  scope :with_enrollment_workflow_states_and_types, lambda { |states: nil, types: nil|
+    enrollment_scope = Enrollment.where("enrollments.course_id=courses.id")
+
+    if states.present?
+      enrollment_scope = enrollment_scope.where(workflow_state: states)
+    end
+
+    if types.present?
+      types = types.filter_map { |type| Enrollment::SIS_TYPES.invert[type] }
+      enrollment_scope = enrollment_scope.where(type: types)
+    end
+
+    where(enrollment_scope.arel.exists)
   }
   scope :without_enrollments, lambda {
     where.not(Enrollment.active.where("enrollments.course_id=courses.id").arel.exists)
@@ -1556,6 +1567,14 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def self.html_fields
+    %w[syllabus_body].freeze
+  end
+
+  def attachment_associations_enabled?
+    root_account.feature_enabled?(:disable_file_verifiers_in_public_syllabus)
+  end
+
   def home_page
     wiki.front_page
   end
@@ -1577,10 +1596,6 @@ class Course < ActiveRecord::Base
 
   def discussion_checkpoints_enabled?
     account&.discussion_checkpoints_enabled?
-  end
-
-  def checkpoints_group_discussions_enabled?
-    account&.checkpoints_group_discussions_enabled?
   end
 
   def wiki
@@ -4261,7 +4276,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.preload_menu_data_for(courses, user, preload_favorites: false)
-    ActiveRecord::Associations.preload(courses, :enrollment_term)
+    ActiveRecord::Associations.preload(courses, [:enrollment_term, :wiki])
     # preload favorites and nicknames
     favorite_ids = preload_favorites && user.favorite_context_ids("Course")
     nicknames = user.all_course_nicknames(courses)
@@ -4527,6 +4542,16 @@ class Course < ActiveRecord::Base
 
   def horizon_course?
     horizon_course && account&.feature_enabled?(:horizon_course_setting)
+  end
+
+  def use_modules_rewrite_view?(user, session)
+    if grants_right?(user, session, :read_as_admin)
+      return root_account.feature_enabled?(:modules_page_rewrite)
+    elsif feature_enabled?(:modules_page_rewrite_student_view)
+      return user || Account.site_admin.feature_enabled?(:disable_graphql_authentication) || root_account.feature_enabled?(:graphql_persisted_queries)
+    end
+
+    false
   end
 
   private

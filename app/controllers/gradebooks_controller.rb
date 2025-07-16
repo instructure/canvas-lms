@@ -989,7 +989,7 @@ class GradebooksController < ApplicationController
           submission_json[:has_sub_assignment_submissions] = assignment.has_sub_assignments
           submission_json[:sub_assignment_submissions] = (assignment.has_sub_assignments &&
             assignment.sub_assignments&.map do |sub_assignment|
-              sub_assignment_submission = sub_assignment.find_or_create_submission(submission.user)
+              sub_assignment_submission = sub_assignment.submissions.active.find_by(user_id: submission.user_id)
               sub_assignnment_submission_json(sub_assignment_submission, sub_assignment_submission.assignment, @current_user, @session, @context)
             end) || []
         end
@@ -1086,7 +1086,8 @@ class GradebooksController < ApplicationController
         late_policy: @context.late_policy&.as_json(include_root: false),
         gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
         can_view_audit_trail: @assignment.present? && @assignment.can_view_audit_trail?(@current_user),
-        PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse)
+        PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse),
+        GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
       }
       js_env(env)
 

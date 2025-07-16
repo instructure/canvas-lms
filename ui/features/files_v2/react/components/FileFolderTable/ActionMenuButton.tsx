@@ -246,7 +246,7 @@ const ActionMenuButton = ({
             {
               icon: IconDownloadLine,
               text: I18n.t('Download'),
-              onClick: () => downloadZip(new Set([`folder-${row.id.toString()}`])),
+              onClick: () => downloadZip(new Set([`folder-${row.id}`])),
             },
             {
               icon: IconPermissionsLine,

@@ -21,8 +21,8 @@ import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../AddressBook'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from '@apollo/client'
 import {handlers} from '../../../../graphql/mswHandlers'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {mswClient} from '@canvas/msw/mswClient'
+import {setupServer} from 'msw/node'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
 // Mock jQuery to prevent flashError errors from unrelated components
@@ -38,7 +38,7 @@ jest.mock('jquery', () => {
   return jest.fn(() => jQueryMock)
 })
 
-const server = mswServer(handlers)
+const server = setupServer(...handlers)
 beforeAll(() => {
   // Start the server with more specific options
   server.listen({

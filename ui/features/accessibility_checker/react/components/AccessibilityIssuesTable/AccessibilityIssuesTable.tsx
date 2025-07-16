@@ -18,15 +18,16 @@
 
 import {useCallback} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
-import {IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
+import {Spinner} from '@instructure/ui-spinner'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table, TableColHeaderProps} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {ContentItem} from '../../types'
-import {IssueCell} from './IssueCell'
+import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -37,14 +38,53 @@ export type TableSortState = {
 
 type Props = {
   isLoading?: boolean
+  error?: string | null
   onRowClick?: (item: ContentItem) => void
   onSortRequest?: (sortId?: string, sortDirection?: TableColHeaderProps['sortDirection']) => void
   tableData?: ContentItem[]
   tableSortState?: TableSortState
 }
 
+const renderTableData = (
+  tableData?: ContentItem[],
+  error?: string | null,
+  onRowClick?: (item: ContentItem) => void,
+) => {
+  if (error) return
+
+  return (
+    <>
+      {tableData?.length === 0 || !tableData ? (
+        <Table.Row data-testid="no-issues-row">
+          <Table.Cell colSpan={5} textAlign="center">
+            <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
+          </Table.Cell>
+        </Table.Row>
+      ) : (
+        tableData.map(item => (
+          <AccessibilityIssuesTableRow key={`${item.id}`} item={item} onRowClick={onRowClick} />
+        ))
+      )}
+    </>
+  )
+}
+
+const renderLoading = () => {
+  return (
+    <Flex direction="column" alignItems="center" margin="small 0">
+      <Flex.Item shouldGrow>
+        <Spinner renderTitle="Loading accessibility issues" size="large" margin="0 0 0 medium" />
+      </Flex.Item>
+      <Flex.Item>
+        <PresentationContent>{I18n.t('Loading accessibility issues')}</PresentationContent>
+      </Flex.Item>
+    </Flex>
+  )
+}
+
 export const AccessibilityIssuesTable = ({
-  // isLoading, - TODO implement loading states
+  isLoading = false,
+  error,
   onRowClick,
   onSortRequest,
   tableData,
@@ -73,15 +113,6 @@ export const AccessibilityIssuesTable = ({
       }
     },
     [tableSortState, onSortRequest],
-  )
-
-  const handleRowClick = useCallback(
-    (item: ContentItem) => {
-      if (onRowClick) {
-        onRowClick(item)
-      }
-    },
-    [onRowClick],
   )
 
   const getCurrentSortDirection = (
@@ -148,62 +179,23 @@ export const AccessibilityIssuesTable = ({
             </Table.ColHeader>
           </Table.Row>
         </Table.Head>
+
         <Table.Body>
-          {tableData?.length === 0 || !tableData ? (
-            <Table.Row data-testid="no-issues-row">
+          {error && (
+            <Table.Row data-testid="error-row">
               <Table.Cell colSpan={5} textAlign="center">
-                <Text color="secondary">{I18n.t('No accessibility issues found')}</Text>
+                <Alert variant="error">{error}</Alert>
               </Table.Cell>
             </Table.Row>
-          ) : (
-            tableData.map(item => (
-              <Table.Row key={`${item.type}-${item.id}`} data-testid={`issue-row-${item.id}`}>
-                <Table.Cell>
-                  <Flex alignItems="center">
-                    <Flex.Item margin="0 0 0 x-small">
-                      <a href={item.url}>{item.title}</a>
-                    </Flex.Item>
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell textAlign="center">
-                  <IssueCell item={item} onClick={handleRowClick} />
-                </Table.Cell>
-                <Table.Cell>{item.type}</Table.Cell>
-                <Table.Cell>
-                  <Flex alignItems="center">
-                    {item.published ? (
-                      <>
-                        <Flex.Item margin="medium">
-                          <IconPublishSolid color="success" />
-                        </Flex.Item>
-                        <Flex.Item>
-                          <Text>{I18n.t('Published')}</Text>
-                        </Flex.Item>
-                      </>
-                    ) : (
-                      <>
-                        <Flex.Item margin="medium">
-                          <IconUnpublishedSolid color="secondary" />
-                        </Flex.Item>
-                        <Flex.Item>
-                          <Text>{I18n.t('Unpublished')}</Text>
-                        </Flex.Item>
-                      </>
-                    )}
-                  </Flex>
-                </Table.Cell>
-                <Table.Cell>
-                  {item.updatedAt
-                    ? new Intl.DateTimeFormat('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: '2-digit',
-                      }).format(new Date(item.updatedAt))
-                    : '-'}
-                </Table.Cell>
-              </Table.Row>
-            ))
           )}
+          {isLoading && (
+            <Table.Row data-testid="no-issues-row">
+              <Table.Cell colSpan={5} textAlign="center">
+                {renderLoading()}
+              </Table.Cell>
+            </Table.Row>
+          )}
+          {renderTableData(tableData, error, onRowClick)}
         </Table.Body>
       </Table>
     </View>

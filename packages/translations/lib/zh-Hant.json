@@ -521,6 +521,9 @@
     "decrease_indent_d9cf469d": {
         "message": "減少縮排"
     },
+    "decrease_rich_content_area_82068f64": {
+        "message": "減少多種格式的內容區域"
+    },
     "deep_purple_bb3e2907": {
         "message": "深紫色"
     },
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "增加縮進"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "增加多種格式的內容區域"
     },
     "indefinite_integral_6623307e": {
         "message": "無限積分"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "頁面的第一個標題應該是 H2。"
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "多種格式的內容區域的高度已減少。"
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "多種格式的內容區域的高度已增加。"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "該材料位於公用網域中。"

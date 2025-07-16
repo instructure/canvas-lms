@@ -21,8 +21,8 @@ import {ApolloProvider} from '@apollo/client'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {MessageDetailContainer} from '../MessageDetailContainer'
 import {Conversation} from '../../../../graphql/Conversation'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {mswClient} from '@canvas/msw/mswClient'
+import {setupServer} from 'msw/node'
 import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
@@ -38,7 +38,7 @@ jest.mock('../../../../util/utils', () => ({
 }))
 
 describe('MessageDetailContainer', () => {
-  const server = mswServer(handlers)
+  const server = setupServer(...handlers)
 
   beforeAll(() => {
     server.listen({onUnhandledRequest: 'error'})

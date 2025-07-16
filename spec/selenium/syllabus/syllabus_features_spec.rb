@@ -88,6 +88,20 @@ describe "course syllabus" do
       expect(fln("text_file.txt")).to be_displayed
     end
 
+    it "adds location to file links in the syllabus if the flag is on", custom_timeout: 30, priority: "1" do
+      @course.root_account.enable_feature!(:disable_file_verifiers_in_public_syllabus)
+      file = @course.attachments.create!(display_name: "text_file.txt", uploaded_data: default_uploaded_data)
+      file.context = @course
+      file.save!
+      @course.saving_user = @teacher
+      @course.update(syllabus_body: <<~HTML)
+        <p><a href="/courses/#{@course.id}/files/#{file.id}">text_file.txt</a></p>
+      HTML
+      get "/courses/#{@course.id}/assignments/syllabus"
+      wait_for_ajax_requests
+      expect(fln("text_file.txt")["href"]).to include("location=course_syllabus_#{@course.id}")
+    end
+
     it "validates Jump to Today works on the mini calendar", priority: "1" do
       2.times { f(".next_month_link").click }
       f(".jump_to_today_link").click

@@ -45,8 +45,10 @@ module Accessibility
         end
 
         siblings = current.parent ? current.parent.xpath("./#{current.name}") : []
-        index = siblings.index(current) + 1
-        identifier += "[#{index}]" if siblings.size > 1
+        if siblings.size > 1 && siblings.index(current)
+          index = siblings.index(current) + 1
+          identifier += "[#{index}]" if siblings.size > 1
+        end
 
         path.unshift(identifier)
         current = current.parent

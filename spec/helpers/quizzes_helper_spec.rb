@@ -456,13 +456,7 @@ describe QuizzesHelper do
       let(:quiz_submission) { double(last_attempt_completed?: false) }
 
       it "provides a useful message" do
-        message, _aria_hidden = render_correct_answer_protection(quiz, quiz_submission)
-        expect(message).to match(/are hidden/)
-      end
-
-      it "tells assistive technologies to ignore the message" do
-        _message, aria_hidden = render_correct_answer_protection(quiz, quiz_submission)
-        expect(aria_hidden).to be_truthy
+        expect(render_correct_answer_protection(quiz, quiz_submission)).to match(/are hidden/)
       end
     end
 

@@ -40,7 +40,8 @@ module Schemas::Lti::IMS
         # Required properties
         "type" => {
           "type" => "string",
-          "enum" => Lti::ResourcePlacement::PLACEMENTS_BY_MESSAGE_TYPE.keys
+          "enum" => Lti::ResourcePlacement::PLACEMENT_BASED_MESSAGE_TYPES +
+                    Lti::ResourcePlacement::PLACEMENTLESS_MESSAGE_TYPES
         }.freeze,
 
         # Optional properties

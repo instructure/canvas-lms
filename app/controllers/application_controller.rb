@@ -376,6 +376,24 @@ class ApplicationController < ActionController::Base
   end
   helper_method :js_env
 
+  # Determines whether the Canvas Career switch button should be displayed in the
+  # global navigation header.
+  def show_career_switch?
+    return false unless @current_user
+
+    return false unless @domain_root_account&.feature_enabled?(:horizon_learner_app) ||
+                        @domain_root_account&.feature_enabled?(:horizon_learning_provider_app_on_contextless_routes)
+
+    career_apps = [
+      CanvasCareer::Constants::App::CAREER_LEARNER,
+      CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
+    ]
+
+    resolver = CanvasCareer::ExperienceResolver.new(@current_user, @context, @domain_root_account, session)
+    resolver.available_apps.intersect?(career_apps)
+  end
+  helper_method :show_career_switch?
+
   def group_information
     if @context.is_a?(Group) &&
        can_do(@context, @current_user, :manage) &&
@@ -406,8 +424,6 @@ class ApplicationController < ActionController::Base
     dashboard_graphql_integration
     discussion_ai_survey_link
     discussion_checkpoints
-    discussion_default_sort
-    discussion_default_expand
     discussion_permalink
     speedgrader_studio_media_capture
     disallow_threaded_replies_fix_alert
@@ -421,6 +437,7 @@ class ApplicationController < ActionController::Base
     files_a11y_rewrite_toggle
     files_a11y_rewrite
     rce_a11y_resize
+    hide_legacy_course_analytics
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours
@@ -430,6 +447,7 @@ class ApplicationController < ActionController::Base
     lti_registrations_next
     lti_registrations_page
     lti_registrations_usage_data
+    lti_registrations_usage_tab
     lti_asset_processor
     buttons_and_icons_root_account
     extended_submission_state
@@ -461,6 +479,8 @@ class ApplicationController < ActionController::Base
     lti_apps_page_ai_translation
     ams_service
     open_tools_in_new_tab
+    horizon_learner_app
+    horizon_learning_provider_app_on_contextless_routes
   ].freeze
   JS_ENV_ROOT_ACCOUNT_SERVICES = %i[account_survey_notifications].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = %i[
@@ -3358,11 +3378,6 @@ class ApplicationController < ActionController::Base
       %r{^/courses/\d+(/assignments|/quizzes|/modules|.?)$}.match?(request.path)
   end
   helper_method :should_show_migration_limitation_message
-
-  def show_migration_text_no_question_warning?
-    !Account.site_admin.feature_enabled?(:hide_quiz_migration_text_no_question_warning)
-  end
-  helper_method :show_migration_text_no_question_warning?
 
   def k5_disabled?
     K5::UserService.new(@current_user, @domain_root_account, @selected_observed_user).k5_disabled?

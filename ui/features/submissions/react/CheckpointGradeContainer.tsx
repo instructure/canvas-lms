@@ -66,22 +66,22 @@ const CheckpointGradeContainer = ({assignment}: Props) => {
   const I18n = useI18nScope('sharedSetDefaultGradeDialog')
 
   const replyToTopicCheckpoint = assignment.checkpoint_submissions.find(
-    cp => cp.tag === REPLY_TO_TOPIC
+    cp => cp.tag === REPLY_TO_TOPIC,
   )
   const replyToEntryCheckpoint = assignment.checkpoint_submissions.find(
-    cp => cp.tag === REPLY_TO_ENTRY
+    cp => cp.tag === REPLY_TO_ENTRY,
   )
   const totalPossiblePoints = assignment.checkpoint_submissions.reduce(
     (acc, cp) => acc + Number(cp.points_possible),
-    0
+    0,
   )
 
   const [totalScore, setTotalScore] = React.useState(getTotalScore(assignment))
   const [replyToTopicScore, setReplyToTopicScore] = React.useState<number>(
-    replyToTopicCheckpoint?.submission_score || 0
+    replyToTopicCheckpoint?.submission_score || 0,
   )
   const [replyToEntryScore, setReplyToEntryScore] = React.useState<number>(
-    replyToEntryCheckpoint?.submission_score || 0
+    replyToEntryCheckpoint?.submission_score || 0,
   )
 
   const [updateSubmission] = useMutation(UPDATE_SUBMISSION_SCORE_MUTATION, {
@@ -89,7 +89,7 @@ const CheckpointGradeContainer = ({assignment}: Props) => {
       // If the grading type is pass/fail, then capitalize and display the score
       if (assignment.grading_type === 'pass_fail') {
         setTotalScore(
-          capitalizePassFailGrade(data.updateSubmissionGrade.parentAssignmentSubmission.grade)
+          capitalizePassFailGrade(data.updateSubmissionGrade.parentAssignmentSubmission.grade),
         )
       } else {
         setTotalScore(data.updateSubmissionGrade.parentAssignmentSubmission.grade)
@@ -128,6 +128,20 @@ const CheckpointGradeContainer = ({assignment}: Props) => {
     })
   }
 
+  const getPassFailScore = (score: string) => {
+    if (assignment.grading_type === 'pass_fail') {
+      const normalized = (score || '').toLowerCase()
+      if (normalized === 'complete') {
+        return I18n.t('Complete')
+      } else if (normalized === 'incomplete') {
+        return I18n.t('Incomplete')
+      } else {
+        return score
+      }
+    }
+    return score
+  }
+
   return (
     <Flex data-testid="checkpoint-grades-container">
       <Flex.Item shouldShrink={true}>
@@ -153,7 +167,9 @@ const CheckpointGradeContainer = ({assignment}: Props) => {
           </Text>
           <TextInput
             width={assignment.grading_type === 'pass_fail' ? '7rem' : '6rem'}
-            value={totalScore}
+            value={
+              assignment.grading_type === 'pass_fail' ? getPassFailScore(totalScore) : totalScore
+            }
             onChange={() => {}}
             disabled={true}
             data-testid="total-score-display"

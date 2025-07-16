@@ -31,7 +31,7 @@ analytics_2_lti_13_enabled:
   after_state_change_proc: analytics_2_after_state_change_hook
 hide_legacy_course_analytics:
   state: hidden
-  applies_to: Account
+  applies_to: Course
   display_name: Hide Legacy Course Analytics
   description:
     hide_legacy_course_analytics_description: Hides the Legacy Course Analytics feature.
@@ -115,23 +115,6 @@ k20_students_in_need_of_attention:
   display_name: Intelligent Insights - Students in Need of Attention
   description:
     k20_students_in_need_of_attention: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission.
-  root_opt_in: true
-  beta: true
-  shadow: true
-students_in_need_of_attention_course_level:
-  state: hidden
-  applies_to: Course
-  display_name: Intelligent Insights - Students in Need of Attention - Course Level (flag)
-  description:
-    students_in_need_of_attention_course_level: Enables the Intelligent Insights - Students in Need of Attention feature and accompanying permission at the Course level.
-  root_opt_in: true
-  beta: true
-students_in_need_of_attention_course_level_beta:
-  state: hidden
-  applies_to: Account
-  display_name: Intelligent Insights - Students in Need of Attention - Course Level (beta)
-  description:
-    students_in_need_of_attention_course_level_beta: Enables the Intelligent Insights - Students in Need of Attention feature in Beta with its accompanying permission at the Course level.
   root_opt_in: true
   beta: true
   shadow: true

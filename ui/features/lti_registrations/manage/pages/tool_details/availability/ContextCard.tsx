@@ -28,6 +28,7 @@ import {renderExceptionCounts} from './renderExceptionCounts'
 import {CourseId} from '../../../model/CourseId'
 import {AccountId} from '../../../model/AccountId'
 import {ContextPath} from './ContextPath'
+import {Tag} from '@instructure/ui-tag'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -54,14 +55,10 @@ export type ContextProps = {
  * @param pathLength
  * @returns
  */
-const borderColor = (courseId: CourseId | undefined, pathLength: number) => {
-  if (typeof courseId !== 'undefined') {
-    return '#B45310' // #B45310 Copper 50 Secondary
-  } else if (pathLength > 0) {
-    return '#C1368F' // #C1368F Plum 50 Secondary
-  } else {
-    return '#007B86' // #007B86 Sea 50 Secondary
-  }
+const borderColor = (courseId: CourseId | undefined) => {
+  // #C1368F Plum 50 Secondary
+  // #007B86 Sea 50 Secondary
+  return courseId ? '#C1368F' : '#007B86'
 }
 
 /**
@@ -84,7 +81,6 @@ export const ContextCard = ({
   depth = 0,
   exception_counts,
 }: ContextProps) => {
-  const pathLength = path_segments?.length || 0
   const marginLeft = depth * 20 + 'px'
 
   return (
@@ -93,7 +89,7 @@ export const ContextCard = ({
         as="div"
         padding="x-small x-small x-small small"
         borderWidth="0 0 0 large"
-        borderColor={borderColor(course_id, pathLength)}
+        borderColor={borderColor(course_id)}
       >
         <Flex as="div">
           <Flex.Item margin="0 small 0 0" as="div">
@@ -105,13 +101,11 @@ export const ContextCard = ({
           </Flex.Item>
           <Flex.Item as="div" shouldShrink>
             <Flex as="div" margin="0" alignItems="center">
-              <Heading level="h4" margin="0 small 0 0">
+              <Heading level="h4" margin="0 xx-small 0 0">
                 <Text weight="bold">{context_name}</Text>
               </Heading>
               {typeof available !== 'undefined' ? (
-                <Pill color="primary" margin="0 0 0 small">
-                  {available ? I18n.t('Available') : I18n.t('Unavailable')}
-                </Pill>
+                <Tag text={available ? I18n.t('Available') : I18n.t('Not Available')} />
               ) : null}
             </Flex>
             <Flex.Item shouldGrow>

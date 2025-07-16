@@ -516,10 +516,13 @@
         "message": "Image décorative"
     },
     "decorative_type_upper_f2c95e3": {
-        "message": "Décoratif { TYPE_UPPER }"
+        "message": "{ TYPE_UPPER } décorative"
     },
     "decrease_indent_d9cf469d": {
         "message": "Diminuer le retrait"
+    },
+    "decrease_rich_content_area_82068f64": {
+        "message": "Diminuer la zone de contenu enrichi"
     },
     "deep_purple_bb3e2907": {
         "message": "Violet foncé"
@@ -1153,6 +1156,9 @@
     },
     "increase_indent_6af90f7c": {
         "message": "Augmenter le retrait"
+    },
+    "increase_rich_content_area_340b775": {
+        "message": "Augmenter la zone de contenu enrichi"
     },
     "indefinite_integral_6623307e": {
         "message": "Intégrale indéfinie"
@@ -2407,6 +2413,12 @@
     },
     "the_first_heading_on_a_page_should_be_an_h2_859089f2": {
         "message": "Le premier titre d''une page doit être un H2."
+    },
+    "the_height_of_rich_content_area_is_decreased_36920e0": {
+        "message": "La hauteur de la zone de contenu enrichi est réduite."
+    },
+    "the_height_of_rich_content_area_is_increased_74c2358d": {
+        "message": "La hauteur de la zone de contenu enrichi est augmentée."
     },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Ce contenu appartient au domaine public"

@@ -226,6 +226,18 @@
           </div>
         <% end %>
       </li>
+      <% if show_career_switch? %>
+        <li class="menu-item ic-app-header__menu-list-item">
+          <%= link_to career_switch_experience_path(experience: 'career'),
+                      class: "ic-app-header__menu-list-link",
+                      method: :post do %>
+            <div class="menu-item-icon-container" aria-hidden="true">
+              <%= render partial: "shared/svg/svg_icon_arrow_end", formats: [:svg] %>
+            </div>
+            <div class="menu-item__text"><%= t('Canvas Career') %></div>
+          <% end %>
+        </li>
+      <% end %>
     </ul>
   </div>
   <div class="ic-app-header__secondary-navigation">

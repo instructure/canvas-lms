@@ -224,6 +224,72 @@ describe Lti::ContextToolFinder do
           expect(subject).to eq [tool4, tool1, tool2, tool3]
         end
       end
+
+      context "with an unavailable context control" do
+        let(:registration) do
+          lti_registration_with_tool(account: @course.root_account)
+        end
+
+        let!(:registration_tool1) { registration.deployments.first }
+        let!(:registration_tool2) { registration.new_external_tool(@root_account) }
+
+        before do
+          # unavailable CC in @account for registration_tool1
+          Lti::ContextControl.create!(
+            account: @account,
+            deployment: registration_tool1,
+            registration:,
+            available: false
+          )
+        end
+
+        it "does not return an unavailable tool" do
+          expect(described_class.all_tools_for(@account, order_by_context: true)).to eq [
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool2 # @root_account, no unavailable context control
+          ]
+        end
+
+        it "does not return a tool for course that is made unavailable in parent account" do
+          expect(described_class.all_tools_for(@course, order_by_context: true)).to eq [
+            tool4, # @course
+            tool1, # @course
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool2 # @root_account, no unavailable context control
+          ]
+        end
+
+        it "returns a tool for course that is unavailable in parent account but available in course" do
+          Lti::ContextControl.create!(
+            course: @course,
+            deployment: registration_tool1,
+            registration:,
+            available: true
+          )
+
+          expect(described_class.all_tools_for(@course, order_by_context: true)).to eq [
+            tool4, # @course
+            tool1, # @course
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool1, # @root_account, context control made available for @course
+            registration_tool2  # @root_account, no unavailable context control
+          ]
+        end
+
+        it "does not affect the tool availability of the lti_registrations_next flag is off" do
+          @account.root_account.disable_feature!(:lti_registrations_next)
+
+          expect(described_class.all_tools_for(@account, order_by_context: true)).to eq [
+            tool2, # @account
+            tool3, # @root_account
+            registration_tool1, # @root_account, unavailable context control being ignored b/c of flag
+            registration_tool2  # @root_account, no unavailable context control
+          ]
+        end
+      end
     end
   end
 

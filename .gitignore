@@ -24,6 +24,7 @@
 !/config/code_ownership.yml
 !/config/credentials.test.yml
 !/config/crystalball.yml
+!/config/graphql_persisted_queries.yml
 /config/environments/*-local.rb
 /config/locales/generated/
 /config/saml/*

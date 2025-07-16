@@ -21,6 +21,7 @@ import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ModuleItem from './ModuleItem'
+import AddItemInline from './AddItemModalComponents/AddItemInline'
 import {Droppable, Draggable} from 'react-beautiful-dnd'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {
@@ -28,39 +29,11 @@ import type {
   ModuleItem as ModuleItemType,
   ModuleAction,
 } from '../utils/types'
+import {validateModuleItemTeacherRenderRequirements} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
-const MemoizedModuleItem = memo(ModuleItem, (prevProps, nextProps) => {
-  const basicPropsEqual =
-    prevProps.id === nextProps.id &&
-    prevProps.moduleId === nextProps.moduleId &&
-    prevProps.published === nextProps.published &&
-    prevProps.index === nextProps.index &&
-    prevProps.content?.title === nextProps.content?.title &&
-    prevProps.indent === nextProps.indent
-
-  if (!basicPropsEqual) return false
-
-  const prevOverrides = prevProps.content?.assignmentOverrides
-  const nextOverrides = nextProps.content?.assignmentOverrides
-
-  if (!!prevOverrides !== !!nextOverrides) return false
-
-  if (!prevOverrides && !nextOverrides) return true
-
-  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
-  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
-  if (prevEdgesCount !== nextEdgesCount) return false
-
-  if (prevEdgesCount > 0) {
-    const prevOverridesStr = JSON.stringify(prevOverrides)
-    const nextOverridesStr = JSON.stringify(nextOverrides)
-    return prevOverridesStr === nextOverridesStr
-  }
-
-  return true
-})
+const MemoizedModuleItem = memo(ModuleItem, validateModuleItemTeacherRenderRequirements)
 
 export interface ModuleItemListProps {
   moduleId: string
@@ -111,7 +84,7 @@ const ModuleItemList: React.FC<ModuleItemListProps> = ({
               </View>
             ) : moduleItems.length === 0 ? (
               <View as="div" textAlign="center" padding="medium">
-                <Text>{I18n.t('No items in this module')}</Text>
+                <AddItemInline moduleId={moduleId} itemCount={0} />
               </View>
             ) : (
               moduleItems.map((item, index) => (
