@@ -2227,8 +2227,8 @@ RSpec.describe Lti::RegistrationsController do
 
     context "with normal data" do
       let(:subaccount) { account_model(parent_account: account, root_account: account, name: "Sub Account", sis_source_id: "FOO") }
-      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101") }
-      let(:other_course) { course_model(account: subaccount, sis_source_id: "OTHER_COURSE_SIS_ID", course_code: "BAR202") }
+      let(:course) { course_model(account:, sis_source_id: "COURSE_SIS_ID", course_code: "FOO101", name: "Foo") }
+      let(:other_course) { course_model(account: subaccount, sis_source_id: "OTHER_COURSE_SIS_ID", course_code: "BAR202", name: "Bar") }
       let(:other_account) { account_model(parent_account: account, root_account: account, name: "Other Account", sis_source_id: "BAR") }
 
       before do
@@ -2246,6 +2246,14 @@ RSpec.describe Lti::RegistrationsController do
       it "includes all courses" do
         subject
         expect(response_json[:courses].length).to eq(2)
+      end
+
+      it "returns them in alphabetical order" do
+        subject
+        expect(response_json[:courses].first[:name]).to eq("Bar")
+        expect(response_json[:courses].second[:name]).to eq("Foo")
+        expect(response_json[:accounts].first[:name]).to eq("Other Account")
+        expect(response_json[:accounts].second[:name]).to eq("Sub Account")
       end
 
       context "with search term" do
