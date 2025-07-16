@@ -5286,8 +5286,10 @@ type LtiAssetProcessor implements LegacyIDInterface {
   _id: ID!
   externalTool: ExternalTool
   iconOrToolIconUrl: String
+  iframe: LtiAssetProcessorIframe
   text: String
   title: String
+  window: LtiAssetProcessorWindowSettings
 }
 
 """
@@ -5325,7 +5327,7 @@ input LtiAssetProcessorDto {
   thumbnail: LtiContentItemIcon
   title: String
   url: String
-  window: LtiAssetProcessorWindowSettings
+  window: LtiAssetProcessorWindowSettingsInput
 }
 
 """
@@ -5343,12 +5345,24 @@ type LtiAssetProcessorEdge {
   node: LtiAssetProcessor
 }
 
+type LtiAssetProcessorIframe {
+  height: Int
+  width: Int
+}
+
 input LtiAssetProcessorReportSettings {
   custom: StringMap
   url: String
 }
 
-input LtiAssetProcessorWindowSettings {
+type LtiAssetProcessorWindowSettings {
+  height: Int
+  targetName: String
+  width: Int
+  windowFeatures: String
+}
+
+input LtiAssetProcessorWindowSettingsInput {
   height: Int
   targetName: String
   width: Int

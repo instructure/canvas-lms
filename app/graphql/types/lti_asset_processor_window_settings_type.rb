@@ -18,27 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Lti::AssetProcessor model, accessible through an Assignment
+# Lti::AssetProcessor new window settings
 module Types
-  class LtiAssetProcessorType < ApplicationObjectType
-    implements Interfaces::LegacyIDInterface
-
-    field :external_tool, Types::ExternalToolType, null: true
-    def external_tool
-      load_association(:context_external_tool)
-    end
-
-    field :text, String, null: true
-    field :title, String, null: true
-
-    field :icon_or_tool_icon_url, String, null: true
-    def icon_or_tool_icon_url
-      load_association(:context_external_tool).then do
-        object.icon_or_tool_icon_url
-      end
-    end
-
-    field :iframe, Types::LtiAssetProcessorIframeType, null: true
-    field :window, Types::LtiAssetProcessorWindowSettingsType, null: true
+  class LtiAssetProcessorWindowSettingsType < ApplicationObjectType
+    # rubocop:disable GraphQL/FieldName
+    # camelCase for compatibility with LTI spec, as these are stored
+    field :height, Int, null: true
+    field :targetName, String, null: true
+    field :width, Int, null: true
+    field :windowFeatures, String, null: true
+    # rubocop:enable GraphQL/FieldName
   end
 end
