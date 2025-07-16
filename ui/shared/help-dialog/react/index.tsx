@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import CreateTicketForm from './CreateTicketForm'
 import TeacherFeedbackForm from './TeacherFeedbackForm'
+import AdaChatbot from './AdaChatbot'
 import HelpLinks from './HelpLinks'
 
 type Props = {
@@ -41,6 +42,8 @@ function HelpDialog({onFormSubmit}: Props) {
       return <CreateTicketForm onCancel={handleCancelClick} onSubmit={onFormSubmit} />
     case '#teacher_feedback':
       return <TeacherFeedbackForm onCancel={handleCancelClick} onSubmit={onFormSubmit} />
+    case '#ada_chatbot':
+      return <AdaChatbot onSubmit={onFormSubmit} />
     default:
       return <HelpLinks onClick={handleLinkClick} />
   }
