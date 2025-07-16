@@ -301,6 +301,11 @@ module Api::V1::Attachment
   def api_attachment_preflight(context, request, opts = {})
     params = opts[:params] || request.params
 
+    if opts[:submit_assignment]
+      # as: automatically submit
+      RequestContext::Generator.add_meta_header("as", "1")
+    end
+
     # Handle deprecated folder path
     params[:parent_folder_path] ||= params[:folder]
     if params[:parent_folder_path] && params[:parent_folder_id]

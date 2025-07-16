@@ -274,6 +274,18 @@ describe Api::V1::Attachment do
 
     def render(*); end
 
+    context "submit_assignment param" do
+      it "includes as (automatically submit) in request headers" do
+        expect(RequestContext::Generator).to receive(:add_meta_header).with("as", "1")
+        api_attachment_preflight(context, request, submit_assignment: true)
+      end
+
+      it "does not include as (automatically submit) in request headers" do
+        expect(RequestContext::Generator).not_to receive(:add_meta_header).with("as", "1")
+        api_attachment_preflight(context, request, submit_assignment: false)
+      end
+    end
+
     context "with the category param set" do
       subject { Attachment.find_by(display_name: params[:name]) }
 
