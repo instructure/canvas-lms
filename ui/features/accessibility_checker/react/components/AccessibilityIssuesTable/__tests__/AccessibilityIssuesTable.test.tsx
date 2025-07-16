@@ -20,44 +20,8 @@ import {fireEvent, render, screen} from '@testing-library/react'
 import {act, renderHook} from '@testing-library/react-hooks'
 
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable'
-import {ContentItem, ContentItemType} from '../../../types'
-import {
-  useAccessibilityCheckerStore,
-  initialState,
-} from '../../../contexts/AccessibilityCheckerStore'
-
-const testData: ContentItem[] = [
-  {
-    id: 1,
-    title: 'Test Wiki Page 1',
-    type: ContentItemType.WikiPage,
-    published: true,
-    updatedAt: '2025-06-03T00:00:00Z',
-    count: 0,
-    url: '/wiki_page_1',
-    issues: [],
-  },
-  {
-    id: 2,
-    title: 'Test Assignment 1',
-    type: ContentItemType.Assignment,
-    published: true,
-    updatedAt: '2025-06-04T00:00:00Z',
-    count: 0,
-    url: '/assignment_1',
-    issues: [],
-  },
-  {
-    id: 3,
-    title: 'Test Assignment 2',
-    type: ContentItemType.Assignment,
-    published: false,
-    updatedAt: '2025-06-08T00:00:00Z',
-    count: 0,
-    url: '/assignment_2',
-    issues: [],
-  },
-]
+import {useAccessibilityCheckerStore, initialState} from '../../../stores/AccessibilityCheckerStore'
+import {sampleTableData} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesTable', () => {
   const mockSetLoading = jest.fn()
@@ -107,7 +71,7 @@ describe('AccessibilityIssuesTable', () => {
 
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
     })
 
     rerender(<AccessibilityIssuesTable />)
@@ -118,11 +82,11 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
     })
 
     render(<AccessibilityIssuesTable />)
-    expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(testData.length)
+    expect(screen.getAllByTestId(/^issue-row-/)).toHaveLength(sampleTableData.length)
   })
 
   it('renders the error state correctly', () => {
@@ -140,7 +104,7 @@ describe('AccessibilityIssuesTable', () => {
 
     act(() => {
       result.current.setError(null)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
     })
 
     rerender(<AccessibilityIssuesTable />)
@@ -152,7 +116,7 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
     })
 
     render(<AccessibilityIssuesTable />)
@@ -177,7 +141,7 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
       result.current.setPageSize(2) // Set perPage to 2 for pagination
     })
 
@@ -194,7 +158,7 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
       result.current.setPageSize(2)
     })
 
@@ -211,7 +175,7 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
       result.current.setPageSize(3)
     })
 
@@ -231,7 +195,7 @@ describe('AccessibilityIssuesTable', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
     act(() => {
       result.current.setLoading(false)
-      result.current.setTableData(testData)
+      result.current.setTableData(sampleTableData)
       result.current.setPageSize(1)
     })
 

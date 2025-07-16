@@ -20,11 +20,17 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {ContentItem} from '../types'
+import {AccessibilityData, ContentItem} from '../types'
 
 export type TableSortState = {
-  sortId?: string
-  sortDirection?: TableColHeaderProps['sortDirection']
+  sortId?: string | null
+  sortDirection?: TableColHeaderProps['sortDirection'] | null
+}
+
+export type NewStateToFetch = {
+  page?: number
+  pageSize?: number
+  tableSortState?: TableSortState | null
 }
 
 export type AccessibilityCheckerState = {
@@ -33,8 +39,10 @@ export type AccessibilityCheckerState = {
   totalCount: number
   loading?: boolean
   error?: string | null
+  accessibilityIssues: AccessibilityData | null
+  accessibilityScanDisabled: boolean
   tableSortState?: TableSortState | null
-  tableData?: ContentItem[] | null
+  tableData: ContentItem[] | null // TODO convert items to ContentItemForDisplay[]
 }
 
 export type AccessibilityCheckerActions = {
@@ -43,6 +51,8 @@ export type AccessibilityCheckerActions = {
   setTotalCount: (totalCount: number) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
+  setAccessibilityIssues: (accessibilityIssues: AccessibilityData | null) => void
+  setAccessibilityScanDisabled: (accessibilityScanDisabled: boolean) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
   setTableData: (tableData: ContentItem[] | null) => void
 }
@@ -51,10 +61,18 @@ export const initialState: AccessibilityCheckerState = {
   page: 0,
   pageSize: 10,
   totalCount: 0,
-  loading: false,
+  loading: true,
   error: null,
+  accessibilityIssues: null,
+  accessibilityScanDisabled: false,
   tableSortState: null,
   tableData: null,
+}
+
+export const defaultStateToFetch: NewStateToFetch = {
+  page: 0,
+  pageSize: 10,
+  tableSortState: {} as TableSortState,
 }
 
 export const useAccessibilityCheckerStore = create<
@@ -69,6 +87,8 @@ export const useAccessibilityCheckerStore = create<
       setTotalCount: totalCount => set({totalCount}),
       setLoading: loading => set({loading}),
       setError: error => set({error}),
+      setAccessibilityIssues: accessibilityIssues => set({accessibilityIssues}),
+      setAccessibilityScanDisabled: accessibilityScanDisabled => set({accessibilityScanDisabled}),
       setTableSortState: tableSortState => set({tableSortState}),
       setTableData: tableData => set({tableData}),
     }),

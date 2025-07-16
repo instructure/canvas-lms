@@ -20,27 +20,29 @@ import {useShallow} from 'zustand/react/shallow'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
-import {useAccessibilityCheckerStore} from '../../contexts/AccessibilityCheckerStore'
+import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
 import {calculateTotalIssuesCount} from '../../utils'
-import {AccessibilityData} from '../../types'
-import {IssuesByTypeChart} from '../IssuesByTypeChart/IssuesByTypeChart'
+import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
 
-type Props = {
-  accessibilityIssues: AccessibilityData | null
-  accessibilityScanDisabled?: boolean
-}
-
-export const AccessibilityCheckerHeader = ({
-  accessibilityScanDisabled,
-  accessibilityIssues,
-}: Props) => {
-  const loading = useAccessibilityCheckerStore(useShallow(state => state.loading))
+export const AccessibilityIssuesSummary = () => {
+  const [accessibilityIssues, accessibilityScanDisabled, loading] = useAccessibilityCheckerStore(
+    useShallow(state => [
+      state.accessibilityIssues,
+      state.accessibilityScanDisabled,
+      state.loading,
+    ]),
+  )
 
   if (accessibilityScanDisabled || loading) return null
 
   return (
-    <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
+    <Flex
+      margin="medium 0 0 0"
+      gap="small"
+      alignItems="stretch"
+      data-testid="accessibility-issues-summary"
+    >
       <Flex.Item>
         <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
           <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />

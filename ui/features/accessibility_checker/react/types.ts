@@ -80,6 +80,21 @@ export interface ContentItem {
   severity?: Severity
 }
 
+/**
+ * This can be used to display content items in a table or list format.
+ * It includes only the necessary fields for display purposes.
+ */
+export interface ContentItemForDisplay {
+  id: number
+  type: ContentItemType
+  title: string
+  published: boolean
+  updatedAt: string
+  count: number
+  url: string
+  editUrl?: string
+}
+
 export interface PreviewResponse {
   content: string
   path?: string

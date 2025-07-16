@@ -17,7 +17,7 @@
  */
 
 import {render, screen} from '@testing-library/react'
-import {IssuesCounter} from '../IssuesCounter'
+import {IssuesCounter} from '../../AccessibilityIssuesSummary/IssuesCounter'
 
 describe('IssuesCounter', () => {
   it('shows correct text with multiple issues', () => {

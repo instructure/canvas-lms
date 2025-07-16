@@ -21,15 +21,17 @@ import {
   AccessibilityData,
   ContentItem,
   ContentItemType,
-  FormType,
   IssueDataPoint,
-  IssueForm,
   RawData,
   Severity,
 } from './types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('accessibility_checker')
+
+export const stripQueryString = (href: string): string => {
+  return href.replace(/\?.*$/, '')
+}
 
 /**
  * This method should be deprecated, once the API will be upgraded
