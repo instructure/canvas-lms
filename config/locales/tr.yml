@@ -2321,6 +2321,7 @@ tr:
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Uluslararası cep telefonu numarası olan kullanıcıların Canvas'tan metin mesajları almasına izin verir."
   alphabetically_60ab47e4: Alfabetik
   alt_text_611fb322: "Etiket Metni"
+  alt_text_c12d1c1c: "Etiket Metni"
   always_3a59e701: "Her zaman"
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Her zaman canvas zengin içerik hizmetinden zengin metin editörünü ve kenar kubuğunu her yere yükle. "
   an_alert_is_generated_for_each_student_that_meets__c36e3561: "Kriterlerin tümünü karşılayan her bir öğrenci için bir uyarı oluşturulur.  Uyarılar her gün kontrol edilir ve sorun sebebi çözülene kadar öğrenci, öğretmen ve/veya hesap yöneticisine bildirimler gönderilir."
@@ -18520,6 +18521,7 @@ tr:
   show_rubric_dca783f2: "Değerlendirme Listesini Göster"
   show_student_names_dcb40934: "Öğrenci İsimlerini Göster"
   show_totals_as_points_on_student_grade_page_d9cb4207: "Toplamı Öğrenci Not Sayfasında Puan olarak Göster"
+  showing_cceab2d9: Gösteriliyor
   showing_count_results_below_61ddca33: 
     zero: "Sonuç bulunamadı"
   shuffle_answers_edb602b7: "Cevapları Karıştır"
