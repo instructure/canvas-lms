@@ -32,7 +32,7 @@ class Mutations::LtiContentItems::LtiContentItemIcon < GraphQL::Schema::InputObj
   argument :width, Int, required: false
 end
 
-class Mutations::LtiContentItems::LtiAssetProcessorWindowSettings < GraphQL::Schema::InputObject
+class Mutations::LtiContentItems::LtiAssetProcessorWindowSettingsInput < GraphQL::Schema::InputObject
   # rubocop:disable GraphQL/ArgumentName
   # camelCase for compatibility with LTI spec, as these are stored
   # directly in Lti::AssetProcessor JSON columns
@@ -60,6 +60,6 @@ class Mutations::LtiContentItems::LtiAssetProcessorDto < GraphQL::Schema::InputO
   argument :thumbnail, Mutations::LtiContentItems::LtiContentItemIcon, required: false
   argument :title, String, required: false
   argument :url, String, required: false
-  argument :window, Mutations::LtiContentItems::LtiAssetProcessorWindowSettings, required: false
+  argument :window, Mutations::LtiContentItems::LtiAssetProcessorWindowSettingsInput, required: false
 end
 # rubocop:enable GraphQL/ExtractInputType
