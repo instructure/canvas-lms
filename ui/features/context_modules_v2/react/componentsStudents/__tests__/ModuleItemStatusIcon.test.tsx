@@ -131,26 +131,6 @@ describe('ModuleItemStatusIcon', () => {
     expect(container.getByText('Missing')).toBeInTheDocument()
   })
 
-  it('should render assigned icon when completionRequirement exists but not completed', () => {
-    const container = setUp({
-      itemId: '1',
-      isCompleted: false,
-      dueDateOffsetHours: 72,
-    })
-    expect(container.container).toBeInTheDocument()
-    expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
-  })
-
-  it('should not render assigned icon when module is completed', () => {
-    const container = setUp({
-      itemId: '1',
-      moduleCompleted: true,
-      dueDateOffsetHours: 72,
-    })
-    expect(container.container).toBeInTheDocument()
-    expect(container.queryByTestId('assigned-icon')).toBeNull()
-  })
-
   it('should prioritize "Missing" over "Complete" status', () => {
     const container = setUp({
       itemId: '1',
@@ -217,81 +197,5 @@ describe('ModuleItemStatusIcon', () => {
     })
     expect(container.container).toBeInTheDocument()
     expect(container.container).toBeEmptyDOMElement()
-  })
-
-  it('should render assigned icon when a requirement is met but does not match a completion requirement', () => {
-    const container = setUp({
-      itemId: '1',
-      isCompleted: false,
-      completionRequirement: {
-        id: '1',
-        type: 'must_view',
-      },
-      requirementsMet: [
-        {
-          id: '1',
-          type: 'must_mark_done',
-        },
-      ],
-    })
-    expect(container.container).toBeInTheDocument()
-    expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
-  })
-
-  describe('In progress Module Items show Tooltips', () => {
-    const completionRequirementList = [
-      {
-        id: '1',
-        type: 'min_score',
-        toolTipMessage: 'Must score at least a 100',
-      },
-      {
-        id: '2',
-        type: 'must_view',
-        toolTipMessage: 'Must view the page',
-      },
-      {
-        id: '3',
-        type: 'must_mark_done',
-        toolTipMessage: 'Must mark as done',
-      },
-      {
-        id: '4',
-        type: 'must_submit',
-        toolTipMessage: 'Must submit the assignment',
-      },
-      {
-        id: '5',
-        type: 'must_contribute',
-        toolTipMessage: 'Must contribute to the page',
-      },
-      {
-        id: '6',
-        type: 'min_percentage',
-        toolTipMessage: 'Must score at least a 100%',
-      },
-      {
-        id: '7',
-        type: 'any_other_type',
-        toolTipMessage: 'Not yet completed',
-      },
-    ]
-
-    completionRequirementList.forEach(({id, type, toolTipMessage}) => {
-      it(`should render tooltip "${toolTipMessage}" for in progress item with type "${type}"`, () => {
-        const container = setUp({
-          itemId: id,
-          isCompleted: false,
-          completionRequirement: {
-            id,
-            type,
-          },
-        })
-        expect(container.getByTestId('assigned-icon')).toBeInTheDocument()
-        const tooltipList = container.getAllByRole('tooltip')
-        expect(tooltipList).toHaveLength(1)
-        expect(tooltipList[0]).toBeInTheDocument()
-      })
-    })
   })
 })

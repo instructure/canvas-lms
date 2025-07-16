@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleItemContent, CompletionRequirement, Checkpoint} from '../utils/types'
-import CompletionRequirementDisplay from './CompletionRequirementDisplay'
+import CompletionRequirementDisplay from '../components/CompletionRequirementDisplay'
 import ModuleDiscussionCheckpointStudent from './ModuleDiscussionCheckpointStudent'
 import {useContextModule} from '../hooks/useModuleContext'
 
@@ -137,7 +137,10 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
               |
             </Text>
           </Flex.Item>
-          <CompletionRequirementDisplay completionRequirement={completionRequirement} />
+          <CompletionRequirementDisplay
+            completionRequirement={completionRequirement}
+            itemContent={content}
+          />
         </>
       )}
     </Flex>
