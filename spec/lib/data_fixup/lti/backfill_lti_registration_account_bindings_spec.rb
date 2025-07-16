@@ -107,6 +107,8 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
   end
 
   context "when dealing with inherited account bindings" do
+    specs_require_sharding
+
     let(:site_admin_key) do
       key = lti_developer_key_model(account: Account.site_admin)
       key.update!(account: nil)
@@ -120,7 +122,8 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
     end
 
     context "and there's a site admin and root account level binding" do
-      let(:root_account_binding) { DeveloperKeyAccountBinding.create!(account:, developer_key: site_admin_key, workflow_state: "on") }
+      let(:root_account) { @shard2.activate { account_model } }
+      let(:root_account_binding) { @shard2.activate { DeveloperKeyAccountBinding.create!(account: root_account, developer_key: site_admin_key, workflow_state: "on") } }
 
       before do
         site_admin_key.account_binding_for(Account.site_admin).update!(workflow_state: "allow")
@@ -128,7 +131,11 @@ RSpec.describe DataFixup::Lti::BackfillLtiRegistrationAccountBindings do
       end
 
       it "backfills successfully" do
-        expect { described_class.run }.to change { Lti::RegistrationAccountBinding.count }.by(2)
+        expect { described_class.run }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+
+        @shard2.activate do
+          expect { described_class.run }.to change { Lti::RegistrationAccountBinding.count }.by(1)
+        end
       end
     end
   end
