@@ -365,13 +365,6 @@ class DiscussionEntry < ActiveRecord::Base
       DiscussionTopicParticipant.where(discussion_topic_id:)
                                 .where.not(user_id: discussion_entry_participants.read.pluck(:user_id))
                                 .update_all("unread_entry_count = unread_entry_count + 1")
-      # users = discussion_topic.discussion_topic_participants
-      #                         .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
-      # # increment unread_entry_count for topic participants
-      # if users.present?
-      #   DiscussionTopicParticipant.where(discussion_topic_id:, user_id: users)
-      #                             .update_all("unread_entry_count = unread_entry_count + 1")
-      # end
     end
   end
 
