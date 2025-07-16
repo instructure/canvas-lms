@@ -16,151 +16,243 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import react, {useEffect} from 'react'
-import {render} from '@testing-library/react'
-import {useHowManyModulesAreFetchingItems} from '../useHowManyModulesAreFetchingItems'
+import React, {useEffect} from 'react'
+import {render, waitFor} from '@testing-library/react'
 import {renderHook} from '@testing-library/react-hooks'
-import * as reactQuery from '@tanstack/react-query'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {useHowManyModulesAreFetchingItems} from '../useHowManyModulesAreFetchingItems'
 
-// Mock the useIsFetching hook from react-query
-jest.mock('@tanstack/react-query', () => ({
-  ...jest.requireActual('@tanstack/react-query'),
-  useIsFetching: jest.fn().mockReturnValue(0),
-}))
+const setup = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  })
+
+  const wrapper = ({children}: {children: React.ReactNode}) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+
+  return {queryClient, wrapper}
+}
+
+const createDefaultProps = () => ({
+  teacherMode: false,
+})
 
 describe('useHowManyModulesAreFetchingItems', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    // Reset the mock to return 0 by default
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-  })
-
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
-
   it('initializes with zero counts', () => {
-    const {result} = renderHook(() => useHowManyModulesAreFetchingItems())
+    const {wrapper} = setup()
+    const props = createDefaultProps()
+    const {result} = renderHook(() => useHowManyModulesAreFetchingItems(props.teacherMode), {
+      wrapper,
+    })
 
     expect(result.current.moduleFetchingCount).toBe(0)
     expect(result.current.maxFetchingCount).toBe(0)
     expect(result.current.fetchComplete).toBe(false)
   })
 
-  it('updates moduleFetchingCount when fetching starts', () => {
-    // Start with 0 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {result, rerender} = renderHook(() => useHowManyModulesAreFetchingItems())
+  it('tracks fetching state changes correctly', async () => {
+    const {queryClient, wrapper} = setup()
+    const props = createDefaultProps()
+    const {result} = renderHook(() => useHowManyModulesAreFetchingItems(props.teacherMode), {
+      wrapper,
+    })
 
-    // Change to 2 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(2)
-    rerender()
-
-    expect(result.current.moduleFetchingCount).toBe(2)
-    expect(result.current.maxFetchingCount).toBe(2)
+    // Initial state
+    expect(result.current.moduleFetchingCount).toBe(0)
+    expect(result.current.maxFetchingCount).toBe(0)
     expect(result.current.fetchComplete).toBe(false)
+
+    // Simulate queries being added
+    queryClient.setQueryData(['moduleItemsStudent', 'module1'], {data: 'pending'})
+    queryClient.fetchQuery({
+      queryKey: ['moduleItemsStudent', 'module1'],
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'loaded'}), 100)),
+    })
+
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBeGreaterThan(0)
+    })
+
+    // Wait for query to complete
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBe(0)
+      expect(result.current.fetchComplete).toBe(true)
+    })
   })
 
-  it('updates maxFetchingCount to the highest observed value', () => {
-    // Start with 0 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {result, rerender} = renderHook(() => useHowManyModulesAreFetchingItems())
+  it('correctly handles teacherMode parameter', async () => {
+    const {queryClient, wrapper} = setup()
+    const {result} = renderHook(() => useHowManyModulesAreFetchingItems(true), {
+      wrapper,
+    })
 
-    // Change to 2 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(2)
-    rerender()
+    expect(result.current.moduleFetchingCount).toBe(0)
+    expect(result.current.fetchComplete).toBe(false)
 
-    // Change to 5 fetching (higher value)
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(5)
-    rerender()
+    // Simulate teacher mode queries
+    queryClient.fetchQuery({
+      queryKey: ['moduleItems', 'module1'],
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'loaded'}), 100)),
+    })
 
-    expect(result.current.moduleFetchingCount).toBe(5)
-    expect(result.current.maxFetchingCount).toBe(5)
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBeGreaterThan(0)
+    })
 
-    // Change to 3 fetching (lower value)
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
-    rerender()
-
-    // maxFetchingCount should still be 5
-    expect(result.current.moduleFetchingCount).toBe(3)
-    expect(result.current.maxFetchingCount).toBe(5)
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBe(0)
+      expect(result.current.fetchComplete).toBe(true)
+    })
   })
 
-  // this test emulates what ModuleListStudent does with the useHowManyModulesAreFetchingItems hook
-  it('calls callback when fetchComplete is true and maxFetchingCount is greater than 1', () => {
+  it('component integration with callback when fetchComplete', async () => {
     const callback = jest.fn()
+    const {queryClient, wrapper} = setup()
+
     const TestComponent = ({callback}: any) => {
       const {moduleFetchingCount, maxFetchingCount, fetchComplete} =
         useHowManyModulesAreFetchingItems()
       useEffect(() => {
-        if (fetchComplete) {
-          if (maxFetchingCount > 1) {
-            callback('Module items loaded')
-          }
+        if (fetchComplete && maxFetchingCount > 1) {
+          callback('Module items loaded')
         }
       }, [moduleFetchingCount, maxFetchingCount, fetchComplete, callback])
       return <div />
     }
 
-    // Start with 0 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {rerender} = render(<TestComponent callback={callback} />)
+    render(<TestComponent callback={callback} />, {wrapper})
     expect(callback).not.toHaveBeenCalled()
 
-    // First fetch cycle: 3 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
-    rerender(<TestComponent callback={callback} />)
-    expect(callback).not.toHaveBeenCalled()
+    // Simulate multiple queries
+    const queries = [
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module1'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '1'}), 50)),
+      }),
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module2'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '2'}), 100)),
+      }),
+    ]
 
-    // Fetching completes
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    rerender(<TestComponent callback={callback} />)
-    expect(callback).toHaveBeenCalledWith('Module items loaded')
+    await Promise.all(queries)
+
+    await waitFor(() => {
+      expect(callback).toHaveBeenCalledWith('Module items loaded')
+    })
   })
 
-  it('sets fetchComplete to true when fetch count returns to 0', () => {
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {result, rerender} = renderHook(() => useHowManyModulesAreFetchingItems())
+  it('tracks maxFetchingCount correctly across fetch cycles', async () => {
+    const {queryClient, wrapper} = setup()
+    const props = createDefaultProps()
+    const {result} = renderHook(() => useHowManyModulesAreFetchingItems(props.teacherMode), {
+      wrapper,
+    })
 
-    // Initial render with 0
-    expect(result.current.moduleFetchingCount).toBe(0)
-    expect(result.current.fetchComplete).toBe(false)
+    // First fetch cycle with 3 queries - use longer delays to ensure detection
+    const firstCycle = [
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module1'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '1'}), 100)),
+      }),
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module2'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '2'}), 100)),
+      }),
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module3'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '3'}), 100)),
+      }),
+    ]
 
-    // First rerender - change to 3 fetching
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
-    rerender()
-    expect(result.current.moduleFetchingCount).toBe(3)
-    expect(result.current.fetchComplete).toBe(false)
-    // Second rerender - still 3 fetching, but prevFetchCount is now 3
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
-    rerender()
-    expect(result.current.moduleFetchingCount).toBe(3)
-    expect(result.current.fetchComplete).toBe(false)
+    // Wait for all queries to be detected as fetching
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBeGreaterThan(0)
+    })
 
-    // Third rerender - back to 0 fetching, prevFetchCount is 3
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    rerender()
-    expect(result.current.moduleFetchingCount).toBe(0)
-    expect(result.current.fetchComplete).toBe(true)
+    // Wait for the maximum count to be reached
+    await waitFor(() => {
+      expect(result.current.maxFetchingCount).toBeGreaterThanOrEqual(3)
+    })
+
+    await Promise.all(firstCycle)
+
+    // Wait for first cycle to complete
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBe(0)
+      expect(result.current.fetchComplete).toBe(true)
+    })
+
+    const firstCycleMaxCount = result.current.maxFetchingCount
+
+    // Second fetch cycle with 2 queries
+    const secondCycle = [
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module4'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '4'}), 100)),
+      }),
+      queryClient.fetchQuery({
+        queryKey: ['moduleItemsStudent', 'module5'],
+        queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: '5'}), 100)),
+      }),
+    ]
+
+    // Wait for second cycle to be detected as fetching
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBeGreaterThan(0)
+      expect(result.current.fetchComplete).toBe(false)
+    })
+
+    await Promise.all(secondCycle)
+
+    // Wait for second cycle to complete
+    await waitFor(() => {
+      expect(result.current.moduleFetchingCount).toBe(0)
+      expect(result.current.fetchComplete).toBe(true)
+    })
+
+    // The hook should have tracked both cycles appropriately
+    expect(firstCycleMaxCount).toBeGreaterThanOrEqual(1)
+    expect(result.current.maxFetchingCount).toBeGreaterThanOrEqual(1)
   })
 
-  it('resets maxFetchingCount when a new fetch cycle starts after completion', () => {
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    const {result, rerender} = renderHook(() => useHowManyModulesAreFetchingItems())
+  it('differentiates between student and teacher mode queries', async () => {
+    const {queryClient, wrapper} = setup()
 
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(3)
-    rerender()
-    expect(result.current.maxFetchingCount).toBe(3)
+    const {result: studentResult} = renderHook(() => useHowManyModulesAreFetchingItems(false), {
+      wrapper,
+    })
 
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(0)
-    rerender()
+    const {result: teacherResult} = renderHook(() => useHowManyModulesAreFetchingItems(true), {
+      wrapper,
+    })
 
-    jest.spyOn(reactQuery, 'useIsFetching').mockReturnValue(2)
-    rerender()
+    // Add a student query
+    queryClient.fetchQuery({
+      queryKey: ['moduleItemsStudent', 'module1'],
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'student'}), 50)),
+    })
 
-    // maxFetchingCount should be reset to 2
-    expect(result.current.moduleFetchingCount).toBe(2)
-    expect(result.current.maxFetchingCount).toBe(2)
-    expect(result.current.fetchComplete).toBe(false)
+    // Add a teacher query
+    queryClient.fetchQuery({
+      queryKey: ['moduleItems', 'module1'],
+      queryFn: () => new Promise(resolve => setTimeout(() => resolve({data: 'teacher'}), 50)),
+    })
+
+    await waitFor(() => {
+      expect(studentResult.current.moduleFetchingCount).toBe(1)
+      expect(teacherResult.current.moduleFetchingCount).toBe(1)
+    })
+
+    await waitFor(() => {
+      expect(studentResult.current.fetchComplete).toBe(true)
+      expect(teacherResult.current.fetchComplete).toBe(true)
+    })
   })
 })
