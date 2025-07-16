@@ -101,7 +101,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
             gap="none"
             direction="column"
             width="100%"
-            height={shouldLimitModalHeight ? '20rem' : 'auto'}
+            height={shouldLimitModalHeight ? '8rem' : 'auto'}
           >
             {isSuccess && (
               <Alert
@@ -147,11 +147,7 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
                 <Text>{I18n.t('No tags available for this user')}</Text>
               </Flex.Item>
             ) : (
-              <Flex
-                direction="column"
-                padding={shouldLimitModalHeight ? 'none none medium none' : 'none'}
-                width="100%"
-              >
+              <Flex direction="row" padding="none" wrap="wrap" width="100%">
                 {(userTagList || []).map(tag => (
                   <Flex.Item
                     key={`tag-flex-${tag.id}`}
