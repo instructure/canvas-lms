@@ -686,10 +686,10 @@ class WikiPagesApiController < ApplicationController
     end
 
     if page_params.key?(:editing_roles)
-      editing_roles = page_params[:editing_roles].split(",").map(&:strip)
+      editing_roles = (page_params[:editing_roles] || "").split(",").map(&:strip)
       editing_roles = %w[teachers] if @context.is_a?(Course) && @context.horizon_course?
       invalid_roles = editing_roles.reject { |role| %w[teachers students members public].include?(role) }
-      unless invalid_roles.empty?
+      if invalid_roles.any? || editing_roles.empty?
         @page.errors.add(:editing_roles, t(:invalid_editing_roles, "The provided editing roles are invalid"))
         return :bad_request
       end
