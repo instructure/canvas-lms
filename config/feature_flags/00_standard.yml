@@ -1,4 +1,11 @@
 ---
+ada_chatbot:
+  type: setting
+  state: hidden
+  display_name: Panda Bot Integration
+  description: Enable Panda Bot virtual assistant in the help menu
+  applies_to: RootAccount
+  shadow: true
 allow_opt_out_of_inbox:
   type: setting
   state: hidden
