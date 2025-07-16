@@ -289,6 +289,16 @@ RSpec.describe Lti::DeploymentsController do
       end
     end
 
+    context "with deployment in other root account" do
+      let(:other_account) { account_model }
+      let(:deployment) { registration.new_external_tool(other_account) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
     it { is_expected.to be_successful }
 
     it "returns the requested deployment" do
@@ -340,6 +350,16 @@ RSpec.describe Lti::DeploymentsController do
 
     context "with flag disabled" do
       before { account.disable_feature!(:lti_registrations_next) }
+
+      it "returns 404" do
+        subject
+        expect(response).to be_not_found
+      end
+    end
+
+    context "for context outside root account" do
+      let(:other_account) { account_model }
+      let(:params) { { for_subaccount_id: other_account.id } }
 
       it "returns 404" do
         subject
