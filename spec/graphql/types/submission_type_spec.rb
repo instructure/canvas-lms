@@ -915,6 +915,62 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "comments_connection" do
+    describe "with includeProvisionalComments filter" do
+      before(:once) do
+        @course = Course.create!
+        @teacher = course_with_teacher(course: @course, active_all: true).user
+        @first_ta = course_with_ta(course: @course, active_all: true).user
+        @student = course_with_student(course: @course, active_all: true).user
+
+        @assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+        @submission = @assignment.submit_homework(@student, body: "hello")
+
+        @submission.add_comment(author: @teacher, comment: "Regular comment")
+        ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+
+        @provisional_comment = @submission.add_comment(author: @first_ta, comment: "Provisional comment", provisional: true)
+        @provisional_comment.update!(provisional_grade_id: ta_pg.id)
+      end
+
+      it "calls visible_provisional_comments when includeProvisionalComments is true" do
+        expect_any_instance_of(Submission).to receive(:visible_provisional_comments).with(@teacher, provisional_comments: [@provisional_comment]).and_call_original
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "does not call visible_provisional_comments when includeProvisionalComments is false" do
+        expect_any_instance_of(Submission).not_to receive(:visible_provisional_comments)
+
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: false) { nodes { _id } }"
+        submission_type.resolve(query)
+      end
+
+      it "includes both regular and provisional comments when includeProvisionalComments is true for a moderator" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: true) { nodes { _id } }"
+        result = submission_type.resolve(query)
+
+        expect(result.length).to eq(2)
+      end
+
+      it "includes only regular comments when includeProvisionalComments is false" do
+        submission_type = GraphQLTypeTester.new(@submission, current_user: @teacher)
+        query = "commentsConnection(filter: {}, includeProvisionalComments: false) { nodes { _id } }"
+        result = submission_type.resolve(query)
+
+        expect(result.length).to eq(1)
+      end
+    end
+  end
+
   describe "turnitin_data" do
     before(:once) do
       @tii_data = {

@@ -169,21 +169,55 @@ module Interfaces::SubmissionInterface
              required: false,
              default_value: nil
     argument :include_draft_comments, Boolean, required: false, default_value: false
+    argument :include_provisional_comments, Boolean, <<~MD, required: false, default_value: false
+      When true, provisional comments that the current user has permission to see will be returned.
+      The Moderator has permission to see all provisional comments.
+      Provisional Graders can see each other's comments if "Graders can view each other's comments" is enabled.
+      Otherwise, Provisional Graders can only see their own comments.
+      Students cannot see provisional comments.
+    MD
   end
-  def comments_connection(filter:, sort_order:, include_draft_comments:)
+  def comments_connection(filter:, sort_order:, include_draft_comments:, include_provisional_comments:)
     filter = filter.to_h
     filter => all_comments:, for_attempt:, peer_review:
 
+    # Preload provisional comments if needed
+    provisional_comments_promise = if include_provisional_comments
+                                     Loaders::AssociationLoader
+                                       .for(Submission, :provisional_grades)
+                                       .load(submission)
+                                       .then do |provisional_grades|
+                                         if provisional_grades.present?
+                                           SubmissionComment
+                                             .where(provisional_grade_id: provisional_grades.map(&:id))
+                                             .preload(:author, :provisional_grade)
+                                             .then do |provisional_comments|
+                                               provisional_comments
+                                             end
+                                         else
+                                           Promise.resolve([])
+                                         end
+                                       end
+                                   else
+                                     Promise.resolve([])
+                                   end
+
     load_association(:assignment).then do
       load_association(:submission_comments).then do
-        comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
+        provisional_comments_promise.then do |provisional_comments|
+          comments = include_draft_comments ? submission.comments_including_drafts_for(current_user) : submission.comments_excluding_drafts_for(current_user)
 
-        comments = comments.select { |comment| comment.attempt.in?(attempt_filter(for_attempt)) } unless all_comments
-        comments = comments.select { |comment| comment.author == current_user } if peer_review && !all_comments
-        comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
-        comments.reverse! if sort_order.to_s.casecmp("desc").zero?
+          if include_provisional_comments
+            comments.concat(submission.visible_provisional_comments(current_user, provisional_comments:))
+          end
 
-        comments.select { |comment| comment.grants_right?(current_user, :read) }
+          comments = comments.select { |comment| comment.attempt.in?(attempt_filter(for_attempt)) } unless all_comments
+          comments = comments.select { |comment| comment.author == current_user } if peer_review && !all_comments
+          comments = comments.sort_by { |comment| [comment.created_at.to_i, comment.id] } if sort_order.present?
+          comments.reverse! if sort_order.to_s.casecmp("desc").zero?
+
+          comments.select { |comment| comment.grants_right?(current_user, :read) }
+        end
       end
     end
   end

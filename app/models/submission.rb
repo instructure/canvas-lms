@@ -2790,6 +2790,37 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def visible_provisional_comments(current_user, provisional_comments: nil)
+    return [] unless assignment.moderated_grading?
+
+    if provisional_comments.nil?
+      provisional_comments = SubmissionComment.where(provisional_grade_id: provisional_grades.pluck(:id))
+    end
+
+    grades_published = assignment.grades_published?
+    can_moderate = assignment.permits_moderation?(current_user)
+    comments_visible_to_graders = assignment.grader_comments_visible_to_graders?
+    current_grader_id = grader_id if grades_published
+
+    # If grades are published, filter out the selected grader's provisional comments
+    # since they've been duplicated as non-provisional comments
+    if grades_published && current_grader_id
+      provisional_comments = provisional_comments.reject { |comment| comment.author_id == current_grader_id }
+    end
+
+    # Return appropriate comments based on user role and permissions
+    if current_user.id == user_id
+      # Students can't see provisional comments
+      []
+    elsif !can_moderate && !comments_visible_to_graders
+      # Regular graders can only see their own comments when comments aren't visible to graders
+      provisional_comments.select { |comment| comment.author_id == current_user.id }
+    else
+      # Moderators and graders (when comments are visible) can see all provisional comments
+      provisional_comments
+    end
+  end
+
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
       %w[score grade published_score published_grade entered_score entered_grade].each do |secret_attr|

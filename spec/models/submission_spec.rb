@@ -10076,4 +10076,103 @@ describe Submission do
       expect(@submission.errors[:lti_id]).to include("Cannot change lti_id!")
     end
   end
+
+  describe "#visible_provisional_comments" do
+    context "with moderated grading" do
+      before(:once) do
+        @course = Course.create!
+        @teacher = course_with_teacher(course: @course, active_all: true).user
+        @first_ta = course_with_ta(course: @course, active_all: true).user
+        @second_ta = course_with_ta(course: @course, active_all: true).user
+        @student = course_with_student(course: @course, active_all: true).user
+
+        @assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @teacher
+        )
+        @submission = @assignment.submit_homework(@student, body: "hello")
+
+        first_ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+        second_ta_pg = @submission.find_or_create_provisional_grade!(@second_ta)
+        final_grader_pg = @submission.find_or_create_provisional_grade!(@teacher)
+
+        @first_ta_comment = @submission.add_comment(author: @first_ta, comment: "First TA comment", provisional: true)
+        @first_ta_comment.update!(provisional_grade_id: first_ta_pg.id)
+
+        @second_ta_comment = @submission.add_comment(author: @second_ta, comment: "Second TA comment", provisional: true)
+        @second_ta_comment.update!(provisional_grade_id: second_ta_pg.id)
+
+        @final_grader_comment = @submission.add_comment(author: @teacher, comment: "Final Grader comment", provisional: true)
+        @final_grader_comment.update!(provisional_grade_id: final_grader_pg.id)
+      end
+
+      context "when grades are not published" do
+        context "when grader comments are visible to graders" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: true)
+          end
+
+          it "returns all provisional comments for the moderator" do
+            comments = @submission.visible_provisional_comments(@teacher)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns all provisional comments for a grader" do
+            comments = @submission.visible_provisional_comments(@first_ta)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns no comments for a student" do
+            comments = @submission.visible_provisional_comments(@student)
+            expect(comments).to be_empty
+          end
+        end
+
+        context "when grader comments are not visible to graders" do
+          before(:once) do
+            @assignment.update!(grader_comments_visible_to_graders: false)
+          end
+
+          it "returns all provisional comments for the moderator" do
+            comments = @submission.visible_provisional_comments(@teacher)
+            expect(comments).to match_array([@first_ta_comment, @second_ta_comment, @final_grader_comment])
+          end
+
+          it "returns only their own comments for a grader" do
+            comments = @submission.visible_provisional_comments(@first_ta)
+            expect(comments).to match_array([@first_ta_comment])
+          end
+
+          it "returns no comments for a student" do
+            comments = @submission.visible_provisional_comments(@student)
+            expect(comments).to be_empty
+          end
+        end
+      end
+
+      context "when grades are published" do
+        before(:once) do
+          # Select the first TA's provisional grade and publish grades
+          first_ta_pg = @submission.find_or_create_provisional_grade!(@first_ta)
+          first_ta_pg.publish!
+          @assignment.update!(grades_published_at: Time.zone.now)
+
+          # When grades are published, the selected grader's comments are duplicated as non-provisional
+          @submission.add_comment(author: @first_ta, comment: "First TA comment")
+        end
+
+        it "filters out the selected grader's provisional comments" do
+          comments = @submission.visible_provisional_comments(@teacher)
+          expect(comments).to match_array([@second_ta_comment, @final_grader_comment])
+          expect(comments).not_to include(@first_ta_comment)
+        end
+
+        it "still shows other graders' provisional comments" do
+          comments = @submission.visible_provisional_comments(@teacher)
+          expect(comments).to include(@second_ta_comment)
+        end
+      end
+    end
+  end
 end
