@@ -31,8 +31,8 @@ import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+import {confirmWithPrompt} from '@canvas/instui-bindings/react/ConfirmWithPrompt'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {showConfirmationDialog} from './ConfirmationDialog'
 
 import * as flagUtils from './util'
 
@@ -53,6 +53,23 @@ function removeFlag(flagName) {
   })
 }
 
+async function confirmSaveIfSiteAdmin(displayName) {
+  return confirmWithPrompt({
+    title: I18n.t('Environment Confirmation for %{featureOption}', {
+      featureOption: displayName,
+    }),
+    message: I18n.t(
+      'Changing Site Admin Feature Options impacts all customers. To proceed, please confirm the current Canvas environment by typing it in the box below.',
+    ),
+    label: I18n.t('Environment'),
+    placeholder: ENV.RAILS_ENVIRONMENT,
+    hintText: I18n.t('The current environment is %{env}, case-insensitive', {
+      env: ENV.RAILS_ENVIRONMENT,
+    }),
+    valueMatchesExpected: value => value.toLowerCase() === ENV.RAILS_ENVIRONMENT.toLowerCase(),
+  })
+}
+
 function FeatureFlagButton({
   featureFlag,
   disableDefaults,
@@ -68,13 +85,9 @@ function FeatureFlagButton({
 
   async function updateFlag(state) {
     if (apiBusy) return
-    const message = flagUtils.transitionMessage(effectiveFlag, state)
-    if (message) {
-      const res = await showConfirmationDialog({
-        label: displayName,
-        body: message,
-      })
-      if (!res) {
+    if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
+      const confirmSave = await confirmSaveIfSiteAdmin(displayName)
+      if (!confirmSave) {
         return
       }
     }
