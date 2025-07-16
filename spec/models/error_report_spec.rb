@@ -239,4 +239,107 @@ describe ErrorReport do
       expect(error_report.send(:truncate_query_params_in_url, url, 50)).to eq(url)
     end
   end
+
+  describe "#normalize_user_roles" do
+    let(:error_report) { ErrorReport.new }
+
+    context "when user_roles is not present in data" do
+      it "does nothing when user_roles key is missing" do
+        error_report.data = { "other_key" => "value" }
+        expect { error_report.send(:normalize_user_roles) }.not_to change { error_report.data }
+      end
+    end
+
+    context "when user_roles is an Array" do
+      it "joins array elements with commas" do
+        error_report.data = { "user_roles" => %w[student teacher admin] }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,teacher,admin")
+      end
+
+      it "removes duplicates from array" do
+        error_report.data = { "user_roles" => %w[student teacher admin student] }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,teacher,admin")
+      end
+
+      it "handles empty array" do
+        error_report.data = { "user_roles" => [] }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("")
+      end
+
+      it "handles single element array" do
+        error_report.data = { "user_roles" => %w[student] }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student")
+      end
+    end
+
+    context "when user_roles is a Hash" do
+      it "flattens hash values and joins with commas" do
+        error_report.data = { "user_roles" => { "course_1" => %w[student], "course_2" => %w[teacher admin] } }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,teacher,admin")
+      end
+
+      it "removes duplicates from hash values" do
+        error_report.data = { "user_roles" => { "course_1" => %w[student admin], "course_2" => %w[teacher admin] } }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,admin,teacher")
+      end
+
+      it "handles empty hash" do
+        error_report.data = { "user_roles" => {} }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("")
+      end
+
+      it "handles hash with empty arrays" do
+        error_report.data = { "user_roles" => { "course_1" => [], "course_2" => [] } }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("")
+      end
+    end
+
+    context "when user_roles is a String" do
+      it "leaves string unchanged" do
+        error_report.data = { "user_roles" => "student,teacher" }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,teacher")
+      end
+
+      it "removes duplicates from comma-separated string" do
+        error_report.data = { "user_roles" => "student,admin,teacher,admin" }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("student,admin,teacher")
+      end
+
+      it "handles empty string" do
+        error_report.data = { "user_roles" => "" }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("")
+      end
+    end
+
+    context "when user_roles is other types" do
+      it "converts integer to string" do
+        error_report.data = { "user_roles" => 123 }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("123")
+      end
+
+      it "converts nil to string" do
+        error_report.data = { "user_roles" => nil }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("")
+      end
+
+      it "converts boolean to string" do
+        error_report.data = { "user_roles" => true }
+        error_report.send(:normalize_user_roles)
+        expect(error_report.data["user_roles"]).to eq("true")
+      end
+    end
+  end
 end

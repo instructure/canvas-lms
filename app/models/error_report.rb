@@ -27,6 +27,7 @@ class ErrorReport < ActiveRecord::Base
 
   before_save :guess_email
   before_save :truncate_enormous_fields
+  before_save :normalize_user_roles
 
   # Define a custom callback for external notification of an error report.
   define_callbacks :on_send_to_external
@@ -248,6 +249,22 @@ class ErrorReport < ActiveRecord::Base
     # If url is populated it will remain preserved in its entirety in the http_env as HTTP_REFERER
     self.url = truncate_query_params_in_url(url) if url.present?
     self.subject = subject.truncate(self.class.maximum_string_length) if subject.present?
+  end
+
+  def normalize_user_roles
+    return unless data.key?("user_roles")
+
+    data["user_roles"] = case data["user_roles"]
+                         when String
+                           # Deduplicate roles in case string already contains duplicates
+                           data["user_roles"].split(",").uniq.join(",")
+                         when Array
+                           data["user_roles"].uniq.join(",")
+                         when Hash
+                           data["user_roles"].values.flatten.uniq.join(",")
+                         else
+                           data["user_roles"].to_s
+                         end
   end
 
   def truncate_query_params_in_url(url, max_length = self.class.maximum_string_length)
