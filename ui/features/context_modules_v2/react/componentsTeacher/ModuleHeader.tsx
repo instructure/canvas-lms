@@ -105,15 +105,47 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
                     </Text>
                   </Heading>
                 </Flex.Item>
-                {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
+                {(unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt)) ||
+                prerequisites?.length ? (
                   <Flex.Item margin="none">
-                    <Flex gap="small">
-                      <Flex.Item>
-                        <ModuleHeaderUnlockAt unlockAt={unlockAt} />
-                      </Flex.Item>
+                    <Flex gap="xx-small" alignItems="center">
+                      {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
+                        <Flex.Item>
+                          <ModuleHeaderUnlockAt unlockAt={unlockAt} />
+                        </Flex.Item>
+                      )}
+                      {unlockAt &&
+                        isModuleUnlockAtDateInTheFuture(unlockAt) &&
+                        prerequisites?.length && (
+                          <Flex.Item>
+                            <Text size="x-small" color="secondary" as="span">
+                              |
+                            </Text>
+                          </Flex.Item>
+                        )}
+                      {prerequisites?.length && (
+                        <Flex.Item>
+                          <Text
+                            size="x-small"
+                            color="secondary"
+                            data-testid="module-header-prerequisites"
+                          >
+                            {I18n.t(
+                              {
+                                one: 'Prerequisite: %{prerequisiteName}',
+                                other: 'Prerequisites: %{prerequisiteName}',
+                              },
+                              {
+                                count: prerequisites.length,
+                                prerequisiteName: prerequisites.map(p => p.name).join(', '),
+                              },
+                            )}
+                          </Text>
+                        </Flex.Item>
+                      )}
                     </Flex>
                   </Flex.Item>
-                )}
+                ) : null}
               </Flex>
             </Flex.Item>
           </Flex>
