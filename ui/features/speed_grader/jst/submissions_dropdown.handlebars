@@ -6,21 +6,21 @@
     {{#if custom_grade_status_id}}
       <span class="submission-custom-grade-status-pill-{{custom_grade_status_id}}"></span>
     {{else}}
-      {{#if late_policy_status}}
-        <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
+      {{#if excused}}
+        <span class="submission-excused-pill"></span>
       {{else}}
-        {{#if late}}
-          <span class="submission-late-pill"></span>
+        {{#if late_policy_status}}
+          <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
         {{else}}
-          {{#if missing}}
-            <span class="submission-missing-pill"></span>
+          {{#if late}}
+            <span class="submission-late-pill"></span>
           {{else}}
-            {{#if excused}}
-              <span class="submission-excused-pill"></span>
+            {{#if missing}}
+              <span class="submission-missing-pill"></span>
             {{/if}}
           {{/if}}
         {{/if}}
-      {{/if}}
+      {{/if}}  
     {{/if}}
   {{/each}}
 {{else}}
