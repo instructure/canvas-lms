@@ -53,6 +53,32 @@ describe "files index page" do
         expect(files_usage_text.text).to include("25 MB of 50 MB used")
       end
 
+      it "loads correct column values on uploaded file", priority: "1" do
+        add_file(fixture_file_upload("example.pdf", "application/pdf"),
+                 @course,
+                 "example.pdf")
+        get "/courses/#{@course.id}/files"
+        time_current = format_time_only(@course.attachments.first.updated_at).strip
+        expect(table_item_by_name("example.pdf")).to be_displayed
+        expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
+        expect(get_item_content_files_table(1, 2)).to eq time_current
+        expect(get_item_content_files_table(1, 3)).to eq time_current
+        expect(get_item_content_files_table(1, 5)).to eq "194 KB"
+      end
+
+      it "can search for file, folder and file inside folder" do
+        search_term = "example"
+        course_folder = Folder.create!(name: "example_folder", context: @course)
+        file_inside_folder = attachment_model(content_type: "application/pdf", context: @course, display_name: "example_file_in_folder.pdf", folder: course_folder)
+        file_outside_folder = attachment_model(content_type: "application/pdf", context: @course, display_name: "example_file_at_root.pdf")
+        get "/courses/#{@course.id}/files"
+        search_input.send_keys(search_term)
+        search_button.click
+        expect(table_item_by_name(file_inside_folder.display_name)).to be_displayed
+        expect(table_item_by_name(course_folder.name)).to be_displayed
+        expect(table_item_by_name(file_outside_folder.display_name)).to be_displayed
+      end
+
       context("with a large number of files") do
         before do
           26.times do |i|
@@ -102,19 +128,6 @@ describe "files index page" do
             expect(content).to include_text("file00.pdf")
           end
         end
-      end
-
-      it "loads correct column values on uploaded file", priority: "1" do
-        add_file(fixture_file_upload("example.pdf", "application/pdf"),
-                 @course,
-                 "example.pdf")
-        get "/courses/#{@course.id}/files"
-        time_current = format_time_only(@course.attachments.first.updated_at).strip
-        expect(table_item_by_name("example.pdf")).to be_displayed
-        expect(get_item_content_files_table(1, 1)).to eq "PDF File\nexample.pdf"
-        expect(get_item_content_files_table(1, 2)).to eq time_current
-        expect(get_item_content_files_table(1, 3)).to eq time_current
-        expect(get_item_content_files_table(1, 5)).to eq "194 KB"
       end
 
       context "from cog icon" do
@@ -561,15 +574,6 @@ describe "files index page" do
           get "/courses/#{@course.id}/files/folder/eh%3F"
           expect(breadcrumb).to contain_css("li", text: "eh?")
         end
-      end
-
-      it "Can search for files" do
-        folder = Folder.create!(name: "parent", context: @course)
-        file_attachment = attachment_model(content_type: "application/pdf", context: @course, display_name: "file1.pdf", folder:)
-        get "/courses/#{@course.id}/files"
-        search_input.send_keys(file_attachment.display_name)
-        search_button.click
-        expect(table_item_by_name(file_attachment.display_name)).to be_displayed
       end
     end
 
