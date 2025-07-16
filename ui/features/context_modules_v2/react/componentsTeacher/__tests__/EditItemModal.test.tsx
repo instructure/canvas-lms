@@ -18,41 +18,101 @@
 
 import React from 'react'
 import {render, fireEvent, screen} from '@testing-library/react'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import EditItemModal from '../EditItemModal'
 
-jest.mock('@canvas/query')
+type ComponentProps = {
+  isOpen: boolean
+  onRequestClose: () => void
+  itemName: string
+  itemIndent: number
+  courseId: string
+  moduleId: string
+  itemId: string
+}
 
-describe('EditItemModal', () => {
-  const defaultProps = {
-    isOpen: true,
-    onRequestClose: jest.fn(),
-    itemName: 'Test Item',
-    itemIndent: 1,
-    itemId: '123',
-    courseId: '1',
-    moduleId: '1',
+const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
+  isOpen: true,
+  onRequestClose: jest.fn(),
+  itemName: 'Test Item',
+  itemIndent: 1,
+  itemId: '123',
+  courseId: '1',
+  moduleId: '1',
+  ...overrides,
+})
+
+const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+        gcTime: 0,
+      },
+    },
+  })
+
+  const contextProps = {
+    ...contextModuleDefaultProps,
+    courseId,
+    moduleGroupMenuTools: [],
+    moduleMenuModalTools: [],
+    moduleMenuTools: [],
+    moduleIndexMenuModalTools: [],
   }
 
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ContextModuleProvider {...contextProps}>
+        <EditItemModal {...props} />
+      </ContextModuleProvider>
+    </QueryClientProvider>,
+  )
+}
+
+const server = setupServer()
+
+describe('EditItemModal', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    jest.clearAllMocks()
+    // @ts-expect-error
+    window.ENV = {
+      TIMEZONE: 'UTC',
+    }
+
+    server.use(
+      http.post('/courses/:courseId/modules/items/:itemId', () => {
+        return HttpResponse.json({
+          id: '123',
+          title: 'Updated Item',
+          indent: 1,
+        })
+      }),
+    )
   })
 
   it('renders with initial values', () => {
-    render(<EditItemModal {...defaultProps} />)
+    const {getByLabelText} = setUp(buildDefaultProps())
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Test Item')
-    expect(screen.getByLabelText('Indent')).toHaveValue('Indent 1 level')
+    expect(getByLabelText('Title')).toHaveValue('Test Item')
+    expect(getByLabelText('Indent')).toHaveValue('Indent 1 level')
   })
 
   it('updates title when typing', () => {
-    render(<EditItemModal {...defaultProps} />)
+    setUp(buildDefaultProps())
     const titleInput = screen.getByTestId('edit-modal-title')
     fireEvent.change(titleInput, {target: {value: 'New Title'}})
     expect(titleInput).toHaveValue('New Title')
   })
 
   it('updates indent when changed', () => {
-    render(<EditItemModal {...defaultProps} />)
+    setUp(buildDefaultProps())
 
     const indentSelect = screen.getByRole('combobox', {name: 'Indent'})
     fireEvent.click(indentSelect)
@@ -61,8 +121,9 @@ describe('EditItemModal', () => {
   })
 
   it('calls onRequestClose when Cancel is clicked', () => {
-    render(<EditItemModal {...defaultProps} />)
+    const props = buildDefaultProps()
+    setUp(props)
     fireEvent.click(screen.getByText('Cancel'))
-    expect(defaultProps.onRequestClose).toHaveBeenCalled()
+    expect(props.onRequestClose).toHaveBeenCalled()
   })
 })
