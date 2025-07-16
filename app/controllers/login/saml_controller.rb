@@ -362,7 +362,7 @@ class Login::SamlController < ApplicationController
       status = SAML2::Status::RESPONDER
       error_message = "No current session"
     elsif message.name_id.id != session[:name_id] ||
-          message.name_id.format != session[:name_identifier_format] ||
+          (message.name_id.format || SAML2::NameID::Format::UNSPECIFIED) != (session[:name_identifier_format] || SAML2::NameID::Format::UNSPECIFIED) ||
           message.name_id.name_qualifier != session[:name_qualifier] ||
           message.name_id.sp_name_qualifier != session[:sp_name_qualifier]
       increment_statsd(:failure, reason: :name_id_mismatch)
