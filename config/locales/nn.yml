@@ -3290,6 +3290,7 @@ nn:
   already_have_a_canvas_account_c4368ac9: "Har du allereie ein Canvas brukar?"
   also_note_that_microsoft_teams_is_unable_to_suppor_5b3c65e1: "Merk at Microsoft Teams ikkje støttar emner med meir enn %{max_enrollments} påmeldingar, eller meir enn %{max_owners} eigarar. Dersom emnet overstig grensene vil synkroniseringa verte avbroten."
   alt_text_611fb322: "Alternativ tekst"
+  alt_text_c12d1c1c: "Alternativ tekst"
   alumno_88c80e37: Alumn
   always_3a59e701: Alltid
   always_include_dates_1ae2935e: "Inkluder alltid datoar"
@@ -24830,6 +24831,7 @@ nn:
   showing_all_announcements_36ff0cec: "Viser alle kunngjeringar"
   showing_all_discussions_7e09f4b7: "Viser alle diskusjonar"
   showing_all_sets_of_grading_periods_6c160874: "Viser alle sett med karaktersetjingsperiodar."
+  showing_cceab2d9: Viser
   showing_count_account_calendars_e8266ae6: 
     one: "Viser 1 kontokalender"
     other: "Viser %{count} kontokalendrar"
