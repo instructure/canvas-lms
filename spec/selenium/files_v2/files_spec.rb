@@ -79,6 +79,24 @@ describe "files index page" do
         expect(table_item_by_name(file_outside_folder.display_name)).to be_displayed
       end
 
+      it "displays a session expired overlay when user interacts after session timeout" do
+        add_file(fixture_file_upload("example.pdf", "application/pdf"),
+                 @course,
+                 "example.pdf")
+        get "/courses/#{@course.id}/files"
+
+        published_status_button.click
+        remove_user_session
+        edit_item_permissions(:unpublished) # attempt to interact after session timeout
+
+        expect(session_expired_overlay).to be_displayed
+        expect(redirect_to_login_button).to be_displayed
+        redirect_to_login_button.click
+        keep_trying_until do
+          expect(driver.current_url).to match %r{/login/canvas}
+        end
+      end
+
       context("with a large number of files") do
         before do
           26.times do |i|
@@ -161,7 +179,7 @@ describe "files index page" do
         end
       end
 
-      context "from cloud icon" do
+      context "Publish cloud icon Dialog" do
         before do
           add_file(fixture_file_upload(base_file_name, "application/pdf"),
                    @course,
@@ -182,6 +200,14 @@ describe "files index page" do
           published_status_button.click
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
+        end
+
+        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
+          published_status_button.click
+          wait_for_ajaximations
+          element = driver.switch_to.active_element
+          should_focus = permissions_dialog_close_button
+          expect(element).to eq(should_focus)
         end
       end
 
@@ -521,28 +547,6 @@ describe "files index page" do
             get "/courses/#{@course.id}/files/folder/base%20folder"
             expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
           end
-        end
-      end
-
-      context "Publish Cloud Dialog" do
-        before(:once) do
-          course_with_teacher(active_all: true)
-          add_file(fixture_file_upload("a_file.txt", "text/plain"),
-                   @course,
-                   "a_file.txt")
-        end
-
-        before do
-          user_session(@teacher)
-          get "/courses/#{@course.id}/files"
-        end
-
-        it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
-          published_status_button.click
-          wait_for_ajaximations
-          element = driver.switch_to.active_element
-          should_focus = permissions_dialog_close_button
-          expect(element).to eq(should_focus)
         end
       end
 
