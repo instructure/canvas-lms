@@ -465,6 +465,61 @@ describe "SpeedGrader" do
         expect(f(".submission-late-pill")).to be_displayed
       end
     end
+
+    context "submission status for checkpointed discussions" do
+      before do
+        checkpointed_discussion = DiscussionTopic.create_graded_topic!(course: @course, title: "checkpointed discussion")
+        replies_required = 1
+
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_TOPIC,
+          dates: [{ type: "everyone", due_at: 2.days.from_now }],
+          points_possible: 3
+        )
+        Checkpoints::DiscussionCheckpointCreatorService.call(
+          discussion_topic: checkpointed_discussion,
+          checkpoint_label: CheckpointLabels::REPLY_TO_ENTRY,
+          dates: [{ type: "everyone", due_at: 3.days.from_now }],
+          points_possible: 9,
+          replies_required:
+        )
+        root_entry = checkpointed_discussion.discussion_entries.create!(user: @students[0], message: "reply to topic")
+        checkpointed_discussion.discussion_entries.create!(user: @students[0], message: "reply to entry", parent_entry: root_entry)
+        @submission_to_grade = checkpointed_discussion.assignment.submissions.where(user_id: @students[0].id).first
+      end
+
+      it "displays the correctly propagated status pill whenever a checkpoint's status is changed" do
+        user_session(@teacher)
+        get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@submission_to_grade.assignment_id}&student_id=#{@submission_to_grade.user_id}"
+
+        # excused vs none is excused
+        f("[data-testid='reply_to_topic-checkpoint-status-select']").click
+        fj("li:contains('Excused')").click
+        wait_for_ajaximations
+        expect(f(".submission-excused-pill")).to be_present
+
+        # excused vs late is excused
+        f("[data-testid='reply_to_entry-checkpoint-status-select']").click
+        fj("li:contains('Late')").click
+        wait_for_ajaximations
+        expect(f(".submission-excused-pill")).to be_present
+
+        # missing vs late is late
+        f("[data-testid='reply_to_topic-checkpoint-status-select']").click
+        fj("li:contains('Missing')").click
+        wait_for_ajaximations
+        expect(f(".submission-late-pill")).to be_present
+
+        # missing vs extended is missing
+        f("[data-testid='reply_to_entry-checkpoint-status-select']").click
+        fj("li:contains('Extended')").click
+        wait_for_ajaximations
+        expect(f(".submission-missing-pill")).to be_present
+
+        # we will not be testing extended vs none, since extended does not show anything different from none in the UI
+      end
+    end
   end
 
   context "reassigning" do

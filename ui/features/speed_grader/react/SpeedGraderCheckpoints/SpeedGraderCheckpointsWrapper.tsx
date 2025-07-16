@@ -25,6 +25,7 @@ import {queryClient} from '@canvas/query'
 type SpeedGrader = {
   setOrUpdateSubmission: (submission: any) => any
   updateSelectMenuStatus: (student: any) => any
+  refreshSubmissionsToView: () => void
 }
 
 type Props = {

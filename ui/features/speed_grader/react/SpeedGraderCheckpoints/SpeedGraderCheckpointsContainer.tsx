@@ -34,6 +34,7 @@ const I18n = createI18nScope('SpeedGraderCheckpoints')
 type SpeedGrader = {
   setOrUpdateSubmission: (submission: any) => any
   updateSelectMenuStatus: (student: any) => any
+  refreshSubmissionsToView: () => void
 }
 
 type Props = {
@@ -299,6 +300,8 @@ export const SpeedGraderCheckpointsContainer = (props: Props) => {
       if (submissionData) {
         const student = props.EG.setOrUpdateSubmission(submissionData)
         props.EG.updateSelectMenuStatus(student)
+        // refreshing to show the updated status pill
+        props.EG.refreshSubmissionsToView()
       }
       invalidateSubmission()
       setShouldAnnounceCurrentGradeChange(true)
