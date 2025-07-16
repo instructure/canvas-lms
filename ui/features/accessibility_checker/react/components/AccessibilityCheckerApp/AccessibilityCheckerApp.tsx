@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext, useEffect, useState} from 'react'
+import {useCallback, useContext, useEffect} from 'react'
 import {useShallow} from 'zustand/react/shallow'
-import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -27,59 +26,33 @@ import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {TypeToKeyMap} from '../../constants'
+import {LIMIT_EXCEEDED_MESSAGE, TypeToKeyMap} from '../../constants'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
-import {useAccessibilityCheckerStore} from '../../contexts/AccessibilityCheckerStore'
-import {AccessibilityData, ContentItem} from '../../types'
-import {convertKeysToCamelCase, processAccessibilityData} from '../../utils'
-import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
+import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
+import {ContentItem} from '../../types'
+import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
+import {useAccessibilityFetchUtils} from './useAccessibilityFetchUtils'
 
 const I18n = createI18nScope('accessibility_checker')
-
-const LIMIT_EXCEEDED_MESSAGE = I18n.t(
-  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).',
-)
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
   const {setSelectedItem, setIsTrayOpen} = context
-  const [accessibilityScanDisabled, setAccessibilityScanDisabled] = useState(false)
-  const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
+  const {parseFetchParams, doFetchAccessibilityIssues} = useAccessibilityFetchUtils()
 
-  const setError = useAccessibilityCheckerStore(useShallow(state => state.setError))
-  const [loading, setLoading] = useAccessibilityCheckerStore(
-    useShallow(state => [state.loading, state.setLoading]),
+  const [accessibilityIssues, accessibilityScanDisabled, loading] = useAccessibilityCheckerStore(
+    useShallow(state => [
+      state.accessibilityIssues,
+      state.accessibilityScanDisabled,
+      state.loading,
+    ]),
   )
-  const setTableData = useAccessibilityCheckerStore(useShallow(state => state.setTableData))
-
-  const doFetchAccessibilityIssues = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data: DoFetchApiResults<any> = await doFetchApi({
-        path: window.location.href + '/issues',
-        method: 'POST',
-      })
-
-      const accessibilityIssues = convertKeysToCamelCase(data.json) as AccessibilityData
-      if (accessibilityIssues.accessibilityScanDisabled) {
-        setAccessibilityScanDisabled(true)
-      }
-      setAccessibilityIssues(accessibilityIssues)
-      setTableData(processAccessibilityData(accessibilityIssues))
-    } catch (err: any) {
-      setError('Error loading accessibility issues. Error is:' + err.message)
-      setAccessibilityIssues(null)
-      setTableData([])
-    } finally {
-      setLoading(false)
-    }
-  }, [setAccessibilityIssues, setTableData, setError, setLoading])
 
   useEffect(() => {
-    doFetchAccessibilityIssues()
-  }, [doFetchAccessibilityIssues])
+    doFetchAccessibilityIssues(parseFetchParams())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleRowClick = useCallback(
     (item: ContentItem) => {
@@ -150,10 +123,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </Flex.Item>
         )}
       </Flex>
-      <AccessibilityCheckerHeader
-        accessibilityIssues={accessibilityIssues}
-        accessibilityScanDisabled={accessibilityScanDisabled}
-      />
+      <AccessibilityIssuesSummary />
       <AccessibilityIssuesTable onRowClick={handleRowClick} />
     </View>
   )

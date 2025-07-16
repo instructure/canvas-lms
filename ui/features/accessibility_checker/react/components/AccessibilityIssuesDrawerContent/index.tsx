@@ -35,6 +35,7 @@ import {useDebouncedCallback} from 'use-debounce'
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
 import {AccessibilityIssue, ContentItem, FormType, FormValue} from '../../types'
+import {stripQueryString} from '../../utils'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'
@@ -132,7 +133,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
 
     setIsRequestInFlight(true)
     doFetchApi({
-      path: window.location.href + '/issues',
+      path: stripQueryString(window.location.href) + '/issues',
       method: 'PUT',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

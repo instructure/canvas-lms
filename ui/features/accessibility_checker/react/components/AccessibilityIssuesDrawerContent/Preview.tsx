@@ -26,6 +26,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {AccessibilityIssue, ContentItemType, FormValue, PreviewResponse} from '../../types'
+import {stripQueryString} from '../../utils'
 
 const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
 const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'
@@ -94,7 +95,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
     })
     setIsLoading(true)
     doFetchApi<PreviewResponse>({
-      path: `${window.location.href}/preview?${params.toString()}`,
+      path: `${stripQueryString(window.location.href)}/preview?${params.toString()}`,
       method: 'GET',
     })
       .then(result => result.json)

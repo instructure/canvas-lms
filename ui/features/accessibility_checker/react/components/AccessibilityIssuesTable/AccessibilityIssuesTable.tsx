@@ -32,10 +32,8 @@ import {IssuesTableColumns, IssuesTableColumnHeaders} from '../../constants'
 import {ContentItem} from '../../types'
 import {getSortingFunction} from '../../utils'
 import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
-import {
-  useAccessibilityCheckerStore,
-  TableSortState,
-} from '../../contexts/AccessibilityCheckerStore'
+import {useAccessibilityCheckerStore, TableSortState} from '../../stores/AccessibilityCheckerStore'
+import {useAccessibilityFetchUtils} from '../AccessibilityCheckerApp/useAccessibilityFetchUtils'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -88,6 +86,8 @@ const renderLoading = () => {
 const ReverseOrderingFirst = [IssuesTableColumns.Issues, IssuesTableColumns.LastEdited]
 
 export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
+  const {updateQueryParamPage, updateQueryParamTableSortState} = useAccessibilityFetchUtils()
+
   const error = useAccessibilityCheckerStore(useShallow(state => state.error))
   const loading = useAccessibilityCheckerStore(useShallow(state => state.loading))
   const tableData = useAccessibilityCheckerStore(useShallow(state => state.tableData))
@@ -131,8 +131,9 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
       }
 
       setTableSortState(newState)
+      updateQueryParamTableSortState(newState)
     },
-    [tableSortState, setTableSortState],
+    [tableSortState, setTableSortState, updateQueryParamTableSortState],
   )
 
   const getCurrentSortDirection = (
@@ -157,14 +158,19 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
       }
     }
     setPage(0)
+    updateQueryParamPage(0)
     setOrderedTableData(newOrderedTableData)
-  }, [tableData, tableSortState, setPage, setOrderedTableData])
+  }, [tableData, tableSortState, setPage, setOrderedTableData, updateQueryParamPage])
 
   const pageCount = (pageSize && Math.ceil((tableData ?? []).length / pageSize)) || 1
 
-  const handlePageChange = (nextPage: number) => {
-    setPage(nextPage - 1)
-  }
+  const handlePageChange = useCallback(
+    (nextPage: number) => {
+      setPage(nextPage - 1)
+      updateQueryParamPage(nextPage - 1)
+    },
+    [setPage, updateQueryParamPage],
+  )
 
   // TODO Remove, once we are dealing with paginated and sorted data from the backend
   const pseudoPaginatedData = useMemo(() => {

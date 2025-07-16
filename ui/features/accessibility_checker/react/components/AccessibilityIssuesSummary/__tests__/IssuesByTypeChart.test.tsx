@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, screen} from '@testing-library/react'
 import '@testing-library/jest-dom'
-import {IssuesByTypeChart} from './../IssuesByTypeChart'
-import {AccessibilityData, AccessibilityIssue, ContentItem, Severity} from '../../../types'
+import {IssuesByTypeChart} from '../IssuesByTypeChart'
+import {AccessibilityData, ContentItem, Severity} from '../../../types'
 
 // Mock ResizeObserver since it's not supported in jsdom
 class ResizeObserver {
