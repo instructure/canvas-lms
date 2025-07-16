@@ -1490,7 +1490,7 @@ class Lti::RegistrationsController < ApplicationController
     end
 
     accounts_within_deployment = Account.sub_account_ids_recursive(deployment.context_id)
-    account_scope = Account.active.where(id: accounts_within_deployment)
+    account_scope = Account.active.where(id: accounts_within_deployment).order(:name)
 
     account_id = params[:only_children_of]
     if account_id.present?
@@ -1506,6 +1506,7 @@ class Lti::RegistrationsController < ApplicationController
                    else
                      Course.active.where(account: account_scope).or(Course.active.where(account: deployment.context))
                    end
+    course_scope = course_scope.order(:name)
 
     search_term = params[:search_term].to_s.strip
     if search_term.present?
