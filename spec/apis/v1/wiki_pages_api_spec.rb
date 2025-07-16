@@ -103,6 +103,10 @@ describe WikiPagesApiController, type: :request do
             create_wiki_page(@teacher, { title: "New Page", editing_roles: "public" })
             expect(WikiPage.last.editing_roles).to eq "public"
           end
+
+          it "requires that editing_roles be set" do
+            create_wiki_page(@teacher, { title: "New Page", editing_roles: nil }, 400)
+          end
         end
 
         context "when the page is in a horizon course" do
@@ -118,6 +122,11 @@ describe WikiPagesApiController, type: :request do
             estimated_duration_attributes = { minutes: 5 }
             create_wiki_page(@teacher, { title: "New Page", estimated_duration_attributes: })
             expect(WikiPage.last.estimated_duration.duration).to eq 5.minutes
+          end
+
+          it "sets editing_roles to teacher" do
+            create_wiki_page(@teacher, { title: "New Page", editing_roles: nil })
+            expect(WikiPage.last.editing_roles).to eq "teachers"
           end
         end
 
