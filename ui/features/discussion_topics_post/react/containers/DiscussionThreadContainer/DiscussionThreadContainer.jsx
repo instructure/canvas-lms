@@ -66,6 +66,7 @@ import {useUpdateDiscussionThread} from '../../hooks/useUpdateDiscussionThread'
 import {useEventHandler, KeyboardShortcuts} from '../../KeyboardShortcuts/useKeyboardShortcut'
 import useHighlightStore from '../../hooks/useHighlightStore'
 import useSpeedGrader from '../../hooks/useSpeedGrader'
+import useRestoreEntry from '../../hooks/useRestoreEntry'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -213,6 +214,8 @@ export const DiscussionThreadContainer = props => {
       }, 3000)
     },
   })
+
+  const {restoreEntry, loading: restoreEntryLoading} = useRestoreEntry(updateLoadedSubentry)
 
   const toggleRatingKeyboard = e => {
     if (e.detail.entryId === props.discussionEntry._id && props.discussionEntry.permissions.rate) {
@@ -368,6 +371,25 @@ export const DiscussionThreadContainer = props => {
           onClick={toggleUnread}
         />,
       )
+    }
+
+    if (props.discussionEntry.deleted) {
+      const isOwner =
+        props.discussionEntry?.author?._id === props.discussionEntry?.editor?._id &&
+        props.discussionEntry?.permissions?.delete
+
+      if (
+        ENV.restore_discussion_entry &&
+        (isOwner || props.discussionTopic.permissions.moderateForum)
+      ) {
+        threadActions.push(
+          <ThreadingToolbar.Restore
+            key={`restore-${props.discussionEntry._id}`}
+            onClick={() => restoreEntry(props.discussionEntry._id)}
+            disabled={restoreEntryLoading}
+          />,
+        )
+      }
     }
 
     return threadActions

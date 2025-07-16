@@ -929,6 +929,7 @@ class DiscussionTopicsController < ApplicationController
                DISCUSSION_CHECKPOINTS_ENABLED: @context.discussion_checkpoints_enabled?,
                DISCUSSION_DEFAULT_EXPAND_ENABLED: true, # this is to avoid a small p4 on release
                DISCUSSION_DEFAULT_SORT_ENABLED: true, # this is to avoid a small p4 on release
+               restore_discussion_entry: context.feature_enabled?(:restore_discussion_entry),
              })
       unless @locked
         InstStatsd::Statsd.distributed_increment("discussion_topic.visit.redesign")
