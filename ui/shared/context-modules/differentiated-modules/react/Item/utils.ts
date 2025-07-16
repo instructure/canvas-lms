@@ -101,6 +101,14 @@ function setTimeToStringDate(time: string, date: string | undefined): string | u
   return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
 }
 
+export function setSeconds(date: string | undefined): string | undefined {
+  if (!date) return date
+  const chosenDate = moment.tz(date, ENV.TIMEZONE || 'UTC')
+  const minute = chosenDate.minute()
+  chosenDate.set({second: minute === 59 ? 59 : 0})
+  return chosenDate.isValid() ? chosenDate.utc().toISOString() : date
+}
+
 function isFancyMidnightNeeded(value: string | undefined) {
   const chosenDueTime = moment
     .utc(value)
@@ -205,11 +213,12 @@ export function useDates({
   const handleRequiredRepliesDueDateChange = useCallback(
     (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultRequiredRepliesDueDate = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newRequiredRepliesDueDate = requiredRepliesDueDate
+      const chosenRequiredRepliesDueDate = requiredRepliesDueDate
         ? value
         : timeValue === ''
           ? setTimeToStringDate(defaultRequiredRepliesDueDate, value)
           : value
+      const newRequiredRepliesDueDate = setSeconds(chosenRequiredRepliesDueDate)
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setRequiredRepliesDueDate(newRequiredRepliesDueDate || null)
@@ -223,11 +232,13 @@ export function useDates({
   const handleReplyToTopicDueDateChange = useCallback(
     (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultReplyToTopicDueDate = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newReplyToTopicDueDate = replyToTopicDueDate
+      const chosenReplyToTopicDueDate = replyToTopicDueDate
         ? value
         : timeValue === ''
           ? setTimeToStringDate(defaultReplyToTopicDueDate, value)
           : value
+
+      const newReplyToTopicDueDate = setSeconds(chosenReplyToTopicDueDate)
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setReplyToTopicDueDate(newReplyToTopicDueDate || null)
@@ -241,11 +252,13 @@ export function useDates({
   const handleDueDateChange = useCallback(
     (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
       const defaultDueTime = ENV.DEFAULT_DUE_TIME ?? '23:59:00'
-      const newDueDate = dueDate
+      const chosenDueDate = dueDate
         ? value
         : timeValue === ''
           ? setTimeToStringDate(defaultDueTime, value)
           : value
+
+      const newDueDate = setSeconds(chosenDueDate)
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setDueDate(newDueDate || null)
@@ -287,11 +300,12 @@ export function useDates({
 
   const handleAvailableToDateChange = useCallback(
     (timeValue: string) => (_event: React.SyntheticEvent, value: string | undefined) => {
-      const newAvailableToDate = availableToDate
+      const chosenAvailableToDate = availableToDate
         ? value
         : timeValue === ''
           ? setTimeToStringDate('23:59:00', value)
           : value
+      const newAvailableToDate = setSeconds(chosenAvailableToDate)
       // When user uses calendar pop-up type is "click", but for KB is "blur"
       if (_event.type !== 'blur') {
         setAvailableToDate(newAvailableToDate || null)
