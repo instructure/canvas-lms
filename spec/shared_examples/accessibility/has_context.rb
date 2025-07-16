@@ -61,4 +61,74 @@ RSpec.shared_examples "has a single accessibility context" do
       end
     end
   end
+
+  context "context methods" do
+    describe "#context" do
+      context "with wiki_page" do
+        let(:wiki_page) { wiki_page_model }
+
+        it "returns the wiki_page" do
+          subject.wiki_page = wiki_page
+          expect(subject.context).to eq(wiki_page)
+        end
+      end
+
+      context "with assignment" do
+        let(:assignment) { assignment_model }
+
+        it "returns the assignment" do
+          subject.assignment = assignment
+          expect(subject.context).to eq(assignment)
+        end
+      end
+
+      context "with attachment" do
+        let(:attachment) { attachment_model }
+
+        it "returns the attachment" do
+          subject.attachment = attachment
+          expect(subject.context).to eq(attachment)
+        end
+      end
+    end
+
+    describe "#context=" do
+      context "with wiki_page" do
+        let(:wiki_page) { wiki_page_model }
+
+        it "sets the wiki_page" do
+          subject.context = wiki_page
+          expect(subject.wiki_page).to eq(wiki_page)
+        end
+      end
+
+      context "with assignment" do
+        let(:assignment) { assignment_model }
+
+        it "sets the assignment" do
+          subject.context = assignment
+          expect(subject.assignment).to eq(assignment)
+        end
+      end
+
+      context "with attachment" do
+        let(:attachment) { attachment_model }
+
+        it "sets the attachment" do
+          subject.context = attachment
+          expect(subject.attachment).to eq(attachment)
+        end
+      end
+
+      context "when context is not supported" do
+        let(:invalid_context) { double("InvalidContext", id: 1) }
+
+        it "raises an error" do
+          expect { subject.context = invalid_context }.to(
+            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
+          )
+        end
+      end
+    end
+  end
 end

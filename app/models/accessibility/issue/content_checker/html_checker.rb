@@ -32,7 +32,7 @@ module Accessibility
 
             issues = []
 
-            rules.each_value do |rule_class|
+            Rule.registry.each_value do |rule_class|
               doc.children.each do |node|
                 next unless node.is_a?(Nokogiri::XML::Element)
 

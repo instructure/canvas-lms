@@ -21,16 +21,15 @@ module Accessibility
   class Issue
     module AttachmentIssues
       def generate_attachment_resources(skip_scan: false)
-        attachments = context.attachments.not_deleted.order(updated_at: :desc)
+        attachments = context
+                      .attachments
+                      .not_deleted
+                      .where(content_type: "application/pdf")
+                      .order(updated_at: :desc)
         return attachments.map { |attachment| attachment_attributes(attachment) } if skip_scan
 
         attachments.each_with_object({}) do |attachment, issues|
-          result = if attachment.content_type == "application/pdf"
-                     check_pdf_accessibility(attachment)
-                   else
-                     {}
-                   end
-
+          result = check_pdf_accessibility(attachment)
           issues[attachment.id] = result.merge(attachment_attributes(attachment))
         end
       end

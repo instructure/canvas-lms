@@ -25,11 +25,34 @@ module Accessibility
       belongs_to :assignment, optional: true
       belongs_to :attachment, optional: true
 
+      scope :for_context, lambda { |context|
+        key = case context
+              when WikiPage then :wiki_page_id
+              when Assignment then :assignment_id
+              when Attachment then :attachment_id
+              else raise ArgumentError, "Unsupported context type: #{context.class.name}"
+              end
+        where(key => context.id)
+      }
+
       validate :exactly_one_context_present
     end
 
     def context
       wiki_page || assignment || attachment
+    end
+
+    def context=(context_object)
+      case context_object
+      when WikiPage
+        self.wiki_page = context_object
+      when Assignment
+        self.assignment = context_object
+      when Attachment
+        self.attachment = context_object
+      else
+        raise ArgumentError, "Unsupported context type: #{context_object.class.name}"
+      end
     end
 
     private

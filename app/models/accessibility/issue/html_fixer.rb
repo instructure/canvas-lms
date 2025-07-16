@@ -42,7 +42,7 @@ module Accessibility
         @content_id   = content_id
         @path         = path
         @value        = value
-        @rule         = issue.rules[@raw_rule]
+        @rule         = Rule.registry[@raw_rule]
         @record       = find_record
       end
 
