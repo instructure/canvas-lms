@@ -58,10 +58,10 @@ describe('GradesSummary', () => {
 
   it('displays screen reader-accessible representations of percentages when grading schemes are not used', () => {
     render(<GradesSummary courses={[defaultCourse]} />)
-    const progressBar = document.querySelector('progress[aria-valuetext*="Grade for Horticulture"]');
+    const progressBar = document.querySelector('progress[aria-label="Grade for Horticulture"]')
 
     expect(progressBar).toBeInTheDocument()
-    expect(progressBar).toHaveAttribute('aria-valuetext', 'Grade for Horticulture 90% of points possible')
+    expect(progressBar).toHaveAttribute('aria-valuetext', '90% of points possible')
   })
 
   it('displays the score as a grade if present and grading schemes are in use', () => {

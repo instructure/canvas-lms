@@ -613,7 +613,7 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_progression_status_bar(@module1.id)).to be_displayed
-      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+      expect(module_progression_info_text(@module1.id)).to include("0 / 100")
     end
 
     it "includes a Required Items progress bar if there are Complete One items" do
@@ -622,7 +622,7 @@ describe "context modules", :ignore_js_errors do
       @module1.save!
       go_to_modules
       expect(module_progression_status_bar(@module1.id)).to be_displayed
-      expect(module_progression_info_text(@module1.id)).to include("0 of 1 Required Items")
+      expect(module_progression_info_text(@module1.id)).to include("0 / 100")
     end
 
     it "shows locked icon if it has a pre-requisite on a previous module" do
