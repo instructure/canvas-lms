@@ -358,39 +358,27 @@ describe "context modules", :ignore_js_errors do
   end
 
   context "module header icons and progress" do
-    it "shows Completed All Items if it has complete all items requirements" do
+    it "shows Completed all items if it has complete all items requirements" do
       @module1.completion_requirements = { @module_item1.id => { type: "must_view" } }
       @module1.save!
       go_to_modules
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete All Items")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete all items")
       get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed All Items")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed all items")
     end
 
-    it "shows Completed One Item if it has complete one item requirement" do
+    it "shows Completed 1 item if it has complete one item requirement" do
       @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
       @module1.requirement_count = 1
       @module1.save!
       go_to_modules
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete One Item")
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Complete 1 item")
       get_student_views_assignment(@course.id, @assignment.id)
       go_to_modules
 
-      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed One Item")
-    end
-
-    it "shows to be completed circle items if item is part of requirements list" do
-      @module1.completion_requirements = {
-        @module_item1.id => { type: "must_view" },
-        @module_item2.id => { type: "must_submit" }
-      }
-      @module1.save!
-      go_to_modules
-      module_header_expand_toggles[0].click
-      expect(module_item_status_icon(@module_item1.id)).to be_displayed
-      expect(module_item_status_icon(@module_item2.id)).to be_displayed
+      expect(module_header_complete_all_pill(@module1.id).text).to include("Completed 1 item")
     end
 
     it "shows Completed icon if item is complete" do

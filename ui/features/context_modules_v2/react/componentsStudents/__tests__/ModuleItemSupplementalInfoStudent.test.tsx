@@ -51,6 +51,7 @@ const buildDefaultProps = (overrides: DefaultPropsOverrides = {}) => {
         },
       ],
     },
+    type: 'Assignment',
     ...overrides.content,
   }
 
@@ -92,7 +93,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
     // Check for the due date using data-testid instead of specific date format
     expect(container.getByTestId('due-date')).toBeInTheDocument()
     expect(container.getByText('100 pts')).toBeInTheDocument()
-    expect(container.getByText('Submit')).toBeInTheDocument()
+    expect(container.getByText('Submit assignment')).toBeInTheDocument()
   })
 
   it('should render null when nothing is provided', () => {
@@ -122,7 +123,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       expect(container.container).toBeInTheDocument()
       expect(container.queryByText(testDate.toLocaleDateString())).not.toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Score at least 100.0')).toBeInTheDocument()
+      expect(container.getByText('Score at least 100.0 points')).toBeInTheDocument()
     })
 
     it('should render completion requirement for min_percentage', () => {
@@ -166,7 +167,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       const container = setUp(props.completionRequirement, props.content)
       expect(container.container).toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Submit')).toBeInTheDocument()
+      expect(container.getByText('Submit assignment')).toBeInTheDocument()
     })
 
     it('should render completion requirement for must_mark_done', () => {
@@ -181,7 +182,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       const container = setUp(props.completionRequirement, props.content)
       expect(container.container).toBeInTheDocument()
       expect(container.getByText('100 pts')).toBeInTheDocument()
-      expect(container.getByText('Mark done')).toBeInTheDocument()
+      expect(container.getByText('Mark as done')).toBeInTheDocument()
     })
   })
 

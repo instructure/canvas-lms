@@ -24,7 +24,6 @@ import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../utils/types'
 import {filterRequirementsMet} from '../utils/utils'
-import {InProgressModuleItemStatus} from './InProgressModuleItemStatus'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -66,11 +65,6 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
     [filteredRequirementsMet, completionRequirement],
   )
 
-  const isSubmissionEmpty = useMemo(
-    () => !!content?.submissionsConnection?.nodes?.length,
-    [content],
-  )
-
   const StatusPill = ({
     color,
     text,
@@ -92,14 +86,12 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
       return <StatusPill color="danger" text={I18n.t('Missing')} />
     } else if (isCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
-    } else if (completionRequirement && !moduleCompleted) {
-      return <InProgressModuleItemStatus completionRequirement={completionRequirement} />
     } else {
       return null
     }
-  }, [isCompleted, isMissing, completionRequirement, moduleCompleted, hasCompletionRequirements])
+  }, [isCompleted, isMissing, moduleCompleted, hasCompletionRequirements])
 
-  return renderPill && (completionRequirement || isSubmissionEmpty) ? (
+  return renderPill ? (
     <View as="div" data-testid="module-item-status-icon">
       {renderPill}
     </View>

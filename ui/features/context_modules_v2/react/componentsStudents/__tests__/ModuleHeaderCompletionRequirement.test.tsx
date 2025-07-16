@@ -45,31 +45,31 @@ describe('ModuleHeaderCompletionRequirement', () => {
   })
 
   describe('incomplete text', () => {
-    it('renders with "Complete All Items" text when no requirementCount and not completed', () => {
+    it('renders with "Complete all items" text when no requirementCount and not completed', () => {
       const {getByText} = setUp(buildDefaultProps({requirementCount: undefined, completed: false}))
-      expect(getByText('Complete All Items')).toBeInTheDocument()
+      expect(getByText('Complete all items')).toBeInTheDocument()
     })
 
-    it('renders with "Complete One Item" text when requirementCount is provided and not completed', () => {
+    it('renders with "Complete 1 item" text when requirementCount is provided and not completed', () => {
       const {getByText} = setUp(buildDefaultProps({requirementCount: 1, completed: false}))
-      expect(getByText('Complete One Item')).toBeInTheDocument()
+      expect(getByText('Complete 1 item')).toBeInTheDocument()
     })
   })
 
   describe('completed text', () => {
-    it('renders with "Completed All Items" text when no requirementCount and is completed', () => {
+    it('renders with "Completed all items" text when no requirementCount and is completed', () => {
       const {getByText, getByTestId} = setUp(
         buildDefaultProps({requirementCount: undefined, completed: true}),
       )
-      expect(getByText('Completed All Items')).toBeInTheDocument()
+      expect(getByText('Completed all items')).toBeInTheDocument()
       expect(getByTestId('module-header-completion-requirement-icon')).toBeInTheDocument()
     })
 
-    it('renders with "Completed One Item" text when requirementCount is provided and is completed', () => {
+    it('renders with "Completed 1 item" text when requirementCount is provided and is completed', () => {
       const {getByText, getByTestId} = setUp(
         buildDefaultProps({requirementCount: 1, completed: true}),
       )
-      expect(getByText('Completed One Item')).toBeInTheDocument()
+      expect(getByText('Completed 1 item')).toBeInTheDocument()
       expect(getByTestId('module-header-completion-requirement-icon')).toBeInTheDocument()
     })
   })

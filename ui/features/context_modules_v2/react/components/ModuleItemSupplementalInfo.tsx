@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {ModuleItemContent, CompletionRequirement} from '../utils/types'
-import CompletionRequirementInfo from '../components/CompletionRequirementInfo'
+import CompletionRequirementDisplay from '../components/CompletionRequirementDisplay'
 import DueDateLabel from './DueDateLabel'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -51,15 +51,10 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   const renderCompletionRequirement = () => {
     if (!completionRequirement) return null
 
-    const {type, minScore, minPercentage, completed = false} = completionRequirement
-
     return (
-      <CompletionRequirementInfo
-        type={type}
-        minScore={minScore}
-        minPercentage={minPercentage}
-        completed={completed}
-        id={content.id || ''}
+      <CompletionRequirementDisplay
+        completionRequirement={completionRequirement}
+        itemContent={content}
       />
     )
   }
