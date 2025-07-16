@@ -34,6 +34,29 @@ describe AccessibilityIssue do
     end
   end
 
+  describe "scopes" do
+    describe ".for_context" do
+      context "when context is valid" do
+        let(:wiki_page) { wiki_page_model }
+        let(:subject_for_context) { accessibility_issue_model(wiki_page:) }
+
+        it "returns the correct record" do
+          expect(described_class.for_context(wiki_page)).to contain_exactly(subject_for_context)
+        end
+      end
+
+      context "when context is not valid" do
+        let(:invalid_context) { double("InvalidContext", id: 1) }
+
+        it "raises an error" do
+          expect { described_class.for_context(invalid_context) }.to(
+            raise_error(ArgumentError, "Unsupported context type: RSpec::Mocks::Double")
+          )
+        end
+      end
+    end
+  end
+
   describe "validations" do
     context "when course is missing" do
       before { subject.course = nil }

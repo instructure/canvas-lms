@@ -17,31 +17,25 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Accessibility
-  class Issue
-    module ContentChecker
-      module PdfChecker
-        def check_pdf_accessibility(pdf)
-          issues = []
+class Accessibility::CourseScannerService < ApplicationService
+  def initialize(course:)
+    super()
+    @course = course
+  end
 
-          begin
-            pdf_reader = PDF::Reader.new(pdf.open)
+  def call
+    delay(singleton: "accessibility_scan_course_#{@course.global_id}").scan_course
+  end
 
-            Rule.pdf_registry.each do |rule_class|
-              next if rule_class.test(pdf_reader).nil?
-
-              issues << build_issue(rule_class, element: "PDF Document")
-            rescue => e
-              log_rule_error(rule_class, "PDF Document", e)
-            end
-
-            process_issues(issues)
-          rescue => e
-            log_general_error(e)
-            NO_ACCESSIBILITY_ISSUES.dup
-          end
-        end
-      end
+  def scan_course
+    @course.wiki_pages.not_deleted.find_each do |resource|
+      Accessibility::ResourceScannerService.call(resource:)
+    end
+    @course.assignments.active.except(:order).find_each do |resource|
+      Accessibility::ResourceScannerService.call(resource:)
+    end
+    @course.attachments.not_deleted.where(content_type: "application/pdf").find_each do |resource|
+      Accessibility::ResourceScannerService.call(resource:)
     end
   end
 end

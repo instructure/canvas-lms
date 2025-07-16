@@ -26,12 +26,10 @@ module Accessibility
     include ContentChecker
     include AccessibilityHelper
 
-    attr_reader :context, :rules, :pdf_rules
+    attr_reader :context
 
-    def initialize(context:, rules: Rule.registry, pdf_rules: Rule.pdf_registry)
+    def initialize(context:)
       @context = context
-      @rules = rules
-      @pdf_rules = pdf_rules
     end
 
     def generate

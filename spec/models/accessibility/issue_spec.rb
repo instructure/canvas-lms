@@ -71,7 +71,7 @@ describe Accessibility::Issue do
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
-      result = described_class.new(context: context_double, rules:).generate
+      result = described_class.new(context: context_double).generate
 
       expect(result[:pages][1][:title]).to eq("Page 1")
       expect(result[:accessibility_scan_disabled]).to be false
@@ -93,7 +93,7 @@ describe Accessibility::Issue do
 
       allow(Rails.application.routes.url_helpers).to receive(:polymorphic_url).and_return("https://fake.url")
 
-      result = described_class.new(context: context_double, rules:).generate
+      result = described_class.new(context: context_double).generate
 
       expect(result[:assignments][2][:title]).to eq("Assignment 1")
       expect(result[:accessibility_scan_disabled]).to be false
@@ -133,7 +133,7 @@ describe Accessibility::Issue do
         end
       end
 
-      issues = described_class.new(context: context_double, rules:, pdf_rules:)
+      issues = described_class.new(context: context_double)
 
       expect(issues).to receive(:check_pdf_accessibility)
         .with(attachment_pdf)
@@ -171,16 +171,18 @@ describe Accessibility::Issue do
         attachments: double("Attachments", not_deleted: double(order: []))
       )
 
-      result = described_class.new(context: context_double, rules:).generate
+      result = described_class.new(context: context_double).generate
       expect(result[:accessibility_scan_disabled]).to be true
     end
   end
 
   describe "#update_content" do
-    let(:rules_hash) { { "mock-rule" => mock_rule } }
+    before do
+      allow(Accessibility::Rule).to receive(:registry).and_return({ "mock-rule" => mock_rule })
+    end
 
     it "returns bad request for empty input" do
-      issue = described_class.new(context: double, rules: rules_hash)
+      issue = described_class.new(context: double)
       response = issue.update_content(nil, nil, nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
@@ -188,7 +190,7 @@ describe Accessibility::Issue do
     end
 
     it "returns unprocessable entity for invalid content type" do
-      issue = described_class.new(context: double, rules: rules_hash)
+      issue = described_class.new(context: double)
       response = issue.update_content("mock-rule", "InvalidType", nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
@@ -202,7 +204,7 @@ describe Accessibility::Issue do
       allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
       allow(wiki_pages_double).to receive(:find_by).and_return(nil)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       response = issue.update_content(
         "invalid-rule", "Page", 1, nil, nil
       )
@@ -222,7 +224,7 @@ describe Accessibility::Issue do
       allow(page).to receive(:body).and_return("<div>content</div>")
       allow(page).to receive(:body=)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
 
       response = issue.update_content(
@@ -246,7 +248,7 @@ describe Accessibility::Issue do
       allow(assignment).to receive(:description).and_return("<div>desc</div>")
       allow(assignment).to receive(:description=)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
 
       response = issue.update_content(
@@ -261,10 +263,12 @@ describe Accessibility::Issue do
   end
 
   describe "#update_preview" do
-    let(:rules_hash) { { "mock-rule" => mock_rule } }
+    before do
+      allow(Accessibility::Rule).to receive(:registry).and_return({ "mock-rule" => mock_rule })
+    end
 
     it "returns bad request for empty input" do
-      issue = described_class.new(context: double, rules: rules_hash)
+      issue = described_class.new(context: double)
       response = issue.update_preview(nil, nil, nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
@@ -272,7 +276,7 @@ describe Accessibility::Issue do
     end
 
     it "returns unprocessable entity for invalid content type" do
-      issue = described_class.new(context: double, rules: rules_hash)
+      issue = described_class.new(context: double)
       response = issue.update_preview("mock-rule", "InvalidType", nil, nil, nil)
 
       expect(response[:status]).to eq(:bad_request)
@@ -286,7 +290,7 @@ describe Accessibility::Issue do
       allow(context_double).to receive(:wiki_pages).and_return(wiki_pages_double)
       allow(wiki_pages_double).to receive(:find_by).and_return(nil)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       response = issue.update_content(
         "invalid-rule", "Page", 1, nil, nil
       )
@@ -306,7 +310,7 @@ describe Accessibility::Issue do
       allow(page).to receive(:body).and_return("<div>content</div>")
       allow(page).to receive(:body=)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed content</div>")
 
       response = issue.update_preview(
@@ -328,7 +332,7 @@ describe Accessibility::Issue do
       allow(assignment).to receive(:description).and_return("<div>desc</div>")
       allow(assignment).to receive(:description=)
 
-      issue = described_class.new(context: context_double, rules: rules_hash)
+      issue = described_class.new(context: context_double)
       allow_any_instance_of(Accessibility::Issue::HtmlFixer).to receive(:fix_content).and_return("<div>fixed description</div>")
 
       response = issue.update_preview(
