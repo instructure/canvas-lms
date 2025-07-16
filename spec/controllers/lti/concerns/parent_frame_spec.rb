@@ -117,6 +117,16 @@ describe Lti::Concerns::ParentFrame do
     end
   end
 
+  context "when the user is the test student" do
+    let(:tool_context) { course_model }
+    let(:current_user) { tool_context.student_view_student }
+    let(:current_pseudonym) { current_user.pseudonym }
+
+    it "allows the test student to access the tool" do
+      expect(subject).to eq(expected_tool_origin)
+    end
+  end
+
   describe "allow_trusted_tools_to_embed_this_page!" do
     let(:tool_context) { Account.default }
 
