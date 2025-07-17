@@ -101,6 +101,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
                   format={I18n.t('#date.formats.date_at_time')}
                   showTime={true}
                   dateTime={cachedDueDate || null}
+                  alwaysUseSpecifiedFormat={true}
                 />
               </Text>
             </Flex.Item>

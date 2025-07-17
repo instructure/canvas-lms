@@ -24,15 +24,24 @@ module Accessibility
 
       # @param label [String] Human-readable label displayed to the user
       # @param value [String] Optional default color value
-      # @param dom_path [String] Optional DOM path for the element to update
-      # @param original_content [String] Optional original HTML content
-      # @param updated_content [String] Optional updated HTML content
       def initialize(label:,
-                     value: nil)
+                     input_label:,
+                     title_label:,
+                     undo_text:,
+                     background_color:,
+                     value:,
+                     contrast_ratio:,
+                     options: {})
         super(
-          label:
+          label:,
+          undo_text:
         )
+        @input_label = input_label
+        @title_label = title_label
+        @options = options
+        @background_color = background_color
         @value = value
+        @contrast_ratio = contrast_ratio
       end
 
       def field_type
@@ -40,7 +49,7 @@ module Accessibility
       end
 
       def to_h
-        super.merge({ value: @value }.compact)
+        super.merge({ options: @options, input_label: @input_label, title_label: @title_label, background_color: @background_color, value: @value, contrast_ratio: @contrast_ratio }.compact)
       end
     end
   end

@@ -30,6 +30,7 @@ type ToolIconUrlOrDefaultProps = {
   // the same as marginRight=12
   margin?: string | number
   marginRight?: string | number
+  hideFromScreenReader?: boolean
 }
 
 export const ToolIconOrDefault = ({
@@ -39,12 +40,14 @@ export const ToolIconOrDefault = ({
   size,
   margin,
   marginRight,
+  hideFromScreenReader,
 }: ToolIconUrlOrDefaultProps) => {
   const defaultIconUrl = `/lti/tool_default_icon?id=${toolId}&name=${encodeURIComponent(toolName)}`
+  const alt = hideFromScreenReader ? '' : toolName
   if (iconUrl) {
     return (
       <img
-        alt={toolName}
+        alt={alt}
         style={{
           height: size,
           width: size,
@@ -62,10 +65,6 @@ export const ToolIconOrDefault = ({
   }
 
   return (
-    <img
-      alt={toolName}
-      style={{height: size, width: size, margin, marginRight}}
-      src={defaultIconUrl}
-    />
+    <img alt={alt} style={{height: size, width: size, margin, marginRight}} src={defaultIconUrl} />
   )
 }

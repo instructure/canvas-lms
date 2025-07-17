@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,40 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
+import {SortOrder} from '../utils/constants'
 
-export const studentShape = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  display_name: PropTypes.string.isRequired,
-  avatar_url: PropTypes.string,
-}
-
-export const outcomeRatingShape = {
-  points: PropTypes.number.isRequired,
-  color: PropTypes.string.isRequired,
-  description: PropTypes.string.isRequired,
-  mastery: PropTypes.bool.isRequired,
-}
-
-export const outcomeShape = {
-  id: PropTypes.string.isRequired,
-  title: PropTypes.string.isRequired,
-  description: PropTypes.string,
-  display_name: PropTypes.string,
-  friendly_description: PropTypes.string,
-  calculation_method: PropTypes.string.isRequired,
-  calculation_int: PropTypes.number,
-  mastery_points: PropTypes.number.isRequired,
-  ratings: PropTypes.arrayOf(PropTypes.shape(outcomeRatingShape)).isRequired,
-}
-
-export const outcomeRollupShape = {
-  outcomeId: PropTypes.string.isRequired,
-  rating: PropTypes.shape(outcomeRatingShape).isRequired,
-}
-
-export const studentRollupsShape = {
-  studentId: PropTypes.string.isRequired,
-  outcomeRollups: PropTypes.arrayOf(PropTypes.shape(outcomeRollupShape)).isRequired,
+export interface Sorting {
+  sortOrder: SortOrder
+  setSortOrder: (sortOrder: SortOrder) => void
 }

@@ -1029,6 +1029,17 @@ describe SectionsController, type: :request do
         expect(@dest_course.reload.active_course_sections).not_to include @section
       end
 
+      it "generates an audit event" do
+        @course.destroy
+        api_call(:delete, "/api/v1/sections/#{@section.id}/crosslist", @params.merge(id: @section.to_param))
+
+        audit_event = @course.reload.auditor_course_records.take
+        expect(audit_event).to be_a(Auditors::ActiveRecord::CourseRecord)
+        expect(audit_event.event_source).to eq "api"
+        expect(audit_event.event_type).to eq "claimed"
+        expect(audit_event.user).to eq @admin
+      end
+
       it "doesn't remove course_id" do
         json = api_call(:delete,
                         "/api/v1/sections/#{@section.id}/crosslist",

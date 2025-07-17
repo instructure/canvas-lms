@@ -73,7 +73,7 @@ class CoursePaceHardEndDateCompressor
         course_pace,
         blackout_dates
       )
-      items = items[compress_items_after + 1..]
+      items = items[(compress_items_after + 1)..]
     end
 
     # This is how much time the Hard End Date plan should take up
@@ -95,7 +95,7 @@ class CoursePaceHardEndDateCompressor
     # This is how much time we're currently using
     plan_length_with_items = CoursePacesDateHelpers.days_between(
       start_date_of_item_group,
-      (start_date_of_item_group > final_item_due_date) ? start_date_of_item_group : final_item_due_date,
+      [start_date_of_item_group, final_item_due_date].max,
       course_pace,
       blackout_dates:
     )

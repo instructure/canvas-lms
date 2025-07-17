@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {RubricCriterion, RubricRating} from '@canvas/rubrics/react/types/rubric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -38,7 +38,8 @@ import {RatingsHeader} from './RatingsHeader'
 import {reorderRatingsAtIndex} from '../../../utils'
 import {DEFAULT_RUBRIC_RATINGS} from '../../constants'
 import {RatingRows} from './RatingRows'
-import {TextArea} from '@instructure/ui-text-area'
+import {CriterionName} from './CriterionName'
+import {CriterionDescription} from './CriterionDescription'
 
 const I18n = createI18nScope('rubrics-criterion-modal')
 
@@ -46,6 +47,7 @@ export type CriterionModalProps = {
   criterion?: RubricCriterion
   criterionUseRangeEnabled: boolean
   hidePoints: boolean
+  isFullWidth: boolean
   isOpen: boolean
   unassessed: boolean
   freeFormCriterionComments: boolean
@@ -56,6 +58,7 @@ export const CriterionModal = ({
   criterion,
   criterionUseRangeEnabled,
   hidePoints,
+  isFullWidth,
   isOpen,
   unassessed,
   freeFormCriterionComments,
@@ -72,6 +75,7 @@ export const CriterionModal = ({
   const [showWarningModal, setShowWarningModal] = useState(false)
 
   const [maxPoints, setMaxPoints] = useState<string | number>(0)
+  const ratingInputRefs = useRef<HTMLInputElement[]>([])
 
   useEffect(() => {
     const maxRatingPoints = ratings.length ? Math.max(...ratings.map(r => r.points), 0) : 0
@@ -96,6 +100,12 @@ export const CriterionModal = ({
     const newRatings = [...ratings]
     newRatings.splice(index, 0, newRating)
     setRatings(newRatings)
+
+    requestAnimationFrame(() => {
+      if (!hidePoints) {
+        ratingInputRefs.current[index]?.focus()
+      }
+    })
   }
 
   const removeRating = (index: number) => {
@@ -198,6 +208,15 @@ export const CriterionModal = ({
     setDragging(false)
   }
 
+  const handleMoveRating = (index: number, moveValue: number) => {
+    const reorderedItems = reorderRatingsAtIndex({
+      list: ratings,
+      startIndex: index,
+      endIndex: index + moveValue,
+    })
+    setRatings(reorderedItems)
+  }
+
   const saveChanges = async () => {
     setCheckValidation(true)
 
@@ -259,37 +278,28 @@ export const CriterionModal = ({
           <Heading>{modalTitle}</Heading>
         </Modal.Header>
         <Modal.Body>
-          <View as="div" margin="0">
-            <Flex alignItems="start">
-              <View as="span" margin="0 small 0 0" themeOverride={{marginSmall: '1rem'}}>
-                <TextInput
-                  renderLabel={I18n.t('Criterion Name')}
-                  placeholder={I18n.t('Enter the name')}
-                  display="inline-block"
-                  width="20.75rem"
-                  value={criterionDescription ?? ''}
-                  messages={criterionDescriptionErrorMessage}
-                  onChange={(_e, value) => setCriterionDescription(value)}
-                  data-testid="rubric-criterion-name-input"
+          <View as="div" margin="0" width="66.5rem">
+            <Flex alignItems="start" gap="small" wrap="wrap" width="100%">
+              <Flex.Item shouldGrow={!isFullWidth}>
+                <CriterionName
+                  isFullWidth={isFullWidth}
+                  criterionDescription={criterionDescription}
+                  criterionDescriptionErrorMessage={criterionDescriptionErrorMessage}
+                  setCriterionDescription={setCriterionDescription}
                 />
-              </View>
-              <View as="span">
-                <TextArea
-                  label={I18n.t('Criterion Description')}
-                  placeholder={I18n.t('Enter the description')}
-                  maxHeight="6.75rem"
-                  width="41.75rem"
-                  value={criterionLongDescription?.replace(/<br\/>/g, '') ?? ''}
-                  onChange={e => setCriterionLongDescription(e.target.value)}
-                  data-testid="rubric-criterion-description-input"
+              </Flex.Item>
+              <Flex.Item shouldGrow shouldShrink>
+                <CriterionDescription
+                  criterionLongDescription={criterionLongDescription}
+                  setCriterionLongDescription={setCriterionLongDescription}
                 />
-              </View>
+              </Flex.Item>
             </Flex>
           </View>
 
           <View as="div" margin="medium 0 0 0" themeOverride={{marginMedium: '1.25rem'}}>
-            <Flex>
-              <Flex.Item shouldGrow={true}>
+            <Flex wrap="wrap" gap="small">
+              <Flex.Item shouldGrow>
                 {unassessed &&
                   criterionUseRangeEnabled &&
                   !hidePoints &&
@@ -361,12 +371,25 @@ export const CriterionModal = ({
 
           {!freeFormCriterionComments && (
             <>
-              <RatingsHeader criterionUseRange={criterionUseRange} hidePoints={hidePoints} />
+              {isFullWidth && (
+                <RatingsHeader criterionUseRange={criterionUseRange} hidePoints={hidePoints} />
+              )}
+
+              {!isFullWidth && (
+                <View as="div" margin="medium 0 small">
+                  <Heading level="h2" as="h2" margin="auto auto 0">
+                    Rating Scale
+                  </Heading>
+                  <View as="hr" margin="xx-small 0 medium" />
+                </View>
+              )}
 
               <RatingRows
                 ratings={ratings}
+                isFullWidth={isFullWidth ?? false}
                 handleDragStart={handleDragStart}
                 handleDragEnd={handleDragEnd}
+                handleMoveRating={handleMoveRating}
                 addRating={addRating}
                 removeRating={removeRating}
                 updateRating={updateRating}
@@ -376,6 +399,7 @@ export const CriterionModal = ({
                 dragging={dragging}
                 hidePoints={hidePoints}
                 unassessed={unassessed}
+                ratingInputRefs={ratingInputRefs}
               />
             </>
           )}

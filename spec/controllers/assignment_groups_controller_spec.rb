@@ -388,7 +388,8 @@ describe AssignmentGroupsController do
                                                                  "due_at" => nil,
                                                                  "unlock_at" => nil,
                                                                  "lock_at" => nil,
-                                                                 "base" => true
+                                                                 "base" => true,
+                                                                 "title" => "Everyone"
                                                                }])
         end
       end

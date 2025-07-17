@@ -37,6 +37,7 @@ const exampleReports: AccountReportInfo[] = [
       created_at: '2025-01-01T00:00:00Z',
       file_url: 'https://example.com/report_2.csv',
       progress: 100,
+      run_time: 10,
       message: 'Report completed successfully',
       parameters: {
         extra_text: 'foo: true',
@@ -88,6 +89,7 @@ describe('ReportsTable', () => {
       created_at: '2025-01-02T00:00:00Z',
       file_url: 'https://example.com/updated_report_1.csv',
       progress: 100,
+      run_time: 11,
       message: 'Report completed successfully',
     }
     fetchMock.post('/api/v1/accounts/123/reports/report_1', {

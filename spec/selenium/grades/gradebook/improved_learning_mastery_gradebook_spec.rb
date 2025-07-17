@@ -118,5 +118,31 @@ describe "Improved Learning Mastery Gradebook" do
         expect(exceeds_mastery_score_cell).to contain_css(LearningMasteryGradebookPage.score_icon_selector(LearningMasteryGradebookPage.exceeds_mastery_icon_id))
       end
     end
+
+    context "pagination" do
+      it "renders pagination controls when there are multiple pages" do
+        register_and_enroll_students(25)
+        navigate_to_gradebook
+        expect(LearningMasteryGradebookPage.pagination_controls).to be_displayed
+      end
+
+      it "doesn't render pagination controls when there is only one page" do
+        register_and_enroll_students(10)
+        navigate_to_gradebook
+        expect(f("body")).not_to contain_css(LearningMasteryGradebookPage.pagination_controls_selector)
+      end
+
+      it "updates the number of students per page" do
+        register_and_enroll_students(30)
+        navigate_to_gradebook
+
+        per_page_dropdown = LearningMasteryGradebookPage.per_page_dropdown
+        expect(per_page_dropdown).to be_displayed
+        expect(LearningMasteryGradebookPage.per_page_dropdown_options.map(&:text)).to include("15", "30", "50", "100")
+        click_INSTUI_Select_option(per_page_dropdown, "30")
+        wait_for_ajaximations
+        expect(LearningMasteryGradebookPage.student_cells.size).to eq(30)
+      end
+    end
   end
 end

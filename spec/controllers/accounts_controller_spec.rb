@@ -989,32 +989,6 @@ describe AccountsController do
       end
     end
 
-    describe "horizon account setting" do
-      before do
-        account_with_admin_logged_in
-      end
-
-      it "can enable the horizon account setting" do
-        post "update", params: { id: @account.id, account: { settings: { horizon_account: { value: true } } } }
-        expect(@account.reload.settings[:horizon_account][:value]).to be true
-      end
-
-      it "can disable the horizon account setting" do
-        @account.settings[:horizon_account] = { value: true }
-        @account.save!
-        post "update", params: { id: @account.id, account: { settings: { horizon_account: { value: false } } } }
-        expect(@account.reload.settings[:horizon_account][:value]).to be false
-      end
-
-      it "includes the setting in the account settings hash" do
-        @account.settings[:horizon_account] = { value: true }
-        @account.save!
-        get "settings", params: { account_id: @account.id }
-        expect(response).to be_successful
-        expect(assigns[:account][:settings][:horizon_account][:value]).to be true
-      end
-    end
-
     describe "quotas" do
       before :once do
         @account = Account.create!
@@ -1210,7 +1184,6 @@ describe AccountsController do
     context "course_template_id" do
       before do
         account_with_admin_logged_in
-        @account.enable_feature!(:course_templates)
       end
 
       let(:template) { @account.courses.create!(template: true) }

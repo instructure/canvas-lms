@@ -32,6 +32,7 @@ module Accessibility
           id: SecureRandom.uuid,
           rule_id: rule_class.id,
           element:,
+          display_name: rule_class.display_name,
           message: rule_class.message,
           why: rule_class.why,
           path:,

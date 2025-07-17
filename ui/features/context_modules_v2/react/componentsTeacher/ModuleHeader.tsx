@@ -30,6 +30,8 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleHeaderActionPanel from './ModuleHeaderActionPanel'
 import {CompletionRequirement, Prerequisite, ModuleAction} from '../utils/types'
 import {Text} from '@instructure/ui-text'
+import ModuleHeaderUnlockAt from '../components/ModuleHeaderUnlockAt'
+import {isModuleUnlockAtDateInTheFuture} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -42,6 +44,7 @@ interface ModuleHeaderProps {
   prerequisites?: Prerequisite[]
   completionRequirements?: CompletionRequirement[]
   requirementCount: number
+  unlockAt: string | null
   dragHandleProps?: any // For react-beautiful-dnd drag handle
   hasActiveOverrides: boolean
   itemCount: number
@@ -59,6 +62,7 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
   prerequisites,
   completionRequirements,
   requirementCount,
+  unlockAt,
   dragHandleProps,
   itemCount,
   hasActiveOverrides,
@@ -93,11 +97,56 @@ const ModuleHeader: React.FC<ModuleHeaderProps> = ({
               />
             </Flex.Item>
             <Flex.Item padding="0 0 x-small 0">
-              <Heading level="h2">
-                <Text size="medium" weight="bold" wrap="break-word">
-                  {name}
-                </Text>
-              </Heading>
+              <Flex direction="column" as="div" margin="none">
+                <Flex.Item margin="none">
+                  <Heading level="h2">
+                    <Text size="medium" weight="bold" wrap="break-word">
+                      {name}
+                    </Text>
+                  </Heading>
+                </Flex.Item>
+                {(unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt)) ||
+                prerequisites?.length ? (
+                  <Flex.Item margin="none">
+                    <Flex gap="xx-small" alignItems="center">
+                      {unlockAt && isModuleUnlockAtDateInTheFuture(unlockAt) && (
+                        <Flex.Item>
+                          <ModuleHeaderUnlockAt unlockAt={unlockAt} />
+                        </Flex.Item>
+                      )}
+                      {unlockAt &&
+                        isModuleUnlockAtDateInTheFuture(unlockAt) &&
+                        prerequisites?.length && (
+                          <Flex.Item>
+                            <Text size="x-small" color="secondary" as="span">
+                              |
+                            </Text>
+                          </Flex.Item>
+                        )}
+                      {prerequisites?.length && (
+                        <Flex.Item>
+                          <Text
+                            size="x-small"
+                            color="secondary"
+                            data-testid="module-header-prerequisites"
+                          >
+                            {I18n.t(
+                              {
+                                one: 'Prerequisite: %{prerequisiteName}',
+                                other: 'Prerequisites: %{prerequisiteName}',
+                              },
+                              {
+                                count: prerequisites.length,
+                                prerequisiteName: prerequisites.map(p => p.name).join(', '),
+                              },
+                            )}
+                          </Text>
+                        </Flex.Item>
+                      )}
+                    </Flex>
+                  </Flex.Item>
+                ) : null}
+              </Flex>
             </Flex.Item>
           </Flex>
         </Flex.Item>

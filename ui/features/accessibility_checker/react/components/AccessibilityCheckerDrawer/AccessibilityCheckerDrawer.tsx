@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
-import AccessibilityIssuesDrawerContent from '../AccessibilityIssuesDrawerContent/AccessibilityIssuesDrawerContent'
+import AccessibilityIssuesDrawerContent from '../AccessibilityIssuesDrawerContent'
 import {ContentItem} from '../../types'
 import {AccessibilityChecker} from '../..'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'

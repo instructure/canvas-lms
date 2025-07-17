@@ -29,7 +29,10 @@ import {
   OutcomeRollup,
   RollupsResponse,
   StudentRollupData,
+  Pagination,
 } from '../types/rollup'
+import {DEFAULT_STUDENTS_PER_PAGE, SortOrder} from '../utils/constants'
+import {Sorting} from '../types/shapes'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -38,13 +41,20 @@ interface UseRollupsProps {
   accountMasteryScalesEnabled: boolean
 }
 
-interface UseRollupsReturn {
+interface UseRollupsReturn extends RollupData {
   isLoading: boolean
-  students: Student[]
-  outcomes: Outcome[]
-  rollups: StudentRollupData[]
   gradebookFilters: string[]
   setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
+  setCurrentPage: (page: number) => void
+  setStudentsPerPage: (studentsPerPage: number) => void
+  sorting: Sorting
+}
+
+interface RollupData {
+  rollups: StudentRollupData[]
+  outcomes: Outcome[]
+  students: Student[]
+  pagination?: Pagination
 }
 
 const getRow = (studentRollups: StudentRollup[], outcomes: Outcome[]): OutcomeRollup[] =>
@@ -97,9 +107,14 @@ export default function useRollups({
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [gradebookFilters, setGradebookFilters] = useState<string[]>([])
-  const [students, setStudents] = useState<Student[]>([])
-  const [outcomes, setOutcomes] = useState<Outcome[]>([])
-  const [rollups, setRollups] = useState<StudentRollupData[]>([])
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [data, setData] = useState<RollupData>({
+    rollups: [],
+    outcomes: [],
+    students: [],
+  })
+  const [studentsPerPage, setStudentsPerPage] = useState<number>(DEFAULT_STUDENTS_PER_PAGE)
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -111,11 +126,24 @@ export default function useRollups({
           courseId,
           gradebookFilters,
           needMasteryAndColorDefaults,
+          currentPage,
+          studentsPerPage,
+          sortOrder,
         )) as RollupsResponse
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
-        setStudents(getStudents(data.rollups, fetchedUsers))
-        setRollups(rollupsByUser(data.rollups, fetchedOutcomes))
-        setOutcomes(fetchedOutcomes)
+        const students = getStudents(data.rollups, fetchedUsers)
+        const rollups = rollupsByUser(data.rollups, fetchedOutcomes)
+        setData({
+          rollups,
+          outcomes: fetchedOutcomes,
+          students,
+          pagination: {
+            currentPage: data.meta.pagination.page,
+            perPage: data.meta.pagination.per_page,
+            totalPages: data.meta.pagination.page_count,
+            totalCount: data.meta.pagination.count,
+          },
+        })
         setIsLoading(false)
       } catch (_e) {
         showFlashAlert({
@@ -124,14 +152,28 @@ export default function useRollups({
         })
       }
     })()
-  }, [courseId, needMasteryAndColorDefaults, gradebookFilters])
+  }, [
+    courseId,
+    needMasteryAndColorDefaults,
+    gradebookFilters,
+    currentPage,
+    studentsPerPage,
+    sortOrder,
+  ])
 
   return {
     isLoading,
-    students,
-    outcomes,
-    rollups,
+    students: data.students,
+    outcomes: data.outcomes,
+    rollups: data.rollups,
     gradebookFilters,
     setGradebookFilters,
+    pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
+    setCurrentPage,
+    setStudentsPerPage,
+    sorting: {
+      sortOrder,
+      setSortOrder,
+    },
   }
 }

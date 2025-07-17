@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import _, {isEmpty} from 'lodash'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {windowAlert} from '@canvas/util/globalUtils'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const I18n = createI18nScope('gradebook_upload')
@@ -94,7 +95,7 @@ const ProcessGradebookUpload = {
 
     return $.when(...deferreds).then(() => {
       if (uploadingBulkData) {
-        alert(successMessage)
+        windowAlert(successMessage)
       }
       this.goToGradebook()
     })

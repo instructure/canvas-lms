@@ -1052,4 +1052,253 @@ describe UserSearch do
       end
     end
   end
+
+  describe "#differentiation_tag_scope" do
+    let(:account) { Account.create! }
+    let(:course) { course_model(name: "Differentiation Tag Course", account:) }
+    let(:searcher) { user_model(name: "Searcher") }
+    let(:user1) { user_model(name: "User 1") }
+    let(:user2) { user_model(name: "User 2") }
+    let(:user3) { user_model(name: "User 3") }
+    let(:users_scope) { User.where(id: [searcher.id, user1.id, user2.id, user3.id]) }
+    let(:differentiation_tag_category) { course.group_categories.create!(name: "Differentiation Tag Category", non_collaborative: true) }
+    let(:differentiation_tag) { course.groups.create!(name: "Differentiation Tag", group_category: differentiation_tag_category) }
+    let(:options_with_tag_id) { { differentiation_tag_id: differentiation_tag.id } }
+
+    before do
+      TeacherEnrollment.create!(user: searcher, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user1, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user2, course:, workflow_state: "active")
+      StudentEnrollment.create!(user: user3, course:, workflow_state: "active")
+
+      account.enable_feature!(:assign_to_differentiation_tags)
+      allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(true)
+    end
+
+    describe "early exit (returns original users scope)" do
+      describe "missing differentiation_tag_id" do
+        it "returns original users scope when differentiation_tag_id is nil" do
+          options = { differentiation_tag_id: nil }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when differentiation_tag_id is empty string" do
+          options = { differentiation_tag_id: "" }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to be_empty
+        end
+
+        it "returns original users scope when differentiation_tag_id is empty array" do
+          options = { differentiation_tag_id: [] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "context is not a Course" do
+        it "returns original users scope when context is an Account" do
+          result = UserSearch.differentiation_tag_scope(users_scope, account, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when context is nil" do
+          result = UserSearch.differentiation_tag_scope(users_scope, nil, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when context is any other object" do
+          other_object = "not a course"
+          result = UserSearch.differentiation_tag_scope(users_scope, other_object, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "feature flag or setting not enabled" do
+        it "returns original users scope when assign_to_differentiation_tags feature is disabled" do
+          account.disable_feature!(:assign_to_differentiation_tags)
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+
+        it "returns original users scope when account setting for assign to differentiation tags is disabled" do
+          allow(account).to receive(:allow_assign_to_differentiation_tags?).and_return(false)
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+
+      describe "searcher lacks required permissions" do
+        before do
+          # Remove all granular manage tags permissions from the searcher
+          RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS.each do |permission|
+            account.role_overrides.create!(
+              permission:,
+              role: teacher_role,
+              enabled: false
+            )
+          end
+        end
+
+        it "returns original users scope when searcher has none of the granular manage tags permissions" do
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result).to eq users_scope
+        end
+      end
+    end
+
+    describe "users scope filtering" do
+      before do
+        differentiation_tag.add_user(user1)
+        differentiation_tag.add_user(user2)
+      end
+
+      it "includes users who are members of the differentiation tag" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+        expect(result).to include(user2)
+      end
+
+      it "excludes users who are not members of the differentiation tag" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).not_to include(user3)
+        expect(result).not_to include(searcher)
+      end
+
+      it "ignores inactive group memberships" do
+        # Make user2's membership inactive
+        membership = differentiation_tag.group_memberships.find_by(user: user2)
+        membership.update!(workflow_state: "deleted")
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result.to_a).to contain_exactly(user1)
+      end
+
+      describe "complex scenarios" do
+        let(:differentiation_tag_category2) { course.group_categories.create!(name: "Second Tag Category", non_collaborative: true) }
+        let(:differentiation_tag2) { course.groups.create!(name: "Second Tag", group_category: differentiation_tag_category2) }
+
+        before do
+          differentiation_tag2.add_user(user2)
+          differentiation_tag2.add_user(user3)
+        end
+
+        it "filters correctly for first differentiation tag" do
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "filters correctly for second differentiation tag" do
+          options = { differentiation_tag_id: differentiation_tag2.id }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user2, user3)
+        end
+
+        it "filters correctly for multiple differentiation tags" do
+          options = { differentiation_tag_id: [differentiation_tag.id, differentiation_tag2.id] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2, user3)
+        end
+
+        it "handles array with single differentiation tag" do
+          options = { differentiation_tag_id: [differentiation_tag.id] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "handles mixed valid and invalid tag IDs in array" do
+          options = { differentiation_tag_id: [differentiation_tag.id, 99_999] }
+          result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+          expect(result.to_a).to contain_exactly(user1, user2)
+        end
+
+        it "handles empty users scope" do
+          empty_scope = User.none
+          result = UserSearch.differentiation_tag_scope(empty_scope, course, searcher, options_with_tag_id)
+          expect(result.to_a).to be_empty
+        end
+
+        it "handles users scope that doesn't include diffrentiation tag members" do
+          user4 = User.create!(name: "User 4")
+          StudentEnrollment.create!(user: user4, course:, workflow_state: "active")
+          scope_without_tag_members = User.where(id: user4.id)
+
+          result = UserSearch.differentiation_tag_scope(scope_without_tag_members, course, searcher, options_with_tag_id)
+          expect(result.to_a).to be_empty
+        end
+      end
+    end
+
+    describe "user permissions" do
+      before do
+        differentiation_tag.add_user(user1)
+      end
+
+      it "allows access when searcher has manage_tags_add permission only" do
+        account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_delete, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has manage_tags_manage permission only" do
+        account.role_overrides.create!(permission: :manage_tags_add, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_delete, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has manage_tags_delete permission only" do
+        account.role_overrides.create!(permission: :manage_tags_add, role: teacher_role, enabled: false)
+        account.role_overrides.create!(permission: :manage_tags_manage, role: teacher_role, enabled: false)
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+
+      it "allows access when searcher has multiple granular manage tags permissions" do
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result).to include(user1)
+      end
+    end
+
+    describe "edge cases" do
+      it "returns empty users scope when differentiation tag ID doesn't exist" do
+        options = { differentiation_tag_id: 99_999 }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when group exists but is in different context" do
+        other_course = Course.create!(workflow_state: "available")
+        other_tag_category = other_course.group_categories.create!(name: "Other Category", non_collaborative: true)
+        other_tag = other_tag_category.groups.create!(name: "Other Tag", context: other_course)
+        other_tag.add_user(user1)
+
+        options = { differentiation_tag_id: other_tag.id }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when group is collaborative (not a differentiation tag)" do
+        collaborative_group_category = course.group_categories.create!(name: "Collaborative Category", non_collaborative: false)
+        collaborative_group = course.groups.create!(name: "Collaborative Group", group_category: collaborative_group_category)
+        collaborative_group.add_user(user1)
+
+        options = { differentiation_tag_id: collaborative_group.id }
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options)
+        expect(result.to_a).to be_empty
+      end
+
+      it "returns empty users scope when differentiation tag is deleted/inactive" do
+        differentiation_tag.add_user(user1)
+        differentiation_tag.update!(workflow_state: "deleted")
+
+        result = UserSearch.differentiation_tag_scope(users_scope, course, searcher, options_with_tag_id)
+        expect(result.to_a).to be_empty
+      end
+    end
+  end
 end

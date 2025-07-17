@@ -23,7 +23,8 @@ import {ZInternalBaseLaunchSettings} from '../InternalBaseLaunchSettings'
 export const ZInternalPlacementConfiguration = ZInternalBaseLaunchSettings.merge(
   z.object({
     placement: ZLtiPlacement,
-    enabled: z.boolean().optional(),
+    // TODO: make this just a boolean along with INTEROP-8921
+    enabled: z.union([z.literal('true'), z.literal('false'), z.boolean()]).optional(),
   }),
 )
 

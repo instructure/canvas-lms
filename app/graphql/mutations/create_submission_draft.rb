@@ -116,109 +116,109 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   def self.submission_draft_log_entry(draft, _ctx)
     draft.submission
   end
-end
 
-private
+  private
 
-def find_submission(submission_id)
-  submission = Submission.active.find(submission_id)
-  verify_authorized_action!(submission, :read)
-  verify_authorized_action!(submission, :submit)
-  submission
-end
+  def find_submission(submission_id)
+    submission = Submission.active.find(submission_id)
+    verify_authorized_action!(submission, :read)
+    verify_authorized_action!(submission, :submit)
+    submission
+  end
 
-def get_and_verify_attachments!(file_ids)
-  attachments_by_shard = Attachment.where(id: file_ids).group_by(&:shard)
-  return_attachments = []
-  attachments_by_shard.each do |shard, attachments|
-    shard.activate do
-      valid_attachment_ids = get_attachment_ids(attachments.map(&:id))
-      validate_file_ids!(attachments, valid_attachment_ids)
-      return_attachments += Attachment.active.where(id: valid_attachment_ids)
+  def get_and_verify_attachments!(file_ids)
+    attachments_by_shard = Attachment.where(id: file_ids).group_by(&:shard)
+    return_attachments = []
+    attachments_by_shard.each do |shard, attachments|
+      shard.activate do
+        valid_attachment_ids = get_attachment_ids(attachments.map(&:id))
+        validate_file_ids!(attachments, valid_attachment_ids)
+        return_attachments += Attachment.active.where(id: valid_attachment_ids)
+      end
+    end
+
+    return_attachments.each do |attachment|
+      verify_authorized_action!(attachment, :read)
+    end
+    return_attachments
+  end
+
+  def validate_file_ids!(file_id_attachments, valid_attachment_ids)
+    file_ids = file_id_attachments.pluck(:id).map(&:to_s)
+    file_ids.each do |file_id|
+      next if valid_attachment_ids.include?(file_id)
+
+      raise SubmissionError, I18n.t(
+        "No attachments found for the following ids: %{ids}",
+        { ids: file_ids - valid_attachment_ids }
+      )
     end
   end
 
-  return_attachments.each do |attachment|
-    verify_authorized_action!(attachment, :read)
+  # TODO: move this into the model
+  def verify_allowed_extensions!(assignment, attachments)
+    return if assignment.allowed_extensions.blank?
+
+    raise SubmissionError, I18n.t("Invalid file type") unless attachments.all? do |attachment|
+      attachment_extension = attachment.after_extension || ""
+      assignment.allowed_extensions.include?(attachment_extension.downcase)
+    end
   end
-  return_attachments
-end
 
-def validate_file_ids!(file_id_attachments, valid_attachment_ids)
-  file_ids = file_id_attachments.pluck(:id).map(&:to_s)
-  file_ids.each do |file_id|
-    next if valid_attachment_ids.include?(file_id)
+  def get_attachment_ids(file_ids)
+    return [] if file_ids.empty?
 
-    raise SubmissionError, I18n.t(
-      "No attachments found for the following ids: %{ids}",
-      { ids: file_ids - valid_attachment_ids }
-    )
-  end
-end
-
-# TODO: move this into the model
-def verify_allowed_extensions!(assignment, attachments)
-  return if assignment.allowed_extensions.blank?
-
-  raise SubmissionError, I18n.t("Invalid file type") unless attachments.all? do |attachment|
-    attachment_extension = attachment.after_extension || ""
-    assignment.allowed_extensions.include?(attachment_extension.downcase)
-  end
-end
-
-def get_attachment_ids(file_ids)
-  return [] if file_ids.empty?
-
-  joined_file_ids = file_ids.to_a.join(",")
-  sql = <<~SQL.squish
-    SELECT
-      p.a_id,
-      p.ra_id
-    FROM
-      (
+    joined_file_ids = file_ids.to_a.join(",")
+    sql = <<~SQL.squish
+      SELECT
+        p.a_id,
+        p.ra_id
+      FROM
         (
-          SELECT
-            a.id as a_id,
-            ra.id as ra_id,
-            a.context_id,
-            a.context_type
-          FROM
-            #{Attachment.quoted_table_name} AS a
-            LEFT JOIN #{Attachment.quoted_table_name} AS ra ON ra.replacement_attachment_id = a.id
-          WHERE
-            a.id in (#{joined_file_ids}) AND
-            a.file_state = 'available'
-        )
-        UNION ALL
-        (
-          SELECT
-            a.id,
-            ra.id,
-            a.context_id,
-            a.context_type
-          FROM
-            #{Attachment.quoted_table_name} AS a
-            JOIN #{Attachment.quoted_table_name} AS ra ON ra.replacement_attachment_id = a.id
-          WHERE
-            ra.id in (#{joined_file_ids}) AND
-            a.file_state = 'available'
-        )
-      ) as p
-    WHERE
-      ( p.context_type = 'User' AND p.context_id = #{current_user.id} )
-      OR
-      ( p.context_type = 'Group' AND exists (
-          SELECT 1
-          FROM #{GroupMembership.quoted_table_name} gm
-              JOIN #{Group.quoted_table_name} g ON g.id = gm.group_id
-          WHERE
-              gm.user_id = #{current_user.id} AND
-              gm.workflow_state = 'accepted' AND
-              g.workflow_state <> 'deleted'
-        )
-      );
-  SQL
+          (
+            SELECT
+              a.id as a_id,
+              ra.id as ra_id,
+              a.context_id,
+              a.context_type
+            FROM
+              #{Attachment.quoted_table_name} AS a
+              LEFT JOIN #{Attachment.quoted_table_name} AS ra ON ra.replacement_attachment_id = a.id
+            WHERE
+              a.id in (#{joined_file_ids}) AND
+              a.file_state = 'available'
+          )
+          UNION ALL
+          (
+            SELECT
+              a.id,
+              ra.id,
+              a.context_id,
+              a.context_type
+            FROM
+              #{Attachment.quoted_table_name} AS a
+              JOIN #{Attachment.quoted_table_name} AS ra ON ra.replacement_attachment_id = a.id
+            WHERE
+              ra.id in (#{joined_file_ids}) AND
+              a.file_state = 'available'
+          )
+        ) as p
+      WHERE
+        ( p.context_type = 'User' AND p.context_id = #{current_user.id} )
+        OR
+        ( p.context_type = 'Group' AND exists (
+            SELECT 1
+            FROM #{GroupMembership.quoted_table_name} gm
+                JOIN #{Group.quoted_table_name} g ON g.id = gm.group_id
+            WHERE
+                gm.user_id = #{current_user.id} AND
+                gm.workflow_state = 'accepted' AND
+                g.workflow_state <> 'deleted'
+          )
+        );
+    SQL
 
-  result = ActiveRecord::Base.connection.execute(sql)
-  result.values.flatten.compact.uniq.map(&:to_s)
+    result = ActiveRecord::Base.connection.execute(sql)
+    result.values.flatten.compact.uniq.map(&:to_s)
+  end
 end

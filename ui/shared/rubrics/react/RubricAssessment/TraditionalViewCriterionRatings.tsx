@@ -117,7 +117,7 @@ export const TraditionalViewCriterionRatings: FC<TraditionalViewCriterionRatings
             }
 
             const min = criterion.criterionUseRange
-              ? rangingFrom(criterionRatings, index, ratingOrder)
+              ? rangingFrom(criterionRatings, index, ratingOrder, true)
               : undefined
 
             const ratingCellMinWidth = `${ratingsColumnMinWidth / criterionRatings.length}rem`

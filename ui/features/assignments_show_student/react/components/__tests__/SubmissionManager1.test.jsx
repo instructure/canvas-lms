@@ -17,30 +17,15 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {
-  CREATE_SUBMISSION,
-  CREATE_SUBMISSION_DRAFT,
-  DELETE_SUBMISSION_DRAFT,
-  SET_MODULE_ITEM_COMPLETION,
-} from '@canvas/assignments/graphql/student/Mutations'
-import {
-  RUBRIC_QUERY,
-  SUBMISSION_HISTORIES_QUERY,
-  USER_GROUPS_QUERY,
-} from '@canvas/assignments/graphql/student/Queries'
+import {CREATE_SUBMISSION} from '@canvas/assignments/graphql/student/Mutations'
+import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
-import doFetchApi from '@canvas/do-fetch-api-effect'
-import {assignLocation} from '@canvas/util/globalUtils'
 import {MockedProviderWithPossibleTypes as MockedProvider} from '@canvas/util/react/testing/MockedProviderWithPossibleTypes'
-import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
-import React from 'react'
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
-import {COMPLETED_PEER_REVIEW_TEXT, availableReviewCount} from '../../helpers/PeerReviewHelpers'
-import TextEntry from '../AttemptType/TextEntry'
 import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
-import store from '../stores'
 
 jest.mock('@canvas/util/globalUtils', () => ({
   assignLocation: jest.fn(),
@@ -62,32 +47,6 @@ function renderInContext(overrides = {}, children) {
   return render(
     <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>,
   )
-}
-
-function gradedOverrides() {
-  return {
-    Submission: {
-      rubricAssessmentsConnection: {
-        nodes: [
-          {
-            _id: 1,
-            score: 5,
-            assessor: {_id: 1, name: 'assessor1', enrollments: []},
-          },
-          {
-            _id: 2,
-            score: 10,
-            assessor: null,
-          },
-          {
-            _id: 3,
-            score: 8,
-            assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
-          },
-        ],
-      },
-    },
-  }
 }
 
 describe('SubmissionManager', () => {
@@ -265,6 +224,7 @@ describe('SubmissionManager', () => {
 
         const props = await mockAssignmentAndSubmission({
           Assignment: {
+            dueAt: dueDate?.toString(),
             submissionTypes: ['online_url'],
           },
           Submission: {
@@ -326,6 +286,13 @@ describe('SubmissionManager', () => {
     dueDate: Date.now() + 100000,
     inDocument: true,
   })
+
+  testConfetti('renders confetti for on time submissions with no due date', {
+    enabled: true,
+    dueDate: null,
+    inDocument: true,
+  })
+
   testConfetti('does not render confetti if not enabled', {
     enabled: false,
     dueDate: Date.now() + 100000,

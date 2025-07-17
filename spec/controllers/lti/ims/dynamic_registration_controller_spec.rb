@@ -52,7 +52,8 @@ describe Lti::IMS::DynamicRegistrationController do
     let(:scopes) do
       [
         "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly",
-        "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+        "https://purl.imsglobal.org/spec/lti-ags/scope/score",
+        "https://canvas.instructure.com/lti/data_services/scope/create"
       ]
     end
 
@@ -123,6 +124,21 @@ describe Lti::IMS::DynamicRegistrationController do
         it "accepts registrations" do
           subject
           expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context "with invalid scopes" do
+        subject do
+          request.headers["Authorization"] = "Bearer #{valid_token}"
+          post :create, params: { **registration_params }
+        end
+
+        let(:scopes) { ["invalid_scope"] }
+
+        it "rejects the registration" do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to match(/invalid_scope/)
         end
       end
 

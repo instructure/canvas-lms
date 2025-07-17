@@ -122,6 +122,382 @@ describe ContextModulesController do
       end
     end
 
+    context "module selection features" do
+      before :once do
+        @mod1 = @course.context_modules.create!(name: "Module 1")
+        @mod2 = @course.context_modules.create!(name: "Module 2")
+        @mod3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      context "with modules_student_module_selection enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id)
+        end
+
+        it "shows all modules to teachers regardless of student module selection" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "shows only selected module to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "shows all modules to teachers even when course is concluded" do
+          user_session(@teacher)
+          @course.complete!
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+
+      context "with modules_teacher_module_selection enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "shows selected module to teachers when teacher selection is enabled" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "shows all modules to students when only teacher selection is enabled" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+
+        it "shows all modules to TAs when teacher selection is enabled (TAs don't get teacher filtering)" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+
+      context "with both module selection features enabled" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id, show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "shows teacher-selected module to teachers" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "shows student-selected module to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+      end
+
+      context "with no module selection features enabled" do
+        it "shows all modules to teachers" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+
+        it "shows all modules to students" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+        end
+      end
+
+      context "edge cases" do
+        before :once do
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id)
+        end
+
+        it "handles TA enrollments correctly (should see all modules)" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "handles designer enrollments correctly (should see all modules)" do
+          course_with_designer(course: @course, active_all: true)
+          user_session(@designer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "handles observers correctly (should see selected module)" do
+          course_with_observer(course: @course, active_all: true)
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "handles site admins correctly (should see all modules)" do
+          site_admin = site_admin_user
+          user_session(site_admin)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+      end
+    end
+
+    context "complex feature flag combinations" do
+      before :once do
+        @mod1 = @course.context_modules.create!(name: "Module 1")
+        @mod2 = @course.context_modules.create!(name: "Module 2")
+        @mod3 = @course.context_modules.create!(name: "Module 3")
+      end
+
+      context "modules_page_rewrite + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with page rewrite enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with page rewrite enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection is enabled with page rewrite" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection is enabled with page rewrite" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "modules_page_rewrite_student_view + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite_student_view)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with student view rewrite enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with student view rewrite enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection enabled with student view rewrite" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection enabled with student view rewrite" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "modules_perf + module selection combinations" do
+        before :once do
+          @course.account.enable_feature!(:modules_perf)
+        end
+
+        context "with modules_student_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules with performance features enabled" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules with performance features enabled" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "with modules_teacher_module_selection" do
+          before :once do
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.update!(show_teacher_only_module_id: @mod1.id)
+          end
+
+          it "teachers see filtered modules when teacher selection enabled with perf features" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod1.id)
+          end
+
+          it "students see all modules when only teacher selection enabled with perf features" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+          end
+        end
+      end
+
+      context "all module-related flags enabled together" do
+        before :once do
+          @course.account.enable_feature!(:modules_page_rewrite)
+          @course.account.enable_feature!(:modules_page_rewrite_student_view)
+          @course.account.enable_feature!(:modules_perf)
+          @course.account.enable_feature!(:modules_student_module_selection)
+          @course.account.enable_feature!(:modules_teacher_module_selection)
+          @course.update!(show_student_only_module_id: @mod2.id, show_teacher_only_module_id: @mod1.id)
+        end
+
+        it "teachers see teacher-selected module with all flags enabled" do
+          user_session(@teacher)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod1.id)
+        end
+
+        it "students see student-selected module with all flags enabled" do
+          user_session(@student)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+
+        it "TAs see all modules with all flags enabled" do
+          ta_in_course(active_all: true)
+          user_session(@ta)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to be_nil
+          expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+        end
+
+        it "observers see student-selected module with all flags enabled" do
+          course_with_observer(course: @course, active_all: true)
+          user_session(@observer)
+          get "index", params: { course_id: @course.id }
+          expect(assigns[:module_show_setting]).to eq(@mod2.id)
+        end
+      end
+
+      context "problematic flag combinations from the original bug report" do
+        context "modules_page_rewrite_student_view OFF, modules_teacher_module_selection ON, modules_page_rewrite OFF, modules_student_module_selection ON" do
+          before :once do
+            # Ensure these are explicitly disabled
+            @course.account.disable_feature!(:modules_page_rewrite_student_view)
+            @course.account.disable_feature!(:modules_page_rewrite)
+            # Enable the problematic combination
+            @course.account.enable_feature!(:modules_teacher_module_selection)
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules (not filtered by student selection)" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+        end
+
+        context "only modules_student_module_selection ON (original failing case)" do
+          before :once do
+            # Ensure all other flags are disabled
+            @course.account.disable_feature!(:modules_page_rewrite_student_view)
+            @course.account.disable_feature!(:modules_page_rewrite)
+            @course.account.disable_feature!(:modules_teacher_module_selection)
+            # Enable only student selection
+            @course.account.enable_feature!(:modules_student_module_selection)
+            @course.update!(show_student_only_module_id: @mod2.id)
+          end
+
+          it "teachers see all modules (this was the original bug - teachers saw only student module)" do
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+
+          it "students see filtered modules" do
+            user_session(@student)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to eq(@mod2.id)
+          end
+
+          it "works correctly with modules_perf enabled as well" do
+            @course.account.enable_feature!(:modules_perf)
+            user_session(@teacher)
+            get "index", params: { course_id: @course.id }
+            expect(assigns[:module_show_setting]).to be_nil
+            expect(assigns[:modules].map(&:name)).to contain_exactly("Module 1", "Module 2", "Module 3")
+          end
+        end
+      end
+    end
+
     context "default post to SIS" do
       before :once do
         @course.account.tap do |a|

@@ -29,6 +29,7 @@ interface Props {
   defaultValue: string
   setInputRef: (input: HTMLInputElement | null) => void
   options: string[]
+  width?: string
 }
 
 export default function AutocompleteSearch(props: Props) {
@@ -157,6 +158,8 @@ export default function AutocompleteSearch(props: Props) {
 
   return (
     <Select
+      shouldNotWrap={true}
+      width={props.width ? props.width : undefined}
       placeholder={I18n.t('Search this course')}
       inputRef={el => props.setInputRef(el)}
       data-testid="search-input"

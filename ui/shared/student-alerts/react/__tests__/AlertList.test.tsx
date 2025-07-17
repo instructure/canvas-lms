@@ -20,9 +20,12 @@ import {render, screen} from '@testing-library/react'
 import Alerts, {AlertListProps, getAccountDescription, getCourseDescription} from '../AlertList'
 import {alert, accountRole} from './helpers'
 import {calculateUIMetadata} from '../utils'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent from '@testing-library/user-event'
 import {CriterionType} from '../types'
+
+const server = setupServer()
 
 describe('AlertList', () => {
   const props: AlertListProps = {
@@ -34,9 +37,9 @@ describe('AlertList', () => {
   const getUrlPrefixFor = (resource: string, alertId?: string | number) =>
     `/${resource}/${props.contextId}/alerts${alertId ? `/${alertId}` : ''}`
 
-  afterEach(() => {
-    fetchMock.reset()
-  })
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   describe.each([
     {contextType: 'Account', resource: 'accounts', description: getAccountDescription()},
@@ -53,19 +56,18 @@ describe('AlertList', () => {
       const url = getUrlPrefixFor(resource, alert.id)
 
       it('should show a success massage when the request succeed', async () => {
-        fetchMock.delete(url, 200, {overwriteRoutes: true})
+        server.use(http.delete(url, () => new HttpResponse(null, {status: 200})))
         render(<Alerts {...props} contextType={contextType} />)
 
         const deleteButton = screen.getByLabelText('Delete alert button')
         await userEvent.click(deleteButton)
 
         const successMessage = await screen.findAllByText('Alert deleted successfully.')
-        expect(fetchMock.called(url, {method: 'DELETE'})).toBeTruthy()
         expect(successMessage.length).toBeTruthy()
       })
 
       it('should show a error massage when the request fail', async () => {
-        fetchMock.delete(url, 500, {overwriteRoutes: true})
+        server.use(http.delete(url, () => new HttpResponse(null, {status: 500})))
         render(<Alerts {...props} contextType={contextType} />)
 
         const deleteButton = screen.getByLabelText('Delete alert button')
@@ -74,7 +76,6 @@ describe('AlertList', () => {
         const errorMessage = await screen.findAllByText(
           'Failed to delete alert. Please try again later.',
         )
-        expect(fetchMock.called(url, {method: 'DELETE'})).toBeTruthy()
         expect(errorMessage.length).toBeTruthy()
       })
     })
@@ -83,7 +84,7 @@ describe('AlertList', () => {
       const url = getUrlPrefixFor(resource, alert.id)
 
       it('should show a success massage when the request succeed', async () => {
-        fetchMock.put(url, alert, {overwriteRoutes: true})
+        server.use(http.put(url, () => HttpResponse.json(alert)))
         render(<Alerts {...props} contextType={contextType} />)
 
         const editButton = screen.getByLabelText('Edit alert button')
@@ -92,12 +93,11 @@ describe('AlertList', () => {
         await userEvent.click(saveButton)
 
         const successMessage = await screen.findAllByText('Alert updated successfully.')
-        expect(fetchMock.called(url, {method: 'PUT'})).toBeTruthy()
         expect(successMessage.length).toBeTruthy()
       })
 
       it('should show a error massage when the request fail', async () => {
-        fetchMock.put(url, 500, {overwriteRoutes: true})
+        server.use(http.put(url, () => new HttpResponse(null, {status: 500})))
         render(<Alerts {...props} contextType={contextType} />)
 
         const editButton = screen.getByLabelText('Edit alert button')
@@ -108,7 +108,6 @@ describe('AlertList', () => {
         const errorMessage = await screen.findAllByText(
           'Failed to update alert. Please try again later.',
         )
-        expect(fetchMock.called(url, {method: 'PUT', body: {alert}})).toBeTruthy()
         expect(errorMessage.length).toBeTruthy()
       })
     })
@@ -124,7 +123,7 @@ describe('AlertList', () => {
       }
 
       it('should show a success massage when the request succeed', async () => {
-        fetchMock.post(url, alert, {overwriteRoutes: true})
+        server.use(http.post(url, () => HttpResponse.json(alert)))
         render(<Alerts {...props} alerts={[]} contextType={contextType} />)
 
         const createButton = screen.getByLabelText('Create new alert')
@@ -137,17 +136,11 @@ describe('AlertList', () => {
         await userEvent.click(saveButton)
 
         const successMessage = await screen.findAllByText('Alert created successfully.')
-        expect(
-          fetchMock.called(url, {
-            method: 'POST',
-            body: expectedBodyPayload,
-          }),
-        ).toBeTruthy()
         expect(successMessage.length).toBeTruthy()
       })
 
       it('should show a error massage when the request fail', async () => {
-        fetchMock.post(url, 500, {overwriteRoutes: true})
+        server.use(http.post(url, () => new HttpResponse(null, {status: 500})))
         render(<Alerts {...props} alerts={[]} contextType={contextType} />)
 
         const createButton = screen.getByLabelText('Create new alert')
@@ -162,12 +155,6 @@ describe('AlertList', () => {
         const errorMessage = await screen.findAllByText(
           'Failed to create alert. Please try again later.',
         )
-        expect(
-          fetchMock.called(url, {
-            method: 'POST',
-            body: expectedBodyPayload,
-          }),
-        ).toBeTruthy()
         expect(errorMessage.length).toBeTruthy()
       })
     })

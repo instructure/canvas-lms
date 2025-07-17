@@ -61,7 +61,7 @@ describe UserContent, type: :request do
                             topic_id: @group_topic.id.to_s })
 
           @doc = Nokogiri::HTML5.fragment(json["message"])
-          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment1.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment1.uuid}"}"
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment1.id}/download#{"?verifier=#{@attachment1.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
       end
     end
@@ -79,7 +79,7 @@ describe UserContent, type: :request do
 
           @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
           subject
-          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment2.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment2.uuid}"}"
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment2.id}/download#{"?verifier=#{@attachment2.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
       end
     end
@@ -93,13 +93,13 @@ describe UserContent, type: :request do
         it "translates course file download links to directly-downloadable urls" do
           @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\" alt=\"important\">")
           subject
-          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment.uuid}"}"
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
 
         it "translates file preview links to directly-downloadable preview urls" do
           @assignment = @course.assignments.create!(title: "first assignment", description: "<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/preview\" alt=\"important\">")
           subject
-          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview#{disable_adding_uuid_verifier_in_api ? "" : "?verifier=#{@attachment.uuid}"}"
+          expect(@doc.at_css("img")["src"]).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview#{"?verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
       end
     end

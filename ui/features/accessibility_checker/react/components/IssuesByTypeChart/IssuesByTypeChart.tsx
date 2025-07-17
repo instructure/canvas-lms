@@ -20,9 +20,15 @@ import React, {useEffect, useMemo, useRef, useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Title} from 'chart.js'
-import {Bar} from 'react-chartjs-2'
-import {ruleIdToLabelMap} from '../../constants'
+import {
+  Chart as ChartJS,
+  BarController,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Title,
+} from 'chart.js'
 import {
   getChartData,
   getChartOptions,
@@ -34,7 +40,7 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = createI18nScope('issuesByTypeChart')
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip)
+ChartJS.register(BarController, CategoryScale, LinearScale, BarElement, Title, Tooltip)
 
 type IssuesByTypeChartProps = {
   accessibilityIssues: AccessibilityData | null
@@ -49,17 +55,13 @@ function renderLoading() {
   )
 }
 
-Object.defineProperty(window, 'ResizeObserver', {
-  writable: true,
-  configurable: true,
-  value: ResizeObserver as any,
-})
-
 export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
   accessibilityIssues,
   isLoading,
-}: IssuesByTypeChartProps) => {
+}) => {
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const chartRef = useRef<ChartJS<'bar'> | null>(null)
   const [containerWidth, setContainerWidth] = useState<number>(0)
 
   useEffect(() => {
@@ -77,18 +79,42 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
   }, [isLoading])
 
   const issuesData: IssueDataPoint[] = useMemo(
-    () => processIssuesToChartData(accessibilityIssues, ruleIdToLabelMap),
-    [accessibilityIssues, ruleIdToLabelMap],
+    () => processIssuesToChartData(accessibilityIssues),
+    [accessibilityIssues],
   )
   const severityCounts = useMemo(() => getSeverityCounts(issuesData), [issuesData])
-
-  const chartData = getChartData(issuesData, containerWidth)
-  const chartOptions = getChartOptions(issuesData, containerWidth)
+  const chartData = useMemo(
+    () => getChartData(issuesData, containerWidth),
+    [issuesData, containerWidth],
+  )
+  const chartOptions = useMemo(
+    () => getChartOptions(issuesData, containerWidth),
+    [issuesData, containerWidth],
+  )
 
   const ariaLabel = I18n.t(
     'Issues by type chart. High: %{high} issues, Medium: %{medium} issues, Low: %{low} issues.',
     {high: severityCounts.high, medium: severityCounts.medium, low: severityCounts.low},
   )
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      // Destroy existing chart to prevent duplicates
+      chartRef.current?.destroy()
+      chartRef.current = new ChartJS(canvasRef.current, {
+        type: 'bar',
+        data: chartData,
+        options: chartOptions,
+      })
+    }
+  }, [chartData, chartOptions])
+
+  // Cleanup chart on unmount
+  useEffect(() => {
+    return () => {
+      chartRef.current?.destroy()
+    }
+  }, [])
 
   if (isLoading) return renderLoading()
 
@@ -108,7 +134,7 @@ export const IssuesByTypeChart: React.FC<IssuesByTypeChartProps> = ({
         }}
         height="190px"
       >
-        <Bar data={chartData} options={chartOptions} />
+        <canvas ref={canvasRef} />
       </View>
     </View>
   )

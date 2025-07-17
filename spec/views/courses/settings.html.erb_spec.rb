@@ -257,42 +257,32 @@ describe "courses/settings" do
   end
 
   context "course template checkbox" do
-    it "is not visible if the feature isn't enabled" do
+    it "is visible" do
       render
       doc = Nokogiri::HTML5(response.body)
-      expect(doc.at_css("div#course_template_details")).to be_nil
+      expect(doc.at_css("div#course_template_details")).not_to be_nil
     end
 
-    context "with the feature enabled" do
-      before { @course.root_account.enable_feature!(:course_templates) }
+    it "is editable if you have permission" do
+      @user = site_admin_user
+      view_context(@course, @user)
+      # have to remove the teacher
+      @course.enrollments.each(&:destroy)
 
-      it "is visible" do
-        render
-        doc = Nokogiri::HTML5(response.body)
-        expect(doc.at_css("div#course_template_details")).not_to be_nil
-      end
+      render
+      doc = Nokogiri::HTML5(response.body)
+      placeholder_div = doc.at_css("div#course_template_details")
+      expect(placeholder_div["data-is-editable"]).to eq "true"
+    end
 
-      it "is editable if you have permission" do
-        @user = site_admin_user
-        view_context(@course, @user)
-        # have to remove the teacher
-        @course.enrollments.each(&:destroy)
+    it "is not editable even if you have permission, but it's not possible" do
+      @user = site_admin_user
+      view_context(@course, @user)
 
-        render
-        doc = Nokogiri::HTML5(response.body)
-        placeholder_div = doc.at_css("div#course_template_details")
-        expect(placeholder_div["data-is-editable"]).to eq "true"
-      end
-
-      it "is not editable even if you have permission, but it's not possible" do
-        @user = site_admin_user
-        view_context(@course, @user)
-
-        render
-        doc = Nokogiri::HTML5(response.body)
-        placeholder_div = doc.at_css("div#course_template_details")
-        expect(placeholder_div["data-is-editable"]).to eq "false"
-      end
+      render
+      doc = Nokogiri::HTML5(response.body)
+      placeholder_div = doc.at_css("div#course_template_details")
+      expect(placeholder_div["data-is-editable"]).to eq "false"
     end
   end
 

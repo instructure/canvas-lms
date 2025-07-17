@@ -28421,7 +28421,7 @@ sv-x-k12:
       grade: "(omdöme: %{grade})"
       see_all_quiz_attempts: "Se alla quizförsök"
       submission_to_view: "Inlämningar att visa:"
-      submitted: "*Inlämnad:* %{submittedAt}%{proxy_submitter_label_text}"
+      submitted: "*Inlämnad:* **%{submittedAt}%{proxy_submitter_label_text}**"
     submit: Spara
     titles: 
       click_to_record: "Tal till text"

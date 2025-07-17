@@ -31,11 +31,11 @@ module Lti
     def eula_launch_urls(user:, assignment:)
       return [] unless assignment.root_account.feature_enabled?(:lti_asset_processor)
 
-      Lti::AssetProcessor.for_assignment_id(assignment.id)
-                         .preload(:context_external_tool)
-                         .map(&:context_external_tool)
-                         .uniq
-                         .select do |tool|
+      assignment.lti_asset_processors
+                .preload(:context_external_tool)
+                .map(&:context_external_tool)
+                .uniq
+                .select do |tool|
         next unless tool.eula_enabled?
         next if tool.asset_processor_eula_required == false
         next unless tool.developer_key.scopes.include?(TokenScopes::LTI_EULA_USER_SCOPE)

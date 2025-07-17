@@ -23,11 +23,14 @@ import {rangingFrom} from '../../../RubricAssessment'
 import {RubricRating} from '../../../types/rubric'
 import {AddRatingRow} from './AddRatingRow'
 import {RatingRow} from './RatingRow'
+import {Button} from '@instructure/ui-buttons'
 
 type RatingRowsProps = {
   ratings: RubricRating[]
+  isFullWidth: boolean
   handleDragStart: () => void
   handleDragEnd: (result: DropResult) => void
+  handleMoveRating: (index: number, moveValue: number) => void
   addRating: (index: number) => void
   removeRating: (index: number) => void
   updateRating: (index: number, updatedRating: RubricRating) => void
@@ -37,11 +40,14 @@ type RatingRowsProps = {
   dragging: boolean
   hidePoints: boolean
   unassessed: boolean
+  ratingInputRefs: React.MutableRefObject<HTMLInputElement[]>
 }
 export const RatingRows = ({
   ratings,
+  isFullWidth,
   handleDragStart,
   handleDragEnd,
+  handleMoveRating,
   addRating,
   removeRating,
   updateRating,
@@ -51,10 +57,13 @@ export const RatingRows = ({
   dragging,
   hidePoints,
   unassessed,
+  ratingInputRefs,
 }: RatingRowsProps) => {
   return (
     <View as="div" position="relative">
-      {!hidePoints && <DragVerticalLineBreak criterionUseRange={criterionUseRange} />}
+      {!hidePoints && isFullWidth && (
+        <DragVerticalLineBreak criterionUseRange={criterionUseRange} />
+      )}
       <DragAndDrop onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <Droppable droppableId="droppable-id">
           {provided => {
@@ -66,16 +75,22 @@ export const RatingRows = ({
 
                   return (
                     <View as="div" key={`rating-row-${rating.id}-${index}`}>
-                      <AddRatingRow
-                        onClick={() => addRating(index)}
-                        unassessed={unassessed}
-                        isDragging={dragging}
-                      />
+                      {isFullWidth && (
+                        <AddRatingRow
+                          onClick={() => addRating(index)}
+                          unassessed={unassessed}
+                          isDragging={dragging}
+                        />
+                      )}
                       <RatingRow
+                        handleMoveRating={handleMoveRating}
                         index={index}
                         checkValidation={checkValidation}
                         hidePoints={hidePoints}
+                        isFullWidth={isFullWidth}
+                        isLastIndex={index === ratings.length - 1}
                         rating={rating}
+                        ratingInputRefs={ratingInputRefs}
                         scale={scale}
                         showRemoveButton={ratings.length > 1}
                         criterionUseRange={criterionUseRange}
@@ -88,11 +103,23 @@ export const RatingRows = ({
                     </View>
                   )
                 })}
-                <AddRatingRow
-                  onClick={() => addRating(ratings.length)}
-                  unassessed={unassessed}
-                  isDragging={dragging}
-                />
+                {isFullWidth && (
+                  <AddRatingRow
+                    onClick={() => addRating(ratings.length)}
+                    unassessed={unassessed}
+                    isDragging={dragging}
+                  />
+                )}
+                {!isFullWidth && unassessed && (
+                  <View as="div" margin="large 0">
+                    <Button
+                      data-testid="add-rating-button"
+                      onClick={() => addRating(ratings.length)}
+                    >
+                      Add Rating
+                    </Button>
+                  </View>
+                )}
                 {provided.placeholder}
               </div>
             )

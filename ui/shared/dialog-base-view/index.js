@@ -60,7 +60,10 @@ DialogBaseView.prototype.initDialog = function () {
     ...this.defaultOptions(),
     buttons: [
       {
-        text: I18n.t('#buttons.cancel', 'Cancel'),
+        // Defer i18n lookup to render time to avoid eager loading
+        get text() {
+          return I18n.t('#buttons.cancel', 'Cancel')
+        },
         class: 'cancel_button',
         click: (function (_this) {
           return function (e) {
@@ -69,7 +72,10 @@ DialogBaseView.prototype.initDialog = function () {
         })(this),
       },
       {
-        text: I18n.t('#buttons.update', 'Update'),
+        // Defer i18n lookup to render time to avoid eager loading
+        get text() {
+          return I18n.t('#buttons.update', 'Update')
+        },
         class: 'btn-primary',
         click: (function (_this) {
           return function (e) {

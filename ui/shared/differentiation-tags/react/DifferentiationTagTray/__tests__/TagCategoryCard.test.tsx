@@ -53,10 +53,9 @@ describe('TagCategoryCard', () => {
     expect(screen.getByText(noTagsCategory.name)).toBeInTheDocument()
   })
 
-  it('displays a "no groups" message and an add variant link when groups are empty', () => {
+  it('displays a "no groups" message when groups are empty', () => {
     renderComponent({category: noTagsCategory})
     expect(screen.getByText('No tags in tag set')).toBeInTheDocument()
-    expect(screen.getByText('+ Add a variant')).toBeInTheDocument()
   })
 
   it('displays information for a single group', () => {
@@ -79,7 +78,6 @@ describe('TagCategoryCard', () => {
     expect(screen.getByText('10 students')).toBeInTheDocument()
     expect(screen.getByText('20 students')).toBeInTheDocument()
     expect(screen.getByText('30 students')).toBeInTheDocument()
-    expect(screen.getByText('+ Add a variant')).toBeInTheDocument()
   })
 
   it('calls onEditCategory when the edit icon button is clicked', async () => {
@@ -94,28 +92,6 @@ describe('TagCategoryCard', () => {
 
     await userEvent.click(editButton!)
     expect(onEditCategoryMock).toHaveBeenCalledWith(4)
-  })
-
-  it('calls onEditCategory when the "+ Add a variant" link is clicked (empty groups)', async () => {
-    const onEditCategoryMock = jest.fn()
-
-    const emptyGroupsCategory = {...noTagsCategory, id: 5, name: 'Empty Groups Category'}
-    renderComponent({category: emptyGroupsCategory, onEditCategory: onEditCategoryMock})
-
-    const addVariantLink = screen.getByText('+ Add a variant')
-    await userEvent.click(addVariantLink)
-    expect(onEditCategoryMock).toHaveBeenCalledWith(5)
-  })
-
-  it('calls onEditCategory when the "+ Add a variant" link is clicked (multiple groups)', async () => {
-    const onEditCategoryMock = jest.fn()
-
-    const multiGroupsCategory = {...multipleTagsCategory, id: 6, name: 'Multi Groups Category'}
-    renderComponent({category: multiGroupsCategory, onEditCategory: onEditCategoryMock})
-
-    const addVariantLink = screen.getByText('+ Add a variant')
-    await userEvent.click(addVariantLink)
-    expect(onEditCategoryMock).toHaveBeenCalledWith(6)
   })
 
   describe('Delete functionality', () => {
@@ -188,5 +164,11 @@ describe('TagCategoryCard', () => {
     const {container} = renderComponent({category: noTagsCategory})
     const card = container.querySelector('span[role="group"]')
     expect(card).toHaveAttribute('aria-label', noTagsCategory.name)
+  })
+
+  it('aria-label with number of students on single tag text', () => {
+    const {getByTestId} = renderComponent({category: singleTagCategory})
+    const card = getByTestId('single-tag-text')
+    expect(card).toHaveAttribute('aria-label', 'Single tag - 15 students')
   })
 })

@@ -161,11 +161,9 @@ module Api::V1::Course
       hash["banner_image_download_url"] = course.banner_image if includes.include?("banner_image")
       hash["concluded"] = course.concluded? if includes.include?("concluded")
       apply_master_course_settings(hash, course, user)
-      if course.root_account.feature_enabled?(:course_templates)
-        hash["template"] = course.template?
-        if course.template? && includes.include?("templated_accounts")
-          hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
-        end
+      hash["template"] = course.template?
+      if course.template? && includes.include?("templated_accounts")
+        hash["templated_accounts"] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
       end
 
       if includes.include?("grading_scheme")

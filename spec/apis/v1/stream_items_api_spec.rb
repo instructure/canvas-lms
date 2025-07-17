@@ -311,7 +311,7 @@ describe UsersController, type: :request do
     @context = @course
     attachment = attachment_model(context: @course, content_type: "application/pdf")
     attachment.root_account.enable_feature!(:file_association_access)
-    discussion_topic_model(message: "<img src='/users/#{@user.id}/files/#{attachment.id}' />")
+    discussion_topic_model(message: "<img src='/users/#{@user.id}/files/#{attachment.id}' />", user: @user)
 
     json = api_call(:get,
                     "/api/v1/users/activity_stream.json",
@@ -729,7 +729,8 @@ describe UsersController, type: :request do
         "license" => nil,
         "homeroom_course" => false,
         "course_color" => nil,
-        "friendly_name" => nil
+        "friendly_name" => nil,
+        "template" => false
       },
 
       "user" => {
@@ -874,7 +875,8 @@ describe UsersController, type: :request do
         "license" => nil,
         "homeroom_course" => false,
         "course_color" => nil,
-        "friendly_name" => nil
+        "friendly_name" => nil,
+        "template" => false
       },
 
       "user" => {

@@ -21,8 +21,8 @@ module Lti
   module IMS
     # @API LTI Dynamic Registrations
     # @internal
-    # Implements the 1EdTech LTI 1.3 Dynamic Registration <a href="/doc/api/registration.html">spec</a>.
-    # See the <a href="/doc/api/registration.html">Registration guide</a> for how to use this API.
+    # Implements the 1EdTech LTI 1.3 Dynamic Registration <a href="file.registration.html">spec</a>.
+    # See the <a href="file.registration.html">Registration guide</a> for how to use this API.
     class DynamicRegistrationController < ApplicationController
       REGISTRATION_TOKEN_EXPIRATION = 1.hour
 
@@ -168,7 +168,7 @@ module Lti
         end
 
         Schemas::Lti::IMS::OidcRegistration.to_model_attrs(params.to_unsafe_h) =>
-          {errors:, registration_attrs:}
+          { errors:, registration_attrs: }
         return render status: :unprocessable_entity, json: { errors: } if errors.present?
 
         registration_url = jwt["registration_url"]

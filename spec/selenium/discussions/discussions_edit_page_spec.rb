@@ -788,6 +788,10 @@ describe "discussions" do
 
           # Open page and assignTo tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Expect check card and override count/content
           expect(module_item_assign_to_card.count).to eq 1
@@ -822,6 +826,10 @@ describe "discussions" do
 
           # Open edit page and AssignTo Tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Check that displayed cards and overrides are correct
           expect(module_item_assign_to_card.count).to eq 4
@@ -853,6 +861,10 @@ describe "discussions" do
 
           # Open edit page and AssignTo Tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Check that displayed cards and overrides are correct
           expect(module_item_assign_to_card.count).to eq 3
@@ -925,6 +937,10 @@ describe "discussions" do
 
           # Open page and assignTo tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Verify that Everyone tag does not appear
           expect(module_item_assign_to_card.count).to eq 1
@@ -943,6 +959,10 @@ describe "discussions" do
 
           # Expect the module override to be overridden and not appear
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           expect(module_item_assign_to_card.count).to eq 1
           expect(f("body")).not_to contain_jqcss(inherited_from_selector)
@@ -959,6 +979,10 @@ describe "discussions" do
 
           # Open page and assignTo tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Verify that Everyone tag does not appear
           expect(module_item_assign_to_card.count).to eq 2
@@ -996,6 +1020,10 @@ describe "discussions" do
 
           # Open page and assignTo tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Verify the module override is shown
           expect(module_item_assign_to_card.count).to eq 1
@@ -1036,6 +1064,10 @@ describe "discussions" do
 
           # Open page and assignTo tray
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Verify the module override is not shown
           expect(module_item_assign_to_card.count).to eq 1
@@ -1046,6 +1078,10 @@ describe "discussions" do
         it "displays highighted cards correctly" do
           graded_discussion = create_graded_discussion(course)
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
+          wait_for_ajaximations
+
+          # Wait for assign-to cards to be rendered
+          wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
           # Expect there to be no highlighted cards
           expect(module_item_assign_to_card.count).to eq 1
@@ -1177,6 +1213,10 @@ describe "discussions" do
 
             # Open page and assignTo tray
             get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}/edit"
+            wait_for_ajaximations
+
+            # Wait for assign-to cards to be rendered
+            wait_for(method: nil, timeout: 10) { ff(module_item_assign_to_card_selector).present? }
 
             expect(module_item_assign_to_card.last).to contain_css(reply_to_topic_due_date_input_selector)
           end

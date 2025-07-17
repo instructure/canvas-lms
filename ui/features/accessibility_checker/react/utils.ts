@@ -16,12 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {severityColors} from './constants'
+import {IssuesTableColumns, severityColors} from './constants'
 import {
   AccessibilityData,
   ContentItem,
   ContentItemType,
+  FormType,
   IssueDataPoint,
+  IssueForm,
   RawData,
   Severity,
 } from './types'
@@ -115,15 +117,12 @@ export const convertKeysToCamelCase = function (input: any): object | boolean {
   return input !== null && input !== undefined ? input : {}
 }
 
-export function processIssuesToChartData(
-  raw: RawData | null,
-  ruleIdToLabelMap: Record<string, string>,
-): IssueDataPoint[] {
+export function processIssuesToChartData(raw: RawData | null): IssueDataPoint[] {
   if (!raw || typeof raw !== 'object') {
     return []
   }
 
-  const grouped: Record<string, {count: number; severity: Severity}> = {}
+  const grouped: Record<string, {count: number; displayName: string; severity: Severity}> = {}
 
   const rootSeverityMap: Record<string, Severity> = {
     low: 'Low',
@@ -143,6 +142,7 @@ export function processIssuesToChartData(
           grouped[ruleId] = {
             count: 1,
             severity: itemRootSeverity,
+            displayName: issue.displayName,
           }
         } else {
           grouped[ruleId].count += 1
@@ -152,14 +152,12 @@ export function processIssuesToChartData(
     })
   })
 
-  const result: IssueDataPoint[] = Object.entries(grouped).map(([ruleId, data]) => ({
+  return Object.entries(grouped).map(([ruleId, data]) => ({
     id: ruleId.replace(/-/g, '_'),
-    issue: ruleIdToLabelMap[ruleId] || ruleId, // fallback to ruleId itself if not found
+    issue: data.displayName,
     count: data.count,
     severity: data.severity,
   }))
-
-  return result
 }
 
 function prioritizeSeverity(a: Severity, b: Severity): Severity {
@@ -243,5 +241,51 @@ export function getSeverityCounts(issuesData: IssueDataPoint[]) {
     high: issuesData.filter(d => d.severity === 'High').reduce((sum, d) => sum + d.count, 0),
     medium: issuesData.filter(d => d.severity === 'Medium').reduce((sum, d) => sum + d.count, 0),
     low: issuesData.filter(d => d.severity === 'Low').reduce((sum, d) => sum + d.count, 0),
+  }
+}
+
+const sortAscending = (aValue: any, bValue: any): number => {
+  if (aValue < bValue) return -1
+  if (aValue > bValue) return 1
+  return 0
+}
+
+const sortDescending = (aValue: any, bValue: any): number => {
+  if (aValue < bValue) return 1
+  if (aValue > bValue) return -1
+  return 0
+}
+
+/**
+ * TODO Remove, once the API is upgraded to support sorting.
+ */
+export const getSortingFunction = (sortId: string, sortDirection: 'ascending' | 'descending') => {
+  const sortFn = sortDirection === 'ascending' ? sortAscending : sortDescending
+
+  if (sortId === IssuesTableColumns.ResourceName) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.title, b.title)
+    }
+  }
+  if (sortId === IssuesTableColumns.Issues) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.count, b.count)
+    }
+  }
+  if (sortId === IssuesTableColumns.ResourceType) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.type, b.type)
+    }
+  }
+  if (sortId === IssuesTableColumns.State) {
+    return (a: ContentItem, b: ContentItem) => {
+      // Published items first by default
+      return sortFn(a.published ? 0 : 1, b.published ? 0 : 1)
+    }
+  }
+  if (sortId === IssuesTableColumns.LastEdited) {
+    return (a: ContentItem, b: ContentItem) => {
+      return sortFn(a.updatedAt, b.updatedAt)
+    }
   }
 }

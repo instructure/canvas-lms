@@ -41,61 +41,63 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('assignment_index')
 
-const course = new Course({
-  id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
-  apply_assignment_group_weights: ENV.apply_assignment_group_weights,
-})
-course.url = ENV.URLS.course_url
-
-const userIsAdmin = ENV.current_user_is_admin
-
-const assignmentGroups = new AssignmentGroupCollection([], {
-  course,
-  courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
-})
-
-const assignmentGroupsView = new AssignmentGroupListView({
-  collection: assignmentGroups,
-  sortURL: ENV.URLS.sort_url,
-  assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
-  course,
-  userIsAdmin,
-})
-
-let assignmentSettingsView = false
-let assignmentSyncSettingsView = false
-let createGroupView = false
-let showByView = false
-
-if (ENV.PERMISSIONS.manage_assignments_edit) {
-  assignmentSettingsView = new AssignmentSettingsView({
-    model: course,
-    assignmentGroups,
-    weightsView: AssignmentGroupWeightsView,
-    userIsAdmin,
-  })
-
-  assignmentSyncSettingsView = new AssignmentSyncSettingsView({
-    collection: assignmentGroups,
-    model: course,
-    sisName: ENV.SIS_NAME,
-  })
-}
-if (ENV.PERMISSIONS.manage_assignments_add) {
-  createGroupView = new CreateGroupView({
-    assignmentGroups,
-    course,
-    userIsAdmin,
-  })
-}
-if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
-  showByView = new ToggleShowByView({
-    course,
-    assignmentGroups,
-  })
-}
-
 ready(() => {
+  const course = new Course({
+    id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
+    apply_assignment_group_weights: ENV.apply_assignment_group_weights,
+  })
+  course.url = ENV.URLS.course_url
+
+  const userIsAdmin = ENV.current_user_is_admin
+
+  const assignmentGroups = new AssignmentGroupCollection([], {
+    course,
+    courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
+  })
+
+  let assignmentSettingsView = false
+  let assignmentSyncSettingsView = false
+  let createGroupView = false
+  let showByView = false
+
+  const assignmentGroupsView = new AssignmentGroupListView({
+    collection: assignmentGroups,
+    sortURL: ENV.URLS.sort_url,
+    assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
+    course,
+    userIsAdmin,
+  })
+
+  if (ENV.PERMISSIONS.manage_assignments_edit) {
+    assignmentSettingsView = new AssignmentSettingsView({
+      model: course,
+      assignmentGroups,
+      weightsView: AssignmentGroupWeightsView,
+      userIsAdmin,
+    })
+
+    assignmentSyncSettingsView = new AssignmentSyncSettingsView({
+      collection: assignmentGroups,
+      model: course,
+      sisName: ENV.SIS_NAME,
+    })
+  }
+
+  if (ENV.PERMISSIONS.manage_assignments_add) {
+    createGroupView = new CreateGroupView({
+      assignmentGroups,
+      course,
+      userIsAdmin,
+    })
+  }
+
+  if (!ENV.PERMISSIONS.manage_assignments_edit && !ENV.PERMISSIONS.manage_assignments_add) {
+    showByView = new ToggleShowByView({
+      course,
+      assignmentGroups,
+    })
+  }
+
   const indexEl =
     window.location.href.indexOf('assignments') === -1 ? '#course_home_content' : '#content'
 

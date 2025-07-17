@@ -23,16 +23,22 @@ import ContextModulesHeader from '@canvas/context-modules/react/ContextModulesHe
 import {useContextModule} from '../hooks/useModuleContext'
 import {useModules} from '../hooks/queries/useModules'
 
+declare const ENV: {
+  CONTEXT_MODULES_HEADER_PROPS: any
+}
+
 interface ModulePageActionHeaderProps {
   onCollapseAll: () => void
   onExpandAll: () => void
   anyModuleExpanded?: boolean
+  disabled?: boolean
 }
 
 const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
   onCollapseAll,
   onExpandAll,
   anyModuleExpanded = true,
+  disabled = false,
 }) => {
   const {courseId} = useContextModule()
   const {data} = useModules(courseId)
@@ -57,15 +63,15 @@ const ModulePageActionHeader: React.FC<ModulePageActionHeaderProps> = ({
 
   return (
     <ContextModulesHeader
-      expandCollapseAll={{
-        onExpandCollapseAll: handleCollapseExpandClick,
-        anyModuleExpanded,
-      }}
-      // @ts-expect-error
       {...ENV.CONTEXT_MODULES_HEADER_PROPS}
       overrides={{
         publishMenu: {
           onPublishComplete: handlePublishComplete,
+        },
+        expandCollapseAll: {
+          onExpandCollapseAll: handleCollapseExpandClick,
+          anyModuleExpanded,
+          disabled,
         },
         handleAddModule: handleAddModule,
       }}

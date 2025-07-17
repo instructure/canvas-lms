@@ -23,33 +23,16 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {useContextModule} from '../../hooks/useModuleContext'
+import {ExternalToolModalItem} from '../../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
-// External tool type definitions based on legacy implementation
-export interface ExternalToolPlacement {
-  message_type?: string
-  url?: string
-  title?: string
-}
-
-export interface ExternalTool {
-  definition_type: string
-  definition_id: string | number
-  url?: string
-  name: string
-  description?: string
-  domain?: string
-  placements: {
-    assignment_selection?: ExternalToolPlacement
-    link_selection?: ExternalToolPlacement
-    [key: string]: ExternalToolPlacement | undefined
-  }
-}
+// Re-export for backward compatibility
+export type ExternalTool = ExternalToolModalItem
 
 interface ExternalToolSelectorProps {
   selectedToolId?: string
-  onToolSelect: (tool: ExternalTool | null) => void
+  onToolSelect: (tool: ExternalToolModalItem | null) => void
   disabled?: boolean
 }
 
@@ -58,11 +41,9 @@ export const ExternalToolSelector: React.FC<ExternalToolSelectorProps> = ({
   onToolSelect,
   disabled = false,
 }) => {
-  // Get external tools from context
-  // Get external tools from context
-  const {externalTools: availableTools} = useContextModule()
+  const {moduleMenuModalTools} = useContextModule()
+  const availableTools: ExternalToolModalItem[] = moduleMenuModalTools as ExternalToolModalItem[]
 
-  // Find selected tool
   const selectedTool = useMemo(() => {
     if (!selectedToolId) return null
     return availableTools.find(tool => tool.definition_id.toString() === selectedToolId) || null

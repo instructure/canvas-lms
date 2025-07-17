@@ -74,10 +74,6 @@ class GraphQLController < ApplicationController
   def execute_on(schema)
     query = anonymous_call? ? persisted_query["query"] : params[:query]
 
-    if params[:query] && params[:query].strip != query.strip
-      raise ActionController::BadRequest, "Requested query mismatches persisted query"
-    end
-
     variables = params[:variables] || {}
     context = {
       current_user: @current_user,

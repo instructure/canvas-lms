@@ -17,14 +17,13 @@
  */
 
 import React from 'react'
-import ReactDOM  from 'react-dom'
+import ReactDOM from 'react-dom'
 import GradebookData from './react/default_gradebook/GradebookData'
 import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
 
-import('@canvas/context-cards/react/StudentContextCardTrigger')
-
 ready(() => {
+  import('@canvas/context-cards/react/StudentContextCardTrigger')
   const mountPoint = document.querySelector('#gradebook_app') as HTMLElement
   const gradebookMenuNode = document.querySelector(
     '[data-component="GradebookMenu"]',
@@ -52,7 +51,6 @@ ready(() => {
   const anonymousSpeedGraderAlertNode = document.querySelector(
     '[data-component="AnonymousSpeedGraderAlert"]',
   ) as HTMLSpanElement
-
 
   ReactDOM.render(
     <GradebookData

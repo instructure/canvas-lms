@@ -329,8 +329,8 @@ module AccountReports
       SQL
                      .joins(<<~SQL.squish)
                        INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' AND e.root_account_id = #{course.root_account.id}
-                         AND e.course_id = #{course.id} AND e.user_id = users.id #{@include_deleted ? "" : "AND e.workflow_state <> 'deleted'"}
-                       INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = users.id #{@include_deleted ? "" : "AND p.workflow_state<>'deleted'"}
+                         AND e.course_id = #{course.id} AND e.user_id = users.id #{"AND e.workflow_state <> 'deleted'" unless @include_deleted}
+                       INNER JOIN #{Pseudonym.quoted_table_name} p ON p.user_id = users.id #{"AND p.workflow_state<>'deleted'" unless @include_deleted}
                        INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
                        LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = #{os_result[:associated_asset_id].to_i}
                          AND subs.user_id = users.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
@@ -492,7 +492,7 @@ module AccountReports
                           INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
                           INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}
                             AND e.user_id = p.user_id AND e.course_id = c.id
-                            #{@include_deleted ? "" : "AND e.workflow_state <> 'deleted'"}
+                            #{"AND e.workflow_state <> 'deleted'" unless @include_deleted}
                           INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
                           LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
                           LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id

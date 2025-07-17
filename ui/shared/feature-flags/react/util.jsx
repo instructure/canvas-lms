@@ -150,29 +150,6 @@ export function transitionLocked(flag, name) {
   return null
 }
 
-export function transitionMessage(flag, name) {
-  let message = null
-  if (flag.transitions[name]) {
-    message = flag.transitions[name].message
-  }
-
-  if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
-    message = (
-      <div>
-        <p>
-          {I18n.t(
-            `You are currently in the %{environment} environment. This will affect every customer. Are you sure?`,
-            {environment: ENV.RAILS_ENVIRONMENT},
-          )}
-        </p>
-        <p>{message}</p>
-      </div>
-    )
-  }
-
-  return message
-}
-
 export function isEnabled(flag) {
   return flag.state === 'on' || flag.state === 'allowed_on'
 }

@@ -336,13 +336,6 @@ describe "Differentiation Tag Management" do
           expect(f("body")).to contain_jqcss("[data-testid='differentiation-tag-pagination']")
         end
 
-        it "opens the edit modal when the + tag variant button is pressed" do
-          fj("button:contains('+ Add a variant')").click
-          wait_for_ajaximations
-
-          expect(fj("span:contains('Edit Tag')")).to be_displayed
-        end
-
         it "shows an empty state if there are no categories" do
           @course.differentiation_tag_categories.destroy_all
           refresh_page
@@ -721,6 +714,50 @@ describe "Differentiation Tag Management" do
 
             expect(fj("h2:contains('Create Tag')")).to be_displayed
             expect(f(".flashalert-message")).to be_displayed
+          end
+
+          it "Displays an error message if tag variant limit is reached", :ignore_js_errors do
+            multiple_tags_full = @course.group_categories.create!(name: "Project Tags", non_collaborative: true)
+            (1..10).each do |x|
+              @course.groups.create!(name: x, group_category: multiple_tags_full)
+            end
+            refresh_page
+
+            fj("button:contains('Manage Tags')").click
+            wait_for_ajaximations
+            f("button[aria-label='Edit tag set: #{multiple_tags_full.name}']").click
+            wait_for_ajaximations
+
+            fj("button:contains('+ Add another tag')").click
+            wait_for_ajaximations
+            tag_inputs = ff("[data-testid='tag-name-input']")
+            new_input = tag_inputs.last
+            new_input.send_keys("11")
+
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+
+            expect(f(".flashalert-message")).to be_displayed
+            expect(fj("p:contains('Validation failed: Variant limit reached for tag')")).to be_displayed
+          end
+
+          it "Displays an error message for tag limit", :ignore_js_errors do
+            tags_to_create = GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE - @multiple_tags.max_diff_tag_validation_count
+            (1..tags_to_create).each do |x|
+              st = @course.group_categories.create!(name: "st #{x}", non_collaborative: true)
+              @course.groups.create!(name: "st #{x}", group_category: st)
+            end
+            expect(@multiple_tags.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
+
+            fj("button:contains('+ Tag')").click
+            wait_for_ajaximations
+
+            tag_input = f("[data-testid='tag-name-input']")
+            tag_input.send_keys("No more tags")
+            fj("button:contains('Save')").click
+            wait_for_ajaximations
+            expect(f(".flashalert-message")).to be_displayed
+            expect(fj("p:contains('Validation failed: You have reached the tag limit for this course')")).to be_displayed
           end
         end
       end

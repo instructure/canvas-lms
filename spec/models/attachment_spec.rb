@@ -365,7 +365,7 @@ describe Attachment do
       it "prefers crocodoc when annotation is requested and canvadocs can't annotate" do
         configure_crocodoc
         configure_canvadocs "annotations_supported" => false
-        stub_const("Canvadoc::DEFAULT_MIME_TYPES", (Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"]))
+        stub_const("Canvadoc::DEFAULT_MIME_TYPES", Canvadoc::DEFAULT_MIME_TYPES + ["application/blah"])
 
         crocodocable = crocodocable_attachment_model
         canvadocable = canvadocable_attachment_model content_type: "application/blah"

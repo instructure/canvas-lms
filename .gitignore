@@ -54,6 +54,7 @@ yarn-error.log
 dump.rdb
 .eslintcache
 tsconfig.tsbuildinfo
+.sentryclirc
 
 # canvas-gems
 /gems/*/coverage

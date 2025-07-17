@@ -897,7 +897,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Manage Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       edit_course_template: {
@@ -912,7 +911,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Courses - Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       delete_course_template: {
@@ -927,7 +925,6 @@ Rails.application.config.to_prepare do
         ],
         group: "manage_course_templates",
         group_label: -> { I18n.t("Manage Course Templates") },
-        account_allows: ->(a) { a.root_account.feature_enabled?(:course_templates) },
         account_only: true
       },
       manage_account_banks: {
@@ -1701,15 +1698,6 @@ Rails.application.config.to_prepare do
         true_for: %w[AccountAdmin],
         account_only: true,
         account_allows: ->(a) { a.feature_enabled?(:k20_course_readiness) }
-      },
-      view_lti_usage: {
-        label: -> { I18n.t("LTI Usage") },
-        group: "view_advanced_analytics",
-        group_label: -> { I18n.t("Intelligent Insights") },
-        available_to: %w[AccountAdmin AccountMembership],
-        true_for: %w[AccountAdmin],
-        account_only: true,
-        account_allows: ->(a) { a.feature_enabled?(:k20_lti_usage) }
       },
       view_title_iv_financial_aid_report: {
         label: -> { I18n.t("Financial Aid Compliance") },

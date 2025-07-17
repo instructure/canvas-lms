@@ -46,7 +46,7 @@ export default function NegativeFeedbackModal(props: Props) {
         shouldReturnFocus={true}
       >
         <Modal.Header>
-          <Heading>{I18n.t('Feedback Noted')}</Heading>
+          <Heading>{I18n.t('Thanks for sharing')}</Heading>
           <CloseButton
             placement="end"
             offset="small"
@@ -56,11 +56,7 @@ export default function NegativeFeedbackModal(props: Props) {
         </Modal.Header>
         <Modal.Body>
           <Flex as="div" gap="modalElements" direction="column">
-            <Text>
-              {I18n.t(
-                "Thank you for your feedback. We're sorry to hear that these results didn't meet your expectations. Your input is crucial for improving our semantic search algorithms, and we'll use it to enhance the accuracy and relevance of future searches.",
-              )}
-            </Text>
+            <Text>{I18n.t('Your feedback helps us improve smart search.')}</Text>
             <TextArea
               maxHeight="6em"
               height="6em"

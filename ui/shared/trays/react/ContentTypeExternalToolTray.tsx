@@ -84,6 +84,7 @@ export default function ContentTypeExternalToolTray({
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
   const title = tool ? tool.title : ''
+  const iframeRef = React.useRef<HTMLIFrameElement>(null)
 
   useEffect(
     // returns cleanup function:
@@ -92,8 +93,8 @@ export default function ContentTypeExternalToolTray({
   )
 
   useEffect(() => {
-    return onLtiClosePostMessage(placement, onDismiss)
-  }, [])
+    return onLtiClosePostMessage(() => iframeRef.current, onDismiss)
+  }, [onDismiss])
 
   return (
     <CanvasTray
@@ -110,6 +111,7 @@ export default function ContentTypeExternalToolTray({
         data-testid="ltiIframe"
         src={iframeUrl}
         title={title}
+        ref={iframeRef}
       />
     </CanvasTray>
   )

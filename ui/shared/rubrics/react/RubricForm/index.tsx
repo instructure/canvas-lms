@@ -23,6 +23,7 @@ import type {Rubric, RubricAssociation, RubricCriterion} from '@canvas/rubrics/r
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {fetchRubric, type SaveRubricResponse} from './queries/RubricFormQueries'
 import type {RubricFormProps} from './types/RubricForm'
 import {CriterionModal} from './components/CriterionModal/CriterionModal'
@@ -403,16 +404,32 @@ export const RubricForm = ({
         onDismiss={() => setShowWarningModal(false)}
         onCancel={onCancel}
       />
-      <CriterionModal
-        criterion={selectedCriterion}
-        criterionUseRangeEnabled={criterionUseRangeEnabled}
-        hidePoints={rubricForm.hidePoints}
-        freeFormCriterionComments={rubricForm.freeFormCriterionComments}
-        isOpen={isCriterionModalOpen}
-        unassessed={rubricForm.unassessed}
-        onDismiss={() => setIsCriterionModalOpen(false)}
-        onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
-      />
+      <Responsive
+        match="media"
+        query={{
+          compact: {maxWidth: '50rem'},
+          fullWidth: {minWidth: '50rem'},
+          large: {minWidth: '66.5rem'},
+        }}
+      >
+        {(_props, matches) => {
+          const isFullWidth = matches?.includes('fullWidth') ?? false
+
+          return (
+            <CriterionModal
+              criterion={selectedCriterion}
+              criterionUseRangeEnabled={criterionUseRangeEnabled}
+              hidePoints={rubricForm.hidePoints}
+              freeFormCriterionComments={rubricForm.freeFormCriterionComments}
+              isFullWidth={isFullWidth}
+              isOpen={isCriterionModalOpen}
+              unassessed={rubricForm.unassessed}
+              onDismiss={() => setIsCriterionModalOpen(false)}
+              onSave={(updatedCriteria: RubricCriterion) => handleSaveCriterion(updatedCriteria)}
+            />
+          )
+        }}
+      </Responsive>
       <OutcomeCriterionModal
         criterion={selectedCriterion}
         isOpen={isOutcomeCriterionModalOpen}

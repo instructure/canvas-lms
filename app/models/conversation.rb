@@ -36,16 +36,12 @@ class Conversation < ActiveRecord::Base
 
   attr_accessor :latest_messages_from_stream_item
 
-  # rubocop:disable Style/Caller
   def self.caller_tag
-    immediate_caller = caller[2]
-    file_line, method_name = immediate_caller.split(":in `")
-    file_name = File.basename(file_line.split(":").first)
-    method_name = method_name&.delete("'") || "unknown"
+    immediate_caller = caller_locations(3..3).first
+    file_name = File.basename(immediate_caller.path)
 
-    "#{file_name}:#{method_name}"
+    "#{file_name}:#{immediate_caller.label}"
   end
-  # rubocop:enable Style/Caller
 
   module DeleteAllLogger
     def delete_all(*args)
@@ -571,7 +567,7 @@ class Conversation < ActiveRecord::Base
     if message.length < 64.kilobytes - 1
       message
     else
-      message[0..64.kilobytes - 100] + I18n.t("... This message was truncated.")
+      message[0..(64.kilobytes - 100)] + I18n.t("... This message was truncated.")
     end
   end
 

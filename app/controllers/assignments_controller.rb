@@ -943,7 +943,7 @@ class AssignmentsController < ApplicationController
       hash[:IS_MODULE_ITEM] = !@assignment.context_module_tags.empty?
 
       selected_tool = @assignment.tool_settings_tool
-      hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil
+      hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool&.id
       hash[:SELECTED_CONFIG_TOOL_TYPE] = selected_tool ? selected_tool.class.to_s : nil
       hash[:REPORT_VISIBILITY_SETTING] = @assignment.turnitin_settings[:originality_report_visibility]
       hash[:SHOW_SPEED_GRADER_LINK] = Account.site_admin.feature_enabled?(:additional_speedgrader_links) && @assignment.published? && @assignment.can_view_speed_grader?(@current_user)
@@ -959,7 +959,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:NEW_QUIZZES_ANONYMOUS_GRADING_ENABLED] = Account.site_admin.feature_enabled?(:anonymous_grading_with_new_quizzes)
-      hash[:ASSET_PROCESSORS] = Lti::AssetProcessor.for_assignment_id(@assignment.id).info_for_display
+      hash[:ASSET_PROCESSORS] = @assignment.lti_asset_processors.info_for_display
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(
         :submission_type_selection,
         @context,

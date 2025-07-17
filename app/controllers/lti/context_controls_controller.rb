@@ -356,6 +356,38 @@ module Lti
         end
       end
 
+      deployments = controls.pluck(:deployment_id).uniq
+      deployment_course_ids = ContextExternalTool.where(id: deployments, context_type: "Course").pluck(:id, :context_id).to_h
+      course_account_ids = Course.where(id: controls.pluck(:course_id).uniq).pluck(:id, :account_id).to_h
+      deployment_account_ids = ContextExternalTool.where(id: deployments, context_type: "Account").pluck(:id, :context_id).to_h
+      account_chains = Account.partitioned_sub_account_ids_recursive(deployment_account_ids.values)
+
+      invalid_controls = controls.reject do |control_params|
+        deployment_id = control_params[:deployment_id].to_i
+
+        if deployment_course_ids.key?(deployment_id)
+          deployment_course_ids[deployment_id] == control_params[:course_id].to_i
+        else
+          account_id = control_params[:account_id]&.to_i || course_account_ids[control_params[:course_id].to_i]
+          deployment_account_ids[deployment_id] == account_id ||
+            account_chains[deployment_account_ids[deployment_id]]&.include?(account_id)
+        end
+      end
+
+      if invalid_controls.any?
+        return render_errors(
+          invalid_controls.map do |c|
+            {
+              message: "Context must belong to the deployment's context",
+              account_id: c[:account_id],
+              course_id: c[:course_id],
+              deployment_id: c[:deployment_id]
+            }.compact
+          end,
+          status: :unprocessable_entity
+        )
+      end
+
       ids = Lti::ContextControl.transaction do
         # Postgres's ON CONFLICT <conflict_target> can only handle a single unique index at a time,
         # hence the split
@@ -433,10 +465,6 @@ module Lti
     def render_errors(errors, status: :unprocessable_entity)
       errors = [errors] unless errors.is_a?(Array)
       render json: { errors: }, status:
-    end
-
-    def error_message_for_control(control, index)
-      { value: params[:_json][index].to_unsafe_h, errors: control.errors.full_messages }
     end
 
     def params_for_control(params)

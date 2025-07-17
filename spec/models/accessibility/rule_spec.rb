@@ -62,8 +62,18 @@ describe Accessibility::Rule do
     context "when not overridden" do
       it "raises NotImplementedError" do
         expect do
-          described_class.fix(nil, nil)
+          described_class.fix!(nil, nil)
         end.to raise_error(NotImplementedError, "#{described_class} must implement fix")
+      end
+    end
+  end
+
+  describe ".display_name" do
+    context "when not overridden" do
+      it "raises NotImplementedError" do
+        expect do
+          described_class.display_name
+        end.to raise_error(NotImplementedError, "#{described_class} must implement display_name")
       end
     end
   end
@@ -84,14 +94,6 @@ describe Accessibility::Rule do
         expect do
           described_class.why
         end.to raise_error(NotImplementedError, "#{described_class} must implement/override why")
-      end
-    end
-  end
-
-  describe ".link_text" do
-    context "by default" do
-      it "returns an empty string" do
-        expect(described_class.link_text).to eq("")
       end
     end
   end

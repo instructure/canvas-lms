@@ -47,7 +47,6 @@ class AnalyticsHubController < ApplicationController
           ADVANCED_ANALYTICS_ASK_QUESTIONS_ENABLED: @account.feature_enabled?(:advanced_analytics_ask_questions),
           K20_STUDENTS_IN_NEED_OF_ATTENTION_ENABLED: @account.feature_enabled?(:k20_students_in_need_of_attention),
           K20_COURSE_READINESS_ENABLED: @account.feature_enabled?(:k20_course_readiness),
-          K20_LTI_USAGE_ENABLED: @account.feature_enabled?(:k20_lti_usage),
           MONITOR_LTI_USAGE_ENABLED: @account.feature_enabled?(:lti_registrations_usage_data)
         }
       }

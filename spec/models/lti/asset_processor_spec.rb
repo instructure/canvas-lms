@@ -31,11 +31,10 @@ describe Lti::AssetProcessor do
         expect(subject.assignment.lti_asset_processor_ids).to include(subject.id)
       end
 
-      it "is not deleted when CET is destroyed to be able to attach it again to tool after tool reinstall" do
+      it "is soft deleted when CET is destroyed" do
         cet = subject.context_external_tool
         cet.destroy!
-        expect(subject.reload.active?).to be_truthy
-        expect(cet.lti_asset_processors.first.id).to equal subject.id
+        expect(subject.reload.deleted?).to be_truthy
       end
 
       it "is soft deleted when Assignment is destroyed but foreign key is kept" do

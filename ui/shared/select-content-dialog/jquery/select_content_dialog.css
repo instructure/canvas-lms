@@ -1,0 +1,20 @@
+.tools .tool {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.tools .tool:hover,
+.tools .tool:focus,
+.tools .tool:focus-within {
+  background-color: #e8e8e8;
+  outline: none;
+}
+
+.tools .tool:focus,
+.tools .tool a:focus {
+  box-shadow: inset 0 0 0 2px #008ee2;
+}
+
+.tools .tool.selected {
+  background-color: #e8e8e8;
+}

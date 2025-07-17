@@ -1049,6 +1049,55 @@ describe Types::CourseType do
         ).to eq [other_teacher.id.to_s]
       end
 
+      context "permissions" do
+        it "returns nil for student without permissions" do
+          @course.account.role_overrides.create!(permission: :read_roster, role: student_role, enabled: false)
+
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { _id } } }",
+              current_user: @student1
+            )
+          ).to be_nil
+        end
+
+        it "returns nil for teacher without permissions" do
+          @course.account.role_overrides.create!(permission: :read_roster, role: teacher_role, enabled: false)
+          @course.account.role_overrides.create!(permission: :view_all_grades, role: teacher_role, enabled: false)
+          @course.account.role_overrides.create!(permission: :manage_grades, role: teacher_role, enabled: false)
+
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { _id } } }",
+              current_user: @teacher
+            )
+          ).to be_nil
+        end
+
+        it "returns user even without read_roster permission if only self is requested" do
+          @course.account.role_overrides.create!(permission: :read_roster, role: student_role, enabled: false)
+
+          student1_id_variations = [@student1.id, @student1.global_id]
+          student1_id_variations.each do |id|
+            expect(
+              course_type.resolve(<<~GQL, current_user: @student1)
+                usersConnection(filter: {userIds: ["#{id}"]}) { edges { node { _id } } }
+              GQL
+            ).to eq [@student1.to_param]
+          end
+        end
+
+        it "returns nil for for user without read_roster permission if they request other users" do
+          @course.account.role_overrides.create!(permission: :read_roster, role: student_role, enabled: false)
+
+          expect(
+            course_type.resolve(<<~GQL, current_user: @student1)
+              usersConnection(filter: {userIds: ["#{@student1.id}", "#{@student2.id}"]}) { edges { node { _id } } }
+            GQL
+          ).to be_nil
+        end
+      end
+
       context "filtering" do
         it "allows filtering by enrollment state" do
           expect(

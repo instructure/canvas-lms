@@ -22,3 +22,11 @@ export const STUDENT_COLUMN_WIDTH: number = 220
 export const STUDENT_COLUMN_RIGHT_PADDING: number = 15
 export const COLUMN_PADDING: number = 2
 export const CELL_HEIGHT: number = 45
+
+export const DEFAULT_STUDENTS_PER_PAGE: number = 15
+export const STUDENTS_PER_PAGE_OPTIONS: number[] = [15, 30, 50, 100]
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}

@@ -380,6 +380,10 @@ module ModulesIndexPage
     f(pagination_selector(module_id))
   end
 
+  def pagination_page_button(module_id, page_no)
+    fj("#{pagination_selector(module_id)} button:contains('#{page_no}')")
+  end
+
   def pill_message(module_id)
     f(pill_message_selector(module_id))
   end
@@ -460,12 +464,8 @@ module ModulesIndexPage
     f(show_less_button_selector(context_module))
   end
 
-  def flash_alert
-    f(".flashalert-message")
-  end
-
-  def flash_alert_close_button
-    fj(".flashalert-message button:contains('Close')")
+  def screenreader_alert
+    f("#flash_screenreader_holder")
   end
 
   #------------------------------ Actions ------------------------------

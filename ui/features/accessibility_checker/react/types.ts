@@ -24,21 +24,33 @@ export enum ContentItemType {
 
 export enum FormType {
   TextInput = 'textinput',
-  DropDown = 'dropdown',
-  Checkbox = 'checkbox',
+  RadioInputGroup = 'radio_input_group',
+  Button = 'button',
   ColorPicker = 'colorpicker',
+  CheckboxTextInput = 'checkbox_text_input',
 }
 
 export interface IssueForm {
   type: FormType
   label?: string
+  undoText?: string
   value?: string
   options?: string[]
+  action?: string
+  inputLabel?: string
+  titleLabel?: string
+  backgroundColor?: string
+  contrastRatio?: number
+  checkboxLabel?: string
+  checkboxSubtext?: string
+  inputDescription?: string
+  inputMaxLength?: number
 }
 
 export interface AccessibilityIssue {
   id: string
-  ruleId?: string
+  ruleId: string
+  displayName: string
   message: string
   why: string
   element: string
@@ -52,6 +64,7 @@ export interface AccessibilityData {
   assignments?: Record<string, ContentItem>
   attachments?: Record<string, ContentItem>
   lastChecked?: string
+  accessibilityScanDisabled?: boolean
 }
 
 export interface ContentItem {
@@ -72,6 +85,8 @@ export interface PreviewResponse {
   path?: string
 }
 
+export type FormValue = any
+
 export type Severity = 'High' | 'Medium' | 'Low'
 
 export type IssueDataPoint = {
@@ -82,3 +97,12 @@ export type IssueDataPoint = {
 }
 
 export type RawData = Record<string, any>
+
+export type ContrastData = {
+  contrast: number
+  isValidNormalText: boolean
+  isValidLargeText: boolean
+  isValidGraphicsText: boolean
+  firstColor: string
+  secondColor: string
+}

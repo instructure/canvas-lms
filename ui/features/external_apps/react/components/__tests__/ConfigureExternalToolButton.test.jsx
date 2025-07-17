@@ -112,12 +112,13 @@ test('closes the modal when tool sends lti.close message', async () => {
   renderComponentOpen()
   monitorLtiMessages()
 
+  const iframe = screen.getByTitle(/Tool Configuration/i)
   fireEvent(
     window,
     new MessageEvent('message', {
       data: {subject: 'lti.close'},
       origin: 'https://advantage.tool.com',
-      source: window,
+      source: iframe.contentWindow,
     }),
   )
 

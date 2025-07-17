@@ -106,6 +106,7 @@ describe('createCourseCopyMutation', () => {
             time_zone: formData.courseTimeZone,
           },
           enroll_me: true,
+          skip_course_template: true,
         },
       })
       expect(doFetchApi).toHaveBeenCalledWith({
@@ -144,6 +145,7 @@ describe('createCourseCopyMutation', () => {
             time_zone: formData.courseTimeZone,
           },
           enroll_me: true,
+          skip_course_template: true,
         },
       })
       expect(doFetchApi).toHaveBeenCalledWith({

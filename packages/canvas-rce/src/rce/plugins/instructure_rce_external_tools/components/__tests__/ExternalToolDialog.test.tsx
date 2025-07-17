@@ -532,6 +532,7 @@ describe('ExternalToolDialog', () => {
         data: {
           subject: 'lti.close',
         },
+        source: document.querySelector('iframe').contentWindow,
       })
 
       expect(closeSpy).toHaveBeenCalled()

@@ -358,6 +358,7 @@ class CoursesController < ApplicationController
   include NewQuizzesFeaturesHelper
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
+  include AccessibilityHelper
 
   before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
   before_action :require_user_or_observer, only: [:user_index]
@@ -848,6 +849,10 @@ class CoursesController < ApplicationController
   # @argument enroll_me [Boolean]
   #   Set to true to enroll the current user as the teacher.
   #
+  # @argument skip_course_template [Boolean]
+  #   If this option is set to true, the template of the account will not be applied to this course
+  #   It means copy_from_course_template will not be executed. This option is thought for a course copy.
+  #
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
   #   * 'feed' Recent Activity Dashboard
@@ -965,7 +970,15 @@ class CoursesController < ApplicationController
       changes = changed_settings(@course.changes, @course.settings)
 
       respond_to do |format|
-        if @course.save
+        success = if value_to_boolean(params[:skip_course_template])
+                    Course.suspend_callbacks(:copy_from_course_template) do
+                      @course.save
+                    end
+                  else
+                    @course.save
+                  end
+
+        if success
           Auditors::Course.record_created(@course, @current_user, changes, source: (api_request? ? :api : :manual))
           @course.enroll_user(@current_user, "TeacherEnrollment", enrollment_state: "active") if params[:enroll_me].to_s == "true"
           @course.require_assignment_group
@@ -1033,7 +1046,7 @@ class CoursesController < ApplicationController
   # Upload a file to the course.
   #
   # This API endpoint is the first step in uploading a file to a course.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Only those with the "Manage Files" permission on a course can upload files
@@ -1146,7 +1159,7 @@ class CoursesController < ApplicationController
         # backcompat limit param
         params[:per_page] ||= params[:limit]
 
-        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort)
+        search_params = params.slice(:search_term, :enrollment_role, :enrollment_role_id, :enrollment_type, :enrollment_state, :sort, :differentiation_tag_id)
         include_inactive = @context.grants_right?(@current_user, session, :read_as_admin) && value_to_boolean(params[:include_inactive])
 
         search_params[:include_inactive_enrollments] = true if include_inactive
@@ -2265,6 +2278,9 @@ class CoursesController < ApplicationController
           @context_enrollment.user = @current_user
           @course_notifications_enabled = NotificationPolicyOverride.enabled_for(@current_user, @context)
         end
+
+        @accessibility_scan_enabled =
+          @context.feature_enabled?(:accessibility_tab_enable) ? !exceeds_accessibility_scan_limit? : false
       end
 
       return if check_for_xlist
@@ -2444,13 +2460,6 @@ class CoursesController < ApplicationController
                 runningProgressId: @progress&.id,
                 disabled: @modules.empty?,
                 visible: @context.grants_right?(@current_user, session, :manage_course_content_edit),
-              },
-              expandCollapseAll: {
-                label: t("Collapse All"),
-                dataUrl: context_url(@context, :context_url) + "/collapse_all_modules",
-                dataExpand: false,
-                ariaExpanded: false,
-                ariaLabel: t("Collapse All Modules"),
               },
               addModule: {
                 label: t("Add Module"),
@@ -2772,7 +2781,7 @@ class CoursesController < ApplicationController
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != "none"
       # this is used for linking and un-linking enrollments
-      enrollment.associated_user_id = student ? student.id : nil
+      enrollment.associated_user_id = student&.id
       enrollment.save!
       render json: enrollment.as_json(methods: :associated_user_name)
     end

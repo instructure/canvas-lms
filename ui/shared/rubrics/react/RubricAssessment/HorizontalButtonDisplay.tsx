@@ -58,7 +58,9 @@ export const HorizontalButtonDisplay = ({
   const selectedSelfAssessmentRatingIndex = selectedSelfAssessmentRating
     ? ratings.indexOf(selectedSelfAssessmentRating)
     : -1
-  const min = criterionUseRange ? rangingFrom(ratings, selectedRatingIndex) : undefined
+  const min = criterionUseRange
+    ? rangingFrom(ratings, selectedRatingIndex, undefined, true)
+    : undefined
 
   useEffect(() => {
     if (shouldFocusFirstRating && firstRatingRef.current) {
@@ -87,7 +89,10 @@ export const HorizontalButtonDisplay = ({
           padding="xx-small"
           margin="0 xx-small small xx-small"
           data-testid={`rating-details-${selectedRatingDescription?.id}`}
-          themeOverride={{borderColorBrand: colors.contrasts.green4570, borderWidthMedium: '0.188rem'}}
+          themeOverride={{
+            borderColorBrand: colors.contrasts.green4570,
+            borderWidthMedium: '0.188rem',
+          }}
         >
           <View as="div">
             <Text size="x-small" weight="bold">

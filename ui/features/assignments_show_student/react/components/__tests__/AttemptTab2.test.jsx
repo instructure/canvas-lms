@@ -445,9 +445,9 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(2)
       const {container} = renderWithProps(props)
 
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
-      const file2 = new Blob(['foo'], { type: 'application/pdf' })
+      const file2 = new Blob(['foo'], {type: 'application/pdf'})
       file2.name = 'file2.pdf'
 
       await submitFiles(container, [file, file2])
@@ -471,7 +471,7 @@ describe('ContentTabs', () => {
       props.assignment.groupSet = null
       const {container} = renderWithProps(props)
 
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
       await submitFiles(container, [file])
       const {calls} = uploadFileModule.uploadFile.mock
@@ -491,7 +491,7 @@ describe('ContentTabs', () => {
 
       const {container} = renderWithProps(props)
 
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
       await submitFiles(container, [file])
       const {calls} = uploadFileModule.uploadFile.mock
@@ -506,7 +506,7 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(2)
       const {container} = renderWithProps(props)
 
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
       await submitFiles(container, [file])
 
@@ -526,7 +526,7 @@ describe('ContentTabs', () => {
       const props = await generatePropsWithAttempt(0)
       const {container} = renderWithProps(props)
 
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
       await submitFiles(container, [file])
 
@@ -558,9 +558,9 @@ describe('ContentTabs', () => {
 
       const props = await generatePropsWithAttempt(0)
       const {container, findAllByRole} = renderWithProps(props)
-      const file = new Blob(['foo'], { type: 'application/pdf' })
+      const file = new Blob(['foo'], {type: 'application/pdf'})
       file.name = 'file1.pdf'
-      const file2 = new Blob(['foo'], { type: 'application/pdf' })
+      const file2 = new Blob(['foo'], {type: 'application/pdf'})
       file2.name = 'file2.pdf'
       await submitFiles(container, [file, file2])
 
@@ -570,15 +570,8 @@ describe('ContentTabs', () => {
       const progressBars = await findAllByRole('progressbar')
       expect(progressBars).toHaveLength(2)
 
-      expect(progressBars[0]).toHaveAttribute(
-        'aria-valuetext',
-        'Upload progress for file1.pdf 10 percent',
-      )
-
-      expect(progressBars[1]).toHaveAttribute(
-        'aria-valuetext',
-        'Upload progress for file2.pdf 20 percent',
-      )
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+      expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
     })
 
     function fireEventWithContentItem(contentItem) {
@@ -615,10 +608,7 @@ describe('ContentTabs', () => {
       const progressBars = await findAllByRole('progressbar')
       expect(progressBars).toHaveLength(1)
 
-      expect(progressBars[0]).toHaveAttribute(
-        'aria-valuetext',
-        'Upload progress for http://localhost/some-lti-file 10 percent',
-      )
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
     })
 
     it('uses "text" of the LTI content item as the file name for display and API calls', async () => {
@@ -645,7 +635,7 @@ describe('ContentTabs', () => {
       progressHandlers[0]({loaded: 10, total: 100})
 
       const progressBars = await findAllByRole('progressbar')
-      expect(progressBars[0]).toHaveAttribute('aria-valuetext', 'Upload progress for x.pdf 10 percent')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
 
       expect(uploadFileModule.uploadFile.mock.calls[0][1]).toEqual({
         url: 'http://localhost/some-lti-file',

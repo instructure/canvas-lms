@@ -65,7 +65,8 @@ export interface PlatformSettings {
 
 export interface PlacementConfig {
   placement: LtiPlacement
-  enabled?: boolean
+  // TODO: make this just a boolean along with INTEROP-8921
+  enabled?: boolean | 'true' | 'false'
   message_type: string
   target_link_uri?: string
   text?: string

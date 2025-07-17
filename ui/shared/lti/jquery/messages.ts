@@ -69,6 +69,29 @@ const isObject = (u: unknown): u is object => {
   return typeof u === 'object'
 }
 
+type IFrameThunk = () => HTMLIFrameElement | undefined | null
+
+// Determine whether the message event came from the given LTI tool launch iframe.
+// Returns true if e's source is the iframe's contentWindow.
+function iframeMatches(e: MessageEvent<unknown>, thunk: IFrameThunk): boolean {
+  const iframeSource = thunk()?.contentWindow
+  if (!iframeSource) {
+    return false
+  }
+  return iframeSource === e.source || iframeSource === forwardedMsgSource(e)
+}
+
+function forwardedMsgSource(e: MessageEvent<unknown>): Window | undefined {
+  if (!e.source || e.source !== window?.top?.frames['post_message_forwarding' as any]) {
+    return undefined
+  }
+  const frameIndex = getKey('indexInTopFrames', getKey('sourceToolInfo', e.data))
+  if (typeof frameIndex !== 'number' || !window.top) {
+    return undefined
+  }
+  return window.top.frames[frameIndex]
+}
+
 /**
  * Returns true if the data from a message event is associated with a dev tool
  * @param data - The `data` attribute from a message event
@@ -149,12 +172,13 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
 
   // look at messageType for backwards compatibility
   const subject = getKey('subject', message) || getKey('messageType', message)
+  const sourceToolInfo = getKey('sourceToolInfo', message) as unknown
   const responseMessages = buildResponseMessages({
     targetWindow,
     origin: e.origin,
     subject,
     message_id: getKey('message_id', message),
-    sourceToolInfo: getKey('sourceToolInfo', message),
+    sourceToolInfo,
   })
 
   if (subject === undefined || isIgnoredSubject(subject) || responseMessages.isResponse(e)) {
@@ -174,9 +198,11 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
   } else {
     try {
       const callback = () => {
-        const subject_callbacks = callbacks[subject]
-        if (subject_callbacks) {
-          Object.values(subject_callbacks).forEach(cb => cb())
+        for (const [cb, iframe] of callbacks[subject] || []) {
+          // Only call callback if message is from the window set up by the listener.
+          if (iframeMatches(e, iframe)) {
+            cb()
+          }
         }
       }
       const handlerModule = await handlers[subject]()
@@ -227,10 +253,10 @@ async function ltiMessageHandler(e: MessageEvent<unknown>) {
 // Prevent duplicate listeners inside the same window
 let hasListener = false
 
-// Let any page define a callback for a given subject and placement
-// Ex: close a modal when `lti.close` is received for a tool launched from `assignment_selection`
-type PlacementCallbacks = Record<string, () => void>
-const callbacks: Partial<Record<(typeof SUBJECT_ALLOW_LIST)[number], PlacementCallbacks>> = {}
+// Let any page define a callback for a given subject and iframe window
+// Ex: close a modal when `lti.close` is received for a tool in the iframe it owns
+type PostMessageCallbacks = Map<() => void, IFrameThunk>
+const callbacks: Partial<Record<(typeof SUBJECT_ALLOW_LIST)[number], PostMessageCallbacks>> = {}
 
 function monitorLtiMessages() {
   // This should only be true when canvas is in an iframe (like for postMessage forwarding),
@@ -253,29 +279,18 @@ function monitorLtiMessages() {
  * @param subject An allowed LTI postMessage subject
  * @param placement A unique identifier for the tool launch placement
  * @param callback A function to execute when a postMessage with the given subject is received
+ * @returns A cleanup function to remove the callback
  */
 function callbackOnLtiPostMessage(
   subject: (typeof SUBJECT_ALLOW_LIST)[number],
-  placement: string,
+  thunk: IFrameThunk,
   callback: () => void,
-) {
-  callbacks[subject] ||= {}
-  callbacks[subject][placement] = callback
-}
-
-/**
- * Remove an extra callback for a given LTI postMessage subject and placement.
- * Does not remove the default subject handler.
- *
- * @param subject An allowed LTI postMessage subject
- * @param placement A unique identifier for the tool launch placement
- */
-function removeLtiPostMessageCallback(
-  subject: (typeof SUBJECT_ALLOW_LIST)[number],
-  placement: string,
-) {
-  if (callbacks[subject] && callbacks[subject][placement]) {
-    delete callbacks[subject][placement]
+): () => void {
+  const cbWrapper: () => void = () => callback()
+  callbacks[subject] ??= new Map()
+  callbacks[subject].set(cbWrapper, thunk)
+  return () => {
+    callbacks[subject]?.delete(cbWrapper)
   }
 }
 
@@ -283,14 +298,11 @@ function removeLtiPostMessageCallback(
  * Be informed when Canvas receives an `lti.close` postMessage,
  * and respond (usually by closing the tool launch modal).
  *
- * @param placement A unique identifier for the tool launch placement
  * @param callback A function to execute on `lti.close`
  * @returns A cleanup function to remove the callback
  */
-function onLtiClosePostMessage(placement: string, callback: () => void) {
-  callbackOnLtiPostMessage('lti.close', placement, callback)
-
-  return () => removeLtiPostMessageCallback('lti.close', placement)
+function onLtiClosePostMessage(iframeThunk: IFrameThunk, callback: () => void) {
+  return callbackOnLtiPostMessage('lti.close', iframeThunk, callback)
 }
 
 export {
@@ -298,6 +310,5 @@ export {
   ltiMessageHandler,
   monitorLtiMessages,
   callbackOnLtiPostMessage,
-  removeLtiPostMessageCallback,
   onLtiClosePostMessage,
 }

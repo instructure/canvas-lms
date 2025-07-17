@@ -94,7 +94,7 @@ describe Schemas::Lti::IMS::OidcRegistration do
     end
 
     it "returns a hash that can be used to construct an Lti::IMS::Registration" do
-      described_class.to_model_attrs(valid) => {errors:, registration_attrs:}
+      described_class.to_model_attrs(valid) => { errors:, registration_attrs: }
       expect(errors).to be_nil
       reg = Lti::IMS::Registration.create!(
         developer_key: developer_key_model,
@@ -110,7 +110,7 @@ describe Schemas::Lti::IMS::OidcRegistration do
     end
 
     it "returns attributes that can be used to construct a DeveloperKey" do
-      described_class.to_model_attrs(valid) => {errors:, registration_attrs:}
+      described_class.to_model_attrs(valid) => { errors:, registration_attrs: }
       developer_key = DeveloperKey.create!(
         current_user: user_model,
         name: registration_attrs["client_name"],
@@ -126,7 +126,7 @@ describe Schemas::Lti::IMS::OidcRegistration do
     end
 
     it "splits up scopes and removes the openid scope" do
-      described_class.to_model_attrs(valid) => {errors:, registration_attrs:}
+      described_class.to_model_attrs(valid) => { errors:, registration_attrs: }
       expect(registration_attrs["scopes"]).to eq([
                                                    "https://purl.imsglobal.org/spec/lti-ags/scope/score",
                                                    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"

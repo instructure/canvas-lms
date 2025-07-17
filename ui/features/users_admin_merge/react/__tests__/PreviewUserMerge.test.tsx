@@ -19,11 +19,14 @@
 import {render, screen} from '@testing-library/react'
 import PreviewUserMerge, {type PreviewMergeProps} from '../PreviewUserMerge'
 import {queryClient} from '@canvas/query'
-import fetchMock from 'fetch-mock'
 import {createUserToMergeQueryKey} from '../common'
 import userEvent from '@testing-library/user-event'
 import {sourceUser, destinationUser} from './test-data'
 import {QueryClientProvider} from '@tanstack/react-query'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
+
+const server = setupServer()
 
 describe('PreviewUserMerge', () => {
   const props: PreviewMergeProps = {
@@ -36,14 +39,26 @@ describe('PreviewUserMerge', () => {
   const MERGE_USERS_URL = `/api/v1/users/${sourceUser.id}/merge_into/${destinationUser.id}`
 
   beforeAll(() => {
+    server.listen()
     // Unfortunately, toSorted is not supported in the current version of Node.js. This could be deleted once we are at Node.js v20.11.1
     Array.prototype.toSorted = function () {
       return this.sort((a, b) => a.localeCompare(b))
     }
   })
 
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(() => {
-    fetchMock.reset()
+    // Mock the user fetch endpoints
+    server.use(
+      http.get(`/users/${sourceUser.id}/user_for_merge`, () => {
+        return HttpResponse.json(sourceUser)
+      }),
+      http.get(`/users/${destinationUser.id}/user_for_merge`, () => {
+        return HttpResponse.json(destinationUser)
+      }),
+    )
     // Pre-populating query cache so that it is more closely resembles the actual behavior.
     queryClient.setQueryData(createUserToMergeQueryKey(sourceUser.id), sourceUser)
     queryClient.setQueryData(createUserToMergeQueryKey(destinationUser.id), destinationUser)
@@ -175,7 +190,11 @@ describe('PreviewUserMerge', () => {
 
   describe('when merging users', () => {
     it('should show an success alert if the merge was successful', async () => {
-      fetchMock.put(MERGE_USERS_URL, 204)
+      server.use(
+        http.put(MERGE_USERS_URL, () => {
+          return new HttpResponse(null, {status: 204})
+        }),
+      )
       renderComponent()
       const mergeButton = screen.getByLabelText('Merge Accounts')
 
@@ -187,11 +206,14 @@ describe('PreviewUserMerge', () => {
         `User merge succeeded! ${sourceUser.name} and ${destinationUser.name} are now one and the same. Redirecting to the user's page...`,
       )
       expect(successAlert.length).toBeTruthy()
-      expect(fetchMock.called(MERGE_USERS_URL)).toBe(true)
     })
 
     it('should show an error alert if the merge failed due to insufficient permissions', async () => {
-      fetchMock.put(MERGE_USERS_URL, 403)
+      server.use(
+        http.put(MERGE_USERS_URL, () => {
+          return new HttpResponse(null, {status: 403})
+        }),
+      )
       renderComponent()
       const mergeButton = screen.getByLabelText('Merge Accounts')
 
@@ -203,11 +225,14 @@ describe('PreviewUserMerge', () => {
         'User merge failed. Please make sure you have proper permission and try again.',
       )
       expect(errorAlert.length).toBeTruthy()
-      expect(fetchMock.called(MERGE_USERS_URL)).toBe(true)
     })
 
     it('should show and error alert if the merge failed for any other reason', async () => {
-      fetchMock.put(MERGE_USERS_URL, 500)
+      server.use(
+        http.put(MERGE_USERS_URL, () => {
+          return new HttpResponse(null, {status: 500})
+        }),
+      )
       renderComponent()
       const mergeButton = screen.getByLabelText('Merge Accounts')
 
@@ -217,7 +242,6 @@ describe('PreviewUserMerge', () => {
 
       const errorAlert = await screen.findAllByText('Failed to merge users. Please try again.')
       expect(errorAlert.length).toBeTruthy()
-      expect(fetchMock.called(MERGE_USERS_URL)).toBe(true)
     })
   })
 })

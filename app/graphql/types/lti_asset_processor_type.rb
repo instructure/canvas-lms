@@ -37,5 +37,8 @@ module Types
         object.icon_or_tool_icon_url
       end
     end
+
+    field :iframe, Types::LtiAssetProcessorIframeType, null: true
+    field :window, Types::LtiAssetProcessorWindowSettingsType, null: true
   end
 end

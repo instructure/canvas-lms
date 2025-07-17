@@ -101,8 +101,6 @@ export const useShouldShowContent = (
 
   const shouldShowViewSettings = ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MODERATE && !isAnnouncement
 
-  const shouldShowAnnouncementOnlyOptions = isAnnouncement && !isGroupContext
-
   const shouldShowGroupOptions =
     !isAnnouncement && !isGroupContext && ENV.DISCUSSION_TOPIC.PERMISSIONS.CAN_SET_GROUP
 
@@ -133,7 +131,9 @@ export const useShouldShowContent = (
     !isAnnouncement && !isGraded && ENV.DISCUSSION_TOPIC?.PERMISSIONS?.CAN_MANAGE_ASSIGN_TO_UNGRADED
 
   const shouldShowAllowParticipantsToCommentOption =
-    !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && shouldShowAnnouncementOnlyOptions
+    !ENV?.ANNOUNCEMENTS_COMMENTS_DISABLED && isAnnouncement
+
+  const groupContextType = ENV?.GROUP_CONTEXT_TYPE
 
   const shouldShowSuppressAssignmentOption = isGraded && ENV.SETTINGS.suppress_assignments
 
@@ -142,7 +142,6 @@ export const useShouldShowContent = (
     shouldShowPostToSectionOption,
     shouldShowAnonymousOptions,
     shouldShowViewSettings,
-    shouldShowAnnouncementOnlyOptions,
     shouldShowGroupOptions,
     shouldShowGradedDiscussionOptions,
     shouldShowUsageRightsOption,
@@ -155,5 +154,6 @@ export const useShouldShowContent = (
     shouldShowAssignToForUngradedDiscussions,
     shouldShowAllowParticipantsToCommentOption,
     shouldShowSuppressAssignmentOption,
+    groupContextType,
   }
 }

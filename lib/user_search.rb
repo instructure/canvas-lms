@@ -36,10 +36,11 @@ module UserSearch
         users_scope = context_scope(context, searcher, options.slice(:enrollment_state, :include_inactive_enrollments))
         users_scope = users_scope.from("(#{conditions_statement(search_term, context.root_account, users_scope)}) AS users")
         users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
-        roles_scope(users_scope, context, options.slice(:enrollment_type,
-                                                        :enrollment_role,
-                                                        :enrollment_role_id,
-                                                        :exclude_groups))
+        users_scope = roles_scope(users_scope, context, options.slice(:enrollment_type,
+                                                                      :enrollment_role,
+                                                                      :enrollment_role_id,
+                                                                      :exclude_groups))
+        differentiation_tag_scope(users_scope, context, searcher, options.slice(:differentiation_tag_id))
       end
     end
 
@@ -70,7 +71,9 @@ module UserSearch
                                                                     :ui_invoked,
                                                                     :temporary_enrollment_recipients,
                                                                     :temporary_enrollment_providers))
-      order_scope(users_scope, context, options.slice(:order, :sort))
+      users_scope = order_scope(users_scope, context, options.slice(:order, :sort))
+
+      differentiation_tag_scope(users_scope, context, searcher, options.slice(:differentiation_tag_id))
     end
 
     def context_scope(context, searcher, options = {})
@@ -317,6 +320,25 @@ module UserSearch
       end
 
       users_scope
+    end
+
+    def differentiation_tag_scope(users_scope, context, searcher, options = {})
+      differentiation_tag_ids = Array(options[:differentiation_tag_id]) if options[:differentiation_tag_id]
+
+      return users_scope unless differentiation_tag_ids&.any? &&
+                                context.is_a?(Course) &&
+                                context.account.feature_enabled?(:assign_to_differentiation_tags) &&
+                                context.account.allow_assign_to_differentiation_tags? &&
+                                context.grants_any_right?(searcher, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS)
+
+      users_scope.where(id: GroupMembership
+                            .active
+                            .select(:user_id)
+                            .where(group_id: Group
+                                             .active
+                                             .non_collaborative
+                                             .select(:id)
+                                             .where(id: differentiation_tag_ids, context:)))
     end
 
     private

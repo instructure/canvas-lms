@@ -56,6 +56,11 @@ describe('defaultTinymceConfig', () => {
     it('includes the expected hex colors and descriptions', () => {
       const {color_map} = defaultTinymceConfig
 
+      expect(color_map).toContain('#BFEDD2') // tinymce default
+      expect(color_map).toContain('#FBEEB8') // tinymce default
+      expect(color_map).toContain('#F8CAC6') // tinymce default
+      expect(color_map).toContain('#ECCAFA') // tinymce default
+      expect(color_map).toContain('#C2E0F4') // tinymce default
       expect(color_map).toContain('#03893D') // InstUI Green45
       expect(color_map).toContain('#CF4A00') // InstUI Orange45
       expect(color_map).toContain('#E62429') // InstUI Red45
@@ -66,12 +71,18 @@ describe('defaultTinymceConfig', () => {
       expect(color_map).toContain('#C71F23') // InstUI Red57
       expect(color_map).toContain('#9242B4') // InstUI Violet57
       expect(color_map).toContain('#0E68B3') // InstUI Blue57
+      expect(color_map).toContain('#FFFFFF') // White
       expect(color_map).toContain('#6A7883') // InstUI Grey45
       expect(color_map).toContain('#3F515E') // InstUI Grey82
       expect(color_map).toContain('#273540') // InstUI Grey125
       expect(color_map).toContain('#000000') // Black
 
       // Verify all descriptions are present
+      expect(color_map).toContain('Light Green')
+      expect(color_map).toContain('Light Orange')
+      expect(color_map).toContain('Light Red')
+      expect(color_map).toContain('Light Purple')
+      expect(color_map).toContain('Light Blue')
       expect(color_map).toContain('Green')
       expect(color_map).toContain('Orange')
       expect(color_map).toContain('Red')
@@ -82,6 +93,7 @@ describe('defaultTinymceConfig', () => {
       expect(color_map).toContain('Dark Red')
       expect(color_map).toContain('Dark Purple')
       expect(color_map).toContain('Dark Blue')
+      expect(color_map).toContain('White')
       expect(color_map).toContain('Light Gray')
       expect(color_map).toContain('Gray')
       expect(color_map).toContain('Dark Gray')

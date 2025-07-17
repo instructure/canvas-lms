@@ -32,11 +32,11 @@ class Lti::Asset < ApplicationRecord
   # so we should check the assignment is not (soft-)deleted when using
   # the report, if we care in the scenario.
 
-  has_many :asset_reports, class_name: "Lti::AssetReport", inverse_of: :asset, foreign_key: :lti_asset_id
+  has_many :asset_reports, class_name: "Lti::AssetReport", inverse_of: :asset, foreign_key: :lti_asset_id, dependent: :destroy
 
-  # In the future, we'll support other types of assets,
-  # for instance RCE content stored in a Submission version,
-  # and attachment can be made optional
+  # We support other types of assets,
+  # for instance RCE content stored in a Submission attempt,
+  # so attachment is optional
   belongs_to :attachment,
              inverse_of: :lti_assets,
              class_name: "Attachment"

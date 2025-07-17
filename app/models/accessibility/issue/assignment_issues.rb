@@ -20,18 +20,28 @@
 module Accessibility
   class Issue
     module AssignmentIssues
-      def generate_assignment_issues
-        context.assignments.active.order(updated_at: :desc).each_with_object({}) do |assignment, issues|
+      def generate_assignment_resources(skip_scan: false)
+        assignments = context.assignments.active.order(updated_at: :desc)
+        return assignments.map { |assignment| assignment_attributes(assignment) } if skip_scan
+
+        assignments.each_with_object({}) do |assignment, issues|
           result = check_content_accessibility(assignment.description)
 
-          issues[assignment.id] = result.merge(
-            title: assignment.title,
-            published: assignment.published?,
-            updated_at: assignment.updated_at&.iso8601 || "",
-            url: polymorphic_path([context, assignment]),
-            edit_url: "#{polymorphic_path([context, assignment])}/edit"
-          )
+          issues[assignment.id] = result.merge(assignment_attributes(assignment))
         end
+      end
+
+      private
+
+      def assignment_attributes(assignment)
+        resource_path = polymorphic_path([context, assignment])
+        {
+          title: assignment.title,
+          published: assignment.published?,
+          updated_at: assignment.updated_at&.iso8601 || "",
+          url: resource_path,
+          edit_url: "#{resource_path}/edit"
+        }
       end
     end
   end

@@ -46,7 +46,7 @@ export default class ConfigureExternalToolButton extends React.Component {
   }
 
   componentDidMount() {
-    this.removeCloseListener = onLtiClosePostMessage('tool_configuration', this.closeModal)
+    this.removeCloseListener = onLtiClosePostMessage(() => this.iframe, this.closeModal)
   }
 
   componentWillUnmount() {

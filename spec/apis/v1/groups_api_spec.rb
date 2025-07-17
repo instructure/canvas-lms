@@ -1134,9 +1134,15 @@ describe "Groups API", type: :request do
       context "when valid users are provided and processing succeeds" do
         it "adds the memberships and returns ok" do
           student = student_in_course(active_all: true).user
-          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [student.id] }
+          student2 = student_in_course(active_all: true).user
+          # add student2 to another section (it should also succeed when added to a tag)
+          sec2 = @course.course_sections.create!(name: "section2")
+          @course.enroll_student(student2, section: sec2, allow_multiple_enrollments: true)
+
+          post "/api/v1/groups/#{@group.id}/memberships", params: { group_id: @group.id, members: [student.id, student2.id] }
           expect(response).to have_http_status :ok
           expect(student.differentiation_tag_memberships.pluck(:group_id)).to include(@group.id)
+          expect(student2.differentiation_tag_memberships.pluck(:group_id)).to include(@group.id)
         end
 
         it "processes all enrollments excluding specified users when using params[:all_in_group_course] and params[:exclude]" do

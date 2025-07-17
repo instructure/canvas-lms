@@ -20,22 +20,24 @@
 module Accessibility
   module Forms
     class TextInputField < FormField
-      attr_accessor :placeholder
+      attr_accessor :value, :placeholder, :action
 
       # @param label [String] Human-readable label displayed to the user
       # @param placeholder [String] Optional placeholder text for text fields
       # @param value [String] Optional default value for the text field
-      # @param dom_path [String] Optional DOM path for the element to update
-      # @param original_content [String] Optional original HTML content
-      # @param updated_content [String] Optional updated HTML content
+      # @param action [String] Optional action text for submit button
       def initialize(label:,
+                     undo_text:,
                      value:,
-                     placeholder: nil)
+                     placeholder: nil,
+                     action: nil)
         super(
-          label:
+          label:,
+          undo_text:,
         )
-        @placeholder = placeholder
         @value = value
+        @placeholder = placeholder
+        @action = action
       end
 
       def field_type
@@ -44,8 +46,9 @@ module Accessibility
 
       def to_h
         super.merge({
+          value: @value,
           placeholder: @placeholder,
-          value: @value
+          action: @action
         }.compact)
       end
     end

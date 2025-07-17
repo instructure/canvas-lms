@@ -4980,7 +4980,7 @@ describe Course do
     end
 
     it "hides tabs for feature flagged external tools" do
-      tool = analytics_2_tool_factory
+      tool = admin_analytics_tool_factory(context: @course)
 
       tabs = @course.external_tool_tabs({}, User.new)
       expect(tabs.pluck(:id)).not_to include(tool.asset_string)
@@ -6877,6 +6877,47 @@ describe Course do
         expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
       end
     end
+
+    context "student module selection feature" do
+      before :once do
+        @course.account.enable_feature!(:modules_student_module_selection)
+      end
+
+      it "shows only the specified module to students when show_student_only_module_id is set" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 2")
+      end
+
+      it "shows all modules to students when show_student_only_module_id is not set" do
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
+      end
+
+      it "shows all modules to teachers regardless of show_student_only_module_id setting" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+
+      it "shows all modules to students when feature is disabled" do
+        @course.account.disable_feature!(:modules_student_module_selection)
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(@student).pluck(:name)).to contain_exactly("published 1", "published 2")
+      end
+
+      it "shows all modules to teachers even when course is concluded and manage_course_content_edit is false" do
+        @course.update!(show_student_only_module_id: @m2.id)
+        @course.complete!
+        expect(@course.grants_right?(@teacher, :manage_course_content_edit)).to be(false)
+        expect(@course.user_has_been_admin?(@teacher)).to be(true)
+        expect(@course.user_has_been_teacher?(@teacher)).to be(true)
+        expect(@course.modules_visible_to(@teacher).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+
+      it "shows all modules to site admins regardless of show_student_only_module_id setting" do
+        site_admin_user = site_admin_user()
+        @course.update!(show_student_only_module_id: @m2.id)
+        expect(@course.modules_visible_to(site_admin_user).pluck(:name)).to contain_exactly("published 1", "published 2", "unpublished")
+      end
+    end
   end
 
   describe "#module_items_visible_to" do
@@ -7369,7 +7410,6 @@ describe Course do
     describe "#copy_from_course_template" do
       it "copies unpublished content" do
         course = Course.create!(template: true)
-        course.root_account.enable_feature!(:course_templates)
         course.account.update!(course_template: course)
         a = course.assignments.create!(title: "bob", workflow_state: "unpublished")
         expect(a).to be_unpublished

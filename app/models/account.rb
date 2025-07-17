@@ -842,6 +842,16 @@ class Account < ActiveRecord::Base
     @cached_users_name_like[query] ||= fast_all_users.name_like(query)
   end
 
+  def users_with_permission(permission)
+    shard.activate do
+      role_ids_with_permission = Rails.cache.fetch([self, "role_ids_with", permission].cache_key, expires_in: 1.hour) do
+        roles = Role.where(id: active_account_users.distinct.select(:role_id))
+        roles.filter_map { |role| role.id if RoleOverride.enabled_for?(self, permission, role).include?(:self) }
+      end
+      User.where(id: active_account_users.where(role_id: role_ids_with_permission).select(:user_id))
+    end
+  end
+
   def associated_courses(opts = {})
     if root_account?
       all_courses
@@ -2348,6 +2358,7 @@ class Account < ActiveRecord::Base
     acct = manually_created_courses_account_from_settings
     if acct.blank?
       GuardRail.activate(:primary) do
+        save! if changed?
         transaction do
           lock!
           acct = manually_created_courses_account_from_settings

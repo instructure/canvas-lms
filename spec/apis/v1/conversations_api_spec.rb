@@ -1127,7 +1127,7 @@ describe ConversationsController, type: :request do
                       "forwarded_messages" => [],
                       "attachments" => [{
                         "filename" => @attachment.filename,
-                        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{disable_adding_uuid_verifier_in_api ? "" : "&verifier=#{@attachment.uuid}"}",
+                        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
                         "content-type" => "image/png",
                         "display_name" => "test my file? hai!&.png",
                         "id" => @attachment.id,
@@ -1467,7 +1467,7 @@ describe ConversationsController, type: :request do
                                     "attachments" => [
                                       {
                                         "filename" => "test.txt",
-                                        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{disable_adding_uuid_verifier_in_api ? "" : "&verifier=#{@attachment.uuid}"}",
+                                        "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}",
                                         "content-type" => "text/plain",
                                         "display_name" => "test.txt",
                                         "id" => @attachment.id,
@@ -1632,7 +1632,7 @@ describe ConversationsController, type: :request do
           user_session(@user)
           get "/api/v1/conversations/#{conversation.conversation_id}"
           json = json_parse
-          expect(json["messages"][0]["attachments"][0]["url"]).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{disable_adding_uuid_verifier_in_api ? "" : "&verifier=#{@attachment.uuid}"}"
+          expect(json["messages"][0]["attachments"][0]["url"]).to eq "http://www.example.com/files/#{@attachment.id}/download?download_frd=1#{"&verifier=#{@attachment.uuid}" unless disable_adding_uuid_verifier_in_api}"
         end
       end
     end

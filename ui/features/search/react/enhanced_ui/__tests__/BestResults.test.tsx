@@ -53,8 +53,7 @@ describe('BestResults', () => {
   it('renders multiple results', () => {
     const {getByText} = render(<BestResults {...props} />)
 
-    expect(getByText('Best matches')).toBeInTheDocument()
-    expect(getByText('2 results for "writing outlines"')).toBeInTheDocument()
+    expect(getByText('2 results')).toBeInTheDocument()
     expect(getByText('Course Syllabus')).toBeInTheDocument()
     expect(getByText('Favorite Artist - Outline')).toBeInTheDocument()
   })
@@ -63,7 +62,7 @@ describe('BestResults', () => {
     const user = userEvent.setup()
     const {getByText} = render(<BestResults {...props} results={[]} />)
 
-    expect(getByText('No best matches for "writing outlines"')).toBeInTheDocument()
+    expect(getByText('No results')).toBeInTheDocument()
     expect(getByText('Try a similar result below or')).toBeInTheDocument() // 'start over' is a separate element (link)
     await user.click(getByText('start over'))
     expect(props.resetSearch).toHaveBeenCalled()

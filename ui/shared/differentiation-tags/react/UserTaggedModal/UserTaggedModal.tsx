@@ -107,11 +107,11 @@ function UserTagModalContainer(props: UserTaggedModalProps) {
               <Alert
                 variant="success"
                 renderCloseButtonLabel={I18n.t('Close')}
-                timeout={3000}
+                timeout={5000}
                 liveRegion={() =>
                   document.getElementById('flash_screenreader_holder') as HTMLElement
                 }
-                liveRegionPoliteness="polite"
+                liveRegionPoliteness="assertive"
               >
                 {I18n.t('Tag removed successfully')}
               </Alert>

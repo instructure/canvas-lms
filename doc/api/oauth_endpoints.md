@@ -223,7 +223,7 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     "canvas_region": "us-east-1"
   }
   </pre>
-  
+
   <p>When using grant_type=refresh_token, the response will not contain a new
   refresh token since the same refresh token can be used multiple times:</p>
 
@@ -237,9 +237,9 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   </pre>
 
   <p>If scope=/auth/userinfo was specified in the
-  <a href=oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request (ex: when using Canvas as an authentication service)
+  <a href=file.oauth_endpoints.html#get-login-oauth2-auth>GET login/oauth2/auth</a> request (ex: when using Canvas as an authentication service)
   then the response that results from
-  <a href=oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:</p>
+  <a href=file.oauth_endpoints.html#post-login-oauth2-token>POST login/oauth2/token</a> would be:</p>
 
   <pre class="example code prettyprint">
   {
@@ -250,12 +250,12 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   </pre>
 
 <h4>Examples using client_credentials</h4>
-  
+
 
   <p>When using grant_type=client_credentials (ex: <a href="file.oauth.html#accessing-lti-advantage-services">to access LTI Advantage Services</a>):</p>
 
 <h5>Example request</h5>
-  
+
 <p>This request must be signed by an RSA256 private key with a public key that is configured on the developer key as described in <a href="file.oauth.html#developer-key-setup" target="_blank">Step 1: Developer Key Setup</a>.</p>
 
   <pre class="example code prettyprint">
@@ -286,12 +286,12 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     "jti": "dffdbdce-a9f1-427b-8fca-604182198783"
   }
   </pre>
- 
+
 <p>NOTE:</p>
 
 <ul>
  <li>the value of the sub claim should match the client_id of the developer key in Canvas.</li>
- <li>the value of the aud claim should contain either the domain of the Canvas account where the desired data resides, or the domain of the LTI 1.3 OIDC Auth endpoint, as described <a href="file.lti_launch_overview.html#step-2" target="_blank">here</a>.</li> 
+ <li>the value of the aud claim should contain either the domain of the Canvas account where the desired data resides, or the domain of the LTI 1.3 OIDC Auth endpoint, as described <a href="file.lti_launch_overview.html#step-2" target="_blank">here</a>.</li>
  <li>if the public key defined on the developer key is a JWK set (specified by an URL) the kid (key ID) value in the signed JWT header must match one of the public keys returned by the public key URL.</li>
 </ul>
 
@@ -363,7 +363,7 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
         <p>Set this to '1' if you want to end all of the user's
         Canvas web sessions.  Without this argument, the endpoint will leave web sessions intact.</p>
         <p>Additionally, if the user logged in to Canvas via a delegated authentication provider,
-        and the provider supports Single Log Out functionality, the response will contain a 
+        and the provider supports Single Log Out functionality, the response will contain a
         forward_url key. If you are still in control of the user's browsing session, it is
         recommended to then redirect them to this URL, in order to also log them out from
         where their session originated. Beware that it is unlikely that control will be returned

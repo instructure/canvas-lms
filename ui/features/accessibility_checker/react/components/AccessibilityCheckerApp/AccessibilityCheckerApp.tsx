@@ -17,38 +17,41 @@
  */
 
 import {useCallback, useContext, useEffect, useState} from 'react'
+import {useShallow} from 'zustand/react/shallow'
 import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
 import {TypeToKeyMap} from '../../constants'
-import {AccessibilityData, ContentItem} from '../../types'
-import {
-  calculateTotalIssuesCount,
-  convertKeysToCamelCase,
-  processAccessibilityData,
-} from '../../utils'
-
-import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
-import type {TableSortState} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
-import {IssuesCounter} from './IssuesCounter'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
-import {IssuesByTypeChart} from '../IssuesByTypeChart/IssuesByTypeChart'
+import {useAccessibilityCheckerStore} from '../../contexts/AccessibilityCheckerStore'
+import {AccessibilityData, ContentItem} from '../../types'
+import {convertKeysToCamelCase, processAccessibilityData} from '../../utils'
+import {AccessibilityCheckerHeader} from './AccessibilityCheckerHeader'
+import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 
 const I18n = createI18nScope('accessibility_checker')
+
+const LIMIT_EXCEEDED_MESSAGE = I18n.t(
+  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).',
+)
 
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
   const {setSelectedItem, setIsTrayOpen} = context
+  const [accessibilityScanDisabled, setAccessibilityScanDisabled] = useState(false)
   const [accessibilityIssues, setAccessibilityIssues] = useState<AccessibilityData | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [tableData, setTableData] = useState<ContentItem[]>([])
-  const [tableSortState, setTableSortState] = useState<TableSortState>({})
+
+  const setError = useAccessibilityCheckerStore(useShallow(state => state.setError))
+  const [loading, setLoading] = useAccessibilityCheckerStore(
+    useShallow(state => [state.loading, state.setLoading]),
+  )
+  const setTableData = useAccessibilityCheckerStore(useShallow(state => state.setTableData))
 
   const doFetchAccessibilityIssues = useCallback(async () => {
     setLoading(true)
@@ -59,9 +62,10 @@ export const AccessibilityCheckerApp: React.FC = () => {
         method: 'POST',
       })
 
-      const accessibilityIssues: AccessibilityData = convertKeysToCamelCase(
-        data.json,
-      ) as AccessibilityData
+      const accessibilityIssues = convertKeysToCamelCase(data.json) as AccessibilityData
+      if (accessibilityIssues.accessibilityScanDisabled) {
+        setAccessibilityScanDisabled(true)
+      }
       setAccessibilityIssues(accessibilityIssues)
       setTableData(processAccessibilityData(accessibilityIssues))
     } catch (err: any) {
@@ -98,26 +102,6 @@ export const AccessibilityCheckerApp: React.FC = () => {
     window.location.reload()
   }, [])
 
-  const handleSortRequest = useCallback(
-    (sortId?: string, sortDirection?: 'ascending' | 'descending' | 'none') => {
-      try {
-        setLoading(true)
-        console.log('Sort request:', sortId, sortDirection)
-        // TODO invoke backend API with the new values to sort the data
-        // Then update states accordingly
-        setTableSortState({
-          sortId,
-          sortDirection,
-        })
-      } catch {
-        // Showing an error alert on the page
-      } finally {
-        setLoading(false)
-      }
-    },
-    [setLoading, setTableSortState],
-  )
-
   const lastCheckedDate =
     (accessibilityIssues?.lastChecked &&
       new Intl.DateTimeFormat('en-US', {
@@ -129,15 +113,29 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   return (
     <View as="div">
-      <Flex as="div" alignItems="start" direction="row">
-        <Flex.Item>
-          <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
-        </Flex.Item>
-        <Flex.Item margin="0 0 0 auto" padding="small 0">
-          <Button color="primary" onClick={handleReload}>
-            {I18n.t('Scan course')}
-          </Button>
-        </Flex.Item>
+      <Flex direction="column">
+        {accessibilityScanDisabled && (
+          <Alert
+            variant="info"
+            renderCloseButtonLabel="Close"
+            onDismiss={() => {}}
+            margin="small 0"
+          >
+            {LIMIT_EXCEEDED_MESSAGE}
+          </Alert>
+        )}
+        <Flex as="div" alignItems="start" direction="row">
+          <Flex.Item>
+            <Heading level="h1">{I18n.t('Course Accessibility Checker')}</Heading>
+          </Flex.Item>
+          {!loading && !accessibilityScanDisabled && (
+            <Flex.Item margin="0 0 0 auto" padding="small 0">
+              <Button color="primary" onClick={handleReload} disabled={accessibilityScanDisabled}>
+                {I18n.t('Check Accessibility')}
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
       </Flex>
 
       <Flex as="div" alignItems="start" direction="row">
@@ -152,26 +150,11 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </Flex.Item>
         )}
       </Flex>
-      <Flex margin="medium 0 0 0" gap="small" alignItems="stretch">
-        <Flex.Item>
-          <View as="div" padding="medium" borderWidth="small" borderRadius="medium" height="100%">
-            <IssuesCounter count={calculateTotalIssuesCount(accessibilityIssues)} />
-          </View>
-        </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink>
-          <View as="div" padding="x-small" borderWidth="small" borderRadius="medium" height="100%">
-            <IssuesByTypeChart accessibilityIssues={accessibilityIssues} isLoading={loading} />
-          </View>
-        </Flex.Item>
-      </Flex>
-      <AccessibilityIssuesTable
-        isLoading={loading}
-        error={error}
-        onRowClick={handleRowClick}
-        onSortRequest={handleSortRequest}
-        tableData={tableData}
-        tableSortState={tableSortState}
+      <AccessibilityCheckerHeader
+        accessibilityIssues={accessibilityIssues}
+        accessibilityScanDisabled={accessibilityScanDisabled}
       />
+      <AccessibilityIssuesTable onRowClick={handleRowClick} />
     </View>
   )
 }

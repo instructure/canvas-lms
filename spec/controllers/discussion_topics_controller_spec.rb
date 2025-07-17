@@ -1707,6 +1707,26 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id }
       expect(assigns[:js_env][:GROUP_CATEGORIES].pluck(:id)).to match_array [regular_category.id]
     end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to nil when creating a discussion in course context" do
+      user_session(@teacher)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to be_nil
+    end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to 'Course' when creating a discussion in course group context" do
+      user_session(@teacher)
+      group = @course.groups.create!
+      get :new, params: { group_id: group.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to eq("Course")
+    end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to 'Account' when creating a discussion in account group context" do
+      user_session(account_admin_user(account: Account.default))
+      group = Account.default.groups.create!
+      get :new, params: { group_id: group.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to eq("Account")
+    end
   end
 
   describe "GET 'edit'" do
@@ -1932,6 +1952,29 @@ describe DiscussionTopicsController do
       @course.save!
       get :edit, params: { course_id: @course.id, id: @topic.id }
       expect(assigns[:js_env][:RESTRICT_QUANTITATIVE_DATA]).to be_falsy
+    end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to nil when editing a discussion in course context" do
+      user_session(@teacher)
+      topic = @course.discussion_topics.create!(title: "course topic", message: "Hello", user: @student)
+      get :edit, params: { course_id: @course.id, id: topic.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to be_nil
+    end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to 'Course' when editing a discussion in course group context" do
+      user_session(@teacher)
+      group = @course.groups.create!
+      topic = group.discussion_topics.create!(title: "course group topic", message: "Hello", user: @student)
+      get :edit, params: { group_id: group.id, id: topic.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to eq("Course")
+    end
+
+    it "js_env GROUP_CONTEXT_TYPE is set to 'Account' when editing a discussion in account group context" do
+      user_session(account_admin_user(account: Account.default))
+      group = Account.default.groups.create!
+      topic = group.discussion_topics.create!(title: "account group topic", message: "Hello", user: @student)
+      get :edit, params: { group_id: group.id, id: topic.id }
+      expect(assigns[:js_env][:GROUP_CONTEXT_TYPE]).to eq("Account")
     end
 
     context "assign to differentiation tags" do

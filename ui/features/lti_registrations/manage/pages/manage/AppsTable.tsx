@@ -28,6 +28,7 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Link} from '@instructure/ui-link'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Link as RouterLink} from 'react-router-dom'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
@@ -124,6 +125,7 @@ const Columns: ReadonlyArray<Column> = [
             toolName={r.name}
             size={27}
             marginRight={12}
+            hideFromScreenReader={true}
           />
           <div style={ellipsisStyles} title={r.name}>
             {r.name}
@@ -282,9 +284,9 @@ const Columns: ReadonlyArray<Column> = [
                 themeOverride={DangerMenuItemThemeOverrides}
                 onClick={() => {
                   alert({
-                    message: I18n.t('This App is locked on, and cannot be deleted.'),
+                    message: I18n.t('This app is locked on by Instructure, and cannot be deleted.'),
                     title: I18n.t('Delete App'),
-                    okButtonLabel: I18n.t('Ok'),
+                    okButtonLabel: I18n.t('Close'),
                   })
                 }}
               >
@@ -321,13 +323,14 @@ const CondensedColumns: ReadonlyArray<Column> = [
     sortable: true,
     render: r => {
       const appName = (
-        <Flex>
+        <Flex display="inline-flex">
           <ToolIconOrDefault
             iconUrl={r.icon_url}
             toolId={r.id}
             toolName={r.name}
             size={27}
             marginRight={12}
+            hideFromScreenReader={true}
           />
           {r.name}
         </Flex>
@@ -349,7 +352,7 @@ const CondensedColumns: ReadonlyArray<Column> = [
     header: I18n.t('Nickname'),
     width: '40%',
     sortable: true,
-    render: r => (r.admin_nickname ? r.admin_nickname : null),
+    render: r => (r.admin_nickname ? <Text wrap="break-word">{r.admin_nickname}</Text> : null),
   },
   {
     id: 'lti_version',
@@ -403,7 +406,10 @@ const renderHeaderRow = (
             }
           : {})}
       >
-        {header}
+        <>
+          <span aria-hidden="true">{header}</span>
+          <ScreenReaderContent>{I18n.t('sort by %{header}', {header})}</ScreenReaderContent>
+        </>
       </Table.ColHeader>
     ))}
   </Table.Row>
@@ -411,6 +417,7 @@ const renderHeaderRow = (
 
 export const AppsTable = (appsTableProps: AppsTableProps) => {
   const {apps, stale, ...restOfProps} = appsTableProps
+
   return (
     <div
       style={{
@@ -484,8 +491,31 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
 
   const layout = responsiveProps && responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
 
+  const totalScreenReaderText = I18n.t(
+    {one: 'Showing %{count} registration.', other: 'Showing %{count} registrations.'},
+    {count: props.tableProps.apps.total},
+  )
+
+  const col = columns.find(column => column.id === props.tableProps.sort)
+  // Default sortedScreenReaderText to an empty string for the initial load, when
+  // props.tableProps.sort isn't set yet
+  let sortedScreenReaderText = ''
+  if (col) {
+    sortedScreenReaderText =
+      props.tableProps.dir === 'asc'
+        ? I18n.t('Sorted by %{column} in ascending order', {column: col.header})
+        : I18n.t('Sorted by %{column} in descending order', {column: col.header})
+  }
+
   return (
     <>
+      <Alert
+        liveRegion={() => document.getElementById('flash_screenreader_holder')!}
+        liveRegionPoliteness="polite"
+        screenReaderOnly
+      >
+        {`${totalScreenReaderText} ${sortedScreenReaderText}`}
+      </Alert>
       <Table {...props.responsiveProps} caption={I18n.t('Installed Apps')} layout={layout}>
         <Table.Head renderSortLabel={I18n.t('Sort by')}>
           {renderHeaderRow(props.tableProps, columns)}

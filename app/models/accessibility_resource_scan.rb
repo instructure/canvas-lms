@@ -25,6 +25,10 @@ class AccessibilityResourceScan < ActiveRecord::Base
   belongs_to :course
 
   enum :workflow_state, %i[queued in_progress completed failed], validate: true
+  enum :resource_workflow_state, %i[unpublished published], validate: true
 
-  validates :course, :workflow_state, presence: true
+  validates :course, :workflow_state, :resource_workflow_state, :issue_count, presence: true
+  validates :wiki_page_id, uniqueness: true, allow_nil: true
+  validates :assignment_id, uniqueness: true, allow_nil: true
+  validates :attachment_id, uniqueness: true, allow_nil: true
 end

@@ -236,6 +236,34 @@ describe "Account Reports API", type: :request do
         expect(json["parameters"][key]).to eq value
       end
     end
+
+    describe "run_time" do
+      before :once do
+        @path = "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}"
+        @params = { report: @report.report_type, controller: "account_reports", action: "show", format: "json", account_id: @admin.account.id.to_s, id: @report.id.to_s }
+      end
+
+      it "returns wait time" do
+        @report.update!(start_at: nil, end_at: nil)
+        Timecop.freeze(@report.created_at + 7.seconds) do
+          json = api_call(:get, @path, @params)
+          expect(json["run_time"].round).to eq 7
+        end
+      end
+
+      it "returns in-progress report run time" do
+        @report.update!(end_at: nil)
+        Timecop.freeze(@report.start_at + 31.seconds) do
+          json = api_call(:get, @path, @params)
+          expect(json["run_time"].round).to eq 31
+        end
+      end
+
+      it "returns completed report run time" do
+        json = api_call(:get, @path, @params)
+        expect(json["run_time"].round).to eq (@report.end_at - @report.start_at).round
+      end
+    end
   end
 
   describe "destroy" do

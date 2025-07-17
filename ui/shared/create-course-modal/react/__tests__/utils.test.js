@@ -16,19 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {createNewCourse, getAccountsFromEnrollments} from '../utils'
+
+const server = setupServer()
 
 const NEW_COURSE_URL =
   '/api/v1/accounts/15/courses?course[name]=Science&course[sync_enrollments_from_homeroom]=true&course[homeroom_course_id]=14&enroll_me=true'
 
-afterEach(() => {
-  fetchMock.restore()
-})
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('createNewCourse', () => {
   it('posts to the new course endpoint and returns the new id', async () => {
-    fetchMock.post(encodeURI(NEW_COURSE_URL), {id: '56'})
+    server.use(http.post('/api/v1/accounts/15/courses', () => HttpResponse.json({id: '56'})))
     const result = await createNewCourse(15, 'Science', true, 14)
     expect(result.id).toBe('56')
   })

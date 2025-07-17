@@ -55,6 +55,11 @@ def getResultsHTMLUrl() {
   return "${env.BUILD_URL}/artifact/crystalball_map.yml"
 }
 
+def sendCrystalballSlack(status) {
+  def message = ":alert: <$env.BUILD_URL|Crystalball Map Build> ${status}! :alert:\nResolve this issue to prevent further build failures!"
+  slackSend channel: '#crystalball-noisy,#devx-alerts', color: 'danger', message: message
+}
+
 def postFn() {
   copyArtifacts(
     filter: 'tmp/*/crystalball/**',
@@ -111,6 +116,7 @@ pipeline {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
     COMPOSE_PROJECT_NAME = 'crystalball-map'
+    FORCE_FAILURE = commitMessageFlag("force-failure-rspec").asBooleanInteger()
     RERUNS_RETRY = commitMessageFlag('rspecq-max-requeues').asType(Integer)
     RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
     RSPECQ_MAX_REQUEUES = commitMessageFlag('rspecq-max-requeues').asType(Integer)
@@ -155,6 +161,9 @@ pipeline {
               }
 
               buildSummaryReport.addFailureRun('Main Build', currentBuild)
+              if (stageConfig.status() != 'SUCCESS') {
+                sendCrystalballSlack(stageConfig.status())
+              }
             },
             onNodeReleasing: {
               postFn()

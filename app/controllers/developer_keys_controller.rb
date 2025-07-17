@@ -21,9 +21,9 @@
 # @API Developer Keys
 #
 # Manage Canvas API Keys, used for OAuth access to this API.
-# See <a href="oauth.html">the OAuth access docs</a> for usage of these keys.
+# See <a href="file.oauth.html">the OAuth access docs</a> for usage of these keys.
 # Note that DeveloperKeys are also (currently) used for LTI 1.3 registration and OIDC access,
-# but this endpoint deals with Canvas API keys. See <a href="registration.html">LTI Registration</a>
+# but this endpoint deals with Canvas API keys. See <a href="file.registration.html">LTI Registration</a>
 # for details.
 #
 # @model DeveloperKey

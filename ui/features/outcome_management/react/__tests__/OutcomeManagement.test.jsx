@@ -69,7 +69,7 @@ describe('OutcomeManagement', () => {
     For now, we are increaseing the timeout interval to 7.5 seconds
   */
   // OUT-6972 (10/23/2024)
-  it.skip('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
+  it('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {
     const rceEnv = {
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
       RICH_CONTENT_APP_HOST: 'rce-host',

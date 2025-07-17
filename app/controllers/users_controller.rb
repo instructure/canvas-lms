@@ -1281,7 +1281,7 @@ class UsersController < ApplicationController
   # Upload a file to the user's personal files section.
   #
   # This API endpoint is the first step in uploading a file to a user's files.
-  # See the {file:file_uploads.html File Upload Documentation} for details on
+  # See the {file:file.file_uploads.html File Upload Documentation} for details on
   # the file upload workflow.
   #
   # Note that typically users will only be able to upload files to their

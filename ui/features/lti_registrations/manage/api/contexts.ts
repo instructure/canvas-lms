@@ -21,20 +21,38 @@ import {AccountId} from '../model/AccountId'
 import {defaultFetchOptions} from '@canvas/util/xhr'
 import {ZSearchableContexts, SearchableContexts} from '../model/SearchableContext'
 import {toQueryString} from '@instructure/query-string-encoding'
+import {LtiRegistrationId} from '../model/LtiRegistrationId'
+import {LtiDeploymentId} from '../model/LtiDeploymentId'
 
+/**
+ * Search for accounts and courses, including sub-accounts and sub-courses, that match the given search term.
+ * Results are limited to contexts that are descendants of the context for which the supplied deployment is for.
+ *
+ * @param accountId Root account ID to search under
+ * @param registrationId LTI registration ID of the LTI deployment to search under
+ * @param deploymentId
+ * @param searchTerm
+ * @param onlyChildrenOf limit results to contexts that are children of this account ID
+ * @returns
+ */
 export const fetchContextSearch = (
   accountId: AccountId,
+  registrationId: LtiRegistrationId,
+  deploymentId: LtiDeploymentId,
   searchTerm?: string,
-  byAccountId?: AccountId,
-): Promise<ApiResult<SearchableContexts>> =>
-  parseFetchResult(ZSearchableContexts)(
+  onlyChildrenOf?: AccountId,
+): Promise<ApiResult<SearchableContexts>> => {
+  return parseFetchResult(ZSearchableContexts)(
     fetch(
-      `/api/v1/accounts/${accountId}/lti_registrations/context_search?${toQueryString({
-        search_term: searchTerm,
-        by_account_id: byAccountId,
-      })}`,
+      `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}/deployments/${deploymentId}/context_search?${toQueryString(
+        {
+          search_term: searchTerm,
+          ...(onlyChildrenOf !== undefined ? {only_children_of: onlyChildrenOf} : {}),
+        },
+      )}`,
       {
         ...defaultFetchOptions(),
       },
     ),
   )
+}

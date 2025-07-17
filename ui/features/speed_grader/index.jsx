@@ -45,12 +45,98 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {executeQuery} from '@canvas/graphql'
+import {initializePendo} from '@canvas/pendo'
 import speedGrader from './jquery/speed_grader'
 import SGUploader from './sg_uploader'
 
 const I18n = createI18nScope('speed_grader')
 
 ready(() => {
+  async function speedGraderProps() {
+    const pendo = await initializePendo().catch(error => {
+      console.error('Failed to initialize Pendo for platform SpeedGrader', error)
+      // let's be explicit. if we run into an error, the pendo prop should be undefined.
+      return undefined
+    })
+
+    const params = new URLSearchParams(window.location.search)
+    const postMessageAliases = {
+      'quizzesNext.register': 'tool.register',
+      'quizzesNext.nextStudent': 'tool.nextStudent',
+      'quizzesNext.previousStudent': 'tool.previousStudent',
+      'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
+    }
+
+    const sgUploader = window.INST.kalturaSettings
+      ? new SGUploader('any', {defaultTitle: 'Upload Media'})
+      : null
+
+    return {
+      executeQuery,
+      mutationFns: {
+        updateSubmissionGrade,
+        createSubmissionComment,
+        deleteSubmissionComment,
+        deleteAttachment,
+        hideAssignmentGradesForSections,
+        postAssignmentGradesForSections,
+        postDraftSubmissionComment,
+        updateSubmissionGradeStatus,
+        updateSubmissionSecondsLate,
+        createCommentBankItem,
+        deleteCommentBankItem,
+        updateCommentBankItem,
+        updateCommentSuggestionsEnabled,
+        updateSpeedGraderSettings,
+        postSubmissionCommentMedia: sgUploader?.doUploadByFile,
+        saveRubricAssessment,
+        reassignAssignment,
+      },
+      platform: 'canvas',
+      postMessageAliases,
+      context: {
+        userId: window.ENV.current_user_id,
+        assignmentId: params.get('assignment_id'),
+        studentId: params.get('student_id'),
+        hrefs: {
+          heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
+        },
+        emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
+        mediaSettings: window.INST.kalturaSettings,
+        lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
+        currentUserIsAdmin: ENV.current_user_is_admin ?? false,
+        themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
+        useHighContrast: window.ENV.use_high_contrast ?? false,
+        commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
+        lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
+        ltiIframeAllowances: iframeAllowances(),
+        pendo,
+        permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
+        gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
+        gradebookSectionFilters: window.ENV.gradebook_section_filter_id ?? null,
+      },
+      features: {
+        a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
+        extendedSubmissionState: window.ENV.FEATURES.extended_submission_state ?? false,
+        emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
+        enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
+        commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
+        consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
+        restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
+        gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
+        discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
+        stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
+        filterSpeedGraderByStudentGroupEnabled:
+          window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
+        projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
+        gradingAssistanceFileUploadEnabled:
+          window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
+        discussionInsightsEnabled: window.ENV.DISCUSSION_INSIGHTS_ENABLED ?? false,
+        multiselectFiltersEnabled: window.ENV.MULTISELECT_FILTERS_ENABLED ?? false,
+      },
+    }
+  }
+
   const classicContainer = document.querySelector('#classic_speedgrader_container')
 
   if (classicContainer instanceof HTMLElement) {
@@ -105,80 +191,10 @@ ready(() => {
     return
   }
 
-  const params = new URLSearchParams(window.location.search)
-  const postMessageAliases = {
-    'quizzesNext.register': 'tool.register',
-    'quizzesNext.nextStudent': 'tool.nextStudent',
-    'quizzesNext.previousStudent': 'tool.previousStudent',
-    'quizzesNext.submissionUpdate': 'tool.submissionUpdate',
-  }
-
-  const sgUploader = window.INST.kalturaSettings
-    ? new SGUploader('any', {defaultTitle: 'Upload Media'})
-    : null
-
   import('speedgrader/appInjector')
-    .then(module => {
-      module.render(mountPoint, {
-        executeQuery,
-        mutationFns: {
-          updateSubmissionGrade,
-          createSubmissionComment,
-          deleteSubmissionComment,
-          deleteAttachment,
-          hideAssignmentGradesForSections,
-          postAssignmentGradesForSections,
-          postDraftSubmissionComment,
-          updateSubmissionGradeStatus,
-          updateSubmissionSecondsLate,
-          createCommentBankItem,
-          deleteCommentBankItem,
-          updateCommentBankItem,
-          updateCommentSuggestionsEnabled,
-          updateSpeedGraderSettings,
-          postSubmissionCommentMedia: sgUploader?.doUploadByFile,
-          saveRubricAssessment,
-          reassignAssignment,
-        },
-        platform: 'canvas',
-        postMessageAliases,
-        context: {
-          userId: window.ENV.current_user_id,
-          assignmentId: params.get('assignment_id'),
-          studentId: params.get('student_id'),
-          hrefs: {
-            heroIcon: `/courses/${window.ENV.course_id}/gradebook`,
-          },
-          emojisDenyList: window.ENV.EMOJI_DENY_LIST ? window.ENV.EMOJI_DENY_LIST.split(',') : [],
-          mediaSettings: window.INST.kalturaSettings,
-          lang: ENV.LOCALE || ENV.BIGEASY_LOCALE || window.navigator.language,
-          currentUserIsAdmin: ENV.current_user_is_admin ?? false,
-          themeOverrides: window.CANVAS_ACTIVE_BRAND_VARIABLES ?? null,
-          useHighContrast: window.ENV.use_high_contrast ?? false,
-          commentLibrarySuggestionsEnabled: window.ENV.comment_library_suggestions_enabled ?? false,
-          lateSubmissionInterval: window.ENV.late_policy?.late_submission_interval || 'day',
-          ltiIframeAllowances: iframeAllowances(),
-          permissions: {canViewAuditTrail: window.ENV.can_view_audit_trail ?? false},
-          gradebookGroupFilterId: window.ENV.gradebook_group_filter_id ?? null,
-        },
-        features: {
-          a2StudentEnabled: window.ENV.A2_STUDENT_ENABLED ?? false,
-          extendedSubmissionState: window.ENV.FEATURES.extended_submission_state ?? false,
-          emojisEnabled: !!window.ENV.EMOJIS_ENABLED,
-          enhancedRubricsEnabled: window.ENV.ENHANCED_RUBRICS_ENABLED ?? false,
-          commentLibraryEnabled: window.ENV.COMMENT_LIBRARY_FEATURE_ENABLED ?? false,
-          consolidatedMediaPlayerEnabled: window.ENV.FEATURES.consolidated_media_player ?? false,
-          restrictQuantitativeDataEnabled: window.ENV.RESTRICT_QUANTITATIVE_DATA_ENABLED ?? false,
-          gradeByStudentEnabled: window.ENV.GRADE_BY_STUDENT_ENABLED ?? false,
-          discussionCheckpointsEnabled: window.ENV.FEATURES.discussion_checkpoints ?? false,
-          stickersEnabled: window.ENV.STICKERS_ENABLED_FOR_ASSIGNMENT ?? false,
-          filterSpeedGraderByStudentGroupEnabled:
-            window.ENV.FILTER_SPEEDGRADER_BY_STUDENT_GROUP_ENABLED ?? false,
-          projectLhotseEnabled: window.ENV.PROJECT_LHOTSE_ENABLED ?? false,
-          gradingAssistanceFileUploadEnabled:
-            window.ENV.GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED ?? false,
-        },
-      })
+    .then(async module => {
+      const props = await speedGraderProps()
+      module.render(mountPoint, props)
     })
     .catch(error => {
       console.error('Failed to load SpeedGrader', error)

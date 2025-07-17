@@ -270,5 +270,36 @@ describe "account admin question bank" do
       driver.switch_to.alert.accept
       expect(f("#content")).not_to contain_jqcss("[data-id='#{@outcome.id}']:visible .delete_outcome_link")
     end
+
+    it "validates mastery at range in question bank" do
+      # Create a test outcome first
+      outcome = Account.default.root_outcome_group.child_outcome_links.first.content
+
+      # Test with value below range (0)
+      f(".add_outcome_link").click
+      wait_for_ajaximations
+      f(".outcome-link").click
+      wait_for_ajaximations
+      replace_content(f("#outcome_mastery_at"), 0)
+      fj(".btn-primary:visible").click
+      wait_for_ajaximations
+      error_box = f("#outcome_mastery_at_container [class$=formFieldMessages] > span:last-child")
+      expect(error_box).to be_present
+      expect(error_box).to include_text("Must be between 1 and 100")
+      # Clear the error and test with value above range (101)
+      replace_content(f("#outcome_mastery_at"), 101)
+      fj(".btn-primary:visible").click
+      wait_for_ajaximations
+      error_box = f("#outcome_mastery_at_container [class$=formFieldMessages] > span:last-child")
+      expect(error_box).to be_present
+      expect(error_box).to include_text("Must be between 1 and 100")
+      # Test with valid boundary values
+      replace_content(f("#outcome_mastery_at"), 100)
+      fj(".btn-primary:visible").click
+      wait_for_ajaximations
+
+      # Verify the outcome was successfully added with 100% mastery
+      expect(fj("[data-id=#{outcome.id}]")).to include_text("mastery at 100%")
+    end
   end
 end

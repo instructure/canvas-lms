@@ -68,7 +68,7 @@ class Quizzes::QuizRegrader::Answer
   end
 
   def points
-    answer[:points].to_d || 0
+    answer[:points].to_d
   end
 
   def score_before_regrade

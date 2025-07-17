@@ -20,7 +20,6 @@ import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {assignLocation} from '@canvas/util/globalUtils'
 import {Alert} from '@instructure/ui-alerts'
 import {HorizonAccount} from './HorizonAccount'
 import {RevertAccount} from './RevertAccount'
@@ -46,12 +45,12 @@ export const Main = ({
       {hasCourses && !isHorizonAccount && (
         <Alert variant="warning">
           {I18n.t(
-            'Existing courses must be removed before making the switch to Canvas Career. To proceed, ensure all courses have been deleted or migrated.',
+            'Existing courses must be removed before making the switch to Canvas Career. To proceed, ensure all courses have been deleted.',
           )}
         </Alert>
       )}
       <Flex margin="medium 0 small 0" gap="x-small">
-        <Heading level="h2">{I18n.t('Switch Learner Experience to Canvas Career')}</Heading>
+        <Heading level="h2">{I18n.t('Switch to Canvas Career')}</Heading>
         {isHorizonAccount && <Pill color="success">{I18n.t('Enabled')}</Pill>}
       </Flex>
       {isHorizonAccount ? (

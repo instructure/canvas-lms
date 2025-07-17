@@ -15,8 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {attachErrorHandler, getImagesAndAttach} from '../markBrokenImages'
+
+const server = setupServer()
 
 function setAttrs(elem, id, src, alt) {
   elem.id = id
@@ -30,9 +33,13 @@ describe('markBrokenImages::', () => {
   let div
 
   beforeAll(() => {
+    server.listen()
     div = document.createElement('div')
     document.body.append(div)
   })
+
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
 
   afterAll(() => {
     div && div.remove()
@@ -54,7 +61,7 @@ describe('markBrokenImages::', () => {
     })
 
     it('attaches proper class to images when they are broken but not locked', async () => {
-      fetchMock.getOnce('end:/broken_img.jpg', 404, {overwriteRoutes: true})
+      server.use(http.get('*/broken_img.jpg', () => new HttpResponse(null, {status: 404})))
       attachErrorHandler(img)
       expect(img.classList.contains('broken-image')).toBe(false)
       const error = new Event('error')
@@ -64,7 +71,7 @@ describe('markBrokenImages::', () => {
     })
 
     it('changes src when the image is locked', async () => {
-      fetchMock.getOnce('end:/broken_img.jpg', 403, {overwriteRoutes: true})
+      server.use(http.get('*/broken_img.jpg', () => new HttpResponse(null, {status: 403})))
       attachErrorHandler(img)
       img.dispatchEvent(new Event('error'))
       await flushPromises()
@@ -72,7 +79,7 @@ describe('markBrokenImages::', () => {
     })
 
     it('sets appropriate alt text indicating the image is locked', async () => {
-      fetchMock.getOnce('end:/broken_img.jpg', 403, {overwriteRoutes: true})
+      server.use(http.get('*/broken_img.jpg', () => new HttpResponse(null, {status: 403})))
       attachErrorHandler(img)
       img.dispatchEvent(new Event('error'))
       await flushPromises()
@@ -106,7 +113,7 @@ describe('markBrokenImages::', () => {
     // to the image. So if that class is present, then the error handler was called,
     // which means it was attached. Otherwise, the error handler was not attached.
     it('attaches error handlers only to elements with a non-empty src', async () => {
-      fetchMock.getOnce('end:/broken_image.jpg', 404, {overwriteRoutes: true})
+      server.use(http.get('*/broken_image.jpg', () => new HttpResponse(null, {status: 404})))
       getImagesAndAttach()
       img1.dispatchEvent(new Event('error'))
       img2.dispatchEvent(new Event('error'))

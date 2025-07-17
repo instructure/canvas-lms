@@ -19,12 +19,15 @@
 import React from 'react'
 import {initializeReaderButton, ImmersiveReaderButton} from '../ImmersiveReader'
 import {render} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import userEvent, {PointerEventsCheckLevel} from '@testing-library/user-event'
 
-afterEach(() => {
-  fetchMock.reset()
-})
+const server = setupServer()
+
+beforeAll(() => server.listen())
+afterEach(() => server.resetHandlers())
+afterAll(() => server.close())
 
 describe('#initializeReaderButton', () => {
   it('renders the immersive reader button into the given mount point', () => {
@@ -43,10 +46,14 @@ describe('#initializeReaderButton', () => {
 
     describe('onClick', () => {
       beforeEach(() => {
-        fetchMock.get('/api/v1/immersive_reader/authenticate', {
-          token: 'fakeToken',
-          subdomain: 'fakeSubdomain',
-        })
+        server.use(
+          http.get('/api/v1/immersive_reader/authenticate', () =>
+            HttpResponse.json({
+              token: 'fakeToken',
+              subdomain: 'fakeSubdomain',
+            }),
+          ),
+        )
       })
 
       it('calls to launch the Immersive Reader with the proper content', async () => {

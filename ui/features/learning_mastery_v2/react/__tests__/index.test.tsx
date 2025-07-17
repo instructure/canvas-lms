@@ -22,6 +22,7 @@ import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
 import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
+import {SortOrder} from '../utils/constants'
 
 jest.mock('../hooks/useRollups')
 
@@ -116,6 +117,12 @@ describe('LearningMastery', () => {
       setGradebookFilters: () => {},
       outcomes,
       rollups,
+      setCurrentPage: jest.fn(),
+      setStudentsPerPage: jest.fn(),
+      sorting: {
+        sortOrder: SortOrder.ASC,
+        setSortOrder: jest.fn(),
+      },
     })
   })
 

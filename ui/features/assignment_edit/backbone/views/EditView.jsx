@@ -761,13 +761,19 @@ function tryJsonParse(jsonStr) {
 }
 
 EditView.prototype.showExternalToolsDialog = function () {
+  const onClose = () => {
+    $('#assignment_external_tool_tag_attributes_url_find').focus()
+  }
+
   return selectContentDialog({
     dialog_title: I18n.t('select_external_tool_dialog_title', 'Configure External Tool'),
     select_button_text: I18n.t('buttons.select_url', 'Select'),
     no_name_input: true,
+    ariaModal: 'true',
     submit: data => {
       this.handleAssignmentSelectionSubmit(data)
     },
+    close: onClose,
   })
 }
 
@@ -1471,7 +1477,8 @@ EditView.prototype.getFormData = function () {
     )
   }
 
-  data.asset_processors = data.asset_processors?.map(tryJsonParse)
+  // Important to set to empty array if not present so the APs are cleared
+  data.asset_processors = data.asset_processors?.map(tryJsonParse) || []
 
   if ($grader_count.length > 0) {
     data.grader_count = numberHelper.parse($grader_count[0].value)

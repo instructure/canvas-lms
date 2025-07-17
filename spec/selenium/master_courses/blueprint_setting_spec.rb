@@ -74,9 +74,11 @@ describe "master courses - settings" do
 
   it "enables blueprint setting based on user permission" do
     role1 = @account.roles.create!(name: "normal admin", base_role_type: "AccountMembership")
+    @account.role_overrides.create!(role: role1, permission: :read_course_content, enabled: true)
     @account.role_overrides.create!(role: role1, permission: :manage_courses_admin, enabled: true)
 
     role2 = @account.roles.create!(name: "blueprint admin", base_role_type: "AccountMembership")
+    @account.role_overrides.create!(permission: :read_course_content, enabled: true, role: role2)
     @account.role_overrides.create!(permission: :manage_courses_admin, enabled: true, role: role2)
     @account.role_overrides.create!(permission: :manage_master_courses, enabled: true, role: role2)
 

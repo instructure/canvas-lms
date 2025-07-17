@@ -83,3 +83,10 @@
     }
   }
 }
+
+.right-of-crumbs {
+  // right of crumbs needs to be flex so that the
+  // k5 course name is centered (course name doesn't
+  // normally exist here)
+  flex: 1;
+}

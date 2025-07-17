@@ -48,6 +48,7 @@ import type {GlobalEnv} from '@canvas/global/env/GlobalEnv.d'
 import replaceTags from '@canvas/util/replaceTags'
 import {EXTERNAL_CONTENT_READY, EXTERNAL_CONTENT_CANCEL} from '@canvas/external-tools/messages'
 import {onLtiClosePostMessage} from '@canvas/lti/jquery/messages'
+import './select_content_dialog.css'
 
 // @ts-expect-error
 if (!('INST' in window)) window.INST = {}
@@ -300,11 +301,59 @@ export function handleContentItemResult(
 
 export const Events = {
   init() {
-    $('#context_external_tools_select .tools').on(
-      'click',
-      '.tool',
-      this.onContextExternalToolSelect,
-    )
+    // Handle both click and keyboard events on tools
+    $('#context_external_tools_select').on('click keydown', '.tool', function (e) {
+      if (e.type === 'keydown') {
+        // Handle Enter or Space key
+        if (e.which !== 13 && e.which !== 32) return
+        e.preventDefault()
+      }
+
+      const $tool = $(this)
+      const $tools = $tool.closest('.tools')
+
+      $tools.find('.tool').removeClass('selected')
+      $tool.addClass('selected')
+
+      // Screen reader announcement
+      const toolName = $tool.find('.name').text()
+      $.screenReaderFlashMessage(I18n.t('Selected external tool %{tool}', {tool: toolName}))
+
+      resetExternalToolFields()
+
+      const tool = $tool.data('tool')
+      $('#external_tool_create_url').val(tool.placements.assignment_selection?.url || '')
+      $('#external_tool_create_title').val(tool.name)
+
+      return false
+    })
+
+    // Handle Enter key on links within tools
+    $('#context_external_tools_select').on('keydown', '.tool a', function (e) {
+      if (e.which === 13) {
+        // Enter key
+        e.preventDefault()
+        const $tool = $(this).closest('.tool')
+        Events.onContextExternalToolSelect(e, $tool)
+      }
+    })
+
+    // Arrow key navigation
+    $('#context_external_tools_select').on('keydown', '.tool', function (e) {
+      const $tool = $(this)
+
+      switch (e.which) {
+        case 38: // up arrow
+          e.preventDefault()
+          $tool.prev('.tool').focus()
+          break
+
+        case 40: // down arrow
+          e.preventDefault()
+          $tool.next('.tool').focus()
+          break
+      }
+    })
   },
 
   onContextExternalToolSelect(
@@ -375,17 +424,31 @@ export const Events = {
               $dialog
                 .find('#resource_selection_iframe')
                 .attr('src', '/images/ajax-loader-medium-444.gif')
+
+              // Set focus to the Configure External Tool dialog's close button
+              $('#select_context_content_dialog')
+                .closest('.ui-dialog')
+                .find('.ui-dialog-titlebar-close')
+                .focus()
             },
             open: () => {
-              removeCloseListener = onLtiClosePostMessage(placement_type, () => {
-                $('#resource_selection_dialog').dialog('close')
-              })
+              removeCloseListener = onLtiClosePostMessage(
+                () =>
+                  $dialog.find('iframe#resource_selection_iframe')[0] as
+                    | HTMLIFrameElement
+                    | null
+                    | undefined,
+                () => $('#resource_selection_dialog').dialog('close'),
+              )
               $dialog.parent().find('.ui-dialog-titlebar-close').focus()
               window.addEventListener('message', ltiPostMessageHandlerForTool)
             },
             title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
             modal: true,
             zIndex: 1000,
+            create: () => {
+              $dialog.parent().attr('aria-modal', 'true')
+            },
           })
           .bind('dialogresize', function () {
             $(this)
@@ -512,6 +575,7 @@ export type SelectContentDialogOptions = {
   width?: number
   submit?: Function
   no_name_input?: boolean
+  ariaModal?: string
   close?: () => void
 }
 
@@ -576,6 +640,11 @@ export const selectContentDialog = function (options?: SelectContentDialogOption
       },
       modal: true,
       zIndex: 1000,
+      create() {
+        if (options.ariaModal) {
+          $(this).closest('.ui-dialog').attr('aria-modal', options.ariaModal)
+        }
+      },
     })
     .fixDialogButtons()
 

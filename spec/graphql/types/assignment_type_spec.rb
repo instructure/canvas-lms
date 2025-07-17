@@ -366,10 +366,10 @@ describe Types::AssignmentType do
     end
 
     it "tags attachments with location when file_association_access is enabled" do
-      assignment_type =  GraphQLTypeTester.new(assignment, current_user: student, domain_root_account: course.root_account)
+      assignment_type =  GraphQLTypeTester.new(assignment, current_user: teacher, domain_root_account: course.root_account)
       course.root_account.enable_feature!(:file_association_access)
       attachment = attachment_model(context: course)
-      assignment.update(description: "<img src='/courses/#{course.id}/files/#{attachment.id}/download'>")
+      assignment.update(description: "<img src='/courses/#{course.id}/files/#{attachment.id}/download'>", saving_user: teacher)
       expect(
         assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
       ).to include "http://test.host/courses/#{course.id}/files/#{attachment.id}/download?location=#{assignment.asset_string}"
@@ -1614,6 +1614,99 @@ describe Types::AssignmentType do
       result = resolver.resolve("assignedStudents { nodes { _id } }")
       expect(result).to eq [student2.id.to_s]
       expect(result).not_to include(student.id.to_s)
+    end
+  end
+
+  describe "graderIdentitiesConnection" do
+    before(:once) do
+      @admin = account_admin_user(account: @account, name: "Admin")
+      @grader_teacher = user_factory(active_all: true, name: "Grader Teacher")
+      @student = user_factory(active_all: true, name: "Student")
+      @moderator = user_factory(active_all: true, name: "Moderator")
+      @course = course_factory(active_all: true)
+      @course.enroll_teacher(@grader_teacher, enrollment_state: "active")
+      @course.enroll_student(@student, enrollment_state: "active")
+      @course.enroll_teacher(@moderator, enrollment_state: "active")
+
+      @assignment = @course.assignments.create!(name: "assignment")
+
+      @moderated_assignment = @course.assignments.create!(
+        name: "moderated assignment",
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: @moderator
+      )
+      @moderated_assignment.grade_student(@student, grader: @grader_teacher, provisional: true, score: 10)
+      @moderated_assignment.grade_student(@student, grader: @moderator, provisional: true, score: 20)
+    end
+
+    def type(assignment, current_user)
+      GraphQLTypeTester.new(assignment, current_user:)
+    end
+
+    it "returns nil for non-moderated assignments" do
+      res = type(@assignment, @moderator).resolve("graderIdentitiesConnection { nodes { name } }")
+      expect(res).to be_nil
+    end
+
+    it "returns nil for non-authorized users" do
+      res = type(@moderated_assignment, @student).resolve("graderIdentitiesConnection { nodes { name } }")
+      expect(res).to be_nil
+    end
+
+    %w[admin moderator grader_teacher].each do |user_type|
+      it "returns all provisional grades for #{user_type}s" do
+        user = instance_variable_get("@#{user_type}")
+        res = type(@moderated_assignment, user).resolve("graderIdentitiesConnection { nodes { name } }")
+        expect(res).to match_array(["Moderator", "Grader Teacher"])
+      end
+    end
+
+    context "when grader names are anonymous to final grader" do
+      before(:once) do
+        @moderated_assignment.update!(grader_names_visible_to_final_grader: false)
+      end
+
+      it "final grader sees anonymous names" do
+        res = type(@moderated_assignment, @moderator).resolve("graderIdentitiesConnection { nodes { name } }")
+        expect(res).to eq ["Grader 1", "Grader 2"]
+      end
+
+      it "provisional grader sees non-anonymous names" do
+        res = type(@moderated_assignment, @grader_teacher).resolve("graderIdentitiesConnection { nodes { name } }")
+        expect(res).not_to eq ["Grader 1", "Grader 2"]
+        expect(res).to match_array(["Moderator", "Grader Teacher"])
+      end
+    end
+
+    shared_examples "grader name visibility" do
+      it "final grader sees non-anonymous names" do
+        res = type(@moderated_assignment, @moderator).resolve("graderIdentitiesConnection { nodes { name } }")
+
+        expect(res).not_to eq ["Grader 1", "Grader 2"]
+        expect(res).to match_array(["Moderator", "Grader Teacher"])
+      end
+
+      it "provisional grader sees anonymous names" do
+        res = type(@moderated_assignment, @grader_teacher).resolve("graderIdentitiesConnection { nodes { name } }")
+        expect(res).to eq ["Grader 1", "Grader 2"]
+      end
+    end
+
+    context "when grader comments are anonymous to graders" do
+      before(:once) do
+        @moderated_assignment.update!(grader_comments_visible_to_graders: false)
+      end
+
+      it_behaves_like "grader name visibility"
+    end
+
+    context "when grader names are anonymous to graders" do
+      before(:once) do
+        @moderated_assignment.update!(graders_anonymous_to_graders: true)
+      end
+
+      it_behaves_like "grader name visibility"
     end
   end
 end

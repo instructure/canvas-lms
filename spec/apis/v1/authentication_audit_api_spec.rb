@@ -170,7 +170,8 @@ describe "AuthenticationAudit API", type: :request do
           "default_time_zone" => @account.default_time_zone.tzinfo.name,
           "default_storage_quota_mb" => @account.default_storage_quota_mb,
           "default_user_storage_quota_mb" => @account.default_user_storage_quota_mb,
-          "default_group_storage_quota_mb" => @account.default_group_storage_quota_mb
+          "default_group_storage_quota_mb" => @account.default_group_storage_quota_mb,
+          "course_template_id" => nil
         }]
       end
     end

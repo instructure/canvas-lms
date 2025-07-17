@@ -50,6 +50,8 @@ module Api::V1::Lti::Registration
   # @param includes [Array<Symbol>] Accepted values: [:configuration, :account_binding, :overlay, :overlay_versions]
   # @param account_binding [Lti::RegistrationAccountBinding] Preloaded account binding to include in the response.
   # @param overlay [Lti::Overlay] Preloaded overlay to include in the response.
+  #
+  # @return [Hash] JSON representation of the LTI registration.
   def lti_registration_json(registration, user, session, context, includes: [], account_binding: nil, overlay: nil)
     includes = includes.map(&:to_sym)
 
@@ -65,13 +67,21 @@ module Api::V1::Lti::Registration
       if registration.site_admin?
         json["created_by"] = "Instructure"
       elsif registration.created_by.present?
-        json["created_by"] = user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
+        json["created_by"] = if Account.site_admin.grants_right?(registration.created_by, session, :read)
+                               "Instructure"
+                             else
+                               user_json(registration.created_by, user, session, [], context, nil, ["pseudonym"])
+                             end
       end
 
       if registration.site_admin?
         json["updated_by"] = "Instructure"
       elsif registration.updated_by.present?
-        json["updated_by"] = user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
+        json["updated_by"] = if Account.site_admin.grants_right?(registration.updated_by, session, :read)
+                               "Instructure"
+                             else
+                               user_json(registration.updated_by, user, session, [], context, nil, ["pseudonym"])
+                             end
       end
 
       if includes.include?(:configuration)

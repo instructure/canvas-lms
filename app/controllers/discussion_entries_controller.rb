@@ -47,7 +47,7 @@ class DiscussionEntriesController < ApplicationController
 
     @entry = @topic.discussion_entries.temp_record(entry_params)
     @entry.current_user = @current_user
-    @entry.user_id = @current_user ? @current_user.id : nil
+    @entry.user_id = @current_user&.id
     @entry.parent_id = parent_id
     if authorized_action(@entry, @current_user, :create)
 

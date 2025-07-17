@@ -135,7 +135,7 @@ describe('AssignmentExternalTools', () => {
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
-      '/courses/1/external_tools/retrieve?borderless=true&' +
+      `/courses/1/external_tools/${tool.definition_id}?display=borderless&` +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
       'placement=assignment_edit&assignment_id=1'
     }`
@@ -169,7 +169,7 @@ describe('AssignmentExternalTools', () => {
     )
     const tool = toolDefinitions[0]
     const correctUrl = `${
-      '/courses/1/external_tools/retrieve?borderless=true&' +
+      `/courses/1/external_tools/${tool.definition_id}?display=borderless&` +
       'url=https%3A%2F%2Flti-tool-provider-example.herokuapp.com%2Fmessages%2Fblti&' +
       'placement=assignment_view&assignment_id=1'
     }`

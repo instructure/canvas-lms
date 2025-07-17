@@ -43,8 +43,10 @@ export const ModuleHeaderSupplementalInfoStudent = ({submissionStatistics}: Prop
             <Text size="medium" color="ai-highlight" themeOverride={{aiBackgroundColor: ''}}>
               <FriendlyDatetime
                 prefix={I18n.t('Due: ')}
+                prefixMobile={I18n.t('Due: ')}
                 format={I18n.t('#date.formats.short')}
                 dateTime={dueDate}
+                alwaysUseSpecifiedFormat={true}
               />
             </Text>
           )}

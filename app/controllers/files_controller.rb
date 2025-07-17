@@ -1790,15 +1790,23 @@ class FilesController < ApplicationController
     true
   end
 
-  # inst-fs recently started identifying files by content via the NPM file-type package,
-  # which doesn't support legacy Office files and detects them as their binary container type
+  # inst-fs recently started identifying files by content via the NPM file-type package
+  # which occasionally returns a content_type that breaks canvas functionality
   def process_content_type_from_instfs(content_type, display_name)
+    ext = File.extname(display_name).downcase
     case content_type
+    # file-type doesn't support legacy Office files and detects them as their binary container type
     when "application/x-cfb"
-      case File.extname(display_name).downcase
+      case ext
       when ".doc" then "application/msword"
       when ".xls" then "application/vnd.ms-excel"
       when ".ppt" then "application/vnd.ms-powerpoint"
+      else content_type
+      end
+    # xml is displayed in speedgrader preview, which is not very user-friendly for some xml-based formats
+    when "application/xml"
+      case ext
+      when ".kml" then "application/vnd.google-earth.kml+xml"
       else content_type
       end
     else

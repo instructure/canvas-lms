@@ -85,6 +85,79 @@ describe Types::LtiAssetProcessorType do
     end
   end
 
+  context "iframe and window settings" do
+    before do
+      # Clear default iframe and window settings from factory
+      @ap1.update!(iframe: nil, window: nil)
+      @ap2.update!(iframe: nil, window: nil)
+    end
+
+    it "returns iframe and window fields when present" do
+      @ap1.update!(iframe: { "width" => 800, "height" => 600 })
+      @ap1.update!(window: {
+                     "width" => 1024,
+                     "height" => 768,
+                     "targetName" => "_blank",
+                     "windowFeatures" => "toolbar=yes,scrollbars=yes"
+                   })
+
+      fields = {
+        "iframe { width }" => [800, nil],
+        "iframe { height }" => [600, nil],
+        "window { width }" => [1024, nil],
+        "window { height }" => [768, nil],
+        "window { targetName }" => ["_blank", nil],
+        "window { windowFeatures }" => ["toolbar=yes,scrollbars=yes", nil]
+      }
+
+      fields.each do |key, vals|
+        arr = ap_query(key)
+        expect(arr).to be_a(Array)
+        expect(arr.length).to eq(2)
+        expect(arr).to match_array(vals)
+      end
+    end
+
+    it "returns null for iframe and window fields when not set" do
+      fields = {
+        "iframe { width }" => [nil, nil],
+        "iframe { height }" => [nil, nil],
+        "window { width }" => [nil, nil],
+        "window { height }" => [nil, nil],
+        "window { targetName }" => [nil, nil],
+        "window { windowFeatures }" => [nil, nil]
+      }
+
+      fields.each do |key, vals|
+        arr = ap_query(key)
+        expect(arr).to be_a(Array)
+        expect(arr.length).to eq(2)
+        expect(arr).to match_array(vals)
+      end
+    end
+
+    it "handles partial iframe and window settings" do
+      @ap1.update!(iframe: { "width" => 500 })
+      @ap2.update!(window: { "targetName" => "_self" })
+
+      fields = {
+        "iframe { width }" => [500, nil],
+        "iframe { height }" => [nil, nil],
+        "window { width }" => [nil, nil],
+        "window { height }" => [nil, nil],
+        "window { targetName }" => [nil, "_self"],
+        "window { windowFeatures }" => [nil, nil]
+      }
+
+      fields.each do |key, vals|
+        arr = ap_query(key)
+        expect(arr).to be_a(Array)
+        expect(arr.length).to eq(2)
+        expect(arr).to match_array(vals)
+      end
+    end
+  end
+
   context "when the lti_asset_processor FF is off" do
     before { @assignment.root_account.enable_feature!(:lti_asset_processor) }
     before { @assignment.root_account.disable_feature!(:lti_asset_processor) }

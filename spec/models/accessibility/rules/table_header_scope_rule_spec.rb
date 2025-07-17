@@ -49,11 +49,38 @@ RSpec.describe "TableHeaderScopeRule", type: :feature do
       end
     end
 
-    it "fixes table headers by adding the correct scope attribute" do
+    it "fixes table headers by adding the row scope" do
+      input_html = "<table><tr><th id=\"test-element\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+      expected_html = "<table><tr><th id=\"test-element\" scope=\"row\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header_scope, input_html, './/th[@id="test-element"]', "Row")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes table headers by adding the column scope" do
       input_html = "<table><tr><th id=\"test-element\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
       expected_html = "<table><tr><th id=\"test-element\" scope=\"column\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
 
       fixed_html = fix_issue(:table_header_scope, input_html, './/th[@id="test-element"]', "Column")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes table headers by adding the row group scope" do
+      input_html = "<table><tr><th id=\"test-element\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+      expected_html = "<table><tr><th id=\"test-element\" scope=\"rowgroup\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header_scope, input_html, './/th[@id="test-element"]', "Row group")
+
+      expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+
+    it "fixes table headers by adding the column group scope" do
+      input_html = "<table><tr><th id=\"test-element\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+      expected_html = "<table><tr><th id=\"test-element\" scope=\"colgroup\">Header 1</th></tr><tr><td>Data 1</td></tr></table>"
+
+      fixed_html = fix_issue(:table_header_scope, input_html, './/th[@id="test-element"]', "Column group")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
     end

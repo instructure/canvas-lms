@@ -20,37 +20,40 @@
 module Accessibility
   class Issue
     include ActiveModel::Model
-    include PageIssues
+    include WikiPageIssues
     include AssignmentIssues
     include AttachmentIssues
     include ContentChecker
+    include AccessibilityHelper
 
-    attr_reader :context, :rules, :pdf_rules
+    attr_reader :context
 
-    def initialize(context:, rules: Rule.registry, pdf_rules: Rule.pdf_registry)
+    def initialize(context:)
       @context = context
-      @rules = rules
-      @pdf_rules = pdf_rules
     end
 
     def generate
+      skip_scan = exceeds_accessibility_scan_limit?
       {
-        pages: generate_page_issues,
-        assignments: generate_assignment_issues,
-        attachments: generate_attachment_issues,
-        last_checked: Time.zone.now.strftime("%b %-d, %Y")
+        pages: generate_wiki_page_resources(skip_scan:),
+        assignments: generate_assignment_resources(skip_scan:),
+        # TODO: Disable PDF Accessibility Checks Until Post-InstCon
+        # attachments: generate_attachment_resources(skip_scan:),
+        attachments: {},
+        last_checked: Time.zone.now.strftime("%b %-d, %Y"),
+        accessibility_scan_disabled: skip_scan
       }
     end
 
-    def update_content(raw_data)
-      html_fixer = HtmlFixer.new(raw_data, self)
+    def update_content(rule, content_type, content_id, path, value)
+      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
       return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
 
       html_fixer.apply_fix!
     end
 
-    def update_preview(raw_data)
-      html_fixer = HtmlFixer.new(raw_data, self)
+    def update_preview(rule, content_type, content_id, path, value)
+      html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
       return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
 
       html_fixer.fix_preview

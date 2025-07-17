@@ -47,6 +47,10 @@ import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import {ApiResultErrorPage} from '../../../common/lib/apiResult/ApiResultErrorPage'
+import {InlineList} from '@instructure/ui-list'
+import {InstUISettingsProvider} from '@instructure/emotion'
+import theme from '@instructure/canvas-theme'
+import Header from 'features/assignment_grade_summary/react/components/Header'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -118,6 +122,63 @@ export type ToolDetailsOutletContext = {
 }
 
 const OverflowThemeOverride = {defaultOverflowY: 'unset'}
+
+const headerDetailsTheme = {
+  componentOverrides: {
+    'InlineList.Item': {
+      // (these colors exist but InstUI doesn't properly export them)
+      color: theme.colors.primitives.grey57,
+    },
+  },
+}
+
+const HeaderDetailFields = (registration: LtiRegistrationWithAllInformation) => (
+  <InstUISettingsProvider theme={headerDetailsTheme}>
+    <InlineList size="small" delimiter="pipe" margin="0 0 small">
+      {registration.admin_nickname ? (
+        <InlineList.Item>
+          <Text
+            wrap="break-word"
+            size="small"
+          >{`${I18n.t('Nickname')}: ${registration.admin_nickname}`}</Text>
+        </InlineList.Item>
+      ) : null}
+      <InlineList.Item>
+        {I18n.t('Installed')}
+        :&nbsp;
+        <FriendlyDatetime
+          dateTime={registration.created_at}
+          format={I18n.t('#date.formats.medium')}
+        />
+        {registration.created_by ? (
+          <Text size="small">
+            &nbsp;{I18n.t('by')}&nbsp;
+            {typeof registration.created_by === 'string'
+              ? registration.created_by
+              : registration.created_by.name}
+          </Text>
+        ) : null}
+      </InlineList.Item>
+      <InlineList.Item>
+        <Text size="small">
+          {I18n.t('Updated')}:&nbsp;
+          <FriendlyDatetime
+            dateTime={registration.updated_at}
+            format={I18n.t('#date.formats.medium')}
+          />
+        </Text>
+        {registration.updated_by ? (
+          <Text size="small">
+            &nbsp;{I18n.t('by')}&nbsp;
+            {typeof registration.updated_by === 'string'
+              ? registration.updated_by
+              : registration.updated_by.name}
+          </Text>
+        ) : null}
+      </InlineList.Item>
+    </InlineList>
+  </InstUISettingsProvider>
+)
 
 export const ToolDetailsInner = ({
   registration,
@@ -213,6 +274,13 @@ export const ToolDetailsInner = ({
     [registration],
   )
 
+  React.useEffect(() => {
+    document.getElementById('drawer-layout-content')?.scrollTo({
+      top: 0,
+      behavior: 'instant',
+    })
+  }, [])
+
   return (
     <Flex direction="column">
       <View
@@ -243,43 +311,19 @@ export const ToolDetailsInner = ({
               <Text size="large" weight="bold">
                 {registration.name}
               </Text>
-              {/* TODO: put "vendor" text here once it's stored by the BE
-              <Text size="small">{registration.vendor}</Text> */}
+              <Text size="small">{registration.vendor}</Text>
             </Flex>
           </Flex>
-          {/* TODO: put "tagline" text here once it's stored by the BE
-          <Flex margin='0 0 small'>
-            <Text size="small"></Text>
-          </Flex> */}
-          <Flex margin="0 0 medium">
+          <Flex margin="0 0 small">
+            <Text>{registration.description}</Text>
+          </Flex>
+          {HeaderDetailFields(registration)}
+          <Flex margin="0 0 small">
             {/* Todo: change this based on registration info */}
             <Pill>v1.3</Pill>
           </Flex>
           <Flex direction="column">
-            {registration.admin_nickname ? (
-              <Flex margin="0 0 small">
-                <Text weight="bold">{I18n.t('Nickname')}:&nbsp;</Text>
-                <Text>{registration.admin_nickname}</Text>
-              </Flex>
-            ) : null}
-            <Flex>
-              <Text weight="bold">{I18n.t('Installed')}:&nbsp;</Text>
-              <Text>
-                <FriendlyDatetime
-                  dateTime={registration.created_at}
-                  format={I18n.t('#date.formats.medium')}
-                />
-              </Text>
-              {registration.created_by ? (
-                <Text>
-                  &nbsp;{I18n.t('by')}&nbsp;
-                  {typeof registration.created_by === 'string'
-                    ? registration.created_by
-                    : registration.created_by.name}
-                </Text>
-              ) : null}
-            </Flex>
-            <Flex gap="small" margin="small 0">
+            <Flex gap="small" margin="0">
               <Button
                 data-pendo="lti-registrations-copy-client-id"
                 color="secondary"

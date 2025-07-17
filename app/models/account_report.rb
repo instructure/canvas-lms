@@ -150,12 +150,10 @@ class AccountReport < ActiveRecord::Base
 
   def self.available_reports
     # check if there is a reports plugin for this account
-    RequestCache.cache("available_reports", PluginSetting.current_account) do
-      AccountReports.available_reports
-    end
+    AccountReports.available_reports
   end
 
-  def self.last_complete_reports(account: PluginSetting.current_account)
+  def self.last_complete_reports(account:)
     account.shard.activate do
       scope = account.account_reports.active.complete.where("report_type=name").most_recent
       AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),
@@ -166,7 +164,7 @@ class AccountReport < ActiveRecord::Base
     end
   end
 
-  def self.last_reports(account: PluginSetting.current_account)
+  def self.last_reports(account:)
     account.shard.activate do
       scope = account.account_reports.active.where("report_type=name").most_recent
       AccountReport.from("unnest('{#{available_reports.keys.join(",")}}'::text[]) report_types (name),

@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {assignLocation} from '@canvas/util/globalUtils'
 import {cleanup, render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import {MemoryRouter, useLocation, useNavigate, useNavigationType} from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import {NewLoginDataProvider, NewLoginProvider, useNewLoginData} from '../../context'
 import {forgotPassword} from '../../services'
 import ForgotPassword from '../ForgotPassword'
-
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: jest.fn(),
-  useNavigationType: jest.fn(),
-  useLocation: jest.fn(),
-}))
 
 jest.mock('../../context', () => {
   const actualContext = jest.requireActual('../../context')
@@ -45,6 +39,10 @@ jest.mock('../../services/auth', () => ({
   forgotPassword: jest.fn(),
 }))
 
+jest.mock('@canvas/util/globalUtils', () => ({
+  assignLocation: jest.fn(),
+}))
+
 describe('ForgotPassword', () => {
   const setup = () => {
     render(
@@ -58,18 +56,9 @@ describe('ForgotPassword', () => {
     )
   }
 
-  const mockNavigate = jest.fn()
-  const mockNavigationType = useNavigationType as jest.Mock
-  const mockLocation = useLocation as jest.Mock
-  beforeAll(() => {
-    ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-  })
-
   beforeEach(() => {
     jest.clearAllMocks()
     jest.restoreAllMocks()
-    mockNavigationType.mockReturnValue('PUSH')
-    mockLocation.mockReturnValue({key: 'default'})
     // reset the mock implementation to return the default values
     ;(useNewLoginData as jest.Mock).mockImplementation(() => ({
       loginHandleName: 'Email',
@@ -154,34 +143,12 @@ describe('ForgotPassword', () => {
   })
 
   describe('navigation behavior', () => {
-    describe('when the cancel button is clicked', () => {
-      it('navigates back to login when there is no previous history', async () => {
-        setup()
-        const backButton = screen.getByTestId('cancel-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('navigates back to the previous page when history exists', async () => {
-        mockNavigationType.mockReturnValue('PUSH')
-        mockLocation.mockReturnValue({key: 'abc123'}) // non-default key
-        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-        setup()
-        const backButton = screen.getByTestId('cancel-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith(-1)
-        expect(mockNavigate).toHaveBeenCalledTimes(1)
-      })
-
-      it('navigates to fallback when navigationType is POP or key is default', async () => {
-        mockNavigationType.mockReturnValue('POP')
-        mockLocation.mockReturnValue({key: 'default'})
-        ;(useNavigate as jest.Mock).mockReturnValue(mockNavigate)
-        setup()
-        const backButton = screen.getByTestId('cancel-button')
-        await userEvent.click(backButton)
-        expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
+    it('navigates back to login when the cancel button is clicked', async () => {
+      setup()
+      const backButton = screen.getByTestId('cancel-button')
+      await userEvent.click(backButton)
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith('/login')
       })
     })
 
@@ -198,8 +165,9 @@ describe('ForgotPassword', () => {
       await waitFor(() => expect(screen.getByTestId('confirmation-heading')).toBeInTheDocument())
       const backButton = screen.getByTestId('confirmation-back-button')
       await userEvent.click(backButton)
-      expect(mockNavigate).toHaveBeenCalledWith('/login/canvas')
-      expect(mockNavigate).toHaveBeenCalledTimes(1)
+      await waitFor(() => {
+        expect(assignLocation).toHaveBeenCalledWith('/login')
+      })
     })
   })
 

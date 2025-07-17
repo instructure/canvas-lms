@@ -20,6 +20,7 @@
 
 class Mutations::SaveRubricAssessment < Mutations::BaseMutation
   argument :assessment_details, GraphQL::Types::JSON, required: true
+  argument :final, Boolean, required: false, default_value: false
   argument :graded_anonymously, Boolean, required: true
   argument :provisional, Boolean, required: false, default_value: false
   argument :rubric_assessment_id, ID, required: false
@@ -51,7 +52,14 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
     begin
       opts = {}
       provisional = input[:provisional]
-      ensure_adjudication_possible(provisional:, association_object:) do
+      if provisional
+        opts[:provisional_grader] = current_user
+        if input[:final] && association_object.permits_moderation?(current_user)
+          opts[:final] = true
+        end
+      end
+
+      ensure_adjudication_possible(provisional:, association_object:, grader: current_user) do
         asset, user = association_object.find_asset_for_assessment(association, user_id, opts)
         assessment_details = JSON.parse(input[:assessment_details]).with_indifferent_access
         assessment_type = assessment_details[:assessment_type]
@@ -78,7 +86,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
     raise GraphQL::ExecutionError, "#{e.model} not found"
   end
 
-  def ensure_adjudication_possible(provisional:, association_object:, &)
+  def ensure_adjudication_possible(provisional:, association_object:, grader:, &)
     # Non-assignment association objects crash if they're passed into this
     # controller, since find_asset_for_assessment only exists on assignments.
     # The check here thus serves only to make sure the crash doesn't happen on
@@ -86,7 +94,7 @@ class Mutations::SaveRubricAssessment < Mutations::BaseMutation
     return yield unless association_object.is_a?(Assignment)
 
     association_object.ensure_grader_can_adjudicate(
-      grader: @current_user,
+      grader:,
       provisional:,
       occupy_slot: true,
       &

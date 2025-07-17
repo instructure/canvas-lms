@@ -34,6 +34,7 @@ describe('CriterionModal tests', () => {
         onSave={() => {}}
         hidePoints={false}
         freeFormCriterionComments={false}
+        isFullWidth={true}
         {...props}
       />,
     )

@@ -27,8 +27,8 @@ class ContextExternalTool < ActiveRecord::Base
   has_many :context_external_tool_placements, autosave: true
   has_many :lti_resource_links, class_name: "Lti::ResourceLink"
   has_many :progresses, as: :context, inverse_of: :context
-  has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler"
-  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor"
+  has_many :lti_notice_handlers, class_name: "Lti::NoticeHandler", dependent: :destroy
+  has_many :lti_asset_processors, class_name: "Lti::AssetProcessor", dependent: :destroy
   has_many :lti_asset_processor_eula_acceptances, class_name: "Lti::AssetProcessorEulaAcceptance", inverse_of: :context_external_tool, dependent: :destroy
   has_many :context_controls, class_name: "Lti::ContextControl", inverse_of: :deployment
 
@@ -126,7 +126,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   DISABLED_STATE = "disabled"
   QUIZ_LTI = "Quizzes 2"
-  ANALYTICS_2 = "fd75124a-140e-470f-944c-114d2d93bb40"
   ADMIN_ANALYTICS = "admin-analytics"
   PREFERRED_LTI_VERSION = "1_3"
 
@@ -929,7 +928,7 @@ class ContextExternalTool < ActiveRecord::Base
     Lti::ContextControl
       .where(deployment_id: id)
       .update_all(workflow_state: "deleted")
-    save!
+    run_callbacks(:destroy) { save! }
   end
 
   def precedence
@@ -1208,12 +1207,9 @@ class ContextExternalTool < ActiveRecord::Base
 
   def feature_flag_enabled?(context = nil)
     context ||= self.context
-
-    if tool_id == ANALYTICS_2
-      context.feature_enabled?(:analytics_2) && !context.feature_enabled?(:analytics_2_lti_13_enabled)
-    elsif tool_id == ADMIN_ANALYTICS
+    if tool_id == ADMIN_ANALYTICS
       if context.is_a?(Course)
-        context.feature_enabled?(:analytics_2_lti_13_enabled) && context.feature_enabled?(:analytics_2)
+        context.feature_enabled?(:analytics_2)
       else
         context.feature_enabled?(:admin_analytics)
       end

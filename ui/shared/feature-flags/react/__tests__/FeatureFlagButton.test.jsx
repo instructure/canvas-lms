@@ -20,6 +20,7 @@ import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 import FeatureFlagButton from '../FeatureFlagButton'
 import sampleData from './sampleData.json'
@@ -107,6 +108,7 @@ describe('feature_flags::FeatureFlagButton', () => {
   })
 
   // FOO-3819
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('Refocuses on the button after the FF icon changes', async () => {
     ENV.CONTEXT_BASE_URL = '/accounts/1'
     const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature4`
@@ -125,5 +127,131 @@ describe('feature_flags::FeatureFlagButton', () => {
     const button = container.querySelector('button')
     const areSameElement = document.activeElement === button
     expect(areSameElement).toBeTruthy()
+  })
+
+  describe('and the context is site admin', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        ...fakeENV.ENV,
+        ACCOUNT: {
+          site_admin: true,
+        },
+        RAILS_ENVIRONMENT: 'production',
+        CONTEXT_BASE_URL: '/accounts/site_admin',
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('renders a confirmation modal to prevent accidental updates in non-development environments', async () => {
+      const user = userEvent.setup()
+      const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
+      fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
+
+      const {container, getByText, getByTestId, queryByText} = render(
+        <FeatureFlagButton
+          featureFlag={sampleData.allowedFeature.feature_flag}
+          displayName="Test Feature"
+        />,
+      )
+
+      await user.click(container.querySelector('button'))
+      await user.click(getByText('Enabled'))
+
+      expect(
+        await waitFor(() => getByText('Environment Confirmation for Test Feature')),
+      ).toBeInTheDocument()
+
+      const input = getByTestId('confirm-prompt-input')
+
+      // Try with incorrect environment
+      await user.click(input)
+      await user.paste('beta')
+      await user.click(getByText(/^Confirm/i).closest('button'))
+
+      expect(await waitFor(() => getByText(/The provided value is incorrect/i))).toBeInTheDocument()
+
+      // Try with correct environment
+      await user.click(input)
+      await user.clear(input)
+      await user.paste('production')
+      await user.click(getByText(/^Confirm/i).closest('button'))
+
+      // Confirmation modal should disappear and API should be called
+      await waitFor(() => {
+        expect(queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+      })
+      await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    })
+
+    it('does not call the API if the confirmation is cancelled', async () => {
+      const user = userEvent.setup()
+      const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
+      fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
+
+      const {container, getByText, queryByText} = render(
+        <FeatureFlagButton
+          featureFlag={sampleData.allowedFeature.feature_flag}
+          displayName="Test Feature"
+        />,
+      )
+
+      await user.click(container.querySelector('button'))
+
+      await user.click(getByText('Enabled'))
+
+      expect(
+        await waitFor(() => getByText('Environment Confirmation for Test Feature')),
+      ).toBeInTheDocument()
+
+      await user.click(getByText(/^Cancel/i).closest('button'))
+
+      // Confirmation modal should disappear but API should not be called
+      await waitFor(() => {
+        expect(queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+      })
+      expect(fetchMock.calls(route)).toHaveLength(0)
+    })
+  })
+
+  describe('and the context is site admin in development', () => {
+    beforeEach(() => {
+      fakeENV.setup({
+        ...fakeENV.ENV,
+        ACCOUNT: {
+          site_admin: true,
+        },
+        RAILS_ENVIRONMENT: 'development',
+        CONTEXT_BASE_URL: '/accounts/site_admin',
+      })
+    })
+
+    afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    it('does not show confirmation modal in development environment', async () => {
+      const user = userEvent.setup()
+      const route = `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/feature1`
+      fetchMock.putOnce(route, sampleData.onFeature.feature_flag)
+
+      const {container, getByText, queryByText} = render(
+        <FeatureFlagButton
+          featureFlag={sampleData.allowedFeature.feature_flag}
+          displayName="Test Feature"
+        />,
+      )
+
+      await user.click(container.querySelector('button'))
+      await user.click(getByText('Enabled'))
+
+      // Should not show the environment confirmation dialog
+      expect(queryByText(/Environment Confirmation/i)).not.toBeInTheDocument()
+
+      // API should be called directly
+      await waitFor(() => expect(fetchMock.calls(route)).toHaveLength(1))
+    })
   })
 })

@@ -250,7 +250,7 @@ module Lti
           parent_frame_context: @opts[:parent_frame_context],
           include_storage_target: @include_storage_target
         }.compact,
-        (Time.zone.now + MESSAGE_HINT_LIFESPAN)
+        Time.zone.now + MESSAGE_HINT_LIFESPAN
       )
     end
 

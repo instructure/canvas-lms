@@ -1101,15 +1101,6 @@ describe Group do
         @course.account.reload
       end
 
-      it "does not allow to create more categories/groups" do
-        expect(@c4.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
-
-        category = GroupCategory.create(context: @course, name: "Category 5", non_collaborative: true)
-
-        expect(category).not_to be_valid
-        expect(category.errors[:base]).to include("You have reached the tag limit for this course")
-      end
-
       it "reaching the tag limit and removing a tag allows to create another" do
         expect(@c4.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
 
@@ -1130,15 +1121,15 @@ describe Group do
         expect(group.errors[:base]).to include("Variant limit reached for tag")
       end
 
-      it "empty tag set counts a one towards the limit" do
+      it "leaves out soft deleted tags" do
         expect(@c4.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
+        GroupCategory.last.update(deleted_at: Time.zone.now)
+        # Each group category has 10 groups so setting a category as deleted will reduce the count by 10
+        expect(@c4.max_diff_tag_validation_count).to eq 30
 
-        Group.where(group_category: @c4).last.delete
-        GroupCategory.create(context: @course, name: "Category 5", non_collaborative: true)
-
-        expect(group).to be_valid
-        expect(group.errors).to be_empty
-        expect(@c4.max_diff_tag_validation_count).to eq GroupCategory.MAX_DIFFERENTIATION_TAG_PER_COURSE
+        tag = GroupCategory.create(context: @course, name: "Category 5", non_collaborative: true)
+        expect(tag).to be_valid
+        expect(tag.errors).to be_empty
       end
     end
   end

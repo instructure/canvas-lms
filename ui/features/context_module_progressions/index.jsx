@@ -27,31 +27,31 @@ import React from 'react'
 import {createRoot} from 'react-dom/client'
 import ProgressionModuleHeader from './react/components/ProgressionModuleHeader'
 
-class IndexView extends PaginatedCollectionView {
-  constructor(options) {
-    super(options)
-    this.root = null
-  }
-
-  // needed to render the react component at the top of the page
-  // in the right lifecycle method of backbone
-  afterRender() {
-    const container = document.getElementById('progression-module-header-root')
-    if (container) {
-      this.root = createRoot(container)
-      this.root.render(<ProgressionModuleHeader bridge={this.collection} />)
-    }
-  }
-
-  remove() {
-    if (this.root) {
-      this.root.unmount()
-    }
-    super.remove()
-  }
-}
-
 ready(() => {
+  class IndexView extends PaginatedCollectionView {
+    constructor(options) {
+      super(options)
+      this.root = null
+    }
+
+    // needed to render the react component at the top of the page
+    // in the right lifecycle method of backbone
+    afterRender() {
+      const container = document.getElementById('progression-module-header-root')
+      if (container) {
+        this.root = createRoot(container)
+        this.root.render(<ProgressionModuleHeader bridge={this.collection} />)
+      }
+    }
+
+    remove() {
+      if (this.root) {
+        this.root.unmount()
+      }
+      super.remove()
+    }
+  }
+
   let students
   $(document.body).addClass('context_modules2')
 

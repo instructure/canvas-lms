@@ -1070,6 +1070,8 @@ class GradebooksController < ApplicationController
 
       remote_env(speedgrader: Services::PlatformServiceSpeedgrader.launch_url)
 
+      multiselect_filters_enabled = Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
+
       env = {
         A2_STUDENT_ENABLED: @assignment&.a2_enabled? || false,
         COMMENT_LIBRARY_FEATURE_ENABLED:
@@ -1087,7 +1089,10 @@ class GradebooksController < ApplicationController
         gradebook_group_filter_id: @current_user.get_latest_preference_setting_by_key(:gradebook_settings, @context.global_id, "filter_rows_by", "student_group_ids"),
         can_view_audit_trail: @assignment.present? && @assignment.can_view_audit_trail?(@current_user),
         PROJECT_LHOTSE_ENABLED: @context.feature_enabled?(:project_lhotse),
-        GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads)
+        GRADING_ASSISTANCE_FILE_UPLOADS_ENABLED: Account.site_admin.feature_enabled?(:grading_assistance_file_uploads),
+        DISCUSSION_INSIGHTS_ENABLED: @context.feature_enabled?(:discussion_insights),
+        MULTISELECT_FILTERS_ENABLED: multiselect_filters_enabled,
+        gradebook_section_filter_id: multiselect_filters_enabled ? gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids") : gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id"),
       }
       js_env(env)
 
@@ -1158,7 +1163,8 @@ class GradebooksController < ApplicationController
           late_policy: @context.late_policy&.as_json(include_root: false),
           assignment_missing_shortcut: Account.site_admin.feature_enabled?(:assignment_missing_shortcut),
           enhanced_rubrics_enabled:,
-          rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : []
+          rubric_outcome_data: enhanced_rubrics_enabled ? rubric&.outcome_data : [],
+          multiselect_filters_enabled: Account.site_admin.feature_enabled?(:multiselect_gradebook_filters)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1169,6 +1175,7 @@ class GradebooksController < ApplicationController
         end
 
         env[:selected_section_id] = gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_id")
+        env[:selected_section_ids] = gradebook_settings(@context.global_id)&.dig("filter_rows_by", "section_ids")
         if @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator)
           env[:new_gradebook_plagiarism_icons_enabled] = true
         end
@@ -1264,6 +1271,43 @@ class GradebooksController < ApplicationController
                                    })
       # Showing a specific section should always display the "Sections" filter
       ensure_section_view_filter_enabled(context_settings) if section_to_show.present?
+      @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
+    end
+
+    if params[:selected_section_ids]
+      context_settings = gradebook_settings(@context.global_id)
+      current_sections = context_settings.dig("filter_rows_by", "section_ids") || []
+
+      if params[:selected_section_ids] == "all"
+        sections_to_show = nil
+      else
+        selected_ids = Array(params[:selected_section_ids])
+
+        valid_ids = @context.active_course_sections.where(id: selected_ids).pluck(:id).map(&:to_s)
+
+        # Toggle each selected ID: remove if already present, add if not
+        sections_to_show = current_sections.map(&:to_s)
+
+        valid_ids.each do |id|
+          if sections_to_show.include?(id)
+            sections_to_show.delete(id)
+          else
+            sections_to_show << id
+          end
+        end
+      end
+
+      sections_to_show&.uniq!
+
+      context_settings.deep_merge!({
+                                     "filter_rows_by" => {
+                                       "section_ids" => sections_to_show
+                                     }
+                                   })
+
+      # Showing a specific section should always display the "Sections" filter
+      ensure_section_view_filter_enabled(context_settings) if sections_to_show.present?
+
       @current_user.set_preference(:gradebook_settings, @context.global_id, context_settings)
     end
 

@@ -20,28 +20,19 @@ import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {IconArrowOpenDownLine} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconArrowDownLine, IconArrowUpLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
+import {CELL_HEIGHT, SortOrder, STUDENT_COLUMN_WIDTH} from '../../utils/constants'
+import {Sorting} from '../../types/shapes'
 
 const I18n = createI18nScope('learning_mastery_gradebook')
 
-type GradebookFilter = 'missing_user_rollups' | 'inactive_enrollments' | 'concluded_enrollments'
-
-interface StudentHeaderProps {
-  gradebookFilters: string[]
-  gradebookFilterHandler: (filter: GradebookFilter) => void
+export interface StudentHeaderProps {
+  sorting: Sorting
 }
 
-export const StudentHeader: React.FC<StudentHeaderProps> = ({
-  gradebookFilters,
-  gradebookFilterHandler,
-}) => {
-  const toggleStudentsWithoutAssessments = () => gradebookFilterHandler('missing_user_rollups')
-  const toggleInactiveEnrollments = () => gradebookFilterHandler('inactive_enrollments')
-  const toggleConcludedEnrollments = () => gradebookFilterHandler('concluded_enrollments')
-
+export const StudentHeader: React.FC<StudentHeaderProps> = ({sorting}) => {
   return (
     <View background="secondary" as="div" width={STUDENT_COLUMN_WIDTH}>
       <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
@@ -62,29 +53,23 @@ export const StudentHeader: React.FC<StudentHeaderProps> = ({
               </IconButton>
             }
           >
-            <Menu.Item>{I18n.t('Sort By')}</Menu.Item>
-            <Menu.Item>{I18n.t('Display as')}</Menu.Item>
-            <Menu.Item>{I18n.t('Secondary info')}</Menu.Item>
-            <Menu.Group label={I18n.t('Show')} allowMultiple={true}>
-              <Menu.Item
-                selected={!gradebookFilters.includes('missing_user_rollups')}
-                onSelect={toggleStudentsWithoutAssessments}
-              >
-                {I18n.t('Students without assessments')}
-              </Menu.Item>
-              <Menu.Item
-                selected={!gradebookFilters.includes('inactive_enrollments')}
-                onSelect={toggleInactiveEnrollments}
-              >
-                {I18n.t('Inactive Enrollments')}
-              </Menu.Item>
-              <Menu.Item
-                selected={!gradebookFilters.includes('concluded_enrollments')}
-                onSelect={toggleConcludedEnrollments}
-              >
-                {I18n.t('Concluded Enrollments')}
-              </Menu.Item>
-            </Menu.Group>
+            <Menu.Group label={I18n.t('Sort')}></Menu.Group>
+            <Menu.Item onClick={() => sorting.setSortOrder(SortOrder.ASC)}>
+              <Flex gap="x-small">
+                <IconArrowUpLine spacing="small" />
+                <Text weight={sorting.sortOrder === SortOrder.ASC ? 'bold' : 'normal'}>
+                  {I18n.t('Ascending')}
+                </Text>
+              </Flex>
+            </Menu.Item>
+            <Menu.Item onClick={() => sorting.setSortOrder(SortOrder.DESC)}>
+              <Flex gap="x-small">
+                <IconArrowDownLine spacing="small" />
+                <Text weight={sorting.sortOrder === SortOrder.DESC ? 'bold' : 'normal'}>
+                  {I18n.t('Descending')}
+                </Text>
+              </Flex>
+            </Menu.Item>
           </Menu>
         </Flex.Item>
       </Flex>

@@ -33,7 +33,7 @@ module LearnPlatform
     end
 
     def valid_learnplatform?
-      learnplatform&.enabled? && (valid_basic_auth_params? || valid_token_auth_params?)
+      learnplatform.enabled? && (valid_basic_auth_params? || valid_token_auth_params?)
     end
 
     def fetch_learnplatform_response(endpoint, expires, params = {})

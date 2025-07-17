@@ -18,13 +18,16 @@
 
 import {fireEvent, render, screen} from '@testing-library/react'
 import MergeUsers, {type MergeUsersProps} from '../MergeUsers'
-import fetchMock from 'fetch-mock'
+import {setupServer} from 'msw/node'
+import {http, HttpResponse} from 'msw'
 import {User} from '../common'
 import userEvent from '@testing-library/user-event'
 import {accountSelectOptions, destinationUser, sourceUser} from './test-data'
 import {MockedQueryClientProvider} from '@canvas/test-utils/query'
 import {QueryClient} from '@tanstack/react-query'
 import {MemoryRouter, Route, Routes} from 'react-router-dom'
+
+const server = setupServer()
 
 describe('MergeUsers', () => {
   const props: MergeUsersProps = {
@@ -77,17 +80,21 @@ describe('MergeUsers', () => {
   }
 
   beforeAll(() => {
+    server.listen()
     // Unfortunately, toSorted is not supported in the current version of Node.js. This could be deleted once we are at Node.js v20.11.1
     Array.prototype.toSorted = function () {
       return this.sort((a, b) => a.localeCompare(b))
     }
   })
 
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
   beforeEach(async () => {
-    fetchMock.get(createUserForMergeUrl(sourceUser.id), sourceUser, {overwriteRoutes: true})
-    fetchMock.get(createUserForMergeUrl(destinationUser.id), destinationUser, {
-      overwriteRoutes: true,
-    })
+    server.use(
+      http.get(createUserForMergeUrl(sourceUser.id), () => HttpResponse.json(sourceUser)),
+      http.get(createUserForMergeUrl(destinationUser.id), () => HttpResponse.json(destinationUser)),
+    )
     renderComponent()
 
     const userId = await screen.findByLabelText('User ID *')

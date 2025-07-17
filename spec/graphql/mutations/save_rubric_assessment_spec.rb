@@ -203,6 +203,47 @@ describe Mutations::SaveRubricAssessment do
     end
   end
 
+  describe "moderated assignments" do
+    it "creates a provisional grade and rubric assessment when a provisional (not final) assessment is submitted" do
+      @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
+
+      mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading"),
+        provisional: true
+      )
+
+      result = CanvasSchema.execute(mutation, context: { current_user: @teacher, domain_root_account: @course.root_account })
+
+      expect(result["data"]["saveRubricAssessment"]["submission"]["_id"]).to eq(@student1_asset.id.to_s)
+
+      provisional_grade = ModeratedGrading::ProvisionalGrade.find_by(submission_id: @student1_asset.id)
+      rubric_assessment = RubricAssessment.find_by(artifact_type: "ModeratedGrading::ProvisionalGrade", artifact_id: provisional_grade.id)
+
+      expect(rubric_assessment).to be_present
+      expect(rubric_assessment.assessor_id).to eq(@teacher.id)
+      expect(rubric_assessment.provisional_grade).to eq(provisional_grade)
+    end
+
+    it "takes a grader slot when a provisional assessment is submitted" do
+      @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
+
+      mutation = mutation_str(
+        rubric_association_id: @rubric_association.id,
+        submission_id: @student1_asset.id,
+        assessment_details: get_assessment_details("grading"),
+        provisional: true
+      )
+
+      CanvasSchema.execute(mutation, context: { current_user: @teacher, domain_root_account: @course.root_account })
+
+      expect(@assignment.moderation_graders.count).to eq(1)
+      expect(@assignment.moderation_graders.first.user_id).to eq(@teacher.id)
+      expect(@assignment.moderation_graders.first.slot_taken).to be true
+    end
+  end
+
   def get_assessment_details(assessment_type, points = 10)
     {
       "assessment_type" => assessment_type,

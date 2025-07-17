@@ -42,13 +42,23 @@ const I18n = createI18nScope('SmartSearch')
 const iconClass = (content_type: string) => {
   switch (content_type) {
     case 'Assignment':
-      return <IconAssignmentLine size="x-small" data-testid="assignment_icon" />
+      return (
+        <IconAssignmentLine size="x-small" data-testid="assignment_icon" key="assignment_icon" />
+      )
     case 'Announcement':
-      return <IconAnnouncementLine size="x-small" data-testid="announcement_icon" />
+      return (
+        <IconAnnouncementLine
+          size="x-small"
+          data-testid="announcement_icon"
+          key="announcement_icon"
+        />
+      )
     case 'DiscussionTopic':
-      return <IconDiscussionLine size="x-small" data-testid="discussion_icon" />
+      return (
+        <IconDiscussionLine size="x-small" data-testid="discussion_icon" key="discussion_icon" />
+      )
     default:
-      return <IconDocumentLine size="x-small" data-testid="document_icon" />
+      return <IconDocumentLine size="x-small" data-testid="document_icon" key="document_icon" />
   }
 }
 
@@ -79,12 +89,16 @@ export default function ResultCard(props: ResultCardProps) {
       return null
     }
     return (
-      <Flex gap="space8">
+      <Flex gap="space8" key="module-list">
         {trimmedModules.map((module: Module, index: number) => (
-          <Flex key={module.id} gap="space8">
+          <Flex key={`module-item-${module.id}`} gap="space8">
             <IconModuleLine data-testid="module_icon" />
-            <Text variant="contentSmall">{module.name}</Text>
-            {index < modules.length - 1 || extraModuleText ? <span> | </span> : null}
+            <Text key={`module-name-${module.id}`} variant="contentSmall">
+              {module.name}
+            </Text>
+            {index < modules.length - 1 || extraModuleText ? (
+              <span key={`module-separator-${index}`}> | </span>
+            ) : null}
           </Flex>
         ))}
         {extraModuleText ? (
@@ -97,59 +111,57 @@ export default function ResultCard(props: ResultCardProps) {
   }
 
   const renderPills = (id: string, dueDate: string | null, published: boolean | null) => {
-    let datePill, publishPill
+    const pills = [
+      iconClass(content_type),
+      <Text variant="content" key="content-type">
+        {readable_type}
+      </Text>,
+    ]
     if (dueDate) {
       const fudgedDate = fudgeDateForProfileTimezone(new Date(dueDate))
-      datePill = (
-        <Pill data-testid={`${id}-due`} renderIcon={<IconCalendarMonthLine />}>
+      pills.push(
+        <Pill data-testid={`${id}-due`} renderIcon={<IconCalendarMonthLine />} key="due-date">
           {I18n.t('Due %{date}', {
             date: fudgedDate!.toLocaleDateString(undefined, {month: 'short', day: 'numeric'}),
           })}
-        </Pill>
+        </Pill>,
       )
     }
     if (published === false) {
-      publishPill = (
-        <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishedLine />}>
+      pills.push(
+        <Pill data-testid={`${id}-publish`} renderIcon={<IconUnpublishedLine />} key="unpublished">
           {I18n.t('Unpublished')}
-        </Pill>
+        </Pill>,
       )
     }
-    if (publishPill || datePill) {
-      return (
-        <Flex gap="space8">
-          {datePill}
-          {publishPill}
-        </Flex>
-      )
-    } else {
-      return null
-    }
+    return (
+      <Flex key="result-pills" gap="space8" alignItems="center">
+        {pills}
+      </Flex>
+    )
   }
 
   return (
     <Flex
+      key={`${props.result.content_id}-${props.result.content_type}`}
       alignItems="start"
       direction="column"
       gap="space8"
       justifyItems="space-between"
       data-testid="search-result"
     >
-      <Link href={html_url} target="_blank">
+      <Link href={html_url} target="_blank" key="result-link">
         <Heading variant="titleCardLarge" data-pendo={`smart-search-${props.resultType}-result`}>
           {title}
         </Heading>
       </Link>
-      <Flex gap="space8" alignItems="center">
-        {iconClass(content_type)}
-        <Text variant="content">{readable_type}</Text>
-      </Flex>
       {renderPills(
         `${props.result.content_id}-${props.result.content_type}`,
         props.result.due_date ?? null,
         props.result.published ?? null,
       )}
       <Text
+        key="result-body"
         variant="content"
         dangerouslySetInnerHTML={{
           __html: addSearchHighlighting(props.searchTerm, htmlEscape(body)),

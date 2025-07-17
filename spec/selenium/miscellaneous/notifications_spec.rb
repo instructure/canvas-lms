@@ -56,7 +56,7 @@ describe "Notifications" do
         get "/users/#{@teacher.id}/messages"
 
         # Checks that the notification is there and has the correct "Notification Name" field
-        fj('.ui-tabs-anchor:contains("Meta Data")').click
+        f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
         expect(ff(".ic-Table--condensed.grid td").last).to include_text("Assignment Submitted")
         expect(ff(".ic-Table--condensed.grid td")[3]).to include_text("Submission: #{@student.name}, #{@assignment.name}")
       end
@@ -70,7 +70,7 @@ describe "Notifications" do
         get "/users/#{@teacher.id}/messages"
         wait_for_ajaximations
         # Checks that the notification is there and has the correct "Notification Name" field
-        fj('.ui-tabs-anchor:contains("Meta Data")').click
+        f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
         expect(ff(".ic-Table--condensed.grid td").last).to include_text("Assignment Submitted")
         expect(ff(".ic-Table--condensed.grid td")[3]).to include_text("Re-Submission: #{@student.name}, #{@assignment.name}")
       end
@@ -93,11 +93,11 @@ describe "Notifications" do
         get "/users/#{@student.id}/messages"
 
         # Checks that the notification is there and has the correct "Notification Name" field
-        fj('.ui-tabs-anchor:contains("Meta Data")').click
+        f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
         expect(ff(".ic-Table--condensed.grid td").last).to include_text("Submission Comment")
         expect(ff(".ic-Table--condensed.grid td")[7]).to include_text("Anonymous User")
 
-        fj('.ui-tabs-anchor:contains("Plain Text")').click
+        f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(2))).click # plain text
         expect(f(".message-body")).to include_text("Anonymous User just made a new comment on the " \
                                                    "submission for #{@student.reload.short_name} for assignment")
       end
@@ -119,7 +119,7 @@ describe "Notifications" do
           get "/users/#{@observer.id}/messages"
 
           # Checks that the notification is there and has the correct "Notification Name" field
-          fj('.ui-tabs-anchor:contains("Meta Data")').click
+          f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
           expect(ff(".ic-Table--condensed.grid td").last).to include_text("Submission Graded")
           expect(ff(".ic-Table--condensed.grid td")[3])
             .to include_text("Assignment Graded: #{@assignment.name}, #{@course.name}")
@@ -140,7 +140,7 @@ describe "Notifications" do
           get "/users/#{@observer.id}/messages"
 
           # Checks that the notification is there and has the correct "Notification Name" field
-          fj('.ui-tabs-anchor:contains("Meta Data")').click
+          f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
           expect(ff(".ic-Table--condensed.grid td").last).to include_text("Submission Comment")
           expect(ff(".ic-Table--condensed.grid td")[3])
             .to include_text("Submission Comment: #{@student.name}, #{@assignment.name}, #{@course.name}")
@@ -166,7 +166,7 @@ describe "Notifications" do
         @course.announcements.create!(title: "Announcement", message: "Announcement time!")
         # Checks that the notification is there and has the correct "Notification Name" field
         get "/users/#{@student.id}/messages"
-        fj('.ui-tabs-anchor:contains("Meta Data")').click
+        f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
         expect(ff(".ic-Table--condensed.grid td").last).to include_text("New Announcement")
         expect(ff(".ic-Table--condensed.grid td")[3]).to include_text("Announcement: #{@course.name}")
       end
@@ -190,7 +190,7 @@ describe "Notifications" do
           get "/users/#{@observer.id}/messages"
 
           # Checks that the notification is there and has the correct "Notification Name" field
-          fj('.ui-tabs-anchor:contains("Meta Data")').click
+          f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
           expect(ff(".ic-Table--condensed.grid td").last).to include_text("Grade Weight Changed")
           expect(ff(".ic-Table--condensed.grid td")[3])
             .to include_text("Grade Weight Changed: #{@course.name}")
@@ -216,7 +216,7 @@ describe "Notifications" do
           get "/users/#{@observer.id}/messages"
 
           # Checks that the notification is there and has the correct "Notification Name" field
-          fj('.ui-tabs-anchor:contains("Meta Data")').click
+          f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
           expect(ff(".ic-Table--condensed.grid td").last).to include_text("New Event Created")
 
           # update event
@@ -225,7 +225,7 @@ describe "Notifications" do
           refresh_page
 
           wait_for_ajaximations
-          fj('.ui-tabs-anchor:contains("Meta Data")').click
+          f(%([data-testid="message-tabs"] [role="tab"]:nth-of-type(1))).click # metadata
           expect(fj('.ic-Table--condensed.grid:first tr:contains("Notification Name")').text)
             .to include("Event Date Changed")
         end

@@ -381,7 +381,7 @@ class Course < ActiveRecord::Base
     {
       get_setting_name: -> { t("files", "Files") },
       flex: :any
-    },
+    }
   ].freeze
 
   def [](attr)
@@ -536,7 +536,17 @@ class Course < ActiveRecord::Base
 
   def modules_visible_to(user)
     scope = grants_right?(user, :view_unpublished_items) ? context_modules.not_deleted : context_modules.active
-    DifferentiableAssignment.scope_filter(scope, user, self)
+    scope = DifferentiableAssignment.scope_filter(scope, user, self)
+
+    # Filter modules based on show_student_only_module_id setting if feature is enabled
+    if account.feature_enabled?(:modules_student_module_selection) &&
+       !grants_right?(user, :read_as_admin) &&
+       show_student_only_module_id.present? &&
+       show_student_only_module_id != "0"
+      scope = scope.where(id: show_student_only_module_id)
+    end
+
+    scope
   end
 
   def visible_module_items_by_module(user, context_module)
@@ -1239,6 +1249,17 @@ class Course < ActiveRecord::Base
 
     fetch_on_enrollments("user_has_been_admin", user) do
       admin_enrollments.active.where(user_id: user).exists? # active here is !deleted; it still includes concluded, etc.
+    end
+  end
+
+  def user_has_been_teacher?(user)
+    return false unless user
+    if @user_ids_by_enroll_type
+      return preloaded_user_has_been?(user, %w[TeacherEnrollment])
+    end
+
+    fetch_on_enrollments("user_has_been_teacher", user) do
+      teacher_enrollments.active.where(user_id: user).exists? # active here is !deleted; it still includes concluded, etc.
     end
   end
 
@@ -4572,8 +4593,7 @@ class Course < ActiveRecord::Base
   end
 
   def copy_from_course_template
-    if root_account.feature_enabled?(:course_templates) &&
-       (template = account.effective_course_template)
+    if (template = account.effective_course_template)
       content_migration = content_migrations.new(
         source_course: template,
         migration_type: "course_copy_importer",

@@ -146,6 +146,10 @@ module Modules2IndexPage
     "[data-testid='module-item-title']"
   end
 
+  def module_item_title_link_selector
+    "[data-testid='module-item-title-link']"
+  end
+
   def module_item_url_icon_selector(module_item_id)
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
@@ -328,6 +332,10 @@ module Modules2IndexPage
     ff(module_item_title_selector)
   end
 
+  def module_item_title_links
+    ff(module_item_title_link_selector)
+  end
+
   def module_item_url_icon(module_item_id)
     f(module_item_url_icon_selector(module_item_id))
   end
@@ -372,8 +380,8 @@ module Modules2IndexPage
     f(teacher_modules_container_selector)
   end
 
-  def flash_alert
-    f(".flashalert-message")
+  def screenreader_alert
+    f("#flash_screenreader_holder")
   end
 
   #------------------------------ Actions -------------------------------

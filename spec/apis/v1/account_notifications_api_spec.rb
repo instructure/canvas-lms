@@ -268,6 +268,43 @@ describe "Account Notification API", type: :request do
       expect(json["roles"]).to eq []
     end
 
+    it "creates an account notification with attachment associations" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@admin.account, @admin)
+      json = api_call(:post,
+                      @path,
+                      @api_params,
+                      { account_notification: {
+                        subject: "New global notification",
+                        start_at: @start_at.iso8601,
+                        end_at: @end_at.iso8601,
+                        message: aa_test_data.base_html,
+                        icon: "information"
+                      } })
+
+      aas = AttachmentAssociation.where(context_type: "AccountNotification", context_id: json["id"])
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
+    it "creates an account notification with attachment associations in a subaccount" do
+      aa_test_data = AttachmentAssociationsSpecHelper.new(@admin.account, @admin)
+      @subaccount = account_model(name: "subaccutcha", parent_account: @admin.account, root_account: @admin.account)
+      json = api_call(:post,
+                      "/api/v1/accounts/#{@subaccount.id}/account_notifications",
+                      @api_params.merge(account_id: @subaccount.id.to_s),
+                      { account_notification: {
+                        subject: "New global notification",
+                        start_at: @start_at.iso8601,
+                        end_at: @end_at.iso8601,
+                        message: aa_test_data.base_html,
+                        icon: "information"
+                      } })
+
+      aas = AttachmentAssociation.where(context_type: "AccountNotification", context_id: json["id"])
+      expect(aas.count).to eq 1
+      expect(aas.first.attachment_id).to eq aa_test_data.attachment1.id
+    end
+
     it "defaults icon to warning" do
       json = api_call(:post,
                       @path,
@@ -430,6 +467,42 @@ describe "Account Notification API", type: :request do
                       id: @notification.id.to_s }
       @start_at = Time.zone.now
       @end_at = 1.day.from_now
+    end
+
+    context "for attachment associations" do
+      before do
+        @aa_test_data = AttachmentAssociationsSpecHelper.new(@admin.account, @admin)
+      end
+
+      it "updates with multiple attachments" do
+        raw_api_call(:put,
+                     @path,
+                     @api_params,
+                     { account_notification: {
+                       start_at: @start_at.iso8601,
+                       end_at: @end_at.iso8601,
+                       message: @aa_test_data.added_html
+                     } })
+
+        aas = AttachmentAssociation.where(context_type: "AccountNotification", context_id: @notification.id)
+        expect(aas.count).to eq 2
+        attachment_ids = aas.pluck(:attachment_id)
+        expect(attachment_ids).to match_array [@aa_test_data.attachment1.id, @aa_test_data.attachment2.id]
+      end
+
+      it "updates with no attachment" do
+        raw_api_call(:put,
+                     @path,
+                     @api_params,
+                     { account_notification: {
+                       start_at: @start_at.iso8601,
+                       end_at: @end_at.iso8601,
+                       message: @aa_test_data.removed_html
+                     } })
+
+        aas = AttachmentAssociation.where(context_type: "AccountNotification", context_id: @notification.id)
+        expect(aas.count).to eq 0
+      end
     end
 
     it "returns forbidden for non admin user" do

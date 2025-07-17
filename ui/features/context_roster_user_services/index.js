@@ -20,9 +20,10 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {initializeTopNavPortalWithDefaults} from '@canvas/top-navigation/react/TopNavPortalWithDefaults'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import ready from '@instructure/ready'
 
 const I18n = createI18nScope('RegisteredServices')
-$(document).ready(() => {
+ready(() => {
   const handleBreadCrumbSetter = ({getCrumbs, setCrumbs}) => {
     const crumbs = getCrumbs()
     crumbs.push({name: I18n.t('People'), url: document.referrer})

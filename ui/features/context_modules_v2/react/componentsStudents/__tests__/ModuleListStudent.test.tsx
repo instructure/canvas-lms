@@ -112,6 +112,7 @@ describe('ModulesListStudent', () => {
                 requireSequentialProgress: false,
                 progression: {collapsed: false},
                 requirementCount: 0,
+                unlockAt: null,
                 submissionStatistics: null,
               },
             ],

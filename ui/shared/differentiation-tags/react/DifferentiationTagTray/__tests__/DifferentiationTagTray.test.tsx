@@ -136,17 +136,6 @@ describe('DifferentiationTagTray', () => {
       expect(modalManager).toHaveAttribute('data-mode', 'create')
       expect(modalManager).toHaveAttribute('data-cat-id', '')
     })
-
-    it('opens modal in edit mode when clicking "+ Add a variant" link in a category with no tags', async () => {
-      const mockCategory = {id: 42, name: 'Editable Category', groups: []}
-      renderComponent({differentiationTagCategories: [mockCategory]})
-      const addVariantLink = screen.getByText('+ Add a variant')
-      const addVariantButton = addVariantLink.closest('button')
-      await userEvent.click(addVariantButton!)
-      const modalManager = screen.getByTestId('dummy-modal-manager')
-      expect(modalManager).toHaveAttribute('data-mode', 'edit')
-      expect(modalManager).toHaveAttribute('data-cat-id', '42')
-    })
   })
 
   describe('pagination logic', () => {

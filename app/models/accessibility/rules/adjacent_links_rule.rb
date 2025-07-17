@@ -24,29 +24,31 @@ module Accessibility
       self.link = "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
 
       def self.test(elem)
-        return true if elem.tag_name != "a"
+        return nil if elem.tag_name != "a"
 
         next_elem = elem.next_element_sibling
-        return true unless next_elem && next_elem.tag_name == "a"
+        return nil unless next_elem && next_elem.tag_name == "a"
 
         elem_href = elem.get_attribute("href")
         next_href = next_elem.get_attribute("href")
 
-        elem_href != next_href
+        I18n.t("Adjacent links contain the same URL.") if elem_href == next_href
+      end
+
+      def self.display_name
+        I18n.t("Adjacent links")
       end
 
       def self.message
-        "Adjacent links with the same URL should be combined."
+        I18n.t("These are two links that go to the same place. Turn them into one link to avoid repetition.")
       end
 
       def self.why
-        "When adjacent links go to the same location, screen reader users have to navigate through " \
-          "redundant links. This creates unnecessary repetition and confusion. " \
-          "Combining adjacent links with the same destination improves navigation efficiency."
-      end
-
-      def self.link_text
-        "Learn more about combining adjacent links"
+        I18n.t(
+          "When two or more links are next to each other and lead to the same destination, " \
+          "screen readers interpret them as two separate links, even though the intent is usually displaying a single link. " \
+          "This creates unnecessary repetition and is confusing."
+        )
       end
 
       def self.root_node(elem)
@@ -54,15 +56,16 @@ module Accessibility
       end
 
       def self.form(_elem)
-        Accessibility::Forms::CheckboxField.new(
-          label: "Merge links",
-          value: "false"
+        Accessibility::Forms::Button.new(
+          label: I18n.t("Merge links"),
+          value: "false",
+          undo_text: I18n.t("Link merged")
         )
       end
 
-      def self.fix(elem, value)
-        return elem unless test(elem) == false
-        return elem unless value == "true" || elem.tag_name == "a"
+      def self.fix!(elem, value)
+        return nil if test(elem).nil?
+        return nil unless value == "true" || elem.tag_name == "a"
 
         next_elem = elem.next_element_sibling
 

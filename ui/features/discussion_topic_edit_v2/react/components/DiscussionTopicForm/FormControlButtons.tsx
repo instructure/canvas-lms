@@ -51,7 +51,7 @@ export const FormControlButtons = ({
       display="block"
       textAlign="end"
       borderWidth="small none none none"
-      margin="none none"
+      margin="small none none none"
       padding="large none"
     >
       <Button

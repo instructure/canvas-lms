@@ -37,7 +37,7 @@ const convertToCourseCreationParams = (formData: CopyCourseFormSubmitData) => {
     delete course.end_at
   }
 
-  return {course, enroll_me: true}
+  return {course, enroll_me: true, skip_course_template: true}
 }
 
 export const createCourseCopyMutation = async ({

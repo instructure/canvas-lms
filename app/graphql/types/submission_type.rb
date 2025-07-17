@@ -162,5 +162,26 @@ module Types
     def auto_grade_submission_errors
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
     end
+
+    field :provisional_grades_connection, Types::ProvisionalGradeType.connection_type, null: true
+    def provisional_grades_connection
+      load_association(:assignment).then do
+        if submission.assignment.moderated_grading?
+          # The current user is an admin or moderator
+          if submission.assignment.permits_moderation?(current_user)
+            # Load all provisional grades for the submission
+            # (admins/moderators can see all grades)
+            load_association(:provisional_grades)
+          elsif submission.assignment.moderation_graders.where(user: current_user).exists?
+            # For provisional graders, only load their own grades
+            Loaders::SubmissionLoaders::ProvisionalGradesLoader.for(current_user).load(submission.id)
+          else
+            nil
+          end
+        else
+          nil
+        end
+      end
+    end
   end
 end

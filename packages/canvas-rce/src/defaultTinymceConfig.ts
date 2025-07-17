@@ -74,6 +74,19 @@ const defaultTinymceConfig = {
 
   color_map: [
     // First row
+    // tiny mce's default first row colors
+    '#BFEDD2',
+    'Light Green',
+    '#FBEEB8',
+    'Light Orange',
+    '#F8CAC6',
+    'Light Red',
+    '#ECCAFA',
+    'Light Purple',
+    '#C2E0F4',
+    'Light Blue',
+
+    // Second row
     '#03893D', // InstUI Green45
     'Green',
     '#CF4A00', // InstUI Orange45
@@ -85,7 +98,7 @@ const defaultTinymceConfig = {
     '#2B7ABC', // InstUI Blue45
     'Blue',
 
-    // Second row
+    // Third row
     '#027634', // InstUI Green57
     'Dark Green',
     '#B34000', // InstUI Orange57
@@ -97,7 +110,9 @@ const defaultTinymceConfig = {
     '#0E68B3', // InstUI Blue57
     'Dark Blue',
 
-    // Third row
+    // Fourth row
+    '#FFFFFF',
+    'White',
     '#6A7883', // InstUI Grey45
     'Light Gray',
     '#3F515E', // InstUI Grey82
