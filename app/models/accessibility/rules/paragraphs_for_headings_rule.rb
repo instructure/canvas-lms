@@ -43,7 +43,7 @@ module Accessibility
       end
 
       def self.display_name
-        I18n.t("Heading text too long")
+        I18n.t("Heading is too long")
       end
 
       def self.message

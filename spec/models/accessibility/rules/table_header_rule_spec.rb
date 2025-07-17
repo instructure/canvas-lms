@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "rule_test_helper"
 
-RSpec.describe "TableHeaderRule", type: :feature do
+describe Accessibility::Rules::TableHeaderRule do
   include RuleTestHelper
 
   context "when testing table headers" do
@@ -74,6 +73,29 @@ RSpec.describe "TableHeaderRule", type: :feature do
       fixed_html = fix_issue(:table_header, input_html, "./*", "Both")
 
       expect(fixed_html.delete("\n")).to eq(expected_html)
+    end
+  end
+
+  describe ".display_name" do
+    it "returns the correct display name" do
+      expect(described_class.display_name).to eq(I18n.t("Table headers aren’t set up"))
+    end
+  end
+
+  describe ".message" do
+    it "returns the correct message" do
+      expect(described_class.message).to eq(I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells."))
+    end
+  end
+
+  describe ".why" do
+    it "returns the correct explanation" do
+      expected_message = I18n.t(
+        "Screen readers use table headers to help students understand what each cell means. " \
+        "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
+        "Setting row and column headers makes your table clear and accessible for all learners." \
+      )
+      expect(described_class.why).to eq(expected_message)
     end
   end
 end

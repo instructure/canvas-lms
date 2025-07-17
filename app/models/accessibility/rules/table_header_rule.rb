@@ -34,13 +34,14 @@ module Accessibility
       end
 
       def self.message
-        I18n.t("Tables should include a caption describing the contents of the table.")
+        I18n.t("Table headers aren't set up correctly for screen readers to know which headers apply to which cells.")
       end
 
       def self.why
         I18n.t(
-          "Tables without headers are difficult for screen reader users to navigate and understand. " \
-          "Headers provide context for the data and allow screen readers to associate data cells with their headers."
+          "Screen readers use table headers to help students understand what each cell means. " \
+          "Without headers, the data can be confusing or meaningless to someone who can’t see the full layout. " \
+          "Setting row and column headers makes your table clear and accessible for all learners." \
         )
       end
 
