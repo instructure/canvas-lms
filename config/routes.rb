@@ -103,17 +103,15 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :files do
+    get "files/folder#{full_path_glob}" => "files#react_files", :format => false, :defaults => { format: "html" }
+    get "files/search" => "files#react_files", :format => false, :defaults => { format: "html" }
     resources :files, except: [:new] do
-      get "inline" => "files#text_show", :as => :text_inline
       get "download" => "files#show", :download => "1"
       get "download.:type" => "files#show", :as => :typed_download, :download => "1"
       get "preview" => "files#show", :preview => "1"
       post "inline_view" => "files#show", :inline => "1"
-      get "contents" => "files#attachment_content", :as => :attachment_content
       get "file_preview" => "file_previews#show"
       collection do
-        get "folder#{full_path_glob}" => "files#react_files", :format => false, :defaults => { format: "html" }
-        get "search" => "files#react_files", :format => false, :defaults => { format: "html" }
         get :quota
         post :reorder
       end
