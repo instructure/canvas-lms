@@ -245,29 +245,89 @@ RSpec.describe Lti::Result do
         end
       end
     end
+  end
 
-    it_behaves_like "soft deletion" do
-      subject { Lti::Result }
+  describe "#needs_review?" do
+    let(:result) { lti_result_model assignment: }
 
-      let(:user) { user_model }
-      let(:line_item) { line_item_model }
-      let(:second_line_item) { line_item_model }
-      let(:creation_arguments) do
-        [
-          {
-            line_item:,
-            user:,
-            created_at: Time.zone.now,
-            updated_at: Time.zone.now
-          },
-          {
-            line_item: second_line_item,
-            user:,
-            created_at: Time.zone.now,
-            updated_at: Time.zone.now
-          }
-        ]
+    context "when grading_progress is PendingManual" do
+      before { result.update!(grading_progress: "PendingManual") }
+
+      %w[Submitted Completed].each do |progress|
+        it "returns true for activity_progress #{progress}" do
+          result.update!(activity_progress: progress)
+          expect(result.needs_review?).to be true
+        end
       end
+
+      %w[Initialized Started InProgress].each do |progress|
+        it "returns false for activity_progress #{progress}" do
+          result.update!(activity_progress: progress)
+          expect(result.needs_review?).to be false
+        end
+      end
+    end
+
+    context "when grading_progress is not PendingManual" do
+      %w[FullyGraded Pending Failed NotReady].each do |grading_progress|
+        it "returns false regardless of activity_progress for #{grading_progress}" do
+          result.update!(grading_progress:, activity_progress: "Submitted")
+          expect(result.needs_review?).to be false
+        end
+      end
+    end
+  end
+
+  describe "#mark_reviewed!" do
+    let(:result) { lti_result_model assignment: }
+
+    context "when the result needs review" do
+      before do
+        result.update!(grading_progress: "PendingManual", activity_progress: "Submitted")
+      end
+
+      it "updates grading_progress to FullyGraded" do
+        expect { result.mark_reviewed! }.to change { result.grading_progress }.from("PendingManual").to("FullyGraded")
+      end
+
+      it "makes needs_review? return false" do
+        result.mark_reviewed!
+        expect(result.needs_review?).to be false
+      end
+    end
+
+    context "when the result does not need review" do
+      before do
+        result.update!(grading_progress: "FullyGraded", activity_progress: "Submitted")
+      end
+
+      it "still updates grading_progress to FullyGraded" do
+        expect { result.mark_reviewed! }.not_to change { result.grading_progress }
+      end
+    end
+  end
+
+  it_behaves_like "soft deletion" do
+    subject { Lti::Result }
+
+    let(:user) { user_model }
+    let(:line_item) { line_item_model }
+    let(:second_line_item) { line_item_model }
+    let(:creation_arguments) do
+      [
+        {
+          line_item:,
+          user:,
+          created_at: Time.zone.now,
+          updated_at: Time.zone.now
+        },
+        {
+          line_item: second_line_item,
+          user:,
+          created_at: Time.zone.now,
+          updated_at: Time.zone.now
+        }
+      ]
     end
   end
 

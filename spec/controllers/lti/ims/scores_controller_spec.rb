@@ -1188,6 +1188,28 @@ module Lti::IMS
         it_behaves_like "a successful scores request"
       end
 
+      context "with different activityProgress values" do
+        %w[Initialized Started InProgress].each do |activity_progress|
+          context "when activityProgress is #{activity_progress}" do
+            let(:params_overrides) do
+              super().merge(activityProgress: activity_progress, gradingProgress: "PendingManual")
+            end
+
+            it "does not mark result as needing review for non-final activity progress" do
+              send_request
+              result.reload
+              expect(result.needs_review?).to be false
+              expect(result.submission.needs_review?).to be false
+            end
+
+            it "does not set submission workflow_state to pending_review" do
+              send_request
+              expect(result.reload.submission.workflow_state).not_to eq("pending_review")
+            end
+          end
+        end
+      end
+
       context "with invalid params" do
         shared_examples_for "a bad request" do
           it "does not process request" do
