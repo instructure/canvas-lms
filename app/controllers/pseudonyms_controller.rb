@@ -64,7 +64,7 @@ class PseudonymsController < ApplicationController
     if @context.is_a?(Account)
       return unless context_is_root_account?
 
-      scope = @context.pseudonyms.active.where(user_id: @user)
+      scope = account_scope
       @pseudonyms = Api.paginate(
         scope,
         self,
@@ -72,11 +72,19 @@ class PseudonymsController < ApplicationController
       )
     else
       bookmark = BookmarkedCollection::SimpleBookmarker.new(Pseudonym, :id)
-      @pseudonyms = ShardedBookmarkedCollection.build(bookmark, @user.pseudonyms.shard(@user).active.order(:id))
+      @pseudonyms = ShardedBookmarkedCollection.build(bookmark, user_scope)
       @pseudonyms = Api.paginate(@pseudonyms, self, api_v1_user_pseudonyms_url)
     end
 
     render json: @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
+  end
+
+  def user_scope
+    @user.pseudonyms.shard(@user).active.order(:id)
+  end
+
+  def account_scope
+    @context.pseudonyms.active.where(user_id: @user)
   end
 
   # @API Kickoff password recovery flow
