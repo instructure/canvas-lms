@@ -876,24 +876,6 @@ class FilesController < ApplicationController
     show
   end
 
-  def attachment_content
-    @attachment = @context.attachments.active.find(params[:file_id])
-    if authorized_action(@attachment, @current_user, :update)
-      # The files page lets you edit text content inline by firing off a json
-      # request to get the data.
-      # Protect ourselves against reading huge files into memory -- if the
-      # attachment is too big, don't return it.
-      if @attachment.size > 1.megabyte
-        render json: { error: t("errors.too_large", "The file is too large to edit") }
-        return
-      end
-
-      stream = @attachment.open
-      json = { body: stream.read.force_encoding(Encoding::ASCII_8BIT) }
-      render json:
-    end
-  end
-
   def send_attachment(attachment)
     # check for download_frd param and, if it's present, force the user to download the
     # file and don't display it inline. we use download_frd instead of looking to the
