@@ -305,6 +305,30 @@ RSpec.describe Lti::Result do
         expect { result.mark_reviewed! }.not_to change { result.grading_progress }
       end
     end
+
+    context "when the record has result_score but null result_maximum (invalid state)" do
+      before do
+        # Create a record in an invalid state (result_score present, result_maximum null)
+        # This simulates old records that might exist in the database
+        described_class.where(id: result.id).update_all(result_score: 5.0, result_maximum: nil, grading_progress: "PendingManual")
+        result.reload
+      end
+
+      it "updates grading_progress without triggering validation errors" do
+        expect(result.result_score).to eq(5.0)
+        expect(result.result_maximum).to be_nil
+        expect(result.grading_progress).to eq("PendingManual")
+
+        # This should not raise a validation error despite the invalid state
+        expect { result.mark_reviewed! }.not_to raise_error
+
+        result.reload
+        expect(result.grading_progress).to eq("FullyGraded")
+        # The invalid state should remain unchanged
+        expect(result.result_score).to eq(5.0)
+        expect(result.result_maximum).to be_nil
+      end
+    end
   end
 
   it_behaves_like "soft deletion" do

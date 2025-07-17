@@ -451,7 +451,10 @@ module Lti::IMS
             scores_params.merge(created_at: timestamp, updated_at: timestamp, user:, submission:)
           )
         else
-          result.update!(scores_params.merge(updated_at: timestamp))
+          result.with_lock do
+            # with_lock reloads the record with fresh make sure we update all the changes
+            result.update!(scores_params.merge(updated_at: timestamp))
+          end
         end
         # An update to a result might require updating a submission's workflow_state.
         # The submission will infer that for us.
