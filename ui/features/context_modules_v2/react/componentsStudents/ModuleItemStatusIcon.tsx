@@ -22,48 +22,21 @@ import {Pill} from '@instructure/ui-pill'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {CompletionRequirement, ModuleItemContent, ModuleRequirement} from '../utils/types'
-import {filterRequirementsMet} from '../utils/utils'
+import {ModuleItemContent} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
 export interface ModuleItemStatusIconProps {
-  itemId: string
   moduleCompleted: boolean
-  completionRequirements?: CompletionRequirement[]
-  requirementsMet?: ModuleRequirement[]
   content?: ModuleItemContent
 }
 
-const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
-  itemId,
-  moduleCompleted,
-  completionRequirements,
-  requirementsMet = [],
-  content,
-}) => {
-  const completionRequirement = useMemo(
-    () => completionRequirements?.find(req => req.id === itemId),
-    [completionRequirements, itemId],
-  )
-  const hasCompletionRequirements = !!completionRequirements?.length
-
+const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({moduleCompleted, content}) => {
   const isMissing = useMemo(() => {
     if (!content) return false
 
     return !!content?.submissionsConnection?.nodes?.[0]?.missing
   }, [content])
-
-  const filteredRequirementsMet = useMemo(() => {
-    return filterRequirementsMet(requirementsMet, completionRequirements ?? []).some(
-      req => req.id === itemId,
-    )
-  }, [requirementsMet, completionRequirements, itemId])
-
-  const isCompleted = useMemo(
-    () => filteredRequirementsMet && !!completionRequirement,
-    [filteredRequirementsMet, completionRequirement],
-  )
 
   const StatusPill = ({
     color,
@@ -82,14 +55,14 @@ const ModuleItemStatusIcon: React.FC<ModuleItemStatusIconProps> = ({
   )
 
   const renderPill = useMemo(() => {
-    if (isMissing && (!moduleCompleted || !hasCompletionRequirements)) {
+    if (isMissing && !moduleCompleted) {
       return <StatusPill color="danger" text={I18n.t('Missing')} />
-    } else if (isCompleted) {
+    } else if (moduleCompleted) {
       return <StatusPill color="success" text={I18n.t('Complete')} />
     } else {
       return null
     }
-  }, [isCompleted, isMissing, moduleCompleted, hasCompletionRequirements])
+  }, [isMissing, moduleCompleted])
 
   return renderPill ? (
     <View as="div" data-testid="module-item-status-icon">
