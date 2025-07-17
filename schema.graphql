@@ -399,7 +399,7 @@ type Assignment implements LegacyIDInterface & ModuleItemInterface & Node & Time
   """
   Issues related to the assignment
   """
-  autoGradeAssignmentErrors: [String!]!
+  autoGradeAssignmentIssues: EligibilityIssue
   canDuplicate: Boolean
   canUnpublish: Boolean
 
@@ -4099,6 +4099,15 @@ enum DraftableSubmissionType {
   online_upload
   online_url
   student_annotation
+}
+
+type EligibilityIssue implements LegacyIDInterface {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  level: String!
+  message: String!
 }
 
 type Enrollment implements AssetString & Node & Timestamped {
@@ -8509,7 +8518,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
   """
   Issues related to the submission
   """
-  autoGradeSubmissionErrors: [String!]!
+  autoGradeSubmissionIssues: EligibilityIssue
   body: String
   cachedDueDate: DateTime
   commentsConnection(

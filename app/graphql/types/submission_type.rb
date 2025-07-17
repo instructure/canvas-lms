@@ -161,8 +161,8 @@ module Types
       end
     end
 
-    field :auto_grade_submission_errors, [String], null: false, description: "Issues related to the submission"
-    def auto_grade_submission_errors
+    field :auto_grade_submission_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the submission"
+    def auto_grade_submission_issues
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_submission(submission:)
     end
 
