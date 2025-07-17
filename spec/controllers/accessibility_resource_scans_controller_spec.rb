@@ -43,7 +43,7 @@ describe AccessibilityResourceScansController do
       resource_name: "Queued Resource",
       resource_workflow_state: :published,
       issue_count: 1,
-      resource_updated_at: 2.days.ago
+      resource_updated_at: 3.days.ago
     )
 
     accessibility_resource_scan_model(
@@ -53,7 +53,7 @@ describe AccessibilityResourceScansController do
       resource_name: "In Progress Resource",
       resource_workflow_state: :unpublished,
       issue_count: 2,
-      resource_updated_at: 1.day.ago
+      resource_updated_at: 2.days.ago.beginning_of_day
     )
 
     accessibility_resource_scan_model(
@@ -171,6 +171,61 @@ describe AccessibilityResourceScansController do
         }
 
         expect(scan_with_issues_json).to eq(expected_json)
+      end
+
+      describe "with filters" do
+        it "filters by rule types" do
+          get :index, params: { course_id: course.id, filters: { ruleTypes: ["headings-start-at-h2"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["issues"].first["rule_id"]).to eq("headings-start-at-h2")
+        end
+
+        it "filters by artifact types" do
+          get :index, params: { course_id: course.id, filters: { artifactTypes: ["assignment"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.all? { |scan| scan["resource_type"] == "Assignment" }).to be true
+        end
+
+        it "filters by workflow states" do
+          get :index, params: { course_id: course.id, filters: { workflowStates: ["published"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(3)
+          expect(json.all? { |scan| scan["resource_workflow_state"] == "published" }).to be true
+        end
+
+        it "filters by date range" do
+          get :index, params: { course_id: course.id, filters: { fromDate: 2.days.ago.beginning_of_day, toDate: 1.day.ago } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(1)
+          expect(json.first["resource_name"]).to eq("In Progress Resource")
+        end
+
+        it "applies multiple filters together" do
+          get :index, params: { course_id: course.id, filters: { artifactTypes: ["wiki_page"], workflowStates: ["published"] } }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(2)
+          expect(json.first["resource_name"]).to eq("Completed Resource")
+        end
+
+        it "returns all scans if filters are empty" do
+          get :index, params: { course_id: course.id, filters: {} }, format: :json
+          expect(response).to have_http_status(:ok)
+
+          json = response.parsed_body
+          expect(json.length).to eq(4)
+        end
       end
     end
   end

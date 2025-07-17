@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useContext, useEffect} from 'react'
+import {useCallback, useContext, useState} from 'react'
 import {useShallow} from 'zustand/react/shallow'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -32,13 +32,18 @@ import {useAccessibilityFetchUtils} from '../../hooks/useAccessibilityFetchUtils
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
 import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
-import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
-import {ContentItem} from '../../types'
+import {
+  USE_ACCESSIBILITY_SCANS_STORE,
+  useAccessibilityScansStore,
+} from '../../stores/AccessibilityScansStore'
+import {ContentItem, Filters} from '../../types'
 import {parseFetchParams as parseFetchParamsN} from '../../utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
+import FiltersPopover from './Filter/FiltersPopover'
 
 import SearchIssue from './Search/SearchIssue'
+import {useDeepCompareEffect} from './useDeepCompareEffect'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -50,9 +55,16 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
 
-  const [accessibilityScans, loadingN, setLoadingN] = useAccessibilityScansStore(
-    useShallow(state => [state.accessibilityScans, state.loading, state.setLoading]),
-  )
+  const [accessibilityScans, loadingN, setLoadingN, filters, setFilters] =
+    useAccessibilityScansStore(
+      useShallow(state => [
+        state.accessibilityScans,
+        state.loading,
+        state.setLoading,
+        state.filters,
+        state.setFilters,
+      ]),
+    )
 
   const {doFetchAccessibilityIssues, parseFetchParams} = useAccessibilityFetchUtils()
 
@@ -70,16 +82,18 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
   const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
 
-  useEffect(() => {
+  useDeepCompareEffect(() => {
     if (!accessibilityScanDisabled) {
-      doFetchAccessibilityScanData(parseFetchParamsN())
-      doFetchAccessibilityIssues(parseFetchParams())
+      if (USE_ACCESSIBILITY_SCANS_STORE) {
+        doFetchAccessibilityScanData(parseFetchParamsN(), filters)
+      } else {
+        doFetchAccessibilityIssues(parseFetchParams())
+      }
     } else {
       setLoadingN(false)
       setLoading(false)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [accessibilityScanDisabled, setLoading, setLoadingN])
+  }, [accessibilityScanDisabled, setLoading, setLoadingN, filters])
 
   const handleRowClick = useCallback(
     (item: ContentItem) => {
@@ -178,12 +192,12 @@ export const AccessibilityCheckerApp: React.FC = () => {
 
       <Flex alignItems="start" direction="row" margin="small 0">
         <Flex.Item width="100%">
-          <Flex direction="column" justifyItems="space-between">
+          <Flex justifyItems="space-between" gap="small">
             <SearchIssue onSearchChange={handleSearchChange} />
+            {USE_ACCESSIBILITY_SCANS_STORE && <FiltersPopover onFilterChange={setFilters} />}
           </Flex>
         </Flex.Item>
       </Flex>
-
       <AccessibilityIssuesSummary />
       <AccessibilityIssuesTable onRowClick={handleRowClick} />
     </View>

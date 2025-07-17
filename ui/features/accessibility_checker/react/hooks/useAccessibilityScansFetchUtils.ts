@@ -26,8 +26,8 @@ import {
   useAccessibilityScansStore,
 } from '../stores/AccessibilityScansStore'
 import {API_FETCH_ERROR_MESSAGE_PREFIX, IssuesTableHeaderApiNames} from '../constants'
-import {AccessibilityResourceScan} from '../types'
-import {convertKeysToCamelCase} from '../utils/apiData'
+import {AccessibilityResourceScan, Filters} from '../types'
+import {convertKeysToCamelCase, getParsedFilters} from '../utils/apiData'
 import {updateQueryParams} from '../utils/query'
 
 const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, any> => {
@@ -45,6 +45,10 @@ const getApiRequestParams = (requestedFetch: NewStateToFetch): Record<string, an
     params['sort'] = IssuesTableHeaderApiNames[requestedFetch.tableSortState.sortId]
     params['direction'] =
       requestedFetch.tableSortState.sortDirection === 'ascending' ? 'asc' : 'desc'
+  }
+
+  if (requestedFetch.filters !== undefined) {
+    params['filters'] = requestedFetch.filters
   }
 
   if (requestedFetch.search) {
@@ -80,7 +84,10 @@ export const useAccessibilityScansFetchUtils = () => {
   )
 
   const doFetchAccessibilityScanData = useCallback(
-    async (requestedStateChange: Partial<NewStateToFetch>): Promise<void> => {
+    async (
+      requestedStateChange: Partial<NewStateToFetch>,
+      filters: Filters | null = null,
+    ): Promise<void> => {
       try {
         // Picking up existing state (or default, if not yet set)
         const newStateToFetch: NewStateToFetch = {
@@ -89,6 +96,7 @@ export const useAccessibilityScansFetchUtils = () => {
           pageSize,
           tableSortState: tableSortState || defaultStateToFetch.tableSortState,
           search: search || defaultStateToFetch.search,
+          filters: filters ? getParsedFilters(filters) : undefined,
         }
 
         Object.assign(newStateToFetch, requestedStateChange)
@@ -108,7 +116,6 @@ export const useAccessibilityScansFetchUtils = () => {
           params,
           method: 'GET',
         })
-
         const accessibilityScans = convertKeysToCamelCase(data.json) as AccessibilityResourceScan[]
         setAccessibilityScans(accessibilityScans)
         setPage(newStateToFetch.page!)

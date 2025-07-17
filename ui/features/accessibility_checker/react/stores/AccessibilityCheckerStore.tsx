@@ -20,7 +20,7 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {AccessibilityData, ContentItem} from '../types'
+import {AccessibilityData, ContentItem, Filters} from '../types'
 
 export type NextResource = {
   index: number

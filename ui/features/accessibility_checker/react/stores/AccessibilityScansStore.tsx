@@ -20,7 +20,9 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {AccessibilityResourceScan} from '../types'
+import {AccessibilityResourceScan, Filters, ParsedFilters} from '../types'
+
+export const USE_ACCESSIBILITY_SCANS_STORE = false
 
 export type TableSortState = {
   sortId?: string | null
@@ -32,6 +34,7 @@ export type NewStateToFetch = {
   pageSize?: number
   tableSortState?: TableSortState | null
   search?: string | null
+  filters?: ParsedFilters | null
 }
 
 /**
@@ -47,6 +50,7 @@ export type AccessibilityCheckerState = {
   accessibilityScans: AccessibilityResourceScan[] | null
   tableSortState?: TableSortState | null
   search?: string | null
+  filters?: Filters | null
 }
 
 export type AccessibilityCheckerActions = {
@@ -58,6 +62,7 @@ export type AccessibilityCheckerActions = {
   setAccessibilityScans: (accessibilityScans: AccessibilityResourceScan[] | null) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
   setSearch: (search: string | null) => void
+  setFilters: (filters: Filters | null) => void
 }
 
 export const initialState: AccessibilityCheckerState = {
@@ -69,6 +74,7 @@ export const initialState: AccessibilityCheckerState = {
   accessibilityScans: null,
   tableSortState: null,
   search: null,
+  filters: null,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {
@@ -76,6 +82,7 @@ export const defaultStateToFetch: NewStateToFetch = {
   pageSize: 10,
   tableSortState: {} as TableSortState,
   search: null,
+  filters: null,
 }
 
 export const useAccessibilityScansStore = create<
@@ -93,6 +100,7 @@ export const useAccessibilityScansStore = create<
       setAccessibilityScans: accessibilityScans => set({accessibilityScans}),
       setTableSortState: tableSortState => set({tableSortState}),
       setSearch: search => set({search}),
+      setFilters: filters => set({filters}),
     }),
     {
       name: 'AccessibilityScansStore',

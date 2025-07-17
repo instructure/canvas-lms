@@ -30,12 +30,13 @@ import {View} from '@instructure/ui-view'
 
 import {IssuesTableColumns, IssuesTableColumnHeaders} from '../../constants'
 import {ContentItem} from '../../types'
-import {getSortingFunction} from '../../utils/apiData'
+import {getSortingFunction, parseScansToContentItems} from '../../utils/apiData'
 import {AccessibilityIssuesTableRow} from './AccessibilityIssuesTableRow'
 import {useAccessibilityCheckerStore, TableSortState} from '../../stores/AccessibilityCheckerStore'
 import {
   useAccessibilityScansStore,
   TableSortState as TableSortStateN,
+  USE_ACCESSIBILITY_SCANS_STORE,
 } from '../../stores/AccessibilityScansStore'
 import {useAccessibilityFetchUtils} from '../../hooks/useAccessibilityFetchUtils'
 import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
@@ -145,15 +146,26 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
     useShallow(state => [state.setPage, state.setTableSortState]),
   )
 
-  const [errorN, loadingN, pageN, pageSizeN, tableSortStateN] = useAccessibilityScansStore(
-    useShallow(state => [
-      state.error,
-      state.loading,
-      state.page,
-      state.pageSize,
-      state.tableSortState,
-    ]),
-  )
+  const [errorN, loadingN, pageN, pageSizeN, accessibilityScans, tableSortStateN] =
+    useAccessibilityScansStore(
+      useShallow(state => [
+        state.error,
+        state.loading,
+        state.page,
+        state.pageSize,
+        state.accessibilityScans,
+        state.tableSortState,
+      ]),
+    )
+
+  const issuesData = useMemo(() => {
+    if (USE_ACCESSIBILITY_SCANS_STORE) {
+      return accessibilityScans ? parseScansToContentItems(accessibilityScans) : []
+    }
+    return tableData
+  }, [accessibilityScans, tableData])
+
+  const isLoading = USE_ACCESSIBILITY_SCANS_STORE ? loadingN : loading
 
   const setOrderedTableData = useAccessibilityCheckerStore(
     useShallow(state => state.setOrderedTableData),
@@ -206,7 +218,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
 
   // The new API won't need this effect, as the data will be sorted on the backend
   useEffect(() => {
-    const newOrderedTableData: ContentItem[] = [...(tableData || [])]
+    const newOrderedTableData: ContentItem[] = [...(issuesData || [])]
 
     if (tableSortState && tableSortState.sortId) {
       if (
@@ -218,9 +230,9 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
       }
     }
     setOrderedTableData(newOrderedTableData)
-  }, [tableData, tableSortState, setOrderedTableData])
+  }, [issuesData, tableSortState, setOrderedTableData])
 
-  const pageCount = (pageSize && Math.ceil((tableData ?? []).length / pageSize)) || 1
+  const pageCount = (pageSize && Math.ceil((issuesData ?? []).length / pageSize)) || 1
 
   const handlePageChange = useCallback(
     (nextPage: number) => {
@@ -286,7 +298,7 @@ export const AccessibilityIssuesTable = ({onRowClick}: Props) => {
                 </Table.Cell>
               </Table.Row>
             )}
-            {loading && (
+            {isLoading && (
               <Table.Row data-testid="loading-row">
                 <Table.Cell colSpan={5} textAlign="center">
                   {renderLoading()}
