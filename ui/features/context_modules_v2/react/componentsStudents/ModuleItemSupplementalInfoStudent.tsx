@@ -53,7 +53,10 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   if (!content) return null
 
   const cachedDueDate = content.submissionsConnection?.nodes?.[0]?.cachedDueDate
+  const todoDate = content.todoDate
+  const isUngradedDiscussion = content.type === 'Discussion' && content.graded === false
   const hasDueDate = !!cachedDueDate
+  const hasTodoDate = !!todoDate && isUngradedDiscussion
   const hasPointsPossible =
     content.pointsPossible !== undefined &&
     content.pointsPossible !== null &&
@@ -92,7 +95,7 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
           </Flex.Item>
         </>
       ) : (
-        hasDueDate && (
+        (hasDueDate || hasTodoDate) && (
           <>
             <Flex.Item padding="0 x-small">
               <Text size="x-small" aria-hidden="true">
@@ -100,13 +103,15 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
               </Text>
             </Flex.Item>
             <Flex.Item padding="0">
+              <Text weight="bold" size="x-small">
+                {I18n.t('Due: ')}
+              </Text>
               <Text weight="normal" size="x-small">
                 <FriendlyDatetime
-                  data-testid="due-date"
-                  prefix={I18n.t('Due: ')}
+                  data-testid={hasTodoDate ? 'todo-date' : 'due-date'}
                   format={I18n.t('#date.formats.date_at_time')}
                   showTime={true}
-                  dateTime={cachedDueDate || null}
+                  dateTime={(hasTodoDate ? todoDate : cachedDueDate) || null}
                   alwaysUseSpecifiedFormat={true}
                 />
               </Text>

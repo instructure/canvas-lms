@@ -32,6 +32,7 @@ query GetModuleItemsStudentQuery($moduleId: ID!) {
             lockAt
             todoDate
             discussionType
+            graded
             published
             replyToEntryRequiredCount
             submissionsConnection(filter: { includeUnsubmitted: true }) {
