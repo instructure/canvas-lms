@@ -9427,6 +9427,7 @@ ko:
           details_link: "세부 정보를 보려면 여기를 클릭"
       sms: 
         link_message: "자세한 정보는 %{url}에서 확인"
+  messages_64e7435f: 메시지
   migration: 
     announcement_type: "공지 사항"
     assignment_group_type: "과제 그룹"
@@ -10259,6 +10260,7 @@ ko:
   permissions_365c49e: 권한
   pick_dd033b86: 선택
   pinned_discussions_a55c0cea: "고정된 토론"
+  plain_text_43999c94: "일반 텍스트"
   play_media_comment_8614d30f: "미디어 설명 재생"
   playback: 
     statistics: 통계
@@ -12628,6 +12630,7 @@ ko:
         go_to_dashboard: "대시보드로 가기"
       not_available_yet: "과목이 시작하기 직전에 이메일을 보냅니다."
   self_sign_up_c8d23585: "직접 등록"
+  send_a_reply_message_81d0600e: "회신 메시지 보내기"
   send_e3bd0ed0: 보내기
   sent_at_23cccc07: "발송:"
   sent_f4ee89ec: 전송했습니다!
@@ -13861,6 +13864,7 @@ ko:
   themes_89bfe9c4: 테마
   there_was_a_problem_logging_in_at_institution_5a298155: "%{institution}에 로그인하는 데 문제가 있습니다."
   there_was_an_error_in_processing_your_request_6513a49a: "요청을 처리하는 중 오류 발생"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "이메일을 보내는 데 오류가 발생했습니다. 페이지를 다시 로드하고 다시 시도하시기 바랍니다."
   this_assignment_is_muted_915e2dab: "이 과제는 평점 비공개 상태임"
   this_assignment_is_part_of_an_unpublished_module_a_4e25b3c5: "이 과제는 게시 안 된 모듈의 일부로서 아직 사용할 수 없습니다."
   this_course_does_not_allow_score_uploads_4b35fe07: "이 과목은 점수 업로드를 허용하지 않습니다."
@@ -14823,6 +14827,7 @@ ko:
   you_must_select_a_file_to_import_content_from_28a242ff: "내용을 가져올 파일을 선택해야 함"
   your_email_address_f881e583: "귀하의 이메일 주소"
   your_email_b5364bee: 이메일
+  your_email_is_being_delivered_8a1d77b8: "이메일을 배달 중입니다."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       교사가 %{title}에 대한 평점 변경 사항과 새 의견을 배포했습니다. 이제 변경 사항을 볼 수 있습니다.
       
