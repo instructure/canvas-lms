@@ -17,7 +17,16 @@
  */
 
 import {IssuesTableColumns} from '../constants'
-import {AccessibilityData, ContentItem, ContentItemType} from '../types'
+import {
+  AccessibilityData,
+  AccessibilityResourceScan,
+  ContentItem,
+  ContentItemType,
+  FilterDateKeys,
+  Filters,
+  ParsedFilters,
+  Severity,
+} from '../types'
 
 // COMMON API UTILS
 
@@ -25,7 +34,7 @@ const snakeToCamel = function (str: string): string {
   return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
 }
 
-export const convertKeysToCamelCase = function (input: any): object | boolean {
+export const convertKeysToCamelCase = function (input: any): object | boolean | string {
   if (Array.isArray(input)) {
     return input.map(convertKeysToCamelCase)
   } else if (input !== null && typeof input === 'object') {
@@ -36,7 +45,7 @@ export const convertKeysToCamelCase = function (input: any): object | boolean {
       ]),
     )
   }
-  return input !== null && input !== undefined ? input : {}
+  return input !== null && input !== undefined ? input : ''
 }
 
 /*
@@ -162,4 +171,90 @@ export const getSortingFunction = (sortId: string, sortDirection: 'ascending' | 
       return sortFn(a.updatedAt, b.updatedAt)
     }
   }
+}
+
+export const getParsedFilters = (filters: Filters | null): ParsedFilters => {
+  const parsed = {} as ParsedFilters
+  if (filters) {
+    ;(Object.keys(filters) as Array<keyof Filters>).forEach((key: keyof Filters) => {
+      const typedKey = key as keyof Filters
+      const value = filters[typedKey]
+      if (Array.isArray(value)) {
+        ;(parsed[typedKey] as any) = value.includes('all') ? undefined : value
+      } else if (value instanceof Date) {
+        parsed[typedKey as FilterDateKeys] = value.toISOString() as string
+      } else {
+        parsed[typedKey] = value ?? undefined
+      }
+    })
+  }
+
+  return parsed || {}
+}
+
+export function issueSeverity(count: number): Severity {
+  if (count > 30) return 'High'
+  if (count > 2) return 'Medium'
+  return 'Low'
+}
+
+export function parseAccessibilityScans(scans: any[]): AccessibilityData {
+  const pages: Record<string, ContentItem> = {}
+  const assignments: Record<string, ContentItem> = {}
+  const attachments: Record<string, ContentItem> = {}
+
+  for (const scan of scans) {
+    const resourceId = String(scan.resourceId)
+    const resourceType = scan.resourceType as ContentItemType
+
+    const contentItem: ContentItem = {
+      id: Number(resourceId),
+      type: resourceType,
+      title: scan.resourceName ?? '',
+      published: scan.resourceWorkflowState === 'published',
+      updatedAt: scan.resourceUpdatedAt || new Date().toISOString(),
+      count: scan.issueCount,
+      url: scan.resourceUrl,
+      editUrl: `${scan.resourceUrl}/edit`,
+      issues: scan.issues ?? [],
+      severity: issueSeverity(scan.issueCount),
+    }
+
+    if (resourceType === ('WikiPage' as ContentItemType)) {
+      pages[resourceId] = contentItem
+    } else if (resourceType === ('Assignment' as ContentItemType)) {
+      assignments[resourceId] = contentItem
+    } else if (resourceType === ('Attachment' as ContentItemType)) {
+      attachments[resourceId] = contentItem
+    }
+  }
+
+  return {
+    pages,
+    assignments,
+    attachments,
+    lastChecked: new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }),
+    accessibilityScanDisabled: false,
+  }
+}
+
+export function parseScansToContentItems(scans: AccessibilityResourceScan[]): ContentItem[] {
+  return scans.map(
+    (scan): ContentItem => ({
+      id: scan.resourceId,
+      type: (scan.resourceType === 'WikiPage' ? 'Page' : scan.resourceType) as ContentItemType,
+      title: scan.resourceName ?? '',
+      published: scan.resourceWorkflowState === 'published',
+      updatedAt: scan.resourceUpdatedAt,
+      count: scan.issueCount,
+      url: scan.resourceUrl,
+      editUrl: `${scan.resourceUrl}/edit`,
+      issues: scan.issues,
+      severity: issueSeverity(scan.issueCount), // you can compute severity from issues if needed
+    }),
+  )
 }

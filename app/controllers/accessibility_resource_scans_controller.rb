@@ -35,10 +35,16 @@ class AccessibilityResourceScansController < ApplicationController
 
     scans = apply_sorting(scans)
 
+    params[:filters] || {}
+
+    if params[:filters].present?
+      scans = apply_filters(scans)
+    end
+
     base_url = course_accessibility_resource_scans_path(@context)
     paginated = Api.paginate(scans, self, base_url)
 
-    render json: paginated.map { |scan| scan_attributes(scan) }
+    render json: paginated.map { |scan, filtered_issues| scan_attributes(scan, issues: filtered_issues) }
   end
 
   private
@@ -78,12 +84,103 @@ class AccessibilityResourceScansController < ApplicationController
     relation.order(order_clause)
   end
 
+  # Apply filtering to the supplied ActiveRecord::Relation of AccessibilityResourceScan
+  # based on a JSON-encoded `filters` param. Filters include rule types, resource types,
+  # workflow states, issue workflow states, and a date range.
+  #
+  # Invalid or missing filters are ignored. All conditions are combined with AND logic.
+  #
+  # @param relation [ActiveRecord::Relation<AccessibilityResourceScan>] the base query
+  # @return [ActiveRecord::Relation<AccessibilityResourceScan>] if rule_types is not present
+  # @return [Array<[AccessibilityResourceScan, Array<AccessibilityIssue>]>] if rule_types is present
+  def apply_filters(relation)
+    raw_filters = begin
+      params[:filters].presence
+    rescue
+      {}
+    end
+
+    return relation unless raw_filters.present?
+
+    rule_types      = raw_filters[:ruleTypes]
+    artifact_types  = raw_filters[:artifactTypes]
+    workflow_states = raw_filters[:workflowStates]
+    from_date = begin
+      Time.zone.parse(raw_filters[:fromDate])
+    rescue
+      nil
+    end
+    to_date = begin
+      Time.zone.parse(raw_filters[:toDate])
+    rescue
+      nil
+    end
+
+    if rule_types.present?
+      scan_issue_map = relation.to_a.filter_map do |scan|
+        matching_issues = scan.accessibility_issues.select do |issue|
+          rule_types.include?(issue.rule_type)
+        end
+
+        next nil if matching_issues.empty?
+
+        [scan, matching_issues]
+      end
+
+      scan_issue_map = scan_issue_map.select do |scan, _|
+        artifact_match = if artifact_types.present?
+                           (artifact_types.include?("wiki_page") && scan.wiki_page_id.present?) ||
+                             (artifact_types.include?("assignment") && scan.assignment_id.present?) ||
+                             (artifact_types.include?("attachment") && scan.attachment_id.present?)
+                         else
+                           true
+                         end
+
+        workflow_match = workflow_states.blank? || workflow_states.include?(scan.resource_workflow_state)
+        updated_at = scan.resource_updated_at
+
+        date_match =
+          (!from_date || (updated_at && updated_at >= from_date)) &&
+          (!to_date   || (updated_at && updated_at <= to_date))
+
+        artifact_match && workflow_match && date_match
+      end
+
+      return scan_issue_map
+    end
+
+    # Apply filters via ActiveRecord when no rule_types filter is present
+    filtered = relation
+    if artifact_types.present?
+      conditions = []
+      conditions << "wiki_page_id IS NOT NULL" if artifact_types.include?("wiki_page")
+      conditions << "assignment_id IS NOT NULL" if artifact_types.include?("assignment")
+      conditions << "attachment_id IS NOT NULL" if artifact_types.include?("attachment")
+      filtered = filtered.where(conditions.join(" OR ")) if conditions.any?
+    end
+
+    filtered = filtered.where(resource_workflow_state: workflow_states) if workflow_states.present?
+    filtered = filtered.where(resource_updated_at: from_date..) if from_date.present?
+    filtered = filtered.where(resource_updated_at: ..to_date) if to_date.present?
+
+    filtered
+  end
+
   # Returns a hash representation of the scan, for JSON rendering.
   # @param scan [AccessibilityResourceScan]
   # @return [Hash]
-  def scan_attributes(scan)
+  # @param scan [AccessibilityResourceScan]
+  # @param issues [Array<AccessibilityIssue>, nil] optional filtered issues
+  # @return [Hash]
+  def scan_attributes(scan, issues: nil)
     resource_id, resource_type = scan.context_id_and_type
     scan_completed = scan.workflow_state == "completed"
+    issue_count = if scan_completed
+                    issues.nil? ? scan.issue_count : issues.count
+                  else
+                    0
+                  end
+
     {
       id: scan.id,
       resource_id:,
@@ -94,8 +191,8 @@ class AccessibilityResourceScansController < ApplicationController
       resource_url: scan.context_url,
       workflow_state: scan.workflow_state,
       error_message: scan.error_message || "",
-      issue_count: scan_completed ? scan.issue_count : 0,
-      issues: scan_completed ? scan.accessibility_issues.map { |issue| issue_attributes(issue) } : []
+      issue_count:,
+      issues: scan_completed ? (issues || scan.accessibility_issues).map { |issue| issue_attributes(issue) } : []
     }
   end
 

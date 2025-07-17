@@ -28,7 +28,7 @@ import {
   useAccessibilityCheckerStore,
 } from '../stores/AccessibilityCheckerStore'
 import {API_FETCH_ERROR_MESSAGE_PREFIX, IssuesTableColumns} from '../constants'
-import {AccessibilityData} from '../types'
+import {AccessibilityData, Filters} from '../types'
 import {convertKeysToCamelCase, processAccessibilityData} from '../utils/apiData'
 
 export const useAccessibilityFetchUtils = () => {

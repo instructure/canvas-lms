@@ -148,3 +148,18 @@ export type ContrastData = {
 export type GenerateResponse = {
   value?: string
 }
+
+export type Filters = {
+  ruleTypes?: string[]
+  artifactTypes?: string[]
+  workflowStates?: string[]
+  fromDate?: Date | null
+  toDate?: Date | null
+}
+
+export type FilterDateKeys = 'fromDate' | 'toDate'
+
+export type ParsedFilters = Omit<Partial<Filters>, FilterDateKeys> & {
+  fromDate?: string
+  toDate?: string
+}

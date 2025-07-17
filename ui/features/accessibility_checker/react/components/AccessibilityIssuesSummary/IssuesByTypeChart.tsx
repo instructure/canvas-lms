@@ -49,7 +49,7 @@ type IssuesByTypeChartProps = {
 
 function renderLoading() {
   return (
-    <View as="div" width="100%" textAlign="center">
+    <View as="div" width="100%" textAlign="center" height="250px">
       <Spinner renderTitle={I18n.t('Loading accessibility issues')} size="large" margin="auto" />
     </View>
   )
