@@ -16,17 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {View} from '@instructure/ui-view'
-import ModulesList from './componentsTeacher/ModulesList'
-
-const ModulesContainer: React.FC = () => {
-  return (
-    <View as="div" data-testid="modules-rewrite-container" className="modules-rewrite-container">
-      <ModulesList />
-      <div id="differentiated-modules-mount-point" />
-    </View>
-  )
+.modules-rewrite-container .published-status {
+  padding: 0;
+  padding-inline: 3px 0; // account for 3p right margin on the icon
+  border-width: 0;
+  width: 28px;
+  height: 28px;
 }
-
-export default ModulesContainer
