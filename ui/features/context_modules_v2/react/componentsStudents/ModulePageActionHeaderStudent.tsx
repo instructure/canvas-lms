@@ -27,6 +27,7 @@ import {useCourseStudent} from '../hooks/queriesStudent/useCourseStudent'
 import {useContextModule} from '../hooks/useModuleContext'
 import {Flex} from '@instructure/ui-flex'
 import {IconAssignmentLine, IconWarningLine} from '@instructure/ui-icons'
+import FeedbackBlock from './FeedbackBlock'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -122,6 +123,7 @@ const ModulePageActionHeaderStudent: React.FC<ModulePageActionHeaderStudentProps
             </Flex>
           </View>
         ) : null}
+        <FeedbackBlock />
         {ENV.CONTEXT_MODULES_HEADER_PROPS && (
           <ContextModulesHeader
             {...ENV.CONTEXT_MODULES_HEADER_PROPS}
