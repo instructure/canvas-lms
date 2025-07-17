@@ -12171,6 +12171,7 @@ hy:
   pink_68ad45cb: Վարդագույն
   pinned_discussions_a55c0cea: "Կապակցված քննարկումներ"
   placements_5b5e056b: Տեղադրումներ
+  plain_text_43999c94: "Սովորական տեքստ"
   plain_text_e3ab33aa: "Սովորական տեքստ"
   play_media_comment_8614d30f: "Մուլտիմեդիա մեկնաբանության վերարտադրում"
   playback: 
@@ -16810,6 +16811,7 @@ hy:
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Գնահատման սխեման պահպանելիս խնդիր է առաջացել"
   there_was_an_error_in_processing_your_request_6513a49a: "Ձեր հարցումը մշակելիս սխալ է տեղի ունեցել"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "Կատարված նշումը պահպանելու ընթացքում սխալ է տեղի ունեցել: Փորձեք կրկին:"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "Ձեր էլեկտրոնային հաղորդագրությունը ուղարկելիս սխալ է տեղի ունեցել: Կրկին բեռնեք էջը և նորից փորձեք:"
   there_was_an_error_setting_usage_rights_53739e1d: "Օգտատիրոջ իրավունքները կարգաբերելիս սխալ է տեղի ունեցել:"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Ձեր հարցման հետ կապված սխալ է տեղի ունեցել, փորձեք որոնման այլ տարբերակ"
   there_were_errors_with_the_form_errors_ab5b559a: "Տեսքի հետ կապված սխալներ՝ %{errors}"
@@ -18080,6 +18082,7 @@ hy:
   your_content_has_been_exported_bbb57764: "Ձեր բովանակությունը արտահանված է:"
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Ձեր կողմից ընտրված թեման հաջողությամբ կիրառվել է"
   your_email_b5364bee: "Ձեր էլեկտրոնային փոստի հասցեն"
+  your_email_is_being_delivered_8a1d77b8: "Ձեր էլեկտրոնային հաղորդագրությունը ուղարկվում է:"
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Ձեր ֆայլը բեռնվում է գնահատականների մատյանում և Դուք կարող եք ցանկացած ժամանակ դուրս գալ էջից: Եթե ունեք մեծ CSV ֆայլ, փոփոխությունների կատարելումը կտևի մի քանի րոպե: Որևէ տվյալ կրկնակի անգամ չգրանցելու համար խնդրում ենք հաստատել բեռնման ավարտը և Ձեր գնահատականների մատյանի ճշգրտությունը՝ նախքան լրացուցիչ փոփոխություններ կատարելը:  "
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       Ձեր դասավանդողը ներկայացրել է գնահատականների փոփոխությունները և նոր մեկնաբանությունն է տվել %{title}-ին: Այդ փոփոխությունները այժմ կարելի է տեսնել:
