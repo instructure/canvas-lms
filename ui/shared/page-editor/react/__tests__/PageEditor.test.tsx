@@ -16,8 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PageEditor} from '@canvas/page-editor'
+import {render} from '@testing-library/react'
+import {PageEditor} from '../PageEditor'
 
-export const ContentBuilderWrapper = () => {
-  return <PageEditor data={null} onInit={null} />
-}
+describe('PageEditor', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('calls onInit with PageEditorHandler on mount', () => {
+    const mockOnInit = jest.fn()
+    render(<PageEditor data={null} onInit={mockOnInit} />)
+
+    expect(mockOnInit).toHaveBeenCalledWith({
+      getContent: expect.any(Function),
+    })
+  })
+
+  it('does not break when onInit is null', () => {
+    expect(() => {
+      render(<PageEditor data={null} onInit={null} />)
+    }).not.toThrow()
+  })
+})
