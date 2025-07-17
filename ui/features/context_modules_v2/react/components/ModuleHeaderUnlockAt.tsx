@@ -20,8 +20,6 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
-import moment from 'moment'
-import {DateTime} from '@instructure/ui-i18n'
 import {isModuleUnlockAtDateInTheFuture} from '../utils/utils'
 
 const I18n = createI18nScope('context_modules_v2')
@@ -38,9 +36,11 @@ const ModuleHeaderUnlockAt: React.FC<ModuleHeaderUnlockAtProps> = ({unlockAt}) =
     <Text size="x-small" wrap="break-word" color="secondary">
       <FriendlyDatetime
         prefix={I18n.t('Will unlock')}
+        prefixMobile={I18n.t('Unlocked')}
         data-testid="module-unlock-at-date"
         format={I18n.t('#date.formats.date_at_time')}
         dateTime={unlockAt}
+        alwaysUseSpecifiedFormat={true}
       />
     </Text>
   )

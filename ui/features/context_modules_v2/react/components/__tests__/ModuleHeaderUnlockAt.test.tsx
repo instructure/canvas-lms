@@ -17,11 +17,14 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import {setupServer} from 'msw/node'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import ModuleHeaderUnlockAt, {ModuleHeaderUnlockAtProps} from '../ModuleHeaderUnlockAt'
+import {format} from '@instructure/moment-utils'
 import moment from 'moment'
+
+const unlockAtFormat = '%b %-d at %l:%M%P'
 
 const server = setupServer()
 
@@ -64,8 +67,23 @@ describe('ModuleHeaderUnlockAt', () => {
     const futureDate = moment().add(1, 'day').toISOString()
     setUp(buildDefaultProps({unlockAt: futureDate}))
 
-    expect(screen.getByTestId('module-unlock-at-date')).toBeInTheDocument()
-    expect(screen.getAllByText(/Will unlock/).length).toBeGreaterThan(0)
+    const formattedDate = format(futureDate, unlockAtFormat)
+    const {container} = render(<ModuleHeaderUnlockAt unlockAt={futureDate} />)
+
+    const desktopElement = container.querySelector(
+      '[data-testid="module-unlock-at-date"] .visible-desktop',
+    )
+    const mobileElement = container.querySelector(
+      '[data-testid="module-unlock-at-date"] .hidden-desktop',
+    )
+
+    expect(desktopElement).toBeInTheDocument()
+    expect(mobileElement).toBeInTheDocument()
+
+    const desktopText = desktopElement?.textContent
+    const mobileText = mobileElement?.textContent
+    expect(desktopText).toMatch(`Will unlock ${formattedDate}`)
+    expect(mobileText).toMatch(`Unlocked ${formattedDate}`)
   })
 
   it('returns null when unlockAt is null', () => {
