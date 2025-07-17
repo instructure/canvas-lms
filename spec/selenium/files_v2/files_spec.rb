@@ -537,6 +537,15 @@ describe "files index page" do
           expect(rename_change_button).to be_displayed
         end
 
+        it "moves a file into folder with drag and drop", priority: "2" do
+          file_to_move_element = get_table_row_item(2)
+          folder_move_to = get_table_row_item(1)
+          drag_and_drop_element(file_to_move_element, folder_move_to)
+          expect(alert).to include_text("#{file_to_move} successfully moved to #{folder_name}")
+          get "/courses/#{@course.id}/files/folder/base%20folder"
+          expect(get_item_content_files_table(1, 1)).to eq "Text File\n#{file_to_move}"
+        end
+
         context "Search Results" do
           it "search and move a file" do
             search_input.send_keys(txt_files[0])
