@@ -65,7 +65,7 @@ class AutoGradeOrchestrationService
   end
 
   def get_grade_data(assignment_text:, root_account_uuid:, submission:, progress:)
-    essay_source = submission.extract_text_from_upload? ? submission.attachment_text : submission.body
+    essay_source = submission.extract_text_from_upload? ? submission.extracted_text : submission.body
     essay = ActionView::Base.full_sanitizer.sanitize(essay_source || "")
 
     rubric = submission.assignment.rubric_association&.rubric

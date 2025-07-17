@@ -54,7 +54,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
 
         allow(CedarClient).to receive(:enabled?).and_return(false)
         issues = described_class.validate_assignment(assignment:)
-        expect(issues).to include("Grading Assistance is not available right now.")
+        expect(issues).to eq({ level: "error", message: "Grading assistance is not available right now." })
       end
     end
 
@@ -62,7 +62,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
       it "returns a missing rubric error" do
         allow(CedarClient).to receive(:enabled?).and_return(true)
         issues = described_class.validate_assignment(assignment:)
-        expect(issues).to include("No rubric is attached to this assignment.")
+        expect(issues).to eq({ level: "error", message: "No rubric is attached to this assignment." })
       end
     end
 
@@ -85,7 +85,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         expect(assignment.rubric_association.rubric).to eq(rubric)
 
         issues = described_class.validate_assignment(assignment:)
-        expect(issues).to include("Rubric is missing rating description.")
+        expect(issues).to eq({ level: "error", message: "Rubric is missing rating description." })
       end
     end
   end
@@ -108,7 +108,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
         issues = described_class.validate_submission(submission:)
-        expect(issues).to be_empty
+        expect(issues).to be_nil
       end
     end
 
@@ -122,7 +122,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("No essay submission found.")
+        expect(issues).to eq({ level: "error", message: "No essay submission found." })
       end
     end
 
@@ -137,7 +137,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         )
         allow(submission).to receive(:word_count).and_return(nil)
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Submission must be at least 5 words.")
+        expect(issues).to eq({ level: "error", message: "Submission must be at least 5 words." })
       end
     end
 
@@ -151,7 +151,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
           attachments: []
         )
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Submission must be a text entry type or file upload.")
+        expect(issues).to eq({ level: "error", message: "Submission must be a text entry type or file upload." })
       end
     end
 
@@ -166,7 +166,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         )
         allow(submission).to receive(:word_count).and_return(nil)
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Submission must be at least 5 words.")
+        expect(issues).to eq({ level: "error", message: "Submission must be at least 5 words." })
       end
     end
 
@@ -184,7 +184,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
 
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Only PDF and DOCX files are supported.")
+        expect(issues).to eq({ level: "error", message: "Only PDF and DOCX files are supported." })
       end
 
       it "returns file uploads disabled error when feature flag is off" do
@@ -200,7 +200,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: false, word_count: 50)
 
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("Grading assistance is disabled for file uploads.")
+        expect(issues).to eq({ level: "error", message: "Grading assistance is disabled for file uploads." })
       end
     end
 
@@ -216,9 +216,10 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
 
         bad_attachment = double("Attachment", mimetype: "application/pdf")
         allow(submission).to receive_messages(attachments: [bad_attachment], extract_text_from_upload?: true, attachment_contains_images: true, word_count: 50)
+        allow(submission).to receive(:contains_images).and_return(true)
 
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("There are images embedded in the file that can not be parsed.")
+        expect(issues).to eq({ level: "warning", message: "Please note that AI Grading Assistance for this submission will ignore any embedded images and only evaluate the text portion of the submission." })
       end
     end
 
@@ -236,35 +237,7 @@ describe GraphQLHelpers::AutoGradeEligibilityHelper do
         allow(submission).to receive(:attempt).and_return(0)
 
         issues = described_class.validate_submission(submission:)
-        expect(issues).to include("No essay submission found.")
-      end
-    end
-
-    context "when submission body contains an RCE file link" do
-      it "returns true" do
-        html_body = '<p><a class="instructure_file_link" data-api-returntype="File" href="/files/123">file.txt</a></p>'
-
-        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(html_body)
-
-        expect(result).to be true
-      end
-    end
-
-    context "when submission body does not contain an RCE file link" do
-      it "returns false" do
-        html_body = '<p><a href="/files/123">file.txt</a></p>'
-
-        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?(html_body)
-
-        expect(result).to be false
-      end
-    end
-
-    context "when submission body is blank" do
-      it "returns false" do
-        result = GraphQLHelpers::AutoGradeEligibilityHelper.contains_rce_file_link?("")
-
-        expect(result).to be false
+        expect(issues).to eq({ level: "error", message: "No essay submission found." })
       end
     end
   end

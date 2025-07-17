@@ -756,8 +756,8 @@ module Types
       assignment.anonymous_student_identities.values
     end
 
-    field :auto_grade_assignment_errors, [String], null: false, description: "Issues related to the assignment"
-    def auto_grade_assignment_errors
+    field :auto_grade_assignment_issues, Types::EligibilityIssueType, null: true, description: "Issues related to the assignment"
+    def auto_grade_assignment_issues
       GraphQLHelpers::AutoGradeEligibilityHelper.validate_assignment(assignment:)
     end
 
