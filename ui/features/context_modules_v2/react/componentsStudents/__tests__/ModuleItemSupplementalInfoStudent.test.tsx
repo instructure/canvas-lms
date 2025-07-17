@@ -270,4 +270,92 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       expect(container.queryByText('100 pts')).not.toBeInTheDocument()
     })
   })
+
+  describe('ungraded discussion todo dates', () => {
+    const testDate = new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString()
+
+    it('should render todo date for ungraded discussion with todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: false,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByTestId('todo-date')).toBeInTheDocument()
+      // Verify that the component contains the todo date text somewhere
+      expect(container.container.innerHTML).toContain('Due: ')
+    })
+
+    it('should render due date for graded discussion with cachedDueDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: true,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: testDate}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.container.innerHTML).toContain('Due: ')
+    })
+
+    it('should not render todo date for graded discussion even with todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: true,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByText(/Due:/)).not.toBeInTheDocument()
+    })
+
+    it('should not render todo date for ungraded discussion without todoDate', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Discussion',
+          graded: false,
+          todoDate: undefined,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByTestId('due-date')).not.toBeInTheDocument()
+      expect(container.queryByTestId('todo-date')).not.toBeInTheDocument()
+    })
+
+    it('should not render todo date for non-discussion items', () => {
+      const props = buildDefaultProps({
+        content: {
+          type: 'Assignment',
+          graded: false,
+          todoDate: testDate,
+          submissionsConnection: {
+            nodes: [{_id: '1', cachedDueDate: undefined}],
+          },
+        },
+      })
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.queryByText(/Due:/)).not.toBeInTheDocument()
+    })
+  })
 })
