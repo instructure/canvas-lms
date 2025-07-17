@@ -20,6 +20,7 @@
 require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
 require_relative "../../helpers/items_assign_to_tray"
+require_relative "../shared_examples/course_modules2_shared"
 
 describe "context modules", :ignore_js_errors do
   include_context "in-process server selenium tests"
@@ -642,5 +643,9 @@ describe "context modules", :ignore_js_errors do
         expect(module_header_due_date_exists?(@module1.id)).to be_falsey
       end
     end
+  end
+
+  context "module locking" do
+    include_examples "module unlock dates"
   end
 end
