@@ -64,7 +64,7 @@ module Accessibility
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: 120,
-          input_value: elem.get_attribute("alt") || ""
+          value: elem.get_attribute("alt") || ""
         )
       end
 

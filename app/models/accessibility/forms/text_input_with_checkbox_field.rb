@@ -26,27 +26,27 @@ module Accessibility
                     :input_description,
                     :input_max_length,
                     :checked,
-                    :input_value
+                    :value
 
       # @param checkbox_label [String] Human-readable label for the checkbox
       # @param checkbox_subtext [String] Optional subtext for the checkbox
       # @param input_label [String] Human-readable label for the input field
       # @param input_description [String] Optional description for the input field
       # @param input_max_length [Integer] Optional maximum length for the input field
-      # @param input_value [String] Optional default value for the input field
+      # @param value [String] Optional default value for the input field
       def initialize(checkbox_label:,
                      input_label:,
                      undo_text:,
                      checkbox_subtext: nil,
                      input_description: nil,
                      input_max_length: nil,
-                     input_value: nil)
+                     value: nil)
         super(label: input_label, undo_text:)
         @checkbox_label = checkbox_label
         @checkbox_subtext = checkbox_subtext
         @input_description = input_description
         @input_max_length = input_max_length
-        @input_value = input_value
+        @value = value
       end
 
       def field_type
@@ -59,7 +59,7 @@ module Accessibility
           checkbox_subtext: @checkbox_subtext,
           input_description: @input_description,
           input_max_length: @input_max_length,
-          input_value: @input_value,
+          value: @value,
         }.compact)
       end
     end

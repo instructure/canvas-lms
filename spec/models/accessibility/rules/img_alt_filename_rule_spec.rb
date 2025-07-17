@@ -62,11 +62,12 @@ RSpec.describe "ImgAltFilenameRule", type: :feature do
 
   context "when generating form for image alt text" do
     it "returns a TextInputWithCheckboxField with correct configuration" do
-      input_html = '<div><img src="image.jpg"></div>'
+      input_html = '<div><img src="image.jpg" alt="image"></div>'
       elem = Nokogiri::HTML.fragment(input_html).css("img").first
       form = Accessibility::Rules::ImgAltFilenameRule.form(elem)
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
+      expect(form.value).to eq("image")
     end
   end
 end
