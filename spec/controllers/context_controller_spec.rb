@@ -611,6 +611,18 @@ describe ContextController do
       expect(g1.workflow_state).to eq "available"
     end
 
+    it "allows undeleting non-collaborative group_categories" do
+      user_session(@teacher)
+      category = GroupCategory.create!(context: @course, name: "Tag Category", non_collaborative: true)
+      g1 = category.groups.create!(context: @course, name: "group_a", non_collaborative: true)
+      category.destroy
+
+      post :undelete_item, params: { course_id: @course.id, asset_string: category.asset_string }
+      expect(category.reload.deleted_at).to be_nil
+      expect(g1.reload.deleted_at).to be_nil
+      expect(g1.workflow_state).to eq "available"
+    end
+
     it "does not allow dangerous sends" do
       user_session(@teacher)
       expect_any_instantiation_of(@course).not_to receive(:teacher_names)
