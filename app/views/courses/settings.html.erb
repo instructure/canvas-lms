@@ -471,7 +471,7 @@
           <% if can_do(@context, @current_user, :manage_course_visibility) %>
             <span>
               <%= f.select :course_visibility, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], id] }, {}, {"aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="panel-border">
               <%= f.check_box :custom_course_visibility %>
@@ -506,7 +506,7 @@
             <span>
               <% vis_value = @context.course_visibility_options[@context.course_visibility][:setting] %>
               <%= f.select :course_visibility, [[vis_value, @context.course_visibility]], {}, {"disabled" => true, "aria-label" => t("Course Visibility Options")} %>
-              <%= visibility_help_link %>
+              <span id="visibility_mount"></span>
             </span>
             <div class="public_options checkbox-flex-container">
               <%= f.check_box :indexed, disabled: true %>

@@ -398,18 +398,6 @@ module ApplicationHelper
     )
   end
 
-  def visibility_help_link
-    js_bundle("visibility_help")
-    icon = safe_join ["<i class='icon-question' aria-hidden='true'></i>".html_safe]
-    link_to(
-      icon,
-      "#",
-      role: "button",
-      class: "visibility_help_link no-hover",
-      title: I18n.t("Help with course visibilities")
-    )
-  end
-
   def equella_enabled?
     @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
     @equella_settings ||= @domain_root_account.try(:equella_settings)
