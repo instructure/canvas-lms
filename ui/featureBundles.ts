@@ -223,7 +223,6 @@ const featureBundles: {
   user_outcome_results: () => import('./features/user_outcome_results/index'),
   user: () => import('./features/user/index'),
   users_index: () => import('./features/users_index/index'),
-  visibility_help: () => import('./features/visibility_help/index'),
   webzip_export: () => import('./features/webzip_export/index'),
   wiki_page_edit: () => import('./features/wiki_page_edit/index'),
   widget_dashboard: () => import('./features/widget_dashboard/index'),
