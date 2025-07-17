@@ -13118,6 +13118,7 @@ tr:
         subject: "Web Üzerinden Canlı Ders Kaydı Hazır: %{name}"
       twitter: 
         tweet: "Canvas Uyarısı - Kayıt hazır: %{title}, %{name}"
+  messages_64e7435f: Mesajlar
   mexico_52_60d635c7: "Meksika (+52)"
   migrate_67c9f753: Aktar
   migrate_quiz_5d0f777: "Kısa Sınavı Aktar"
@@ -14439,6 +14440,7 @@ tr:
   place_title_2c183274: "\"%{title}\" yerleştir"
   placements_5b5e056b: Yerleştirmeler
   plagiarism_review_tool_error_513f47ff: "İntihal gözden geçirme araç hatası"
+  plain_text_43999c94: "Düz Metin"
   plain_text_e3ab33aa: "Düz metin"
   plain_text_view_7640af4c: "Düz Metin Görünümü"
   play_media_comment_8614d30f: "Medya Yorumunu Oynat"
@@ -17713,6 +17715,7 @@ tr:
   self_signup_15b23092: self_signup
   send_a_message_to_student_b2e72576: "%{student} mesaj gönder"
   send_a_message_to_the_teacher_1ae115b6: "Eğitmene Bir Mesaj Gönderin"
+  send_a_reply_message_81d0600e: "Yanıt mesajını gönder"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Her bir alıcıya bireysel mesaj gönder"
   send_comment_to_the_whole_group_8d41e63a: "Tüm gruba yorum gönder"
   send_e3bd0ed0: Gönder
@@ -19357,6 +19360,7 @@ tr:
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Notlandırma şemasını kaydetmede hata"
   there_was_an_error_in_processing_your_request_6513a49a: "İsteğin işlenmesinde hata ile karşılaşıldı"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Dersteki değişiklikler kaydedilirken bir hata oluştu"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "E-posta'nın gönderilmesinde hata meydana geldi. Lütfen sayfayı yenileyip tekrar deneyin."
   there_was_an_error_setting_usage_rights_53739e1d: "Kullanım haklarını ayarlamada hata oluştu"
   there_were_errors_with_the_form_errors_ab5b559a: "Şu formla ilgili hatalar oluştu: %{errors}"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Bu bölüm, değerlendirici tarafından yorum yapılması amacıyla kullanılacaktır."
@@ -20689,6 +20693,7 @@ tr:
   your_email_address_844297ea: "E-Posta Adresiniz"
   your_email_address_f881e583: "E-Posta adresiniz"
   your_email_b5364bee: "E-Posta Adresiniz"
+  your_email_is_being_delivered_8a1d77b8: "E-Postanız iletildi."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       Öğretim elemanı %{title} için not değişikliği ve yeni yorumlar yaptı. Bu değişiklikler şu anda görülebilir durumdadır.
       
