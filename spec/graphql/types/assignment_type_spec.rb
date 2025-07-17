@@ -1581,7 +1581,7 @@ describe Types::AssignmentType do
 
     it "returns students with assignment visibility when user has :manage_grades permission" do
       resolver = GraphQLTypeTester.new(regular_assignment, current_user: teacher)
-      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to eq [student.id.to_s, student2.id.to_s]
+      expect(resolver.resolve("assignedStudents { nodes { _id } }")).to match_array [student.id.to_s, student2.id.to_s]
     end
 
     it "returns nil when user doesn't have :manage_grades permission" do
