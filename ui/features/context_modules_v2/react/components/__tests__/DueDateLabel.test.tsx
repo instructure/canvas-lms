@@ -20,6 +20,7 @@ import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import type {ModuleItemContent, CompletionRequirement} from '../../utils/types'
+import {format} from '@instructure/moment-utils'
 import DueDateLabel from '../DueDateLabel'
 
 const currentDate = new Date().toISOString()
@@ -106,13 +107,24 @@ describe('DueDateLabel', () => {
 
     it('shows tooltip with details upon hover', async () => {
       const container = setUp(contentWithManyDueDates)
+      const dueAtFormat = '%b %-d at %l:%M%P'
+      const dueDate1 = format(
+        contentWithManyDueDates.assignmentOverrides?.edges?.[0].node.dueAt,
+        dueAtFormat,
+      ) as string
+      const dueDate2 = format(
+        contentWithManyDueDates.assignmentOverrides?.edges?.[1].node.dueAt,
+        dueAtFormat,
+      ) as string
 
       fireEvent.mouseOver(container.getByText('Multiple Due Dates'))
 
       await waitFor(() => container.getByTestId('override-details'))
 
       expect(container.getByTestId('override-details')).toHaveTextContent('1 student')
+      expect(container.getByTestId('override-details').textContent).toContain(dueDate1)
       expect(container.getByTestId('override-details')).toHaveTextContent('1 section')
+      expect(container.getByTestId('override-details').textContent).toContain(dueDate2)
     })
 
     it('shows a single date when overrides are redundant', () => {
