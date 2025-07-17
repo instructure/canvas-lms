@@ -24,16 +24,19 @@ import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {ImageBlock} from './Blocks/ImageBlock'
 import {PageEditorLayout} from './layout/PageEditorLayout'
 import {Toolbar} from './Toolbar'
+import {PageEditorHandler, usePageEditorIntegration} from './hooks/usePageEditorIntegration'
 
 export const PageEditor = (props: {
   data: SerializedNodes | null
+  onInit: ((handler: PageEditorHandler) => void) | null
 }) => {
+  const onNodesChange = usePageEditorIntegration(props.onInit)
   return (
     <PageEditorContext data={props.data}>
       <PageEditorLayout
         toolbar={<Toolbar />}
         editor={
-          <Editor resolver={{TextBlock, ImageBlock}}>
+          <Editor resolver={{TextBlock, ImageBlock}} onNodesChange={onNodesChange}>
             <AddBlockModalRenderer />
             <AddBlock />
             <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
