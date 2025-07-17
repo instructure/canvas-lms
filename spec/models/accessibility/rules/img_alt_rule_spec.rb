@@ -66,6 +66,7 @@ RSpec.describe "ImgAltRule", type: :feature do
       form = Accessibility::Rules::ImgAltRule.form(elem)
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
+      expect(form.value).to eq("")
     end
   end
 end

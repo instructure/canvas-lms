@@ -61,7 +61,7 @@ module Accessibility
           undo_text: I18n.t("Alt text fixed"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: MAX_LENGTH,
-          input_value: elem.get_attribute("alt") || ""
+          value: elem.get_attribute("alt") || ""
         )
       end
 

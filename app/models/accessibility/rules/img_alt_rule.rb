@@ -46,7 +46,7 @@ module Accessibility
       end
 
       # TODO: define undo text
-      def self.form(_elem)
+      def self.form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
           checkbox_subtext: I18n.t("This image is for visual decoration only and screen readers can skip it."),
@@ -54,7 +54,7 @@ module Accessibility
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: 120,
-          input_value: ""
+          value: elem.get_attribute("alt") || ""
         )
       end
 
