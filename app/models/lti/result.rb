@@ -107,7 +107,7 @@ class Lti::Result < ApplicationRecord
   end
 
   def mark_reviewed!
-    update!(grading_progress: "FullyGraded")
+    update_column(:grading_progress, "FullyGraded")
   end
 
   private
