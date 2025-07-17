@@ -20,7 +20,11 @@ import React, {useRef, useEffect, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {CSVLink} from 'react-csv'
 import {IconExportLine} from '@instructure/ui-icons'
-import useCSVExport, {EXPORT_COMPLETE, EXPORT_FAILED, EXPORT_PENDING} from '../hooks/useCSVExport'
+import useCSVExport, {
+  EXPORT_COMPLETE,
+  EXPORT_FAILED,
+  EXPORT_PENDING,
+} from '../../hooks/useCSVExport'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('learning_mastery_gradebook')

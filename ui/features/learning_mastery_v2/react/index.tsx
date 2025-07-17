@@ -18,31 +18,18 @@
 
 import React from 'react'
 import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-import {IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Gradebook} from './components/Gradebook'
 import useRollups from './hooks/useRollups'
-import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
-import {Flex} from '@instructure/ui-flex'
-import {InstUISettingsProvider} from '@instructure/emotion'
-import {IconButton} from '@instructure/ui-buttons'
 import LMGBContext, {
   getLMGBContext,
   LMGBContextType,
 } from '@canvas/outcomes/react/contexts/LMGBContext'
-import {ExportCSVButton} from './components/ExportCSVButton'
 import {FilterWrapper} from './components/filters/FilterWrapper'
+import {Toolbar} from './components/toolbar/Toolbar'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
-
-const componentOverrides = {
-  Link: {
-    // TODO: this should be changed to theme.colors.contrasts.grey125125
-    color: '#273540',
-  },
-}
 
 const renderLoader = (): JSX.Element => (
   <View width="100%" display="block" textAlign="center">
@@ -88,45 +75,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
 
   return (
     <LMGBContext.Provider value={contextValues}>
-      <InstUISettingsProvider theme={{componentOverrides}}>
-        <Flex
-          height="100%"
-          display="flex"
-          alignItems="center"
-          justifyItems="space-between"
-          padding="medium 0 0 0"
-          data-testid="lmgb-menu-and-settings"
-        >
-          <Flex alignItems="center" data-testid="lmgb-gradebook-menu">
-            <Text size="xx-large" weight="bold">
-              {I18n.t('Learning Mastery Gradebook')}
-            </Text>
-            <View padding="xx-small">
-              <GradebookMenu
-                courseUrl={contextURL ?? ''}
-                learningMasteryEnabled={true}
-                variant="DefaultGradebookLearningMastery"
-                customTrigger={
-                  <IconButton
-                    withBorder={false}
-                    withBackground={false}
-                    screenReaderLabel={I18n.t('Gradebook Menu Dropdown')}
-                  >
-                    <IconArrowOpenDownSolid size="x-small" />
-                  </IconButton>
-                }
-              />
-            </View>
-          </Flex>
-          <View>
-            <ExportCSVButton
-              courseId={courseId}
-              gradebookFilters={gradebookFilters}
-              data-testid="export-csv-button"
-            />
-          </View>
-        </Flex>
-      </InstUISettingsProvider>
+      <Toolbar courseId={courseId} contextURL={contextURL} gradebookFilters={gradebookFilters} />
       <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
       {isLoading ? (
         renderLoader()
