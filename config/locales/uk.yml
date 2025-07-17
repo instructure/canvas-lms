@@ -11609,6 +11609,7 @@ uk:
         subject: "Запис веб-конференції готовий: %{name}"
       twitter: 
         tweet: "Сповіщення Canvas - Запис готовий: %{title}, %{name}"
+  messages_64e7435f: Повідомлення
   messages_deleted_8f781481: 
     few: "Повідомлення видалені!"
     many: "Повідомлення видалені!"
@@ -12866,6 +12867,7 @@ uk:
   plagiarism_review_tool_error_513f47ff: "Помилка інструменту перевірки на плагіат"
   plagiarism_review_tool_is_missing_submission_event_75273069: "У засобі перевірки на плагіат відсутні служба подання подій"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "У службі подій засобу перевірки на плагіат відсутня кінцева точка"
+  plain_text_43999c94: "Простий текст"
   plain_text_e3ab33aa: "Простий текст"
   plain_text_view_7640af4c: "У вигляді відкритого тексту"
   play_media_comment_8614d30f: "Програти медіа-коментар"
@@ -16009,6 +16011,7 @@ uk:
   self_signup_15b23092: self_signup
   send_a_message_to_student_b2e72576: "Відправити повідомлення %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Відправити повідомлення вчителю"
+  send_a_reply_message_81d0600e: "Відправити повідомлення у відповідь"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Надіслати персональне повідомлення для кожного одержувача"
   send_e3bd0ed0: Надіслати
   send_message_6ccc90e8: "Відправити повідомлення"
@@ -17649,6 +17652,7 @@ uk:
   there_was_an_error_removing_the_image_c83acffe: "Виникла помилка з видаленням зображення"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Виникла помилка з відновленням зображення курсу"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Виникла помилка при збереженні змін курсу"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "Була виявлена помилка відправки електронної пошти. Будь ласка, перезавантажте сторінку і спробуйте ще раз."
   there_was_an_error_setting_usage_rights_53739e1d: "Виникла помилка з налаштуванням прав доступу."
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Була помилка відправлення до сервісу визначення схожості. Будь ласка, спробуйте відправити файл повторно перед зверненням до служби підтримки."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Відбулася помилка оновлення цього завдання. Будь ласка, поновіть сторінку та спробуйте ще раз."
@@ -19200,6 +19204,7 @@ uk:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Ваша спеціально розроблена тема успішно застосована."
   your_email_address_f881e583: "Ваша електронна адреса"
   your_email_b5364bee: "Ваша електронна адреса"
+  your_email_is_being_delivered_8a1d77b8: "Ваша електронна адреса доставляється."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       Ваш інструктор вніс зміни до оцінок і нові коментарі для %{title}. Ці зміни доступні для перегляду.
       
