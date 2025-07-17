@@ -1267,4 +1267,227 @@ describe Outcomes::StudentOutcomeRollupCalculationService do
       end
     end
   end
+
+  describe "#store_rollups" do
+    let(:outcome1) { outcome_model(context: course) }
+    let(:outcome2) { outcome_model(context: course) }
+
+    # Helper to create a RollupScore using a LearningOutcomeResult objects
+    def create_rollup_score(outcome, score_value, calculation_method = "average")
+      # Set up the outcome with proper calculation method
+      outcome.calculation_method = calculation_method
+      outcome.rubric_criterion = {
+        mastery_points: 3,
+        points_possible: 5,
+        ratings: [
+          { points: 5, description: "Exceeds" },
+          { points: 3, description: "Meets" },
+          { points: 0, description: "Does Not Meet" }
+        ]
+      }
+      outcome.save!
+
+      assignment = assignment_model(context: course)
+      alignment = outcome.align(assignment, course)
+      result = LearningOutcomeResult.create!(
+        learning_outcome: outcome,
+        user: student,
+        context: course,
+        alignment:,
+        score: score_value,
+        possible: 5
+      )
+
+      RollupScore.new(outcome_results: [result])
+    end
+
+    def create_rollup_collection_with_scores(context, rollup_scores)
+      Outcomes::ResultAnalytics::Rollup.new(context, rollup_scores)
+    end
+
+    it "creates new OutcomeRollup records" do
+      rollup_score = create_rollup_score(outcome1, 2.0, "average")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      expect do
+        subject.send(:store_rollups, [rollup_collection])
+      end.to change {
+        OutcomeRollup.where(course_id: course.id, user_id: student.id).count
+      }.from(0).to(1)
+
+      stored_rollup = OutcomeRollup.find_by(course_id: course.id, user_id: student.id, outcome_id: outcome1.id)
+      expect(stored_rollup.aggregate_score).to eq(2.0)
+    end
+
+    it "updates an existing rollup instead of inserting a duplicate" do
+      existing = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "average",
+        aggregate_score: 1.0,
+        last_calculated_at: 1.hour.ago
+      )
+
+      rollup_score = create_rollup_score(outcome1, 3.0, "average")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score])
+
+      expect do
+        subject.send(:store_rollups, [rollup_collection])
+      end.not_to change { OutcomeRollup.count }
+
+      expect(existing.reload.aggregate_score).to eq(3.0)
+    end
+
+    it "removes stale rollups not included in the current batch" do
+      stale = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "average",
+        aggregate_score: 1.0,
+        last_calculated_at: Time.current
+      )
+
+      fresh_rollup_score = create_rollup_score(outcome2, 4.0, "highest")
+      fresh_rollup_collection = create_rollup_collection_with_scores(student, [fresh_rollup_score])
+      subject.send(:store_rollups, [fresh_rollup_collection])
+
+      expect(stale.reload.workflow_state).to eq("deleted")
+      expect(
+        OutcomeRollup.active.where(course_id: course.id, user_id: student.id).pluck(:outcome_id)
+      ).to contain_exactly(outcome2.id)
+    end
+
+    it "handles multiple scores in a single rollup" do
+      rollup_score1 = create_rollup_score(outcome1, 2.0, "average")
+      rollup_score2 = create_rollup_score(outcome2, 4.0, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score1, rollup_score2])
+
+      expect do
+        subject.send(:store_rollups, [rollup_collection])
+      end.to change {
+        OutcomeRollup.where(course_id: course.id, user_id: student.id).count
+      }.from(0).to(2)
+
+      stored_rollup1 = OutcomeRollup.find_by(course_id: course.id, user_id: student.id, outcome_id: outcome1.id)
+      stored_rollup2 = OutcomeRollup.find_by(course_id: course.id, user_id: student.id, outcome_id: outcome2.id)
+
+      expect(stored_rollup1.aggregate_score).to eq(2.0)
+      expect(stored_rollup1.calculation_method).to eq("average")
+      expect(stored_rollup2.aggregate_score).to eq(4.0)
+      expect(stored_rollup2.calculation_method).to eq("highest")
+    end
+
+    it "handles empty rollups array" do
+      expect(subject.send(:store_rollups, [])).to eq([])
+    end
+
+    it "handles transaction rollback on error" do
+      score = create_rollup_score(outcome1, 2.0, "average")
+      rollup = create_rollup_collection_with_scores(student, [score])
+
+      # Mock upsert_all to raise an error
+      allow(OutcomeRollup).to receive(:upsert_all).and_raise(StandardError, "Database error")
+
+      expect do
+        subject.send(:store_rollups, [rollup])
+      end.to raise_error(StandardError, "Database error")
+
+      # Should not have created any rollups due to transaction rollback
+      expect(OutcomeRollup.where(course_id: course.id, user_id: student.id).count).to eq(0)
+    end
+
+    it "sets all existing rollups to deleted when no current rollups" do
+      # Create some existing rollups
+      existing1 = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "average",
+        aggregate_score: 1.0,
+        last_calculated_at: 1.hour.ago
+      )
+
+      existing2 = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome2.id,
+        calculation_method: "highest",
+        aggregate_score: 2.0,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Store empty rollups (no current scores)
+      empty_rollup_collection = create_rollup_collection_with_scores(student, [])
+      subject.send(:store_rollups, [empty_rollup_collection])
+
+      # All existing rollups should be marked as deleted
+      expect(existing1.reload.workflow_state).to eq("deleted")
+      expect(existing2.reload.workflow_state).to eq("deleted")
+    end
+
+    it "correctly identifies and preserves active rollups for same outcomes" do
+      # Create existing rollups for outcome1 and outcome2
+      existing1 = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome1.id,
+        calculation_method: "average",
+        aggregate_score: 1.0,
+        last_calculated_at: 1.hour.ago
+      )
+
+      existing2 = OutcomeRollup.create!(
+        root_account_id: course.root_account_id,
+        course_id: course.id,
+        user_id: student.id,
+        outcome_id: outcome2.id,
+        calculation_method: "highest",
+        aggregate_score: 2.0,
+        last_calculated_at: 1.hour.ago
+      )
+
+      # Store rollups for outcome1 and outcome2 (updating both)
+      rollup_score1 = create_rollup_score(outcome1, 3.0, "average")
+      rollup_score2 = create_rollup_score(outcome2, 4.0, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score1, rollup_score2])
+      subject.send(:store_rollups, [rollup_collection])
+
+      # Both should be updated, neither marked as deleted
+      expect(existing1.reload.workflow_state).to eq("active")
+      expect(existing1.aggregate_score).to eq(3.0)
+      expect(existing2.reload.workflow_state).to eq("active")
+      expect(existing2.aggregate_score).to eq(4.0)
+    end
+
+    it "returns an array of OutcomeRollup objects that were upserted" do
+      rollup_score1 = create_rollup_score(outcome1, 2.5, "average")
+      rollup_score2 = create_rollup_score(outcome2, 3.5, "highest")
+      rollup_collection = create_rollup_collection_with_scores(student, [rollup_score1, rollup_score2])
+
+      result = subject.send(:store_rollups, [rollup_collection])
+
+      expect(result.size).to eq(2)
+      expect(result).to all(be_an(OutcomeRollup))
+
+      # Should include the correct outcome IDs
+      returned_outcome_ids = result.map(&:outcome_id)
+      expect(returned_outcome_ids).to contain_exactly(outcome1.id, outcome2.id)
+
+      # Should have the correct scores
+      outcome1_rollup = result.find { |r| r.outcome_id == outcome1.id }
+      outcome2_rollup = result.find { |r| r.outcome_id == outcome2.id }
+
+      expect(outcome1_rollup.aggregate_score).to eq(2.5)
+      expect(outcome1_rollup.calculation_method).to eq("average")
+      expect(outcome2_rollup.aggregate_score).to eq(3.5)
+      expect(outcome2_rollup.calculation_method).to eq("highest")
+    end
+  end
 end
