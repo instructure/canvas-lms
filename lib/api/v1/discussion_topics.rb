@@ -197,7 +197,7 @@ module Api::V1::DiscussionTopics
     # topic can be announcement
     json[:is_announcement] = topic.is_announcement
 
-    json[:sort_order] = topic.sanitized_sort_order
+    json[:sort_order] = topic.sort_order
     json[:sort_order_locked] = topic.sort_order_locked
     json[:expanded] = topic.expanded
     json[:expanded_locked] = topic.expanded_locked

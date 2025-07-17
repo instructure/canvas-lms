@@ -456,7 +456,7 @@ module Types
     end
 
     def sort_order
-      object.sanitized_sort_order.to_sym
+      object.sort_order.to_sym
     end
 
     field :participant, Types::DiscussionParticipantType, null: true
