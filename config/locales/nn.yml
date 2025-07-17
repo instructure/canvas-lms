@@ -17604,6 +17604,7 @@ nn:
         subject: "Webkonferanseopptaket er klart: %{name}"
       twitter: 
         tweet: "Canvas-varsel – opptaket er klart: %{title}, %{name}"
+  messages_64e7435f: Meldingar
   messages_archived_58eb202f: 
     one: "Melding arkivert!"
     other: "Meldingar er arkiverte!"
@@ -19700,6 +19701,7 @@ nn:
   plagiarism_review_tool_error_513f47ff: "Feil med plagiatkontrollverktøy"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Plagiatkontrollverktøy manglar innleveringsaktivitetsteneste"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiatkontrollverktøyet sitt innleveringsaktivitetsteneste manglar sluttpunkt"
+  plain_text_43999c94: "Rein tekst"
   plain_text_e3ab33aa: "Rein tekst"
   plain_text_view_7640af4c: "Rein tekst-vising"
   planner_7fd46783: Planleggar
@@ -23803,6 +23805,7 @@ nn:
   send_a_message_to_student_b2e72576: "Send melding til %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Send ei melding til faglærar"
   send_a_message_to_this_student_ec46b8dd: "Send ei melding til denne studenten"
+  send_a_reply_message_81d0600e: "Send eit svar"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Send ei individuell melding til kvar mottakar"
   send_assignment_name_to_another_user_e2ca494d: "Send oppgåve %{name} til ein annan brukar"
   send_automatic_replies_to_incoming_mail_c18da8eb: "Send automatiske svar til innkommende meldingar"
@@ -26644,6 +26647,7 @@ nn:
   there_was_an_error_saving_your_blackout_dates_1efee334: "Det oppstod ein feil ved lagring av dine blokkerte datoar."
   there_was_an_error_saving_your_changes_bfaf3d79: "Det opptstod ein feil då endringane dine skulle lagrast."
   there_was_an_error_sending_the_message_791127d9: "Det oppstod ein feil ved sending av meldingen."
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "Det oppstod ein feil under sending av e-posten. Last opp sida på nytt og prøv ein gong til."
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod ein feil under fastsetjinga av bruksrettar."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Det oppsto ein feil under oppstart av lagre oppgåvedatoar-jobben"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Det oppstod ein feil under avlevering til tekstsamanlikningstenesta. Prøv å levere fila på nytt før du kontaktar brukarstøtte."
@@ -29757,6 +29761,7 @@ nn:
   your_email_address_844297ea: "E-postadressa di"
   your_email_address_f881e583: "E-postadressa di"
   your_email_b5364bee: "E-posten din"
+  your_email_is_being_delivered_8a1d77b8: "E-posten blir levert."
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Fila di vert lasta opp til karakterboka, og du kan gå at av sida når som helst. Om du har ei stor CSV-fil, kan det ta nokre minutt å oppdatere endringane. Om du vil hindre overskriving av data, må du stadfeste at opplastinga er fullført og karakterboka er korrekt før du utfører fleire endringar."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Fila di vert lasta opp til karakterboka, og du kan gå at av sida når som helst. Om du har ei stor CSV-fil, kan det ta nokre minutt å oppdatere endringane. Om du vil hindre overskriving av data, må du stadfeste at opplastinga er fullført og karakterboka er korrekt før du utfører fleire endringar."
   your_grading_schemes_b785: "Dine vurderingsskjema"
