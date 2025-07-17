@@ -119,7 +119,8 @@ class ContextModulesController < ApplicationController
         CAN_MANAGE_DIFFERENTIATION_TAGS: @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_TAGS_PERMISSIONS) && assign_to_tags,
         MODULE_TOOLS: module_tool_definitions,
         DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
-        PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?
+        PUBLISH_FINAL_GRADE: Canvas::Plugin.find!("grade_export").enabled?,
+        restrict_quantitative_data: @context.is_a?(Course) ? @context.restrict_quantitative_data?(@current_user) : false
       }
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)

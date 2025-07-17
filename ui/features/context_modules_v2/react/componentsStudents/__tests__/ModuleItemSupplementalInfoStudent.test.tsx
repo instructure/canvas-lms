@@ -20,6 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ModuleItemSupplementalInfoStudent from '../ModuleItemSupplementalInfoStudent'
 import {CompletionRequirement, ModuleItemContent} from '../../utils/types'
+import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 
 type DefaultPropsOverrides = {
   completionRequirement?: Partial<CompletionRequirement>
@@ -65,14 +66,20 @@ const setUp = (
   content: ModuleItemContent,
   itemIcon?: React.ReactNode,
   itemTypeText?: string,
+  restrictQuantitativeData?: boolean,
 ) => {
   return render(
-    <ModuleItemSupplementalInfoStudent
-      completionRequirement={completionRequirement}
-      content={content}
-      itemIcon={itemIcon}
-      itemTypeText={itemTypeText}
-    />,
+    <ContextModuleProvider
+      {...contextModuleDefaultProps}
+      restrictQuantitativeData={restrictQuantitativeData ?? false}
+    >
+      <ModuleItemSupplementalInfoStudent
+        completionRequirement={completionRequirement}
+        content={content}
+        itemIcon={itemIcon}
+        itemTypeText={itemTypeText}
+      />
+    </ContextModuleProvider>,
   )
 }
 
@@ -90,10 +97,12 @@ describe('ModuleItemSupplementalInfoStudent', () => {
 
   it('should render null when nothing is provided', () => {
     const {container} = render(
-      <ModuleItemSupplementalInfoStudent
-        content={null as any}
-        completionRequirement={null as any}
-      />,
+      <ContextModuleProvider {...contextModuleDefaultProps}>
+        <ModuleItemSupplementalInfoStudent
+          content={null as any}
+          completionRequirement={null as any}
+        />
+      </ContextModuleProvider>,
     )
     expect(container).toBeEmptyDOMElement()
   })
@@ -195,6 +204,69 @@ describe('ModuleItemSupplementalInfoStudent', () => {
       // Both should not be present since we're not rendering them
       expect(container.queryByTestId('item-icon')).not.toBeInTheDocument()
       expect(container.queryByText('discussion')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('restrict quantitative data', () => {
+    it('should show points when restrictQuantitativeData is false', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        false,
+      )
+
+      expect(container.getByText('100 pts')).toBeInTheDocument()
+    })
+
+    it('should hide points when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
+    })
+
+    it('should show points when restrictQuantitativeData is undefined (defaults to false)', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(props.completionRequirement, props.content)
+
+      expect(container.getByText('100 pts')).toBeInTheDocument()
+    })
+
+    it('should still show due date when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.getByTestId('due-date')).toBeInTheDocument()
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
+    })
+
+    it('should still show completion requirements when restrictQuantitativeData is true', () => {
+      const props = buildDefaultProps({})
+      const container = setUp(
+        props.completionRequirement,
+        props.content,
+        undefined,
+        undefined,
+        true,
+      )
+
+      expect(container.getByText('Submit')).toBeInTheDocument()
+      expect(container.queryByText('100 pts')).not.toBeInTheDocument()
     })
   })
 })

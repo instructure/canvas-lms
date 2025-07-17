@@ -25,6 +25,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {ModuleItemContent, CompletionRequirement, Checkpoint} from '../utils/types'
 import CompletionRequirementDisplay from './CompletionRequirementDisplay'
 import ModuleDiscussionCheckpointStudent from './ModuleDiscussionCheckpointStudent'
+import {useContextModule} from '../hooks/useModuleContext'
 
 const I18n = createI18nScope('context_modules_v2')
 
@@ -47,11 +48,16 @@ const ModuleItemSupplementalInfoStudent: React.FC<ModuleItemSupplementalInfoStud
   checkpoints,
   replyToEntryRequiredCount,
 }) => {
+  const {restrictQuantitativeData} = useContextModule()
+
   if (!content) return null
 
   const cachedDueDate = content.submissionsConnection?.nodes?.[0]?.cachedDueDate
   const hasDueDate = !!cachedDueDate
-  const hasPointsPossible = content.pointsPossible !== undefined && content.pointsPossible !== null
+  const hasPointsPossible =
+    content.pointsPossible !== undefined &&
+    content.pointsPossible !== null &&
+    !restrictQuantitativeData
   const hasCompletionRequirement = !!completionRequirement
 
   return (
