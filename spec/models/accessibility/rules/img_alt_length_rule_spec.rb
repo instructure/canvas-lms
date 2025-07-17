@@ -17,10 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require "spec_helper"
 require_relative "rule_test_helper"
 
-RSpec.describe "ImgAltLengthRule", type: :feature do
+describe Accessibility::Rules::ImgAltLengthRule do
   include RuleTestHelper
 
   context "when testing image alt text length" do
