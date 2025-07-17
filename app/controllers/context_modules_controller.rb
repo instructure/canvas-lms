@@ -270,7 +270,6 @@ class ContextModulesController < ApplicationController
 
       js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       js_env(CONTEXT_MODULE_ESTIMATED_DURATION_INFO_URL: context_url(@context, :context_context_modules_estimated_duration_info_url))
-      css_bundle :content_next, :context_modules2
 
       if @context.use_modules_rewrite_view?(@current_user, session)
         # Load new modules page assets
@@ -324,10 +323,13 @@ class ContextModulesController < ApplicationController
         js_env(MODULES_PERMISSIONS: modules_permissions)
 
         js_bundle :context_modules_v2
+        css_bundle :content_next, :context_modules2, :context_modules_v2
+
         render html: "", layout: true
       else
         # Load legacy modules page assets
         js_bundle :context_modules
+        css_bundle :content_next, :context_modules2
         render stream: can_stream_template?
       end
     end

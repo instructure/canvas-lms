@@ -2498,6 +2498,7 @@ class CoursesController < ApplicationController
             js_env(MODULES_PERMISSIONS: modules_permissions)
 
             js_bundle :context_modules_v2
+            css_bundle :content_next, :context_modules2, :context_modules_v2
           else
             @progress = Progress.find_by(
               context: @context,
