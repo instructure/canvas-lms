@@ -21,6 +21,7 @@ require_relative "../../helpers/context_modules_common"
 require_relative "../page_objects/modules2_index_page"
 require_relative "../../helpers/items_assign_to_tray"
 require_relative "../../helpers/assignments_common"
+require_relative "../shared_examples/course_modules2_shared"
 
 describe "context modules", :ignore_js_errors do
   include_context "in-process server selenium tests"
@@ -377,5 +378,9 @@ describe "context modules", :ignore_js_errors do
       expect(item_titles1).to include("a_file.txt")
       expect(item_titles2).to include("b_file.txt")
     end
+  end
+
+  context "module locking" do
+    include_examples "module unlock dates"
   end
 end

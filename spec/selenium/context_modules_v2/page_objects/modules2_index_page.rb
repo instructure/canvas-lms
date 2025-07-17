@@ -98,6 +98,10 @@ module Modules2IndexPage
     "#{module_header_selector(module_id)} [data-testid='module-header-prerequisites']"
   end
 
+  def module_header_will_unlock_selector(module_id)
+    "#{module_header_selector(module_id)} [data-testid='module-unlock-at-date']"
+  end
+
   def module_header_selector(module_id)
     "#context_module_#{module_id}"
   end
@@ -282,6 +286,10 @@ module Modules2IndexPage
 
   def module_header_prerequisites(module_id)
     f(module_header_prerequisites_selector(module_id))
+  end
+
+  def module_header_will_unlock_label(module_id)
+    f(module_header_will_unlock_selector(module_id))
   end
 
   def module_item_action_menu
