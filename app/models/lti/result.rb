@@ -24,6 +24,7 @@ class Lti::Result < ApplicationRecord
   GRADING_PROGRESS_TYPES = %w[FullyGraded Pending PendingManual Failed NotReady].freeze
   ACCEPT_GIVEN_SCORE_TYPES = %w[FullyGraded PendingManual].freeze
   ACTIVITY_PROGRESS_TYPES = %w[Initialized Started InProgress Submitted Completed].freeze
+  ACTIVITY_PROGRESSES_NEEDS_GRADING = %w[Submitted Completed].freeze
 
   AGS_EXT_SUBMISSION = "https://canvas.instructure.com/lti/submission"
 
@@ -102,7 +103,7 @@ class Lti::Result < ApplicationRecord
   end
 
   def needs_review?
-    grading_progress == "PendingManual"
+    grading_progress == "PendingManual" && ACTIVITY_PROGRESSES_NEEDS_GRADING.include?(activity_progress)
   end
 
   def mark_reviewed!
