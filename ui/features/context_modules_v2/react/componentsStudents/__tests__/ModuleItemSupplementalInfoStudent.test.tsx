@@ -266,7 +266,7 @@ describe('ModuleItemSupplementalInfoStudent', () => {
         true,
       )
 
-      expect(container.getByText('Submit')).toBeInTheDocument()
+      expect(container.getByText('Submit assignment')).toBeInTheDocument()
       expect(container.queryByText('100 pts')).not.toBeInTheDocument()
     })
   })
