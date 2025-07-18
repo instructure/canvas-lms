@@ -15922,6 +15922,7 @@ fa:
         subject: "ضبط کنفرانس مجازی آماده است: %{name}"
       twitter: 
         tweet: "هشدار کانواس - ضبط آماده است: %{title}، %{name}"
+  messages_64e7435f: "پیام ها"
   messages_deleted_8f781481: 
     one: "پیام ها حذف شد!"
     other: "پیام ها حذف شد!"
@@ -16716,6 +16717,7 @@ fa:
   notification: 
     account_notification_display: "اطلاعیه های سراسری"
     added_to_conversation_description: "شما به یک گفتگو افزوده شده اید"
+    added_to_conversation_description_legend: "شما به یک گفتگو افزوده شده اید"
     added_to_conversation_display: "به گفتگو افزوده شد"
     all_submissions_description: |-
         *فقط استاد و مدیر:*
@@ -16725,8 +16727,12 @@ fa:
     announcement_created_by_you_description: |-
         * اطلاعیه هایی که ایجاد کرده اید
         * پاسخ به اطلاعیه هایی که ایجاد کرده اید
+    announcement_created_by_you_description_legend: |-
+        * اطلاعیه هایی که ایجاد کرده اید
+        * پاسخ به اطلاعیه هایی که ایجاد کرده اید
     announcement_created_by_you_display: "اطلاعیه ای که ایجاد کرده اید"
     announcement_description: "اطلاعیه جدید در درس شما"
+    announcement_description_legend: "اطلاعیه جدید در درس شما"
     announcement_display: اطلاعیه
     appointment_availability_description: |-
         *فقط استاد و مدیر:*
@@ -16734,8 +16740,10 @@ fa:
         تغییر به بازه های زمانی قرار ملاقات
     appointment_availability_display: "در دسترس بودن قرار ملاقات"
     appointment_cancelations_description: "لغو قرار ملاقات"
+    appointment_cancelations_description_legend: "لغو قرار ملاقات"
     appointment_cancelations_display: "لغو قرارهای ملاقات"
     appointment_signups_description: "قرار ملاقات جدید در تقویم شما"
+    appointment_signups_description_legend: "قرار ملاقات جدید در تقویم شما"
     appointment_signups_display: "ثبت نام های قرار ملاقات"
     blueprint_description: |-
         *فقط استاد و مدیر:*
@@ -16743,6 +16751,7 @@ fa:
         محتوا از یک دوره طرح به دوره‌های مرتبط همگام شد
     blueprint_display: "همگام‌سازی طرح"
     calendar_description: "موردهای جدید و تغییر یافته در تقویم درسی شما"
+    calendar_description_legend: "موردهای جدید و تغییر یافته در تقویم درسی شما"
     calendar_display: تقویم
     categories: 
       account_notification: "اطلاعیه  حساب"
@@ -16778,8 +16787,10 @@ fa:
         مکان و محتوا پیوند انجام نشده که دانشجو با آن تعامل داشته است
     content_link_error_display: "خطای پیوند محتوا"
     conversation_created_description: "یک گفتگو ایجاد کرده اید"
+    conversation_created_description_legend: "یک گفتگو ایجاد کرده اید"
     conversation_created_display: "گفتگوهایی که ایجاد کرده ام"
     conversation_message_description: "پیام های جدید صندوق ورودی"
+    conversation_message_description_legend: "پیام های جدید صندوق ورودی"
     conversation_message_display: "پیام گفتگو"
     course_content_description: |-
         تغییر در محتوای درس:
@@ -16793,8 +16804,10 @@ fa:
     discussion_post_description: "ارسال بحث جدید در موضوعی که در آن مشترک نشده اید"
     discussion_post_display: "پاسخ جدید"
     due_date_description: "تغییر تاریخ مهلت تکلیف"
+    due_date_description_legend: "تغییر تاریخ مهلت تکلیف"
     due_date_display: "تاریخ مهلت"
     files_description: "فایل جدید به درس شما افزوده شد"
+    files_description_legend: "فایل جدید به درس شما افزوده شد"
     files_display: "فایل ها"
     grading_description: |-
         شامل:
@@ -16805,8 +16818,16 @@ fa:
     grading_display: "نمره گذاری"
     grading_notify_include_grade: "نمره در هنگام هشدار دادن درباره تغییرهای نمره، شامل شود."
     grading_policies_description: "تغییر سیاست نمره گذاری درس"
+    grading_policies_description_legend: "تغییر سیاست نمره گذاری درس"
     grading_policies_display: "سیاست های نمره گذاری"
     invitation_description: |-
+        دعوت برای:
+        
+        * کنفرانس تحت وب
+        * گروه
+        * همکاری
+        * بازبینی گروهی و یادآور
+    invitation_description_legend: |-
         دعوت برای:
         
         * کنفرانس تحت وب
@@ -16826,6 +16847,7 @@ fa:
         * پذیرفته شد/ رد شد
     membership_update_display: "بهنگام سازی عضویت"
     missing_description_description: "برای اطلاعیه های %{category}"
+    missing_description_description_legend: "برای اطلاعیه های %{category}"
     missing_display_display: "برای اطلاعیه های %{category}"
     names: 
       account_notification: "اطلاعیه  حساب"
@@ -16921,8 +16943,10 @@ fa:
         ثبت نام قرار ملاقات دانشجو
     student_appointment_display: "ثبت نام های قرار ملاقات دانشجو"
     submission_comment_description: "نظر درباره تکلیف ارسالی"
+    submission_comment_description_legend: "نظر درباره تکلیف ارسالی"
     submission_comment_display: "نظر درباره مورد ارسالی"
     web_conference_recording_ready: "یک ضبط کنفرانس آماده است"
+    web_conference_recording_ready_legend: "یک ضبط کنفرانس آماده است"
   notification_preferences: 
     communication: 
       email: 
@@ -17712,6 +17736,7 @@ fa:
   plagiarism_review_tool_error_513f47ff: "خطای ابزار بازبینی سرقت ادبی"
   plagiarism_review_tool_is_missing_submission_event_75273069: "ابزار بازبینی سرقت ادبی، سرویس رویداد ارسال را از دست می‌دهد"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "سرویس رویداد ارسال ابزار بازبینی سرقت ادبی، نقظه انتهایی را از دست می‌دهد"
+  plain_text_43999c94: "متن ساده"
   plain_text_e3ab33aa: "متن ساده"
   plain_text_view_7640af4c: "نمای متن ساده"
   planner_7fd46783: برنامه‌ریز
@@ -21535,6 +21560,7 @@ fa:
   send_a_message_to_name_43eec865: "ارسال پیام برای %{name}"
   send_a_message_to_student_b2e72576: "ارسال پیام برای %{student}"
   send_a_message_to_the_teacher_1ae115b6: "ارسال پیام برای استاد"
+  send_a_reply_message_81d0600e: "ارسال پیام پاسخ"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "ارسال پیام جداگانه برای هر گیرنده"
   send_assignment_name_to_another_user_e2ca494d: "ارسال  تکلیف %{name} به کاربر دیگر"
   send_comment_4e05f2fb: "ارسال نظر"
@@ -23899,6 +23925,7 @@ fa:
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "در هنگام ذخیره سازی تغییرات در درس خطایی رخ داد"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "در هنگام ذخیره سازی یادداشت خطایی رخ داد. لطفا دوباره سعی کنید."
   there_was_an_error_saving_your_changes_bfaf3d79: "هنگام ذخیره تغییرات شما خطایی روی داد."
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "در هنگام ارسال نامه الکترونیکی شما، خطایی رخ داد. لطفا صفحه را دوباره بارگذاری کنید و دوباره سعی کنید."
   there_was_an_error_setting_usage_rights_53739e1d: "در هنگام تعیین حقوق استفاده، خطایی رخ داد."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "هنگام شروع کار ذخیره تاریخ تکلیف خطایی روی داد"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "در هنگام ارسال به سرویس تشخیص شباهت وجود داشت. لطفا قبل از تماس با پشتیبانی، ارسال دوباره فایل را امتحان کنید."
@@ -26229,6 +26256,7 @@ fa:
   your_email_address_844297ea: "نشانی پست الکترونیکی شما"
   your_email_address_f881e583: "نشانی پست الکترونیکی شما"
   your_email_b5364bee: "پست الکترونیکی شما"
+  your_email_is_being_delivered_8a1d77b8: "نامه الکترونیکی شما در حال ارسال است."
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "فایل شما در حال بارگذاری در دفتر نمره است، و می توانید در هر زمان از این صفحه خارج شوید. اگر یک فایل CSV بزرگ دارید، بهنگام سازی تغییرات شما ممکن است چند دقیقه طول بکشد. برای جلوگیری از رونویسی هر گونه داده، لطفا قبل از ایجاد تغییرات دیگر تأیید کنید که بارگذاری انجام شده است و دفتر نمره درست می باشد."
   your_groups_are_being_created_50156e34: "گروه های شما در حال ایجاد هستند."
   your_homeroom_is_currently_unpublished_93c14f4f: "کلاس درس شما در حال حاضر منتشر نشده است."
