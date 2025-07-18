@@ -132,6 +132,13 @@ describe Accessibility::ResourceScannerService do
 
           expect(scan.reload.issue_count).to eq(2)
         end
+
+        it "connects the scan to the issue" do
+          subject.scan_resource(scan:)
+
+          issue = AccessibilityIssue.for_context(wiki_page).first
+          expect(issue.accessibility_resource_scan).to eq(scan)
+        end
       end
 
       it "updates the scan to completed" do
