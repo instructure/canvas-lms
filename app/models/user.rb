@@ -2898,6 +2898,10 @@ class User < ActiveRecord::Base
     initialize_default_folder(Folder::FLAMEGRAPHS_FOLDER_NAME)
   end
 
+  def n_plus_one_detection_folder
+    initialize_default_folder(Folder::N_PLUS_ONE_DETECTION_FOLDER_NAME)
+  end
+
   def initialize_default_folder(name)
     folder = active_folders.where(name:).first
     folder ||= folders.create!(name:,

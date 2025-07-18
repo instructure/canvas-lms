@@ -46,18 +46,11 @@ class ApplicationController < ActionController::Base
   #   (which is common for 401, 404, 500 responses)
   # Around action yields return (in REVERSE order) after all after actions
 
+  # If both a flamegraph and n+1 detection are requested, the flamegraph will take precedence.
+  # This is because otherwise, the flamegraph would also capture the N+1 detection code, which results
+  # in a bad flamegraph and can often lead to stack overflows, as the report is simply too deeply nested.
   around_action :generate_flamegraph, if: :flamegraph_requested_and_permitted?
-
-  if Rails.env.development? && !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
-    around_action :n_plus_one_detection
-
-    def n_plus_one_detection
-      Prosopite.scan
-      yield
-    ensure
-      Prosopite.finish
-    end
-  end
+  around_action :n_plus_one_detection, if: :enable_n_plus_one_detection?
 
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
@@ -139,6 +132,35 @@ class ApplicationController < ActionController::Base
     flamegraph_requested && Account.site_admin.grants_right?(@current_user, :update)
   end
   private :flamegraph_requested_and_permitted?
+
+  def enable_n_plus_one_detection?
+    if flamegraph_requested_and_permitted? || @current_user.blank?
+      false
+    elsif Rails.env.local?
+      !Canvas::Plugin.value_to_boolean(ENV["DISABLE_N_PLUS_ONE_DETECTION"])
+    else
+      value_to_boolean(params.fetch(:n_plus_one_detection, false)) && Account.site_admin.grants_right?(@current_user, :update)
+    end
+  end
+  private :enable_n_plus_one_detection?
+
+  def n_plus_one_detection(&)
+    if Rails.env.local?
+      begin
+        Prosopite.scan
+        yield
+      ensure
+        Prosopite.finish
+      end
+    else
+      NPlusOneDetection::NPlusOneDetectionService.call(
+        user: @current_user,
+        source_name: "#{controller_name}##{action_name}",
+        custom_name: params[:n_plus_one_name],
+        &
+      )
+    end
+  end
 
   def generate_flamegraph(&)
     Flamegraphs::FlamegraphService.call(
