@@ -45,6 +45,32 @@
 <% css_bundle :submission %>
 <% js_bundle 'submissions_show_preview_asset_report_status' %>
 
+<script>
+  window.addEventListener('message', function(event) {
+    const data = event.data;
+    if (!data || !data.type || !data.entryId) return;
+
+    if (data.type === 'IFRAME_STATUS') {
+      const entryDiv = document.getElementById('entry_' + data.entryId);
+      if(entryDiv) {
+        window.parent.postMessage({ type: 'CANVAS_IFRAME_READY' }, window.location.origin);
+      }
+    }
+    else if (data.type === 'HIGHLIGHT' && data.entryId != null) {
+      const entries = document.querySelectorAll('[id^="entry_"]');
+      entries.forEach(div => {
+        div.style.backgroundColor = '';
+      });
+
+      const entryDiv = document.getElementById('entry_' + data.entryId);
+      if (entryDiv) {
+        entryDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        entryDiv.style.backgroundColor = '#DFEBFB';
+      }
+    }
+  });
+</script>
+
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
 <% show_updated_plagiarism_icons = @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator) %>
 
