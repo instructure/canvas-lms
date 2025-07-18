@@ -284,12 +284,12 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def can_read_assessor_name?(user, session)
-    assessment_type == "grading" ||
-      !considered_anonymous? ||
-      assessor_id == user.id ||
-      rubric_association.association_object.context.grants_right?(
-        user, session, :view_all_grades
-      )
+    return true if assessor_id == user.id
+    return false if provisional_grader_names_hidden?
+    return true if assessment_type == "grading"
+    return true unless considered_anonymous?
+
+    rubric_association.association_object.context.grants_right?(user, session, :view_all_grades)
   end
 
   def considered_anonymous?
@@ -297,6 +297,13 @@ class RubricAssessment < ActiveRecord::Base
 
     rubric_association.association_type == "Assignment" &&
       rubric_association.association_object.anonymous_peer_reviews?
+  end
+
+  def provisional_grader_names_hidden?
+    return false unless active_rubric_association?
+    return false unless rubric_association.association_type == "Assignment"
+
+    !rubric_association.association_object.grader_names_visible_to_final_grader?
   end
 
   def ratings

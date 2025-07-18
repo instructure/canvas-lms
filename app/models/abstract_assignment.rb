@@ -4006,7 +4006,7 @@ class AbstractAssignment < ActiveRecord::Base
   end
 
   def ordered_moderation_graders_with_slot_taken
-    moderation_graders.with_slot_taken.order(:anonymous_id)
+    @ordered_moderation_graders_with_slot_taken ||= moderation_graders.with_slot_taken.order(:anonymous_id)
   end
 
   def moderation_grader_users_with_slot_taken
