@@ -16319,6 +16319,7 @@ hu:
         subject: "Webkonferencia felvétele kész: %{name}"
       twitter: 
         tweet: "Canvas-figyelmeztetés - Felvétel kész: %{title}, %{name}"
+  messages_64e7435f: Üzenetek
   messages_archived_58eb202f: 
     one: "Üzenet archiválva!"
     other: "Üzenetek archiválva!"
@@ -17228,8 +17229,10 @@ hu:
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Megjegyzés: Az osztályzási időszak ehhez a hallgatóhoz lezárva"
   notification: 
     account_notification_description: "Intézményszintű hirdetmények (a Vezérlőpult oldalakon is megjelennek)"
+    account_notification_description_legend: "Intézményszintű hirdetmények (a Vezérlőpult oldalakon is megjelennek)"
     account_notification_display: "Globális hirdetmények"
     added_to_conversation_description: "Önt hozzáadták egy üzenetváltáshoz"
+    added_to_conversation_description_legend: "Önt hozzáadták egy üzenetváltáshoz"
     added_to_conversation_display: "Hozzáadva az üzenetváltáshoz"
     all_submissions_description: |-
         *Csak oktató és admin:*
@@ -17239,13 +17242,19 @@ hu:
     announcement_created_by_you_description: |-
         * Hirdetmények, amelyeket Ön hozott létre
         * Válaszok a hirdetményekre, amelyeket Ön hozott létre
+    announcement_created_by_you_description_legend: |-
+        * Hirdetmények, amelyeket Ön hozott létre
+        * Válaszok a hirdetményekre, amelyeket Ön hozott létre
     announcement_created_by_you_display: "Ön által létrehozott hirdetmények"
     announcement_description: "Új hirdetmények a kurzusában"
+    announcement_description_legend: "Új hirdetmények a kurzusában"
     announcement_display: Hirdetmény
     appointment_availability_display: "Megbeszélés elérhetősége"
     appointment_cancelations_description: "Megbeszélés lemondása"
+    appointment_cancelations_description_legend: "Megbeszélés lemondása"
     appointment_cancelations_display: "Megbeszélés lemondások"
     appointment_signups_description: "Új megbeszélés az Ön naptárában"
+    appointment_signups_description_legend: "Új megbeszélés az Ön naptárában"
     appointment_signups_display: "Megbeszélés feliratkozások"
     blueprint_description: |-
         *Csak oktató és admin:*
@@ -17253,6 +17262,7 @@ hu:
         Tartalom szinkronizálva egy tervrajz kurzusból a hozzárendelt kurzusokba
     blueprint_display: "Blueprint Sync"
     calendar_description: "Új és módosított elemek az Ön kurzus naptárában"
+    calendar_description_legend: "Új és módosított elemek az Ön kurzus naptárában"
     calendar_display: Naptár
     categories: 
       account_notification: Fiókértesítés
@@ -17288,8 +17298,10 @@ hu:
         Hely és tartalom egy hibás hivatkozáshoz, amivel egy hallgató kapcsolatba került
     content_link_error_display: "Tartalom Hivatkozás Hiba"
     conversation_created_description: "Létrehozott egy üzenetváltást"
+    conversation_created_description_legend: "Létrehozott egy üzenetváltást"
     conversation_created_display: "Általam létrehozott üzenetváltások"
     conversation_message_description: "Új bejövő üzenetek"
+    conversation_message_description_legend: "Új bejövő üzenetek"
     conversation_message_display: "Üzenetváltási üzenet"
     course_content_description: |-
         Váltás a kurzus tartalomra:
@@ -17297,8 +17309,15 @@ hu:
         * Oldal tartalom
         * Kvíz tartalom
         * Feladat tartalom
+    course_content_description_legend: |-
+        Váltás a kurzus tartalomra:
+        
+        * Oldal tartalom
+        * Kvíz tartalom
+        * Feladat tartalom
     course_content_display: Kurzustartalom
     discussion_description: "Új Fórum a kurzusában"
+    discussion_description_legend: "Új Fórum a kurzusában"
     discussion_display: "Új téma"
     discussion_mention_description: |-
         Új megemlítés egy Fórumban.
@@ -17308,20 +17327,36 @@ hu:
         amelyeknél a Fórumok/Hirdetmények Újratervezés
         funkció be van kapcsolva.*
     discussion_post_description: "Új válasz egy feliratkozott témára"
+    discussion_post_description_legend: "Új válasz egy feliratkozott témára"
     discussion_post_display: "Új válasz"
     due_date_description: "A feladat határideje módosult"
+    due_date_description_legend: "A feladat határideje módosult"
     due_date_display: Határidő
     files_description: "Új fájl hozzáadva a kurzusához"
+    files_description_legend: "Új fájl hozzáadva a kurzusához"
     files_display: Fájlok
     grading_description: |-
         Tartalmazza:
         
         * Feladat/feladat leadási osztályzat megadása/megváltoztatása
         * A jegy súlya megváltozott
+    grading_description_legend: |-
+        Tartalmazza:
+        
+        * Feladat/feladat leadási osztályzat megadása/megváltoztatása
+        * A jegy súlya megváltozott
     grading_display: Értékelés
     grading_policies_description: "A kurzusértékelési rendszer megváltozott"
+    grading_policies_description_legend: "A kurzusértékelési rendszer megváltozott"
     grading_policies_display: "Értékelési irányelvek"
     invitation_description: |-
+        Meghívás erre:
+        
+        * Webkonferencia
+        * Csoport
+        * Együttműködés
+        * Társértékelés és emlékeztető
+    invitation_description_legend: |-
         Meghívás erre:
         
         * Webkonferencia
@@ -17341,6 +17376,7 @@ hu:
         * elfogadva/elutasítva
     membership_update_display: "Tagság frissítése"
     missing_description_description: "%{category} értesítések "
+    missing_description_description_legend: "%{category} értesítések "
     missing_display_display: "%{category} értesítések "
     names: 
       account_notification: Fiókértesítés
@@ -17435,14 +17471,17 @@ hu:
     recording_ready_display: "A felvétel elkészült"
     reminder_display: Emlékeztető
     reported_reply_description: "Új jelentett válasz egy Fórumban"
+    reported_reply_description_legend: "Új jelentett válasz egy Fórumban"
     student_appointment_description: |-
         *Csak oktató és admin számára:*
         
         Hallgatói megbeszélés feliratkozás
     student_appointment_display: "Hallgatói megbeszélés-feliratkozások"
     submission_comment_description: "Feladatbeadási megjegyzés"
+    submission_comment_description_legend: "Feladatbeadási megjegyzés"
     submission_comment_display: "Beadási megjegyzés"
     web_conference_recording_ready: "Egy konferencia felvétele kész"
+    web_conference_recording_ready_legend: "Egy konferencia felvétele kész"
   notification_policies_requires_the_communication_c_2e7ded08: |-
       Az értesítési irányelvek a kommunikációs csatorna azonosítóját, az értesítési kategóriát és a frissítési
                 gyakoriságot igényli.
@@ -18366,6 +18405,7 @@ hu:
   plagiarism_review_tool_is_missing_submission_event_75273069: "A plágium ellenőrző eszköz hiányolja a beadás esemény szolgáltatást"
   plagiarism_review_tool_live_event_subscription_err_9094579d: "Plágium felülvizsgálati eszköz élő esemény előfizetési hiba"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "A plágium ellenőrző eszköz beadás esemény szolgáltatása hiányolja a végpontot"
+  plain_text_43999c94: "Egyszerű szöveg"
   plain_text_e3ab33aa: "Egyszerű szöveg"
   plain_text_view_7640af4c: "Egyszerű szövegnézet"
   planner_7fd46783: Tervező
@@ -22325,6 +22365,7 @@ hu:
   send_a_message_to_name_43eec865: "Üzenet küldése neki: %{name}"
   send_a_message_to_student_b2e72576: "Üzenet küldése neki: %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Üzenet küldése az oktatónak"
+  send_a_reply_message_81d0600e: "Válasz küldése"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "Egyedi üzenet küldése minden résztvevőnek"
   send_assignment_name_to_another_user_e2ca494d: "Feladat %{name} küldése egy másik felhasználónak"
   send_automatic_replies_to_incoming_mail_c18da8eb: "Automatikus válaszok küldése a bejövő levelekre."
@@ -24935,6 +24976,7 @@ hu:
   there_was_an_error_saving_your_blackout_dates_1efee334: "Hiba történt a tilalmi dátumok mentése során"
   there_was_an_error_saving_your_changes_bfaf3d79: "Hiba történt a módosítások mentése során."
   there_was_an_error_sending_the_message_791127d9: "Hiba történt az üzenet küldésében"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "Hiba történt az e-mail küldése során. Kérjük, frissítse az oldalt, és próbálja újra!"
   there_was_an_error_setting_usage_rights_53739e1d: "Hiba történt a felhasználási jogok beállítása közben."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Hiba történt a hozzárendelési dátumok mentése feladat indításakor"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Hiba történt a hasonlóság érzékelő szolgáltatásba való beküldés közben. Kérjük, próbálja meg beküldeni a fájlt újra, mielőtt kapcsolatba lépne a támogatással!"
@@ -27926,6 +27968,7 @@ hu:
   your_email_address_844297ea: "Az Ön e-mail címe"
   your_email_address_f881e583: "Az Ön e-mail címe"
   your_email_b5364bee: "Az Ön e-mailje"
+  your_email_is_being_delivered_8a1d77b8: "Az e-mail kézbesítése folyamatban van"
   your_grade_has_been_updated_f1cd8f06: "Az osztályzatodat frissítettük"
   your_gradebook_export_has_been_cancelled_c1b99ca1: "Az osztálynapló exportálása megszakításra került"
   your_grading_schemes_b785: "Az Ön osztályozási rendszerei"
