@@ -312,13 +312,12 @@ const ProductDetail = (props: ProductDetailProps) => {
             {!isDesktop && renderConfigureButton()}
             <View
               as="div"
-              width={130}
               margin="small 0 small 0"
               position="relative"
               withFocusOutline={!showTrucatedDescription}
             >
               <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-                {I18n.t('Overview')}
+                <span style={{wordBreak: 'break-word'}}>{I18n.t('Overview')}</span>
               </Heading>
             </View>{' '}
             <Flex gap="x-large">
@@ -409,7 +408,9 @@ const ProductDetail = (props: ProductDetailProps) => {
             <Flex margin="medium 0 0 0">
               <Flex.Item margin="0 0 small 0">
                 <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-                  {I18n.t('Implementation Resources')}
+                  <span style={{wordBreak: 'break-word'}}>
+                    {I18n.t('Implementation Resources')}
+                  </span>
                 </Heading>
               </Flex.Item>
             </Flex>

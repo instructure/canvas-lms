@@ -42,7 +42,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         <Flex direction="column" width={isMobile ? '70%' : '90%'}>
           <Flex.Item margin="0 0 medium 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-              {I18n.t('Privacy')}
+              <span style={{wordBreak: 'break-word'}}>{I18n.t('Privacy')}</span>
             </Heading>
           </Flex.Item>
           {product.privacy_policy_url ? (
@@ -67,7 +67,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         <Flex direction="column">
           <Flex.Item margin="0 0 small 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-              {I18n.t('Terms of Service')}
+              <span style={{wordBreak: 'break-word'}}>{I18n.t('Terms of Service')}</span>
             </Heading>
           </Flex.Item>
           {product.terms_of_service_url ? (
@@ -81,7 +81,9 @@ const ExternalLinks = (props: ExternalLinksProps) => {
               </Flex.Item>
             </Flex>
           ) : (
-            <Flex.Item margin={product.privacy_and_security_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}>
+            <Flex.Item
+              margin={product.privacy_and_security_badges.length > 0 ? '0 0 large 0' : '0 0 0 0'}
+            >
               {I18n.t(
                 'The terms of service documentation for this provider is not currently available.',
               )}
@@ -91,7 +93,7 @@ const ExternalLinks = (props: ExternalLinksProps) => {
         <Flex direction="column" width={isMobile ? '70%' : '90%'}>
           <Flex.Item margin="0 0 small 0">
             <Heading level="h2" themeOverride={{h2FontWeight: 700}}>
-              {I18n.t('Accessibility')}
+              <span style={{wordBreak: 'break-word'}}>{I18n.t('Accessibility')}</span>
             </Heading>
           </Flex.Item>
           {product.accessibility_url ? (
