@@ -21,7 +21,6 @@ import {monitorProgress, type CanvasProgress} from '@canvas/progress/ProgressHel
 import {useMutation} from '@tanstack/react-query'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {GenerateCriteriaFormProps} from '../types/RubricForm'
 
 const I18n = createI18nScope('rubrics-form-generated-criteria')
 

@@ -229,6 +229,7 @@ export const CriterionRow = ({
     if (selectedViewMode === 'horizontal' && ratings.length <= 5) {
       return (
         <HorizontalButtonDisplay
+          hidePoints={hidePoints}
           isPreviewMode={isPreviewMode}
           isSelfAssessment={isSelfAssessment}
           ratings={ratings}
@@ -246,6 +247,7 @@ export const CriterionRow = ({
 
     return (
       <VerticalButtonDisplay
+        hidePoints={hidePoints}
         isPreviewMode={isPreviewMode}
         isSelfAssessment={isSelfAssessment}
         ratings={ratings}
