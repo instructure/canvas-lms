@@ -664,6 +664,32 @@ describe LearningObjectDatesController do
       expect(json_parse["overrides"]).to eq []
     end
 
+    it "prefers the section name over the override title" do
+      section = @course.course_sections.create!(name: "Old Section Name")
+      @override.set = section
+      @override.save!
+      section.update_column(:name, "New Section Name")
+      section.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse["overrides"][0]["title"]).to eq section.name
+    end
+
+    it "prefers the group name over the override title" do
+      category = @course.group_categories.create(name: "Group Category")
+      @assignment.update!(group_category_id: category.id)
+      category.create_groups(2)
+      group = category.groups.first
+      group.update_column(:name, "Old Group Name")
+      @override.set = group
+      @override.save!
+      group.update_column(:name, "New Group Name")
+      group.save!
+      get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
+      expect(response).to be_successful
+      expect(json_parse["overrides"][0]["title"]).to eq group.name
+    end
+
     it "returns unauthorized for students" do
       course_with_student_logged_in(course: @course)
       get :show, params: { course_id: @course.id, assignment_id: @assignment.id }
