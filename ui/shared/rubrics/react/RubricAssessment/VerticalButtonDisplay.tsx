@@ -28,6 +28,7 @@ import {escapeNewLineText, rangingFrom} from './utils/rubricUtils'
 import {SelfAssessmentRatingButton} from '@canvas/rubrics/react/RubricAssessment/SelfAssessmentRatingButton'
 
 type VerticalButtonDisplayProps = {
+  hidePoints: boolean
   isPreviewMode: boolean
   isSelfAssessment: boolean
   ratings: RubricRating[]
@@ -39,6 +40,7 @@ type VerticalButtonDisplayProps = {
   shouldFocusFirstRating?: boolean
 }
 export const VerticalButtonDisplay = ({
+  hidePoints,
   isPreviewMode,
   isSelfAssessment,
   ratings,
@@ -143,11 +145,13 @@ export const VerticalButtonDisplay = ({
                         dangerouslySetInnerHTML={escapeNewLineText(rating.longDescription)}
                       />
                     </View>
-                    <View as="div" textAlign="end">
-                      <Text size="x-small" weight="bold">
-                        {getPossibleText(rating.points)}
-                      </Text>
-                    </View>
+                    {!hidePoints && (
+                      <View as="div" textAlign="end">
+                        <Text size="x-small" weight="bold">
+                          {getPossibleText(rating.points)}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 ) : (
                   <Text size="x-small" weight="bold">

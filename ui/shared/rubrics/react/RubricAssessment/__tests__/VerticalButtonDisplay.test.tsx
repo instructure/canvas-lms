@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 - present Instructure, Inc.
+ * Copyright (C) 2025 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,7 +19,7 @@
 import React from 'react'
 import {render, screen} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import {HorizontalButtonDisplay} from '../HorizontalButtonDisplay'
+import {VerticalButtonDisplay} from '../VerticalButtonDisplay'
 import type {RubricRating} from '../../types/rubric'
 
 const mockRatings: RubricRating[] = [
@@ -43,7 +43,7 @@ const mockRatings: RubricRating[] = [
   },
 ]
 
-describe('HorizontalButtonDisplay', () => {
+describe('VerticalButtonDisplay', () => {
   const defaultProps = {
     isPreviewMode: false,
     ratings: mockRatings,
@@ -59,7 +59,7 @@ describe('HorizontalButtonDisplay', () => {
   })
 
   it('renders all rating buttons', () => {
-    render(<HorizontalButtonDisplay {...defaultProps} />)
+    render(<VerticalButtonDisplay {...defaultProps} />)
 
     mockRatings.forEach((rating, index) => {
       expect(screen.getByTestId(`rating-button-${rating.id}-${index}`)).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('HorizontalButtonDisplay', () => {
   })
 
   it('displays rating details when a rating is selected', () => {
-    render(<HorizontalButtonDisplay {...defaultProps} selectedRatingId="1" />)
+    render(<VerticalButtonDisplay {...defaultProps} selectedRatingId="1" />)
 
     const ratingDetails = screen.getByTestId('rating-details-1')
     expect(ratingDetails).toBeInTheDocument()
@@ -78,7 +78,7 @@ describe('HorizontalButtonDisplay', () => {
 
   it('calls onSelectRating when a rating button is clicked', async () => {
     const user = userEvent.setup()
-    render(<HorizontalButtonDisplay {...defaultProps} />)
+    render(<VerticalButtonDisplay {...defaultProps} />)
 
     const ratingButton = screen.getByTestId('rubric-rating-button-2')
     await user.click(ratingButton)
@@ -87,7 +87,7 @@ describe('HorizontalButtonDisplay', () => {
   })
 
   it('renders ratings in ascending order when specified', () => {
-    render(<HorizontalButtonDisplay {...defaultProps} ratingOrder="ascending" />)
+    render(<VerticalButtonDisplay {...defaultProps} ratingOrder="ascending" />)
 
     const ratingButtons = screen.getAllByTestId(/^rating-button-/)
     expect(ratingButtons[ratingButtons.length - 1].getAttribute('aria-label')).toContain('No Marks')
@@ -96,7 +96,7 @@ describe('HorizontalButtonDisplay', () => {
 
   it('shows point range when criterionUseRange is true', () => {
     render(
-      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={true} selectedRatingId="2" />,
+      <VerticalButtonDisplay {...defaultProps} criterionUseRange={true} selectedRatingId="2" />,
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')
@@ -105,7 +105,7 @@ describe('HorizontalButtonDisplay', () => {
 
   it('shows exact points when criterionUseRange is false', () => {
     render(
-      <HorizontalButtonDisplay {...defaultProps} criterionUseRange={false} selectedRatingId="2" />,
+      <VerticalButtonDisplay {...defaultProps} criterionUseRange={false} selectedRatingId="2" />,
     )
 
     const ratingDetails = screen.getByTestId('rating-details-2')
@@ -113,7 +113,7 @@ describe('HorizontalButtonDisplay', () => {
   })
 
   it('does not show points when hidePoints is true', () => {
-    render(<HorizontalButtonDisplay {...defaultProps} selectedRatingId="1" hidePoints={true} />)
+    render(<VerticalButtonDisplay {...defaultProps} selectedRatingId="1" hidePoints={true} />)
 
     const ratingDetails = screen.getByTestId('rating-details-1')
     expect(ratingDetails).toBeInTheDocument()

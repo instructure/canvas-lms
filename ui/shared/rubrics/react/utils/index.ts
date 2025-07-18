@@ -28,6 +28,7 @@ export type RubricUnderscoreType = {
   title: string
   criteria: RubricUnderscoreCriteria[]
   data?: RubricUnderscoreCriteria[]
+  hide_points: boolean
   id: string
   rating_order: string
   free_form_criterion_comments: boolean
@@ -121,6 +122,7 @@ export const mapRubricUnderscoredKeysToCamelCase = (
     freeFormCriterionComments: rubric.free_form_criterion_comments,
     pointsPossible: rubric.points_possible,
     criteriaCount: criteria.length,
+    hidePoints: rubric.hide_points,
     id: rubric.id,
     unassessed: rubric.unassessed,
     workflowState: rubric.workflow_state,
