@@ -16,18 +16,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class AccessibilityIssue < ActiveRecord::Base
-  extend RootAccountResolver
-  include Accessibility::HasContext
+# RuboCop warnings disabled because the affected tables are empty, and the index changes do not pose a risk.
+# rubocop:disable Migration/AddIndex, Rails/NotNullColumn
+class AddAccessibilityResourceScanToAccessibilityIssues < ActiveRecord::Migration[7.2]
+  tag :predeploy
 
-  resolves_root_account through: :course
-
-  belongs_to :course
-  belongs_to :updated_by, class_name: "User", optional: true
-  belongs_to :accessibility_resource_scan
-
-  enum :workflow_state, %i[active resolved dismissed], validate: true
-
-  validates :course, :workflow_state, presence: true
-  validates :rule_type, presence: true, inclusion: { in: Accessibility::Rule.registry.keys }
+  def change
+    add_reference :accessibility_issues,
+                  :accessibility_resource_scan,
+                  null: false,
+                  foreign_key: true,
+                  index: true
+  end
 end
+# rubocop:enable Migration/AddIndex, Rails/NotNullColumn
