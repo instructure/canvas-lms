@@ -17,37 +17,36 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Flamegraphs::FlamegraphService < SiteAdminReportingService
-  SAMPLING_INTERVAL_MICROSECONDS = 1_000
+class NPlusOneDetection::NPlusOneDetectionService < SiteAdminReportingService
+  HEADER_MESSAGE = "N+1 Detection Report\nIf this file is empty, no N+1 queries were detected.\n\n"
+  class NoBlockError < StandardError; end
+  class NonSiteAdminUser < StandardError; end
 
   private
 
   def create_report(file)
-    report = Tempfile.create do |temp|
-      StackProf.run(
-        mode: :wall,
-        raw: true,
-        ignore_gc: true,
-        out: temp,
-        interval: SAMPLING_INTERVAL_MICROSECONDS,
-        &@block
-      )
-      StackProf::Report.from_file(temp)
-    end
-    report.print_d3_flamegraph(file)
-    file.rewind
-    file
-  end
+    file.write(HEADER_MESSAGE)
+    # If we've gotten this far, we know we're in production, as this service is only
+    # used in production mode. Avoid cluttering the logs.
+    Prosopite.rails_logger = false
+    Prosopite.prosopite_logger = false
+    Prosopite.custom_logger = Logger.new(file)
 
-  def report_type
-    "flamegraph"
+    Prosopite.scan
+    block.call
+  ensure
+    Prosopite.finish
   end
 
   def content_type
-    "text/html"
+    "text/plain"
+  end
+
+  def report_type
+    "n_plus_one_detection"
   end
 
   def attachment_folder
-    user.flamegraphs_folder
+    user.n_plus_one_detection_folder
   end
 end
