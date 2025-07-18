@@ -9941,6 +9941,7 @@ el:
         subject: "<mrk mid=\"3635\" mtype=\"seg\">Ηχογράφηση Συνεδρίας μέσω Διαδικτύου Έτοιμη:</mrk> <mrk mid=\"3636\" mtype=\"seg\">%{name}</mrk>"
       twitter: 
         tweet: "<mrk mid=\"3637\" mtype=\"seg\">Ειδοποίηση Canvas - Η ηχογράφηση είναι έτοιμη:</mrk> <mrk mid=\"3638\" mtype=\"seg\">%{title}, %{name}</mrk>"
+  messages_64e7435f: Μηνύματα
   migrate_67c9f753: Μεταφορά
   migration: 
     announcement_type: Ανακοίνωση
@@ -10901,6 +10902,7 @@ el:
   pink_68ad45cb: Ροζ
   pinned_discussions_a55c0cea: "Καρφιτσωμένες Συζητήσεις"
   placements_5b5e056b: Τοποθετήσεις
+  plain_text_43999c94: "Απλό Κείμενο"
   plain_text_e3ab33aa: "Απλό κείμενο"
   play_media_comment_8614d30f: "Αναπαραγωγή Πολυμεσικού Σχολίου"
   playback: 
@@ -13708,6 +13710,7 @@ el:
       not_available_yet: "Θα λάβετε σύντομα ένα email πριν ξεκινήσει το μάθημα."
   self_registration_156392d6: Αυτο-εγγραφή
   self_sign_up_c8d23585: Αυτο-εγγραφή
+  send_a_reply_message_81d0600e: "Αποστολή απαντητικού μηνύματος"
   send_e3bd0ed0: Αποστολή
   sent_at_23cccc07: "Στάλθηκε στις"
   sent_f4ee89ec: Εστάλη!
@@ -15015,6 +15018,7 @@ el:
   there_was_a_problem_saving_the_grading_period_243bed6c: "Υπήρξε ένα πρόβλημα με την αποθήκευση της περιόδου βαθμολόγησης"
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Υπήρξε ένα πρόβλημα με την αποθήκευση του κανονισμού βαθμολόγησης"
   there_was_an_error_in_processing_your_request_6513a49a: "Παρουσιάστηκε σφάλμα κατά την επεξεργασία του αιτήματός σας"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "<mrk mid=\"4790\" mtype=\"seg\">Παρουσιάστηκε σφάλμα κατά την αποστολή του email σας.</mrk> <mrk mid=\"4791\" mtype=\"seg\">Παρακαλώ επαναφορτώστε τη σελίδα και δοκιμάστε ξανά.</mrk>"
   there_was_an_error_setting_usage_rights_53739e1d: "Παρουσιάστηκε σφάλμα κατά τη ρύθμιση των δικαιωμάτων χρήσης."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Υπήρξε σφάλμα κατά την αναζήτησή σας, παρακαλώ δοκιμάστε ξανά με νέα αναζήτηση"
   there_were_errors_with_the_form_errors_ab5b559a: "<mrk mid=\"1165\" mtype=\"seg\">Παρουσιάστηκαν σφάλματα όπως φαίνεται παρακάτω:</mrk> <mrk mid=\"1166\" mtype=\"seg\">%{errors}</mrk>"
@@ -16211,6 +16215,7 @@ el:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "To προσαρμοσμένο θέμα σας έχει εφαρμοστεί επιτυχώς."
   your_email_address_f881e583: "Η ηλεκτρονική σας διεύθυνση"
   your_email_b5364bee: "Η ηλεκτρονική σας διεύθυνση"
+  your_email_is_being_delivered_8a1d77b8: "Το μήνυμά σας παραδίδεται."
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
       <mrk mid="5566" mtype="seg">Ο εκπαιδευτής κοινοποίησε αλλαγές στη βαθμολογία και σχόλια για το %{title}.</mrk> <mrk mid="5567" mtype="seg">Οι αλλαγές αυτές είναι τώρα ορατές.</mrk>
       
