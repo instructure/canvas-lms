@@ -221,6 +221,24 @@ describe "Importing assignments" do
     expect(ra.hide_outcome_results).to be true
   end
 
+  it "does not update the association count when importing an assignment" do
+    file_data = get_import_data("", "assignment")
+    context = get_import_context("")
+    migration = context.content_migrations.create!
+
+    assignment_hash = file_data.find { |h| h["migration_id"] == "4469882339231" }.with_indifferent_access
+    rubric_model({ context:, migration_id: assignment_hash[:grading][:rubric_id] })
+    assignment_hash[:rubric_use_for_grading] = true
+    assignment_hash[:rubric_hide_points] = true
+    assignment_hash[:rubric_hide_outcome_results] = true
+
+    expect(Rubric).not_to receive(:update_association_count)
+    Importers::AssignmentImporter.import_from_migration(assignment_hash, context, migration)
+    rubric = Rubric.find(@rubric.id)
+    expect(rubric.association_count).to eq 0
+    expect(rubric.read_only).to be false
+  end
+
   describe "migrate_assignment_group_categories" do
     context "with feature off" do
       it "imports group category into existing group with same name when marked as a group assignment" do
