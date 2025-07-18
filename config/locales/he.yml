@@ -13014,6 +13014,7 @@ he:
         subject: "הקלטת שיחת הועידה מוכנה: %{name}"
       twitter: 
         tweet: "התראת קנבס - הקלטה מוכנה: %{title}, %{name}"
+  messages_64e7435f: "הודעות "
   messages_deleted_8f781481: 
     many: "ההודעה בוטלה!"
     one: "ההודעה בוטלה!"
@@ -13553,8 +13554,12 @@ he:
     announcement_created_by_you_description: |-
         * הכרזות אשר יצרת
         * תגובות להכרזות אשר יצרת
+    announcement_created_by_you_description_legend: |-
+        * הכרזות אשר יצרת
+        * תגובות להכרזות אשר יצרת
     announcement_created_by_you_display: "הכרזות שיצרת"
     announcement_description: "הכרזה חדשה בקורס שלך"
+    announcement_description_legend: "הכרזה חדשה בקורס שלך"
     announcement_display: הכרזה
     appointment_availability_description: |-
         *מדריכים ומנהלי מערכת בלבד*
@@ -13562,10 +13567,13 @@ he:
         שינוי חלונות זמן של פגישות
     appointment_availability_display: "זמינות פגישה"
     appointment_cancelations_description: "ביטול פגישה"
+    appointment_cancelations_description_legend: "ביטול פגישה"
     appointment_cancelations_display: "ביטולי פגישה"
     appointment_signups_description: "פגישה חדשה ביומנך"
+    appointment_signups_description_legend: "פגישה חדשה ביומנך"
     appointment_signups_display: "הרשמות לפגישה"
     calendar_description: "פריטים חדשים או מעודכנים ביומן הקורס שלך"
+    calendar_description_legend: "פריטים חדשים או מעודכנים ביומן הקורס שלך"
     calendar_display: יומן
     categories: 
       all_submissions: "כל ההגשות "
@@ -13596,6 +13604,7 @@ he:
     conversation_created_description: "יצרת דיון"
     conversation_created_display: "שיחות שיצרתי"
     conversation_message_description: "הודעות דוא\"ל חדשות"
+    conversation_message_description_legend: "הודעות דוא\"ל חדשות"
     conversation_message_display: "הודעת דיון"
     course_content_description: |-
         שינוי לתוכן הקורס:
@@ -13609,8 +13618,10 @@ he:
     discussion_post_description: "פרסום חדש בקבוצת הדיון בנושא אליו נרשמת"
     discussion_post_display: "פרסום בקבוצת דיון"
     due_date_description: "שינוי בתאריך יעד של משימה"
+    due_date_description_legend: "שינוי בתאריך יעד של משימה"
     due_date_display: "תאריך יעד"
     files_description: "קובץ חדש נתווסף לקורס שלך"
+    files_description_legend: "קובץ חדש נתווסף לקורס שלך"
     files_display: קבצים
     grading_description: |-
         כולל:
@@ -13620,8 +13631,16 @@ he:
         * שיקלול ציונים השתנה
     grading_display: "חישוב הציון"
     grading_policies_description: "שינוי במדיניות ההערכה לקורס"
+    grading_policies_description_legend: "שינוי במדיניות ההערכה לקורס"
     grading_policies_display: "מדיניות הערכה"
     invitation_description: |-
+        הזמנה ל:
+        
+        * שיחת ועידה
+        * קבוצה
+        * שיתוף פעולה
+        * סקירת עמיתים ותזכורת
+    invitation_description_legend: |-
         הזמנה ל:
         
         * שיחת ועידה
@@ -13641,6 +13660,7 @@ he:
         * אושרה/נדחתה
     membership_update_display: "עדכון חברות"
     missing_description_description: "עבור התראות %{category} "
+    missing_description_description_legend: "עבור התראות %{category} "
     missing_display_display: "עבור התראות %{category} "
     names: 
       account_user_notification: "התראות חשבון משתמש"
@@ -13732,8 +13752,10 @@ he:
         הרשמה לפגישת תלמידים
     student_appointment_display: "הרשמות לפגישת תלמידים"
     submission_comment_description: "הערת הגשת משימה"
+    submission_comment_description_legend: "הערת הגשת משימה"
     submission_comment_display: "הערת הגשה"
     web_conference_recording_ready: "הקלטת שיחת ועידה מוכנה "
+    web_conference_recording_ready_legend: "הקלטת שיחת ועידה מוכנה "
   notification_preferences: 
     communication: 
       email: 
@@ -14337,6 +14359,7 @@ he:
   plagiarism_review_tool_error_513f47ff: "שגיאת כלי בחינת העתקה"
   plagiarism_review_tool_is_missing_submission_event_75273069: "לכלי סקירת העתקות חסרה האפשרות להפעילו"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "כלי סקירת העתקות חסר את נקודת הקצה עבור שרות ההפעלה"
+  plain_text_43999c94: "טקסט פשוט"
   plain_text_e3ab33aa: "כיתוב פשוט"
   play_media_comment_8614d30f: "ניגון הערת מדיה"
   playback: 
@@ -17711,6 +17734,7 @@ he:
   self_signup_15b23092: self_signup
   send_a_message_to_student_b2e72576: "שליחת הודעה אל %{student}"
   send_a_message_to_the_teacher_1ae115b6: "משלוח הודעה למורה"
+  send_a_reply_message_81d0600e: "שיגור הודעת תגובה"
   send_an_individual_message_to_each_recipient_e9ddaeb8: "שליחת הודעה לכל נמען בנפרד"
   send_e3bd0ed0: שליחה
   send_message_6ccc90e8: "שליחת הודעה"
@@ -19515,6 +19539,7 @@ he:
   there_was_an_error_retrieving_the_course_image_d7ea094d: "אירעה שגיאה בעת איחזור תמונת הקורס"
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "אירעה שגיאה בעת הנסיון לשמור את הנתונים לקורס"
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "אירעה תקלה בעת שמירת ההערה. יש לנסות שוב"
+  there_was_an_error_sending_your_email_please_reloa_44a5b0db: "אירעה תקלה בשיגור הודעת הדוא\"ל שלך. יש לרענן את הדף ולנסות שוב"
   there_was_an_error_setting_usage_rights_53739e1d: "אירעה תקלה בעת הגדרת זכויות שימוש"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "אירעה שגיאה בעת השליחה לשרות בדיקת התאימות. יש לנסות לשלוח את הקובץ שוב לפני שפונים לסיוע טכני."
   there_was_an_error_updating_this_assignment_please_59fc608d: "אירעה שגיאה בעת עדכון מטלה זו. בבקשה לרענן את הדף ולנסות שוב"
@@ -21086,6 +21111,7 @@ he:
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "העיצוב הידני של ערכת הנושא שלך יושם בהצלחה"
   your_email_address_f881e583: "כתובת הדוא\"ל שלך"
   your_email_b5364bee: "כתובת הדוא\"ל שלך"
+  your_email_is_being_delivered_8a1d77b8: "הודעת הדוא\"ל שלך נשלחה."
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "הקובץ שלך מועלה כעת לספר הציונים, וניתן לעזוב דף זה בכל עת. אם יש לך קובץ CSV גדול, עדכון השינויים יכול להמשך כמה דקות. כדי למנוע דריסת נתונים כלשהם, בבקשה לוודא שההעלאה הושלמה וספר הציונים שלך נכון, לפני המשך ביצוע שינויים. "
   your_instructor_has_released_grade_changes_and_new_ffe458c8: |-

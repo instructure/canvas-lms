@@ -12107,6 +12107,7 @@ uk:
   notification: 
     account_notification_display: "Глобальні оголошення"
     added_to_conversation_description: "Ви добавлені до бесіди"
+    added_to_conversation_description_legend: "Ви добавлені до бесіди"
     added_to_conversation_display: "Доданий До Бесіди"
     all_submissions_description: |-
         *Лише для інструктора та адміністратора:*
@@ -12116,13 +12117,18 @@ uk:
     announcement_created_by_you_description: |-
         * Оголошення, які ви створили
         * Відповіді на оголошення, які ви створили
+    announcement_created_by_you_description_legend: |-
+        * Оголошення, які ви створили
+        * Відповіді на оголошення, які ви створили
     announcement_created_by_you_display: "Оголошення Створені Вами"
     announcement_description: "Нове оголошення у Вашому курсі"
+    announcement_description_legend: "Нове оголошення у Вашому курсі"
     announcement_display: Оголошення
     appointment_availability_display: "Доступніпсть призначення"
     appointment_cancelations_description: "Зустріч скасована "
     appointment_cancelations_display: "Скасування зустрічі "
     appointment_signups_description: "Нове призначення у Вашому календарі "
+    appointment_signups_description_legend: "Нове призначення у Вашому календарі "
     appointment_signups_display: "Реєстрація зустрічі "
     blueprint_description: |-
         *Лише для інструктора та адміністратора:*
@@ -12130,6 +12136,7 @@ uk:
         Контент синхронізовано з проектного курсу на пов'язані курси
     blueprint_display: "Синхронізація Проекту"
     calendar_description: "Нові та змінені елементи в календарі курсу "
+    calendar_description_legend: "Нові та змінені елементи в календарі курсу "
     calendar_display: Календар
     categories: 
       all_submissions: "Усі матеріали"
@@ -12158,8 +12165,10 @@ uk:
       student_appointment_signups: "Реєстрація призначення студента"
       submission_comment: коментарый
     conversation_created_description: "Ви створили бесіду"
+    conversation_created_description_legend: "Ви створили бесіду"
     conversation_created_display: "Бесіди, створені мною"
     conversation_message_description: "Нові вхідні повідомлення"
+    conversation_message_description_legend: "Нові вхідні повідомлення"
     conversation_message_display: "Повідомлення бесіди"
     course_content_description: |-
         Змінити контент курсу
@@ -12172,8 +12181,10 @@ uk:
     discussion_post_description: "Новий пост для обговорення у темі, на яку ви підписані"
     discussion_post_display: "Пост дискусії"
     due_date_description: "Дата кінця завдання змінена"
+    due_date_description_legend: "Дата кінця завдання змінена"
     due_date_display: "Очікувана дата"
     files_description: "Новий файл додано до вашого курсу"
+    files_description_legend: "Новий файл додано до вашого курсу"
     files_display: Файли
     grading_description: |-
         Включає:
@@ -12183,8 +12194,16 @@ uk:
         * Змінена вага балу
     grading_display: Оцінювання
     grading_policies_description: "Зміна політики оцінювання курсу"
+    grading_policies_description_legend: "Зміна політики оцінювання курсу"
     grading_policies_display: "Політика Оцінювання"
     invitation_description: |-
+        Запрошення для:
+        
+        * Веб-конференції
+        * Групи
+        * Співпраці
+        * Рецензування та нагадування
+    invitation_description_legend: |-
         Запрошення для:
         
         * Веб-конференції
@@ -12204,6 +12223,7 @@ uk:
         * прийнято/відхилено
     membership_update_display: "Оновлення Членства"
     missing_description_description: "Для %{category} оповіщення"
+    missing_description_description_legend: "Для %{category} оповіщення"
     missing_display_display: "Для %{category} оповіщення"
     names: 
       account_user_notification: "Оповіщення Користувацького Аккаунту"
@@ -12297,8 +12317,10 @@ uk:
         Призачення для реэстрації студента
     student_appointment_display: "Реєстрація призначення студента"
     submission_comment_description: "Представлення коментаря до завдання"
+    submission_comment_description_legend: "Представлення коментаря до завдання"
     submission_comment_display: "Представлення контенту"
     web_conference_recording_ready: "Запис конференції готовий"
+    web_conference_recording_ready_legend: "Запис конференції готовий"
   notification_preferences: 
     communication: 
       email: 
