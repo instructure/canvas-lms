@@ -18535,8 +18535,10 @@ nn:
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Merk: karaktersetjingsperioden er stengd for denne studenten"
   notification: 
     account_notification_description: "Globale kunngjeringar (også vist på dashbordet)"
+    account_notification_description_legend: "Globale kunngjeringar (også vist på dashbordet)"
     account_notification_display: "Globale kunngjeringar"
     added_to_conversation_description: "Du er lagt til i ein samtale"
+    added_to_conversation_description_legend: "Du er lagt til i ein samtale"
     added_to_conversation_display: "Lagt til i samtale"
     all_submissions_description: |-
         *Berre faglærar og administrator:*
@@ -18546,8 +18548,12 @@ nn:
     announcement_created_by_you_description: |-
         * Kunngjeringar oppretta av deg
         * Tilbakemeldingar på kunngjeringar du har oppretta
+    announcement_created_by_you_description_legend: |-
+        * Kunngjeringar oppretta av deg
+        * Tilbakemeldingar på kunngjeringar du har oppretta
     announcement_created_by_you_display: "Kunngjering oppretta av deg"
     announcement_description: "Nye kunngjeringar på emnet ditt"
+    announcement_description_legend: "Nye kunngjeringar på emnet ditt"
     announcement_display: Kunngjering
     appointment_availability_description: |-
         *Berre faglærar og administrator:*
@@ -18555,8 +18561,10 @@ nn:
         Endre til tidsluker for avtalar
     appointment_availability_display: "Tilgjengelege avtalar"
     appointment_cancelations_description: "Avlysing av avtale"
+    appointment_cancelations_description_legend: "Avlysing av avtale"
     appointment_cancelations_display: "Avlysing av avtalar"
     appointment_signups_description: "Ny avtale i kalenderen din"
+    appointment_signups_description_legend: "Ny avtale i kalenderen din"
     appointment_signups_display: "Påmelding til avtalar"
     blueprint_description: |-
         *Berre faglærar og administrator:*
@@ -18564,6 +18572,7 @@ nn:
         Innhald er synkronisert frå eit Blueprint-emne til tilknytta emne
     blueprint_display: "Synkronisering av Blueprint"
     calendar_description: "Nye og endra element i emnekalenderen din"
+    calendar_description_legend: "Nye og endra element i emnekalenderen din"
     calendar_display: Kalender
     categories: 
       account_notification: Kontovarsel
@@ -18599,6 +18608,7 @@ nn:
         Plassering og innhald til ei brutt lenke som studenten har handtert
     content_link_error_display: "Feil ved innhaldslenke"
     conversation_created_description: "Du oppretta ein samtale"
+    conversation_created_description_legend: "Du oppretta ein samtale"
     conversation_created_display: "Samtalar oppretta av meg"
     conversation_message_description: "Nye innboksmeldingar"
     conversation_message_display: Samtalemelding
@@ -18608,8 +18618,15 @@ nn:
         * Sideinnhald
         * Quizinnhald
         * Oppgåveinnhald
+    course_content_description_legend: |-
+        Endre emneinnhald:
+        
+        * Sideinnhald
+        * Quizinnhald
+        * Oppgåveinnhald
     course_content_display: Emneinnhald
     discussion_description: "Nytt diskusjonstema i ditt emne"
+    discussion_description_legend: "Nytt diskusjonstema i ditt emne"
     discussion_display: "Nytt tema"
     discussion_mention_description: |-
         Du vart nevnt i ein diskusjon
@@ -18619,20 +18636,36 @@ nn:
         funksjonaliteten med Diskusjonar/Kunngjeringar Redesign
         slått på.*
     discussion_post_description: "Nytt svar i eit tema som du abonnerar på"
+    discussion_post_description_legend: "Nytt svar i eit tema som du abonnerar på"
     discussion_post_display: "Nytt svar"
     due_date_description: "Endring av innleveringsfrist for oppgåve"
+    due_date_description_legend: "Endring av innleveringsfrist for oppgåve"
     due_date_display: Innleveringsfrist
     files_description: "Ny fil er lagd til emnet ditt"
+    files_description_legend: "Ny fil er lagd til emnet ditt"
     files_display: Filer
     grading_description: |-
         Inkluderer:
         
         * Vurderinga som er lagt inn/endra
         * Vekting av endra vurdering
+    grading_description_legend: |-
+        Inkluderer:
+        
+        * Vurderinga som er lagt inn/endra
+        * Vekting av endra vurdering
     grading_display: Karaktersetjing
     grading_policies_description: "Endring i retningslinjer for karaktersetjing på emnet"
+    grading_policies_description_legend: "Endring i retningslinjer for karaktersetjing på emnet"
     grading_policies_display: "Retningslinjer for karaktersetjing"
     invitation_description: |-
+        Invitasjon til:
+        
+        * Nettmøte
+        * Gruppe
+        * Samarbeid
+        * Fagfellevurdering & påminning
+    invitation_description_legend: |-
         Invitasjon til:
         
         * Nettmøte
@@ -18652,6 +18685,7 @@ nn:
         * godkjend/avslått
     membership_update_display: "Oppdatering av medlemskap"
     missing_description_description: "For %{category}-varsel"
+    missing_description_description_legend: "For %{category}-varsel"
     missing_display_display: "For %{category}-varsel"
     names: 
       account_notification: Kontovarsel
@@ -18746,14 +18780,17 @@ nn:
     recording_ready_display: "Opptaket er klart"
     reminder_display: Påminning
     reported_reply_description: "Nytt innlegg i ein diskusjon"
+    reported_reply_description_legend: "Nytt innlegg i ein diskusjon"
     student_appointment_description: |-
         *Berre faglærar og administrator:*
         
         Påmelding til studentavtale
     student_appointment_display: "Påmeldingar til studentavtalar"
     submission_comment_description: "Kommentar til oppgåveinnlevering"
+    submission_comment_description_legend: "Kommentar til oppgåveinnlevering"
     submission_comment_display: "Kommentar til innlevering"
     web_conference_recording_ready: "Eit webkonferanseopptak er klart"
+    web_conference_recording_ready_legend: "Eit webkonferanseopptak er klart"
   notification_policies_requires_the_communication_c_2e7ded08: "Varslingsretnignslinjer krev kommunikasjonskanal_id, varselkategori og oppdateringsfrekvens."
   notification_preferences: 
     communication: 
