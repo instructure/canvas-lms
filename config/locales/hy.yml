@@ -11084,6 +11084,7 @@ hy:
         subject: "Վեբ-կոնֆերանսի գրառումը պատրաստ է՝ %{name}:"
       twitter: 
         tweet: "Canvas ծանուցում. գրառումը պատրաստ է՝ %{title}, %{name}"
+  messages_64e7435f: Հաղորդագրություններ
   migration: 
     announcement_type: Հայտարարություն
     assignment_group_type: "Հանձնարարությունների խումբ"
@@ -11477,6 +11478,7 @@ hy:
   notification: 
     account_notification_display: "Ընդհանուր հայտարարություններ"
     added_to_conversation_description: "Դուք ավելացվել եք խոսակցությանը"
+    added_to_conversation_description_legend: "Դուք ավելացվել եք խոսակցությանը"
     added_to_conversation_display: "Ավելացվել է խոսակցությանը"
     all_submissions_description: |-
         *Միայն դասավանդողը և ադմինիստրատորը*
@@ -11486,8 +11488,12 @@ hy:
     announcement_created_by_you_description: |-
         * Ձեր կողմից ստեղծված հայտարարություններ
         * Պատասխաններ ձեր կողմից ստեղծված հայտարարություններին
+    announcement_created_by_you_description_legend: |-
+        * Ձեր կողմից ստեղծված հայտարարություններ
+        * Պատասխաններ ձեր կողմից ստեղծված հայտարարություններին
     announcement_created_by_you_display: "Ձեր կողմից ստեղծված հայտարարություն"
     announcement_description: "Նոր հայտարարություն ձեր դասընթացում "
+    announcement_description_legend: "Նոր հայտարարություն ձեր դասընթացում "
     announcement_display: Հայտարարություն
     appointment_availability_description: |-
         *Միայն դասավանդողը և ադմինիստրատորը*
@@ -11495,10 +11501,13 @@ hy:
         Փոխել հանդիպման ժամանակային միջակայքերը
     appointment_availability_display: "Հանդիպման առկայություն"
     appointment_cancelations_description: "Չեղյալ համարված հանդիպում"
+    appointment_cancelations_description_legend: "Չեղյալ համարված հանդիպում"
     appointment_cancelations_display: "Չեղյալ համարված հանդիպումներ"
     appointment_signups_description: "Նոր հանդիպում ձեր օրացույցում"
+    appointment_signups_description_legend: "Նոր հանդիպում ձեր օրացույցում"
     appointment_signups_display: "Հանդիպումների համար գրանցումներ "
     calendar_description: "Ձեր դասընթացի օրացույցում նոր և փոփոխված տարրեր"
+    calendar_description_legend: "Ձեր դասընթացի օրացույցում նոր և փոփոխված տարրեր"
     calendar_display: Օրացույց
     categories: 
       all_submissions: "Բոլոր ուղարկված աշխատանքները"
@@ -11526,8 +11535,10 @@ hy:
       student_appointment_signups: "Ուսանողական հանդիպումների գրանցումներ"
       submission_comment: "Ուղարկված աշխատանքների մեկնաբանություն"
     conversation_created_description: "Դուք ստեղծել եք խոսակցություն"
+    conversation_created_description_legend: "Դուք ստեղծել եք խոսակցություն"
     conversation_created_display: "Իմ կողմից ստեղծված խոսակցություններ"
     conversation_message_description: "Նոր մուտքային հաղորդագրություններ"
+    conversation_message_description_legend: "Նոր մուտքային հաղորդագրություններ"
     conversation_message_display: "Խոսակցության հաղորդագրություն"
     course_content_display: "Դասընթացի բովանդակություն "
     discussion_description: "Քննարկման նոր թեմա ձեր դասընթացում"
@@ -11535,12 +11546,15 @@ hy:
     discussion_post_description: "Քննարկման նոր գրառում այն թեմայով, որին դուք բաժանորդագրվել եք "
     discussion_post_display: "Քննարկման վերաբերյալ գրառում"
     due_date_description: "Հանձնարարության կատարման ժամկետի փոփոխություն"
+    due_date_description_legend: "Հանձնարարության կատարման ժամկետի փոփոխություն"
     due_date_display: "Կատարման ամսաթիվ"
     files_description: "Նոր ֆայլ է ավելացվել ձեր դասընթացին"
+    files_description_legend: "Նոր ֆայլ է ավելացվել ձեր դասընթացին"
     files_display: Ֆայլեր
     grading_display: Գնահատականներ
     grading_notify_include_grade: "Գնահատականների փոփոխության մասին ծանուցման մեջ ներառեք նաև գնահատականները:"
     grading_policies_description: "Դասընթացի գնահատման քաղաքականության փոփոխություն"
+    grading_policies_description_legend: "Դասընթացի գնահատման քաղաքականության փոփոխություն"
     grading_policies_display: "Գնահատման քաղաքականություններ"
     invitation_display: Հրավեր
     late_grading_description: |-
@@ -11555,6 +11569,7 @@ hy:
         *ընդունվել/մերժվել է
     membership_update_display: " Անդամակցության թարմացում"
     missing_description_description: "%{category} ծանուցումների համար"
+    missing_description_description_legend: "%{category} ծանուցումների համար"
     missing_display_display: "%{category} ծանուցումների համար"
     names: 
       account_user_notification: "Հաշվի օգտատիրոջ ծանուցումներ"
@@ -11644,8 +11659,10 @@ hy:
         Ունկնդրի հանդիպման գրանցում
     student_appointment_display: "Ունկնդրի հանդիպումների գրանցումներ"
     submission_comment_description: "Ուղարկված հանձնարարության մեկնաբանություն"
+    submission_comment_description_legend: "Ուղարկված հանձնարարության մեկնաբանություն"
     submission_comment_display: "Ուղարկված աշխատանքների մեկնաբանություն"
     web_conference_recording_ready: "Կոնֆերանսի գրառումը պատրաստ է"
+    web_conference_recording_ready_legend: "Կոնֆերանսի գրառումը պատրաստ է"
   notification_preferences: 
     communication: 
       email: 
@@ -15267,6 +15284,7 @@ hy:
       not_available_yet: "Մենք ձեզ էլեկտրոնային հաղորդագրություն կուղարկենք դասընթացն սկսվելուց քիչ առաջ:"
   self_registration_156392d6: Ինքնագրանցում
   self_sign_up_c8d23585: Ինքնագրանցում
+  send_a_reply_message_81d0600e: "Ուղարկել պատասխան հաղորդագրություն"
   send_custom_fields_uncheck_unless_using_canvas_zen_67e83666: "Ուղարկել Օգտագործողի դաշտերը  (հանել դրոշակը, եթե չեք օգտագործում  Canvas zendesk)"
   send_e3bd0ed0: Ուղարկել
   sent_at_23cccc07: Ուղարկել
