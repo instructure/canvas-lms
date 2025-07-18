@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useMemo} from 'react'
 import {useLocation, Link, useNavigate} from 'react-router-dom'
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -69,9 +69,15 @@ const NameLink = ({item, collection, isStacked}: NameLinkProps) => {
     }
   }
 
+  const backToUrl = useMemo(() => {
+    const searchParams = new URLSearchParams(location.search)
+    searchParams.delete('preview')
+    return `${location.pathname}?${searchParams.toString()}`
+  }, [location.pathname, location.search])
+
   const handleCloseModal = () => {
     setIsModalOpen(false)
-    navigate(location.pathname, {replace: true})
+    navigate(backToUrl, {replace: true})
   }
 
   const isFile = 'display_name' in item

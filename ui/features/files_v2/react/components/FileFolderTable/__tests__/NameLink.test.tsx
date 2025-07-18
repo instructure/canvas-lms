@@ -28,6 +28,16 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert', () => ({
   showFlashError: jest.fn(() => jest.fn()),
+  showFlashAlert: jest.fn(),
+}))
+
+const mockNavigate = jest.fn()
+const mockUseLocation = jest.fn()
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+  useLocation: () => mockUseLocation(),
 }))
 
 const defaultProps = {
@@ -47,6 +57,17 @@ const renderComponent = (props = {}) => {
 }
 
 describe('NameLink', () => {
+  const path = '/courses/1/files/subfolder/'
+  const queryParams = '?sort=name&order=asc&preview=123&search_term=example'
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseLocation.mockReturnValue({
+      pathname: path,
+      search: queryParams,
+    })
+  })
+
   it('renders folder with folder icon', () => {
     const folder = {...FAKE_FOLDERS[0]}
     renderComponent({item: folder})
@@ -100,6 +121,28 @@ describe('NameLink', () => {
       expect(showFlashError).toHaveBeenCalledWith(
         `${folder.name} is currently locked and unavailable to view.`,
       )
+    })
+  })
+
+  it('should call the navigate with existing query params, but the preview query param is removed when closing modal', async () => {
+    const user = userEvent.setup()
+    const file = {...FAKE_FILES[0]}
+    renderComponent({item: file})
+
+    await user.click(screen.getByText(file.display_name))
+
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining(`preview=${file.id}`), {
+      replace: true,
+    })
+
+    mockNavigate.mockClear()
+
+    const closeButton = screen.getByTestId('close-button')
+    await user.click(closeButton)
+
+    const expectedUrl = `${path}${queryParams.replace('&preview=123', '')}`
+    expect(mockNavigate).toHaveBeenCalledWith(expectedUrl, {
+      replace: true,
     })
   })
 })
