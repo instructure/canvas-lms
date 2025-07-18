@@ -122,4 +122,28 @@ describe Mutations::DeleteConversations do
       end
     end
   end
+
+  context "when restrict_student_access feature is enabled" do
+    before do
+      sender.account.root_account.enable_feature!(:restrict_student_access)
+    end
+
+    it "raises insufficient permissions error" do
+      query = <<~GQL
+        ids: [#{conv.id}]
+      GQL
+      result = execute_with_input(query)
+      expect(result["errors"]).not_to be_nil
+      expect(result["errors"][0]["message"]).to eq("Insufficient permissions")
+    end
+
+    it "does not delete any conversations" do
+      query = <<~GQL
+        ids: [#{conv.id}]
+      GQL
+      expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
+      execute_with_input(query)
+      expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 1
+    end
+  end
 end
