@@ -98,7 +98,7 @@ export default function buildStyle() {
   const tinySplitButtonChevronHoverBackgroundConst = darken(toolbarButtonHoverBackgroundConst, 10)
 
   const theme = {
-    canvasBackgroundColor: variables.colors.white,
+    canvasBackgroundColor: variables.colors.primitives.white,
     canvasTextColor: themeCanvasTextColor,
     canvasErrorColor: variables.colors.contrasts.red4570,
     canvasWarningColor: variables.colors.contrasts.orange4570,
