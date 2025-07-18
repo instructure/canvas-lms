@@ -143,5 +143,8 @@ module Types
     def can_reply
       object.submission.grants_right?(current_user, :comment)
     end
+
+    field :provisional, Boolean, null: false
+    delegate :provisional, to: :object
   end
 end
