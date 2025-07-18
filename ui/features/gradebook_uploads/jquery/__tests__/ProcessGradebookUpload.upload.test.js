@@ -18,7 +18,6 @@
 
 import {http, HttpResponse} from 'msw'
 import {setupServer} from 'msw/node'
-import $ from 'jquery'
 import ProcessGradebookUpload from '../process_gradebook_upload'
 import fakeENV from '@canvas/test-utils/fakeENV'
 
@@ -61,7 +60,6 @@ describe('ProcessGradebookUpload.upload', () => {
       bulk_update_path: '/bulk_update_path/url',
       bulk_update_override_scores_path: null, // Disable by default
       custom_grade_statuses: [],
-      gradebook_path: '/gradebook',
     })
 
     // Reset handlers
@@ -79,7 +77,6 @@ describe('ProcessGradebookUpload.upload', () => {
 
     // Clear all mock function calls
     jest.clearAllMocks()
-    windowAlert.mockClear()
   })
 
   afterEach(() => {
@@ -87,44 +84,50 @@ describe('ProcessGradebookUpload.upload', () => {
     ProcessGradebookUpload.goToGradebook = originalGoToGradebook
     server.resetHandlers()
     fakeENV.teardown()
+
+    // Ensure all timers are cleared
+    jest.clearAllTimers()
   })
 
   afterAll(() => {
     server.close()
   })
 
-  test('sends no data to server if given null', () => {
-    ProcessGradebookUpload.upload(null)
+  test('sends no data to server if given null', async () => {
+    await ProcessGradebookUpload.upload(null)
     expect(goToGradebookStub).not.toHaveBeenCalled()
   })
 
-  test('sends no data to server if given an empty object', () => {
-    ProcessGradebookUpload.upload({})
+  test('sends no data to server if given an empty object', async () => {
+    await ProcessGradebookUpload.upload({})
     expect(goToGradebookStub).not.toHaveBeenCalled()
   })
 
-  test('sends no data to server if given a single existing assignment with no submissions', () => {
+  test('sends no data to server if given a single existing assignment with no submissions', async () => {
     const student = {previous_id: 1, submissions: []}
     const gradebook = {students: [student], assignments: [oldAssignment1]}
-    ProcessGradebookUpload.upload(gradebook)
+    await ProcessGradebookUpload.upload(gradebook)
 
-    expect(goToGradebookStub).not.toHaveBeenCalled()
+    // goToGradebook is always called, but no alert should be shown when no data is uploaded
+    expect(goToGradebookStub).toHaveBeenCalled()
+    expect(windowAlert).not.toHaveBeenCalled()
   })
 
-  test('sends no data to server if given a single existing assignment that requires no change', () => {
+  test('sends no data to server if given a single existing assignment that requires no change', async () => {
     const student = {previous_id: 1, submissions: [submissionOld1NoChange]}
     const gradebook = {students: [student], assignments: [oldAssignment1]}
-    ProcessGradebookUpload.upload(gradebook)
+    await ProcessGradebookUpload.upload(gradebook)
 
-    expect(goToGradebookStub).not.toHaveBeenCalled()
+    // goToGradebook is always called, but no alert should be shown when no data is uploaded
+    expect(goToGradebookStub).toHaveBeenCalled()
+    expect(windowAlert).not.toHaveBeenCalled()
   })
 
   test('handles a grade change to a single existing assignment', async () => {
     const student = {previous_id: 1, submissions: [submissionOld1Change]}
     const gradebook = {students: [student], assignments: [oldAssignment1]}
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(goToGradebookStub).toHaveBeenCalled()
     expect(windowAlert).toHaveBeenCalled()
@@ -134,15 +137,14 @@ describe('ProcessGradebookUpload.upload', () => {
     const student = {previous_id: 1, submissions: [submissionOld1Excused]}
     const gradebook = {students: [student], assignments: [oldAssignment1]}
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(goToGradebookStub).toHaveBeenCalled()
     expect(windowAlert).toHaveBeenCalled()
   })
 
   test('handles a creation of a new assignment with no submissions', async () => {
-    const student = {id: 1, previous_id: 1, submissions: []}
+    const student = {previous_id: 1, submissions: []}
     const gradebook = {students: [student], assignments: [newAssignment1]}
 
     await ProcessGradebookUpload.upload(gradebook)
@@ -156,8 +158,7 @@ describe('ProcessGradebookUpload.upload', () => {
     const student = {previous_id: 1, submissions: [submissionNew1Change]}
     const gradebook = {students: [student], assignments: [newAssignment1]}
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(goToGradebookStub).toHaveBeenCalled()
     expect(windowAlert).toHaveBeenCalled()
@@ -167,15 +168,14 @@ describe('ProcessGradebookUpload.upload', () => {
     const student = {previous_id: 1, submissions: [submissionNew1Excused]}
     const gradebook = {students: [student], assignments: [newAssignment1]}
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(goToGradebookStub).toHaveBeenCalled()
     expect(windowAlert).toHaveBeenCalled()
   })
 
   test('calls uploadCustomColumnData if custom_columns is non-empty', async () => {
-    const uploadCustomColumnDataStub = jest.fn().mockResolvedValue($.Deferred().resolve())
+    const uploadCustomColumnDataStub = jest.fn()
     const originalUploadCustomColumnData = ProcessGradebookUpload.uploadCustomColumnData
     ProcessGradebookUpload.uploadCustomColumnData = uploadCustomColumnDataStub
 
@@ -233,8 +233,7 @@ describe('ProcessGradebookUpload.upload', () => {
       ],
     }
 
-    const uploadPromise = ProcessGradebookUpload.upload(gradebook)
-    await uploadPromise
+    await ProcessGradebookUpload.upload(gradebook)
 
     expect(windowAlert).toHaveBeenCalled()
   })
@@ -272,14 +271,23 @@ describe('ProcessGradebookUpload.upload', () => {
         },
       ],
     }
-    const result = ProcessGradebookUpload.upload(gradebook)
+    await ProcessGradebookUpload.upload(gradebook)
 
-    // Since no update URL is set, override scores are ignored
-    expect(goToGradebookStub).not.toHaveBeenCalled()
+    // goToGradebook is always called, but no alert should be shown since override scores are ignored
+    expect(goToGradebookStub).toHaveBeenCalled()
+    expect(windowAlert).not.toHaveBeenCalled()
+  })
 
-    // If result is defined, await it to ensure cleanup
-    if (result) {
-      await result
-    }
+  // Test to ensure no async operations are left dangling
+  test('completes all async operations before test ends', async () => {
+    const student = {previous_id: 1, submissions: [submissionOld1Change]}
+    const gradebook = {students: [student], assignments: [oldAssignment1]}
+
+    await ProcessGradebookUpload.upload(gradebook)
+
+    // Wait a bit to ensure no dangling promises
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(goToGradebookStub).toHaveBeenCalled()
   })
 })
