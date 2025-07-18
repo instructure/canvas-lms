@@ -173,7 +173,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
   if (isRequestInFlight) return renderSpinner()
 
   return (
-    <>
+    <View position="fixed" overflowY="auto">
       <Flex as="div" direction="column" height="100vh" width="100%">
         <Flex.Item
           as="header"
@@ -254,7 +254,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
       <Alert screenReaderOnly={true} liveRegionPoliteness="assertive" liveRegion={getLiveRegion}>
         {assertiveAlertMessage}
       </Alert>
-    </>
+    </View>
   )
 }
 
