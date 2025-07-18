@@ -17,6 +17,7 @@
  */
 
 import {Modal} from '@instructure/ui-modal'
+import {View} from '@instructure/ui-view'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -76,21 +77,23 @@ export const DeleteExceptionModal = ({onClose, onDelete, ...props}: DeleteExcept
     )
   } else if (props.open) {
     body = (
-      <Modal.Body padding="medium medium">
-        {'accountControl' in props ? (
-          <AccountControlDeletionBody
-            parent={props.accountControl}
-            childControls={props.childControls}
-            toolName={props.toolName}
-            availableInParentContext={props.availableInParentContext}
-          />
-        ) : (
-          <CourseControlDeletionBody
-            toolName={props.toolName}
-            control={props.courseControl}
-            availableInParentContext={props.availableInParentContext}
-          />
-        )}
+      <Modal.Body padding="medium medium" overflow="scroll">
+        <View height="25rem" as="div">
+          {'accountControl' in props ? (
+            <AccountControlDeletionBody
+              parent={props.accountControl}
+              childControls={props.childControls}
+              toolName={props.toolName}
+              availableInParentContext={props.availableInParentContext}
+            />
+          ) : (
+            <CourseControlDeletionBody
+              toolName={props.toolName}
+              control={props.courseControl}
+              availableInParentContext={props.availableInParentContext}
+            />
+          )}
+        </View>
       </Modal.Body>
     )
   } else {

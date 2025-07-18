@@ -20,7 +20,7 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import {Modal} from '@instructure/ui-modal'
 
-export const MODAL_BODY_HEIGHT = '50vh'
+export const MODAL_BODY_HEIGHT = '25rem'
 
 export type RegistrationModalProps = {
   padding?: 'medium' | 'none'
