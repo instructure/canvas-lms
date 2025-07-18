@@ -48,6 +48,7 @@ type Account implements LegacyIDInterface & Node {
     last: Int
   ): CustomGradeStatusConnection
   id: ID!
+  instructureIdentityOrganizationId: String
   name: String
   outcomeCalculationMethod: OutcomeCalculationMethod
   outcomeProficiency: OutcomeProficiency
@@ -8695,6 +8696,7 @@ type SubmissionComment implements LegacyIDInterface & Timestamped {
   id: ID!
   mediaCommentId: String
   mediaObject: MediaObject
+  provisional: Boolean!
   read: Boolean!
   submissionId: ID!
   updatedAt: DateTime
@@ -10249,6 +10251,8 @@ type User implements LegacyIDInterface & Node & Timestamped {
   htmlUrl(courseId: ID): URL
   id: ID!
   inboxLabels: [String!]
+  instructureIdentityGlobalUserId: String
+  instructureIdentityOrganizationUserId: String
   integrationId: String
   lastName: HtmlEncodedString
   loginId: String
