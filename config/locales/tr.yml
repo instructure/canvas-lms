@@ -13622,6 +13622,7 @@ tr:
   notification: 
     account_notification_display: "Genel Duyurular"
     added_to_conversation_description: "Bu mesajlaşmaya eklendiniz"
+    added_to_conversation_description_legend: "Bu mesajlaşmaya eklendiniz"
     added_to_conversation_display: "Mesajlaşmalara Eklendi"
     all_submissions_description: |-
         *Sadece Eğitmen ve Yönetici*
@@ -13631,8 +13632,12 @@ tr:
     announcement_created_by_you_description: |-
         * Tarafınızdan oluşturulan Duyurular
         * Oluşturduğunuz duyurulara verilen cevaplar
+    announcement_created_by_you_description_legend: |-
+        * Tarafınızdan oluşturulan Duyurular
+        * Oluşturduğunuz duyurulara verilen cevaplar
     announcement_created_by_you_display: "Tarafınızdan Oluşturulan Duyuru"
     announcement_description: "Dersinizdeki Yeni Duyurular"
+    announcement_description_legend: "Dersinizdeki Yeni Duyurular"
     announcement_display: Duyuru
     appointment_availability_description: |-
         *Sadece eğitmen ve yönetici:*
@@ -13640,11 +13645,14 @@ tr:
         Randevu saatlerini değiştirin
     appointment_availability_display: "Varolan Randevu"
     appointment_cancelations_description: "Randevu iptali"
+    appointment_cancelations_description_legend: "Randevu iptali"
     appointment_cancelations_display: "Randevu İptalleri"
     appointment_signups_description: "Takvime yeni randevu oluştur"
+    appointment_signups_description_legend: "Takvime yeni randevu oluştur"
     appointment_signups_display: "Randevulara Kayıt Ol"
     blueprint_display: "Şablon Eşzamanlama"
     calendar_description: "Ders takvimi üzerindeki yeni ve değişen öğeler"
+    calendar_description_legend: "Ders takvimi üzerindeki yeni ve değişen öğeler"
     calendar_display: Takvim
     categories: 
       all_submissions: "Tüm Gönderiler"
@@ -13675,10 +13683,18 @@ tr:
       submission_comment: "Gönderi Yorumu"
     content_link_error_display: "İçerik Bağlantı Hatası"
     conversation_created_description: "Bir sohbet oluşturdunuz"
+    conversation_created_description_legend: "Bir sohbet oluşturdunuz"
     conversation_created_display: "Tarafımdan Oluşturulan Mesajlar"
     conversation_message_description: "Yeni Gelen Mesajlar"
+    conversation_message_description_legend: "Yeni Gelen Mesajlar"
     conversation_message_display: "Sohbet Mesajları"
     course_content_description: |-
+        Ders içeriğine değiştir:
+        
+        * Sayfa içeriği
+        * Kısa sınav içeriği
+        * Ödev içeriği
+    course_content_description_legend: |-
         Ders içeriğine değiştir:
         
         * Sayfa içeriği
@@ -13690,8 +13706,10 @@ tr:
     discussion_post_description: "Takip ettiğiniz başlıklardaki yeni tartışma gönderileri"
     discussion_post_display: "Gönderilen Tartışma"
     due_date_description: "Ödev bitiş tarihini değiştir"
+    due_date_description_legend: "Ödev bitiş tarihini değiştir"
     due_date_display: "Bitiş Tarihi"
     files_description: "Dersinize yeni bir dosya eklendi"
+    files_description_legend: "Dersinize yeni bir dosya eklendi"
     files_display: Dosyalar
     grading_description: |-
         Şunları Kapsar:
@@ -13707,6 +13725,7 @@ tr:
     grading_display: Notlandırma
     grading_notify_include_grade: "No değişiklikleri ile ilgili uyarılarda puanları dahil et."
     grading_policies_description: "Ders değerlendirme kuralı değişikliği"
+    grading_policies_description_legend: "Ders değerlendirme kuralı değişikliği"
     grading_policies_display: "Notlandırma Kuralları"
     invitation_description: |-
         Davet:
@@ -13729,6 +13748,7 @@ tr:
         * onaylandı/reddedildi
     membership_update_display: "Üyelik Güncelleme"
     missing_description_description: "%{category} bildirimleri için"
+    missing_description_description_legend: "%{category} bildirimleri için"
     missing_display_display: "%{category} bildirimleri için"
     names: 
       account_user_notification: "Kullanıcı Hesabı Bildirimi"
@@ -13814,8 +13834,10 @@ tr:
         Öğrenci ödev kaydı
     student_appointment_display: "Öğrenci Randevu Oturumları"
     submission_comment_description: "Ödev gönderim yorumu"
+    submission_comment_description_legend: "Ödev gönderim yorumu"
     submission_comment_display: "Gönderi Yorumu"
     web_conference_recording_ready: "Bir canlı ders kaydı hazır"
+    web_conference_recording_ready_legend: "Bir canlı ders kaydı hazır"
   notification_preferences: 
     communication: 
       email: 
