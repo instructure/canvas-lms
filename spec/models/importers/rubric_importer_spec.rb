@@ -108,6 +108,7 @@ describe "Importing Rubrics" do
       migration = double
       allow(migration).to receive(:add_imported_item)
       allow(migration).to receive_messages(context:, migration_settings: { associate_with_assignment_id: assignment.id })
+      expect_any_instance_of(Rubric).not_to receive(:update_association_count)
 
       data[:rubrics_to_import] = {}
       data[:rubrics_to_import][data[:migration_id]] = true
@@ -119,6 +120,32 @@ describe "Importing Rubrics" do
       assignment.reload
       expect(assignment.rubric_association.purpose).to eq "grading"
       expect(assignment.rubric_association.rubric_id).to eq r.id
+      expect(r.association_count).to eq 0
+    end
+
+    it "imports the association count correctly" do
+      data = get_import_data(system, "rubric")
+      context = get_import_context(system)
+      assignment = Assignment.create!(course: @course)
+      migration = double
+      allow(migration).to receive(:add_imported_item)
+      allow(migration).to receive_messages(context:, migration_settings: { associate_with_assignment_id: assignment.id })
+
+      data[:rubrics_to_import] = {}
+      data[:rubrics_to_import][data[:migration_id]] = true
+      data[:rubrics] = data[:data]
+      data[:rubrics][0][:migration_id] = data[:migration_id]
+      Importers::RubricImporter.import_from_migration(data, migration)
+      expect(context.rubrics.count).to eq 1
+      r = Rubric.where(migration_id: data[:migration_id]).first
+      expect(r.association_count).to eq 0
+
+      Importers::RubricImporter.process_rubric_association_count(data)
+
+      assignment.reload
+      expect(assignment.rubric_association.purpose).to eq "grading"
+      expect(assignment.rubric_association.rubric_id).to eq r.id
+      expect(r.reload.association_count).to eq 1
     end
   end
 

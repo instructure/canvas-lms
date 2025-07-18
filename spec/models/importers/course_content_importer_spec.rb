@@ -157,6 +157,7 @@ describe Course do
       expect(@course.rubrics.length).to eq(1)
       rubric = @course.rubrics.first
       expect(rubric.data.length).to eq(3)
+      expect(rubric.association_count).to eq 1
       # Spelling
       criterion = rubric.data[0].with_indifferent_access
       expect(criterion["description"]).to eq("Spelling")
