@@ -542,6 +542,7 @@ CanvasRails::Application.routes.draw do
         resource :issues, only: [:create, :update], module: "accessibility"
         post "preview" => "accessibility/preview#create"
         get "preview" => "accessibility/preview#show"
+        post "generate" => "accessibility/generate#create"
       end
     end
 

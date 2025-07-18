@@ -19,12 +19,15 @@
 
 module Accessibility
   class FormField
-    attr_accessor :label, :undo_text
+    attr_accessor :label, :undo_text, :can_generate_fix
 
     # @param label [String] Human-readable label displayed to the user
-    def initialize(label:, undo_text:)
+    # @param undo_text [String] Text for the undo action
+    # @param can_generate_fix [Boolean] Indicates if the field can generate a fix
+    def initialize(label:, undo_text:, can_generate_fix: false)
       @label = label
       @undo_text = undo_text
+      @can_generate_fix = can_generate_fix
     end
 
     def to_json(*options)
@@ -35,7 +38,8 @@ module Accessibility
       {
         type: field_type,
         undo_text:,
-        label:
+        label:,
+        can_generate_fix:
       }.compact
     end
 
