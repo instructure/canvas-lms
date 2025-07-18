@@ -50,10 +50,10 @@ module Lti::Concerns
       validate_parent_frame_context
 
       tool = Lti::ToolFinder.find_by(id: parent_frame_context)
+      can_launch_tool = tool&.context&.grants_any_right?(@current_user, session, :read, :launch_external_tool) || @current_user.fake_student?
 
       @parent_frame_origin =
-        if !tool&.active? || !tool&.developer_key&.internal_service ||
-           !tool.context&.grants_any_right?(@current_user, session, :read, :launch_external_tool)
+        if !tool&.active? || !tool&.developer_key&.internal_service || !can_launch_tool
           nil
         elsif tool.url
           override_parent_frame_origin(tool.url_with_environment_overrides(tool.url, include_launch_url: true))
