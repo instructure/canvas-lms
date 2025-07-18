@@ -46,6 +46,7 @@ module Api::V1::AssignmentOverride
         json[:group_id] = override.set_id
         json[:non_collaborative] = override.set.non_collaborative?
         json[:group_category_id] = override.set[:group_category_id]
+        json[:title] = override.set.name
 
         # Remove the title from the override if the group is non_collaborative AND the user does not have read permission
         if override.set.non_collaborative? && !override.set.grants_right?(@current_user, session, :read)
@@ -53,6 +54,7 @@ module Api::V1::AssignmentOverride
         end
       when "CourseSection"
         json[:course_section_id] = override.set_id
+        json[:title] = override.set.name
       when "Course"
         json[:course_id] = override.set_id
       when "Noop"
