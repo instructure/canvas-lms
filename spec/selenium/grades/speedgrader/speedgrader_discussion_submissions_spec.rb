@@ -52,15 +52,15 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
     @first_message = "first student message"
     @second_message = "second student message"
     @discussion_topic = DiscussionTopic.find_by(assignment_id: @assignment.id)
-    entry = @discussion_topic.discussion_entries
-                             .create!(user: @student, message: @first_message)
-    entry.update_topic
-    entry.context_module_action
+    @entry = @discussion_topic.discussion_entries
+                              .create!(user: @student, message: @first_message)
+    @entry.update_topic
+    @entry.context_module_action
     @attachment_thing = attachment_model(context: @student_2, filename: "horse.doc", content_type: "application/msword")
-    entry_2 = @discussion_topic.discussion_entries
-                               .create!(user: @student_2, message: @second_message, attachment: @attachment_thing)
-    entry_2.update_topic
-    entry_2.context_module_action
+    @entry_2 = @discussion_topic.discussion_entries
+                                .create!(user: @student_2, message: @second_message, attachment: @attachment_thing)
+    @entry_2.update_topic
+    @entry_2.context_module_action
   end
 
   context "when discussion_checkpoints is off" do
@@ -76,6 +76,7 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
         expect(f("#main")).to include_text(@first_message)
         expect(f("#main")).not_to include_text(@second_message)
       end
+
       f("#next-student-button").click
       wait_for_ajax_requests
       in_frame "speedgrader_iframe", "#discussion_view_link" do
@@ -98,6 +99,82 @@ describe "SpeedGrader - discussion submissions", :ignore_js_errors do
       in_frame "speedgrader_iframe", "#discussion_view_link" do
         expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion for this group. Below are the discussion posts for")
         expect(f("#main")).to include_text(entry_text)
+      end
+    end
+
+    context "post message handling" do
+      it "sends out CANVAS_IFRAME_READY message when receives an IFRAME_STATUS message with existing entryId" do
+        Speedgrader.visit(@course.id, @assignment.id)
+        wait_for_ajax_requests
+        driver.execute_script(<<~JS)
+          window.receivedMessages = [];
+          window.addEventListener('message', function(event) {
+            window.receivedMessages.push(event.data);
+          });
+        JS
+
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          wait_for_ajax_requests
+        end
+        Speedgrader.send_post_message_to_iframe({ type: "IFRAME_STATUS", entryId: @entry.id })
+
+        messages = driver.execute_script("return window.receivedMessages;")
+        expect(messages).to include({ "type" => "CANVAS_IFRAME_READY" })
+      end
+
+      it "does not send out CANVAS_IFRAME_READY message when receives an IFRAME_STATUS message with not existing entryId" do
+        Speedgrader.visit(@course.id, @assignment.id)
+        wait_for_ajax_requests
+        driver.execute_script(<<~JS)
+          window.receivedMessages = [];
+          window.addEventListener('message', function(event) {
+            window.receivedMessages.push(event.data);
+          });
+        JS
+
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          wait_for_ajax_requests
+        end
+        Speedgrader.send_post_message_to_iframe({ type: "IFRAME_STATUS", entryId: 69_420 })
+
+        messages = driver.execute_script("return window.receivedMessages;")
+        expect(messages.length).to eq(0)
+      end
+
+      it "highlights entry when HIGHLIGHT type post message sent from parent frame" do
+        Speedgrader.visit(@course.id, @assignment.id)
+        # check for correct submissions in SpeedGrader iframe
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          expect(f("#main")).to include_text("The submissions for this assignment are posts in the assignment's discussion. Below are the discussion posts for")
+          expect(f("#main")).to include_text(@first_message)
+          expect(f("#main")).not_to include_text(@second_message)
+        end
+
+        Speedgrader.send_post_message_to_iframe({ type: "HIGHLIGHT", entryId: @entry.id })
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          wait_for_ajax_requests
+          highlighted = f("#entry_#{@entry.id}")
+          color = highlighted.css_value("background-color")
+          expect(color).to eq("rgba(223, 235, 251, 1)") # RGB for #DFEBFB
+        end
+
+        f("#next-student-button").click
+        wait_for_ajax_requests
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          expect(f("#main")).not_to include_text(@first_message)
+          expect(f("#main")).to include_text(@second_message)
+          url = f("#main div.attachment_data a")["href"]
+          expect(url).to include "/files/#{@attachment_thing.id}/download?verifier=#{@attachment_thing.uuid}"
+          expect(url).not_to include "/courses/#{@course}"
+        end
+
+        Speedgrader.send_post_message_to_iframe({ type: "HIGHLIGHT", entryId: @entry_2.id })
+        in_frame "speedgrader_iframe", "#discussion_view_link" do
+          wait_for_ajax_requests
+          highlighted = f("#entry_#{@entry_2.id}")
+          color = highlighted.css_value("background-color")
+          expect(color).to eq("rgba(223, 235, 251, 1)") # RGB for #DFEBFB
+        end
       end
     end
   end

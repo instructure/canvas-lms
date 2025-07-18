@@ -261,7 +261,9 @@ body.is-inside-submission-frame {
       }
     }
   }
-
+  .discussion_entry {
+    background-clip: content-box;
+  }
 }
 
 #add_comment_form {

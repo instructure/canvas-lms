@@ -745,5 +745,13 @@ class Speedgrader
       fj("label:contains('Show replies in context')").click
       fj(".ui-dialog-buttonset .ui-button:visible:last").click
     end
+
+    def send_post_message_to_iframe(message)
+      driver.execute_script(<<~JS, f("#speedgrader_iframe"), message)
+        const iframe = arguments[0];
+        const msg = arguments[1];
+        iframe.contentWindow?.postMessage(msg, '*');
+      JS
+    end
   end
 end
