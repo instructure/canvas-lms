@@ -40,6 +40,8 @@ export interface IssueForm {
   type: FormType
   label?: string
   undoText?: string
+  canGenerateFix?: boolean
+  generateButtonLabel?: string
   value?: string
   options?: string[]
   action?: string
@@ -126,4 +128,8 @@ export type ContrastData = {
   isValidGraphicsText: boolean
   firstColor: string
   secondColor: string
+}
+
+export type GenerateResponse = {
+  value?: string
 }

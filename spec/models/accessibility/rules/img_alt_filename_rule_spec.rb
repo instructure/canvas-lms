@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "rule_test_helper"
+require_relative "../../../../app/models/accessibility/rules/img_alt_rule_helper"
 
 describe Accessibility::Rules::ImgAltFilenameRule do
   include RuleTestHelper
@@ -67,6 +68,29 @@ describe Accessibility::Rules::ImgAltFilenameRule do
 
       expect(form).to be_a(Accessibility::Forms::TextInputWithCheckboxField)
       expect(form.value).to eq("image")
+    end
+  end
+
+  context "when generating alt text automatically" do
+    it "calls ImgAltRuleHelper and returns generated text" do
+      # Create HTML with an image that has a source
+      input_html = '<figure><img src="https://example.com/image.jpg" class="hero-image" width="500" height="300"><figcaption>Beautiful scenery</figcaption></figure>'
+      document = Nokogiri::HTML.fragment(input_html)
+      extend_nokogiri_with_dom_adapter(document) # Using method from RuleTestHelper
+      img_element = document.at_css("img")
+
+      # Mock ImgAltRuleHelper to verify the call but still use a controlled return value
+      helper_class = Accessibility::Rules::ImgAltRuleHelper
+      generated_alt = "A beautiful landscape with mountains"
+      expect(helper_class).to receive(:generate_alt_text)
+        .with("https://example.com/image.jpg")
+        .and_return(generated_alt)
+
+      # Call the method with our image element
+      result = Accessibility::Rules::ImgAltRule.generate_fix(img_element)
+
+      # Verify the result is what our mock returned
+      expect(result).to eq(generated_alt)
     end
   end
 end

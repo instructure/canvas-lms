@@ -55,7 +55,6 @@ module Accessibility
         I18n.t("Alt text is filename")
       end
 
-      # TODO: define undo text
       def self.form(elem)
         Accessibility::Forms::TextInputWithCheckboxField.new(
           checkbox_label: I18n.t("This image is decorative"),
@@ -64,8 +63,18 @@ module Accessibility
           input_label: I18n.t("Alt text"),
           input_description: I18n.t("Describe what's on the picture."),
           input_max_length: 120,
+          can_generate_fix: true,
+          generate_button_label: I18n.t("Generate alt text"),
           value: elem.get_attribute("alt") || ""
         )
+      end
+
+      def self.generate_fix(elem)
+        return nil if elem.tag_name != "img"
+        return nil unless elem.attribute?("src")
+
+        src = elem.get_attribute("src")
+        ImgAltRuleHelper.generate_alt_text(src)
       end
 
       def self.fix!(elem, value)

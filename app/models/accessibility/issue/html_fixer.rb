@@ -68,6 +68,25 @@ module Accessibility
         end
       end
 
+      def generate_fix
+        body = record.send(target_attribute)
+        doc = Nokogiri::HTML5.fragment(body, nil, **CanvasSanitize::SANITIZE[:parser_options])
+        issue.extend_nokogiri_with_dom_adapter(doc)
+
+        begin
+          element = doc.at_xpath(path)
+          if element
+            { json: { value: rule.generate_fix(element) }, status: :ok }
+          else
+            { json: { error: "Element not found for path: #{path}" }, status: :bad_request }
+          end
+        rescue => e
+          Rails.logger.error "Cannot fix accessibility issue due to error: #{e.message} (rule #{rule.id})"
+          Rails.logger.error e.backtrace.join("\n")
+          { json: { error: e.message }, status: :bad_request }
+        end
+      end
+
       private
 
       def fix_content(html_content, rule, target_element, fix_value)
