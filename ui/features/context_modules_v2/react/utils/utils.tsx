@@ -154,7 +154,9 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.indent === nextProps.indent &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
-    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
+    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
+    JSON.stringify(prevProps.completionRequirements) ===
+      JSON.stringify(nextProps.completionRequirements)
 
   if (!basicPropsEqual) return false
 
