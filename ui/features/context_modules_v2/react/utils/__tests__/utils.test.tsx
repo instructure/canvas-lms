@@ -304,6 +304,270 @@ describe('utils', () => {
       }
       expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
     })
+
+    describe('checkpoint comparison', () => {
+      const baseContentWithCheckpoints = {
+        id: '1',
+        type: 'Discussion',
+        title: 'Discussion with Checkpoints',
+        checkpoints: [
+          {
+            dueAt: '2024-01-20T23:59:00Z',
+            name: 'Reply to Topic',
+            tag: 'reply_to_topic',
+          },
+          {
+            dueAt: '2024-01-22T23:59:00Z',
+            name: 'Required Replies',
+            tag: 'reply_to_entry',
+          },
+        ],
+      }
+
+      it('should return true when checkpoint data is identical and other content props are same', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {...baseContentWithCheckpoints},
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(true) // identical content data
+      })
+
+      it('should return true when content objects are the same reference (with checkpoints)', () => {
+        const sharedContent = baseContentWithCheckpoints
+        const prevProps = {
+          ...defaultProps,
+          content: sharedContent,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: sharedContent,
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(true)
+      })
+
+      it('should return false when checkpoint due dates change', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [
+              {
+                dueAt: '2024-01-21T23:59:00Z', // different date
+                name: 'Reply to Topic',
+                tag: 'reply_to_topic',
+              },
+              {
+                dueAt: '2024-01-22T23:59:00Z',
+                name: 'Required Replies',
+                tag: 'reply_to_entry',
+              },
+            ],
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when checkpoint names change', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [
+              {
+                dueAt: '2024-01-20T23:59:00Z',
+                name: 'Different Name', // different name
+                tag: 'reply_to_topic',
+              },
+              {
+                dueAt: '2024-01-22T23:59:00Z',
+                name: 'Required Replies',
+                tag: 'reply_to_entry',
+              },
+            ],
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when checkpoint tags change', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [
+              {
+                dueAt: '2024-01-20T23:59:00Z',
+                name: 'Reply to Topic',
+                tag: 'different_tag', // different tag
+              },
+              {
+                dueAt: '2024-01-22T23:59:00Z',
+                name: 'Required Replies',
+                tag: 'reply_to_entry',
+              },
+            ],
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when number of checkpoints changes', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [
+              {
+                dueAt: '2024-01-20T23:59:00Z',
+                name: 'Reply to Topic',
+                tag: 'reply_to_topic',
+              },
+              // removed second checkpoint
+            ],
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when checkpoints are added', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [],
+          },
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when checkpoints are removed', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [],
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should handle null/undefined checkpoints correctly', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: undefined,
+          },
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: null,
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false) // null vs undefined are different
+      })
+
+      it('should return false when one has checkpoints and other has null', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: null,
+          },
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should handle content being null/undefined', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: null,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: null,
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(true)
+      })
+
+      it('should return false when one content is null and other has checkpoints', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: null,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return false when checkpoints are same but other content properties change', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            title: 'Different Title', // changed title
+          },
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return true when no checkpoints exist and other content props are same', () => {
+        const contentWithoutCheckpoints = {
+          id: '1',
+          type: 'Assignment',
+          title: 'Assignment',
+        }
+        const prevProps = {
+          ...defaultProps,
+          content: contentWithoutCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {...contentWithoutCheckpoints},
+        }
+        expect(validateModuleItemStudentRenderRequirements(prevProps, nextProps)).toBe(true)
+      })
+    })
   })
 
   describe('validateModuleTeacherRenderRequirements', () => {
@@ -666,6 +930,82 @@ describe('utils', () => {
         completionRequirements: [{id: '1', type: 'must_view'}],
       }
       expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    describe('checkpoint comparison', () => {
+      const baseContentWithCheckpoints = {
+        id: '1',
+        title: 'Discussion with Checkpoints',
+        type: 'Discussion',
+        dueAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        lockAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        unlockAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+        checkpoints: [
+          {
+            dueAt: '2024-01-20T23:59:00Z',
+            name: 'Reply to Topic',
+            tag: 'reply_to_topic',
+          },
+          {
+            dueAt: '2024-01-22T23:59:00Z',
+            name: 'Required Replies',
+            tag: 'reply_to_entry',
+          },
+        ],
+      }
+
+      it('should return false when checkpoint due dates change', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [
+              {
+                dueAt: '2024-01-21T23:59:00Z', // different date
+                name: 'Reply to Topic',
+                tag: 'reply_to_topic',
+              },
+              {
+                dueAt: '2024-01-22T23:59:00Z',
+                name: 'Required Replies',
+                tag: 'reply_to_entry',
+              },
+            ],
+          },
+        }
+        expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
+
+      it('should return true when checkpoint data is identical', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+      })
+
+      it('should return false when number of checkpoints changes', () => {
+        const prevProps = {
+          ...defaultProps,
+          content: baseContentWithCheckpoints,
+        }
+        const nextProps = {
+          ...defaultProps,
+          content: {
+            ...baseContentWithCheckpoints,
+            checkpoints: [baseContentWithCheckpoints.checkpoints[0]], // removed second checkpoint
+          },
+        }
+        expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+      })
     })
   })
 

@@ -100,6 +100,12 @@ export const handleAssignTo = (
     return
   }
 
+  const isCheckpointed = !!(
+    content?.type === 'Discussion' &&
+    content?.checkpoints &&
+    content.checkpoints.length > 0
+  )
+
   renderItemAssignToManager(true, document.activeElement as HTMLElement, {
     courseId,
     moduleItemName: content?.title || 'Untitled Item',
@@ -107,6 +113,7 @@ export const handleAssignTo = (
     moduleItemContentId: content?._id,
     pointsPossible: content?.pointsPossible,
     moduleId,
+    isCheckpointed,
   })
   if (setIsMenuOpen) {
     setIsMenuOpen(false)

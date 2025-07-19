@@ -72,6 +72,7 @@ export interface ItemAssignToProps {
   moduleItemContentId?: string
   pointsPossible?: number
   moduleId?: string
+  isCheckpointed?: boolean
 }
 
 export const renderItemAssignToManager = (
@@ -168,6 +169,7 @@ export const renderItemAssignToManager = (
       iconType={getIconType(itemProps.moduleItemType)}
       itemContentId={itemProps.moduleItemContentId}
       pointsPossible={itemProps.pointsPossible}
+      isCheckpointed={itemProps.isCheckpointed}
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
     />,
