@@ -29,14 +29,16 @@ class AccessibilityResourceScansController < ApplicationController
   #   page, per_page           – pagination
   #   sort, direction          – sorting, see ALLOWED_SORTS
   def index
-    scans = AccessibilityResourceScan.where(course_id: @context.id)
+    scans = AccessibilityResourceScan
+            .preload(:accessibility_issues)
+            .where(course_id: @context.id)
 
     scans = apply_sorting(scans)
 
     base_url = course_accessibility_resource_scans_path(@context)
     paginated = Api.paginate(scans, self, base_url)
 
-    render json: paginated.map { |scan| scan_json(scan) }
+    render json: paginated.map { |scan| scan_attributes(scan) }
   end
 
   private
@@ -76,24 +78,42 @@ class AccessibilityResourceScansController < ApplicationController
     relation.order(order_clause)
   end
 
-  # Build the JSON representation for an AccessibilityResourceScan
-  # adhering to the requirements described in the controller docstring.
-  #
+  # Returns a hash representation of the scan, for JSON rendering.
   # @param scan [AccessibilityResourceScan]
   # @return [Hash]
-  def scan_json(scan)
-    context = scan.context
-    state = %w[queued in_progress].include?(scan.workflow_state) ? "checking" : "idle"
-
+  def scan_attributes(scan)
+    resource_id, resource_type = scan.context_id_and_type
+    scan_completed = scan.workflow_state == "completed"
     {
       id: scan.id,
-      resource_id: context.id,
-      resource_type: context.class.name,
+      resource_id:,
+      resource_type:,
       resource_name: scan.resource_name,
       resource_workflow_state: scan.resource_workflow_state,
-      resource_updated_at: scan.resource_updated_at,
-      scan_status: state,
-      issue_count: (state == "checking") ? nil : scan.issue_count
+      resource_updated_at: scan.resource_updated_at&.iso8601 || "",
+      resource_url: scan.context_url,
+      workflow_state: scan.workflow_state,
+      error_message: scan.error_message || "",
+      issue_count: scan_completed ? scan.issue_count : 0,
+      issues: scan_completed ? scan.accessibility_issues.map { |issue| issue_attributes(issue) } : []
+    }
+  end
+
+  # Returns a hash representation of the issue, for JSON rendering.
+  # @param issue [AccessibilityIssue]
+  # @return [Hash]
+  def issue_attributes(issue)
+    rule = Accessibility::Rule.registry[issue.rule_type]
+    {
+      id: issue.id,
+      rule_id: issue.rule_type,
+      element: issue.metadata["element"],
+      display_name: rule&.display_name,
+      message: rule&.message,
+      why: rule&.why,
+      path: issue.node_path,
+      issue_url: rule&.link,
+      form: issue.metadata["form"]
     }
   end
 end
