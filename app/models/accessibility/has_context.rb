@@ -55,6 +55,34 @@ module Accessibility
       end
     end
 
+    def context_id_and_type
+      if wiki_page_id
+        [wiki_page_id, "WikiPage"]
+      elsif assignment_id
+        [assignment_id, "Assignment"]
+      elsif attachment_id
+        [attachment_id, "Attachment"]
+      else
+        [nil, nil]
+      end
+    end
+
+    def context_url
+      id, type = context_id_and_type
+      return nil unless id && type
+
+      case type
+      when "WikiPage"
+        Rails.application.routes.url_helpers.course_wiki_page_url(course_id, id, only_path: true)
+      when "Assignment"
+        Rails.application.routes.url_helpers.course_assignment_url(course_id, id, only_path: true)
+      when "Attachment"
+        Rails.application.routes.url_helpers.course_files_url(course_id, preview: id, only_path: true)
+      else
+        nil
+      end
+    end
+
     private
 
     def exactly_one_context_present
