@@ -124,7 +124,7 @@ const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
     .map((item: any) => ({
       id: item._id || '',
       name: item.content?.title || '',
-      resource: getResourceType(item.content?.type.toLowerCase()),
+      resource: getResourceType(item.content?.type?.toLowerCase()),
       graded: item.content?.graded,
       pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',
     }))
