@@ -90,6 +90,12 @@ const MODULE_ITEMS_QUERY = gql`
               isLockedByMasterCourse
               canDuplicate
               graded
+              replyToEntryRequiredCount
+              checkpoints {
+                dueAt(applyOverrides: false)
+                name
+                tag
+              }
             }
             ... on File {
               _id

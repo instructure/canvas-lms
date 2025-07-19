@@ -134,14 +134,52 @@ export const validateModuleStudentRenderRequirements = (prevProps: any, nextProp
 }
 
 export const validateModuleItemStudentRenderRequirements = (prevProps: any, nextProps: any) => {
-  return (
+  const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.url === nextProps.url &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
-    prevProps.content === nextProps.content &&
     prevProps.smallScreen === nextProps.smallScreen
-  )
+
+  if (!basicPropsEqual) return false
+
+  // If content objects are the same reference, they're equal
+  if (prevProps.content === nextProps.content) return true
+
+  // If one is null/undefined and the other isn't, they're different
+  if (!prevProps.content !== !nextProps.content) return false
+
+  // If both are null/undefined, they're equal
+  if (!prevProps.content && !nextProps.content) return true
+
+  // Compare checkpoint data explicitly (deep comparison needed for nested arrays)
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+
+  // Handle exact null/undefined differences
+  if (prevCheckpoints !== nextCheckpoints && (!prevCheckpoints || !nextCheckpoints)) return false
+
+  if (prevCheckpoints && nextCheckpoints) {
+    if (prevCheckpoints.length !== nextCheckpoints.length) return false
+
+    // Use JSON.stringify for deep comparison of checkpoint arrays
+    if (JSON.stringify(prevCheckpoints) !== JSON.stringify(nextCheckpoints)) return false
+  }
+
+  // If we reach here, checkpoint data is identical (or both are null/undefined)
+  // But since content objects are different references, we need to check if
+  // any other content properties that matter have changed
+  const contentPropsEqual =
+    prevProps.content?.id === nextProps.content?.id &&
+    prevProps.content?.title === nextProps.content?.title &&
+    prevProps.content?.type === nextProps.content?.type &&
+    prevProps.content?.published === nextProps.content?.published &&
+    prevProps.content?.pointsPossible === nextProps.content?.pointsPossible &&
+    prevProps.content?.dueAt === nextProps.content?.dueAt &&
+    prevProps.content?.lockAt === nextProps.content?.lockAt &&
+    prevProps.content?.unlockAt === nextProps.content?.unlockAt
+
+  return contentPropsEqual
 }
 
 export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
@@ -159,6 +197,20 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
       JSON.stringify(nextProps.completionRequirements)
 
   if (!basicPropsEqual) return false
+
+  // Compare checkpoint data explicitly (deep comparison needed for nested arrays)
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+
+  // Handle exact null/undefined differences
+  if (prevCheckpoints !== nextCheckpoints && (!prevCheckpoints || !nextCheckpoints)) return false
+
+  if (prevCheckpoints && nextCheckpoints) {
+    if (prevCheckpoints.length !== nextCheckpoints.length) return false
+
+    // Use JSON.stringify for deep comparison of checkpoint arrays
+    if (JSON.stringify(prevCheckpoints) !== JSON.stringify(nextCheckpoints)) return false
+  }
 
   const prevOverrides = prevProps.content?.assignmentOverrides
   const nextOverrides = nextProps.content?.assignmentOverrides
