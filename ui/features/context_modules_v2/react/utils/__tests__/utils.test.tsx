@@ -531,6 +531,142 @@ describe('utils', () => {
       }
       expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
     })
+
+    it('should return true when completionRequirements are the same', () => {
+      const completionRequirements = [
+        {id: '1', type: 'must_view'},
+        {id: '2', type: 'min_score', minScore: 80},
+      ]
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements,
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements,
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return true when completionRequirements are structurally identical', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [
+          {id: '1', type: 'must_view'},
+          {id: '2', type: 'min_score', minScore: 80},
+        ],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [
+          {id: '1', type: 'must_view'},
+          {id: '2', type: 'min_score', minScore: 80},
+        ],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when completionRequirements are different - added requirement', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_view'}],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [
+          {id: '1', type: 'must_view'},
+          {id: '2', type: 'min_score', minScore: 80},
+        ],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when completionRequirements are different - removed requirement', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [
+          {id: '1', type: 'must_view'},
+          {id: '2', type: 'min_score', minScore: 80},
+        ],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_view'}],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when completionRequirements are different - changed type', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_view'}],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_submit'}],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when completionRequirements are different - changed minScore', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'min_score', minScore: 80}],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'min_score', minScore: 90}],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return false when one has completionRequirements and other does not', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: undefined,
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_view'}],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
+
+    it('should return true when both have no completionRequirements', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: undefined,
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: undefined,
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return true when both have empty completionRequirements arrays', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(true)
+    })
+
+    it('should return false when completionRequirements change from empty to populated', () => {
+      const prevProps = {
+        ...defaultProps,
+        completionRequirements: [],
+      }
+      const nextProps = {
+        ...defaultProps,
+        completionRequirements: [{id: '1', type: 'must_view'}],
+      }
+      expect(validateModuleItemTeacherRenderRequirements(prevProps, nextProps)).toBe(false)
+    })
   })
 
   describe('filterRequirementsMet', () => {
