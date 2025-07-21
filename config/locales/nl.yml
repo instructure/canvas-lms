@@ -1877,7 +1877,7 @@ nl:
           required: Vereist
           required_for_admins: "Voor beheerders vereist"
       self_enroll_for_any_courses_option: "Voor alle cursussen"
-      self_enroll_for_manually_created_courses_option: "Voor manueel gecreëerde cursussen"
+      self_enroll_for_manually_created_courses_option: "Voor handmatig aangemaakte cursussen"
       settings_crumb: Instellingen
       survey_announcement: "Dit is een overzicht aankondiging. Deze zal iedere maand voor zover actief naar 1 / %{denominator} van de gebruikers van ingeschakelde accounts verzonden worden."
       tab_admins: Beheerders
