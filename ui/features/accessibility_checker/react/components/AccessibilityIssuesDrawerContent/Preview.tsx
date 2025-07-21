@@ -118,7 +118,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
   ) => {
     setIsLoading(true)
     doFetchApi<PreviewResponse>({
-      path: window.location.href + '/preview',
+      path: `${stripQueryString(window.location.href)}/preview`,
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
