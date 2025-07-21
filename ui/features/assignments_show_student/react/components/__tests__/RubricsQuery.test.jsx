@@ -23,6 +23,7 @@ import {render} from '@testing-library/react'
 import RubricsQuery from '../RubricsQuery'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {useAllPages} from '@canvas/query'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 jest.mock('@canvas/query', () => ({
   useAllPages: jest.fn(),
@@ -40,7 +41,8 @@ async function makeMocks() {
     Node: {__typename: 'Assignment'},
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
-    Submission: {rubricAssessmentsConnection: null},
+    Submission: {rubricAssessmentsConnection: []},
+    HtmlEncodedString: () => 'Mocked HTML encoded string',
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
@@ -65,6 +67,16 @@ async function makeProps() {
 }
 
 describe('RubricsQuery', () => {
+  beforeEach(() => {
+    fakeENV.setup({
+      current_user: {id: '1', display_name: 'Test User'},
+    })
+  })
+
+  afterEach(() => {
+    fakeENV.teardown()
+  })
+
   it('renders the rubric tab', async () => {
     useAllPages.mockReturnValue({
       data: {pages: []},

@@ -29,7 +29,7 @@ module Types
     field :context_id, ID, null: false
     field :context_type, String, null: false
 
-    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: true
+    field :proficiency_ratings_connection, ProficiencyRatingType.connection_type, null: false
     def proficiency_ratings_connection
       object.outcome_proficiency_ratings
     end

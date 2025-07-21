@@ -88,7 +88,7 @@ module Types
       end
     end
 
-    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
+    field :submission_histories_connection, SubmissionHistoryType.connection_type, null: false do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
       argument :order_by, SubmissionHistoryOrderInputType, required: false
     end

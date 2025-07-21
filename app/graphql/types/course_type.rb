@@ -151,7 +151,7 @@ module Types
     field :assignment_groups_connection,
           AssignmentGroupType.connection_type,
           method: :assignment_groups,
-          null: true
+          null: false
 
     def assignment_groups_connection
       assignment_groups = object.assignment_groups
@@ -228,7 +228,7 @@ module Types
       Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
     end
 
-    field :sections_connection, SectionType.connection_type, null: true do
+    field :sections_connection, SectionType.connection_type, null: false do
       argument :filter, CourseSectionsFilterInputType, required: false
     end
 
@@ -367,7 +367,7 @@ module Types
       scope
     end
 
-    field :grading_periods_connection, GradingPeriodType.connection_type, null: true
+    field :grading_periods_connection, GradingPeriodType.connection_type, null: false
     def grading_periods_connection
       GradingPeriod.for(course).order(:start_date)
     end

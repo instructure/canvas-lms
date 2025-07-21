@@ -65,7 +65,7 @@ function gradedResolvers() {
 
 function ungradedResolvers() {
   return {
-    Submission: {rubricAssessmentsConnection: () => null},
+    Submission: {rubricAssessmentsConnection: () => []},
     Course: {
       account: {
         outcomeProficiency: {
@@ -92,6 +92,7 @@ async function makeProps(opts = {}) {
       Rubric: {
         criteria: [{}],
       },
+      HtmlEncodedString: () => 'Mocked HTML encoded string',
     },
   ]
 
