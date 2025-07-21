@@ -331,7 +331,7 @@ describe "override assignees" do
         AssignmentCreateEditPage.visit_new_assignment_create_page(@course.id)
       end
 
-      include_examples "item assign to on page during assignment creation/update"
+      it_behaves_like "item assign to on page during assignment creation/update"
     end
 
     context "manage assign to from assignment edit page" do
@@ -339,7 +339,7 @@ describe "override assignees" do
         AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @assignment1.id)
       end
 
-      include_examples "item assign to on page during assignment creation/update"
+      it_behaves_like "item assign to on page during assignment creation/update"
 
       it "assigns student and cancels assignment edit" do
         AssignmentCreateEditPage.replace_assignment_name("new test assignment")
