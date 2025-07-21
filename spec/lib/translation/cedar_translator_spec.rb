@@ -131,9 +131,7 @@ describe Translation::CedarTranslator do
     subject { described_class.languages }
 
     let(:language_abbrs) do
-      %w[
-        ar ca cy da da-x-k12 de el en en-AU en-CA en-GB en-US es es-ES fa fi fr fr-CA he hi ht hu hy id is it ja ko ms nb nb-x-k12 nl pl pt pt-BR pt-PT ru sl sv sv-x-k12 th tr uk vi zh-Hans zh-Hant
-      ]
+      %w[ca de en es fr nl pt-BR ru sv zh-Hans]
     end
 
     it "returns the proper list" do

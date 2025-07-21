@@ -113,9 +113,9 @@ describe TranslationController do
       before do
         mock_response = OpenStruct.new(body: StringIO.new({
           "__type" => "UnsupportedLanguagePairException",
-          "Message" => "Unsupported language pair: en to hu.",
+          "Message" => "Unsupported language pair: en to es.",
           "SourceLanguageCode" => "en",
-          "TargetLanguageCode" => "hu"
+          "TargetLanguageCode" => "es"
         }.to_json))
 
         mock_context = OpenStruct.new(http_response: mock_response)
@@ -127,7 +127,7 @@ describe TranslationController do
         post :translate, params: { course_id: @course.id, inputs: params }
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation from English to Hungarian is not supported." } })
+        expect(response.parsed_body.deep_symbolize_keys).to eq({ translationError: { type: "error", message: "Translation from English to Spanish is not supported." } })
       end
     end
 
