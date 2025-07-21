@@ -665,7 +665,7 @@ describe UserObserveesController, type: :request do
         end
       end
 
-      include_examples "handle_observees_by_auth_token"
+      it_behaves_like "handle_observees_by_auth_token"
     end
 
     context "without sharding" do
@@ -673,7 +673,7 @@ describe UserObserveesController, type: :request do
         @token_student = user_with_pseudonym(name: "Sameshard Student", active_all: true)
       end
 
-      include_examples "handle_observees_by_auth_token"
+      it_behaves_like "handle_observees_by_auth_token"
     end
   end
 end

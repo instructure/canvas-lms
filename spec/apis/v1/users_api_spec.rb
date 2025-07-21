@@ -2963,8 +2963,8 @@ describe "Users API", type: :request do
       @context = @user
     end
 
-    include_examples "file uploads api with folders"
-    include_examples "file uploads api with quotas"
+    it_behaves_like "file uploads api with folders"
+    it_behaves_like "file uploads api with quotas"
 
     def preflight(preflight_params, opts = {})
       api_call(:post,

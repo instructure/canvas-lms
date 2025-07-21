@@ -518,7 +518,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       context "access validations" do
-        include_examples "Quiz Submissions API Restricted Endpoints"
+        it_behaves_like "Quiz Submissions API Restricted Endpoints"
 
         before do
           @request_proxy = method(:qs_api_create)
@@ -635,7 +635,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     context "access validations" do
-      include_examples "Quiz Submissions API Restricted Endpoints"
+      it_behaves_like "Quiz Submissions API Restricted Endpoints"
 
       before do
         @request_proxy = method(:qs_api_complete)

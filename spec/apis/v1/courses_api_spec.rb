@@ -4922,8 +4922,8 @@ describe CoursesController, type: :request do
     end
 
     context "course files" do
-      include_examples "file uploads api with folders"
-      include_examples "file uploads api with quotas"
+      it_behaves_like "file uploads api with folders"
+      it_behaves_like "file uploads api with quotas"
 
       before do
         @context = @course

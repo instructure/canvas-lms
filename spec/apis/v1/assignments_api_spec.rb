@@ -31,10 +31,8 @@ describe AssignmentsApiController, type: :request do
 
   specs_require_sharding
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "assignment" }
-
-    include_examples "a locked api item"
 
     let_once(:locked_item) do
       @course.assignments.create!(title: "Locked Assignment")
