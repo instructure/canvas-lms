@@ -63,6 +63,7 @@ GEM
       deep_merge (~> 1.2)
       faraday (>= 0.9, < 3.0, != 2.0.0)
     drb (2.2.3)
+    erb (5.0.2)
     erubi (1.13.1)
     faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
@@ -128,7 +129,8 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     reline (0.6.2)
       io-console (~> 0.5)

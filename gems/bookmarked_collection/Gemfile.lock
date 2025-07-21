@@ -74,6 +74,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.6.1)
     drb (2.2.3)
+    erb (5.0.2)
     erubi (1.13.1)
     folio-pagination (0.0.12)
     i18n (1.14.7)
@@ -132,7 +133,8 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     reline (0.6.2)
       io-console (~> 0.5)

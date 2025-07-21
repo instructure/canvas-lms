@@ -109,6 +109,7 @@ GEM
     diff-lcs (1.6.1)
     digest-murmurhash (1.1.1)
     drb (2.2.3)
+    erb (5.0.2)
     erubi (1.13.1)
     guardrail (3.0.4)
       activerecord (>= 6.1, < 8.0)
@@ -174,7 +175,8 @@ GEM
       thor (~> 1.0, >= 1.2.2)
       zeitwerk (~> 2.6)
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     redis (5.4.0)
       redis-client (>= 0.22.0)
