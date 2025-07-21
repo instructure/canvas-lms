@@ -496,7 +496,7 @@ GEM
     db-query-matchers (0.14.0)
       activesupport (>= 4.0, < 8.1)
       rspec (>= 3.0)
-    debug (1.10.0)
+    debug (1.11.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
