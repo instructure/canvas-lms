@@ -19,7 +19,7 @@
 import {
   existingAttachedAssetProcessorFromGraphql,
   ExistingAttachedAssetProcessorGraphql,
-} from '../assetProcessorGraphqlTypes'
+} from '@canvas/lti/model/AssetProcessor'
 
 import {LtiAssetProcessor} from '../../../graphql/LtiAssetProcessor'
 import PropTypes from 'prop-types'

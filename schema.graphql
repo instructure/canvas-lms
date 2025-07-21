@@ -5388,7 +5388,9 @@ type LtiAsset implements LegacyIDInterface {
   """
   _id: ID!
   attachmentId: ID
+  attachmentName: String
   submissionAttempt: Int
+  submissionId: ID
 }
 
 type LtiAssetProcessor implements LegacyIDInterface {
@@ -8699,6 +8701,11 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    When true, returns only the asset reports of the latest submission attempt (as students would see them)
+    """
+    latest: Boolean = false
   ): LtiAssetReportConnection
   mediaObject: MediaObject
   missing: Boolean

@@ -209,6 +209,14 @@ describe GradebooksController do
           expect(submission).to have_key(:asset_reports)
           expect(submission[:asset_reports]).to eq([{ id: 1, priority: 0 }])
         end
+
+        it "includes submission_type in submission data" do
+          @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "test submission")
+          get "grade_summary", params: { course_id: @course.id, id: @student.id }
+          submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+          expect(submission).to have_key(:submission_type)
+          expect(submission[:submission_type]).to eq("online_text_entry")
+        end
       end
     end
 
@@ -263,6 +271,13 @@ describe GradebooksController do
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
         assignment_id = assigns.dig(:js_env, :assignment_groups, 0, :assignments, 0, :id)
         expect(assignment_id).to eq @assignment.id
+      end
+
+      it "returns nil for asset_reports" do
+        allow_any_instance_of(AssetProcessorStudentHelper).to receive(:asset_reports).and_return([{ id: 1, priority: 0 }])
+        get "grade_summary", params: { course_id: @course.id, id: @student.id }
+        submission = assigns[:js_env][:submissions].find { |s| s[:assignment_id] == @assignment.id }
+        expect(submission[:asset_reports]).to be_nil
       end
     end
 

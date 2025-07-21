@@ -50,7 +50,6 @@ describe Loaders::SubmissionLtiAssetReportsStudentLoader do
 
   describe "#perform" do
     before do
-      # Mock the method on any instance of the loader class since it includes the helper module
       allow_any_instance_of(described_class).to receive(:raw_asset_reports).with(submission: sub1).and_return([1, 2])
       allow_any_instance_of(described_class).to receive(:raw_asset_reports).with(submission: sub2).and_return([3, 4])
     end

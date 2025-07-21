@@ -133,7 +133,8 @@ class GradebooksController < ApplicationController
                       score: submission.score,
                       workflow_state: submission.workflow_state,
                       asset_processors: asset_processors(assignment: submission.assignment),
-                      asset_reports: asset_reports(submission:)
+                      asset_reports: @presenter.user_has_elevated_permissions? ? nil : asset_reports(submission:),
+                      submission_type: submission.submission_type
                     })
         json[:custom_grade_status_id] = submission.custom_grade_status_id if custom_gradebook_statuses_enabled
       end
