@@ -222,7 +222,13 @@ export default class WikiPageView extends Backbone.View {
   }
 
   maybeRenderBlockEditorContent() {
-    if (
+    if (this.model.get('editor') === 'canvas_content_builder') {
+      import('@canvas/page-editor').then(({PageEditor}) => {
+        const container = document.getElementById('block-editor-content')
+        const data = this.model.get('block_editor_attributes').blocks
+        createRoot(container).render(<PageEditor data={data} />)
+      })
+    } else if (
       this.model.get('editor') === 'block_editor' &&
       this.model.get('block_editor_attributes')?.blocks
     ) {
@@ -390,9 +396,9 @@ export default class WikiPageView extends Backbone.View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.page_id = this.model.get('page_id')
-    if (this.model.get('editor') === 'block_editor') {
-      json.body = '<div id="block-editor-content"/>' // this is where the BlockEditorView will be rendered
-    }
+    json.is_block_editor = ['block_editor', 'canvas_content_builder'].includes(
+      this.model.get('editor'),
+    )
     json.modules_path = this.modules_path
     json.wiki_pages_path = this.wiki_pages_path
     json.wiki_page_edit_path = this.wiki_page_edit_path
