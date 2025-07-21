@@ -21,11 +21,11 @@ GEM
     declarative (0.0.20)
     diff-lcs (1.6.2)
     erb (5.0.2)
-    faraday (2.13.1)
+    faraday (2.13.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
-    faraday-net_http (3.4.0)
+    faraday-net_http (3.4.1)
       net-http (>= 0.5.0)
     google-apis-core (0.17.0)
       addressable (~> 2.5, >= 2.5.1)
