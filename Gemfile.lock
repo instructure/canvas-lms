@@ -439,7 +439,7 @@ GEM
       msgpack (~> 1.2)
     brakeman (7.0.2)
       racc
-    brotli (0.6.0)
+    brotli (0.7.0)
     browser (6.2.0)
     builder (3.3.0)
     business_time (0.13.0)
