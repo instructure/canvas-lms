@@ -123,7 +123,7 @@ const transformModuleItemsForTray = (rawModuleItems: any[]): any[] => {
     .filter((item: any) => item.content?.type !== 'SubHeader')
     .map((item: any) => ({
       id: item._id || '',
-      name: item.content?.title || '',
+      name: item.title || '',
       resource: getResourceType(item.content?.type?.toLowerCase()),
       graded: item.content?.graded,
       pointsPossible: item.content?.pointsPossible ? String(item.content.pointsPossible) : '',

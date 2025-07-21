@@ -35,18 +35,34 @@ interface EditItemModalProps {
   isOpen: boolean
   onRequestClose: () => void
   itemName: string
+  itemURL?: string
   itemIndent: number
   courseId: string
   moduleId: string
   itemId: string
+  itemType?: string
 }
 
 const EditItemModal = (props: EditItemModalProps) => {
-  const {isOpen, onRequestClose, itemName, itemIndent, itemId, courseId, moduleId} = props
+  const {
+    isOpen,
+    onRequestClose,
+    itemName,
+    itemURL,
+    itemIndent,
+    itemId,
+    courseId,
+    moduleId,
+    itemType,
+  } = props
 
   const [title, setTitle] = useState(itemName)
+  const [url, setUrl] = useState(itemURL)
   const [indent, setIndent] = useState(itemIndent)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const showExternalUrlFields =
+    itemType && ['external', 'externalurl', 'externaltool'].includes(itemType)
 
   const handleSubmit = () => {
     setIsLoading(true)
@@ -54,6 +70,7 @@ const EditItemModal = (props: EditItemModalProps) => {
     const itemData = prepareItemData({
       title,
       indentation: indent,
+      url,
     })
 
     submiEditItem(courseId, itemId, itemData)
@@ -120,6 +137,25 @@ const EditItemModal = (props: EditItemModalProps) => {
               />
             </Grid.Col>
           </Grid.Row>
+          {showExternalUrlFields && (
+            <Grid.Row>
+              <Grid.Col width={3} vAlign="middle">
+                <Text>{I18n.t('URL')}:</Text>
+              </Grid.Col>
+              <Grid.Col>
+                <TextInput
+                  id="url"
+                  name="url"
+                  renderLabel={<ScreenReaderContent>{I18n.t('URL')}</ScreenReaderContent>}
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
+                  display="inline-block"
+                  width="12.5rem"
+                  data-testid="edit-modal-url"
+                />
+              </Grid.Col>
+            </Grid.Row>
+          )}
           <Grid.Row>
             <Grid.Col width={3} vAlign="middle">
               <Text>{I18n.t('Indent')}:</Text>

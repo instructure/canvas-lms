@@ -28,16 +28,19 @@ type ComponentProps = {
   isOpen: boolean
   onRequestClose: () => void
   itemName: string
+  itemType: string
   itemIndent: number
   courseId: string
   moduleId: string
   itemId: string
+  itemURL?: string
 }
 
 const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
   isOpen: true,
   onRequestClose: jest.fn(),
   itemName: 'Test Item',
+  itemType: 'assignment',
   itemIndent: 1,
   itemId: '123',
   courseId: '1',
@@ -125,5 +128,22 @@ describe('EditItemModal', () => {
     setUp(props)
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onRequestClose).toHaveBeenCalled()
+  })
+
+  describe('External URL types', () => {
+    const defaultProps = buildDefaultProps({
+      itemType: 'external',
+      itemURL: 'http://example.com',
+    })
+
+    it('renders external URL fields when itemType is external', () => {
+      setUp(defaultProps)
+      expect(screen.getByLabelText('URL')).toBeInTheDocument()
+    })
+
+    it('does not render external URL fields when itemType is not external', () => {
+      setUp(buildDefaultProps())
+      expect(screen.queryByLabelText('URL')).not.toBeInTheDocument()
+    })
   })
 })

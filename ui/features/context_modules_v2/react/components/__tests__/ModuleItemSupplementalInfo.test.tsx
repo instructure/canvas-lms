@@ -31,7 +31,6 @@ const defaultCompletionRequirement: CompletionRequirement = {
 const currentDate = new Date().toISOString()
 const defaultContent: ModuleItemContent = {
   id: '19',
-  title: 'Test Module Item',
   dueAt: currentDate,
   pointsPossible: 100,
 }
@@ -54,7 +53,6 @@ const defaultCheckpoints: Checkpoint[] = [
 
 const discussionContentWithCheckpoints: ModuleItemContent = {
   id: '20',
-  title: 'Discussion with Checkpoints',
   type: 'Discussion',
   pointsPossible: 10,
   checkpoints: defaultCheckpoints,
@@ -275,7 +273,6 @@ describe('ModuleItemSupplementalInfo', () => {
     it('does not render when no checkpoints, due dates, points, or requirements', () => {
       const emptyContent: ModuleItemContent = {
         id: '21',
-        title: 'Empty Content',
       }
       const container = setUp(emptyContent, null)
       expect(container.container.firstChild).toBeNull()

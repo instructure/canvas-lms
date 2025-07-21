@@ -37,6 +37,7 @@ export interface ModuleItemProps {
   id: string
   _id: string
   url: string
+  title: string
   indent: number
   moduleId: string
   moduleTitle?: string
@@ -60,6 +61,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   _id,
   id,
   url,
+  title,
   moduleId,
   moduleTitle = '',
   indent,
@@ -128,7 +130,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
                 <Flex alignItems="start" justifyItems="start" wrap="no-wrap" direction="column">
                   {/* Item Title */}
                   <Flex.Item shouldGrow={true}>
-                    <ModuleItemTitle content={content} url={url} onClick={onClick} />
+                    <ModuleItemTitle content={content} url={url} title={title} onClick={onClick} />
                   </Flex.Item>
                   {/* Due Date and Points Possible */}
                   <Flex.Item>
@@ -149,6 +151,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             moduleTitle={moduleTitle}
             itemId={_id}
             id={id}
+            title={title}
             indent={indent}
             content={content}
             published={published || false}

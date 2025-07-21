@@ -105,7 +105,7 @@ const ReferenceSelect: React.FC<ReferenceSelectProps> = ({
               .filter(item => !(item._id === sourceModuleItemId))
               .map((item: ModuleItem) => (
                 <SimpleSelect.Option key={item._id} id={item._id} value={item._id}>
-                  {item.content?.title || 'Untitled Item'}
+                  {item.title || 'Untitled Item'}
                 </SimpleSelect.Option>
               ))}
           </SimpleSelect>

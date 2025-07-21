@@ -55,6 +55,7 @@ interface ModuleItemActionPanelProps {
   moduleId: string
   itemId: string
   id: string
+  title: string
   indent: number
   content: ModuleItemContent
   published: boolean
@@ -71,6 +72,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   moduleId,
   itemId,
   id: _id,
+  title,
   indent,
   content,
   published,
@@ -126,7 +128,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [content, courseId, setIsMenuOpen])
 
   const handleAssignToRef = useCallback(() => {
-    handleAssignTo(content, courseId, setIsMenuOpen, moduleId)
+    handleAssignTo(content, courseId, title, setIsMenuOpen, moduleId)
   }, [content, courseId, setIsMenuOpen, moduleId])
 
   const handleDuplicateRef = useCallback(() => {
@@ -140,6 +142,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       moduleId,
       moduleTitle,
       itemId,
+      title,
       content,
       setModuleAction,
       setSelectedModuleItem,
@@ -176,7 +179,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [setIsDirectShareCourseOpen, setIsMenuOpen])
 
   const handleRemoveRef = useCallback(() => {
-    handleRemove(moduleId, itemId, content, queryClient, courseId, setIsMenuOpen)
+    handleRemove(moduleId, itemId, title, queryClient, courseId, setIsMenuOpen)
   }, [moduleId, itemId, content, courseId, setIsMenuOpen])
 
   const handleMasteryPathsRef = useCallback(() => {
@@ -184,7 +187,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   }, [masteryPathsData, itemId, setIsMenuOpen])
 
   const publishIconOnClickRef = useCallback(() => {
-    handlePublishToggle(moduleId, itemId, content, canBeUnpublished, queryClient, courseId)
+    handlePublishToggle(moduleId, itemId, title, content, canBeUnpublished, queryClient, courseId)
   }, [moduleId, itemId, content, canBeUnpublished, courseId])
 
   const renderFilePublishButton = () => {
@@ -195,7 +198,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
       hidden: content?.fileState === 'hidden',
       unlock_at: content?.unlockAt,
       lock_at: content?.lockAt,
-      display_name: content?.title,
+      display_name: title,
       thumbnail_url: content?.thumbnailUrl,
       module_item_id: parseInt(itemId),
       published: content?.published,
@@ -302,18 +305,20 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
               setIsDirectShareCourseOpen(false)
             }}
           />
-          {content && (
-            <EditItemModal
-              isOpen={isEditItemOpen}
-              onRequestClose={() => setIsEditItemOpen(false)}
-              itemName={content?.title}
-              itemIndent={indent}
-              itemId={itemId}
-              courseId={courseId}
-              moduleId={moduleId}
-            />
-          )}
         </>
+      )}
+      {content && (
+        <EditItemModal
+          isOpen={isEditItemOpen}
+          onRequestClose={() => setIsEditItemOpen(false)}
+          itemName={title}
+          itemURL={content?.url}
+          itemIndent={indent}
+          itemId={itemId}
+          itemType={content?.type?.toLowerCase()}
+          courseId={courseId}
+          moduleId={moduleId}
+        />
       )}
     </>
   )

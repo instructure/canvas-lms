@@ -68,6 +68,7 @@ export const getItemIcon = (content: ModuleItemContent, isStudentView = false) =
       return <IconPaperclipLine color={color} data-testid="attachment-icon" />
     case 'ExternalUrl':
     case 'ModuleExternalTool':
+    case 'ExternalTool':
       return <IconLinkLine color={color} data-testid="url-icon" />
     case 'Page':
       return <IconDocumentLine color={color} data-testid="page-icon" />
@@ -94,6 +95,7 @@ export const getItemTypeText = (content: ModuleItemContent) => {
     case 'Page':
       return I18n.t('Page')
     case 'ModuleExternalTool':
+    case 'ExternalTool':
       return I18n.t('External Tool')
     default:
       return I18n.t('Unknown')
@@ -137,6 +139,7 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
   const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.url === nextProps.url &&
+    prevProps.title === nextProps.title &&
     prevProps.indent === nextProps.indent &&
     prevProps.index === nextProps.index &&
     prevProps.smallScreen === nextProps.smallScreen
@@ -188,8 +191,8 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.moduleId === nextProps.moduleId &&
     prevProps.published === nextProps.published &&
     prevProps.index === nextProps.index &&
-    prevProps.content?.title === nextProps.content?.title &&
     prevProps.indent === nextProps.indent &&
+    prevProps.title === nextProps.title &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
     prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&

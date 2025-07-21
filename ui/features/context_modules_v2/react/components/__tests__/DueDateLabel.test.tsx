@@ -26,7 +26,6 @@ import DueDateLabel from '../DueDateLabel'
 const currentDate = new Date().toISOString()
 const defaultContent: ModuleItemContent = {
   id: '19',
-  title: 'Test Module Item',
   dueAt: currentDate,
   pointsPossible: 100,
 }

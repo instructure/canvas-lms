@@ -35,7 +35,6 @@ const buildDefaultProps = (overrides: TestPropsOverrides = {}) => {
   // Create default content
   const defaultContent: ModuleItemContent = {
     _id: 'item-1',
-    title: 'Test Item',
     submissionsConnection: {
       nodes: [
         {

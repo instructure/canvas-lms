@@ -41,7 +41,8 @@ const setUp = ({
   return render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemTitle
-        content={{type, title, isLockedByMasterCourse: false, newTab}}
+        title={title}
+        content={{type, isLockedByMasterCourse: false, newTab}}
         url="https://canvas.instructure.com/courses/1/modules"
       />
     </ContextModuleProvider>,

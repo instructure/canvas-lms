@@ -27,6 +27,7 @@ import ModuleItemTitleStudent from './ModuleItemTitleStudent'
 
 export interface ModuleItemStudentProps {
   _id: string
+  title: string
   url: string
   indent: number
   position: number
@@ -41,6 +42,7 @@ export interface ModuleItemStudentProps {
 
 const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
   _id,
+  title,
   url,
   indent,
   position,
@@ -108,6 +110,7 @@ const ModuleItemStudent: React.FC<ModuleItemStudentProps> = ({
               {/* Item Title */}
               <Flex.Item shouldGrow={true}>
                 <ModuleItemTitleStudent
+                  title={title}
                   content={content}
                   url={url}
                   onClick={onClick}
