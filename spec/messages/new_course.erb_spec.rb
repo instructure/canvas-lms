@@ -28,5 +28,5 @@ describe "new_course" do
   let(:asset) { @course }
   let(:notification_name) { :new_course }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

@@ -28,5 +28,5 @@ describe "assignment_graded" do
   let(:asset) { @assignment }
   let(:notification_name) { :assignment_graded }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

@@ -28,5 +28,5 @@ describe "upcoming_assignment_alert" do
   let(:asset) { @assignment }
   let(:notification_name) { :upcoming_assignment_alert }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end

@@ -37,7 +37,7 @@ message")
   let(:asset) { @message }
   let(:notification_name) { :conversation_created }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 
   describe ".email" do
     it "doesnt have trailing erb closures" do

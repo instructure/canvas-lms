@@ -31,5 +31,5 @@ describe "group_membership_accepted" do
   let(:asset) { @object }
   let(:notification_name) { :group_membership_accepted }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end
