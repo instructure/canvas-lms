@@ -76,7 +76,7 @@ GEM
     aes_key_wrap (1.1.0)
     after_transaction_commit (2.2.2)
       activerecord (>= 5.2)
-    base64 (0.2.0)
+    base64 (0.3.0)
     benchmark (0.4.0)
     bigdecimal (3.1.9)
     bindata (2.5.1)
