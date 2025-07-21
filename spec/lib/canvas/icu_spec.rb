@@ -79,7 +79,7 @@ describe Canvas::ICU do
   end
 
   context "NaiveCollator" do
-    include_examples "Collator"
+    it_behaves_like "Collator"
 
     before do
       allow(Canvas::ICU).to receive(:collator).and_return(Canvas::ICU::NaiveCollator)
@@ -129,8 +129,8 @@ describe Canvas::ICU do
   end
 
   context "ICU" do
-    include_examples "Collator"
-    include_examples "ICU Collator"
+    it_behaves_like "Collator"
+    it_behaves_like "ICU Collator"
 
     before do
       if Canvas::ICU.collator == Canvas::ICU::NaiveCollator
@@ -146,7 +146,7 @@ describe Canvas::ICU do
     end
 
     context "postgres" do
-      include_examples "ICU Collator"
+      it_behaves_like "ICU Collator"
 
       before do
         skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key("col").include?("LOWER")

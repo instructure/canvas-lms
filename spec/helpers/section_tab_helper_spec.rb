@@ -307,7 +307,7 @@ describe SectionTabHelper do
             allow(context).to receive(:tabs_available).and_return(tabs)
           end
 
-          include_examples "allow Quiz LTI placement when the correct Feature Flags are enabled"
+          it_behaves_like "allow Quiz LTI placement when the correct Feature Flags are enabled"
         end
 
         context "the root account has a course_navigation Quiz LTI placement and @context is a Course" do
@@ -328,7 +328,7 @@ describe SectionTabHelper do
             allow(context).to receive(:tabs_available).and_return(tabs)
           end
 
-          include_examples "allow Quiz LTI placement when the correct Feature Flags are enabled"
+          it_behaves_like "allow Quiz LTI placement when the correct Feature Flags are enabled"
         end
 
         context "the root account has non-Quiz_LTI navigation placements" do

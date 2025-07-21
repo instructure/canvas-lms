@@ -1151,7 +1151,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "returns bad_request if dates are invalid" do
         put :update, params: { **default_params, unlock_at: "2023-01-" }
@@ -1323,7 +1323,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "returns unauthorized if user doesn't have manage_assignments_edit permission" do
         RoleOverride.create!(context: @course.account, permission: "manage_assignments_edit", role: teacher_role, enabled: false)
@@ -1933,7 +1933,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", true
+      it_behaves_like "learning object updates", true
 
       it "removes base dates on DiscussionTopic object if it has any" do
         learning_object.update!(**default_availability_dates)
@@ -1968,8 +1968,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "removes section visibilities and changes 'is_section_specific' to false" do
         learning_object.discussion_topic_section_visibilities << DiscussionTopicSectionVisibility.new(
@@ -2012,8 +2012,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "creates an assignment if noop override is included and conditional release is enabled" do
         @course.conditional_release = true
@@ -2212,7 +2212,7 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
+      it_behaves_like "learning object updates", false
 
       it "does not remove the assignment if a noop override is removed" do
         @course.conditional_release = true
@@ -2260,8 +2260,8 @@ describe LearningObjectDatesController do
         }
       end
 
-      include_examples "learning object updates", false
-      include_examples "learning objects without due dates"
+      it_behaves_like "learning object updates", false
+      it_behaves_like "learning objects without due dates"
 
       it "returns unauthorized if user doesn't have manage_files_edit permission" do
         RoleOverride.create!(context: @course.account, permission: "manage_files_edit", role: teacher_role, enabled: false)

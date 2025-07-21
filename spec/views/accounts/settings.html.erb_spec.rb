@@ -139,13 +139,13 @@ describe "accounts/settings" do
     describe "Root Account Announcements" do
       let(:account) { Account.create!(name: "reading_rainbow") }
 
-      include_examples "account notifications", "This is a message from <b>reading_rainbow</b>"
+      it_behaves_like "account notifications", "This is a message from <b>reading_rainbow</b>"
     end
 
     describe "Site Admin Announcements" do
       let(:account) { Account.site_admin }
 
-      include_examples "account notifications", "This is a message from <b>Canvas Administration</b>"
+      it_behaves_like "account notifications", "This is a message from <b>Canvas Administration</b>"
     end
   end
 

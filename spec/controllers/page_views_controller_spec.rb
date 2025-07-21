@@ -76,7 +76,7 @@ describe PageViewsController do
       Setting.set("enable_page_views", true)
     end
 
-    include_examples "GET 'index' as csv"
+    it_behaves_like "GET 'index' as csv"
   end
 
   context "pv4" do

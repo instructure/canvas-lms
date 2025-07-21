@@ -924,11 +924,11 @@ describe OutcomeResultsController do
       describe "for different users" do
         let(:student) { student_in_course(active_all: true, course: outcome_course, name: "Hello Kitty").user }
 
-        include_examples "outcome results" do
+        it_behaves_like "outcome results" do
           let(:user) { student }
         end
 
-        include_examples "outcome results" do
+        it_behaves_like "outcome results" do
           let(:user) { @teacher }
         end
       end

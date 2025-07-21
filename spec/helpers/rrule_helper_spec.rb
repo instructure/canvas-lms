@@ -76,7 +76,7 @@ describe RruleHelper do
     }
 
     @rrule_to_natural_lang.each_key do |rrule|
-      include_examples "rrule variants", rrule, @rrule_to_natural_lang[rrule]
+      it_behaves_like "rrule variants", rrule, @rrule_to_natural_lang[rrule]
     end
   end
 
