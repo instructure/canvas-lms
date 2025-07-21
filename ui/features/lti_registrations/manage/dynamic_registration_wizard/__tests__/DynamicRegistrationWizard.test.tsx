@@ -17,7 +17,10 @@
  */
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {ZAccountId} from '../../model/AccountId'
-import {DynamicRegistrationWizard} from '../DynamicRegistrationWizard'
+import {
+  DynamicRegistrationWizard,
+  DynamicRegistrationWizardProps,
+} from '../DynamicRegistrationWizard'
 import {success} from '../../../common/lib/apiResult/ApiResult'
 import userEvent from '@testing-library/user-event'
 import type {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -32,10 +35,20 @@ import {ZUnifiedToolId} from '../../model/UnifiedToolId'
 const mockAlert = jest.fn() as jest.Mock<typeof showFlashAlert>
 
 describe('DynamicRegistrationWizard', () => {
-  it('renders a loading screen when fetching the registration token', () => {
-    const accountId = ZAccountId.parse('123')
-    const unifiedToolId = ZUnifiedToolId.parse('asdf')
+  const defaultProps = {
+    dynamicRegistrationUrl: 'https://example.com',
+    accountId: ZAccountId.parse('123'),
+    unifiedToolId: ZUnifiedToolId.parse('asdf'),
+    service: mockDynamicRegistrationWizardService({}),
+    onDismiss: jest.fn(),
+    onSuccessfulRegistration: jest.fn(),
+  }
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('renders a loading screen when fetching the registration token', () => {
     const fetchRegistrationToken = jest.fn().mockImplementation(() => new Promise(() => {}))
 
     const getRegistrationByUUID = jest.fn().mockResolvedValue(success(mockRegistration()))
@@ -45,21 +58,12 @@ describe('DynamicRegistrationWizard', () => {
       getRegistrationByUUID,
     })
 
-    render(
-      <DynamicRegistrationWizard
-        dynamicRegistrationUrl="https://example.com"
-        service={service}
-        accountId={accountId}
-        unifiedToolId={unifiedToolId}
-        unregister={() => {}}
-        onSuccessfulRegistration={() => {}}
-      />,
-    )
+    render(<DynamicRegistrationWizard {...defaultProps} service={service} />)
 
     expect(fetchRegistrationToken).toHaveBeenCalledWith(
-      accountId,
+      defaultProps.accountId,
       'https://example.com',
-      unifiedToolId,
+      defaultProps.unifiedToolId,
     )
     // Ignore screenreader title.
     expect(screen.getByText(/Loading/i, {ignore: 'title'})).toBeInTheDocument()
@@ -81,19 +85,10 @@ describe('DynamicRegistrationWizard', () => {
       getRegistrationByUUID,
     })
 
-    render(
-      <DynamicRegistrationWizard
-        dynamicRegistrationUrl="https://example.com?foo=bar"
-        service={service}
-        accountId={accountId}
-        unifiedToolId={unifiedToolId}
-        unregister={() => {}}
-        onSuccessfulRegistration={() => {}}
-      />,
-    )
+    render(<DynamicRegistrationWizard {...defaultProps} service={service} />)
     expect(fetchRegistrationToken).toHaveBeenCalledWith(
       accountId,
-      'https://example.com?foo=bar',
+      defaultProps.dynamicRegistrationUrl,
       unifiedToolId,
     )
     const frame = await waitFor(() => screen.getByTestId('dynamic-reg-wizard-iframe'))
@@ -101,12 +96,11 @@ describe('DynamicRegistrationWizard', () => {
     expect(frame).toBeInstanceOf(HTMLIFrameElement)
     expect(frame as HTMLIFrameElement).toHaveAttribute(
       'src',
-      'https://example.com/?foo=bar&openid_configuration=oidc_config_url_value&registration_token=reg_token_value',
+      'https://example.com/?openid_configuration=oidc_config_url_value&registration_token=reg_token_value',
     )
   })
 
   it('retrieves the registration when the tool returns', async () => {
-    const accountId = ZAccountId.parse('123')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',
@@ -120,15 +114,7 @@ describe('DynamicRegistrationWizard', () => {
       getRegistrationByUUID,
     })
 
-    render(
-      <DynamicRegistrationWizard
-        service={service}
-        dynamicRegistrationUrl="https://example.com/"
-        accountId={accountId}
-        unregister={() => {}}
-        onSuccessfulRegistration={() => {}}
-      />,
-    )
+    render(<DynamicRegistrationWizard {...defaultProps} service={service} />)
 
     const iframe = await screen.findByTestId('dynamic-reg-wizard-iframe')
     expect(iframe).toBeInTheDocument()
@@ -157,7 +143,6 @@ describe('DynamicRegistrationWizard', () => {
   })
 
   describe('PermissionConfirmation', () => {
-    const accountId = ZAccountId.parse('123')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',
@@ -173,6 +158,7 @@ describe('DynamicRegistrationWizard', () => {
         ],
       }),
     })
+    const mockOnDismiss = jest.fn().mockImplementation(() => true)
     const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
     const deleteRegistration = jest.fn().mockImplementation(async () => success(reg))
     const service = mockDynamicRegistrationWizardService({
@@ -181,14 +167,13 @@ describe('DynamicRegistrationWizard', () => {
       deleteRegistration,
     })
 
-    const setup = async () => {
+    const setup = async (overrides: Partial<DynamicRegistrationWizardProps> = {}) => {
       render(
         <DynamicRegistrationWizard
+          {...defaultProps}
+          onDismiss={mockOnDismiss}
           service={service}
-          dynamicRegistrationUrl="https://example.com/"
-          accountId={accountId}
-          unregister={() => {}}
-          onSuccessfulRegistration={() => {}}
+          {...overrides}
         />,
       )
 
@@ -232,22 +217,31 @@ describe('DynamicRegistrationWizard', () => {
       await userEvent.click(screen.getByText(/Cancel/i).closest('button')!)
 
       await waitFor(() => {
-        expect(deleteRegistration).toHaveBeenCalledWith(accountId, reg.id)
+        expect(deleteRegistration).toHaveBeenCalledWith(defaultProps.accountId, reg.id)
         expect(mockAlert).not.toHaveBeenCalled()
       })
     })
 
-    it('tries to delete the registration when the X button is clicked', async () => {
+    it("doesn't try to delete the associated dev key if the user doesn't confirm the cancellation", async () => {
+      const mockDismiss = jest.fn().mockReturnValue(false)
+      await setup({
+        onDismiss: mockDismiss,
+      })
+      await userEvent.click(screen.getByText(/Cancel/i).closest('button')!)
+      expect(mockDismiss).toHaveBeenCalled()
+      expect(deleteRegistration).not.toHaveBeenCalled()
+    })
+
+    it('tries to delete the registration when the X button is clicked and onDismiss returns true', async () => {
       await setup()
       await userEvent.click(screen.getByText(/Close/i, {ignore: false}).closest('button')!)
       await waitFor(() => {
-        expect(deleteRegistration).toHaveBeenCalledWith(accountId, reg.id)
+        expect(deleteRegistration).toHaveBeenCalledWith(defaultProps.accountId, reg.id)
       })
     })
   })
 
   describe('IconConfirmation', () => {
-    const accountId = ZAccountId.parse('123')
     const fetchRegistrationToken = jest.fn().mockResolvedValue(
       success({
         token: 'reg_token_value',
@@ -256,6 +250,7 @@ describe('DynamicRegistrationWizard', () => {
       }),
     )
     let reg = mockRegistration()
+    const mockOnDismiss = jest.fn().mockImplementation(() => true)
     const getRegistrationByUUID = jest.fn().mockImplementation(async () => success(reg))
     const deleteRegistration = jest.fn().mockImplementation(async () => success(reg))
     const service = mockDynamicRegistrationWizardService({
@@ -266,13 +261,7 @@ describe('DynamicRegistrationWizard', () => {
 
     const setup = async () => {
       render(
-        <DynamicRegistrationWizard
-          service={service}
-          dynamicRegistrationUrl="https://example.com/"
-          accountId={accountId}
-          unregister={() => {}}
-          onSuccessfulRegistration={() => {}}
-        />,
+        <DynamicRegistrationWizard {...defaultProps} onDismiss={mockOnDismiss} service={service} />,
       )
 
       await screen.findByTestId('dynamic-reg-wizard-iframe')

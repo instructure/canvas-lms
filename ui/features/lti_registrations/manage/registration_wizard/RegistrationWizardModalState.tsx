@@ -85,12 +85,6 @@ export type RegistrationWizardModalState = {
    * JSON methods
    */
   jsonFetch: JsonFetchStatus
-  /**
-   * Controls whether the modal should close when the user
-   * clicks "cancel" Should be true when the modal is
-   * launched from the Product Detail page
-   */
-  exitOnCancel: boolean
   onSuccessfulInstallation?: () => void
 }
 
@@ -105,7 +99,6 @@ export type RegistrationWizardModalStateActions = {
   updateJsonCode: (url: string) => void
   updateJsonFetchStatus: (status: JsonFetchStatus) => void
   register: () => void
-  unregister: () => void
   close: () => void
 }
 
@@ -123,7 +116,6 @@ export const useRegistrationModalWizardState = create<
   manualAppName: '',
   unifiedToolId: undefined,
   registering: false,
-  exitOnCancel: false,
   isInstructureTool: false,
   showBlankConfigurationMessage: false,
   jsonFetch: {_tag: 'initial'},
@@ -134,22 +126,6 @@ export const useRegistrationModalWizardState = create<
   updateManualAppName: name => set({manualAppName: name}),
   updateJsonCode: code => set({jsonCode: code, jsonFetch: {_tag: 'initial'}}),
   register: () => set({registering: true}),
-  unregister: () => {
-    // todo: if we've already returned from the tool,
-    // we need to delete the registration we created
-    set(prev => {
-      if (prev.exitOnCancel) {
-        return {
-          open: false,
-        }
-      } else {
-        return {
-          ltiImsRegistrationId: undefined,
-          registering: false,
-        }
-      }
-    })
-  },
   updateJsonFetchStatus: status => {
     if (status._tag === 'loaded') {
       set({jsonFetch: status, registering: isSuccessful(status.result)})
@@ -199,7 +175,6 @@ export const openJsonRegistrationWizard = (
         },
       },
       unifiedToolId,
-      exitOnCancel: true,
       registering: true,
       onSuccessfulInstallation,
     }
@@ -227,7 +202,6 @@ export const openJsonUrlRegistrationWizard = (
       },
       unifiedToolId,
       registering: true,
-      exitOnCancel: true,
       onSuccessfulInstallation,
     }
   })
@@ -247,7 +221,6 @@ export const openDynamicRegistrationWizard = (
   openRegistrationWizard({
     dynamicRegistrationUrl,
     registering: true,
-    exitOnCancel: true,
     onSuccessfulInstallation,
     unifiedToolId,
   })
@@ -268,7 +241,6 @@ export const openEditDynamicRegistrationWizard = (
   openRegistrationWizard({
     existingRegistrationId,
     registering: true,
-    exitOnCancel: true,
     onSuccessfulInstallation,
   })
 }
@@ -280,7 +252,6 @@ export const openEditManualRegistrationWizard = (
   openRegistrationWizard({
     existingRegistrationId,
     registering: true,
-    exitOnCancel: true,
     onSuccessfulInstallation,
     method: 'manual',
   })

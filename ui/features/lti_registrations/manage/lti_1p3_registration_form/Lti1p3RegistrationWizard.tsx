@@ -52,7 +52,7 @@ export type Lti1p3RegistrationWizardProps = {
   accountId: AccountId
   internalConfiguration: InternalLtiConfiguration
   service: Lti1p3RegistrationWizardService
-  unregister: () => void
+  onDismiss: () => void
   unifiedToolId?: UnifiedToolId
   onSuccessfulRegistration: () => void
 }
@@ -62,7 +62,7 @@ export const Lti1p3RegistrationWizard = ({
   accountId,
   internalConfiguration,
   service,
-  unregister,
+  onDismiss,
   unifiedToolId,
   onSuccessfulRegistration,
 }: Lti1p3RegistrationWizardProps) => {
@@ -100,12 +100,12 @@ export const Lti1p3RegistrationWizard = ({
     case 'LaunchSettings':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <LaunchSettingsConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
             reviewing={store.state.reviewing}
-            onPreviousClicked={unregister}
+            onPreviousClicked={onDismiss}
             onNextClicked={handleNextClicked('Permissions')}
           />
         </>
@@ -113,7 +113,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Permissions':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <PermissionConfirmationWrapper
             showAllSettings={true}
             overlayStore={store.state.overlayStore}
@@ -130,7 +130,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'DataSharing':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <PrivacyConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -146,7 +146,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Placements':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <PlacementsConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -162,7 +162,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'OverrideURIs':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <OverrideURIsConfirmationWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
@@ -175,7 +175,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Naming':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <NamingConfirmationWrapper
             internalConfig={internalConfiguration}
             overlayStore={store.state.overlayStore}
@@ -198,7 +198,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Icons':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <IconConfirmationWrapper
             internalConfig={internalConfiguration}
             reviewing={store.state.reviewing}
@@ -211,7 +211,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Review':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <ReviewScreenWrapper
             overlayStore={store.state.overlayStore}
             internalConfig={internalConfiguration}
@@ -247,7 +247,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Installing':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <RegistrationModalBody>
             <Flex justifyItems="center" alignItems="center" height="100%">
               <Flex.Item>
@@ -261,7 +261,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Updating':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <RegistrationModalBody>
             <Flex justifyItems="center" alignItems="center" height="100%">
               <Flex.Item>
@@ -275,7 +275,7 @@ export const Lti1p3RegistrationWizard = ({
     case 'Error':
       return (
         <>
-          <Header onClose={unregister} editing={!!existingRegistration} />
+          <Header onClose={onDismiss} editing={!!existingRegistration} />
           <RegistrationModalBody>
             <GenericErrorPage
               imageUrl={errorShipUrl}

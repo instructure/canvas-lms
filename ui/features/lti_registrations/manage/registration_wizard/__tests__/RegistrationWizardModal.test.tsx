@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import {RegistrationWizardModal} from '../RegistrationWizardModal'
 import {ZAccountId} from '../../model/AccountId'
@@ -76,7 +75,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         onSuccessfulInstallation: jest.fn(),
         jsonFetch: {_tag: 'initial'},
@@ -141,7 +139,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'json_url',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
@@ -263,7 +260,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'json',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
@@ -381,7 +377,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
@@ -461,7 +456,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: true,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
@@ -489,7 +483,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: true,
         method: 'manual',
         registering: false,
-        exitOnCancel: false,
         jsonUrl: '',
         jsonCode: '',
         onSuccessfulInstallation: jest.fn(),
@@ -511,7 +504,15 @@ describe('RegistrationWizardModal', () => {
   })
 
   describe('when pre-opened with dynamic registration', () => {
-    it('should exit the modal when the cancel button is clicked & exitOnCancel is true', async () => {
+    beforeEach(() => {
+      jest.spyOn(window, 'confirm').mockReturnValue(true)
+    })
+
+    afterEach(() => {
+      ;(window.confirm as unknown as jest.SpyInstance).mockReset()
+    })
+
+    it('should exit the modal when the cancel button is clicked', async () => {
       openRegistrationWizard({
         dynamicRegistrationUrl: 'http://example.com',
         unifiedToolId: ZUnifiedToolId.parse('asdf'),
@@ -520,7 +521,6 @@ describe('RegistrationWizardModal', () => {
         showBlankConfigurationMessage: undefined,
         method: 'dynamic_registration',
         registering: true,
-        exitOnCancel: true,
         jsonUrl: '',
         onSuccessfulInstallation: jest.fn(),
         jsonFetch: {_tag: 'initial'},
@@ -532,6 +532,7 @@ describe('RegistrationWizardModal', () => {
       })
       fireEvent.click(cancelButton)
       await waitFor(() => {
+        expect(window.confirm).toHaveBeenCalled()
         expect(screen.queryByText(/Install App/i)).not.toBeInTheDocument()
       })
     })

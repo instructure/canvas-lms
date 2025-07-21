@@ -74,18 +74,20 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
 
   const label = state.existingRegistrationId ? I18n.t('Edit App') : I18n.t('Install App')
 
+  /**
+   * Handles the dismissal of the modal.
+   * @returns Returns true if the user wants to close the modal, false otherwise
+   */
   const onDismiss = useCallback(() => {
     const confirmationMessage = state.existingRegistrationId
       ? I18n.t('Are you sure you want to stop editing? Any changes will be lost.')
       : I18n.t('Are you sure you want to stop registering? Any progress will be lost.')
 
-    if (!state.registering) {
-      state.unregister()
-      state.close()
-    } else if (window.confirm(confirmationMessage)) {
-      state.unregister()
+    const shouldClose = !state.registering || window.confirm(confirmationMessage)
+    if (shouldClose) {
       state.close()
     }
+    return shouldClose
   }, [state])
 
   return (
@@ -104,6 +106,7 @@ export const RegistrationWizardModal = (props: RegistrationWizardModalProps) => 
             dynamicRegistrationWizardService={props.dynamicRegistrationWizardService}
             lti1p3RegistrationWizardService={props.lti1p3RegistrationWizardService}
             jsonUrlWizardService={props.jsonUrlWizardService}
+            onDismiss={onDismiss}
           />
         </Modal>
       )}
@@ -117,12 +120,14 @@ const ModalBodyWrapper = ({
   dynamicRegistrationWizardService,
   lti1p3RegistrationWizardService,
   jsonUrlWizardService,
+  onDismiss,
 }: {
   state: RegistrationWizardModalState & RegistrationWizardModalStateActions
   accountId: AccountId
   dynamicRegistrationWizardService: DynamicRegistrationWizardService
   lti1p3RegistrationWizardService: Lti1p3RegistrationWizardService
   jsonUrlWizardService: JsonUrlWizardService
+  onDismiss: () => boolean
 }) => {
   if (state.registering) {
     if (
@@ -140,7 +145,7 @@ const ModalBodyWrapper = ({
             state.close()
             state.onSuccessfulInstallation?.()
           }}
-          unregister={state.unregister}
+          onDismiss={onDismiss}
         />
       )
     } else if (state.method === 'dynamic_registration') {
@@ -150,7 +155,7 @@ const ModalBodyWrapper = ({
           dynamicRegistrationUrl={state.dynamicRegistrationUrl}
           accountId={accountId}
           unifiedToolId={state.unifiedToolId}
-          unregister={state.unregister}
+          onDismiss={onDismiss}
           registrationId={state.existingRegistrationId}
           onSuccessfulRegistration={() => {
             state.close()
@@ -173,9 +178,7 @@ const ModalBodyWrapper = ({
           }}
           registrationId={state.existingRegistrationId}
           service={lti1p3RegistrationWizardService}
-          unregister={() => {
-            state.close()
-          }}
+          onDismiss={onDismiss}
           unifiedToolId={state.unifiedToolId}
         />
       )
@@ -198,7 +201,7 @@ const ModalBodyWrapper = ({
             state.close()
             state.onSuccessfulInstallation?.()
           }}
-          unregister={state.unregister}
+          onDismiss={onDismiss}
         />
       )
     } else {
