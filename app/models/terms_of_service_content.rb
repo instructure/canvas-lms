@@ -51,6 +51,22 @@ class TermsOfServiceContent < ActiveRecord::Base
     true
   end
 
+  def content
+    original = super
+    return original unless account && root_account.feature_enabled?(:file_association_access)
+
+    file_url_pattern = %r{(?<![a-zA-Z0-9:])(/(?:[\w-]+/\d+/)?(?:files/\d+(?:/[\w-]+)?|media_attachments_iframe/\d+)(?:\?[^"'<>]*)?)}
+
+    original.gsub(file_url_pattern) do |_|
+      url = Regexp.last_match(1)
+      if url.include?("?")
+        "#{url}&location=#{asset_string}"
+      else
+        "#{url}?location=#{asset_string}"
+      end
+    end
+  end
+
   def ensure_terms_updated_at
     self.terms_updated_at ||= Time.now.utc
   end
