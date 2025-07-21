@@ -91,7 +91,7 @@ GEM
     diff-lcs (1.6.1)
     docile (1.4.1)
     dogstatsd-ruby (5.6.6)
-    drb (2.2.1)
+    drb (2.2.3)
     erubi (1.13.1)
     folio-pagination (0.0.12)
     i18n (1.14.7)

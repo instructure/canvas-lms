@@ -91,7 +91,7 @@ GEM
     date (3.4.1)
     diff-lcs (1.6.1)
     digest-murmurhash (1.1.1)
-    drb (2.2.1)
+    drb (2.2.3)
     erubi (1.13.1)
     guardrail (3.0.4)
       activerecord (>= 6.1, < 8.0)

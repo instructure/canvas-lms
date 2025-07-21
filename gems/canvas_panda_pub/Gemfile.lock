@@ -100,7 +100,7 @@ GEM
     date (3.4.1)
     diff-lcs (1.6.1)
     digest-murmurhash (1.1.1)
-    drb (2.2.1)
+    drb (2.2.3)
     erubi (1.13.1)
     faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
