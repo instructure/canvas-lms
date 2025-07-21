@@ -43,7 +43,8 @@ export interface FilePreviewModalProps {
 }
 
 export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePreviewModalProps) => {
-  const closeButton = useRef<HTMLElement | null>(null)
+  const modalBody = useRef<HTMLElement | null>(null)
+  const fileInfoButton = useRef<HTMLElement | null>(null)
   const [currentItem, setCurrentItem] = useState<File>(item)
   const [currentIndex, setCurrentIndex] = useState<number>(collection.indexOf(item))
   const [isTrayOpen, setIsTrayOpen] = useState(false)
@@ -62,7 +63,12 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
   }
 
   useEffect(() => {
-    const timeoutID = isOpen ? setTimeout(() => closeButton.current?.focus(), 50) : undefined
+    const timeoutID = isOpen
+      ? setTimeout(() => {
+          fileInfoButton.current?.focus()
+          modalBody.current?.removeAttribute('tabindex')
+        }, 50)
+      : undefined
     return timeoutID ? () => clearTimeout(timeoutID) : undefined
   }, [isOpen])
 
@@ -160,19 +166,6 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
           </Flex.Item>
           <Flex.Item>
             <div style={{display: 'grid', gridTemplate: "'info download close'"}}>
-              <div style={{gridArea: 'close'}}>
-                <IconButton
-                  color="primary-inverse"
-                  withBackground={false}
-                  withBorder={false}
-                  renderIcon={IconXSolid}
-                  screenReaderLabel={I18n.t('Close')}
-                  onClick={onClose}
-                  id="close-button"
-                  ref={e => (closeButton.current = e as HTMLElement | null)}
-                  data-testid="close-button"
-                />
-              </div>
               <div style={{gridArea: 'info'}}>
                 <IconButton
                   color="primary-inverse"
@@ -183,6 +176,7 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
                   margin="0 x-small 0 0"
                   id="file-info-button"
                   onClick={() => handleOverlayTrayChange(true)}
+                  ref={e => (fileInfoButton.current = e as HTMLElement | null)}
                 />
               </div>
               <div style={{gridArea: 'download'}}>
@@ -197,11 +191,27 @@ export const FilePreviewModal = ({isOpen, onClose, item, collection}: FilePrevie
                   href={currentItem.url}
                 />
               </div>
+              <div style={{gridArea: 'close'}}>
+                <IconButton
+                  color="primary-inverse"
+                  withBackground={false}
+                  withBorder={false}
+                  renderIcon={IconXSolid}
+                  screenReaderLabel={I18n.t('Close')}
+                  onClick={onClose}
+                  id="close-button"
+                  data-testid="close-button"
+                />
+              </div>
             </div>
           </Flex.Item>
         </Flex>
       </Modal.Header>
-      <Modal.Body padding="none" id="file-preview-modal-alert">
+      <Modal.Body
+        padding="none"
+        id="file-preview-modal-alert"
+        elementRef={el => (modalBody.current = el as HTMLElement | null)}
+      >
         <DrawerLayout onOverlayTrayChange={handleOverlayTrayChange}>
           <DrawerLayout.Content
             id="file-preview-modal-drawer-layout"

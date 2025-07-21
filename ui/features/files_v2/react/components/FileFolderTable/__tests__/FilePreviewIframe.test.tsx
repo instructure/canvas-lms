@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { render } from '@testing-library/react';
-import { file } from './fixtures'
-import '@testing-library/jest-dom';
-import FilePreviewIframe from '../FilePreviewIframe';
+import React from 'react'
+import {render} from '@testing-library/react'
+import {file} from './fixtures'
+import '@testing-library/jest-dom'
+import FilePreviewIframe from '../FilePreviewIframe'
 
 describe('FilePreviewIframe', () => {
   it('renders with correct sandbox attributes when mime_class is html', () => {
@@ -29,17 +29,17 @@ describe('FilePreviewIframe', () => {
       mime_class: 'html',
       preview_url: 'https://example.com',
       display_name: 'test.html',
-    };
+    }
 
-    const { getByTitle } = render(<FilePreviewIframe item={item} />);
-    const iframe = getByTitle('Preview for file: test.html');
+    const {getByTitle} = render(<FilePreviewIframe item={item} />)
+    const iframe = getByTitle('Preview for file: test.html')
 
-    expect(iframe).toHaveAttribute('sandbox', 'allow-same-origin');
-    expect(iframe).toHaveAttribute('src', 'https://example.com');
-    expect(iframe).toHaveStyle('background-color: #F2F4F4');
-    expect(iframe).toHaveStyle('height: 100%');
-    expect(iframe).toHaveStyle('width: 100%');
-  });
+    expect(iframe).toHaveAttribute('sandbox', 'allow-same-origin')
+    expect(iframe).toHaveAttribute('src', 'https://example.com')
+    expect(iframe).toHaveStyle('background-color: #F2F4F4')
+    expect(iframe).toHaveStyle('height: 100%')
+    expect(iframe).toHaveStyle('width: 100%')
+  })
 
   it('renders with correct sandbox attributes when mime_class is not html', () => {
     const item = {
@@ -47,15 +47,15 @@ describe('FilePreviewIframe', () => {
       mime_class: 'pdf',
       preview_url: 'https://example.com',
       display_name: 'test.pdf',
-    };
+    }
 
-    const { getByTitle } = render(<FilePreviewIframe item={item} />);
-    const iframe = getByTitle('Preview for file: test.pdf');
+    const {getByTitle} = render(<FilePreviewIframe item={item} />)
+    const iframe = getByTitle('Preview for file: test.pdf')
 
-    expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin');
-    expect(iframe).toHaveAttribute('src', 'https://example.com');
-    expect(iframe).not.toHaveStyle('background-color: #F2F4F4');
-    expect(iframe).toHaveStyle('height: 100%');
-    expect(iframe).toHaveStyle('width: 100%');
-  });
-});
+    expect(iframe).toHaveAttribute('sandbox', 'allow-scripts allow-same-origin')
+    expect(iframe).toHaveAttribute('src', 'https://example.com')
+    expect(iframe).not.toHaveStyle('background-color: #F2F4F4')
+    expect(iframe).toHaveStyle('height: 100%')
+    expect(iframe).toHaveStyle('width: 100%')
+  })
+})
