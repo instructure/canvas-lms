@@ -30418,10 +30418,10 @@ nb-x-k12:
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Dette vedlegget har blitt opphevet av forfatteren."
   this_can_be_a_device_that_can_generate_verificatio_f0787dcf: "Dette kan være en enhet som kan generere bekreftelsekoder, eller en telefon som kan motta tekstmeldinger."
   this_canvas_community_article_details_the_reasonin_37be9375: "*Denne Canvas Community-artikkelen* beskriver begrunnelsen for denne endringen, omfanget, nøyaktige instruksjoner for hva som skal endres, og ytterligere avklaringer for både Canvas-administratorer og utviklere av LTI 1.3-verktøy."
-  this_canvas_installation_is_only_for_testing_and_w_12e52370: "Canvas-installasjonen er kun for quizing, og *vil tilbakestilles hver måned.*"
+  this_canvas_installation_is_only_for_testing_and_w_12e52370: "Denne Canvas-installasjonen er kun for testing, og *vil tilbakestilles hver måned.*"
   this_canvas_installation_is_only_for_testing_and_w_17ce8bc2: 
-    one: "Canvas-installasjonen er kun for quizing, og *vil tilbakestilles hver uke.*"
-    other: "Canvas-installasjonen er kun for quizing, og *vil tilbakestilles hver %{count} uke.*"
+    one: "Denne Canvas-installasjonen er kun for testing, og *vil tilbakestilles hver uke.*"
+    other: "Denne Canvas-installasjonen er kun for testing, og *vil tilbakestilles hver %{count} uke.*"
   this_catalog_will_be_a_template_account_and_its_da_8b6277cb: "Katalog vil være en malkonto, og dataene kan kopieres over to nylig provisjonerte kataloger."
   this_change_is_irreversible_and_will_affect_all_di_d1118ec1: "Denne endringen er irreversibel og vil påvirke alle diskusjoner i faget ditt."
   this_change_will_affect_1_course_36c065ed: "Denne endringen vil påvirke 1 fag"
@@ -33466,8 +33466,8 @@ nb-x-k12:
   warning_you_are_about_to_adjust_this_group_s_membe_a04281b6: "Advarsel! Du er i ferd med å endre medlemskapet i denne gruppen. *Denne endringen vil påvirke eksisterende gruppeinnleveringer, merknader og kommentarer og resultater som tap av data for BÅDE denne gruppen og elevens tidligere gruppe.*** For å forhindre utilsiktede konsekvenser med eksisterende gruppeinnleveringer, lag en ny gruppe for fremtidige oppgaver. **"
   warnings: 
     test_install: 
-      periodic_message: "Denne Canvas-installasjonen er kun for quizing, og *vil tilbakestilles periodisk.*"
-      title: "Quizinstallasjon av Canvas"
+      periodic_message: "Denne Canvas-installasjonen er kun for testing, og *vil tilbakestilles periodisk.*"
+      title: "Canvas testinstallasjon"
       weekly_message: 
         one: "Denne Canvas-installasjonen er kun for testing, og vil tilbakestilles hver uke."
         other: "Denne Canvas-installasjonen er kun for testing, og vil tilbakestilles hver %{count}. uke."
