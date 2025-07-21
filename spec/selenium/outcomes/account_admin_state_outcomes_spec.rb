@@ -24,7 +24,7 @@ describe "account admin outcomes" do
   let(:who_to_login) { "admin" }
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
 
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
   include OutcomeCommon
 
   describe "state level outcomes" do

@@ -125,7 +125,7 @@ describe "SpeedGrader" do
       @is_moderator = true
     end
 
-    include_examples "moderated grading"
+    it_behaves_like "moderated grading"
   end
 
   context "as a provisional grader" do
@@ -134,7 +134,7 @@ describe "SpeedGrader" do
       @is_moderator = false
     end
 
-    include_examples "moderated grading"
+    it_behaves_like "moderated grading"
 
     it "does not lock a provisional grader out if graded by self" do
       @assignment.moderation_graders.create!(user: @ta, anonymous_id: "12345")

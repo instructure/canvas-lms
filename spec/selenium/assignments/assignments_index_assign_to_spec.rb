@@ -240,7 +240,7 @@ describe "assignments index menu tool placement" do
       user_session(@teacher)
     end
 
-    include_examples "selective_release assign to tray", :assignment_index
+    it_behaves_like "selective_release assign to tray", :assignment_index
   end
 
   context "assign to tray on course homepage with default assignments index" do
@@ -249,6 +249,6 @@ describe "assignments index menu tool placement" do
       @course.update!(default_view: "assignments")
     end
 
-    include_examples "selective_release assign to tray", :course_homepage
+    it_behaves_like "selective_release assign to tray", :course_homepage
   end
 end

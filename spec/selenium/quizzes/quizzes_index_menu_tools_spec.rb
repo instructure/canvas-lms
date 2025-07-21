@@ -56,7 +56,7 @@ describe "quiz index menu tool placement" do
       Account.site_admin.disable_feature!(:new_quizzes_media_type)
     end
 
-    include_examples "launches the index menu tool via the tray", ["quiz"]
+    it_behaves_like "launches the index menu tool via the tray", ["quiz"]
   end
 
   context "new_quizzes_media_type feature flag is enabled" do
@@ -64,6 +64,6 @@ describe "quiz index menu tool placement" do
       Account.site_admin.enable_feature!(:new_quizzes_media_type)
     end
 
-    include_examples "launches the index menu tool via the tray", ["quiz", "quizzesnext"]
+    it_behaves_like "launches the index menu tool via the tray", ["quiz", "quizzesnext"]
   end
 end

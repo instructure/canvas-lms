@@ -24,7 +24,7 @@ describe "Course Grading Periods" do
   let(:period_helper) { Factories::GradingPeriodHelper.new }
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   context "with grading periods" do
     before do
@@ -84,7 +84,7 @@ describe "Course Grading Periods Inheritance" do
   let(:start_date) { format_date_for_view(3.months.from_now) }
   let(:title) { "hi" }
 
-  include_examples "in-process server selenium tests"
+  include_context "in-process server selenium tests"
 
   before do
     course_with_admin_logged_in
