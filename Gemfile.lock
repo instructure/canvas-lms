@@ -478,7 +478,7 @@ GEM
     crass (1.0.6)
     crocodoc-ruby (0.0.1)
       json
-    csv (3.3.4)
+    csv (3.3.5)
     database_cleaner (2.1.0)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.2.0)
