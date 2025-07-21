@@ -10232,20 +10232,28 @@ el:
   notification: 
     account_notification_display: "Καθολικές Ανακοινώσεις"
     added_to_conversation_description: "Έχετε προστεθεί σε μια συνομιλία"
+    added_to_conversation_description_legend: "Έχετε προστεθεί σε μια συνομιλία"
     added_to_conversation_display: "Προστέθηκε στην Συνομιλία"
     all_submissions_display: "Όλες οι Υποβολές"
     announcement_created_by_you_description: |-
         * Ανακοινώσεις που δημιουργήθηκαν από εσάς
         * Απαντήσεις στις ανακοινώσεις που δημιουργήθηκαν από εσάς
+    announcement_created_by_you_description_legend: |-
+        * Ανακοινώσεις που δημιουργήθηκαν από εσάς
+        * Απαντήσεις στις ανακοινώσεις που δημιουργήθηκαν από εσάς
     announcement_created_by_you_display: "Ανακοίνωση που δημιουργήθηκε απο εσάς"
     announcement_description: "Νέα Ανακοίνωση στο μάθημά σας"
+    announcement_description_legend: "Νέα Ανακοίνωση στο μάθημά σας"
     announcement_display: Ανακοίνωση
     appointment_availability_display: "Διαθεσιμότητα Ραντεβού"
     appointment_cancelations_description: "Ακύρωση ραντεβού"
+    appointment_cancelations_description_legend: "Ακύρωση ραντεβού"
     appointment_cancelations_display: "Ακυρώσεις Ραντεβού"
     appointment_signups_description: "Νέο ραντεβού στο ημερολόγιό σας"
+    appointment_signups_description_legend: "Νέο ραντεβού στο ημερολόγιό σας"
     appointment_signups_display: "Εγγραφές σε Ραντεβού"
     calendar_description: "Νέα στοιχεία και στοιχεία που έχουν αλλάξει στο ημερολόγιο του μαθήματός σας"
+    calendar_description_legend: "Νέα στοιχεία και στοιχεία που έχουν αλλάξει στο ημερολόγιο του μαθήματός σας"
     calendar_display: Ημερολόγιο
     categories: 
       all_submissions: "Όλες οι Υποβολές"
@@ -10273,8 +10281,10 @@ el:
       student_appointment_signups: "Εγγραφές Σπουδαστή σε Ραντεβού"
       submission_comment: "Σχόλιο Υποβολής"
     conversation_created_description: "Δημιουργήσατε μια συνομιλία"
+    conversation_created_description_legend: "Δημιουργήσατε μια συνομιλία"
     conversation_created_display: "Συνομιλίες που Δημιουργήθηκαν Από Εμένα"
     conversation_message_description: "Νέα Εισερχόμενα Μηνύματα"
+    conversation_message_description_legend: "Νέα Εισερχόμενα Μηνύματα"
     conversation_message_display: "Μήνυμα Συνομιλίας"
     course_content_description: |-
         <mrk mid="2234" mtype="seg">Αλλαγή στο περιεχόμενο του μαθήματος:</mrk>
@@ -10288,11 +10298,14 @@ el:
     discussion_post_description: "Νέα δημοσίευση σε θέμα συζήτησης στο οποίο έχετε εγγραφεί"
     discussion_post_display: "Δημοσίευση σε Συζήτηση"
     due_date_description: "Αλλαγή της καταληκτικής ημερομηνίας της εργασίας"
+    due_date_description_legend: "Αλλαγή της καταληκτικής ημερομηνίας της εργασίας"
     due_date_display: "Καταληκτική Ημερομηνία"
     files_description: "Ένα νέο αρχείο προστέθηκε στο μάθημά σας"
+    files_description_legend: "Ένα νέο αρχείο προστέθηκε στο μάθημά σας"
     files_display: Αρχεία
     grading_display: Βαθμολογία
     grading_policies_description: "Αλλαγή της πολιτικής βαθμολόγησης του μαθήματος"
+    grading_policies_description_legend: "Αλλαγή της πολιτικής βαθμολόγησης του μαθήματος"
     grading_policies_display: "Πολιτικές Βαθμολόγησης"
     invitation_display: Πρόσκληση
     late_grading_description: |-
@@ -10307,6 +10320,7 @@ el:
         * έγινε δεκτή/απορρίφθηκε
     membership_update_display: "Ενημέρωση Συνδρομής"
     missing_description_description: "For %{category} ειδοποιήσεις"
+    missing_description_description_legend: "For %{category} ειδοποιήσεις"
     missing_display_display: "For %{category} ειδοποιήσεις"
     names: 
       account_user_notification: "Ειδοποίηση του Χρήστη του Λογαριασμού"
@@ -10398,8 +10412,10 @@ el:
         <mrk mid="2300" mtype="seg">Εγγραφή σπουδαστή στη συνάντηση</mrk>
     student_appointment_display: "Εγγραφές Σπουδαστή σε Ραντεβού"
     submission_comment_description: "Σχόλιο υποβολής εργασίας"
+    submission_comment_description_legend: "Σχόλιο υποβολής εργασίας"
     submission_comment_display: "Σχόλιο Υποβολής"
     web_conference_recording_ready: "Μια ηχογράφηση συνεδρίας είναι έτοιμη"
+    web_conference_recording_ready_legend: "Μια ηχογράφηση συνεδρίας είναι έτοιμη"
   notification_preferences: 
     communication: 
       email: 
