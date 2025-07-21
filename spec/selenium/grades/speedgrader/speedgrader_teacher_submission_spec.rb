@@ -135,6 +135,19 @@ describe "SpeedGrader submissions" do
       expect(f("#this_student_does_not_have_a_submission")).to be_displayed
     end
 
+    it "displays submitted at as submission to view options" do
+      submission = student_submission(username: "student1@example.com", body: "attempt 1")
+      update_submission(submission, "attempt 2")
+      dates = submission.submission_history.map(&:submitted_at)
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      wait_for_ajaximations
+
+      expect(f("#submission_to_view").find_elements(:css, "option").length).to eq 2
+      expect(f("#submission_to_view").find_elements(:css, "option")[0]).to include_text(format_time_for_view(dates[0]))
+      expect(f("#submission_to_view").find_elements(:css, "option")[1]).to include_text(format_time_for_view(dates[1]))
+    end
+
     it "handles versions correctly", priority: "2" do
       submission1 = student_submission(username: "student1@example.com", body: "first student, first version")
       submission2 = student_submission(username: "student2@example.com", body: "second student")
