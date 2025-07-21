@@ -31,6 +31,7 @@ GEM
     diff-lcs (1.6.1)
     docile (1.4.1)
     drb (2.2.3)
+    erb (5.0.2)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     io-console (0.8.1)
@@ -47,7 +48,8 @@ GEM
       date
       stringio
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     reline (0.6.2)
       io-console (~> 0.5)

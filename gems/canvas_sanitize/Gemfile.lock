@@ -14,6 +14,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.6.1)
     docile (1.4.1)
+    erb (5.0.2)
     io-console (0.8.1)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -39,7 +40,8 @@ GEM
       stringio
     racc (1.8.1)
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     reline (0.6.2)
       io-console (~> 0.5)

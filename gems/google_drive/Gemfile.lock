@@ -20,6 +20,7 @@ GEM
       reline (>= 0.3.8)
     declarative (0.0.20)
     diff-lcs (1.6.1)
+    erb (5.0.2)
     faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -74,7 +75,8 @@ GEM
       stringio
     public_suffix (6.0.2)
     rake (13.2.1)
-    rdoc (6.13.1)
+    rdoc (6.14.2)
+      erb
       psych (>= 4.0.0)
     reline (0.6.2)
       io-console (~> 0.5)
