@@ -89,7 +89,6 @@ export const LtiAppsLayout = React.memo(() => {
       lti_version: '1p3',
       method: 'dynamic_registration',
       registering: false,
-      exitOnCancel: false,
       onSuccessfulInstallation: () => {
         refreshRegistrations()
       },

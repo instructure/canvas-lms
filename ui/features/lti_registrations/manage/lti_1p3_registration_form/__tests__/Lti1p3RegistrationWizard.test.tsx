@@ -33,11 +33,23 @@ describe('Lti1p3RegistrationWizard', () => {
     accountId,
     internalConfiguration: mockInternalConfiguration(),
     service: mockLti1p3RegistrationWizardService({}),
-    unregister: jest.fn(),
+    onDismiss: jest.fn(),
     onSuccessfulRegistration: jest.fn(),
   }
 
   const findNextButton = () => screen.getByText('Next').closest('button')!
+
+  it('calls onDismiss when the user clicks the X button', async () => {
+    const onDismiss = jest.fn()
+    render(<Lti1p3RegistrationWizard {...defaultProps} onDismiss={onDismiss} />)
+
+    const closeButton = await screen.findByRole('button', {
+      name: 'Close',
+    })
+    await userEvent.click(closeButton)
+
+    expect(onDismiss).toHaveBeenCalled()
+  })
 
   it('navigates through all steps in order', async () => {
     render(<Lti1p3RegistrationWizard {...defaultProps} />)
