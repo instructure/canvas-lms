@@ -26,7 +26,7 @@ GEM
     aws-sigv4 (1.11.0)
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
-    benchmark (0.4.0)
+    benchmark (0.4.1)
     diff-lcs (1.6.1)
     docile (1.4.1)
     jmespath (1.6.2)
