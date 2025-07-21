@@ -99,7 +99,7 @@ module Accessibility
             changed = rule.fix!(element, fix_value)
             error = nil
             unless changed.nil?
-              error = rule.test(element)
+              error = rule.test(changed)
             end
             [doc.to_html, element_path(element), error]
           else
