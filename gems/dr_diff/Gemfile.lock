@@ -21,7 +21,7 @@ GEM
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    io-console (0.8.0)
+    io-console (0.8.1)
     irb (1.15.2)
       pp (>= 0.6.0)
       rdoc (>= 4.0.0)
@@ -37,7 +37,7 @@ GEM
       stringio
     rdoc (6.13.1)
       psych (>= 4.0.0)
-    reline (0.6.1)
+    reline (0.6.2)
       io-console (~> 0.5)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
