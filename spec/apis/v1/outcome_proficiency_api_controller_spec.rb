@@ -53,7 +53,7 @@ describe OutcomeProficiencyApiController, type: :request do
            { description: "1", points: 1, mastery: false, color: "ff0000" }]
         end
 
-        include_examples "update ratings"
+        it_behaves_like "update ratings"
       end
 
       context "increase number of ratings" do
@@ -63,7 +63,7 @@ describe OutcomeProficiencyApiController, type: :request do
            { description: "0", points: 0, mastery: false, color: "ff0000" }]
         end
 
-        include_examples "update ratings"
+        it_behaves_like "update ratings"
       end
 
       context "decrease number of ratings" do
@@ -71,7 +71,7 @@ describe OutcomeProficiencyApiController, type: :request do
           [{ description: "2", points: 2, mastery: true, color: "000000" }]
         end
 
-        include_examples "update ratings"
+        it_behaves_like "update ratings"
       end
 
       context "remove top rating" do
@@ -79,7 +79,7 @@ describe OutcomeProficiencyApiController, type: :request do
           [{ description: "0", points: 0, mastery: true, color: "ff0000" }]
         end
 
-        include_examples "update ratings"
+        it_behaves_like "update ratings"
       end
 
       context "empty ratings" do
@@ -134,7 +134,7 @@ describe OutcomeProficiencyApiController, type: :request do
       context "missing mastery rating" do
         let(:ratings) { [{ description: "1", points: 1, mastery: false, color: "000000" }] }
 
-        include_examples "bad mastery ratings"
+        it_behaves_like "bad mastery ratings"
       end
 
       context "two mastery ratings" do
@@ -143,7 +143,7 @@ describe OutcomeProficiencyApiController, type: :request do
            { description: "2", points: 2, mastery: true, color: "00ff00" }]
         end
 
-        include_examples "bad mastery ratings"
+        it_behaves_like "bad mastery ratings"
       end
     end
 
@@ -187,7 +187,7 @@ describe OutcomeProficiencyApiController, type: :request do
       @context = @course
     end
 
-    context "create" do
+    it_behaves_like "create examples" do
       before do
         revoke_manage_proficiency_scales if revoke_permissions
 
@@ -205,8 +205,6 @@ describe OutcomeProficiencyApiController, type: :request do
           }
         )
       end
-
-      include_examples "create examples"
 
       context "update" do
         before do
@@ -227,7 +225,7 @@ describe OutcomeProficiencyApiController, type: :request do
           @proficiency.reload
         end
 
-        include_examples "update examples"
+        it_behaves_like "update examples"
       end
     end
 
@@ -325,7 +323,7 @@ describe OutcomeProficiencyApiController, type: :request do
       @context = @account
     end
 
-    context "create" do
+    it_behaves_like "create examples" do
       before do
         revoke_manage_proficiency_scales if revoke_permissions
 
@@ -343,8 +341,6 @@ describe OutcomeProficiencyApiController, type: :request do
           }
         )
       end
-
-      include_examples "create examples"
 
       context "update" do
         before do
@@ -365,7 +361,7 @@ describe OutcomeProficiencyApiController, type: :request do
           @proficiency.reload
         end
 
-        include_examples "update examples"
+        it_behaves_like "update examples"
       end
     end
 

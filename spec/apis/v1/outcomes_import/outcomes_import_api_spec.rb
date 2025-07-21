@@ -159,13 +159,13 @@ describe "Outcomes Import API", type: :request do
   end
 
   describe "create" do
-    include_examples "academic benchmark config" do
+    it_behaves_like "academic benchmark config" do
       let(:request_type) { "create" }
     end
   end
 
   describe "available" do
-    include_examples "academic benchmark config" do
+    it_behaves_like "academic benchmark config" do
       let(:request_type) { "available" }
     end
   end
@@ -424,7 +424,7 @@ describe "Outcomes Import API", type: :request do
     allow(cm_mock).to receive(:id).and_return(3)
     allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
   end
-  include_examples "outcomes import" do
+  it_behaves_like "outcomes import" do
     let(:json_file) { "available_return_val.json" }
     def stub_ab_api
       standards_mock = double("standards")

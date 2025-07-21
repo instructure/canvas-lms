@@ -29,7 +29,7 @@ describe "Files API", type: :request do
     course_with_teacher(active_all: true, user: user_with_pseudonym)
   end
 
-  context "locked api item" do
+  it_behaves_like "a locked api item" do
     let(:item_type) { "file" }
 
     let(:locked_item) do
@@ -44,8 +44,6 @@ describe "Files API", type: :request do
         { controller: "files", action: "api_show", format: "json", id: locked_item.id.to_s }
       )
     end
-
-    include_examples "a locked api item"
   end
 
   describe "create file" do
