@@ -38,7 +38,7 @@ describe Course do
     end
 
     context "outcome imports" do
-      include_examples "outcome import context examples"
+      it_behaves_like "outcome import context examples"
 
       describe "lti2 proxies" do
         include_context "lti2_course_spec_helper"
@@ -6936,25 +6936,25 @@ describe Course do
       describe "restrict_student_future_view" do
         let(:setting) { :restrict_student_future_view }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "restrict_student_past_view" do
         let(:setting) { :restrict_student_past_view }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "lock_all_announcements" do
         let(:setting) { :lock_all_announcements }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
 
       describe "usage_rights_required" do
         let(:setting) { :usage_rights_required }
 
-        include_examples "inherited setting should inherit"
+        it_behaves_like "inherited setting should inherit"
       end
     end
   end

@@ -2117,7 +2117,7 @@ describe Enrollment do
         end
       end
 
-      include_examples "term and enrollment dates"
+      it_behaves_like "term and enrollment dates"
 
       describe "section dates" do
         before do
@@ -2209,7 +2209,7 @@ describe Enrollment do
         end
       end
 
-      include_examples "term and enrollment dates"
+      it_behaves_like "term and enrollment dates"
     end
 
     it "allows teacher access if both course and term have dates" do

@@ -1479,7 +1479,7 @@ describe WikiPage do
       @page = @course.wiki_pages.create!(title: "page")
     end
 
-    include_examples "expected_values_for_teacher_student", true, true
+    it_behaves_like "expected_values_for_teacher_student", true, true
 
     context "when pages tab is disabled" do
       before do
@@ -1493,7 +1493,7 @@ describe WikiPage do
         @course.save!
       end
 
-      include_examples "expected_values_for_teacher_student", true, false
+      it_behaves_like "expected_values_for_teacher_student", true, false
 
       context "and the page is in a module" do
         before do
@@ -1510,14 +1510,14 @@ describe WikiPage do
           @course.context_modules.destroy_all
         end
 
-        include_examples "expected_values_for_teacher_student", true, true
+        it_behaves_like "expected_values_for_teacher_student", true, true
 
         context "and the module is unpublished" do
           before do
             @context_module.unpublish!
           end
 
-          include_examples "expected_values_for_teacher_student", true, false
+          it_behaves_like "expected_values_for_teacher_student", true, false
         end
 
         context "and the module is locked" do
@@ -1525,7 +1525,7 @@ describe WikiPage do
             @context_module.update!(unlock_at: 1.day.from_now)
           end
 
-          include_examples "expected_values_for_teacher_student", true, false
+          it_behaves_like "expected_values_for_teacher_student", true, false
         end
       end
     end

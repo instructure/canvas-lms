@@ -21,18 +21,18 @@ require_relative "support/answer_serializers_specs"
 require_relative "support/id_answer_serializers_specs"
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleChoice do
-  let :output do
-    {
-      question_5: "2405"
-    }.with_indifferent_access
-  end
-  let :input do
-    "2405"
-  end
+  it_behaves_like "Answer Serializers" do
+    let :output do
+      {
+        question_5: "2405"
+      }.with_indifferent_access
+    end
+    let :input do
+      "2405"
+    end
 
-  include_examples "Answer Serializers"
-
-  context "validations" do
-    include_examples "Id Answer Serializers"
+    context "validations" do
+      it_behaves_like "Id Answer Serializers"
+    end
   end
 end

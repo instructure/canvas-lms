@@ -3877,30 +3877,30 @@ describe DiscussionTopic do
       student_in_course(active_all: true)
     end
 
-    include_examples "expected_values_for_teacher_student", true, true
+    it_behaves_like "expected_values_for_teacher_student", true, true
 
     context "topic is locked" do
       let(:topic) { @course.discussion_topics.create!(title: "locked topic", unlock_at: 1.week.from_now) }
 
-      include_examples "expected_values_for_teacher_student", true, false
+      it_behaves_like "expected_values_for_teacher_student", true, false
 
       context "and was previously unlocked" do
         before { topic.update!(lock_at: 1.week.ago, unlock_at: 2.weeks.ago) }
 
-        include_examples "expected_values_for_teacher_student", true, true
+        it_behaves_like "expected_values_for_teacher_student", true, true
       end
     end
 
     context "topic is delayed" do
       let(:topic) { @course.discussion_topics.create!(title: "delayed topic", delayed_post_at: 1.week.from_now) }
 
-      include_examples "expected_values_for_teacher_student", true, false
+      it_behaves_like "expected_values_for_teacher_student", true, false
     end
 
     context "topic is unpublished" do
       let(:topic) { @course.discussion_topics.create!(title: "unpublished topic", workflow_state: "unpublished") }
 
-      include_examples "expected_values_for_teacher_student", true, false
+      it_behaves_like "expected_values_for_teacher_student", true, false
     end
 
     context "topic is deleted" do
@@ -3910,7 +3910,7 @@ describe DiscussionTopic do
         topic
       end
 
-      include_examples "expected_values_for_teacher_student", false, false
+      it_behaves_like "expected_values_for_teacher_student", false, false
     end
 
     context "topic is in a module" do
@@ -3930,14 +3930,14 @@ describe DiscussionTopic do
         @course.context_modules.destroy_all
       end
 
-      include_examples "expected_values_for_teacher_student", true, true
+      it_behaves_like "expected_values_for_teacher_student", true, true
 
       context "and the module is unpublished" do
         before do
           @context_module.unpublish!
         end
 
-        include_examples "expected_values_for_teacher_student", true, false
+        it_behaves_like "expected_values_for_teacher_student", true, false
       end
 
       context "and the module is locked" do
@@ -3945,7 +3945,7 @@ describe DiscussionTopic do
           @context_module.update!(unlock_at: 1.week.from_now)
         end
 
-        include_examples "expected_values_for_teacher_student", true, false
+        it_behaves_like "expected_values_for_teacher_student", true, false
       end
     end
   end

@@ -1891,7 +1891,7 @@ describe Submission do
     end
   end
 
-  include_examples "url validation tests"
+  include_context "url validation tests"
   it "checks url validity" do
     test_url_validation(submission_spec_model)
   end

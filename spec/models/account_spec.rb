@@ -19,7 +19,7 @@
 #
 
 describe Account do
-  include_examples "outcome import context examples"
+  it_behaves_like "outcome import context examples"
 
   context "domain_method" do
     it "retrieves correct account domain" do

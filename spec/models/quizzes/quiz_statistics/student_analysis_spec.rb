@@ -53,7 +53,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
 
   let(:report_type) { "student_analysis" }
 
-  include_examples "Quizzes::QuizStatistics::Report"
+  it_behaves_like "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 
   def csv(opts = {}, quiz = @quiz)

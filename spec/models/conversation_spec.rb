@@ -265,11 +265,11 @@ describe Conversation do
       end
     end
 
-    include_examples "message counts"
+    it_behaves_like "message counts"
 
     context "sharding" do
       specs_require_sharding
-      include_examples "message counts"
+      it_behaves_like "message counts"
     end
   end
 
@@ -366,10 +366,10 @@ describe Conversation do
       end
     end
 
-    include_examples "unread counts"
+    it_behaves_like "unread counts"
     context "sharding" do
       specs_require_sharding
-      include_examples "unread counts"
+      it_behaves_like "unread counts"
     end
   end
 

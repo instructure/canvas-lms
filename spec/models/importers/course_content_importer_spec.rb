@@ -814,11 +814,11 @@ describe Course do
     end
 
     context "with allow_student_discussion_reporting" do
-      include_examples "setting set correctly", :allow_student_discussion_reporting
+      it_behaves_like "setting set correctly", :allow_student_discussion_reporting
     end
 
     context "with allow_student_anonymous_discussion_topics" do
-      include_examples "setting set correctly", :allow_student_anonymous_discussion_topics
+      it_behaves_like "setting set correctly", :allow_student_anonymous_discussion_topics
     end
   end
 
