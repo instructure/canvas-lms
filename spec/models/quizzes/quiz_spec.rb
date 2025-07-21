@@ -2304,7 +2304,7 @@ describe Quizzes::Quiz do
         quiz.unlock_at = 1.hour.from_now
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 
@@ -2324,7 +2324,7 @@ describe Quizzes::Quiz do
         quiz.lock_at = 1.hour.ago
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 
@@ -2357,7 +2357,7 @@ describe Quizzes::Quiz do
           quiz.assignment.save
         end
 
-        include_examples "overrides"
+        it_behaves_like "overrides"
 
         it { is_expected.to be_truthy }
 
@@ -2379,7 +2379,7 @@ describe Quizzes::Quiz do
         locked_module.add_item(id: quiz.id, type: "quiz")
       end
 
-      include_examples "overrides"
+      it_behaves_like "overrides"
 
       it { is_expected.to be_truthy }
 

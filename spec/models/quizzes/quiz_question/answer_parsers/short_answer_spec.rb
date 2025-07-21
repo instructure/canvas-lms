@@ -46,6 +46,6 @@ describe Quizzes::QuizQuestion::AnswerParsers::ShortAnswer do
     let(:question_params) { {} }
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::ShortAnswer }
 
-    include_examples "All answer parsers"
+    it_behaves_like "All answer parsers"
   end
 end

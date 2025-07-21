@@ -19,7 +19,7 @@
 #
 
 describe ScoreMetadata do
-  include_examples "has_one soft deletion" do
+  it_behaves_like "has_one soft deletion" do
     subject { score.create_score_metadata!(calculation_details:) }
 
     let(:course) { Course.create! }

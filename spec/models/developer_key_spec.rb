@@ -1721,7 +1721,7 @@ describe DeveloperKey do
         enable_developer_key_account_binding!(@key)
       end
 
-      include_examples "authorized_for_account?"
+      it_behaves_like "authorized_for_account?"
 
       describe "#by_cached_vendor_code" do
         let(:vendor_code) { "tool vendor code" }
@@ -1755,7 +1755,7 @@ describe DeveloperKey do
         enable_developer_key_account_binding!(@key)
       end
 
-      include_examples "authorized_for_account?"
+      it_behaves_like "authorized_for_account?"
     end
   end
 

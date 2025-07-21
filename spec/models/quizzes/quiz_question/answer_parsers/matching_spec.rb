@@ -84,7 +84,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Matching do
       ]
     end
 
-    include_examples "All answer parsers"
+    it_behaves_like "All answer parsers"
 
     it "reuses match_id for duplicate answer_match_right" do
       question = Quizzes::QuizQuestion::QuestionData.new(question_params)

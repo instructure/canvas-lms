@@ -3477,15 +3477,15 @@ describe Assignment do
     end
 
     context "topics" do
-      let(:submission_type) { "discussion_topic" }
-
-      include_examples "submittable"
+      it_behaves_like "submittable" do
+        let(:submission_type) { "discussion_topic" }
+      end
     end
 
     context "pages" do
-      let(:submission_type) { "wiki_page" }
-
-      include_examples "submittable"
+      it_behaves_like "submittable" do
+        let(:submission_type) { "wiki_page" }
+      end
     end
   end
 
@@ -6550,44 +6550,44 @@ describe Assignment do
     end
 
     context "topics" do
-      let(:submission_type) { "discussion_topic" }
-      let(:submission_class) { DiscussionTopic }
+      it_behaves_like "submittable" do
+        let(:submission_type) { "discussion_topic" }
+        let(:submission_class) { DiscussionTopic }
 
-      include_examples "submittable"
+        it "does not delete the topic if non-empty when unlinked" do
+          expect(@a.submission_types).to eql(submission_type)
+          @topic = @a.discussion_topic
+          expect(@topic).not_to be_nil
+          expect(@topic.assignment_id).to eql(@a.id)
+          @topic.discussion_entries.create!(user: @user, message: "testing")
+          @a.discussion_topic.reload
+          @a.submission_types = "on_paper"
+          @a.save!
+          @a.reload
+          expect(@a.discussion_topic).to be_nil
+          expect(@a.state).to be(:published)
+          @topic = submission_class.find(@topic.id)
+          expect(@topic.assignment_id).to be_nil
+          expect(@topic.state).to be(:active)
+        end
 
-      it "does not delete the topic if non-empty when unlinked" do
-        expect(@a.submission_types).to eql(submission_type)
-        @topic = @a.discussion_topic
-        expect(@topic).not_to be_nil
-        expect(@topic.assignment_id).to eql(@a.id)
-        @topic.discussion_entries.create!(user: @user, message: "testing")
-        @a.discussion_topic.reload
-        @a.submission_types = "on_paper"
-        @a.save!
-        @a.reload
-        expect(@a.discussion_topic).to be_nil
-        expect(@a.state).to be(:published)
-        @topic = submission_class.find(@topic.id)
-        expect(@topic.assignment_id).to be_nil
-        expect(@topic.state).to be(:active)
-      end
-
-      it "grabs the original topic if unlinked and relinked" do
-        expect(@a.submission_types).to eql(submission_type)
-        @topic = @a.discussion_topic
-        expect(@topic).not_to be_nil
-        expect(@topic.assignment_id).to eql(@a.id)
-        @topic.discussion_entries.create!(user: @user, message: "testing")
-        @a.discussion_topic.reload
-        @a.submission_types = "on_paper"
-        @a.save!
-        @a.submission_types = "discussion_topic"
-        @a.save!
-        @a.reload
-        expect(@a.discussion_topic).to eql(@topic)
-        expect(@a.state).to be(:published)
-        @topic.reload
-        expect(@topic.state).to be(:active)
+        it "grabs the original topic if unlinked and relinked" do
+          expect(@a.submission_types).to eql(submission_type)
+          @topic = @a.discussion_topic
+          expect(@topic).not_to be_nil
+          expect(@topic.assignment_id).to eql(@a.id)
+          @topic.discussion_entries.create!(user: @user, message: "testing")
+          @a.discussion_topic.reload
+          @a.submission_types = "on_paper"
+          @a.save!
+          @a.submission_types = "discussion_topic"
+          @a.save!
+          @a.reload
+          expect(@a.discussion_topic).to eql(@topic)
+          expect(@a.state).to be(:published)
+          @topic.reload
+          expect(@topic.state).to be(:active)
+        end
       end
     end
 
@@ -6601,7 +6601,7 @@ describe Assignment do
           @course.save!
         end
 
-        include_examples "submittable"
+        it_behaves_like "submittable"
       end
 
       it "does not create a record if feature is disabled" do
