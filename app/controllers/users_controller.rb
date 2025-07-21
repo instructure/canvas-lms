@@ -448,7 +448,11 @@ class UsersController < ApplicationController
       users = users.with_last_login if params[:sort] == "last_login"
     end
 
-    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten.take(MAX_UUIDS_IN_FILTER))
+    if params[:uuids].present? && Array(params[:uuids]).size > MAX_UUIDS_IN_FILTER
+      return render json: { error: "Too many UUIDs in filter. Current limit is #{MAX_UUIDS_IN_FILTER}" }, status: :bad_request
+    end
+
+    if params[:uuids].present? && (uuids = Array(params[:uuids]).flatten)
       users = users.where(uuid: uuids)
     end
 

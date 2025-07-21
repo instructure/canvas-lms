@@ -3675,5 +3675,20 @@ describe EnrollmentsApiController, type: :request do
       expect(enrollments.map(&:user_id)).to match_array([user1.id, user2.id, user1.id, user2.id])
       expect(Progress.find(json["id"])).to be_completed
     end
+
+    it "returns an error when too many users are enrolled at once" do
+      user1 = user_with_pseudonym(name: "User One")
+      @course2 = @course.root_account.courses.create!(name: "course2", workflow_state: "available")
+      api_call_as_user account_admin_user(active_all: true),
+                       :post,
+                       @path,
+                       @path_options,
+                       {
+                         user_ids: [user1.id] * 251,
+                         course_ids: [@course.id, @course2.id]
+                       }
+      run_jobs
+      expect(response).to have_http_status :bad_request
+    end
   end
 end
