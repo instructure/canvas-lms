@@ -22,7 +22,6 @@ import {LtiAssetReportWithAsset} from '@canvas/lti-asset-processor/model/AssetRe
 import {filterReportsByAttempt} from '@canvas/lti-asset-processor/react/AssetProcessorHelper'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {ViewOwnProps} from '@instructure/ui-view'
 import {useMemo, useState} from 'react'
 import AssetReportStatus from '@canvas/lti-asset-processor/react/AssetReportStatus'
 import StudentAssetReportModal from '@canvas/lti-asset-processor/react/StudentAssetReportModal'
@@ -52,11 +51,6 @@ export default function TextEntryAssetReportStatusLink({
     [reports, attempt],
   )
 
-  function openModal(event: React.MouseEvent<ViewOwnProps, MouseEvent>) {
-    event.preventDefault()
-    setIsModalOpen(true)
-  }
-
   function handleClose() {
     setIsModalOpen(false)
   }
@@ -65,7 +59,7 @@ export default function TextEntryAssetReportStatusLink({
     <>
       <Flex gap="x-small" alignItems="end">
         <Text weight="bold">{I18n.t('Document Processors:')}</Text>
-        <AssetReportStatus reports={filteredReports} openModal={openModal} />
+        <AssetReportStatus reports={filteredReports} openModal={() => setIsModalOpen(true)} />
       </Flex>
       {isModalOpen && (
         <StudentAssetReportModal

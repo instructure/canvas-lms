@@ -202,6 +202,62 @@ describe('StudentAssetReportModal', () => {
     expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
   })
 
+  it('handles multiple attachments with multiple reports per attachment', () => {
+    const reports = [
+      // Reports for first attachment (document.pdf)
+      createUploadReport(0, '10', 'document.pdf', {
+        asset_processor_id: 1,
+        _id: 101,
+        reportType: 'plagiarism',
+      }),
+      createUploadReport(2, '10', 'document.pdf', {
+        asset_processor_id: 1,
+        _id: 102,
+        reportType: 'similarity',
+      }),
+
+      // Reports for second attachment (essay.docx)
+      createUploadReport(1, '20', 'essay.docx', {
+        asset_processor_id: 1,
+        _id: 201,
+        reportType: 'plagiarism',
+      }),
+      createUploadReport(0, '20', 'essay.docx', {
+        asset_processor_id: 1,
+        _id: 202,
+        reportType: 'similarity',
+      }),
+
+      // Reports for third attachment (presentation.pptx)
+      createUploadReport(3, '30', 'presentation.pptx', {
+        asset_processor_id: 1,
+        _id: 301,
+        reportType: 'plagiarism',
+      }),
+    ]
+
+    render(
+      <StudentAssetReportModal
+        assetProcessors={mockAssetProcessors}
+        assignmentName={assignmentName}
+        reports={reports}
+        open={true}
+        submissionType="online_upload"
+      />,
+    )
+
+    // Should show all attachment names since there are multiple attachments
+    expect(screen.getByText('document.pdf')).toBeInTheDocument()
+    expect(screen.getByText('essay.docx')).toBeInTheDocument()
+    expect(screen.getByText('presentation.pptx')).toBeInTheDocument()
+
+    expect(screen.getByText('Test Processor · Test Processor Title')).toBeInTheDocument()
+
+    // Should show the overall status reflecting the highest priority (3 = high priority)
+    expect(screen.getByText('Needs attention')).toBeInTheDocument()
+    expect(screen.getByText(`Document Processors for ${assignmentName}`)).toBeInTheDocument()
+  })
+
   describe('with online_text_entry submission type', () => {
     it('renders the modal with text entry label', () => {
       const reports = [createTextEntryReport()]
