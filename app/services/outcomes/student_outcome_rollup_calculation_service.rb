@@ -74,9 +74,10 @@ module Outcomes
       os_results     = fetch_outcomes_service_results
 
       combined_results = combine_results(canvas_results, os_results)
-      return [] if combined_results.empty?
+      return OutcomeRollup.none if combined_results.empty?
 
-      generate_student_rollups(combined_results)
+      student_rollups = generate_student_rollups(combined_results)
+      store_rollups(student_rollups)
     end
 
     private
@@ -164,13 +165,13 @@ module Outcomes
       when 0
         # Student has been removed from all outcomes, mark all as deleted
         delete_all_student_rollups
-        return []
+        return OutcomeRollup.none
       when 1
         student_rollup = rollups.first
         # When a student has no outcome scores, it means they have no scored outcomes
         if student_rollup.scores.blank?
           delete_all_student_rollups
-          return []
+          return OutcomeRollup.none
         end
       else
         raise ArgumentError, "Expected rollups for exactly one student, got #{rollups.size} students"
@@ -211,7 +212,10 @@ module Outcomes
     end
 
     def build_rollup_rows(rollup)
-      rollup.scores.map do |score|
+      rollup.scores.filter_map do |score|
+        # Skip scores that are nil (e.g., from n_mastery calculations with insufficient attempts)
+        next if score.score.nil?
+
         {
           root_account_id: course.root_account_id,
           course_id: course.id,
