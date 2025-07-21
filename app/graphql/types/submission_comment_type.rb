@@ -78,7 +78,7 @@ module Types
                   ]).then { object.author if object.grants_right?(current_user, :read_author) }
     end
 
-    field :attachments, [Types::FileType], null: true
+    field :attachments, [Types::FileType], null: false
     def attachments
       attachment_ids = object.parse_attachment_ids
       return [] if attachment_ids.empty?

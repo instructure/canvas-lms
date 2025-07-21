@@ -78,7 +78,7 @@ module Interfaces::AssignmentsConnectionInterface
           In courses with grading periods that don't have students, it is necessary
           to *not* filter by grading period to list assignments.
         MD
-        null: true do
+        null: false do
     argument :filter, AssignmentFilterInputType, required: false
   end
 

@@ -855,7 +855,7 @@ type AssignmentGroup implements AssignmentsConnectionInterface & LegacyIDInterfa
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): AssignmentConnection
+  ): AssignmentConnection!
   createdAt: DateTime
 
   """
@@ -1187,7 +1187,7 @@ interface AssignmentsConnectionInterface {
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): AssignmentConnection
+  ): AssignmentConnection!
 }
 
 type AuditEvent implements LegacyIDInterface & Timestamped {
@@ -1815,7 +1815,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): AssignmentGroupConnection
+  ): AssignmentGroupConnection!
 
   """
   PostPolicies for assignments within a course
@@ -1871,7 +1871,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): AssignmentConnection
+  ): AssignmentConnection!
   availableModerators(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2069,7 +2069,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): GradingPeriodConnection
+  ): GradingPeriodConnection!
   gradingStandard: GradingStandard
 
   """
@@ -2263,7 +2263,7 @@ type Course implements AssetString & AssignmentsConnectionInterface & Discussion
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): SectionConnection
+  ): SectionConnection!
 
   """
   Settings for the course
@@ -6958,7 +6958,7 @@ type OutcomeProficiency implements LegacyIDInterface & Node {
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): ProficiencyRatingConnection
+  ): ProficiencyRatingConnection!
 }
 
 input OutcomeProficiencyRatingCreate {
@@ -8477,7 +8477,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     """
     last: Int
     sortOrder: SubmissionCommentsSortOrderType = null
-  ): SubmissionCommentConnection
+  ): SubmissionCommentConnection!
   createdAt: DateTime
   customGradeStatus: String
   customGradeStatusId: ID
@@ -8631,7 +8631,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): RubricAssessmentConnection
+  ): RubricAssessmentConnection!
   score: Float
   secondsLate: Float
   state: SubmissionState!
@@ -8665,7 +8665,7 @@ type Submission implements LegacyIDInterface & Node & SubmissionInterface & Time
     """
     last: Int
     orderBy: SubmissionHistoryOrder
-  ): SubmissionHistoryConnection
+  ): SubmissionHistoryConnection!
   submissionStatus: String
   submissionType: SubmissionType
   submittedAt: DateTime
@@ -8685,7 +8685,7 @@ type SubmissionComment implements LegacyIDInterface & Timestamped {
   """
   _id: ID!
   assignment: Assignment
-  attachments: [File!]
+  attachments: [File!]!
   attempt: Int!
   author: User
   canReply: Boolean
@@ -8870,7 +8870,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     """
     last: Int
     sortOrder: SubmissionCommentsSortOrderType = null
-  ): SubmissionCommentConnection
+  ): SubmissionCommentConnection!
   createdAt: DateTime
   customGradeStatus: String
   customGradeStatusId: ID
@@ -8959,7 +8959,7 @@ type SubmissionHistory implements SubmissionInterface & Timestamped {
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): RubricAssessmentConnection
+  ): RubricAssessmentConnection!
   score: Float
   secondsLate: Float
   state: SubmissionState!
@@ -9076,7 +9076,7 @@ interface SubmissionInterface {
     """
     last: Int
     sortOrder: SubmissionCommentsSortOrderType = null
-  ): SubmissionCommentConnection
+  ): SubmissionCommentConnection!
   customGradeStatus: String
   customGradeStatusId: ID
 
@@ -9159,7 +9159,7 @@ interface SubmissionInterface {
     Returns the last _n_ elements from the list.
     """
     last: Int
-  ): RubricAssessmentConnection
+  ): RubricAssessmentConnection!
   score: Float
   secondsLate: Float
   state: SubmissionState!

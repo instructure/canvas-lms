@@ -162,7 +162,7 @@ module Interfaces::SubmissionInterface
     submission.attempt || 0 # Nil in database, make it 0 here for easier api
   end
 
-  field :comments_connection, Types::SubmissionCommentType.connection_type, null: true do
+  field :comments_connection, Types::SubmissionCommentType.connection_type, null: false do
     argument :filter, Types::SubmissionCommentFilterInputType, required: false, default_value: {}
     argument :sort_order,
              Types::SubmissionCommentsSortOrderType,
@@ -476,7 +476,7 @@ module Interfaces::SubmissionInterface
     end
   end
 
-  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: true do
+  field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: false do
     argument :filter,
              Types::SubmissionRubricAssessmentFilterInputType,
              required: false,
