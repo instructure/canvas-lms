@@ -43,7 +43,7 @@ GEM
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
-    psych (5.2.3)
+    psych (5.2.6)
       date
       stringio
     rake (13.2.1)
