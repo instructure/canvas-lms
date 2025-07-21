@@ -50,83 +50,82 @@ describe "context modules", :ignore_js_errors do
 
   context "modules action menu" do
     before do
-      @item = @module1.content_tags[0]
+      # Create a module with at leas one item of each type
+      module_setup
+      # Create a module item of file type
+      file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
+      @module.add_item(type: "file", id: file.id)
     end
 
-    context "edit assignment kebab form" do
-      it "edit item form is shown" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        wait_for_ajaximations
-        manage_module_item_button(@item.id).click
-        module_item_action_menu_link("Edit").click
+    def validate_edit_item_form(item)
+      manage_module_item_button(item.id).click
+      module_item_action_menu_link("Edit").click
 
-        expect(edit_item_modal).to be_displayed
+      expect(edit_item_modal).to be_displayed
+      edit_item_modal.find_element(:css, "button[type='button']").click
+      wait_for_ajaximations
+    end
+
+    def validate_text_fields_has_right_value(item)
+      manage_module_item_button(item.id).click
+      module_item_action_menu_link("Edit").click
+
+      item_title = item.title
+      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
+
+      expect(title.attribute("value")).to eq(item_title)
+
+      # URL field is only present for ExternalTool, ExternalUrl, and ContextExternalTool items
+      if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
+        url = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']")
+        expect(url.attribute("value")).to eq(item.url)
       end
 
-      it "title field has the right value" do
+      edit_item_modal.find_element(:css, "button[type='button']").click
+      wait_for_ajaximations
+    end
+
+    def validate_update_module_item_title(item, new_title = "New Title")
+      manage_module_item_button(item.id).click
+      module_item_action_menu_link("Edit").click
+
+      title = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-title']")
+      replace_content(title, new_title)
+
+      edit_item_modal.find_element(:css, "button[type='submit']").click
+      wait_for_ajaximations
+      assignment_title = manage_module_item_container(item.id).find_element(:xpath, ".//*[text()='#{new_title}']")
+      expect(assignment_title.text).to eq(new_title)
+    end
+
+    context "edit module item kebab form" do
+      it "edit item form is shown" do
         go_to_modules
-        module_header_expand_toggles.first.click
+        module_header_expand_toggles.last.click
         wait_for_ajaximations
-        manage_module_item_button(@item.id).click
-        module_item_action_menu_link("Edit").click
 
-        item_title = @module1.content_tags[0].title
-        title = edit_item_modal.find_element(:css, "input[type=text]")
+        @module.content_tags.each do |item|
+          validate_edit_item_form(item)
+        end
+      end
 
-        expect(title.attribute("value")).to eq(item_title)
+      it "title fields has the right value" do
+        go_to_modules
+        module_header_expand_toggles.last.click
+        wait_for_ajaximations
+
+        @module.content_tags.each do |item|
+          validate_text_fields_has_right_value(item)
+        end
       end
 
       it "item is updated" do
         go_to_modules
-        module_header_expand_toggles.first.click
+        module_header_expand_toggles.last.click
         wait_for_ajaximations
-        manage_module_item_button(@item.id).click
-        module_item_action_menu_link("Edit").click
 
-        title = edit_item_modal.find_element(:css, "input[type=text]")
-        replace_content(title, "New Title")
-
-        edit_item_modal.find_element(:css, "button[type='submit']").click
-        wait_for_ajaximations
-        assignment_title = manage_module_item_container(@item.id).find_element(:css, "[data-testid='module-item-title-link']")
-        expect(assignment_title.text).to eq("New Title")
-      end
-
-      context "send to kebab form" do
-        before do
-          student_in_course
-          @first_user = @course.students.first
-        end
-
-        it "shows the send to kebab form" do
-          go_to_modules
-          module_action_menu(@module1.id).click
-          module_item_action_menu_link("Send To...").click
-
-          expect(send_to_modal).to be_displayed
-        end
-
-        it "module is correctly sent" do
-          go_to_modules
-
-          module_action_menu(@module1.id).click
-          module_item_action_menu_link("Send To...").click
-
-          set_value(send_to_modal_input, "User")
-          option_list_id = send_to_modal_input.attribute("aria-controls")
-
-          expect(ff("##{option_list_id} [role='option']").count).to eq 1
-
-          fj("##{option_list_id} [role='option']:contains(#{@first_user.first_name})").click
-          selected_element = send_to_form_selected_elements.first
-
-          expect(selected_element.text).to eq("User")
-
-          fj("button:contains('Send')").click
-
-          wait_for_ajaximations
-          expect(f("body")).not_to contain_css(send_to_modal_modal_selector)
+        @module.content_tags.each do |item|
+          validate_update_module_item_title(item)
         end
       end
     end
@@ -135,9 +134,11 @@ describe "context modules", :ignore_js_errors do
       before do
         student_in_course
         @first_user = @course.students.first
+        # First item of the module item list is the one used for testing
+        @item = @module1.content_tags[0]
       end
 
-      it "edit item form is shown" do
+      it "send item form is shown" do
         go_to_modules
         module_header_expand_toggles.first.click
         wait_for_ajaximations
@@ -176,6 +177,8 @@ describe "context modules", :ignore_js_errors do
         @other_course = course_factory(course_name: "Other Course Eh")
         course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
         @course = course
+        # First item of the module item list is the one used for testing
+        @item = @module1.content_tags[0]
       end
 
       it "module item is correctly copied" do

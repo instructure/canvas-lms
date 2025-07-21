@@ -32,6 +32,7 @@ const ENV = window.ENV as GlobalEnv
 export const handlePublishToggle = async (
   moduleId: string,
   itemId: string,
+  title: string,
   content: ModuleItemContent | null,
   canBeUnpublished: boolean,
   queryClient: QueryClient,
@@ -52,7 +53,7 @@ export const handlePublishToggle = async (
 
     showFlashSuccess(
       I18n.t('%{title} has been %{publishState}', {
-        title: content?.title,
+        title: title,
         publishState: newPublishedState ? I18n.t('published') : I18n.t('unpublished'),
       }),
     )
@@ -61,7 +62,7 @@ export const handlePublishToggle = async (
   } catch (error) {
     showFlashError(
       I18n.t('Failed to change published state for %{title}', {
-        title: content?.title,
+        title: title,
       }),
     )
     console.error('Error updating published state:', error)
@@ -92,6 +93,7 @@ export const handleSpeedGrader = (
 export const handleAssignTo = (
   content: ModuleItemContent | null,
   courseId: string,
+  title: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
   moduleId?: string,
 ) => {
@@ -108,7 +110,7 @@ export const handleAssignTo = (
 
   renderItemAssignToManager(true, document.activeElement as HTMLElement, {
     courseId,
-    moduleItemName: content?.title || 'Untitled Item',
+    moduleItemName: title || 'Untitled Item',
     moduleItemType: getItemType(content?.type),
     moduleItemContentId: content?._id,
     pointsPossible: content?.pointsPossible,
@@ -147,6 +149,7 @@ export const handleMoveTo = (
   moduleId: string,
   moduleTitle: string,
   itemId: string,
+  title: string,
   content: ModuleItemContent | null,
   setModuleAction: React.Dispatch<React.SetStateAction<ModuleAction | null>>,
   setSelectedModuleItem: (item: {id: string; title: string} | null) => void,
@@ -163,7 +166,7 @@ export const handleMoveTo = (
   if (content && itemId) {
     setSelectedModuleItem({
       id: itemId,
-      title: content.title || '',
+      title: title || '',
     })
   }
 
@@ -263,7 +266,7 @@ export const handleCopyTo = (
 export const handleRemove = (
   moduleId: string,
   itemId: string,
-  content: ModuleItemContent | null,
+  title: string,
   queryClient: QueryClient,
   courseId: string,
   setIsMenuOpen?: (isOpen: boolean) => void,
@@ -276,7 +279,7 @@ export const handleRemove = (
       .then(() => {
         showFlashSuccess(
           I18n.t('%{title} was successfully removed.', {
-            title: content?.title,
+            title: title,
           }),
         )
         queryClient.invalidateQueries({queryKey: ['moduleItems', moduleId || '']})

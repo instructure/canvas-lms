@@ -24,7 +24,6 @@ import {CompletionRequirement, ModuleItemContent} from '../../utils/types'
 const defaultContent: ModuleItemContent = {
   type: 'Assignment',
   isNewQuiz: false,
-  title: 'Test Title',
 }
 
 describe('CompletionRequirementDisplay', () => {

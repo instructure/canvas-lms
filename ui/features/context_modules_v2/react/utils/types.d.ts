@@ -32,7 +32,6 @@ export interface Checkpoint {
 export type ModuleItemContent = {
   id?: string
   _id?: string
-  title: string
   type?:
     | 'Assignment'
     | 'Quiz'
@@ -43,6 +42,7 @@ export type ModuleItemContent = {
     | 'Attachment'
     | 'SubHeader'
     | 'ModuleExternalTool'
+    | 'ExternalTool'
   pointsPossible?: number
   published?: boolean
   canUnpublish?: boolean
@@ -257,6 +257,7 @@ export interface ModuleItem {
   id: string
   _id: string
   url: string
+  title: string
   indent: number
   position: number
   content: ModuleItemContent

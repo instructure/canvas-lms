@@ -46,63 +46,61 @@ describe('utils', () => {
 
   describe('getItemIcon', () => {
     it('should return the correct icon for an assignment', () => {
-      const container = render(getItemIcon({type: 'Assignment', title: 'Assignment'}))
+      const container = render(getItemIcon({type: 'Assignment'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('assignment-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a quiz', () => {
-      const container = render(getItemIcon({type: 'Quiz', title: 'Quiz'}))
+      const container = render(getItemIcon({type: 'Quiz'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('quiz-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a new quiz', () => {
-      const container = render(
-        getItemIcon({type: 'Assignment', title: 'New Quiz', isNewQuiz: true}),
-      )
+      const container = render(getItemIcon({type: 'Assignment', isNewQuiz: true}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('new-quiz-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a discussion', () => {
-      const container = render(getItemIcon({type: 'Discussion', title: 'Discussion'}))
+      const container = render(getItemIcon({type: 'Discussion'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('discussion-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a file', () => {
-      const container = render(getItemIcon({type: 'File', title: 'File'}))
+      const container = render(getItemIcon({type: 'File'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('attachment-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a attachment', () => {
-      const container = render(getItemIcon({type: 'Attachment', title: 'File'}))
+      const container = render(getItemIcon({type: 'Attachment'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('attachment-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for an external URL', () => {
-      const container = render(getItemIcon({type: 'ExternalUrl', title: 'ExternalUrl'}))
+      const container = render(getItemIcon({type: 'ExternalUrl'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('url-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for an external tool', () => {
-      const container = render(getItemIcon({type: 'ModuleExternalTool', title: 'ExternalTool'}))
+      const container = render(getItemIcon({type: 'ModuleExternalTool'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('url-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for a page', () => {
-      const container = render(getItemIcon({type: 'Page', title: 'Page'}))
+      const container = render(getItemIcon({type: 'Page'}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('page-icon')).toBeInTheDocument()
     })
 
     it('should return the correct icon for an unknown type (default icon)', () => {
-      const container = render(getItemIcon({type: 'unknown' as any, title: 'Unknown'}))
+      const container = render(getItemIcon({type: 'unknown' as any}))
       expect(container.container).toBeInTheDocument()
       expect(container.getByTestId('document-icon')).toBeInTheDocument()
     })
@@ -110,41 +108,39 @@ describe('utils', () => {
 
   describe('getItemTypeText', () => {
     it('should return "Assignment" for an assignment', () => {
-      expect(getItemTypeText({type: 'Assignment', title: 'Assignment'})).toBe('Assignment')
+      expect(getItemTypeText({type: 'Assignment'})).toBe('Assignment')
     })
 
     it('should return "New Quiz" for a new quiz', () => {
-      expect(getItemTypeText({type: 'Assignment', title: 'New Quiz', isNewQuiz: true})).toBe(
-        'New Quiz',
-      )
+      expect(getItemTypeText({type: 'Assignment', isNewQuiz: true})).toBe('New Quiz')
     })
 
     it('should return "Quiz" for a quiz', () => {
-      expect(getItemTypeText({type: 'Quiz', title: 'Quiz'})).toBe('Quiz')
+      expect(getItemTypeText({type: 'Quiz'})).toBe('Quiz')
     })
 
     it('should return "Discussion" for a discussion', () => {
-      expect(getItemTypeText({type: 'Discussion', title: 'Discussion'})).toBe('Discussion')
+      expect(getItemTypeText({type: 'Discussion'})).toBe('Discussion')
     })
 
     it('should return "File" for a file', () => {
-      expect(getItemTypeText({type: 'File', title: 'File'})).toBe('File')
+      expect(getItemTypeText({type: 'File'})).toBe('File')
     })
 
     it('should return "File" for an attachment', () => {
-      expect(getItemTypeText({type: 'Attachment', title: 'Attachment'})).toBe('File')
+      expect(getItemTypeText({type: 'Attachment'})).toBe('File')
     })
 
     it('should return "External Url" for an external URL', () => {
-      expect(getItemTypeText({type: 'ExternalUrl', title: 'ExternalUrl'})).toBe('External Url')
+      expect(getItemTypeText({type: 'ExternalUrl'})).toBe('External Url')
     })
 
     it('should return "Page" for a page', () => {
-      expect(getItemTypeText({type: 'Page', title: 'Page'})).toBe('Page')
+      expect(getItemTypeText({type: 'Page'})).toBe('Page')
     })
 
     it('should return "Unknown" for an unknown type', () => {
-      expect(getItemTypeText({type: 'unknown' as any, title: 'Unknown'})).toBe('Unknown')
+      expect(getItemTypeText({type: 'unknown' as any})).toBe('Unknown')
     })
 
     it('should return "Unknown" on missing content', () => {
@@ -152,9 +148,7 @@ describe('utils', () => {
     })
 
     it('should return "External Tool" for an external tool', () => {
-      expect(getItemTypeText({type: 'ModuleExternalTool', title: 'ModuleExternalTool'})).toBe(
-        'External Tool',
-      )
+      expect(getItemTypeText({type: 'ModuleExternalTool'})).toBe('External Tool')
     })
   })
 
@@ -164,10 +158,10 @@ describe('utils', () => {
       url: 'https://example.com',
       indent: 0,
       index: 0,
+      title: 'Assignment',
       content: {
         id: '1',
         type: 'Assignment',
-        title: 'Assignment',
       },
     }
     it('should return true when the props are the same', () => {
@@ -231,10 +225,10 @@ describe('utils', () => {
       url: 'https://example.com',
       indent: 0,
       index: 0,
+      title: 'Assignment',
       content: {
         id: '1',
         type: 'Assignment',
-        title: 'Assignment',
       },
     }
     it('should return true when the props are the same', () => {

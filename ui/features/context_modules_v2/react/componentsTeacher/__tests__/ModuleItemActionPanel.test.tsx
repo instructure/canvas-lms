@@ -30,12 +30,12 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   moduleId: '1',
   itemId: '123',
   id: '123',
+  title: 'Test Discussion',
   indent: 0,
   content: {
     _id: 'discussion1',
     id: 'discussion1',
     type: 'Discussion',
-    title: 'Test Discussion',
     published: false,
   },
   published: false,
@@ -87,11 +87,11 @@ describe('ModuleItemActionPanel', () => {
     setUp(
       buildDefaultProps({
         published: true,
+        title: 'Test File',
         content: {
           _id: 'file1',
           id: 'file1',
           type: 'File',
-          title: 'Test File',
           published: true,
           fileState: '',
         },
@@ -105,11 +105,11 @@ describe('ModuleItemActionPanel', () => {
     setUp(
       buildDefaultProps({
         published: false,
+        title: 'Test Discussion',
         content: {
           _id: 'discussion1',
           id: 'discussion1',
           type: 'Discussion',
-          title: 'Test Discussion',
           published: false,
         },
       }),

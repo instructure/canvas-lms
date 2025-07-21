@@ -39,6 +39,11 @@ describe Types::ModuleItemType do
     expect(resolver.resolve("indent")).to eq 0
   end
 
+  it "gets the title" do
+    resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
+    expect(resolver.resolve("title")).to eq assign1.title
+  end
+
   it "gets the position" do
     resolver = GraphQLTypeTester.new(module_item1, current_user: @teacher)
     expect(resolver.resolve("position")).to eq 1

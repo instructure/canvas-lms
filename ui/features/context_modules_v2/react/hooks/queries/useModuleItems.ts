@@ -33,12 +33,12 @@ const MODULE_ITEMS_QUERY = gql`
           _id
           id
           url
+          title
           indent
           content {
             ... on Assignment {
               _id
               id
-              title
               type: __typename
               pointsPossible
               graded
@@ -80,7 +80,6 @@ const MODULE_ITEMS_QUERY = gql`
             ... on Discussion {
               _id
               id
-              title
               type: __typename
               lockAt
               todoDate
@@ -100,7 +99,6 @@ const MODULE_ITEMS_QUERY = gql`
             ... on File {
               _id
               id
-              title: displayName
               type: __typename
               contentType
               size
@@ -119,7 +117,6 @@ const MODULE_ITEMS_QUERY = gql`
             ... on Page {
               _id
               id
-              title
               published
               canUnpublish
               type: __typename
@@ -130,7 +127,6 @@ const MODULE_ITEMS_QUERY = gql`
             ... on Quiz {
               _id
               id
-              title
               type: __typename
               pointsPossible
               published
@@ -140,7 +136,6 @@ const MODULE_ITEMS_QUERY = gql`
               graded
             }
             ... on ExternalUrl {
-              title
               type: __typename
               url
               published
@@ -149,7 +144,13 @@ const MODULE_ITEMS_QUERY = gql`
               graded
             }
             ... on ModuleExternalTool {
-              title
+              type: __typename
+              url
+              published
+              canUnpublish
+              graded
+            }
+            ... on ExternalTool {
               type: __typename
               url
               published
@@ -157,7 +158,6 @@ const MODULE_ITEMS_QUERY = gql`
               graded
             }
             ... on SubHeader {
-              title
               published
               type: __typename
             }

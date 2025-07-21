@@ -24,7 +24,6 @@ import {ModuleItemContent, ModuleProgression, CompletionRequirement} from '../..
 const buildDefaultProps = (overrides: Partial<ModuleItemTitleStudentProps> = {}) => {
   const defaultProps = {
     content: {
-      title: 'Test Title',
       type: 'Assignment',
       isNewQuiz: false,
       published: true,
@@ -41,6 +40,7 @@ const buildDefaultProps = (overrides: Partial<ModuleItemTitleStudentProps> = {})
       started: false,
     } as ModuleProgression,
     position: 1,
+    title: 'Test Title',
     requireSequentialProgress: false,
     url: 'https://canvas.instructure.com',
     onClick: () => {},
@@ -81,9 +81,9 @@ describe('ModuleItemTitleStudent', () => {
   it('renders subheader text', () => {
     const container = setUp(
       buildDefaultProps({
+        title: 'Test SubHeader',
         content: {
           type: 'SubHeader',
-          title: 'Test SubHeader',
         },
       }),
     )
@@ -91,7 +91,7 @@ describe('ModuleItemTitleStudent', () => {
   })
 
   it('renders an untitled item correctly', () => {
-    setUp(buildDefaultProps({content: {title: ''}}))
+    setUp(buildDefaultProps({title: ''}))
     expect(screen.getByText('Untitled Item')).toBeInTheDocument()
   })
 })

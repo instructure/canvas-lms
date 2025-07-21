@@ -66,6 +66,9 @@ module Types
     field :indent, Integer, null: true
     delegate :indent, to: :object
 
+    field :title, String, null: true
+    delegate :title, to: :object
+
     field :next, Types::ModuleItemType, null: true, resolver_method: :next_resolver
     def next_resolver
       Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|

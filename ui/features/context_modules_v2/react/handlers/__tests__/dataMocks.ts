@@ -22,6 +22,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '0',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 0,
@@ -30,6 +31,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '1',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 1,
@@ -38,6 +40,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '2',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 2,
@@ -46,6 +49,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '3',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 3,
@@ -54,6 +58,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '4',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 4,
@@ -62,6 +67,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '5',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 5,
@@ -70,6 +76,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '6',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 6,
@@ -78,6 +85,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '7',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 7,
@@ -86,6 +94,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '8',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 8,
@@ -94,6 +103,7 @@ export const defaultModuleItems: ModuleItem[] = [
   {
     _id: '9',
     id: '',
+    title: '',
     url: '',
     indent: 0,
     position: 9,

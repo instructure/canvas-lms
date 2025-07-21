@@ -21,16 +21,18 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 export interface ItemData {
   title: string
   indentation: number
+  url?: string
 }
 
 export const prepareItemData = (
   itemData: ItemData,
 ): Record<string, string | number | string[] | undefined | boolean> => {
-  const {title, indentation} = itemData
+  const {title, indentation, url} = itemData
 
   const result: Record<string, string | number | string[] | undefined | boolean> = {
     'content_tag[title]': title,
     'content_tag[indent]': indentation,
+    'content_tag[url]': url,
     new_tab: 0,
     graded: 0,
     _method: 'PUT',

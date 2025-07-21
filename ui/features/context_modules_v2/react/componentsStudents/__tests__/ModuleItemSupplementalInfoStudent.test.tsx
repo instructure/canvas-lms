@@ -41,7 +41,6 @@ const buildDefaultProps = (overrides: DefaultPropsOverrides = {}) => {
 
   const defaultContent: ModuleItemContent = {
     _id: '1',
-    title: 'Test Item',
     pointsPossible: 100,
     submissionsConnection: {
       nodes: [
