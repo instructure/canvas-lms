@@ -514,7 +514,7 @@ GEM
     docx (0.9.1)
       nokogiri (~> 1.13, >= 1.13.0)
       rubyzip (~> 2.0)
-    dogstatsd-ruby (5.6.6)
+    dogstatsd-ruby (5.7.0)
     dotenv (3.1.8)
     drb (2.2.3)
     dress_code (1.2.1)
