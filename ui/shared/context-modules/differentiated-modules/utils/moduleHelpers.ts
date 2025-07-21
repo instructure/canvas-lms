@@ -292,11 +292,27 @@ function updatePrerequisites(moduleElement: HTMLDivElement, moduleSettings: Sett
       const div = document.createElement('div')
       div.classList.add(...['prerequisite_criterion', 'context_module_criterion'])
       div.style.float = 'left'
-      div.innerHTML = `
-        <span class="id" style="display: none;">${prerequisite.id}</span>
-        <span class="type" style="display: none;">context_module</span>
-        <span class="name" style="display: none;" title="${moduleSettings.moduleName}">${prerequisite.name}</span>
-      `
+
+      const idSpan = document.createElement('span')
+      idSpan.className = 'id'
+      idSpan.style.display = 'none'
+      idSpan.textContent = prerequisite.id
+
+      const typeSpan = document.createElement('span')
+      typeSpan.className = 'type'
+      typeSpan.style.display = 'none'
+      typeSpan.textContent = 'context_module'
+
+      const nameSpan = document.createElement('span')
+      nameSpan.className = 'name'
+      nameSpan.style.display = 'none'
+      nameSpan.title = moduleSettings.moduleName
+      nameSpan.textContent = prerequisite.name
+
+      div.appendChild(idSpan)
+      div.appendChild(typeSpan)
+      div.appendChild(nameSpan)
+
       prerequisiteElement.appendChild(div)
     })
 
