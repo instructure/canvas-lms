@@ -236,6 +236,12 @@ describe Lti::IMS::DynamicRegistrationController do
             expect { subject }.to change { ContextExternalTool.count }.by(1)
           end
 
+          it "returns the tool's deployment_id" do
+            subject
+            parsed_body = response.parsed_body
+            expect(parsed_body["deployment_id"]).to eq ContextExternalTool.last.deployment_id
+          end
+
           it "marks the tool as unavailable" do
             subject
             context_control = Lti::ContextControl.last
