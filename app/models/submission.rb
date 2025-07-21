@@ -2212,7 +2212,7 @@ class Submission < ActiveRecord::Base
     strand = "conditional_release_grade_change:#{global_assignment_id}"
 
     progress = Progress.create!(context: self, tag: "conditional_release_handler")
-    priority = case Setting.get("conditional_release_handler_priority_#{root_account.global_id}", nil)
+    priority = case Canvas::Plugin.find("conditional_release_tuning").settings[:priority]
                when "high"
                  Delayed::HIGH_PRIORITY
                when "normal"
