@@ -1657,6 +1657,10 @@ class AccountsController < ApplicationController
     return render_unauthorized_action unless @account.grants_right?(@current_user, :manage_users_in_bulk)
 
     user_ids = params[:user_ids]
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     progress = Progress.create!(context: @context, user: @current_user, tag: :remove_users_from_account)
     process_params = {
       user_ids:
@@ -1689,6 +1693,11 @@ class AccountsController < ApplicationController
 
     allowed_attributes = [:event] # currently only used for suspend/unsuspend
     user_ids = params[:user_ids]
+
+    if !user_ids.empty? && user_ids.size > 100
+      return render json: { errors: "Too many users to update at once." }, status: :bad_request
+    end
+
     user_params = (params[:user] || {}).permit(*allowed_attributes).to_h
     progress = Progress.create!(context: @context, user: @current_user, tag: :update_multiple_users)
     process_params = {
