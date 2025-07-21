@@ -8,7 +8,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    diff-lcs (1.6.1)
+    diff-lcs (1.6.2)
     folio-pagination (0.0.12)
     mini_portile2 (2.8.9)
     rake (13.2.1)

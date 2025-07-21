@@ -12,7 +12,7 @@ GEM
     debug (1.11.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
-    diff-lcs (1.6.1)
+    diff-lcs (1.6.2)
     docile (1.4.1)
     erb (5.0.2)
     io-console (0.8.1)
