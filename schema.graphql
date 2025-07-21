@@ -4413,6 +4413,7 @@ type File implements LegacyIDInterface & ModuleItemInterface & Node & Timestampe
   updatedAt: DateTime
   url: URL
   usageRights: UsageRights
+  viewedAt: DateTime
   wordCount: Int
 }
 

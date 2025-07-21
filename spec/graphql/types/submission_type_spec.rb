@@ -629,6 +629,15 @@ describe Types::SubmissionType do
         )
       ).to eq [[@attachment1.id.to_s]]
     end
+
+    it "has a valid viewedAt" do
+      now = Time.zone.now.change(usec: 0)
+      @attachment1.update!(viewed_at: now)
+
+      expect(Time.zone.parse(submission_type.resolve(
+        "submissionHistoriesConnection(first: 1) { nodes { attachments { viewedAt }}}"
+      )[0][0])).to eq now
+    end
   end
 
   describe "submission histories connection" do
