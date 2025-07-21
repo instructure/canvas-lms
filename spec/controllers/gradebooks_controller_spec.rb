@@ -1715,7 +1715,7 @@ describe GradebooksController do
           @user.set_preference(:gradebook_version, "2")
         end
 
-        include_examples "working download"
+        it_behaves_like "working download"
       end
 
       context "with teacher that prefers Individual View" do
@@ -1723,7 +1723,7 @@ describe GradebooksController do
           @user.set_preference(:gradebook_version, "srgb")
         end
 
-        include_examples "working download"
+        it_behaves_like "working download"
       end
     end
 

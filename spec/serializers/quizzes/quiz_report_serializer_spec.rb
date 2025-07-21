@@ -129,7 +129,7 @@ describe Quizzes::QuizReportSerializer do
     end
 
     context "associations" do
-      include_examples "QuizReportSerializer Associations"
+      it_behaves_like "QuizReportSerializer Associations"
 
       it "links to the quiz" do
         expect(json["links"]).to be_present
@@ -160,7 +160,7 @@ describe Quizzes::QuizReportSerializer do
     end
 
     context "associations" do
-      include_examples "QuizReportSerializer Associations"
+      it_behaves_like "QuizReportSerializer Associations"
     end
   end
 end

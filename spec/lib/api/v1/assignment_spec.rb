@@ -1038,16 +1038,16 @@ describe "Api::V1::Assignment" do
     context "when workflow_state is 'duplicating'" do
       let(:workflow_state) { "duplicating" }
 
-      include_examples "retains the original publication state"
-      include_examples "falls back to 'unpublished' state"
-      include_examples "sets workflow_state to outcome_alignment_cloning"
+      it_behaves_like "retains the original publication state"
+      it_behaves_like "falls back to 'unpublished' state"
+      it_behaves_like "sets workflow_state to outcome_alignment_cloning"
     end
 
     context "when workflow_state is 'failed_to_duplicate'" do
       let(:workflow_state) { "failed_to_duplicate" }
 
-      include_examples "retains the original publication state"
-      include_examples "falls back to 'unpublished' state"
+      it_behaves_like "retains the original publication state"
+      it_behaves_like "falls back to 'unpublished' state"
     end
 
     context "when workflow_state is other that 'duplicating' or 'failed_to_duplicate'" do
