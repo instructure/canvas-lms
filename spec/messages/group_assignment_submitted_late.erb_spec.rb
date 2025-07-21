@@ -29,5 +29,5 @@ describe "group_assignment_submitted_late" do
   let(:asset) { @submission }
   let(:notification_name) { :group_assignment_submitted_late }
 
-  include_examples "a message"
+  it_behaves_like "a message"
 end
