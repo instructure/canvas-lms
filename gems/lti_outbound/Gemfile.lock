@@ -28,7 +28,7 @@ GEM
     connection_pool (2.5.3)
     diff-lcs (1.6.1)
     docile (1.4.1)
-    drb (2.2.1)
+    drb (2.2.3)
     hashie (5.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)

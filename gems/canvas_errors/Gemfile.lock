@@ -68,7 +68,7 @@ GEM
       reline (>= 0.3.8)
     debug_inspector (1.2.0)
     diff-lcs (1.6.1)
-    drb (2.2.1)
+    drb (2.2.3)
     erubi (1.13.1)
     et-orbi (1.2.11)
       tzinfo
