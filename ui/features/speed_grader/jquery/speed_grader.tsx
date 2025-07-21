@@ -2926,7 +2926,7 @@ EG = {
           selected: selectedIndex === i,
           proxy_submitter: s.proxy_submitter,
           proxy_submitter_label_text: s.proxy_submitter ? ` by ${s.proxy_submitter}` : null,
-          submittedAt: submittedAtText,
+          submittedAt: datetimeString(s.submitted_at) || noSubmittedAt,
           grade,
         }
       })
