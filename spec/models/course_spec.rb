@@ -2800,6 +2800,18 @@ describe Course do
         @course.disable_feature!(:canvas_k6_theme)
       end
 
+      it "returns Accessibility tab if feature flag is enabled for teachers" do
+        @course.enable_feature!(:accessibility_tab_enable)
+        tabs = @course.tabs_available(@user)
+
+        # Checks that Accessibility tab is at the end of the tabs (except for Settings tab)
+        settings_tab_index = tabs.pluck(:id).index(Course::TAB_SETTINGS)
+        accessibility_tab_index = tabs.pluck(:id).index(Course::TAB_ACCESSIBILITY)
+        expect(accessibility_tab_index).to eq(settings_tab_index - 1)
+      ensure
+        @course.disable_feature!(:accessibility_tab_enable)
+      end
+
       it "defaults tab configuration to an empty array" do
         course = Course.new
         expect(course.tab_configuration).to eq []
