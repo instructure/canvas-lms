@@ -86,6 +86,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
   handleMasteryPaths = () => {},
 }) => {
   const {permissions} = useContextModule()
+  const isFile = itemType === 'File'
   return (
     <Menu
       onToggle={isOpen => setIsMenuOpen(isOpen)}
@@ -97,6 +98,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           withBackground={false}
           withBorder={false}
           size="small"
+          data-testid="module-item-action-menu-button"
         />
       }
       data-testid="module-item-action-menu"
@@ -111,7 +113,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && (
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && !isFile && (
         <Menu.Item onClick={handleSpeedGrader}>
           <Flex>
             <Flex.Item>
@@ -121,7 +123,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canEdit && !basicContentTypes.includes(itemType) && (
+      {permissions?.canEdit && !basicContentTypes.includes(itemType) && !isFile && (
         <Menu.Item onClick={handleAssignTo}>
           <Flex>
             <Flex.Item>
@@ -131,7 +133,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && (
+      {permissions?.canAdd && canDuplicate && !basicContentTypes.includes(itemType) && !isFile && (
         <Menu.Item onClick={handleDuplicate}>
           <Flex>
             <Flex.Item>
@@ -171,7 +173,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && (
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && !isFile && (
         <Menu.Item onClick={handleSendTo}>
           <Flex>
             <Flex.Item>
@@ -181,7 +183,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && (
+      {permissions?.canDirectShare && !basicContentTypes.includes(itemType) && !isFile && (
         <Menu.Item onClick={handleCopyTo}>
           <Flex>
             <Flex.Item>
@@ -191,7 +193,7 @@ const ModuleItemActionMenu: React.FC<ModuleItemActionMenuProps> = ({
           </Flex>
         </Menu.Item>
       )}
-      {!basicContentTypes.includes(itemType) && masteryPathsData?.isCyoeAble && (
+      {!basicContentTypes.includes(itemType) && masteryPathsData?.isCyoeAble && !isFile && (
         <Menu.Item onClick={handleMasteryPaths}>
           <Flex>
             <Flex.Item>
