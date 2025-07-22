@@ -37,6 +37,10 @@ export const LIMIT_EXCEEDED_MESSAGE = I18n.t(
   'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).',
 )
 
+export const API_FETCH_ERROR_MESSAGE_PREFIX = I18n.t(
+  'Error loading accessibility issues. Error is: ',
+)
+
 export const IssuesTableColumns = {
   ResourceName: 'resource-name-header',
   Issues: 'issues-header',
@@ -52,3 +56,11 @@ export const IssuesTableColumnHeaders = [
   {id: IssuesTableColumns.State, name: I18n.t('State')},
   {id: IssuesTableColumns.LastEdited, name: I18n.t('Last Edited')},
 ]
+
+export const IssuesTableHeaderApiNames: Record<string, string> = {
+  [IssuesTableColumns.ResourceName]: 'resource_name',
+  [IssuesTableColumns.Issues]: 'issue_count',
+  [IssuesTableColumns.ResourceType]: 'resource_type',
+  [IssuesTableColumns.State]: 'resource_workflow_state',
+  [IssuesTableColumns.LastEdited]: 'resource_updated_at',
+}

@@ -21,20 +21,20 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
-import {calculateTotalIssuesCount} from '../../utils'
+import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
+import {calculateTotalIssuesCount} from '../../utils/apiData'
 import {IssuesByTypeChart} from './IssuesByTypeChart'
 import {IssuesCounter} from './IssuesCounter'
 
 export const AccessibilityIssuesSummary = () => {
-  const [accessibilityIssues, accessibilityScanDisabled, loading] = useAccessibilityCheckerStore(
-    useShallow(state => [
-      state.accessibilityIssues,
-      state.accessibilityScanDisabled,
-      state.loading,
-    ]),
+  const [accessibilityIssues, loading] = useAccessibilityCheckerStore(
+    useShallow(state => [state.accessibilityIssues, state.loading]),
+  )
+  const [accessibilityScans, loadingN] = useAccessibilityScansStore(
+    useShallow(state => [state.accessibilityScans, state.loading]),
   )
 
-  if (accessibilityScanDisabled || loading) return null
+  if (window.ENV.SCAN_DISABLED === true || loading) return null
 
   return (
     <Flex

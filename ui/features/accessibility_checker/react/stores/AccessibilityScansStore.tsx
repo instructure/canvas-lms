@@ -20,12 +20,7 @@ import {TableColHeaderProps} from '@instructure/ui-table'
 import {create} from 'zustand'
 import {devtools} from 'zustand/middleware'
 
-import {AccessibilityData, ContentItem} from '../types'
-
-export type NextResource = {
-  index: number
-  item?: ContentItem | null
-}
+import {AccessibilityResourceScan} from '../types'
 
 export type TableSortState = {
   sortId?: string | null
@@ -39,17 +34,18 @@ export type NewStateToFetch = {
   search?: string | null
 }
 
+/**
+ * tableData: ContentItem[] | null - will reintroduce such, only if needed for local state management
+ * accessibilityScanDisabled: boolean - removed due to getting that value in js_env from the API
+ */
 export type AccessibilityCheckerState = {
   page: number
   pageSize: number
   totalCount: number
   loading?: boolean
   error?: string | null
-  accessibilityIssues: AccessibilityData | null
+  accessibilityScans: AccessibilityResourceScan[] | null
   tableSortState?: TableSortState | null
-  tableData: ContentItem[] | null
-  orderedTableData: ContentItem[] | null
-  nextResource: NextResource
   search?: string | null
 }
 
@@ -59,15 +55,10 @@ export type AccessibilityCheckerActions = {
   setTotalCount: (totalCount: number) => void
   setLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  setAccessibilityIssues: (accessibilityIssues: AccessibilityData | null) => void
+  setAccessibilityScans: (accessibilityScans: AccessibilityResourceScan[] | null) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
-  setTableData: (tableData: ContentItem[] | null) => void
-  setOrderedTableData: (paginatedData: ContentItem[] | null) => void
-  setNextResource: (nextResource: NextResource) => void
   setSearch: (search: string | null) => void
 }
-
-export const defaultNextResource: NextResource = {index: -1, item: null}
 
 export const initialState: AccessibilityCheckerState = {
   page: 0,
@@ -75,11 +66,8 @@ export const initialState: AccessibilityCheckerState = {
   totalCount: 0,
   loading: true,
   error: null,
-  accessibilityIssues: null,
+  accessibilityScans: null,
   tableSortState: null,
-  tableData: null,
-  orderedTableData: null,
-  nextResource: defaultNextResource,
   search: null,
 }
 
@@ -90,7 +78,7 @@ export const defaultStateToFetch: NewStateToFetch = {
   search: null,
 }
 
-export const useAccessibilityCheckerStore = create<
+export const useAccessibilityScansStore = create<
   AccessibilityCheckerState & AccessibilityCheckerActions
 >()(
   devtools(
@@ -102,15 +90,12 @@ export const useAccessibilityCheckerStore = create<
       setTotalCount: totalCount => set({totalCount}),
       setLoading: loading => set({loading}),
       setError: error => set({error}),
-      setAccessibilityIssues: accessibilityIssues => set({accessibilityIssues}),
+      setAccessibilityScans: accessibilityScans => set({accessibilityScans}),
       setTableSortState: tableSortState => set({tableSortState}),
-      setTableData: tableData => set({tableData}),
-      setOrderedTableData: orderedTableData => set({orderedTableData}),
-      setNextResource: nextResource => set({nextResource}),
       setSearch: search => set({search}),
     }),
     {
-      name: 'AccessibilityCheckerStore',
+      name: 'AccessibilityScansStore',
     },
   ),
 )

@@ -55,6 +55,7 @@ const SearchIssue: React.FC<SearchIssueProps> = ({onSearchChange}) => {
       defaultValue={search || undefined}
       value={search}
       renderBeforeInput={() => <IconSearchLine inline={false} />}
+      renderLabel={''}
       onChange={handleSearchChange}
       placeholder={I18n.t('Search...')}
       width="100%"

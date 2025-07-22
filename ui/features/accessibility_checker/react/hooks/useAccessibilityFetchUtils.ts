@@ -26,17 +26,16 @@ import {
   NewStateToFetch,
   TableSortState,
   useAccessibilityCheckerStore,
-} from '../../stores/AccessibilityCheckerStore'
-import {IssuesTableColumns} from '../../constants'
-import {AccessibilityData} from '../../types'
-import {convertKeysToCamelCase, processAccessibilityData} from '../../utils'
+} from '../stores/AccessibilityCheckerStore'
+import {API_FETCH_ERROR_MESSAGE_PREFIX, IssuesTableColumns} from '../constants'
+import {AccessibilityData} from '../types'
+import {convertKeysToCamelCase, processAccessibilityData} from '../utils/apiData'
 
 export const useAccessibilityFetchUtils = () => {
-  const [page, pageSize, tableSortState, search] = useAccessibilityCheckerStore(
-    useShallow(state => [state.page, state.pageSize, state.tableSortState, state.search]),
+  const [page, pageSize, search, tableSortState] = useAccessibilityCheckerStore(
+    useShallow(state => [state.page, state.pageSize, state.search, state.tableSortState]),
   )
   const [
-    setAccessibilityScanDisabled,
     setAccessibilityIssues,
     setError,
     setLoading,
@@ -47,7 +46,6 @@ export const useAccessibilityFetchUtils = () => {
     setSearch,
   ] = useAccessibilityCheckerStore(
     useShallow(state => [
-      state.setAccessibilityScanDisabled,
       state.setAccessibilityIssues, // Set accessibility issues
       state.setError,
       state.setLoading,
@@ -215,7 +213,6 @@ export const useAccessibilityFetchUtils = () => {
         })
 
         const accessibilityIssues = convertKeysToCamelCase(data.json) as AccessibilityData
-        setAccessibilityScanDisabled(accessibilityIssues.accessibilityScanDisabled ?? false)
         setAccessibilityIssues(accessibilityIssues)
         setTableData(processAccessibilityData(accessibilityIssues))
 
@@ -226,7 +223,7 @@ export const useAccessibilityFetchUtils = () => {
 
         updateQueryParams(newStateToFetch)
       } catch (err: any) {
-        setError('Error loading accessibility issues. Error is:' + err.message)
+        setError(API_FETCH_ERROR_MESSAGE_PREFIX + err.message)
         setAccessibilityIssues(null)
         setTableData([])
       } finally {
@@ -236,9 +233,9 @@ export const useAccessibilityFetchUtils = () => {
     [
       page,
       pageSize,
+      search,
       tableSortState,
       setAccessibilityIssues,
-      setAccessibilityScanDisabled,
       setError,
       setLoading,
       setPage,

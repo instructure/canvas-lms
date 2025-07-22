@@ -24,11 +24,14 @@ import {AccessibilityIssuesSummary} from '../../AccessibilityIssuesSummary/Acces
 import {sampleTableData} from '../../../stores/mockData'
 
 describe('AccessibilityIssuesSummary', () => {
+  beforeEach(() => {
+    window.ENV.SCAN_DISABLED = false
+  })
+
   it('renders without error', async () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
 
     await act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(false)
       result.current.setTableData(sampleTableData)
     })
@@ -43,7 +46,6 @@ describe('AccessibilityIssuesSummary', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
 
     await act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(false)
       result.current.setTableData([])
     })
@@ -55,11 +57,8 @@ describe('AccessibilityIssuesSummary', () => {
   })
 
   it('does not render when accessibility scan is disabled', () => {
-    const {result} = renderHook(() => useAccessibilityCheckerStore())
-
-    act(() => {
-      result.current.setAccessibilityScanDisabled(true)
-    })
+    renderHook(() => useAccessibilityCheckerStore())
+    window.ENV.SCAN_DISABLED = true
 
     render(<AccessibilityIssuesSummary />)
     expect(screen.queryByTestId('accessibility-issues-summary')).not.toBeInTheDocument()
@@ -69,7 +68,6 @@ describe('AccessibilityIssuesSummary', () => {
     const {result} = renderHook(() => useAccessibilityCheckerStore())
 
     act(() => {
-      result.current.setAccessibilityScanDisabled(false)
       result.current.setLoading(true)
       result.current.setTableData(null)
     })

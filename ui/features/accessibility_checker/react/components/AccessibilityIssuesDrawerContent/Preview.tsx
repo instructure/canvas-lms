@@ -27,7 +27,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 import {AccessibilityIssue, ContentItemType, FormValue, PreviewResponse} from '../../types'
-import {stripQueryString} from '../../utils'
+import {stripQueryString} from '../../utils/query'
 
 const SELECTOR_STYLE = 'outline:2px solid #273540; outline-offset:2px;'
 const A11Y_ISSUE_ATTR_NAME = 'data-a11y-issue-scroll-target'

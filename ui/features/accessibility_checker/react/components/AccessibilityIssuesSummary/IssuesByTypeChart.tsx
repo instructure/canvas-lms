@@ -34,7 +34,7 @@ import {
   getChartOptions,
   getSeverityCounts,
   processIssuesToChartData,
-} from '../../utils'
+} from '../../utils/chart'
 import {AccessibilityData, IssueDataPoint} from '../../types'
 import {Spinner} from '@instructure/ui-spinner'
 

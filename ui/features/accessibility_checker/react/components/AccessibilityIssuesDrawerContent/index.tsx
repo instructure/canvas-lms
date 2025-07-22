@@ -37,7 +37,7 @@ import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerCo
 import AccessibilityIssuesDrawerFooter from './Footer'
 import Form, {FormHandle} from './Form'
 import {AccessibilityIssue, ContentItem, ContentTypeToKey, FormType, FormValue} from '../../types'
-import {stripQueryString} from '../../utils'
+import {stripQueryString} from '../../utils/query'
 import Preview, {PreviewHandle} from './Preview'
 import WhyMattersPopover from './WhyMattersPopover'
 import ApplyButton from './ApplyButton'

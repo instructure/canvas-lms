@@ -24,6 +24,7 @@ class AccessibilityController < ApplicationController
 
   def index
     js_bundle :accessibility_checker
+    js_env(SCAN_DISABLED: @context.exceeds_accessibility_scan_limit?)
 
     render html: '<div id="accessibility-checker-container"></div>'.html_safe, layout: true
   end

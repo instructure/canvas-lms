@@ -24,7 +24,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityCheckerContext'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-import {stripQueryString} from '../../../utils'
+import {stripQueryString} from '../../../utils/query'
 import {FormComponentProps, FormComponentHandle} from '.'
 import {GenerateResponse} from '../../../types'
 
