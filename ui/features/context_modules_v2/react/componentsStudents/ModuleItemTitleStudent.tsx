@@ -53,7 +53,7 @@ const ModuleItemTitleStudent = ({
     ) {
       return (
         <View as="div" padding="xx-small">
-          <Text weight="light" color="secondary" data-testid="module-item-title-locked">
+          <Text weight="bold" color="secondary" data-testid="module-item-title-locked">
             {content?.title || missingTitleText}
           </Text>
         </View>
