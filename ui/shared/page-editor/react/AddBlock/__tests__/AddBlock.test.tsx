@@ -18,19 +18,29 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
+import {PageEditorContextType} from '../../PageEditorContext'
 
 const openMock = jest.fn()
+const closeMock = jest.fn()
+const setShouldShowMock = jest.fn()
+
 jest.mock('../../PageEditorContext', () => ({
   __esModule: true,
-  usePageEditorContext: jest.fn(() => ({
-    addBlockModal: {
-      open: openMock,
-    },
-    addBlock: {
-      shouldShow: true,
-      handleNodesCountChange: jest.fn(),
-    },
-  })),
+  usePageEditorContext: jest.fn(
+    () =>
+      ({
+        addBlockModal: {
+          isOpen: false,
+          insertAfterNodeId: undefined,
+          open: openMock,
+          close: closeMock,
+        },
+        initialAddBlockHandler: {
+          shouldShow: true,
+          setShouldShow: setShouldShowMock,
+        },
+      }) as PageEditorContextType,
+  ),
 }))
 
 jest.mock('../../hooks/useAddNode', () => ({

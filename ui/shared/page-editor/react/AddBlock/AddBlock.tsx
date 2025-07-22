@@ -27,8 +27,8 @@ import {AddButton} from './AddButton'
 const I18n = createI18nScope('page_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal, addBlock} = usePageEditorContext()
-  if (!addBlock.shouldShow) {
+  const {addBlockModal, initialAddBlockHandler} = usePageEditorContext()
+  if (!initialAddBlockHandler.shouldShow) {
     return null
   }
   return (
