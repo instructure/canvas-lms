@@ -23,7 +23,56 @@ require_relative "../spec_helper"
 describe PluginsController do
   include Rails.application.routes.url_helpers
 
+  describe "#index" do
+    it "does not allow non-site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      get :index
+      expect(response).to be_unauthorized
+    end
+
+    it "allows site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      Account.site_admin.account_users.create!(user:)
+      user_session(user)
+      get :index
+      expect(response).to be_successful
+    end
+  end
+
+  describe "#show" do
+    it "does not allow non-site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      get :show, params: { id: "account_reports" }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      Account.site_admin.account_users.create!(user:)
+      user_session(user)
+      get :show, params: { id: "account_reports" }
+      expect(response).to be_successful
+    end
+  end
+
   describe "#update" do
+    it "does not allow non-site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      put :update, params: { id: "account_reports", plugin_setting: { disabled: false } }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows site-admins" do
+      user = user_with_pseudonym(active_all: true)
+      Account.site_admin.account_users.create!(user:)
+      user_session(user)
+      put :update, params: { id: "account_reports", plugin_setting: { disabled: false } }
+      expect(response).to be_redirect
+    end
+
     it "still enables plugins even with no settings posted" do
       expect(PluginSetting.find_by(name: "account_reports")).to be_nil
       allow(controller).to receive(:require_setting_site_admin).and_return(true)

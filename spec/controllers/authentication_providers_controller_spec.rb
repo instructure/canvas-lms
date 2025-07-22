@@ -360,6 +360,38 @@ describe AuthenticationProvidersController do
         expect(ap.skip_internal_mfa).to be(false)
       end
     end
+
+    it "does not allow non-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      post :create, params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com" }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows admins" do
+      user = account_admin_user(account:)
+      user_session(user)
+      post :create, params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com" }
+      expect(response).to be_redirect
+    end
+  end
+
+  describe "PUT #update" do
+    let!(:auth_provider) { account.authentication_providers.create!(cas_hash) }
+
+    it "does not allow non-admins" do
+      user = user_with_pseudonym(active_all: true)
+      user_session(user)
+      put :update, params: { account_id: account.id, id: auth_provider.id, auth_base: "http://updated.example.com" }
+      expect(response).to be_unauthorized
+    end
+
+    it "allows admins" do
+      user = account_admin_user(account:)
+      user_session(user)
+      put :update, params: { account_id: account.id, id: auth_provider.id, auth_base: "http://updated.example.com" }
+      expect(response).to be_redirect
+    end
   end
 
   describe "PUT #restore" do
