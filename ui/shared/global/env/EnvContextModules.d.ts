@@ -74,4 +74,9 @@ export interface EnvContextModules {
     MODULES_ARE_PAGINATED?: boolean
     PAGE_SIZE?: number
   }
+  MODULES_OBSERVER_INFO?: {
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
+    courseName: string
+  }
 }

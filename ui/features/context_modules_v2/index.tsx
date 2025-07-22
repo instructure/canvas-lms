@@ -64,6 +64,8 @@ ready(() => {
             teacherViewEnabled={!!ENV?.MODULE_FEATURES?.TEACHER_MODULE_SELECTION}
             studentViewEnabled={!!ENV?.MODULE_FEATURES?.STUDENT_MODULE_SELECTION}
             restrictQuantitativeData={ENV.restrict_quantitative_data}
+            isObserver={ENV.MODULES_OBSERVER_INFO?.isObserver}
+            observedStudent={ENV.MODULES_OBSERVER_INFO?.observedStudent ?? null}
             moduleMenuModalTools={
               Array.isArray(ENV.MODULE_TOOLS?.module_menu_modal)
                 ? ENV.MODULE_TOOLS.module_menu_modal
