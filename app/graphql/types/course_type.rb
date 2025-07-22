@@ -576,7 +576,15 @@ module Types
     def submission_statistics
       return nil unless course.grants_right?(current_user, :read)
 
-      Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+      # Check if current user is an observer with observed students
+      observed_students = ObserverEnrollment.observed_students(course, current_user, include_restricted_access: false).keys
+      is_observer = !observed_students.empty?
+
+      if is_observer
+        Loaders::ObserverCourseSubmissionDataLoader.for(current_user:, request: context[:request]).load(course)
+      else
+        Loaders::CourseSubmissionDataLoader.for(current_user:).load(course)
+      end
     end
 
     field :allow_final_grade_override, Boolean, null: true

@@ -320,7 +320,27 @@ class ContextModulesController < ApplicationController
           readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
         }
 
+        observer_enrollments = @context.observer_enrollments.for_user(@current_user).active_or_pending
+        is_observer = observer_enrollments.exists?
+        observed_students = if is_observer && @context.grants_right?(@current_user, session, :read_roster)
+                              observer_enrollments.includes(:associated_user).filter_map do |enrollment|
+                                associated_user = enrollment.associated_user
+                                if associated_user && enrollment.associated_user_id &&
+                                   @context.enrollments.where(user_id: associated_user.id, workflow_state: ["active", "completed"]).exists?
+                                  { id: associated_user.id.to_s, name: associated_user.name }
+                                end
+                              end
+                            else
+                              []
+                            end
+
+        modules_observer_info = {
+          isObserver: is_observer,
+          observedStudents: observed_students
+        }
+
         js_env(MODULES_PERMISSIONS: modules_permissions)
+        js_env(MODULES_OBSERVER_INFO: modules_observer_info)
 
         js_bundle :context_modules_v2
         css_bundle :content_next, :context_modules2, :context_modules_v2
