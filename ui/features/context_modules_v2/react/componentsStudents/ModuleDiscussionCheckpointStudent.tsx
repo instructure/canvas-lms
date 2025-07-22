@@ -72,6 +72,7 @@ const ModuleDiscussionCheckpointStudent: React.FC<ModuleDiscussionCheckpointStud
                 format={I18n.t('#date.formats.date_at_time')}
                 showTime={true}
                 dateTime={checkpoint.dueAt || null}
+                alwaysUseSpecifiedFormat={true}
               />
             </Text>
           </Flex.Item>
