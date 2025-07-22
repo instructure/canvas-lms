@@ -89,6 +89,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
               data-testid="checkpoint-due-date"
               format={I18n.t('#date.formats.medium')}
               dateTime={checkpoint.dueAt || null}
+              alwaysUseSpecifiedFormat={true}
             />
           </Text>
         </Flex.Item>
@@ -121,7 +122,7 @@ const ModuleItemSupplementalInfo: React.FC<ModuleItemSupplementalInfoProps> = ({
   }
 
   return (
-    <Flex gap="xx-small" padding="0 0 0 xx-small">
+    <Flex gap="xx-small" padding="0 0 0 xx-small" wrap="wrap">
       {hasCheckpoints ? (
         <>
           {checkpointElements}
