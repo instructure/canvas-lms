@@ -16,108 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IssuesTableColumns, severityColors} from './constants'
-import {
-  AccessibilityData,
-  ContentItem,
-  ContentItemType,
-  IssueDataPoint,
-  RawData,
-  Severity,
-} from './types'
+import {severityColors} from '../constants'
+import {IssueDataPoint, RawData, Severity} from '../types'
 import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('accessibility_checker')
-
-export const stripQueryString = (href: string): string => {
-  return href.replace(/\?.*$/, '')
-}
-
-/**
- * This method should be deprecated, once the API will be upgraded
- * to support pagination.
- */
-export const calculateTotalIssuesCount = (data?: AccessibilityData | null): number => {
-  let total = 0
-  ;['pages', 'assignments', 'attachments'].forEach(key => {
-    const items = data?.[key as keyof AccessibilityData]
-    if (items) {
-      Object.values(items).forEach(item => {
-        if (item.count) {
-          total += item.count
-        }
-      })
-    }
-  })
-
-  return total
-}
-
-/**
- * This method flattens the accessibility data structure from the current API
- * response data into a simple array of ContentItem objects.
- * - Should be deprecated, once the API will be upgraded to support pagination.
- */
-export const processAccessibilityData = (accessibilityIssues?: AccessibilityData | null) => {
-  const flatData: ContentItem[] = []
-
-  const processContentItems = (
-    items: Record<string, ContentItem> | undefined,
-    type: ContentItemType,
-    defaultTitle: string,
-  ) => {
-    if (!items) return
-
-    Object.entries(items).forEach(([id, itemData]) => {
-      if (itemData) {
-        flatData.push({
-          id: Number(id),
-          type,
-          title: itemData?.title || defaultTitle,
-          published: itemData?.published || false,
-          updatedAt: itemData?.updatedAt || '',
-          count: itemData?.count || 0,
-          url: itemData?.url,
-          editUrl: itemData?.editUrl,
-        })
-      }
-    })
-  }
-
-  processContentItems(accessibilityIssues?.pages, ContentItemType.WikiPage, 'Untitled Page')
-
-  processContentItems(
-    accessibilityIssues?.assignments,
-    ContentItemType.Assignment,
-    'Untitled Assignment',
-  )
-
-  processContentItems(
-    accessibilityIssues?.attachments,
-    ContentItemType.Attachment,
-    'Untitled Attachment',
-  )
-
-  return flatData
-}
-
-const snakeToCamel = function (str: string): string {
-  return str.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase())
-}
-
-export const convertKeysToCamelCase = function (input: any): object | boolean {
-  if (Array.isArray(input)) {
-    return input.map(convertKeysToCamelCase)
-  } else if (input !== null && typeof input === 'object') {
-    return Object.fromEntries(
-      Object.entries(input).map(([key, value]) => [
-        snakeToCamel(key),
-        convertKeysToCamelCase(value),
-      ]),
-    )
-  }
-  return input !== null && input !== undefined ? input : {}
-}
 
 export function processIssuesToChartData(raw: RawData | null): IssueDataPoint[] {
   if (!raw || typeof raw !== 'object') {
@@ -243,51 +146,5 @@ export function getSeverityCounts(issuesData: IssueDataPoint[]) {
     high: issuesData.filter(d => d.severity === 'High').reduce((sum, d) => sum + d.count, 0),
     medium: issuesData.filter(d => d.severity === 'Medium').reduce((sum, d) => sum + d.count, 0),
     low: issuesData.filter(d => d.severity === 'Low').reduce((sum, d) => sum + d.count, 0),
-  }
-}
-
-const sortAscending = (aValue: any, bValue: any): number => {
-  if (aValue < bValue) return -1
-  if (aValue > bValue) return 1
-  return 0
-}
-
-const sortDescending = (aValue: any, bValue: any): number => {
-  if (aValue < bValue) return 1
-  if (aValue > bValue) return -1
-  return 0
-}
-
-/**
- * TODO Remove, once the API is upgraded to support sorting.
- */
-export const getSortingFunction = (sortId: string, sortDirection: 'ascending' | 'descending') => {
-  const sortFn = sortDirection === 'ascending' ? sortAscending : sortDescending
-
-  if (sortId === IssuesTableColumns.ResourceName) {
-    return (a: ContentItem, b: ContentItem) => {
-      return sortFn(a.title, b.title)
-    }
-  }
-  if (sortId === IssuesTableColumns.Issues) {
-    return (a: ContentItem, b: ContentItem) => {
-      return sortFn(a.count, b.count)
-    }
-  }
-  if (sortId === IssuesTableColumns.ResourceType) {
-    return (a: ContentItem, b: ContentItem) => {
-      return sortFn(a.type, b.type)
-    }
-  }
-  if (sortId === IssuesTableColumns.State) {
-    return (a: ContentItem, b: ContentItem) => {
-      // Published items first by default
-      return sortFn(a.published ? 0 : 1, b.published ? 0 : 1)
-    }
-  }
-  if (sortId === IssuesTableColumns.LastEdited) {
-    return (a: ContentItem, b: ContentItem) => {
-      return sortFn(a.updatedAt, b.updatedAt)
-    }
   }
 }

@@ -28,12 +28,15 @@ import {View} from '@instructure/ui-view'
 
 import {LIMIT_EXCEEDED_MESSAGE, TypeToKeyMap} from '../../constants'
 import {AccessibilityCheckerContext} from '../../contexts/AccessibilityCheckerContext'
+import {useAccessibilityFetchUtils} from '../../hooks/useAccessibilityFetchUtils'
+import {useAccessibilityScansFetchUtils} from '../../hooks/useAccessibilityScansFetchUtils'
+import {useNextResource} from '../../hooks/useNextResource'
 import {useAccessibilityCheckerStore} from '../../stores/AccessibilityCheckerStore'
+import {useAccessibilityScansStore} from '../../stores/AccessibilityScansStore'
 import {ContentItem} from '../../types'
+import {parseFetchParams as parseFetchParamsN} from '../../utils/query'
 import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/AccessibilityIssuesSummary'
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
-import {useAccessibilityFetchUtils} from './useAccessibilityFetchUtils'
-import {useNextResource} from '../../hooks/useNextResource'
 
 import SearchIssue from './Search/SearchIssue'
 
@@ -42,26 +45,41 @@ const I18n = createI18nScope('accessibility_checker')
 export const AccessibilityCheckerApp: React.FC = () => {
   const context = useContext(AccessibilityCheckerContext)
   const {setSelectedItem, setIsTrayOpen} = context
-  const {parseFetchParams, doFetchAccessibilityIssues} = useAccessibilityFetchUtils()
 
-  const [accessibilityIssues, accessibilityScanDisabled, loading, search, setSearch] =
+  const {getNextResource} = useNextResource()
+
+  const {doFetchAccessibilityScanData} = useAccessibilityScansFetchUtils()
+
+  const [accessibilityScans, loadingN, setLoadingN] = useAccessibilityScansStore(
+    useShallow(state => [state.accessibilityScans, state.loading, state.setLoading]),
+  )
+
+  const {doFetchAccessibilityIssues, parseFetchParams} = useAccessibilityFetchUtils()
+
+  const [accessibilityIssues, loading, orderedTableData, setLoading, setNextResource, setSearch] =
     useAccessibilityCheckerStore(
       useShallow(state => [
         state.accessibilityIssues,
-        state.accessibilityScanDisabled,
         state.loading,
-        state.search,
+        state.orderedTableData,
+        state.setLoading,
+        state.setNextResource,
         state.setSearch,
       ]),
     )
-  const {getNextResource} = useNextResource()
-  const orderedTableData = useAccessibilityCheckerStore(useShallow(state => state.orderedTableData))
-  const setNextResource = useAccessibilityCheckerStore(useShallow(state => state.setNextResource))
+
+  const accessibilityScanDisabled = window.ENV.SCAN_DISABLED
 
   useEffect(() => {
-    doFetchAccessibilityIssues(parseFetchParams())
+    if (!accessibilityScanDisabled) {
+      doFetchAccessibilityScanData(parseFetchParamsN())
+      doFetchAccessibilityIssues(parseFetchParams())
+    } else {
+      setLoadingN(false)
+      setLoading(false)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [accessibilityScanDisabled, setLoading, setLoadingN])
 
   const handleRowClick = useCallback(
     (item: ContentItem) => {
@@ -83,7 +101,14 @@ export const AccessibilityCheckerApp: React.FC = () => {
         }
       }
     },
-    [accessibilityIssues, setSelectedItem, setIsTrayOpen, orderedTableData],
+    [
+      accessibilityIssues,
+      setSelectedItem,
+      setIsTrayOpen,
+      orderedTableData,
+      getNextResource,
+      setNextResource,
+    ],
   )
 
   const handleSearchChange = useCallback(
@@ -111,7 +136,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
     I18n.t('Unknown')
 
   return (
-    <View as="div">
+    <View as="div" data-testid="accessibility-checker-app">
       <Flex direction="column">
         {accessibilityScanDisabled && (
           <Alert
@@ -119,6 +144,7 @@ export const AccessibilityCheckerApp: React.FC = () => {
             renderCloseButtonLabel="Close"
             onDismiss={() => {}}
             margin="small 0"
+            data-testid="accessibility-scan-disabled-alert"
           >
             {LIMIT_EXCEEDED_MESSAGE}
           </Alert>

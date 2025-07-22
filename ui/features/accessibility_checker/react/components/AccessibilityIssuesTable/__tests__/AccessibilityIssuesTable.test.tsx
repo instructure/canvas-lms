@@ -37,7 +37,7 @@ describe('AccessibilityIssuesTable', () => {
   }
 
   beforeEach(() => {
-    useAccessibilityCheckerStore.setState(mockState)
+    useAccessibilityCheckerStore.setState({...mockState})
   })
 
   it('renders empty table without crashing', () => {

@@ -55,6 +55,36 @@ export interface IssueForm {
   inputMaxLength?: number
 }
 
+export interface AccessibilityScanData {
+  accessibilityIssues: AccessibilityResourceScan[]
+}
+
+export enum ScanWorkflowState {
+  Queued = 'queued',
+  InProgress = 'in_progress',
+  Completed = 'completed',
+  Failed = 'failed',
+}
+
+export enum ResourceWorkflowState {
+  Unpublished = 'unpublished',
+  Published = 'published',
+}
+
+export interface AccessibilityResourceScan {
+  id: number
+  resourceId: number
+  resourceType: string
+  resourceName: string
+  resourceWorkflowState: ResourceWorkflowState
+  resourceUpdatedAt: string
+  resourceUrl: string
+  workflowState: ScanWorkflowState
+  errorMessage?: string
+  issueCount: number
+  issues?: AccessibilityIssue[]
+}
+
 export interface AccessibilityIssue {
   id: string
   ruleId: string
@@ -86,21 +116,6 @@ export interface ContentItem {
   editUrl?: string
   issues?: AccessibilityIssue[]
   severity?: Severity
-}
-
-/**
- * This can be used to display content items in a table or list format.
- * It includes only the necessary fields for display purposes.
- */
-export interface ContentItemForDisplay {
-  id: number
-  type: ContentItemType
-  title: string
-  published: boolean
-  updatedAt: string
-  count: number
-  url: string
-  editUrl?: string
 }
 
 export interface PreviewResponse {

@@ -38,7 +38,7 @@ import {AccessibilityCheckerContext} from '../../../contexts/AccessibilityChecke
 import type {AccessibilityCheckerContextType} from '../../../contexts/AccessibilityCheckerContext'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
-import {stripQueryString} from '../../../utils'
+import {stripQueryString} from '../../../utils/query'
 
 const I18n = createI18nScope('accessibility_checker')
 
