@@ -72,7 +72,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def should_convert_file?(unescaped)
-      filename = File.basename(unescaped).gsub(/#{File.extname(unescaped)}/, "")
+      filename = File.basename(unescaped).gsub(File.extname(unescaped), "")
 
       unsupported_files.none? do |file|
         CGI.unescape(file[:file_name]).include?(filename)
