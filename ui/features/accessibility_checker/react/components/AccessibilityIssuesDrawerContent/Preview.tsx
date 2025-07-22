@@ -21,6 +21,7 @@ import {forwardRef, useCallback, useEffect, useImperativeHandle, useState} from 
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
+import {Mask} from '@instructure/ui-overlays'
 
 import {useScope as createI18nScope} from '@canvas/i18n'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -40,6 +41,39 @@ interface PreviewProps {
   issue: AccessibilityIssue
   itemId: number
   itemType: ContentItemType
+}
+
+interface PreviewOverlayProps {
+  isLoading: boolean
+  error: string | null
+}
+
+const I18n = createI18nScope('accessibility_checker')
+
+const PreviewOverlay = ({isLoading, error}: PreviewOverlayProps) => {
+  if (error) {
+    return (
+      <Mask id="a11y-issue-preview-overlay">
+        <Alert
+          variant="error"
+          renderCloseButtonLabel={I18n.t('Close alert')}
+          variantScreenReaderLabel={I18n.t('Error, ')}
+        >
+          {error}
+        </Alert>
+      </Mask>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <Mask id="a11y-issue-preview-overlay">
+        <Spinner renderTitle={I18n.t('Loading preview...')} size="large" />
+      </Mask>
+    )
+  }
+
+  return null
 }
 
 const applyHighlight = (previewResponse: PreviewResponse | null, issue: AccessibilityIssue) => {
@@ -77,8 +111,6 @@ const applyHighlight = (previewResponse: PreviewResponse | null, issue: Accessib
 
   return doc.body.innerHTML
 }
-
-const I18n = createI18nScope('accessibility_checker')
 
 const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = forwardRef<
   PreviewHandle,
@@ -133,7 +165,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
             path: `${stripQueryString(window.location.href)}/preview?${params.toString()}`,
             method: 'GET',
           }),
-        I18n.t('Error loading preview for accessibility issue'),
+        I18n.t('Error previewing fixed accessibility issue.'),
         onSuccess,
         onError,
       )
@@ -157,7 +189,7 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
               value: formValue,
             }),
           }),
-        I18n.t('Error updating preview for accessibility issue'),
+        I18n.t('Error previewing fixed accessibility issue.'),
         onSuccess,
         onError,
       )
@@ -175,40 +207,19 @@ const Preview: React.FC<PreviewProps & React.RefAttributes<PreviewHandle>> = for
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemId])
 
-  if (isLoading) {
-    return (
-      <View as="div" textAlign="center" width="100%">
-        <Spinner
-          data-testid="spinner-loader"
-          renderTitle={I18n.t('Loading preview...')}
-          size="small"
-        />
-      </View>
-    )
-  }
-
-  if (error) {
-    return (
-      <Alert
-        variant="error"
-        renderCloseButtonLabel={I18n.t('Close alert')}
-        variantScreenReaderLabel={I18n.t('Error, ')}
-      >
-        {error}
-      </Alert>
-    )
-  }
-
   return (
-    <View
-      as="div"
-      id="a11y-issue-preview"
-      borderWidth="small"
-      height="15rem"
-      overflowY="auto"
-      padding="x-small x-small x-small x-small"
-      dangerouslySetInnerHTML={{__html: applyHighlight(contentResponse, issue)}}
-    />
+    <View as="div" position="relative" id="a11y-issue-preview-container">
+      <PreviewOverlay isLoading={isLoading} error={error} />
+      <View
+        as="div"
+        id="a11y-issue-preview"
+        borderWidth="small"
+        height="15rem"
+        overflowY="auto"
+        padding="x-small x-small x-small x-small"
+        dangerouslySetInnerHTML={{__html: applyHighlight(contentResponse, issue)}}
+      />
+    </View>
   )
 })
 
