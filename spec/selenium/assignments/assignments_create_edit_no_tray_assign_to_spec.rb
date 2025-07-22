@@ -363,7 +363,7 @@ describe "override assignees" do
           consumer_key: "test_key",
           shared_secret: "test_secret",
           tool_id: "Quizzes 2",
-          url: "http://example.com/launch"
+          url: "http://localhost:3000/launch"
         )
         @course.root_account.settings[:provision] = { "lti" => "lti url" }
         @course.root_account.save!
