@@ -231,6 +231,14 @@ module FilesPage
     f("[data-testid='unpublished-button-icon']")
   end
 
+  def link_only_status_button
+    f("[data-testid='link-only-button-icon']")
+  end
+
+  def restricted_status_button
+    f("button[data-testid='restricted-button-icon']")
+  end
+
   def all_item_published?
     expect(published_status_button).to be_present
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='unpublished-button-icon']")
@@ -239,14 +247,6 @@ module FilesPage
   def all_item_unpublished?
     expect(unpublished_status_button).to be_present
     expect(f(all_files_table_row)).not_to contain_css("[data-testid='published-button-icon']")
-  end
-
-  def link_only_status_button
-    f("[data-testid='link-only-button-icon']")
-  end
-
-  def restricted_status_button
-    f("button[data-testid='restricted-button-icon']")
   end
 
   def permission_availablability_selector_listbox
@@ -265,12 +265,28 @@ module FilesPage
     f("#link_only")
   end
 
+  def permission_selector_date_range
+    f("#date_range")
+  end
+
+  def date_input_available_from
+    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[2]
+  end
+
+  def date_input_until
+    ff("span[aria-label='Edit Permissions'] input[aria-haspopup='listbox']")[4]
+  end
+
   def permission_save_button
     fxpath("//button[.//span[contains(text(), 'Save')]]")
   end
 
   def permissions_dialog_close_button
     fxpath("//button[.//span[text()='Close']]")
+  end
+
+  def permission_tooltip
+    f('span[role="tooltip"]')
   end
 
   def edit_item_permissions(availability)
@@ -282,6 +298,15 @@ module FilesPage
       permission_selector_unpublish.click
     when :available_with_link
       permission_selector_only_with_link.click
+    when :available_with_timeline
+      permission_selector_date_range.click
+      wait_for_ajaximations
+      date_input_available_from.click
+      date_input_available_from.send_keys("15")
+      date_input_available_from.send_keys(:enter)
+      date_input_until.click
+      date_input_until.send_keys("25")
+      date_input_until.send_keys(:enter)
     end
     permission_save_button.click
   end
