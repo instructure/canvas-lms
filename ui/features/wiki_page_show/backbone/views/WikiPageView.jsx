@@ -222,7 +222,7 @@ export default class WikiPageView extends Backbone.View {
   }
 
   maybeRenderBlockEditorContent() {
-    if (this.model.get('editor') === 'canvas_content_builder') {
+    if (this.model.get('editor') === 'block_content_editor') {
       import('@canvas/page-editor').then(({PageEditor}) => {
         const container = document.getElementById('block-editor-content')
         const data = this.model.get('block_editor_attributes').blocks
@@ -396,7 +396,7 @@ export default class WikiPageView extends Backbone.View {
   toJSON() {
     const json = super.toJSON(...arguments)
     json.page_id = this.model.get('page_id')
-    json.is_block_editor = ['block_editor', 'canvas_content_builder'].includes(
+    json.is_block_editor = ['block_editor', 'block_content_editor'].includes(
       this.model.get('editor'),
     )
     json.modules_path = this.modules_path

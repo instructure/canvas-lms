@@ -27,9 +27,9 @@ describe WikiPagesController do
   describe "new page" do
     render_views
 
-    context "when 'canvas_content_builder' feature is enabled" do
+    context "when 'block_content_editor' feature is enabled" do
       before do
-        @course.account.enable_feature!(:canvas_content_builder)
+        @course.account.enable_feature!(:block_content_editor)
       end
 
       it "renders new page" do
@@ -43,9 +43,9 @@ describe WikiPagesController do
       end
     end
 
-    context "when 'canvas_content_builder' feature is disabled" do
+    context "when 'block_content_editor' feature is disabled" do
       before do
-        @course.account.disable_feature!(:canvas_content_builder)
+        @course.account.disable_feature!(:block_content_editor)
       end
 
       it "renders error page" do
@@ -89,20 +89,20 @@ describe WikiPagesController do
         end
       end
 
-      context "when the canvas content builder is enabled" do
-        it "sets EDITOR_FEATURE to canvas_content_builder" do
-          @course.account.enable_feature!(:canvas_content_builder)
+      context "when the block content editor is enabled" do
+        it "sets EDITOR_FEATURE to block_content_editor" do
+          @course.account.enable_feature!(:block_content_editor)
           get "index", params: { course_id: @course.id }
-          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :canvas_content_builder
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
         end
       end
 
       context "when both features are enabled" do
-        it "sets EDITOR_FEATURE to canvas_content_builder" do
+        it "sets EDITOR_FEATURE to block_content_editor" do
           @course.account.enable_feature!(:block_editor)
-          @course.account.enable_feature!(:canvas_content_builder)
+          @course.account.enable_feature!(:block_content_editor)
           get "index", params: { course_id: @course.id }
-          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :canvas_content_builder
+          expect(assigns[:js_env][:EDITOR_FEATURE]).to eq :block_content_editor
         end
       end
 

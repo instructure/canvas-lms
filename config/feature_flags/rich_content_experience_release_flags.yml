@@ -53,12 +53,12 @@ buttons_and_icons_root_account:
     production:
       state: hidden
 
-canvas_content_builder:
+block_content_editor:
   applies_to: Account
   state: hidden
-  display_name: Canvas Content Builder
+  display_name: Block Content Editor
   description: |-
-    Enable the new Canvas Content Builder for the Rich Content Editor.
+    Enable the new Block Content Editor for creating pages.
   shadow: true
 
 consolidated_media_player:
