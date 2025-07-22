@@ -226,6 +226,7 @@ const featureBundles: {
   visibility_help: () => import('./features/visibility_help/index'),
   webzip_export: () => import('./features/webzip_export/index'),
   wiki_page_edit: () => import('./features/wiki_page_edit/index'),
+  widget_dashboard: () => import('./features/widget_dashboard/index'),
   wiki_page_index: () => import('./features/wiki_page_index/index'),
   wiki_page_revisions: () => import('./features/wiki_page_revisions/index'),
   wiki_page_show: () => import('./features/wiki_page_show/index'),
