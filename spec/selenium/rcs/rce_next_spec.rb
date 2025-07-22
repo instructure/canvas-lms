@@ -1144,14 +1144,14 @@ describe "RCE next tests", :ignore_js_errors do
       click_embed_toolbar_button
       code_box = embed_code_textarea
       code_box.click
-      code_box.send_keys('<iframe src="https://example.com/"></iframe>')
+      code_box.send_keys('<iframe src="https://localhost:3000/"></iframe>')
       click_embed_submit_button
       wait_for_animations
 
       fj('button:contains("Save")').click
       wait_for_ajaximations
 
-      expect(f('iframe[title="embedded content"][src="https://example.com/"]')).to be_displayed # save the page
+      expect(f('iframe[title="embedded content"][src="https://localhost:3000/"]')).to be_displayed # save the page
     end
 
     it "does not load duplicate data when opening sidebar tray multiple times" do

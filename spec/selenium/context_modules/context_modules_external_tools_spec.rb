@@ -37,7 +37,7 @@ describe "module-level external tool launches" do
     @t3 = @course.context_external_tools.create!(
       context_id: 1,
       context_type: "Course",
-      url: "https://example.com/",
+      url: "https://localhost:3000/",
       shared_secret: "fake",
       consumer_key: "fake",
       name: "Module Index Menu (Modal)",

@@ -36,7 +36,7 @@ describe "context modules" do
       @assignment.publish
       @assignment_tag = @module1.add_item(id: @assignment.id, type: "assignment")
       @external_url_tag = @module1.add_item(type: "external_url",
-                                            url: "http://example.com/lolcats",
+                                            url: "http://localhost:3000/lolcats",
                                             title: "pls view",
                                             indent: 1)
       @external_url_tag.publish
@@ -342,7 +342,7 @@ describe "context modules" do
 
     it "shows student progress once External URL-view requirement is met", priority: "1" do
       @external_url_tag = @module1.add_item(type: "external_url",
-                                            url: "http://example.com/lolcats",
+                                            url: "http://localhost:3000/lolcats",
                                             title: "External_URL",
                                             indent: 1)
       @external_url_tag.publish!
