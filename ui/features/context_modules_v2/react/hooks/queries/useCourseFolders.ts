@@ -92,6 +92,7 @@ export const useCourseFolders = (courseId: string) => {
     queryKey: ['courseFolders', courseId],
     queryFn: getFolders,
     staleTime: 5 * 60 * 1000,
+    enabled: !!courseId,
   })
 
   return {
