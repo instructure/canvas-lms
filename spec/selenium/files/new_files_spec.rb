@@ -111,7 +111,7 @@ describe "better_file_browsing" do
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
       end
 
-      it "makes file available to student within given timeframe", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student within given timeframe", priority: "1", upgrade_files_v2: "done" do
         set_item_permissions(:restricted_access, :available_with_timeline, :cloud_icon)
         expect(f(".btn-link.published-status.restricted")).to be_displayed
       end
@@ -139,7 +139,7 @@ describe "better_file_browsing" do
         expect(f(".btn-link.published-status.hiddenState")).to be_displayed
       end
 
-      it "makes file available to student within given timeframe from toolbar", priority: "1", upgrade_files_v2: "waiting for deployment" do
+      it "makes file available to student within given timeframe from toolbar", priority: "1", upgrade_files_v2: "done" do
         get "/courses/#{@course.id}/files"
         set_item_permissions(:restricted_access, :available_with_timeline, :toolbar_menu)
         expect(f(".btn-link.published-status.restricted")).to be_displayed

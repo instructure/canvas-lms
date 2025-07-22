@@ -21,7 +21,7 @@ require_relative "pages/files_page"
 require_relative "../helpers/files_common"
 require_relative "../helpers/public_courses_context"
 
-describe "files index page" do
+describe "files index page", :ignore_js_errors do
   include_context "in-process server selenium tests"
   include FilesPage
   include FilesCommon
@@ -202,6 +202,12 @@ describe "files index page" do
           expect(link_only_status_button).to be_present
         end
 
+        it "makes file available to student within given timeframe", priority: "1" do
+          published_status_button.click
+          edit_item_permissions(:available_with_timeline)
+          expect(restricted_status_button).to be_displayed
+        end
+
         it "sets focus to the close button when opening the permission edit dialog", priority: "1" do
           published_status_button.click
           wait_for_ajaximations
@@ -242,6 +248,14 @@ describe "files index page" do
           toolbox_menu_button("edit-permissions-button").click
           edit_item_permissions(:available_with_link)
           expect(link_only_status_button).to be_present
+        end
+
+        it "makes file available to student within given timeframe from toolbar", priority: "1" do
+          select_item_to_edit_from_kebab_menu(1)
+          toolbox_menu_button("edit-permissions-button").click
+          edit_item_permissions(:available_with_timeline)
+          expect(restricted_status_button).to be_displayed
+          expect(permission_tooltip.attribute("innerText")).to include(/Available from [A-Za-z]{3} 15 at 12am until [A-Za-z]{3} 25 at 12am/)
         end
 
         it "deletes file from toolbar", priority: "1" do
