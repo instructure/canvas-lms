@@ -41,7 +41,12 @@ import {Pill} from '@instructure/ui-pill'
 import {Link} from '@instructure/ui-link'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import ModuleItemActionMenu from './ModuleItemActionMenu'
-import {MasteryPathsData, ModuleItemContent, ModuleAction} from '../utils/types'
+import {
+  MasteryPathsData,
+  ModuleItemContent,
+  ModuleAction,
+  ModuleItemMasterCourseRestrictionType,
+} from '../utils/types'
 import {useContextModule} from '../hooks/useModuleContext'
 import {mapContentSelection} from '../utils/utils'
 import BlueprintLockIcon from './BlueprintLockIcon'
@@ -58,6 +63,7 @@ interface ModuleItemActionPanelProps {
   title: string
   indent: number
   content: ModuleItemContent
+  masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   published: boolean
   canBeUnpublished: boolean
   masteryPathsData: MasteryPathsData | null
@@ -75,6 +81,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   title,
   indent,
   content,
+  masterCourseRestrictions,
   published,
   canBeUnpublished,
   masteryPathsData,
@@ -242,7 +249,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
         {/* Mastery Path Info */}
         {renderMasteryPathsInfo()}
         {/* BlueprintLockIcon */}
-        {(isMasterCourse || isChildCourse) && (
+        {(isMasterCourse || isChildCourse) && !!masterCourseRestrictions && (
           <BlueprintLockIcon
             initialLockState={content?.isLockedByMasterCourse || false}
             contentId={content?._id}
@@ -274,15 +281,9 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           />
         </Flex.Item>
       </Flex>
-      {[
-        'assignment',
-        'attachment',
-        'discussion_topic',
-        'page',
-        'quiz',
-        'module',
-        'module_item',
-      ].includes(content?.type?.toLowerCase() || '') && (
+      {['assignment', 'attachment', 'discussion', 'page', 'quiz', 'module', 'module_item'].includes(
+        content?.type?.toLowerCase() || '',
+      ) && (
         <>
           <DirectShareUserModal
             open={isDirectShareOpen}

@@ -152,5 +152,10 @@ module Types
         estimated_duration&.duration&.iso8601
       end
     end
+
+    field :master_course_restrictions, Types::ModuleItemMasterCourseRestrictionType, null: true, description: "Restrictions from master courses for this module item", camelize: true
+    def master_course_restrictions
+      Loaders::ModuleItemMasterCourseRestrictionsLoader.for(current_user).load(content_tag)
+    end
   end
 end

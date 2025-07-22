@@ -28,6 +28,7 @@ import ModuleItemTitle from './ModuleItemTitle'
 import ModuleItemSupplementalInfo from '../components/ModuleItemSupplementalInfo'
 import {
   ModuleItemContent,
+  ModuleItemMasterCourseRestrictionType,
   MasteryPathsData,
   ModuleAction,
   CompletionRequirement,
@@ -43,6 +44,7 @@ export interface ModuleItemProps {
   moduleTitle?: string
   index: number
   content: ModuleItemContent
+  masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
   onClick?: () => void
   published?: boolean
   canUnpublish?: boolean
@@ -66,6 +68,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   moduleTitle = '',
   indent,
   content,
+  masterCourseRestrictions,
   onClick,
   completionRequirements,
   published,
@@ -154,6 +157,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             title={title}
             indent={indent}
             content={content}
+            masterCourseRestrictions={masterCourseRestrictions}
             published={published || false}
             canBeUnpublished={canUnpublish || false}
             masteryPathsData={masteryPathsData}

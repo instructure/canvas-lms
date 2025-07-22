@@ -156,6 +156,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
     return (
       <SimpleSelect
+        data-testid="add-item-content-select"
         renderLabel={I18n.t('Select %{itemType}', {itemType: itemTypeLabel})}
         assistiveText={I18n.t('Type or use arrow keys to navigate options.')}
         value={inputValue}
@@ -177,6 +178,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   return (
     <CanvasModal
+      data-testid="add-item-modal"
       as="form"
       open={isOpen}
       onDismiss={onRequestClose}

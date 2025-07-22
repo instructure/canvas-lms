@@ -434,7 +434,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def restrict_item
     content_type = params[:content_type]
     unless %w[assignment attachment course_pace discussion_topic external_tool lti-quiz quiz wiki_page].include?(content_type)
-      return render json: { message: "Must be a valid content type (assignment,attachment,course_pace,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, status: :bad_request
+      return render json: { message: "Must be a valid content type (assignment,attachment,course_pace,discussion_topic,external_tool,lti-quiz,quiz,wiki_page). Got #{content_type}" }, status: :bad_request
     end
     unless params.key?(:restricted)
       return render json: { message: "Must set 'restricted'" }, status: :bad_request

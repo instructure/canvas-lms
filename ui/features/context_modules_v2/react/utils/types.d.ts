@@ -261,6 +261,7 @@ export interface ModuleItem {
   indent: number
   position: number
   content: ModuleItemContent
+  masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
@@ -322,4 +323,13 @@ export interface ExternalToolLaunchOptions {
   placement: ExternalToolPlacementType
   display?: 'borderless' | 'full'
   contextModuleId?: string
+}
+
+export interface ModuleItemMasterCourseRestrictionType {
+  all: boolean | null
+  availabilityDates: boolean | null
+  content: boolean | null
+  dueDates: boolean | null
+  points: boolean | null
+  settings: boolean | null
 }
