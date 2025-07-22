@@ -301,7 +301,9 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
           }}
         >
           <View>
-            <Heading level="h2">{item.title}</Heading>
+            <Heading level="h2" variant="titleCardRegular">
+              {item.title}
+            </Heading>
             <CloseButton
               placement="end"
               data-testid="close-button"
@@ -311,7 +313,7 @@ const AccessibilityIssuesDrawerContent: React.FC<AccessibilityIssuesDrawerConten
             />
           </View>
           <View>
-            <Text size="large" as="h3">
+            <Text size="large" variant="descriptionPage" as="h3">
               {I18n.t('Issue %{current}/%{total}: %{message}', {
                 current: currentIssueIndex + 1,
                 total: issues.length,
