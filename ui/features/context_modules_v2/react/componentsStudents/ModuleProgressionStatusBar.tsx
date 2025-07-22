@@ -50,6 +50,7 @@ const ModuleProgressionStatusBar: React.FC<ModuleProgressionStatusBarProps> = ({
 
   const completionPercentage = Math.round((completedCount / totalCount) * 100)
   const isComplete = completionPercentage >= 100
+
   const completionText = I18n.t('%{completed} of %{total} Required Items', {
     completed: completedCount > totalCount ? totalCount : completedCount,
     total: totalCount,

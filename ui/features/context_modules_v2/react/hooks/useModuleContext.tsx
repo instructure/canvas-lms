@@ -29,6 +29,8 @@ const ContextModule = createContext<{
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean
+  isObserver: boolean
+  observedStudent: {id: string; name: string} | null
   externalTools: ExternalTool[]
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
@@ -49,6 +51,8 @@ const ContextModule = createContext<{
     teacherViewEnabled: boolean
     studentViewEnabled: boolean
     restrictQuantitativeData: boolean
+    isObserver: boolean
+    observedStudent: {id: string; name: string} | null
     externalTools: ExternalTool[]
     moduleMenuModalTools: ExternalTool[]
     moduleGroupMenuTools: ExternalTool[]
@@ -72,6 +76,8 @@ export const ContextModuleProvider = ({
   teacherViewEnabled,
   studentViewEnabled,
   restrictQuantitativeData,
+  isObserver,
+  observedStudent,
   moduleMenuModalTools,
   moduleGroupMenuTools,
   moduleMenuTools,
@@ -96,6 +102,8 @@ export const ContextModuleProvider = ({
   teacherViewEnabled: boolean
   studentViewEnabled: boolean
   restrictQuantitativeData: boolean | undefined
+  isObserver?: boolean
+  observedStudent?: {id: string; name: string} | null
   moduleMenuModalTools: ExternalTool[]
   moduleGroupMenuTools: ExternalTool[]
   moduleMenuTools: ExternalTool[]
@@ -116,6 +124,8 @@ export const ContextModuleProvider = ({
         teacherViewEnabled,
         studentViewEnabled,
         restrictQuantitativeData: restrictQuantitativeData ?? false,
+        isObserver: isObserver ?? false,
+        observedStudent: observedStudent ?? null,
         externalTools: moduleMenuModalTools,
         moduleMenuModalTools,
         moduleGroupMenuTools,
@@ -153,6 +163,8 @@ export const contextModuleDefaultProps = {
   teacherViewEnabled: false,
   studentViewEnabled: false,
   restrictQuantitativeData: false,
+  isObserver: false,
+  observedStudent: null,
   externalTools: [],
   moduleMenuModalTools: [],
   moduleGroupMenuTools: [],

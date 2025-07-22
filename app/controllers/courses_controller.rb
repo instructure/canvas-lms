@@ -356,6 +356,7 @@ class CoursesController < ApplicationController
   include WebZipExportHelper
   include CoursesHelper
   include NewQuizzesFeaturesHelper
+  include ObserverModuleInfo
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
 
@@ -2498,7 +2499,10 @@ class CoursesController < ApplicationController
               readAsAdmin: @context.grants_right?(@current_user, session, :read_as_admin)
             }
 
+            modules_observer_info = observer_module_info
+
             js_env(MODULES_PERMISSIONS: modules_permissions)
+            js_env(MODULES_OBSERVER_INFO: modules_observer_info)
 
             js_bundle :context_modules_v2
             css_bundle :content_next, :context_modules2, :context_modules_v2
