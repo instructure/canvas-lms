@@ -42,8 +42,8 @@ module Api::V1::WikiPage
     hash["todo_date"] = wiki_page.todo_date
     hash["publish_at"] = wiki_page.publish_at
 
-    if @context.account.feature_enabled?(:canvas_content_builder)
-      hash["editor"] = wiki_page.block_editor ? "canvas_content_builder" : "rce"
+    if @context.account.feature_enabled?(:block_content_editor)
+      hash["editor"] = wiki_page.block_editor ? "block_content_editor" : "rce"
     elsif @context.account.feature_enabled?(:block_editor)
       hash["editor"] = wiki_page.block_editor ? "block_editor" : "rce"
     end
@@ -58,7 +58,7 @@ module Api::V1::WikiPage
     end
     locked_json(hash, wiki_page, current_user, "page", deep_check_if_needed: opts[:deep_check_if_needed])
     if include_body && !hash["locked_for_user"] && !hash["lock_info"]
-      if @context.account.feature_enabled?(:canvas_content_builder) && wiki_page.block_editor
+      if @context.account.feature_enabled?(:block_content_editor) && wiki_page.block_editor
         hash["block_editor_attributes"] = {
           id: wiki_page.block_editor.id,
           blocks: wiki_page.block_editor.blocks

@@ -82,7 +82,7 @@ export const dispatchTemplateEvent = (event: CustomEvent) => {
 }
 
 export type EditorTypes = 'rce' | 'block_editor' | ''
-export type EditorFeatures = 'canvas_content_builder' | 'block_editor' | null
+export type EditorFeatures = 'block_content_editor' | 'block_editor' | null
 export type EditorPrefEnv = {
   text_editor_preference: EditorTypes
   EDITOR_FEATURE: EditorFeatures
