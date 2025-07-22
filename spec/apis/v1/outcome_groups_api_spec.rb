@@ -1448,6 +1448,35 @@ describe "Outcome Groups API", type: :request do
       @group = @account.root_outcome_group
     end
 
+    it "requires permission" do
+      revoke_permission(@account_user, :manage_outcomes)
+      raw_api_call(:post,
+                   "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
+                   { controller: "outcome_groups_api",
+                     action: "link",
+                     account_id: @account.id.to_s,
+                     id: @group.id.to_s,
+                     format: "json" },
+                   { title: "My Outcome",
+                     description: "Description of my outcome" })
+      assert_forbidden
+    end
+
+    it "requires manage_global_outcomes permission for global groups" do
+      @account_user = @user.account_users.create(account: Account.site_admin)
+      @group = LearningOutcomeGroup.global_root_outcome_group
+      revoke_permission(@account_user, :manage_global_outcomes)
+      raw_api_call(:post,
+                   "/api/v1/global/outcome_groups/#{@group.id}/outcomes",
+                   { controller: "outcome_groups_api",
+                     action: "link",
+                     id: @group.id.to_s,
+                     format: "json" },
+                   { title: "My Outcome",
+                     description: "Description of my outcome" })
+      assert_forbidden
+    end
+
     it "fails (400) if the new outcome is invalid" do
       too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
       raw_api_call(:post,
