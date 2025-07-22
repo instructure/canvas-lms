@@ -39,7 +39,7 @@ const renderComponent = (props: Partial<ModuleItemListStudentProps>) => {
 describe('ModuleItemListStudent', () => {
   it('displays loading spinner when isLoading is true', () => {
     renderComponent({isLoading: true})
-    expect(screen.getByText('Loading module items')).toBeInTheDocument()
+    expect(screen.getByText('Loading module items...')).toBeInTheDocument()
   })
 
   it('displays error message when error is present', () => {

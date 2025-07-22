@@ -62,9 +62,12 @@ const Module: React.FC<ModuleProps> = ({
   const [isExpanded, setIsExpanded] = useState(propExpanded !== undefined ? propExpanded : false)
   const {data, isLoading, error} = useModuleItems(id, !!isExpanded)
 
+  const moduleItems = data?.moduleItems || []
+
   const toggleExpanded = () => {
     const newExpandedState = !isExpanded
     setIsExpanded(newExpandedState)
+
     if (onToggleExpand) {
       onToggleExpand(id)
     }
@@ -104,7 +107,7 @@ const Module: React.FC<ModuleProps> = ({
             requirementCount={requirementCount || 0}
             unlockAt={unlockAt}
             dragHandleProps={dragHandleProps}
-            itemCount={data?.moduleItems?.length || 0}
+            itemCount={moduleItems.length}
             hasActiveOverrides={hasActiveOverrides}
             setModuleAction={setModuleAction}
             setIsManageModuleContentTrayOpen={setIsManageModuleContentTrayOpen}
@@ -116,7 +119,7 @@ const Module: React.FC<ModuleProps> = ({
             <ModuleItemList
               moduleId={id}
               moduleTitle={name}
-              moduleItems={data?.moduleItems || []}
+              moduleItems={moduleItems}
               completionRequirements={completionRequirements}
               isLoading={isLoading}
               error={error}

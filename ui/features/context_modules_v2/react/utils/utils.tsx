@@ -185,7 +185,87 @@ export const validateModuleItemStudentRenderRequirements = (prevProps: any, next
   return contentPropsEqual
 }
 
+// Performance thresholds for module rendering optimizations
+export const LARGE_MODULE_THRESHOLD = 50
+
+// Optimized shallow comparison for completion requirements
+const compareCompletionRequirements = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevReq = prev[i]
+    const nextReq = next[i]
+    if (
+      prevReq?.type !== nextReq?.type ||
+      prevReq?.min_score !== nextReq?.min_score ||
+      prevReq?.minScore !== nextReq?.minScore ||
+      prevReq?.completed !== nextReq?.completed
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized checkpoint comparison
+const compareCheckpoints = (prev: any[], next: any[]): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+  if (prev.length !== next.length) return false
+
+  for (let i = 0; i < prev.length; i++) {
+    const prevCP = prev[i]
+    const nextCP = next[i]
+    if (
+      prevCP?.dueAt !== nextCP?.dueAt ||
+      prevCP?.name !== nextCP?.name ||
+      prevCP?.tag !== nextCP?.tag
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
+// Optimized assignment overrides comparison
+const compareAssignmentOverrides = (prev: any, next: any): boolean => {
+  if (!prev && !next) return true
+  if (!prev || !next) return false
+
+  const prevEdges = prev.edges || []
+  const nextEdges = next.edges || []
+
+  if (prevEdges.length !== nextEdges.length) return false
+  if (prevEdges.length === 0) return true
+
+  // For performance, only do deep comparison if edges count is reasonable
+  if (prevEdges.length > 20) {
+    // For very large override lists, fall back to JSON comparison but cache it
+    return JSON.stringify(prev) === JSON.stringify(next)
+  }
+
+  for (let i = 0; i < prevEdges.length; i++) {
+    const prevEdge = prevEdges[i]
+    const nextEdge = nextEdges[i]
+    const prevNode = prevEdge?.node
+    const nextNode = nextEdge?.node
+
+    if (
+      prevNode?._id !== nextNode?._id ||
+      prevNode?.dueAt !== nextNode?.dueAt ||
+      prevNode?.lockAt !== nextNode?.lockAt ||
+      prevNode?.unlockAt !== nextNode?.unlockAt
+    ) {
+      return false
+    }
+  }
+  return true
+}
+
 export const validateModuleItemTeacherRenderRequirements = (prevProps: any, nextProps: any) => {
+  // Basic props comparison (most likely to differ)
   const basicPropsEqual =
     prevProps.id === nextProps.id &&
     prevProps.moduleId === nextProps.moduleId &&
@@ -195,41 +275,32 @@ export const validateModuleItemTeacherRenderRequirements = (prevProps: any, next
     prevProps.title === nextProps.title &&
     prevProps?.content?.dueAt === nextProps?.content?.dueAt &&
     prevProps?.content?.lockAt === nextProps?.content?.lockAt &&
-    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt &&
-    JSON.stringify(prevProps.completionRequirements) ===
-      JSON.stringify(nextProps.completionRequirements)
+    prevProps?.content?.unlockAt === nextProps?.content?.unlockAt
 
   if (!basicPropsEqual) return false
 
-  // Compare checkpoint data explicitly (deep comparison needed for nested arrays)
-  const prevCheckpoints = prevProps.content?.checkpoints
-  const nextCheckpoints = nextProps.content?.checkpoints
-
-  // Handle exact null/undefined differences
-  if (prevCheckpoints !== nextCheckpoints && (!prevCheckpoints || !nextCheckpoints)) return false
-
-  if (prevCheckpoints && nextCheckpoints) {
-    if (prevCheckpoints.length !== nextCheckpoints.length) return false
-
-    // Use JSON.stringify for deep comparison of checkpoint arrays
-    if (JSON.stringify(prevCheckpoints) !== JSON.stringify(nextCheckpoints)) return false
+  // Optimized completion requirements comparison
+  if (
+    !compareCompletionRequirements(
+      prevProps.completionRequirements,
+      nextProps.completionRequirements,
+    )
+  ) {
+    return false
   }
 
+  // Optimized checkpoint comparison
+  const prevCheckpoints = prevProps.content?.checkpoints
+  const nextCheckpoints = nextProps.content?.checkpoints
+  if (!compareCheckpoints(prevCheckpoints, nextCheckpoints)) {
+    return false
+  }
+
+  // Optimized assignment overrides comparison
   const prevOverrides = prevProps.content?.assignmentOverrides
   const nextOverrides = nextProps.content?.assignmentOverrides
-
-  if (!!prevOverrides !== !!nextOverrides) return false
-
-  if (!prevOverrides && !nextOverrides) return true
-
-  const prevEdgesCount = prevOverrides?.edges?.length ?? 0
-  const nextEdgesCount = nextOverrides?.edges?.length ?? 0
-  if (prevEdgesCount !== nextEdgesCount) return false
-
-  if (prevEdgesCount > 0) {
-    const prevOverridesStr = JSON.stringify(prevOverrides)
-    const nextOverridesStr = JSON.stringify(nextOverrides)
-    return prevOverridesStr === nextOverridesStr
+  if (!compareAssignmentOverrides(prevOverrides, nextOverrides)) {
+    return false
   }
 
   return true
