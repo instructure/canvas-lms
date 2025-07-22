@@ -19,7 +19,12 @@
 import React from 'react'
 import {screen, render} from '@testing-library/react'
 import AssignToPanel, {type AssignToPanelProps} from '../AssignToPanel'
-import {ASSIGNMENT_OVERRIDES_DATA, SECTIONS_DATA, STUDENTS_DATA, DIFFERENTIATION_TAGS_DATA} from './mocks'
+import {
+  ASSIGNMENT_OVERRIDES_DATA,
+  SECTIONS_DATA,
+  STUDENTS_DATA,
+  DIFFERENTIATION_TAGS_DATA,
+} from './mocks'
 import * as utils from '../../utils/assignToHelper'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
@@ -54,7 +59,7 @@ describe('AssignToPanel', () => {
   const ASSIGNMENT_OVERRIDES_URL_PUT = `/api/v1/courses/${props.courseId}/modules/${props.moduleId}/assignment_overrides`
   const COURSE_SETTINGS_URL = `/api/v1/courses/${props.courseId}/settings`
   const SECTIONS_URL = /\/api\/v1\/courses\/.+\/sections\?per_page=\d+/
-  const DIFFERENTIATION_TAGS_URL = `/api/v1/courses/${props.courseId}/groups?per_page=100&collaboration_state=non_collaborative&include=group_category`
+  const DIFFERENTIATION_TAGS_URL = `/api/v1/courses/${props.courseId}/groups?collaboration_state=non_collaborative&include=group_category&per_page=100`
 
   beforeAll(() => {
     if (!document.getElementById('flash_screenreader_holder')) {
@@ -63,17 +68,6 @@ describe('AssignToPanel', () => {
       liveRegion.setAttribute('role', 'alert')
       document.body.appendChild(liveRegion)
     }
-
-    /*
-      These are used for the differentiation tag tests
-      This file has some leakage with other tests so setting the
-      ENV variables between tests is inconsistent
-      This is a workaround until we can refactor the tests
-    */
-    // These are being skipped for now because setting the ENV 
-    // in this file causes tests to be flakey
-    // window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
-    // window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
   })
 
   beforeEach(() => {
@@ -226,9 +220,10 @@ describe('AssignToPanel', () => {
       )
     })
 
-    // Skipping this test because it relies on the ENV variables
-    // Setting these ENV variables causes tests in this file to be flakey
-    it.skip('can select a differentiation tag as an assignee', async () => {
+    it('can select a differentiation tag as an assignee', async () => {
+      const originalEnv = {...window.ENV}
+      window.ENV.ALLOW_ASSIGN_TO_DIFFERENTIATION_TAGS = true
+      window.ENV.CAN_MANAGE_DIFFERENTIATION_TAGS = true
       const {findByTestId, findByText, getAllByTestId} = renderComponent()
       const customOption = await findByTestId('custom-option')
       await userEvent.click(customOption)
@@ -237,6 +232,7 @@ describe('AssignToPanel', () => {
       const option = await findByText(DIFFERENTIATION_TAGS_DATA[0].name)
       await userEvent.click(option)
       expect(getAllByTestId('assignee_selector_selected_option')).toHaveLength(1)
+      window.ENV = originalEnv
     })
   })
 
