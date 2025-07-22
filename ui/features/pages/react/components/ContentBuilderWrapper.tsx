@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PageEditor} from '@canvas/page-editor'
+import {PageEditor} from '@canvas/block-content-editor'
 
 export const ContentBuilderWrapper = () => {
   return <PageEditor data={null} onInit={null} />
