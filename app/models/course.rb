@@ -3470,17 +3470,6 @@ class Course < ActiveRecord::Base
                      Course.default_tabs
                    end
 
-    if feature_enabled?(:accessibility_tab_enable)
-      default_tabs.insert(1,
-                          {
-                            id: TAB_ACCESSIBILITY,
-                            label: t("#tabs.accessibility", "Accessibility"),
-                            css_class: "accessibility",
-                            href: :course_accessibility_index_path,
-                            visibility: "admins"
-                          })
-    end
-
     if SmartSearch.smart_search_available?(self)
       default_tabs.insert(1,
                           {
@@ -3498,6 +3487,17 @@ class Course < ActiveRecord::Base
                             css_class: "course_paces",
                             href: :course_course_pacing_path
                           })
+    end
+
+    if feature_enabled?(:accessibility_tab_enable)
+      # Add Accessibility tab at the end of the tabs (except for Settings tab)
+      default_tabs.push({
+                          id: TAB_ACCESSIBILITY,
+                          label: t("#tabs.accessibility", "Accessibility"),
+                          css_class: "accessibility",
+                          href: :course_accessibility_index_path,
+                          visibility: "admins"
+                        })
     end
 
     # Remove already cached tabs for Horizon courses
