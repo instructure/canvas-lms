@@ -53,4 +53,25 @@ module ObserverEnrollmentsHelper
     cookies.delete(observed_user_cookie_name) if @selected_observed_user == users.first
     users.map { |u| user_json(u, @current_user, session, ["avatar_url"], @context, nil, ["pseudonym"]) }
   end
+
+  # Helper method for GraphQL loaders to determine which observed student is currently selected
+  # based on the observer cookie mechanism
+  def selected_observed_student_from_cookie(current_user, observed_students, request)
+    return observed_students.first if observed_students.empty? || current_user.nil?
+
+    # Use the observer cookie mechanism to determine which student is currently selected
+    observed_user_cookie_name = "#{OBSERVER_COOKIE_PREFIX}#{current_user.id}"
+
+    # Get cookies from request if available
+    selected_user_id = request&.cookies&.[](observed_user_cookie_name)
+
+    # Find the selected student from observed students, or fall back to first
+    if selected_user_id
+      selected_student = observed_students.find { |student| student.id.to_s == selected_user_id.to_s }
+      return selected_student if selected_student
+    end
+
+    # Default to first observed student
+    observed_students.first
+  end
 end
