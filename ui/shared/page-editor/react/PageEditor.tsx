@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Editor, Frame, SerializedNodes} from '@craftjs/core'
+import {Editor, Element, Frame, SerializedNodes} from '@craftjs/core'
 import {AddBlock} from './AddBlock'
 import {TextBlock} from './Blocks/TextBlock'
 import {PageEditorContext} from './PageEditorContext'
@@ -39,7 +39,9 @@ export const PageEditor = (props: {
           <Editor resolver={{TextBlock, ImageBlock}} onNodesChange={onNodesChange}>
             <AddBlockModalRenderer />
             <AddBlock />
-            <Frame data={props.data ?? undefined}>{!props.data && <article></article>}</Frame>
+            <Frame data={props.data ?? undefined}>
+              <Element is="div"></Element>
+            </Frame>
           </Editor>
         }
       />

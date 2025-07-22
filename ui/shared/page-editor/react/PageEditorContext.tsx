@@ -18,26 +18,15 @@
 
 import {createContext, PropsWithChildren, useContext, useState} from 'react'
 import {SerializedNodes} from '@craftjs/core'
-import {Prettify} from './utilities/Prettify'
+import {AddBlockModal, useAddBlockModal} from './hooks/useAddBlockModal'
+import {InitialAddBlockHandler, useInitialAddBlockHandler} from './hooks/useInitialAddBlockHandler'
 
-type AddBlockModal = {
-  isOpen: boolean
-  insertAfterNodeId?: string
-  open: (insertAfterNodeId?: string) => void
-  close: () => void
-}
-
-type AddBlock = {
-  shouldShow: boolean
-  setShouldShow: (shouldShow: boolean) => void
-}
-
-type PageEditorContextType = {
+export type PageEditorContextType = {
   addBlockModal: AddBlockModal
-  addBlock: AddBlock
+  initialAddBlockHandler: InitialAddBlockHandler
 }
 
-type PageEditorContextProps = {
+export type PageEditorContextProps = {
   data: SerializedNodes | null
 }
 
@@ -46,42 +35,14 @@ const Context = createContext<PageEditorContextType>(null as any)
 export const usePageEditorContext = () => useContext(Context)
 
 export const PageEditorContext = (props: PropsWithChildren<PageEditorContextProps>) => {
-  const [addBlockModal, setAddBlockModal] = useState<
-    Prettify<Pick<AddBlockModal, 'isOpen' | 'insertAfterNodeId'>>
-  >({
-    isOpen: false,
-    insertAfterNodeId: undefined,
-  })
-
-  const [shouldShowAddBlock, setShouldShowAddBlock] = useState<boolean>(
-    (props?.data?.['ROOT']?.nodes.length ?? 0) === 0,
-  )
-
-  const openAddBlockModal = (insertAfterNodeId?: string) => {
-    setAddBlockModal({
-      isOpen: true,
-      insertAfterNodeId,
-    })
-  }
-  const closeAddBlockModal = () => {
-    setAddBlockModal({
-      isOpen: false,
-      insertAfterNodeId: undefined,
-    })
-  }
+  const addBlockModal = useAddBlockModal()
+  const initialAddBlockHandler = useInitialAddBlockHandler(props.data?.['ROOT']?.nodes.length ?? 0)
 
   return (
     <Context.Provider
       value={{
-        addBlockModal: {
-          ...addBlockModal,
-          open: openAddBlockModal,
-          close: closeAddBlockModal,
-        },
-        addBlock: {
-          shouldShow: shouldShowAddBlock,
-          setShouldShow: setShouldShowAddBlock,
-        },
+        addBlockModal,
+        initialAddBlockHandler,
       }}
     >
       {props.children}

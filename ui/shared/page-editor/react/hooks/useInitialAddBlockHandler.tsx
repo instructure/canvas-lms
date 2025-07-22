@@ -16,19 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback} from 'react'
-import {useGetRootNode} from './useGetRootNode'
-import {usePageEditorContext} from '../PageEditorContext'
+import {useState} from 'react'
 
-export const useHandleNodesCountChange = () => {
-  const getRootNode = useGetRootNode()
-  const {initialAddBlockHandler} = usePageEditorContext()
+export type InitialAddBlockHandler = {
+  shouldShow: boolean
+  setShouldShow: (shouldShow: boolean) => void
+}
 
-  const handleNodesCountChange = useCallback(() => {
-    const rootNode = getRootNode()
-    const rootNodesCount = rootNode ? rootNode.data.nodes.length : 0
-    initialAddBlockHandler.setShouldShow(rootNodesCount === 0)
-  }, [getRootNode, initialAddBlockHandler])
+export const useInitialAddBlockHandler = (nodeCount: number) => {
+  const [shouldShow, setShouldShow] = useState<boolean>(nodeCount === 0)
 
-  return handleNodesCountChange
+  return {
+    shouldShow,
+    setShouldShow,
+  }
 }
