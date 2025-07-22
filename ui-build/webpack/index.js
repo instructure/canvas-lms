@@ -18,7 +18,6 @@
 
 const {resolve, join} = require('path')
 const ReactRefreshRspackPlugin = require('@rspack/plugin-react-refresh')
-const {rspack} = require('@rspack/core')
 
 // determines which folder public assets are compiled to
 const webpackPublicPath = require('./webpackPublicPath')
@@ -30,17 +29,7 @@ const {canvasDir} = require('../params')
 const isProduction = process.env.NODE_ENV === 'production'
 const isDev = process.env.NODE_ENV === 'development'
 
-const {
-  swc,
-  css,
-  fonts,
-  handlebars,
-  images,
-  istanbul,
-  instUIWorkaround,
-  webpack5Workaround,
-  graphql,
-} = require('./webpack.rules')
+const {swc, css, fonts, handlebars, images, istanbul, graphql} = require('./webpack.rules')
 
 const {
   buildCacheOptions,
@@ -201,8 +190,6 @@ module.exports = {
 
     rules: [
       process.env.CRYSTALBALL_MAP === '1' && istanbul, // adds ~20 seconds to build time
-      instUIWorkaround,
-      webpack5Workaround,
       css,
       images,
       fonts,
