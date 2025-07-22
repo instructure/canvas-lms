@@ -71,6 +71,85 @@ describe('Preview', () => {
       expect(screen.getByText('Loading preview...')).toBeInTheDocument()
     })
 
+    it('shows loading overlay with spinner during API calls', async () => {
+      // Create a promise that we can control
+      let resolvePromise: (value: any) => void
+      const pendingPromise = new Promise(resolve => {
+        resolvePromise = resolve
+      })
+
+      // @ts-expect-error
+      mockDoFetchApi.mockReturnValue(pendingPromise)
+
+      render(<Preview {...defaultProps} />)
+
+      // Should show loading spinner initially
+      expect(screen.getByText('Loading preview...')).toBeInTheDocument()
+
+      // Should have the overlay mask
+      expect(document.getElementById('a11y-issue-preview-overlay')).toBeInTheDocument()
+
+      // Resolve the promise to complete the loading
+      resolvePromise!({
+        json: {
+          content: '<div>Test content</div>',
+          path: '//div',
+        },
+      })
+
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
+      })
+    })
+
+    it('shows loading overlay during update operations', async () => {
+      const mockResponse: PreviewResponse = {
+        content: '<div>Updated content</div>',
+        path: '//div',
+      }
+
+      // @ts-expect-error
+      mockDoFetchApi.mockResolvedValue({
+        json: mockResponse,
+      })
+
+      const ref = React.createRef<PreviewHandle>()
+      render(<Preview {...defaultProps} ref={ref} />)
+
+      // Wait for initial load to complete
+      await waitFor(() => {
+        expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
+      })
+
+      // Create a promise for the update operation
+      let resolveUpdatePromise: (value: any) => void
+      const updatePromise = new Promise(resolve => {
+        resolveUpdatePromise = resolve
+      })
+
+      // @ts-expect-error
+      mockDoFetchApi.mockReturnValueOnce(updatePromise)
+
+      // Trigger update
+      const formValue: FormValue = {value: 'test-value'}
+      ref.current?.update(formValue)
+
+      // Should show loading spinner during update
+      expect(screen.getByText('Loading preview...')).toBeInTheDocument()
+      expect(document.getElementById('a11y-issue-preview-overlay')).toBeInTheDocument()
+
+      // Resolve the update promise
+      resolveUpdatePromise!({
+        json: mockResponse,
+      })
+
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
+      })
+    })
+
     it('calls API on mount with correct parameters', async () => {
       const mockResponse: PreviewResponse = {
         content: '<div>Test content</div>',
@@ -98,9 +177,62 @@ describe('Preview', () => {
       render(<Preview {...defaultProps} />)
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Error loading preview for accessibility issue'),
-        ).toBeInTheDocument()
+        expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
+      })
+    })
+
+    it('hides loading overlay when not loading and no error', async () => {
+      const mockResponse: PreviewResponse = {
+        content: '<div>Test content</div>',
+        path: '//div',
+      }
+
+      // @ts-expect-error
+      mockDoFetchApi.mockResolvedValue({
+        json: mockResponse,
+      })
+
+      render(<Preview {...defaultProps} />)
+
+      // Wait for loading to complete
+      await waitFor(() => {
+        expect(screen.getByText('Test content')).toBeInTheDocument()
+      })
+
+      // Should not show loading spinner
+      expect(screen.queryByText('Loading preview...')).not.toBeInTheDocument()
+
+      // Should not have the overlay mask
+      expect(document.getElementById('a11y-issue-preview-overlay')).not.toBeInTheDocument()
+    })
+
+    it('shows loading spinner with correct accessibility attributes', () => {
+      // Create a promise that we can control
+      let resolvePromise: (value: any) => void
+      const pendingPromise = new Promise(resolve => {
+        resolvePromise = resolve
+      })
+
+      // @ts-expect-error
+      mockDoFetchApi.mockReturnValue(pendingPromise)
+
+      render(<Preview {...defaultProps} />)
+
+      // Should show loading spinner with correct title
+      const loadingSpinner = screen.getByText('Loading preview...')
+      expect(loadingSpinner).toBeInTheDocument()
+
+      // The spinner should be inside the overlay mask
+      const overlay = document.getElementById('a11y-issue-preview-overlay')
+      expect(overlay).toBeInTheDocument()
+      expect(overlay).toContainElement(loadingSpinner)
+
+      // Clean up
+      resolvePromise!({
+        json: {
+          content: '<div>Test content</div>',
+          path: '//div',
+        },
       })
     })
   })
@@ -449,9 +581,7 @@ describe('Preview', () => {
       render(<Preview {...defaultProps} ref={ref} />)
 
       await waitFor(() => {
-        expect(
-          screen.getByText('Error loading preview for accessibility issue'),
-        ).toBeInTheDocument()
+        expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
       })
 
       // Second call succeeds
@@ -469,7 +599,7 @@ describe('Preview', () => {
 
       await waitFor(() => {
         expect(
-          screen.queryByText('Error loading preview for accessibility issue'),
+          screen.queryByText('Error previewing fixed accessibility issue.'),
         ).not.toBeInTheDocument()
       })
     })
@@ -487,7 +617,7 @@ describe('Preview', () => {
     const {rerender} = render(<Preview {...defaultProps} />)
 
     await waitFor(() => {
-      expect(screen.getByText('Error loading preview for accessibility issue')).toBeInTheDocument()
+      expect(screen.getByText('Error previewing fixed accessibility issue.')).toBeInTheDocument()
     })
 
     // @ts-expect-error
@@ -499,7 +629,7 @@ describe('Preview', () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Error loading preview for accessibility issue'),
+        screen.queryByText('Error previewing fixed accessibility issue.'),
       ).not.toBeInTheDocument()
     })
   })
