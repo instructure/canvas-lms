@@ -45,7 +45,7 @@ class Mutations::AutoGradeSubmission < Mutations::BaseMutation
 
     verify_authorized_action!(course, :manage_grades)
 
-    service = AutoGradeOrchestrationService.new(course:)
+    service = AutoGradeOrchestrationService.new(course:, current_user:)
     progress = service.auto_grade_in_background(submission:)
 
     { progress: }

@@ -37,10 +37,11 @@ class CommentsService
     </INSTRUCTIONS>
   TEXT
 
-  def initialize(assignment:, grade_data:, root_account_uuid:)
+  def initialize(assignment:, grade_data:, root_account_uuid:, current_user:)
     @assignment = assignment.to_s
     @grade_data = grade_data
     @root_account_uuid = root_account_uuid
+    @current_user = current_user
   end
 
   def call
@@ -57,7 +58,8 @@ class CommentsService
         prompt:,
         model: "anthropic.claude-3-haiku-20240307-v1:0",
         feature_slug: "grading-comments-assistance",
-        root_account_uuid: @root_account_uuid
+        root_account_uuid: @root_account_uuid,
+        current_user: @current_user
       )
 
       guidance_list = safe_parse_json_array(response)

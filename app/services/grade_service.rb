@@ -49,11 +49,12 @@ class GradeService
     </INSTRUCTIONS>
   TEXT
 
-  def initialize(assignment:, essay:, rubric:, root_account_uuid:)
+  def initialize(assignment:, essay:, rubric:, root_account_uuid:, current_user:)
     @assignment = assignment.to_s
     @essay = essay.to_s
     @rubric = rubric
     @root_account_uuid = root_account_uuid
+    @current_user = current_user
     @rubric_prompt_format = self.class.normalize_rubric_for_prompt(@rubric)
   end
 
@@ -72,7 +73,8 @@ class GradeService
         prompt:,
         model: "anthropic.claude-3-haiku-20240307-v1:0",
         feature_slug: "grading-assistance",
-        root_account_uuid: @root_account_uuid
+        root_account_uuid: @root_account_uuid,
+        current_user: @current_user
       )
 
       body = safe_parse_json_array(response)

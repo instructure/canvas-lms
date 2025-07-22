@@ -41,7 +41,8 @@ class TranslationController < ApplicationController
                                                  flags: translation_flags,
                                                  options: {
                                                    root_account_uuid: @domain_root_account.uuid,
-                                                   feature_slug: required_params[:feature_slug]
+                                                   feature_slug: required_params[:feature_slug],
+                                                   current_user: @current_user
                                                  })
 
     render json: { translated_text: }
@@ -61,7 +62,8 @@ class TranslationController < ApplicationController
       flags: translation_flags,
       options: {
         root_account_uuid: @domain_root_account.uuid,
-        feature_slug: required_params[:feature_slug]
+        feature_slug: required_params[:feature_slug],
+        current_user: @current_user
       }
     )
     if Translation.current_translation_provider_type(translation_flags) == Translation::TranslationType::AWS_TRANSLATE
