@@ -114,6 +114,16 @@ describe "MediaConverter" do
 
       expect(other_doc.at_css("a")["href"]).to eq "#{CC::Exporter::Epub::FILE_PATH}/path/to/im%28g.jpg"
     end
+
+    it "does not explode with extensions that aren't valid regexes" do
+      other_doc = Nokogiri::HTML5.fragment(
+        "<div><a href=\"#{CGI.escape(klass::WEB_CONTENT_TOKEN)}/path/to/(img.jpg)\"}>blah</a>"
+      )
+
+      test_instance.convert_media_paths!(other_doc)
+
+      expect(other_doc.at_css("a")["href"]).to eq "#{CC::Exporter::Epub::FILE_PATH}/path/to/%28img.jpg%29"
+    end
   end
 
   describe "#convert_flv_paths!" do
