@@ -96,4 +96,24 @@ describe('ModuleItemActionMenu', () => {
     expect(container.queryByText('Copy To...')).not.toBeInTheDocument()
     expect(container.getByText('Remove')).toBeInTheDocument()
   })
+
+  it('hides specific menu items for File itemType', () => {
+    const container = setUp('File')
+    const menuButton = container.getByTestId('module-item-action-menu-button')
+    fireEvent.click(menuButton)
+
+    expect(container.getByText('Edit')).toBeInTheDocument()
+    expect(container.getByText('Move to...')).toBeInTheDocument()
+    expect(container.getByText('Decrease indent')).toBeInTheDocument()
+    expect(container.getByText('Increase indent')).toBeInTheDocument()
+    expect(container.getByText('Remove')).toBeInTheDocument()
+
+    expect(container.queryByText('SpeedGrader')).not.toBeInTheDocument()
+    expect(container.queryByText('Assign To...')).not.toBeInTheDocument()
+    expect(container.queryByText('Duplicate')).not.toBeInTheDocument()
+    expect(container.queryByText('Send To...')).not.toBeInTheDocument()
+    expect(container.queryByText('Copy To...')).not.toBeInTheDocument()
+    expect(container.queryByText('Add Mastery Paths')).not.toBeInTheDocument()
+    expect(container.queryByText('Edit Mastery Paths')).not.toBeInTheDocument()
+  })
 })
