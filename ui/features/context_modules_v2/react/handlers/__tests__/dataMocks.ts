@@ -27,6 +27,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 0,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '1',
@@ -36,6 +37,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 1,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '2',
@@ -45,6 +47,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 2,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '3',
@@ -54,6 +57,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 3,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '4',
@@ -63,6 +67,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 4,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '5',
@@ -72,6 +77,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 5,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '6',
@@ -81,6 +87,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 6,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '7',
@@ -90,6 +97,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 7,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '8',
@@ -99,6 +107,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 8,
     content: null,
+    masterCourseRestrictions: null,
   },
   {
     _id: '9',
@@ -108,6 +117,7 @@ export const defaultModuleItems: ModuleItem[] = [
     indent: 0,
     position: 9,
     content: null,
+    masterCourseRestrictions: null,
   },
 ]
 

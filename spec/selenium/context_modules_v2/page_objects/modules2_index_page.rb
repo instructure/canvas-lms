@@ -158,6 +158,11 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} [data-testid='url-icon']"
   end
 
+  def blueprint_lock_icon_selector(module_item_id, locked: false)
+    selector = locked ? "[data-testid='lock-icon-locked']" : "[data-testid='lock-icon-unlock']"
+    "#{module_item_by_id_selector(module_item_id)} #{selector}"
+  end
+
   def module_progression_status_bar_selector(module_id)
     "#{module_header_selector(module_id)} [data-testid='module-progression-status-bar']"
   end
@@ -348,6 +353,10 @@ module Modules2IndexPage
     f(module_item_url_icon_selector(module_item_id))
   end
 
+  def blueprint_lock_icon(module_item_id, locked: false)
+    f(blueprint_lock_icon_selector(module_item_id, locked:))
+  end
+
   def module_progression_info(module_id)
     f(module_progression_info_selector(module_id))
   end
@@ -454,5 +463,21 @@ module Modules2IndexPage
 
   def visit_course(course)
     get "/courses/#{course.id}"
+  end
+
+  def add_item_button(module_id)
+    fj("button:contains('Add Item')", context_module_selector(module_id))
+  end
+
+  def new_item_type_select_selector
+    "[data-testid='add-item-type-selector']"
+  end
+
+  def add_existing_item_select_selector
+    "[data-testid='add-item-content-select']"
+  end
+
+  def add_item_modal_add_item_button
+    fj("button:contains('Add Item')", f("[data-testid='add-item-modal']"))
   end
 end

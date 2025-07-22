@@ -38,6 +38,7 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
     type: 'Discussion',
     published: false,
   },
+  masterCourseRestrictions: null,
   published: false,
   canBeUnpublished: true,
   masteryPathsData: null,
