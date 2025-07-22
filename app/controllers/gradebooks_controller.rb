@@ -1065,7 +1065,6 @@ class GradebooksController < ApplicationController
     if @assignment.moderated_grading? && !@assignment.user_is_moderation_grader?(@current_user)
       @assignment.create_moderation_grader(@current_user, occupy_slot: false)
     end
-
     if platform_service_speedgrader_enabled
       InstStatsd::Statsd.distributed_increment("speedgrader.platform_service.load")
       @page_title = t("SpeedGrader")

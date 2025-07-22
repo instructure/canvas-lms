@@ -24,6 +24,7 @@ require_relative "../../app/services/auto_grade_orchestration_service"
 RSpec.describe CommentsService, type: :service do
   let(:assignment) { "Write an essay about your favorite book." }
   let(:root_account_uuid) { "test-root-uuid" }
+  let(:current_user) { User.create!(name: "Test User") }
   let(:grade_data) do
     [
       {
@@ -57,7 +58,7 @@ RSpec.describe CommentsService, type: :service do
 
   describe "#call" do
     it "calls CedarClient and updates grade_data with comments" do
-      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:, current_user:)
       result = service.call
 
       expect(result[0]["comments"]).to eq("Add more specific examples to support your points.")
@@ -71,14 +72,14 @@ RSpec.describe CommentsService, type: :service do
         end
       end)
 
-      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data: grade_data.deep_dup, root_account_uuid:, current_user:)
       expect { service.call }.to raise_error(CedarAIGraderError, /Invalid JSON response/)
     end
   end
 
   describe "#build_prompt" do
     it "includes assignment and list_of_reasonings in the prompt" do
-      service = described_class.new(assignment:, grade_data:, root_account_uuid:)
+      service = described_class.new(assignment:, grade_data:, root_account_uuid:, current_user:)
       prompt = service.build_prompt(list_of_reasonings: [{ "CRITERION" => "Content", "REASONING" => "Needs more detail." }])
       expect(prompt).to include("Write an essay about your favorite book.")
       expect(prompt).to include("Needs more detail.")

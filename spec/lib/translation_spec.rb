@@ -23,6 +23,7 @@ TranslationResponse = Struct.new(:translation, :source_language, keyword_init: t
 
 describe Translation do
   let(:translation_flags) { { translation: true, ai_translation_improvements: true, cedar_translation: true } }
+  let(:current_user) { double("User") }
 
   before do
     # We're gonna focus on CedarClient, since other clients are deprecated
@@ -156,12 +157,12 @@ describe Translation do
     end
 
     it "translates text when tgt_lang is provided" do
-      expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "inbox" })).to eq(result)
+      expect(described_class.translate_text(text:, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "inbox", current_user: })).to eq(result)
     end
 
     context "when target language is identical to detected source language" do
       it "raises SameLanguageTranslationError" do
-        expect { described_class.translate_text(text: "Hello world", tgt_lang: "en", flags: translation_flags) }.to raise_error(Translation::SameLanguageTranslationError)
+        expect { described_class.translate_text(text: "Hello world", tgt_lang: "en", flags: translation_flags, options: { feature_slug: "inbox", current_user: }) }.to raise_error(Translation::SameLanguageTranslationError)
       end
     end
   end
@@ -195,7 +196,7 @@ describe Translation do
     end
 
     it "translates text when tgt_lang is provided" do
-      expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "discussion" })).to eq("<p>Hola, mundo!</p>")
+      expect(described_class.translate_html(html_string: html, tgt_lang: "es", flags: translation_flags, options: { feature_slug: "discussion", current_user: })).to eq("<p>Hola, mundo!</p>")
     end
   end
 end
