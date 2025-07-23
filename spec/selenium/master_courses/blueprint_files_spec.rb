@@ -36,6 +36,7 @@ describe "blueprint courses - file locking" do
       @tag = @template.create_content_tag_for!(@original_file)
 
       course_with_teacher(active_all: true)
+      @teacher.set_preference(:files_ui_version, "v1")
       @copy_to = @course
       @template.add_child_course!(@copy_to)
       @file_copy = Attachment.create!(filename: @filename,
@@ -120,6 +121,7 @@ describe "blueprint courses - file locking" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session(@teacher)
     end
 

@@ -32,6 +32,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session @teacher
     end
 
@@ -56,6 +57,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session @teacher
     end
 
@@ -175,6 +177,7 @@ describe "better_file_browsing" do
 
       it "returns focus to the link when the close button is clicked", priority: "1", upgrade_files_v2: "done" do
         f(".ef-file-preview-header-close").click
+        wait_for_ajaximations
         check_element_has_focus(fln("example.pdf"))
       end
     end
@@ -190,19 +193,10 @@ describe "better_file_browsing" do
     end
   end
 
-  context "when a public course is accessed" do
-    include_context "public course as a logged out user"
-
-    it "displays course files", priority: "1", upgrade_files_v2: "done" do
-      public_course.attachments.create!(filename: "somefile.doc", uploaded_data: StringIO.new("test"))
-      get "/courses/#{public_course.id}/files"
-      expect(f(".ef-main")).to be_displayed
-    end
-  end
-
   context "Search textbox" do
     before do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       txt_files.map do |text_file|
         add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
@@ -225,6 +219,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session(@teacher)
     end
 
@@ -316,6 +311,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session(@teacher)
       get "/courses/#{@course.id}/files"
     end
@@ -336,6 +332,7 @@ describe "better_file_browsing" do
   context "Preview Media Attachments" do
     before do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       allow_any_instance_of(MediaObject).to receive(:grants_right?).with(anything, anything, :add_captions).and_return(true)
 
       @att = Attachment.create! filename: "file.mp4", context: @course, media_entry_id: "mediaentryid", uploaded_data: stub_file_data("test.m4v", "asdf", "video/mp4")
@@ -402,6 +399,7 @@ describe "better_file_browsing" do
   context "File Preview" do
     before do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       add_file(fixture_file_upload("a_file.txt", "text/plain"),
                @course,
                "a_file.txt")
@@ -499,6 +497,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @teacher.set_preference(:files_ui_version, "v1")
       user_session @teacher
     end
 
@@ -597,6 +596,7 @@ describe "better_file_browsing" do
   context "When Require Usage Rights is turned-off" do
     it "sets files to published by default", priority: "1", upgrade_files_v2: "done" do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       @course.usage_rights_required = true
       @course.save!
       add_file(fixture_file_upload("b_file.txt", "text/plain"), @course, "b_file.txt")
@@ -610,6 +610,7 @@ describe "better_file_browsing" do
     it "sorts the files properly", priority: 2, upgrade_files_v2: "done" do
       # this test performs 2 sample sort combinations
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
 
       add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "a_example.pdf")
       add_file(fixture_file_upload("b_file.txt", "text/plain"), @course, "b_file.txt")
@@ -629,6 +630,7 @@ describe "better_file_browsing" do
 
     it "url-encodes sort header links", upgrade_files_v2: "done" do
       course_with_teacher_logged_in
+      @teacher.set_preference(:files_ui_version, "v1")
       Folder.root_folders(@course).first.sub_folders.create!(name: "eh?", context: @course)
       get "/courses/#{@course.id}/files/folder/eh%3F"
       expect(ff(".ef-plain-link").first.attribute("href")).to include "/files/folder/eh%3F?sort"

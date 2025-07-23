@@ -30,6 +30,7 @@ describe "better_file_browsing" do
     end
 
     before do
+      @student.set_preference(:files_ui_version, "v1")
       user_session(@student)
     end
 
