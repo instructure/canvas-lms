@@ -61,6 +61,7 @@ interface ModuleItemActionPanelProps {
   itemId: string
   id: string
   title: string
+  newTab?: boolean
   indent: number
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
@@ -79,6 +80,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
   itemId,
   id: _id,
   title,
+  newTab,
   indent,
   content,
   masterCourseRestrictions,
@@ -317,6 +319,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           onRequestClose={() => setIsEditItemOpen(false)}
           itemName={title}
           itemURL={content?.url}
+          itemNewTab={newTab}
           itemIndent={indent}
           itemId={itemId}
           itemType={content?.type?.toLowerCase()}

@@ -22,6 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Grid} from '@instructure/ui-grid'
 import {View} from '@instructure/ui-view'
 import IndentSelector from './AddItemModalComponents/IndentSelector'
@@ -37,6 +38,7 @@ export interface EditItemModalProps {
   onRequestClose: () => void
   itemName: string
   itemURL?: string
+  itemNewTab?: boolean
   itemIndent: number
   courseId: string
   moduleId: string
@@ -51,6 +53,7 @@ const EditItemModal = (props: EditItemModalProps) => {
     onRequestClose,
     itemName,
     itemURL,
+    itemNewTab,
     itemIndent,
     itemId,
     courseId,
@@ -61,11 +64,19 @@ const EditItemModal = (props: EditItemModalProps) => {
 
   const [title, setTitle] = useState(itemName)
   const [url, setUrl] = useState(itemURL)
+  const [newTab, setNewTab] = useState(itemNewTab || false)
   const [indent, setIndent] = useState(itemIndent)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const showExternalUrlFields =
-    itemType && ['external', 'externalurl', 'externaltool'].includes(itemType)
+    itemType &&
+    [
+      'external',
+      'externalurl',
+      'externaltool',
+      'contextexternaltool',
+      'moduleexternaltool',
+    ].includes(itemType)
 
   const handleSubmit = () => {
     setIsLoading(true)
@@ -74,6 +85,7 @@ const EditItemModal = (props: EditItemModalProps) => {
       title,
       indentation: indent,
       url,
+      newTab,
     })
 
     submiEditItem(courseId, itemId, itemData)
@@ -176,6 +188,20 @@ const EditItemModal = (props: EditItemModalProps) => {
               />
             </Grid.Col>
           </Grid.Row>
+          {showExternalUrlFields && (
+            <Grid.Row>
+              <Grid.Col vAlign="middle">
+                <Checkbox
+                  label={I18n.t('Load in a new tab')}
+                  checked={newTab}
+                  onChange={e => {
+                    setNewTab(e.target.checked)
+                  }}
+                  data-testid="edit-modal-new-tab"
+                />
+              </Grid.Col>
+            </Grid.Row>
+          )}
         </Grid>
       </View>
     </CanvasModal>

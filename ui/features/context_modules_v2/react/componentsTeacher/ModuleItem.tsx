@@ -39,6 +39,7 @@ export interface ModuleItemProps {
   _id: string
   url: string
   title: string
+  newTab?: boolean
   indent: number
   moduleId: string
   moduleTitle?: string
@@ -64,6 +65,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
   id,
   url,
   title,
+  newTab,
   moduleId,
   moduleTitle = '',
   indent,
@@ -155,6 +157,7 @@ const ModuleItem: React.FC<ModuleItemProps> = ({
             itemId={_id}
             id={id}
             title={title}
+            newTab={newTab}
             indent={indent}
             content={content}
             masterCourseRestrictions={masterCourseRestrictions}

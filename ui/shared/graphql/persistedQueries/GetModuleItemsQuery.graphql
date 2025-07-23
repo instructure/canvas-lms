@@ -7,6 +7,7 @@ query GetModuleItemsQuery($moduleId: ID!) {
         url
         title
         indent
+        newTab
         masterCourseRestrictions {
           content
           points
