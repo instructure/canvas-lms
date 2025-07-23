@@ -83,6 +83,7 @@ const getResourceType = (type?: string): string => {
       return 'externalUrl'
     case 'context_external_tool':
     case 'moduleexternaltool':
+    case 'externaltool':
       return 'externalTool'
     default:
       return 'assignment'

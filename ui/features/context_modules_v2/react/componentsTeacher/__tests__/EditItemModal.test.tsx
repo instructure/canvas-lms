@@ -179,16 +179,27 @@ describe('EditItemModal', () => {
     const defaultProps = buildDefaultProps({
       itemType: 'external',
       itemURL: 'http://example.com',
+      itemNewTab: true,
     })
 
-    it('renders external URL fields when itemType is external', () => {
+    it('renders external URL field when itemType is external', () => {
       setUp(defaultProps)
       expect(screen.getByLabelText('URL')).toBeInTheDocument()
+    })
+
+    it('renders new Tab field when itemType is external', () => {
+      setUp(defaultProps)
+      expect(screen.getByLabelText('Load in a new tab')).toBeInTheDocument()
     })
 
     it('does not render external URL fields when itemType is not external', () => {
       setUp(buildDefaultProps())
       expect(screen.queryByLabelText('URL')).not.toBeInTheDocument()
+    })
+
+    it('does not render new Tab fields when itemType is not external', () => {
+      setUp(buildDefaultProps())
+      expect(screen.queryByLabelText('Load in a new tab')).not.toBeInTheDocument()
     })
   })
 })

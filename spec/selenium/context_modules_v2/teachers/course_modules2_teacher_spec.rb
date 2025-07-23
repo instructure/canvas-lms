@@ -93,6 +93,10 @@ describe "context modules", :ignore_js_errors do
       if %w[External ExternalUrl ExternalTool ContextExternalTool].include?(item.content_type)
         url = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-url']")
         expect(url.attribute("value")).to eq(item.url)
+
+        new_tab = edit_item_modal.find_element(:css, "input[data-testid='edit-modal-new-tab']")
+        new_tab_value = item.new_tab.nil? ? false : item.new_tab
+        expect(new_tab.selected?).to eq(new_tab_value)
       end
 
       edit_item_modal.find_element(:css, "button[type='button']").click

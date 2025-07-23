@@ -66,6 +66,9 @@ module Types
     field :indent, Integer, null: true
     delegate :indent, to: :object
 
+    field :new_tab, Boolean, null: true
+    delegate :new_tab, to: :object
+
     field :title, String, null: true
     delegate :title, to: :object
 

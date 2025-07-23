@@ -262,6 +262,7 @@ export interface ModuleItem {
   position: number
   content: ModuleItemContent
   masterCourseRestrictions: ModuleItemMasterCourseRestrictionType | null
+  newTab?: boolean
 }
 
 export type ModuleAction = 'move_module' | 'move_module_item' | 'move_module_contents'
