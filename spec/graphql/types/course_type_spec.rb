@@ -653,15 +653,15 @@ describe Types::CourseType do
       ).to be_nil
     end
 
-    it "returns nil when the requesting user lacks needed permissions" do
-      expect(
-        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @student)
-      ).to be_nil
-    end
-
     it "returns the custom grade statuses used by the course" do
       expect(
         course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @teacher)
+      ).to match_array ["My Status"]
+    end
+
+    it "returns the custom grade statuses used by the course for a student" do
+      expect(
+        course_type.resolve("customGradeStatusesConnection { edges { node { name } } }", current_user: @student)
       ).to match_array ["My Status"]
     end
 

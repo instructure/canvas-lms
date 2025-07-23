@@ -340,7 +340,6 @@ module Types
     field :custom_grade_statuses_connection, CustomGradeStatusType.connection_type, null: true
     def custom_grade_statuses_connection
       return unless Account.site_admin.feature_enabled?(:custom_gradebook_statuses)
-      return unless course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
 
       course.custom_grade_statuses.active.order(:id)
     end
