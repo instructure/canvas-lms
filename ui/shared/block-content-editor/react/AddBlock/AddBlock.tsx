@@ -21,13 +21,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {usePageEditorContext} from '../PageEditorContext'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddButton} from './AddButton'
 
 const I18n = createI18nScope('page_editor')
 
 export const AddBlock = () => {
-  const {addBlockModal, initialAddBlockHandler} = usePageEditorContext()
+  const {addBlockModal, initialAddBlockHandler} = useBlockContentEditorContext()
   if (!initialAddBlockHandler.shouldShow) {
     return null
   }

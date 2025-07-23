@@ -17,12 +17,12 @@
  */
 
 import {ReactElement} from 'react'
-import {usePageEditorContext} from '../PageEditorContext'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 import {AddBlockModal} from './AddBlockModal'
 import {useAddNode} from '../hooks/useAddNode'
 
-export const AddBlockModalRenderer = (props: {}) => {
-  const {addBlockModal} = usePageEditorContext()
+export const AddBlockModalRenderer = () => {
+  const {addBlockModal} = useBlockContentEditorContext()
   const addNode = useAddNode()
   const onAddBlock = (block: ReactElement) => {
     addNode(block, addBlockModal.insertAfterNodeId)

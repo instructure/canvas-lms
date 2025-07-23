@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render} from '@testing-library/react'
-import {ContentBuilderWrapper} from '../ContentBuilderWrapper'
+import {BlockContentEditor} from '@canvas/block-content-editor'
 
-describe('ContentBuilderWrapper', () => {
-  it('renders without crashing', () => {
-    render(<ContentBuilderWrapper />)
-  })
-})
+export const BlockContentEditorWrapper = () => {
+  return <BlockContentEditor data={null} onInit={null} />
+}

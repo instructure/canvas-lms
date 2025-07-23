@@ -18,11 +18,11 @@
 
 import {useCallback} from 'react'
 import {useGetRootNode} from './useGetRootNode'
-import {usePageEditorContext} from '../PageEditorContext'
+import {useBlockContentEditorContext} from '../BlockContentEditorContext'
 
 export const useHandleNodesCountChange = () => {
   const getRootNode = useGetRootNode()
-  const {initialAddBlockHandler} = usePageEditorContext()
+  const {initialAddBlockHandler} = useBlockContentEditorContext()
 
   const handleNodesCountChange = useCallback(() => {
     const rootNode = getRootNode()
