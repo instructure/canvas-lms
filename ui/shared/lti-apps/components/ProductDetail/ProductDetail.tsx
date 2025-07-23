@@ -296,7 +296,12 @@ const ProductDetail = (props: ProductDetailProps) => {
     <div>
       {isLoading ? (
         <Flex justifyItems="center">
-          <Spinner renderTitle="Loading Page" role="alert" aria-busy="true" data-testid="loading" />
+          <Spinner
+            renderTitle={I18n.t('Loading Page')}
+            role="alert"
+            aria-busy="true"
+            data-testid="loading"
+          />
         </Flex>
       ) : (
         product && (
@@ -369,7 +374,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                     fontWeight: 600,
                   }}
                 >
-                  {showTrucatedDescription ? 'See more' : 'See less'}
+                  {showTrucatedDescription ? I18n.t('See more') : I18n.t('See less')}
                 </Link>
               )}
               {product.screenshots.length > 0 && (
@@ -377,7 +382,7 @@ const ProductDetail = (props: ProductDetailProps) => {
                   <IconButton
                     size="large"
                     themeOverride={{largeHeight: '5rem'}}
-                    screenReaderLabel="View decorative image carousel"
+                    screenReaderLabel={I18n.t('View decorative image carousel')}
                     onClick={() => {
                       imageModalClickHandler(product?.screenshots)
                     }}

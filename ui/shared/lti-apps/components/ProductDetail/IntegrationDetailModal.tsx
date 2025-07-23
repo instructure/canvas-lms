@@ -18,8 +18,11 @@
 
 import React from 'react'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
+import {useScope as createI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
+
+const I18n = createI18nScope('lti_registrations')
 
 interface ImplementationDetailModalProps {
   title: string
@@ -41,7 +44,7 @@ const ImplementationDetailModal = (props: ImplementationDetailModalProps) => {
           <Text dangerouslySetInnerHTML={{__html: props.content || ''}} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={() => props.setModalOpen(false)}>Close</Button>
+          <Button onClick={() => props.setModalOpen(false)}>{I18n.t('Close')}</Button>
         </Modal.Footer>
       </Modal>
     </div>
