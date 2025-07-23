@@ -19,8 +19,11 @@
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage'
 import WikiPageCollection from '../WikiPageCollection'
 
-const checkFrontPage = function (collection) {
-  const total = collection.reduce((i, model) => (i += model.get('front_page') ? 1 : 0), 0)
+const checkFrontPage = function (collection: WikiPageCollection): boolean {
+  const total = (collection as any).reduce(
+    (i: number, model: any) => (i += model.get('front_page') ? 1 : 0),
+    0,
+  )
   return total <= 1
 }
 
@@ -28,20 +31,20 @@ describe('WikiPageCollection', () => {
   test('only a single front_page per collection', () => {
     const collection = new WikiPageCollection()
     for (let i = 0; i <= 2; i++) {
-      collection.add(new WikiPage())
+      ;(collection as any).add(new (WikiPage as any)())
     }
     expect(checkFrontPage(collection)).toBeTruthy()
-    collection.models[0].set('front_page', true)
+    ;(collection as any).models[0].set('front_page', true)
     expect(checkFrontPage(collection)).toBeTruthy()
-    collection.models[1].set('front_page', true)
+    ;(collection as any).models[1].set('front_page', true)
     expect(checkFrontPage(collection)).toBeTruthy()
-    collection.models[2].set('front_page', true)
+    ;(collection as any).models[2].set('front_page', true)
     expect(checkFrontPage(collection)).toBeTruthy()
   })
 })
 
 describe('WikiPageCollection:sorting', () => {
-  let collection
+  let collection: WikiPageCollection
 
   beforeEach(() => {
     collection = new WikiPageCollection()
@@ -52,55 +55,55 @@ describe('WikiPageCollection:sorting', () => {
   })
 
   test('default sort orders', () => {
-    expect(collection.sortOrders.title).toBe('asc')
-    expect(collection.sortOrders.created_at).toBe('desc')
-    expect(collection.sortOrders.updated_at).toBe('desc')
+    expect(collection.sortOrders?.title).toBe('asc')
+    expect(collection.sortOrders?.created_at).toBe('desc')
+    expect(collection.sortOrders?.updated_at).toBe('desc')
   })
 
   test('sort order toggles (sort on same field)', () => {
     collection.currentSortField = 'created_at'
-    collection.sortOrders.created_at = 'desc'
+    if (collection.sortOrders) collection.sortOrders.created_at = 'desc'
     collection.setSortField('created_at')
-    expect(collection.sortOrders.created_at).toBe('asc')
+    expect(collection.sortOrders?.created_at).toBe('asc')
   })
 
   test('sort order does not toggle (sort on different field)', () => {
     collection.currentSortField = 'title'
-    collection.sortOrders.created_at = 'desc'
+    if (collection.sortOrders) collection.sortOrders.created_at = 'desc'
     collection.setSortField('created_at')
-    expect(collection.sortOrders.created_at).toBe('desc')
+    expect(collection.sortOrders?.created_at).toBe('desc')
   })
 
   test('sort order can be forced', () => {
     collection.currentSortField = 'title'
-    collection.setSortField('created_at', 'asc')
+    ;(collection as any).setSortField('created_at', 'asc')
     expect(collection.currentSortField).toBe('created_at')
-    expect(collection.sortOrders.created_at).toBe('asc')
-    collection.setSortField('created_at', 'asc')
+    expect(collection.sortOrders?.created_at).toBe('asc')
+    ;(collection as any).setSortField('created_at', 'asc')
     expect(collection.currentSortField).toBe('created_at')
-    expect(collection.sortOrders.created_at).toBe('asc')
+    expect(collection.sortOrders?.created_at).toBe('asc')
   })
 
   test('setting sort triggers a sortChanged event', () => {
     const sortChangedSpy = jest.fn()
-    collection.on('sortChanged', sortChangedSpy)
+    ;(collection as any).on('sortChanged', sortChangedSpy)
     collection.setSortField('created_at')
     expect(sortChangedSpy).toHaveBeenCalledTimes(1)
     expect(sortChangedSpy).toHaveBeenCalledWith(collection.currentSortField, collection.sortOrders)
   })
 
   test('setting sort sets fetch parameters', () => {
-    collection.setSortField('created_at', 'desc')
+    ;(collection as any).setSortField('created_at', 'desc')
     expect(collection.options).toBeTruthy()
-    expect(collection.options.params).toBeTruthy()
-    expect(collection.options.params.sort).toBe('created_at')
-    expect(collection.options.params.order).toBe('desc')
+    expect((collection as any).options?.params).toBeTruthy()
+    expect((collection as any).options?.params.sort).toBe('created_at')
+    expect((collection as any).options?.params.order).toBe('desc')
   })
 
   test('sortByField delegates to setSortField', () => {
     const setSortFieldStub = jest.spyOn(collection, 'setSortField').mockImplementation()
-    const fetchStub = jest.spyOn(collection, 'fetch').mockImplementation()
-    collection.sortByField('created_at', 'desc')
+    const fetchStub = jest.spyOn(collection, 'fetch' as any).mockImplementation()
+    ;(collection as any).sortByField('created_at', 'desc')
     expect(setSortFieldStub).toHaveBeenCalledTimes(1)
     expect(setSortFieldStub).toHaveBeenCalledWith('created_at', 'desc')
     setSortFieldStub.mockRestore()
@@ -108,8 +111,8 @@ describe('WikiPageCollection:sorting', () => {
   })
 
   test('sortByField triggers a fetch', () => {
-    const fetchStub = jest.spyOn(collection, 'fetch').mockImplementation()
-    collection.sortByField('created_at', 'desc')
+    const fetchStub = jest.spyOn(collection, 'fetch' as any).mockImplementation()
+    ;(collection as any).sortByField('created_at', 'desc')
     expect(fetchStub).toHaveBeenCalledTimes(1)
     fetchStub.mockRestore()
   })

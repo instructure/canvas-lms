@@ -20,7 +20,7 @@ import $ from 'jquery'
 import '../redirectClickTo' // Assuming this adds a method to jQuery objects
 
 describe('redirectClickTo', () => {
-  const createClick = () => {
+  const createClick = (): MouseEvent => {
     const e = new MouseEvent('click', {
       bubbles: true,
       cancelable: true,
@@ -44,10 +44,14 @@ describe('redirectClickTo', () => {
     const targetDivSpy = jest.fn()
 
     targetDiv.on('click', targetDivSpy)
+    // @ts-expect-error - redirectClickTo is added to jQuery prototype
     sourceDiv.redirectClickTo(targetDiv)
     const e = createClick()
 
-    sourceDiv.get(0).dispatchEvent(e)
+    const sourceDivElement = sourceDiv.get(0)
+    if (sourceDivElement) {
+      sourceDivElement.dispatchEvent(e)
+    }
 
     expect(targetDivSpy).toHaveBeenCalled()
     expect(targetDivSpy.mock.calls[0][0].type).toBe(e.type)
