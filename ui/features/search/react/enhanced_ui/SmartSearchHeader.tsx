@@ -307,7 +307,7 @@ export default function SmartSearchHeader(props: Props) {
   return (
     <>
       <Flex direction="column" gap="sections">
-        <Heading variant="titlePageDesktop" data-testid="smart-search-heading">
+        <Heading variant="titlePageDesktop" level="h1" data-testid="smart-search-heading">
           <Flex alignItems="center" gap="small">
             <IconAiColoredSolid size="small" />
             {I18n.t('Smart Search')}

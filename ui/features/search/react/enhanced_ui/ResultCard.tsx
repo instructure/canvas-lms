@@ -151,9 +151,13 @@ export default function ResultCard(props: ResultCardProps) {
       data-testid="search-result"
     >
       <Link href={html_url} target="_blank" key="result-link">
-        <Heading variant="titleCardLarge" data-pendo={`smart-search-${props.resultType}-result`}>
+        <Text
+          size="descriptionPage"
+          weight="weightImportant"
+          data-pendo={`smart-search-${props.resultType}-result`}
+        >
           {title}
-        </Heading>
+        </Text>
       </Link>
       {renderPills(
         `${props.result.content_id}-${props.result.content_type}`,
