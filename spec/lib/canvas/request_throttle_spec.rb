@@ -20,12 +20,12 @@
 
 describe RequestThrottle do
   let(:site_admin_service_user) { site_admin_user }
-  let(:developer_key_sasu) { DeveloperKey.create!(account: Account.site_admin, user: site_admin_service_user) }
+  let(:developer_key_sasu) { DeveloperKey.create!(name: "sasu", account: Account.site_admin, user: site_admin_service_user) }
   let(:base_req) { { "QUERY_STRING" => "", "PATH_INFO" => "/", "REQUEST_METHOD" => "GET" } }
   let(:request_user_1) { base_req.merge({ "REMOTE_ADDR" => "1.2.3.4", "rack.session" => { user_id: 1 } }) }
   let(:request_user_2) { base_req.merge({ "REMOTE_ADDR" => "4.3.2.1", "rack.session" => { user_id: 2 } }) }
-  let(:token1) { AccessToken.create!(user: user_factory) }
-  let(:token2) { AccessToken.create!(user: user_factory) }
+  let(:token1) { AccessToken.create!(user: user_factory, purpose: "token1") }
+  let(:token2) { AccessToken.create!(user: user_factory, purpose: "token2") }
   let(:token_sasu) { AccessToken.create!(developer_key: developer_key_sasu, user: site_admin_service_user) }
   let(:request_query_token) { request_user_1.merge({ "REMOTE_ADDR" => "1.2.3.4", "QUERY_STRING" => "access_token=#{token1.full_token}" }) }
   let(:request_header_token) { request_user_2.merge({ "REMOTE_ADDR" => "4.3.2.1", "HTTP_AUTHORIZATION" => "Bearer #{token2.full_token}" }) }

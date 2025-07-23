@@ -2855,7 +2855,7 @@ describe "Users API", type: :request do
     let_once(:path_options) { { controller: "users", action: "expire_mobile_sessions", format: "json" } }
 
     before do
-      user.access_tokens.create!
+      user.access_tokens.create!(purpose: "Test Access Token")
     end
 
     it "allows admin to expire mobile sessions" do

@@ -22,7 +22,7 @@ describe FileAuthenticator do
   before do
     @oauth_host = "http://oauth.host/"
     @user = user_model
-    @access_token = @user.access_tokens.create!
+    @access_token = @user.access_tokens.create!(purpose: "test")
     @acting_as = user_model
     @attachment = attachment_with_context(@user)
     @attachment.filename = "test.txt"

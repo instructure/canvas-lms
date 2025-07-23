@@ -25,7 +25,7 @@ module Lti
     describe AuthorizationController, type: :request do
       let(:account) { Account.create! }
 
-      let(:developer_key) { DeveloperKey.create!(redirect_uri: "http://example.com/redirect") }
+      let(:developer_key) { DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}", redirect_uri: "http://example.com/redirect") }
 
       let(:product_family) do
         ProductFamily.create(

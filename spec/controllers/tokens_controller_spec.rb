@@ -84,7 +84,7 @@ describe TokensController do
       end
 
       it "allows deleting an access token" do
-        token = @user.access_tokens.create!
+        token = @user.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq @user.id
         delete "destroy", params: { user_id: "self", id: token.id }
         expect(response).to be_successful
@@ -94,7 +94,7 @@ describe TokensController do
       it "does not allow deleting an access token while masquerading" do
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym(active_all: true).id
-        token = @user.access_tokens.create!
+        token = @user.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq @user.id
 
         delete "destroy", params: { user_id: "self", id: token.id }
@@ -103,7 +103,7 @@ describe TokensController do
 
       it "does not allow deleting someone else's access token" do
         user2 = User.create!
-        token = user2.access_tokens.create!
+        token = user2.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq user2.id
         delete "destroy", params: { user_id: "self", id: token.id }
         assert_status(404)
@@ -112,6 +112,7 @@ describe TokensController do
       it "allows retrieving an access token, but not give the full token string" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -122,7 +123,7 @@ describe TokensController do
       end
 
       it "does not include token for non-manually-generated tokens" do
-        key = DeveloperKey.create!
+        key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}")
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be false
@@ -134,7 +135,7 @@ describe TokensController do
 
       it "does not allow retrieving someone else's access token" do
         user2 = User.create!
-        token = user2.access_tokens.create!
+        token = user2.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq user2.id
         get "show", params: { user_id: "self", id: token.id }
         assert_status(404)
@@ -143,6 +144,7 @@ describe TokensController do
       it "allows updating a token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -155,7 +157,7 @@ describe TokensController do
       end
 
       it "does not overwrite the token's permanent_expires_at on update if expires_at not provided" do
-        token = @user.access_tokens.create!(permanent_expires_at: 1.day.from_now)
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.from_now, purpose: "test")
         put "update", params: { user_id: "self", id: token.id, token: { purpose: "test" } }
         expect(assigns[:token].purpose).to eq "test"
         expect(assigns[:token].permanent_expires_at).to eq token.permanent_expires_at
@@ -164,6 +166,7 @@ describe TokensController do
       it "allows regenerating a manually generated token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -180,6 +183,7 @@ describe TokensController do
         session[:become_user_id] = user_with_pseudonym(active_all: true).id
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -188,7 +192,7 @@ describe TokensController do
       end
 
       it "does not allow regenerating a non-manually-generated token" do
-        key = DeveloperKey.create!
+        key = DeveloperKey.create!(name: "test_key_#{SecureRandom.hex(4)}")
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be false
@@ -200,20 +204,20 @@ describe TokensController do
       end
 
       it "does not allow regenerating an expired token without a new expiration date" do
-        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago)
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago, purpose: "test")
         put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
         assert_status(400)
       end
 
       it "allows regenerating an expired token with a new expiration date" do
-        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago)
+        token = @user.access_tokens.create!(permanent_expires_at: 1.day.ago, purpose: "test")
         put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1", expires_at: 1.day.from_now } }
         assert_status(200)
       end
 
       it "does not allow updating someone else's token" do
         user2 = User.create!
-        token = user2.access_tokens.create!
+        token = user2.access_tokens.create!(purpose: "test")
         expect(token.user_id).to eq user2.id
         put "update", params: { user_id: user2.id, id: token.id, token: { regenerate: "1" } }
         assert_status(404)
@@ -222,6 +226,7 @@ describe TokensController do
       it "allows activating a pending token" do
         token = @user.access_tokens.new(workflow_state: "pending")
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -234,6 +239,7 @@ describe TokensController do
       it "does not allow activating an active token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -246,6 +252,7 @@ describe TokensController do
         session[:become_user_id] = user_with_pseudonym(active_all: true).id
         token = @user.access_tokens.new(workflow_state: "pending")
         token.developer_key = DeveloperKey.default
+        token.purpose = "test"
         token.save!
         expect(token.user_id).to eq @user.id
         expect(token.manually_created?).to be true
@@ -266,7 +273,7 @@ describe TokensController do
             end
 
             it "does not allow updating an access token" do
-              token = @user.access_tokens.create!
+              token = @user.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(401)
             end
@@ -284,7 +291,7 @@ describe TokensController do
             end
 
             it "allows updating an access token" do
-              token = @admin.access_tokens.create!
+              token = @admin.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(200)
               expect(assigns[:token]).to be_active
@@ -315,7 +322,7 @@ describe TokensController do
               end
 
               it "allows updating an access token" do
-                token = @other_user.access_tokens.create!
+                token = @other_user.access_tokens.create!(purpose: "test")
                 expect(token).to be_active
                 put "update", params: { user_id: @other_user.id, id: token.id, token: { regenerate: "1" } }
 
@@ -347,7 +354,7 @@ describe TokensController do
                 end
 
                 it "allows updating an access token" do
-                  token = @other_user.access_tokens.create!
+                  token = @other_user.access_tokens.create!(purpose: "test")
                   expect(token).to be_active
                   put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
 
@@ -369,7 +376,7 @@ describe TokensController do
             end
 
             it "allows updating an access token" do
-              token = @user.access_tokens.create!
+              token = @user.access_tokens.create!(purpose: "test")
               put "update", params: { user_id: "self", id: token.id, token: { regenerate: "1" } }
               assert_status(200)
             end

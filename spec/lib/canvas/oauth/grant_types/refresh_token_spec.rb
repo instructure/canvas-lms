@@ -18,13 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 RSpec.describe Canvas::OAuth::GrantTypes::RefreshToken do # rubocop:disable RSpec/SpecFilePathFormat
-  let(:key) { DeveloperKey.create! }
+  let(:key) { DeveloperKey.create!(name: "test_key") }
   let(:client_id) { key.global_id }
   let(:secret) { key.api_key }
   let(:opts) { { refresh_token: "test_refresh_token" } }
   let(:provider) { instance_double(Canvas::OAuth::Provider) }
   let(:token) { instance_double(Canvas::OAuth::Token) }
-  let(:access_token) { key.access_tokens.create! }
+  let(:access_token) { key.access_tokens.create!(purpose: "test") }
   let(:refresh_token_instance) { described_class.new(client_id, secret, opts) }
 
   before do
