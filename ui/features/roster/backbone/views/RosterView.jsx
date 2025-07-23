@@ -299,7 +299,7 @@ export default class RosterView extends Backbone.View {
           <AlertManager>
             <UserDifferentiationTagManager
               courseId={ENV.course.id}
-              users={users}
+              users={[...users]}
               allInCourse={allInCourse}
               userExceptions={exceptions}
             />
