@@ -2542,6 +2542,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/grading_standards/:grading_standard_id", action: :context_show
       post "accounts/:account_id/grading_standards", action: :create
       post "courses/:course_id/grading_standards", action: :create
+      delete "courses/:course_id/grading_standards/:grading_standard_id", action: :destroy
+      delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end
 
     get "/crocodoc_session", controller: "crocodoc_sessions", action: "show", as: :crocodoc_session

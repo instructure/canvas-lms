@@ -212,6 +212,28 @@ class GradingStandardsApiController < ApplicationController
     end
   end
 
+  # @API Delete a grading standard
+  # Deletes the grading standard with the given id
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/grading_standards/5 \
+  #     -X DELETE \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns GradingStandard
+  def destroy
+    grading_standard = @context.grading_standards.find(params[:grading_standard_id])
+    if authorized_action(grading_standard, @current_user, :manage)
+      respond_to do |format|
+        if grading_standard.destroy
+          format.json { render json: grading_standard_json(grading_standard, @current_user, session) }
+        else
+          format.json { render json: grading_standard.errors, status: :bad_request }
+        end
+      end
+    end
+  end
+
   private
 
   def build_grading_scheme(params)

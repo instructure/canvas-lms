@@ -69,6 +69,18 @@ describe GradingStandardsApiController, type: :request do
                                     action: "create"
                                   })
   end
+  let(:account_destroy_params) do
+    account_resources_params.merge({
+                                     action: "destroy",
+                                     grading_standard_id: account_standard.id
+                                   })
+  end
+  let(:course_destroy_params) do
+    course_resources_params.merge({
+                                    action: "destroy",
+                                    grading_standard_id: course_standard.id
+                                  })
+  end
 
   context "account admin" do
     before do
@@ -270,6 +282,32 @@ describe GradingStandardsApiController, type: :request do
         expect(json).to eq(expected_json)
       end
     end
+
+    describe "#destroy" do
+      it "deletes an account grading standard" do
+        standard_id = account_standard.id
+        res = api_call(:delete, account_resource_path, account_destroy_params)
+        expect(res["id"]).to eq standard_id
+        expect(res["context_type"]).to eq "Account"
+        expect(res["context_id"]).to eq account.id
+        deleted_standard = GradingStandard.find_by(id: standard_id)
+        expect(deleted_standard.workflow_state).to eq "deleted"
+      end
+
+      it "deletes a course grading standard" do
+        standard_id = course_standard.id
+        res = api_call(:delete, course_resource_path, course_destroy_params)
+        expect(res["id"]).to eq standard_id
+        expect(res["context_type"]).to eq "Course"
+        expect(res["context_id"]).to eq course.id
+        deleted_standard = GradingStandard.find_by(id: standard_id)
+        expect(deleted_standard.workflow_state).to eq "deleted"
+      end
+
+      it "returns a 404 if the grading standard does not exist" do
+        api_call(:delete, "#{course_resources_path}/999", course_destroy_params.merge(grading_standard_id: "999"), {}, {}, { expected_status: 404 })
+      end
+    end
   end
 
   context "teacher" do
@@ -313,6 +351,22 @@ describe GradingStandardsApiController, type: :request do
         expect(res["context_type"]).to eq "Course"
         expect(res["context_id"]).to eq course.id
         expect(res["id"]).to eq course_standard.id
+      end
+    end
+
+    describe "#destroy" do
+      it "returns forbidden for account grading standards" do
+        api_call(:delete, account_resource_path, account_destroy_params, {}, {}, { expected_status: 403 })
+      end
+
+      it "deletes course grading standards" do
+        standard_id = course_standard.id
+        res = api_call(:delete, course_resource_path, course_destroy_params)
+        expect(res["id"]).to eq standard_id
+        expect(res["context_type"]).to eq "Course"
+        expect(res["context_id"]).to eq course.id
+        deleted_standard = GradingStandard.find_by(id: standard_id)
+        expect(deleted_standard.workflow_state).to eq "deleted"
       end
     end
   end
