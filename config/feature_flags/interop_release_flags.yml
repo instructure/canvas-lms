@@ -55,8 +55,6 @@ custom_variables_booleans_as_strings:
   environments:
     development:
       state: allowed_on
-    test:
-      state: allowed_on
     ci:
       state: allowed_on
 disable_graphql_authentication:
