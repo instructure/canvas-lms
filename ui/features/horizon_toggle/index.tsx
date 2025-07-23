@@ -23,6 +23,7 @@ import {LoadTab} from '../../shared/tabs/react/LoadTab'
 import ready from '@instructure/ready'
 
 ready(() => {
+  initAccountSelectModal()
   let careersTabRoot: ReturnType<typeof createRoot> | null = null
 
   function loadCareersTab(targetId: string) {
@@ -45,8 +46,6 @@ ready(() => {
     }
 
     careersTabRoot.render(app)
-
-    initAccountSelectModal()
   }
 
   LoadTab(loadCareersTab)
