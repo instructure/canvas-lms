@@ -1371,12 +1371,12 @@ describe "RCE next tests", :ignore_js_errors do
 
         it "shows MRU tools in the Tools > Apps submenu", :ignore_js_errors do
           rce_wysiwyg_state_setup(@course)
-          driver.local_storage["ltimru"] = "[#{@tool.id}]"
+          set_local_storage(["ltimru"], "[#{@tool.id}]")
 
           click_menubar_submenu_item("Tools", "Apps")
           expect(menubar_menu_item("View All")).to be_displayed
           expect(f("body")).to contain_css(menubar_menu_item_css("Commons Favorites"))
-          driver.local_storage.clear
+          clear_local_storage
         end
       end
     end
@@ -1458,11 +1458,11 @@ describe "RCE next tests", :ignore_js_errors do
     end
 
     describe "the content tray" do
-      after { driver.local_storage.clear }
+      after { clear_local_storage }
 
       it "shows course links after user files" do
         get "/"
-        driver.session_storage["canvas_rce_links_accordion_index"] = "assignments"
+        set_session_storage("canvas_rce_links_accordion_index", "assignments")
 
         title = "Assignment-Title"
         @assignment = @course.assignments.create!(name: title)

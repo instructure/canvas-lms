@@ -215,7 +215,7 @@ describe "help dialog" do
     it "opens up the welcome tour on page load and shows the welcome tour link and opens the tour when clicked" do
       course_with_ta(course: @course)
       get "/"
-      driver.local_storage.clear
+      clear_local_storage
       wait_for_ajaximations
 
       get "/courses/#{@course.id}"
@@ -241,7 +241,7 @@ describe "help dialog" do
     it "shows the welcome tour for Account Admins" do
       Account.default.account_users.create!(user: @user)
       get "/"
-      driver.local_storage.clear
+      clear_local_storage
       wait_for_ajaximations
 
       # Reload so the local storage clearing take effect
