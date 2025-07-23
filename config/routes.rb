@@ -2005,10 +2005,13 @@ CanvasRails::Application.routes.draw do
       delete "groups/:group_id/followers/self", action: :unfollow
       get "groups/:group_id/collaborations", controller: :collaborations, action: :api_index, as: "group_collaborations_index"
       delete "groups/:group_id/collaborations/:id", controller: :collaborations, action: :destroy
+      get "courses/:course_id/bulk_user_tags", to: "groups#bulk_user_tags"
 
       scope(controller: :group_memberships) do
         resources :memberships, path: "groups/:group_id/memberships", name_prefix: "group_", controller: :group_memberships
         resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :create]
+
+        delete "groups/:group_id/users", to: "group_memberships#destroy_bulk"
       end
 
       get "groups/:group_id/files", controller: :files, action: :api_index, as: "group_files"
