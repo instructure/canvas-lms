@@ -22,6 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import type {IndexProgress, Result} from '../types'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {IconAiSolid, IconAiColoredSolid, IconFilterLine, IconXLine} from '@instructure/ui-icons'
 import AutocompleteSearch from './AutocompleteSearch'
@@ -188,7 +189,10 @@ export default function SmartSearchHeader(props: Props) {
                 }}
                 renderIcon={<IconXLine />}
               >
-                {readableFilters[filter]}
+                <PresentationContent>{readableFilters[filter]}</PresentationContent>
+                <ScreenReaderContent>
+                  {I18n.t('Remove filter: %{filter}', {filter: readableFilters[filter]})}
+                </ScreenReaderContent>
               </Pill>
             </InlineListItem>
           )
