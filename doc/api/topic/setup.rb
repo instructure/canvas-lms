@@ -28,6 +28,8 @@ def init
     sections :header, [:topic_doc, :method_details_list, [T("method_details")]]
     @resource = object
     @beta = options[:controllers].any? { |c| c.tag("beta") }
+    @internal = options[:controllers].any? { |c| c.tag("internal") }
+    @show_internal = show_internal?
   end
 end
 

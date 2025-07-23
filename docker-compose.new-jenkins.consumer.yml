@@ -7,6 +7,7 @@ services:
       - redis
     environment:
       RAILS_ENV: development
+      INCLUDE_INTERNAL_API_DOCS: 'true'
       USE_OPTIMIZED_JS: "true"
       ADDITIONAL_ALLOWED_HOSTS: localhost:8181
     ports:
