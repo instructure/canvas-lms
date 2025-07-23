@@ -52,7 +52,9 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
             _id
             message
             pinType
-            pinnedBy
+            pinnedBy {
+              _id
+            }
             attachment {
               _id
             }

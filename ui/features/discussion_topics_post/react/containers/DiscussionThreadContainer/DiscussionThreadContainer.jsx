@@ -144,6 +144,9 @@ export const DiscussionThreadContainer = props => {
 
   const removeRef = useHighlightStore(state => state.removeReplyRef)
 
+  const isPinned =
+    props.discussionEntry.pinType === 'reply' || props.discussionEntry.pinType === 'thread'
+
   useEffect(() => {
     if (props.discussionEntry._id === props.highlightEntryId) {
       window.postMessage({
@@ -238,6 +241,15 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         rating: props.discussionEntry.entryParticipant?.rating ? 'not_liked' : 'liked',
+      },
+    })
+  }
+
+  const togglePinned = () => {
+    updateDiscussionEntry({
+      variables: {
+        discussionEntryId: props.discussionEntry._id,
+        pinType: props.discussionEntry.pinType ? 'none' : 'reply',
       },
     })
   }
@@ -361,16 +373,6 @@ export const DiscussionThreadContainer = props => {
       )
     }
 
-    if (ENV.discussion_pin_post) {
-      threadActions.push(
-        <ThreadingToolbar.Pin
-          key={`pin-${props.discussionEntry._id}`}
-          delimiterKey={`pin-delimiter-${props.discussionEntry._id}`}
-          onClick={() => {}}
-        />,
-      )
-    }
-
     if (!props.discussionEntry.deleted) {
       threadActions.push(
         <ThreadingToolbar.MarkAsRead
@@ -381,6 +383,19 @@ export const DiscussionThreadContainer = props => {
           onClick={toggleUnread}
         />,
       )
+    }
+
+    if (ENV.discussion_pin_post) {
+      if (props.discussionTopic.permissions.moderateForum && !props.discussionEntry.deleted) {
+        threadActions.push(
+          <ThreadingToolbar.Pin
+            key={`pin-${props.discussionEntry._id}`}
+            delimiterKey={`pin-delimiter-${props.discussionEntry._id}`}
+            onClick={togglePinned}
+            isPinned={isPinned}
+          />,
+        )
+      }
     }
 
     if (props.discussionEntry.deleted) {
@@ -639,6 +654,8 @@ export const DiscussionThreadContainer = props => {
                     discussionEntry={props.discussionEntry}
                     toggleUnread={toggleUnread}
                     isTopic={false}
+                    isPinned={isPinned}
+                    pinnedBy={props.discussionEntry.pinnedBy}
                     postUtilities={
                       !props.discussionEntry.deleted ? (
                         <ThreadActions

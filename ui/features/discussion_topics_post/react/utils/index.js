@@ -340,6 +340,8 @@ export const getOptimisticResponse = ({
         createdAt: new Date().toString(),
         updatedAt: new Date().toString(),
         deleted: false,
+        pinType: null,
+        pinnedBy: null,
         message,
         ratingCount: null,
         ratingSum: null,
