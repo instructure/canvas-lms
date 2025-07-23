@@ -82,7 +82,7 @@ function ImageCarouselModal(props: ImageCarouselModalProps) {
   return (
     <div>
       <Modal
-        label={`${productName} Images`}
+        label={I18n.t('%{productName} Images', {productName})}
         open={isModalOpen}
         size={!isDesktop ? 'fullscreen' : 'large'}
         variant="inverse"
