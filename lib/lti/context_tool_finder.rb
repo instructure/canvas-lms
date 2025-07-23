@@ -115,41 +115,11 @@ module Lti
       Lti::ScopeUnion.new(scopes)
     end
 
-    def self.contexts_to_search(context, include_federated_parent: false)
-      case context
-      when Course
-        [:self, :account_chain]
-      when Group
-        if context.context
-          [:self, :recursive]
-        else
-          [:self, :account_chain]
-        end
-      when Account
-        [:account_chain]
-      when Assignment
-        [:recursive]
-      else
-        []
-      end.flat_map do |component|
-        case component
-        when :self
-          context
-        when :recursive
-          contexts_to_search(context.context, include_federated_parent:)
-        when :account_chain
-          inc_fp = include_federated_parent &&
-                   Account.site_admin.feature_enabled?(:lti_tools_from_federated_parents) &&
-                   !context.root_account.primary_settings_root_account?
-          context.account_chain(include_federated_parent: inc_fp)
-        end
-      end
-    end
-
     # Produces an SQL fragment for ordering by context. This should be used
     # in a JOIN clause and coupled with an "ORDER BY context_order.ordering" clause.
     #
-    # @param contexts [Array<Context>] the context chain, usually from contexts_to_search
+    # @param contexts [Array<Context>] the context chain, usually from
+    #                                  Lti::ToolFinderUtils.contexts_to_search
     # @return [String] SQL fragment for ordering by context. use in .joins
     def self.context_ordering_sql(contexts)
       table_name = ContextExternalTool.quoted_table_name
@@ -176,7 +146,7 @@ module Lti
     # is on
     def scopes(include_federated_parent: true)
       placements = * @placements || @type
-      contexts = Lti::ContextToolFinder.contexts_to_search(context, include_federated_parent:)
+      contexts = Lti::ToolFinderUtils.contexts_to_search(context, include_federated_parent:)
 
       return [ContextExternalTool.none] if contexts.empty?
 
@@ -188,7 +158,7 @@ module Lti
         scope = scope.selectable if Canvas::Plugin.value_to_boolean(@selectable)
         scope = scope.where(tool_id: @tool_ids) if @tool_ids.present?
         scope = scope.preload(:context_external_tool_placements)
-        scope = Lti::ToolFinder.filter_by_unavailable_context_controls(scope, context)
+        scope = Lti::ToolFinderUtils.filter_by_unavailable_context_controls(scope, context)
 
         if Canvas::Plugin.value_to_boolean(@only_visible)
           scope = scope.visible(@current_user, context, @session, placements, scope)
