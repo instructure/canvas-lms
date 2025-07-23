@@ -313,8 +313,15 @@ module Types
     field :has_submitted_submissions,
           Boolean,
           "If true, the assignment has been submitted to by at least one student",
-          method: :has_submitted_submissions?,
           null: true
+    def has_submitted_submissions
+      Loaders::AssignmentHasSubmissionsLoader.for.load(assignment.id).then do |has_submissions|
+        # Set cache for both methods that check submission existence
+        assignment.instance_variable_set(:@has_student_submissions, has_submissions)
+        assignment.instance_variable_set(:@has_submitted_submissions, has_submissions)
+        assignment.has_student_submissions?
+      end
+    end
     field :omit_from_final_grade,
           Boolean,
           "If true, the assignment will be omitted from the student's final grade",
