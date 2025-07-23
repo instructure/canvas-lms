@@ -63,7 +63,7 @@ describe('HorizonAccountModal', () => {
 
   it('renders the modal', () => {
     setup()
-    expect(screen.getByText('Canvas Career Sub-Account')).toBeInTheDocument()
+    expect(screen.getByText('Canvas Career Account')).toBeInTheDocument()
   })
 
   it('calls onClose when the Cancel button is clicked', () => {
