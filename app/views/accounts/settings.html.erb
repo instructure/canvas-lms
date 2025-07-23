@@ -1384,7 +1384,7 @@ acknowledge that you have read and agreed to the
                     <%= announcement.subject %>
                   </h2>
                   <span class="notification_message">
-                    <%= user_content(announcement.message) %>
+                    <%= user_content(announcement.message, location: announcement.asset_string) %>
                   </span>
                   <% if can_do(@account, @current_user, :manage_alerts) %>
                     <div class="ic-notification__admin-actions">
