@@ -721,7 +721,12 @@
 #         "visibility": {
 #           "description": "Specifies types of users that can see this placement. Only valid for some placements like course_navigation.",
 #           "example": "admins",
-#           "type": "string"
+#           "type": "string",
+#           "enum": [
+#             "admins",
+#             "members",
+#             "public"
+#           ]
 #         },
 #         "prefer_sis_email": {
 #           "description": "1.1 specific. If true, the tool will send the SIS email in the lis_person_contact_email_primary launch property",
