@@ -12501,4 +12501,9 @@ describe Assignment do
       expect(@assignment.rubric_self_assessment_enabled?).to be_falsey
     end
   end
+
+  it_behaves_like "an accessibility scannable resource" do
+    let(:valid_attributes) { { title: "Test Assignment", course: course_model } }
+    let(:relevant_attributes_for_scan) { { description: "<p>Lorem ipsum</p>" } }
+  end
 end

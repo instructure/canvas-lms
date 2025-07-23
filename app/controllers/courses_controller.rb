@@ -358,7 +358,6 @@ class CoursesController < ApplicationController
   include NewQuizzesFeaturesHelper
   include ObserverEnrollmentsHelper
   include DefaultDueTimeHelper
-  include AccessibilityHelper
 
   before_action :require_user, only: %i[index activity_stream activity_stream_summary effective_due_dates offline_web_exports start_offline_web_export]
   before_action :require_user_or_observer, only: [:user_index]
@@ -2284,7 +2283,7 @@ class CoursesController < ApplicationController
         end
 
         @accessibility_scan_enabled =
-          @context.feature_enabled?(:accessibility_tab_enable) ? !exceeds_accessibility_scan_limit? : false
+          @context.feature_enabled?(:accessibility_tab_enable) ? !@context.exceeds_accessibility_scan_limit? : false
       end
 
       return if check_for_xlist

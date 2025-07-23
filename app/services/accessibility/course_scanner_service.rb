@@ -34,8 +34,5 @@ class Accessibility::CourseScannerService < ApplicationService
     @course.assignments.active.except(:order).find_each do |resource|
       Accessibility::ResourceScannerService.call(resource:)
     end
-    @course.attachments.not_deleted.where(content_type: "application/pdf").find_each do |resource|
-      Accessibility::ResourceScannerService.call(resource:)
-    end
   end
 end

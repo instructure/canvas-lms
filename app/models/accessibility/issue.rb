@@ -24,7 +24,6 @@ module Accessibility
     include AssignmentIssues
     include AttachmentIssues
     include ContentChecker
-    include AccessibilityHelper
 
     attr_reader :context
 
@@ -33,7 +32,7 @@ module Accessibility
     end
 
     def generate
-      skip_scan = exceeds_accessibility_scan_limit?
+      skip_scan = @context.exceeds_accessibility_scan_limit?
       {
         pages: generate_wiki_page_resources(skip_scan:),
         assignments: generate_assignment_resources(skip_scan:),

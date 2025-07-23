@@ -8570,4 +8570,42 @@ describe Course do
       expect(Course.copied_asset("page_#{source_page.id}")).to include(copied_course)
     end
   end
+
+  describe "accessibility scanning" do
+    let(:course) { course_model }
+
+    describe "#exceeds_accessibility_scan_limit?" do
+      before do
+        allow(course.wiki_pages).to receive(:not_deleted).and_return(double(count: wiki_count))
+        allow(course.assignments).to receive(:active).and_return(double(count: assignment_count))
+      end
+
+      context "when total resources exceed limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 600 }
+
+        it "returns true" do
+          expect(course.exceeds_accessibility_scan_limit?).to be true
+        end
+      end
+
+      context "when total resources are within limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 400 }
+
+        it "returns false" do
+          expect(course.exceeds_accessibility_scan_limit?).to be false
+        end
+      end
+
+      context "when total resources equal limit" do
+        let(:wiki_count) { 500 }
+        let(:assignment_count) { 500 }
+
+        it "returns false" do
+          expect(course.exceeds_accessibility_scan_limit?).to be false
+        end
+      end
+    end
+  end
 end
