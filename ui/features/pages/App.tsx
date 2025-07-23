@@ -28,7 +28,7 @@ const I18n = createI18nScope('pages')
 export const App = () => {
   return (
     <MainLayout
-      header={<Heading variant="titlePageDesktop">{I18n.t('Page Editor')}</Heading>}
+      header={<Heading variant="titlePageDesktop">{I18n.t('Block Content Editor')}</Heading>}
       body={<BodyLayout title={<PageTitle />} editor={<BlockContentEditorWrapper />} />}
     />
   )
