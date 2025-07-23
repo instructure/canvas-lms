@@ -72,6 +72,7 @@ const TableBody: React.FC<TableBodyProps> = ({
   const [unresolvedCollisions, setUnresolvedCollisions] = useState<FileOptions[]>([])
   const [fixingNameCollisions, setFixingNameCollisions] = useState<boolean>(false)
   const [destinationFolder, setDestinationFolder] = useState<null | Folder>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const dragHolderRef = useRef<null | JQuery<HTMLElement>>(null)
   const dragRootRef = useRef<null | Root>(null)
 
@@ -131,6 +132,7 @@ const TableBody: React.FC<TableBodyProps> = ({
     removeDragFeedback()
     document.removeEventListener('dragover', handleDocumentDragOver)
     document.removeEventListener('dragend', removeDragFeedback)
+    setDragOverIndex(null)
   }
 
   const handleDrop = (e: React.DragEvent, dropFolder: File | Folder) => {
@@ -172,6 +174,20 @@ const TableBody: React.FC<TableBodyProps> = ({
         sendMoveRequests(dropFolder, resolveCollisions, selectedItems as ResolvedName[])
     }
     handleDragEnd()
+  }
+
+  const handleDragEnter = (_e: React.DragEvent, rowIndex: number, row: File | Folder) => {
+    if (isFile(row)) {
+      setDragOverIndex(null)
+      return
+    }
+    setDragOverIndex(rowIndex)
+  }
+
+  const handleDragLeave = (_e: React.DragEvent, rowIndex: number) => {
+    if (dragOverIndex === rowIndex) {
+      setDragOverIndex(null)
+    }
   }
 
   const resolveCollisions = (nameCollisions: FileOptions[]) => {
@@ -303,8 +319,11 @@ const TableBody: React.FC<TableBodyProps> = ({
             onDragStart={e => handleDragStart(e, row)}
             onDrop={e => handleDrop(e, row)}
             onDragEnd={handleDragEnd}
+            onDragEnter={e => handleDragEnter(e, index, row)}
+            onDragLeave={e => handleDragLeave(e, index)}
             key={getUniqueId(row)}
             data-testid="table-row"
+            setHoverStateTo={dragOverIndex === index}
           >
             {...rowHead}
           </Table.Row>
