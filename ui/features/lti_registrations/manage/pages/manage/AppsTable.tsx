@@ -32,20 +32,27 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Link as RouterLink} from 'react-router-dom'
 import React from 'react'
 import type {PaginatedList} from '../../api/PaginatedList'
-import type {AppsSortDirection, AppsSortProperty} from '../../api/registrations'
+import {
+  LIST_REGISTRATIONS_PAGE_LIMIT,
+  refreshRegistrations,
+  useDeleteRegistration,
+  type AppsSortDirection,
+  type AppsSortProperty,
+} from '../../api/registrations'
 import {isForcedOn, type LtiRegistration} from '../../model/LtiRegistration'
 import {useManageSearchParams, type ManageSearchParams} from './ManageSearchParams'
 import {colors} from '@instructure/canvas-theme'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Pagination} from '@instructure/ui-pagination'
-import {MANAGE_APPS_PAGE_LIMIT, refreshRegistrations} from './ManagePageLoadingState'
 import {
   openEditDynamicRegistrationWizard,
   openEditManualRegistrationWizard,
 } from '../../registration_wizard/RegistrationWizardModalState'
 import {alert} from '@canvas/instui-bindings/react/Alert'
 import {ToolIconOrDefault} from '@canvas/lti-apps/components/common/ToolIconOrDefault'
+import type {AccountId} from '../../model/AccountId'
+import {confirmDanger} from '@canvas/instui-bindings/react/Confirm'
 
 type CallbackWithRegistration = (registration: LtiRegistration) => void
 
@@ -54,8 +61,8 @@ export type AppsTableProps = {
   sort: AppsSortProperty
   dir: AppsSortDirection
   stale: boolean
+  accountId: AccountId
   updateSearchParams: ReturnType<typeof useManageSearchParams>[1]
-  deleteApp: CallbackWithRegistration
   page: number
 }
 
@@ -467,7 +474,17 @@ const AppsTableResponsiveWrapper = React.memo(
   },
 )
 
-type AppsTableInnerProps = {
+const confirmDeletion = (registration: LtiRegistration): Promise<boolean> =>
+  confirmDanger({
+    title: I18n.t('Delete App'),
+    confirmButtonLabel: I18n.t('Delete'),
+    heading: I18n.t('You are about to delete “%{appName}”.', {appName: registration.name}),
+    message: I18n.t(
+      'You are removing the app from the entire account. It will be removed from its placements and any resource links to it will stop working. To reestablish placements and links, you will need to reinstall the app.',
+    ),
+  })
+
+export type AppsTableInnerProps = {
   responsiveProps: ResponsivePropsObject | null | undefined
   tableProps: Omit<AppsTableProps, 'stale' | 'pageCount' | 'updatePage'>
 }
@@ -475,19 +492,43 @@ type AppsTableInnerProps = {
 export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
   const [, setManageSearchParams] = useManageSearchParams()
   const responsiveProps = props.responsiveProps
-  const {page, apps} = props.tableProps
+  const deleteMutation = useDeleteRegistration()
+  const {page, apps, accountId} = props.tableProps
   const columns = window.ENV.FEATURES.lti_registrations_next ? CondensedColumns : Columns
+
+  const deleteApp = React.useCallback(
+    async (app: LtiRegistration) => {
+      if (await confirmDeletion(app)) {
+        try {
+          await deleteMutation.mutateAsync({
+            registrationId: app.id,
+            accountId,
+          })
+          showFlashAlert({
+            type: 'success',
+            message: I18n.t('App “%{appName}” successfully deleted', {appName: app.name}),
+          })
+        } catch {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('There was an error deleting “%{appName}”', {appName: app.name}),
+          })
+        }
+      }
+    },
+    [deleteMutation, accountId],
+  )
   const rows = React.useMemo(() => {
     return props.tableProps.apps.data.map(row => (
       <Table.Row key={row.id}>
         {columns.map(({id, render, textAlign}) => (
           <Table.Cell key={id} textAlign={textAlign}>
-            {render(row, {deleteApp: props.tableProps.deleteApp})}
+            {render(row, {deleteApp})}
           </Table.Cell>
         ))}
       </Table.Row>
     ))
-  }, [props.tableProps.apps, props.tableProps.deleteApp])
+  }, [props.tableProps.apps.data, columns, deleteApp])
 
   const layout = responsiveProps && responsiveProps.layout === 'stacked' ? 'stacked' : 'fixed'
 
@@ -534,8 +575,8 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
       >
         <div style={{flex: layout === 'stacked' ? undefined : 1}}>
           {I18n.t('%{first_item} - %{last_item} of %{total_items} displayed', {
-            first_item: (page - 1) * MANAGE_APPS_PAGE_LIMIT + 1,
-            last_item: Math.min(page * MANAGE_APPS_PAGE_LIMIT, apps.total),
+            first_item: (page - 1) * LIST_REGISTRATIONS_PAGE_LIMIT + 1,
+            last_item: Math.min(page * LIST_REGISTRATIONS_PAGE_LIMIT, apps.total),
             total_items: apps.total,
           })}
         </div>
@@ -547,17 +588,19 @@ export const AppsTableInner = React.memo((props: AppsTableInnerProps) => {
             labelNext="Next Page"
             labelPrev="Previous Page"
           >
-            {Array.from(Array(Math.ceil(apps.total / MANAGE_APPS_PAGE_LIMIT))).map((_, i) => (
-              <Pagination.Page
-                key={i}
-                current={i === page - 1}
-                onClick={() => {
-                  setManageSearchParams({page: (i + 1).toString()})
-                }}
-              >
-                {i + 1}
-              </Pagination.Page>
-            ))}
+            {Array.from(Array(Math.ceil(apps.total / LIST_REGISTRATIONS_PAGE_LIMIT))).map(
+              (_, i) => (
+                <Pagination.Page
+                  key={i}
+                  current={i === page - 1}
+                  onClick={() => {
+                    setManageSearchParams({page: (i + 1).toString()})
+                  }}
+                >
+                  {i + 1}
+                </Pagination.Page>
+              ),
+            )}
           </Pagination>
         </div>
         {layout === 'stacked' ? null : <div style={{flex: 1}} />}
