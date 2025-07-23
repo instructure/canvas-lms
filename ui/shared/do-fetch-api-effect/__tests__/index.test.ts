@@ -18,8 +18,9 @@
 
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
+import z from 'zod'
 
-import doFetchApi from '../index'
+import doFetchApi, {doFetchWithSchema} from '../index'
 
 const server = setupServer()
 
@@ -134,8 +135,9 @@ describe('doFetchApi', () => {
       expect.hasAssertions()
       await doFetchApi({path})
     } catch (err) {
-      expect(err.message).toMatch(/unauthorized/i)
-      expect(err.response.status).toBe(401)
+      const actualErr = err as Error & {response: Response}
+      expect(actualErr.message).toMatch(/unauthorized/i)
+      expect(actualErr.response.status).toBe(401)
     }
   })
 
@@ -159,11 +161,17 @@ describe('doFetchApi', () => {
 
   it('passes default headers, headers, body, and fetch options', async () => {
     const path = '/api/v1/blah'
-    let capturedRequest
+    let capturedRequest: {
+      headers: Record<string, string>
+      cache: RequestCache
+      body: string
+      method: string
+    }
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
           headers: Object.fromEntries(request.headers.entries()),
+          cache: request.cache,
           body: await request.text(),
           method: request.method,
         }
@@ -177,11 +185,12 @@ describe('doFetchApi', () => {
       headers,
       method: 'POST',
       body: 'the body',
-      fetchOpts: {additional: 'option'},
+      fetchOpts: {cache: 'no-cache'},
     })
-    expect(capturedRequest.method).toBe('POST')
-    expect(capturedRequest.body).toBe('the body')
-    expect(capturedRequest.headers).toMatchObject({
+    expect(capturedRequest!.method).toBe('POST')
+    expect(capturedRequest!.body).toBe('the body')
+    expect(capturedRequest!.cache).toBe('no-cache')
+    expect(capturedRequest!.headers).toMatchObject({
       'x-csrf-token': 'the_token',
       accept: expect.stringMatching(/application\/json\+canvas-string-ids/),
       'x-requested-with': 'XMLHttpRequest',
@@ -192,7 +201,7 @@ describe('doFetchApi', () => {
 
   it('does not allow sneaking in headers via fetchOpts', async () => {
     const path = '/api/v1/blah'
-    let capturedHeaders
+    let capturedHeaders: Record<string, string>
     server.use(
       http.get(path, ({request}) => {
         capturedHeaders = Object.fromEntries(request.headers.entries())
@@ -201,14 +210,18 @@ describe('doFetchApi', () => {
     )
     const headers = new Headers({foo: 'bar'})
     const fetchOpts = {headers: {baz: 'bing'}}
+    // @ts-expect-error We're testing that they can't sneak in headers this way
     await doFetchApi({path, headers, fetchOpts})
-    expect(capturedHeaders.baz).toBeUndefined()
-    expect(capturedHeaders.foo).toBe('bar')
+    expect(capturedHeaders!.baz).toBeUndefined()
+    expect(capturedHeaders!.foo).toBe('bar')
   })
 
   it('converts body object to string body and overrides content-type to JSON', async () => {
     const path = '/api/v1/blah'
-    let capturedRequest
+    let capturedRequest: {
+      headers: Record<string, string>
+      body: string
+    }
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
@@ -224,14 +237,17 @@ describe('doFetchApi', () => {
       body: {the: 'body'},
       headers: {'Content-Type': 'application/octet-stream'},
     })
-    expect(JSON.parse(capturedRequest.body)).toEqual({the: 'body'})
-    expect(capturedRequest.headers['content-type']).toBe('application/json')
+    expect(JSON.parse(capturedRequest!.body)).toEqual({the: 'body'})
+    expect(capturedRequest!.headers['content-type']).toBe('application/json')
   })
 
   it('handles string body correctly without altering it or setting Content-Type', async () => {
     const path = '/api/v1/string-body-test'
     const body = 'this is a plain string'
-    let capturedRequest
+    let capturedRequest: {
+      headers: Record<string, string>
+      body: string
+    }
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
@@ -242,9 +258,9 @@ describe('doFetchApi', () => {
       }),
     )
     await doFetchApi({path, method: 'POST', body})
-    expect(capturedRequest.body).toBe(body)
+    expect(capturedRequest!.body).toBe(body)
     // When posting a string body, fetch may add text/plain content-type automatically
-    const contentType = capturedRequest.headers['content-type']
+    const contentType = capturedRequest!.headers['content-type']
     expect(!contentType || contentType.includes('text/plain')).toBe(true)
   })
 
@@ -252,7 +268,10 @@ describe('doFetchApi', () => {
     const path = '/api/v1/string-body-test'
     const body = '<p>this is an html string</p>'
     const headers = {'Content-Type': 'text/html'}
-    let capturedRequest
+    let capturedRequest: {
+      headers: Record<string, string>
+      body: string
+    }
     server.use(
       http.post(path, async ({request}) => {
         capturedRequest = {
@@ -263,14 +282,17 @@ describe('doFetchApi', () => {
       }),
     )
     await doFetchApi({path, method: 'POST', body, headers})
-    expect(capturedRequest.body).toBe(body)
-    expect(capturedRequest.headers['content-type']).toBe('text/html')
+    expect(capturedRequest!.body).toBe(body)
+    expect(capturedRequest!.headers['content-type']).toBe('text/html')
   })
 
   describe('handles FormData correctly', () => {
     it('does not stringify FormData and does not set a Content-Type', async () => {
       const path = '/api/v1/formdata-test'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -284,14 +306,17 @@ describe('doFetchApi', () => {
       const formData = new FormData()
       formData.append('key', 'value')
       await doFetchApi({path, method: 'POST', body: formData})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
-      const contentType = capturedRequest.headers['content-type']
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
+      const contentType = capturedRequest!.headers['content-type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
 
     it('sends FormData along with other headers correctly', async () => {
       const path = '/api/v1/formdata-headers-test'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -306,15 +331,18 @@ describe('doFetchApi', () => {
       formData.append('key', 'value')
       const headers = {foo: 'bar'}
       await doFetchApi({path, method: 'POST', body: formData, headers})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
-      expect(capturedRequest.headers.foo).toBe('bar')
-      const contentType = capturedRequest.headers['content-type']
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
+      expect(capturedRequest!.headers.foo).toBe('bar')
+      const contentType = capturedRequest!.headers['content-type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
 
     it('handles FormData with no additional headers', async () => {
       const path = '/api/v1/formdata-no-headers'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -328,15 +356,18 @@ describe('doFetchApi', () => {
       const formData = new FormData()
       formData.append('key', 'value')
       await doFetchApi({path, method: 'POST', body: formData})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
       const contentType =
-        capturedRequest.headers['content-type'] || capturedRequest.headers['Content-Type']
+        capturedRequest!.headers['content-type'] || capturedRequest!.headers['Content-Type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
 
     it('handles FormData with multiple values for a single key', async () => {
       const path = '/api/v1/formdata-multiple-values'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -351,14 +382,17 @@ describe('doFetchApi', () => {
       formData.append('files', new Blob(['file1']), 'file1.txt')
       formData.append('files', new Blob(['file2']), 'file2.txt')
       await doFetchApi({path, method: 'POST', body: formData})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
-      const contentType = capturedRequest.headers['content-type']
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
+      const contentType = capturedRequest!.headers['content-type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
 
     it('removes manually set Content-Type header when using FormData', async () => {
       const path = '/api/v1/formdata-custom-content-type'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -373,14 +407,17 @@ describe('doFetchApi', () => {
       formData.append('key', 'value')
       const headers = {'Content-Type': 'multipart/form-data'}
       await doFetchApi({path, method: 'POST', body: formData, headers})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
-      const contentType = capturedRequest.headers['content-type']
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
+      const contentType = capturedRequest!.headers['content-type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
 
     it('handles FormData with empty entries correctly', async () => {
       const path = '/api/v1/formdata-empty-entries'
-      let capturedRequest
+      let capturedRequest: {
+        headers: Record<string, string>
+        bodyIsFormData: boolean
+      }
       server.use(
         http.post(path, async ({request}) => {
           const contentType = request.headers.get('content-type') || ''
@@ -395,9 +432,111 @@ describe('doFetchApi', () => {
       formData.append('key1', 'value1')
       formData.append('emptyKey', '')
       await doFetchApi({path, method: 'POST', body: formData})
-      expect(capturedRequest.bodyIsFormData).toBe(true)
-      const contentType = capturedRequest.headers['content-type']
+      expect(capturedRequest!.bodyIsFormData).toBe(true)
+      const contentType = capturedRequest!.headers['content-type']
       expect(!contentType || contentType.includes('multipart/form-data')).toBe(true)
     })
+  })
+})
+
+describe('doFetchWithSchema', () => {
+  beforeAll(() => server.listen())
+  afterEach(() => server.resetHandlers())
+  afterAll(() => server.close())
+
+  it('validates successful responses against schema', async () => {
+    const path = '/api/v1/schema-test'
+    const mockData = {id: 123, name: 'Test Item'}
+
+    server.use(
+      http.get(path, () => {
+        return HttpResponse.json(mockData, {
+          headers: {'Content-Type': 'application/json; charset=utf-8'},
+        })
+      }),
+    )
+
+    const schema = z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+
+    const result = await doFetchWithSchema({path}, schema)
+
+    expect(result.json).toEqual(mockData)
+    expect(result.response).toBeDefined()
+  })
+
+  it('throws when response does not match schema', async () => {
+    const path = '/api/v1/invalid-schema-test'
+    const invalidData = {id: 'not-a-number', name: 123} // id should be number, name should be string
+
+    server.use(
+      http.get(path, () => {
+        return HttpResponse.json(invalidData, {
+          headers: {'Content-Type': 'application/json; charset=utf-8'},
+        })
+      }),
+    )
+
+    const schema = z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+
+    await expect(doFetchWithSchema({path}, schema)).rejects.toThrow()
+  })
+
+  it('returns parsed data with additional properties transformed by schema', async () => {
+    const path = '/api/v1/transform-schema-test'
+    const mockData = {id: '123', created_at: '2023-05-15T00:00:00Z'}
+
+    server.use(
+      http.get(path, () => {
+        return HttpResponse.json(mockData, {
+          headers: {'Content-Type': 'application/json; charset=utf-8'},
+        })
+      }),
+    )
+
+    const schema = z.object({
+      id: z.string().transform(id => Number.parseInt(id, 10)),
+      created_at: z.string().transform(date => new Date(date)),
+    })
+
+    const result = await doFetchWithSchema({path}, schema)
+
+    expect(typeof result.json.id).toBe('number')
+    expect(result.json.id).toBe(123)
+    expect(result.json.created_at instanceof Date).toBe(true)
+  })
+
+  it('passes through all properties from doFetchApi result', async () => {
+    const path = '/api/v1/complete-result-test'
+    const mockData = {value: 'test'}
+
+    server.use(
+      http.get(path, () => {
+        return HttpResponse.json(mockData, {
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            Link: '<http://api?page=2>; rel="next"',
+          },
+        })
+      }),
+    )
+
+    const schema = z.object({
+      value: z.string(),
+    })
+
+    const result = await doFetchWithSchema({path}, schema)
+
+    expect(result.json).toEqual(mockData)
+    expect(result.text).toBeDefined()
+    expect(result.response).toBeDefined()
+    expect(result.link).toBeDefined()
+    expect(result.link!.next).toBeDefined()
+    expect(result.link!.next!.page).toBe('2')
   })
 })

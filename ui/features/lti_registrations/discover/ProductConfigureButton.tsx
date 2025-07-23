@@ -26,7 +26,7 @@ import {Button} from '@instructure/ui-buttons'
 import * as React from 'react'
 import {useNavigate} from 'react-router-dom'
 import {isSuccessful} from '../common/lib/apiResult/ApiResult'
-import {fetchThirdPartyToolConfiguration} from '../manage/api/registrations'
+import {fetchThirdPartyToolConfiguration, refreshRegistrations} from '../manage/api/registrations'
 import {openInheritedKeyWizard} from '../manage/inherited_key_registration_wizard/InheritedKeyRegistrationWizardState'
 import type {AccountId} from '../manage/model/AccountId'
 import {ZDeveloperKeyId} from '../manage/model/developer_key/DeveloperKeyId'
@@ -37,11 +37,8 @@ import {
   openJsonRegistrationWizard,
   openJsonUrlRegistrationWizard,
   type JsonFetchStatus,
-  openEditManualRegistrationWizard,
 } from '../manage/registration_wizard/RegistrationWizardModalState'
-import {refreshRegistrations} from '../manage/pages/manage/ManagePageLoadingState'
 import type {LtiRegistrationWithConfiguration} from '../manage/model/LtiRegistration'
-import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 export type ConfigureButtonProps = {
   buttonWidth: 'block' | 'inline-block'
