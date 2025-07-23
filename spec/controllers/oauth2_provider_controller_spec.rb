@@ -195,21 +195,23 @@ describe OAuth2ProviderController do
       end
 
       it "redirects to the redirect uri if the user already has remember-me token" do
-        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
         get :auth,
             params: { client_id: key.id,
                       redirect_uri: "https://example.com",
                       response_type: "code",
-                      scope: "/auth/userinfo" }
+                      scope: "/auth/userinfo",
+                      purpose: "test" }
         expect(response).to be_redirect
         expect(response.location).to match(%r{https://example.com})
       end
 
       it "does not reuse userinfo tokens for other scopes" do
-        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+        @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
         get :auth, params: { client_id: key.id,
                              redirect_uri: "https://example.com",
-                             response_type: "code" }
+                             response_type: "code",
+                             purpose: "test" }
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
@@ -232,12 +234,13 @@ describe OAuth2ProviderController do
             response_type: "code",
             scope: "/auth/userinfo",
             prompt: "none",
-            state: "value"
+            state: "value",
+            purpose: "test"
           }
         end
 
         it "redirects to the redirect uri if the user already has remember-me token" do
-          @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: nil })
+          @user.access_tokens.create!({ developer_key: key, remember_access: true, scopes: ["/auth/userinfo"], purpose: "test" })
           get(:auth, params:)
           expect(response).to be_redirect
           expect(response.location).to match(%r{https://example.com})
@@ -385,9 +388,9 @@ describe OAuth2ProviderController do
   describe "POST token" do
     subject { response }
 
-    let_once(:key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
-    let_once(:other_key) { DeveloperKey.create! }
-    let_once(:inactive_key) { DeveloperKey.create! workflow_state: "inactive" }
+    let_once(:key) { DeveloperKey.create! name: "test", scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
+    let_once(:other_key) { DeveloperKey.create! name: "other" }
+    let_once(:inactive_key) { DeveloperKey.create! name: "inactive", workflow_state: "inactive" }
     let_once(:user) { User.create!(locale: "zh-Hant") }
     let(:old_token) { user.access_tokens.create!(developer_key: key) }
     let(:client_id) { key.id }
@@ -1198,7 +1201,7 @@ describe OAuth2ProviderController do
       d
     end
     let_once(:user) { user_with_pseudonym(active_all: 1, password: "qwertyuiop") }
-    let(:token) { user.access_tokens.create!(developer_key: key) }
+    let(:token) { user.access_tokens.create!(developer_key: key, purpose: "test") }
 
     it "deletes the token" do
       delete :destroy, params: { access_token: token.full_token }

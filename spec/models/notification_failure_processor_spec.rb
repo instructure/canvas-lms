@@ -81,7 +81,7 @@ describe NotificationFailureProcessor do
       good_arn = "good arn"
       bad_arn = "bad arn"
 
-      @at = AccessToken.create!(user: @user, developer_key: DeveloperKey.default)
+      @at = AccessToken.create!(user: @user, developer_key: DeveloperKey.default, purpose: "test")
 
       sns_client = double
       expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: { "Enabled" => "true", "CustomUserData" => @at.global_id.to_s }))

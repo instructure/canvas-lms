@@ -3297,7 +3297,7 @@ describe CoursesController do
 
     it "does not affect api requests that use an access token with an unscoped developer key" do
       user = user_model
-      developer_key = DeveloperKey.create!
+      developer_key = DeveloperKey.create!(name: "dev key")
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
@@ -3309,7 +3309,7 @@ describe CoursesController do
 
     it "raises AccessTokenScopeError if scopes do not match" do
       user = user_model
-      developer_key = DeveloperKey.create!(require_scopes: true)
+      developer_key = DeveloperKey.create!(name: "dev key", require_scopes: true)
       token = AccessToken.create!(user:, developer_key:)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
@@ -3321,7 +3321,7 @@ describe CoursesController do
     end
 
     context "with valid scopes on dev key" do
-      let(:developer_key) { DeveloperKey.create!(require_scopes: true, scopes: ["url:GET|/api/v1/accounts"]) }
+      let(:developer_key) { DeveloperKey.create!(name: "dev key", require_scopes: true, scopes: ["url:GET|/api/v1/accounts"]) }
 
       it "allows adequately scoped requests through" do
         user = user_model
@@ -3363,7 +3363,7 @@ describe CoursesController do
     end
 
     context "with valid scopes and allow includes on dev key" do
-      let(:developer_key) { DeveloperKey.create!(require_scopes: true, allow_includes: true, scopes: ["url:GET|/api/v1/accounts"]) }
+      let(:developer_key) { DeveloperKey.create!(name: "dev key", require_scopes: true, allow_includes: true, scopes: ["url:GET|/api/v1/accounts"]) }
 
       it "keeps includes for adequately scoped requests" do
         user = user_model

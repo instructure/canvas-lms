@@ -358,9 +358,9 @@ describe FilesController do
       before do
         user_with_pseudonym
         pseudonym(@teacher)
-        @access_token = AccessToken.create!(user: @teacher)
-        @invalid_token = AccessToken.create!(user: @teacher, permanent_expires_at: 1.day.ago)
-        @unauthorized_token = AccessToken.create!(user: @user)
+        @access_token = AccessToken.create!(user: @teacher, purpose: "test")
+        @invalid_token = AccessToken.create!(user: @teacher, purpose: "test", permanent_expires_at: 1.day.ago)
+        @unauthorized_token = AccessToken.create!(user: @user, purpose: "test")
       end
 
       context "with enable_file_access_with_api_tokens disabled" do

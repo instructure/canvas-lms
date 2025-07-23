@@ -25,7 +25,7 @@ describe TokensController, type: :request do
 
   describe "#destroy" do
     let_once(:user) { User.create!(workflow_state: "registered") }
-    let_once(:token) { user.access_tokens.create! }
+    let_once(:token) { user.access_tokens.create! purpose: "Test Access Token" }
 
     it "allows a user to delete their own tokens" do
       @user = user

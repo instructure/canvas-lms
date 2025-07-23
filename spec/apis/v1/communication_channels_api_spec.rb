@@ -267,7 +267,7 @@ describe "CommunicationChannels API", type: :request do
 
         it "works" do
           allow(DeveloperKey).to receive(:sns).and_return(client)
-          $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
+          $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk, purpose: "Test").full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: "endpointarn")
 
           json = api_call(:post, @path, @path_options, @post_params)
@@ -278,7 +278,7 @@ describe "CommunicationChannels API", type: :request do
 
         it "does not create two push channels regardless of case" do
           allow(DeveloperKey).to receive(:sns).and_return(client)
-          $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
+          $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk, purpose: "Test").full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: "endpointarn")
           @post_params[:communication_channel][:token].upcase!
           api_call(:post, @path, @path_options, @post_params)
@@ -292,7 +292,7 @@ describe "CommunicationChannels API", type: :request do
 
           it "does not have unique constraint error for push channel" do
             allow(DeveloperKey).to receive(:sns).and_return(client)
-            $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
+            $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk, purpose: "Test").full_token
             expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: "endpointarn")
             api_call(:post, @path, @path_options, @post_params)
             @shard1.activate { @new_user = User.create!(name: "shard one") }

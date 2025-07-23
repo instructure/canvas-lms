@@ -843,14 +843,16 @@ describe "Student reports" do
       @at1 = AccessToken.create!(
         user: @user1,
         developer_key: DeveloperKey.default,
-        permanent_expires_at: 2.hours.ago
+        permanent_expires_at: 2.hours.ago,
+        purpose: "at1"
       )
       @user1.destroy
 
       @at2 = AccessToken.create!(
         user: @user2,
         developer_key: DeveloperKey.default,
-        permanent_expires_at: 2.hours.from_now
+        permanent_expires_at: 2.hours.from_now,
+        purpose: "at2"
       )
 
       @at2.update_attribute(:last_used_at, 2.hours.ago)
@@ -858,7 +860,8 @@ describe "Student reports" do
       @at3 = AccessToken.create!(
         user: @user3,
         developer_key: DeveloperKey.default,
-        permanent_expires_at: nil
+        permanent_expires_at: nil,
+        purpose: "at3"
       )
     end
 

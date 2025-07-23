@@ -1403,7 +1403,7 @@ describe CommunicationChannelsController do
       DeveloperKey.default
     end
 
-    let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
+    let(:sns_access_token) { @user.access_tokens.create!(purpose: "Test Access Token", developer_key: sns_developer_key) }
     let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: "push") }
 
     it "404s if there is no communication channel", type: :request do
@@ -1440,7 +1440,7 @@ describe CommunicationChannelsController do
         DeveloperKey.default
       end
 
-      let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
+      let(:second_sns_access_token) { @user.access_tokens.create!(purpose: "Test Access Token", developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: "push") }
 
       before { sns_channel }

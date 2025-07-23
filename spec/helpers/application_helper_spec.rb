@@ -919,7 +919,7 @@ describe ApplicationHelper do
 
       it "returns token's developer_key with @access_token set" do
         user = user_model
-        developer_key = DeveloperKey.create!
+        developer_key = DeveloperKey.create!(name: "Test Developer Key")
         @access_token = user.access_tokens.where(developer_key_id: developer_key).create!
         expect(file_access_developer_key).to eql developer_key
       end
@@ -1036,7 +1036,7 @@ describe ApplicationHelper do
       end
 
       it "creates an authenticator aware of the access token if present" do
-        @access_token = logged_in_user.access_tokens.create!
+        @access_token = logged_in_user.access_tokens.create!(purpose: "Test Access Token")
         expect(file_authenticator.access_token).to eql @access_token
       end
 
