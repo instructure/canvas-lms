@@ -31,6 +31,7 @@ import WithBreakpoints from '@canvas/with-breakpoints'
 import {AuthorAvatar} from './AuthorAvatar'
 import {Timestamps} from './Timestamps'
 import {NameLink} from './NameLink'
+import {IconPinSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_posts')
 
@@ -122,6 +123,8 @@ export interface AuthorInfoProps {
   published?: boolean
   isAnnouncement?: boolean
   isSplitView?: boolean
+  isPinned: boolean
+  pinnedBy: UserType
 }
 
 const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
@@ -247,6 +250,8 @@ const AuthorInfoBase = ({breakpoints, ...props}: AuthorInfoProps) => {
               isTopic={props.isTopic}
               published={props.published}
               isAnnouncement={props.isAnnouncement}
+              isPinned={props.isPinned}
+              pinnedBy={props.pinnedBy}
             />
             {(ENV as any).discussion_entry_version_history &&
               props.discussionEntryVersions &&

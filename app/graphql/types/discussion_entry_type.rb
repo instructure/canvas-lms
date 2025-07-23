@@ -30,7 +30,7 @@ module Types
     field :discussion_topic_id, ID, null: false
     field :edited_at, Types::DateTimeType, null: true
     field :parent_id, ID, null: true
-    field :pinned_by, ID, null: true
+    field :pinned_by, Types::UserType, null: true
     field :rating_count, Integer, null: true
     field :rating_sum, Integer, null: true
     field :root_entry_id, ID, null: true

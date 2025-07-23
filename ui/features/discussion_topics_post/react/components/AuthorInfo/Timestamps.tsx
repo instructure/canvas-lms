@@ -25,6 +25,7 @@ import {UserType} from './AuthorInfo'
 import {NameLink} from './NameLink'
 import {hideStudentNames, userNameToShow} from '../../utils'
 import {useScope as createI18nScope} from '@canvas/i18n'
+import {IconPinSolid} from '@instructure/ui-icons'
 
 const I18n = createI18nScope('discussion_topics_post')
 
@@ -41,6 +42,8 @@ interface TimestampsProps {
   published?: boolean
   isAnnouncement?: boolean
   showCreatedAsTooltip?: boolean
+  isPinned: boolean
+  pinnedBy: UserType
 }
 
 const Timestamps = (props: TimestampsProps) => {
@@ -107,6 +110,16 @@ const Timestamps = (props: TimestampsProps) => {
     }
   }, [isTeacher, props.createdAt, props.delayedPostAt, props.isTopic])
 
+  const pinnedPostText = useMemo(() => {
+    if (!ENV?.discussion_pin_post) return null
+
+    if (!props.isPinned || !props.pinnedBy) return null
+
+    return I18n.t('Pinned by %{pinnedByName}', {
+      pinnedByName: props.pinnedBy.shortName,
+    })
+  }, [props.isPinned, props.pinnedBy])
+
   const delayedPostText = useMemo(() => {
     if (!props.isTopic) return null
     // duplicate createdAt for teachers if the post is instant
@@ -134,9 +147,19 @@ const Timestamps = (props: TimestampsProps) => {
 
   return (
     <Flex wrap="wrap">
+      {pinnedPostText && (
+        <Flex.Item data-testid="pinned-by-user-text" overflowX="hidden" padding={timestampsPadding}>
+          <Text size={props.timestampTextSize as any}>
+            <IconPinSolid /> {pinnedPostText}
+          </Text>
+        </Flex.Item>
+      )}
       {createdAtText && (
         <Flex.Item overflowX="hidden" padding={timestampsPadding}>
-          <Text size={props.timestampTextSize as any}>{createdAtText}</Text>
+          <Text size={props.timestampTextSize as any}>
+            {pinnedPostText && ' | '}
+            {createdAtText}
+          </Text>
         </Flex.Item>
       )}
       {delayedPostText && (
