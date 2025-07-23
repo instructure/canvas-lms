@@ -213,12 +213,13 @@ create_external_apps_side_tray_overrides:
       state: allowed_on
 
 use_dyslexic_font:
-  state: hidden
+  state: allowed
   display_name: Use a dyslexia friendly font
   description: |-
     When enabled, this setting replaces the default font in Canvas with OpenDyslexic,
     an open source font created to help increase readability for readers with dyslexia.
   applies_to: User
+
 
 wiki_page_mastery_path_no_assignment_group:
   state: hidden
