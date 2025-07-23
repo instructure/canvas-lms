@@ -17,16 +17,16 @@
  */
 
 import {render} from '@testing-library/react'
-import {PageEditor} from '../PageEditor'
+import {BlockContentEditor} from '../BlockContentEditor'
 
-describe('PageEditor', () => {
+describe('BlockContentEditor', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  it('calls onInit with PageEditorHandler on mount', () => {
+  it('calls onInit with BlockContentEditorHandler on mount', () => {
     const mockOnInit = jest.fn()
-    render(<PageEditor data={null} onInit={mockOnInit} />)
+    render(<BlockContentEditor data={null} onInit={mockOnInit} />)
 
     expect(mockOnInit).toHaveBeenCalledWith({
       getContent: expect.any(Function),
@@ -35,7 +35,7 @@ describe('PageEditor', () => {
 
   it('does not break when onInit is null', () => {
     expect(() => {
-      render(<PageEditor data={null} onInit={null} />)
+      render(<BlockContentEditor data={null} onInit={null} />)
     }).not.toThrow()
   })
 })

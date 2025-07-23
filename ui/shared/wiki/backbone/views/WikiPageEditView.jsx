@@ -327,10 +327,10 @@ export default class WikiPageEditView extends ValidatedFormView {
         </Suspense>,
       )
     } else if (this.model.get('editor') === 'block_content_editor') {
-      const PageContentBlockBuilderEditor = lazy(() => import('@canvas/block-content-editor'))
+      const BlockContentEditor = lazy(() => import('@canvas/block-content-editor'))
       const root = createRoot(document.getElementById('block_editor'))
       root.render(
-        <PageContentBlockBuilderEditor
+        <BlockContentEditor
           data={null}
           onInit={handler => {
             this.blockEditorHandler = handler

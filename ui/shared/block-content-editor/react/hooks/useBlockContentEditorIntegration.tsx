@@ -26,7 +26,9 @@ export interface PageEditorHandler {
   }
 }
 
-export const usePageEditorIntegration = (onInit: ((handler: PageEditorHandler) => void) | null) => {
+export const useBlockContentEditorIntegration = (
+  onInit: ((handler: PageEditorHandler) => void) | null,
+) => {
   const queryRef = useRef<QueryCallbacksFor<typeof QueryMethods> | null>(null)
 
   useEffect(() => {

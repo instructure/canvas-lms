@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PageEditor} from './react/PageEditor'
+import {BlockContentEditor} from './react/BlockContentEditor'
 
-export * from './react/PageEditor'
-export default PageEditor
+export * from './react/BlockContentEditor'
+export default BlockContentEditor

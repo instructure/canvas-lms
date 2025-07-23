@@ -18,15 +18,15 @@
 
 import {render, screen} from '@testing-library/react'
 import {AddBlock} from '../AddBlock'
-import {PageEditorContextType} from '../../PageEditorContext'
+import {BlockContentEditorContextType} from '../../BlockContentEditorContext'
 
 const openMock = jest.fn()
 const closeMock = jest.fn()
 const setShouldShowMock = jest.fn()
 
-jest.mock('../../PageEditorContext', () => ({
+jest.mock('../../BlockContentEditorContext', () => ({
   __esModule: true,
-  usePageEditorContext: jest.fn(
+  useBlockContentEditorContext: jest.fn(
     () =>
       ({
         addBlockModal: {
@@ -39,7 +39,7 @@ jest.mock('../../PageEditorContext', () => ({
           shouldShow: true,
           setShouldShow: setShouldShowMock,
         },
-      }) as PageEditorContextType,
+      }) as BlockContentEditorContextType,
   ),
 }))
 

@@ -25,12 +25,12 @@ import {AddButton} from '../../AddBlock/AddButton'
 import {useDeleteNode} from '../../hooks/useDeleteNode'
 import {useDuplicateNode} from '../../hooks/useDuplicateNode'
 import {useNode} from '@craftjs/core'
-import {usePageEditorContext} from '../../PageEditorContext'
+import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
 import {ApplyButton} from './ApplyButton'
 import {CopyButton} from './CopyButton'
 
 const InsertButton = () => {
-  const {addBlockModal} = usePageEditorContext()
+  const {addBlockModal} = useBlockContentEditorContext()
   const {id} = useNode()
   return <AddButton onClicked={() => addBlockModal.open(id)} />
 }

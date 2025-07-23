@@ -19,21 +19,24 @@
 import {Editor, Element, Frame, SerializedNodes} from '@craftjs/core'
 import {AddBlock} from './AddBlock'
 import {TextBlock} from './Blocks/TextBlock'
-import {PageEditorContext} from './PageEditorContext'
+import {BlockContentEditorContext} from './BlockContentEditorContext'
 import {AddBlockModalRenderer} from './AddBlock/AddBlockModalRenderer'
 import {ImageBlock} from './Blocks/ImageBlock'
-import {PageEditorLayout} from './layout/PageEditorLayout'
+import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
 import {Toolbar} from './Toolbar'
-import {PageEditorHandler, usePageEditorIntegration} from './hooks/usePageEditorIntegration'
+import {
+  PageEditorHandler,
+  useBlockContentEditorIntegration,
+} from './hooks/useBlockContentEditorIntegration'
 
-export const PageEditor = (props: {
+export const BlockContentEditor = (props: {
   data: SerializedNodes | null
   onInit: ((handler: PageEditorHandler) => void) | null
 }) => {
-  const onNodesChange = usePageEditorIntegration(props.onInit)
+  const onNodesChange = useBlockContentEditorIntegration(props.onInit)
   return (
-    <PageEditorContext data={props.data}>
-      <PageEditorLayout
+    <BlockContentEditorContext data={props.data}>
+      <BlockContentEditorLayout
         toolbar={<Toolbar />}
         editor={
           <Editor resolver={{TextBlock, ImageBlock}} onNodesChange={onNodesChange}>
@@ -45,6 +48,6 @@ export const PageEditor = (props: {
           </Editor>
         }
       />
-    </PageEditorContext>
+    </BlockContentEditorContext>
   )
 }

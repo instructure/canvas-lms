@@ -16,17 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import './page-editor-layout.css'
-import {ReactNode} from 'react'
+import {render} from '@testing-library/react'
+import {BlockContentEditorWrapper} from '../BlockContentEditorWrapper'
 
-export const PageEditorLayout = (props: {
-  toolbar: ReactNode
-  editor: ReactNode
-}) => {
-  return (
-    <div className="page-editor-container">
-      <div className="toolbar-area">{props.toolbar}</div>
-      <div className="editor-area">{props.editor}</div>
-    </div>
-  )
-}
+describe('BlockContentEditorWrapper', () => {
+  it('renders without crashing', () => {
+    render(<BlockContentEditorWrapper />)
+  })
+})

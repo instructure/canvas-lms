@@ -16,8 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PageEditor} from '@canvas/block-content-editor'
+import './page-editor-layout.css'
+import {ReactNode} from 'react'
 
-export const ContentBuilderWrapper = () => {
-  return <PageEditor data={null} onInit={null} />
+export const BlockContentEditorLayout = (props: {
+  toolbar: ReactNode
+  editor: ReactNode
+}) => {
+  return (
+    <div className="page-editor-container">
+      <div className="toolbar-area">{props.toolbar}</div>
+      <div className="editor-area">{props.editor}</div>
+    </div>
+  )
 }

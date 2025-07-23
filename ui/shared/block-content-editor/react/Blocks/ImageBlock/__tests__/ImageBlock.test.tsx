@@ -19,9 +19,9 @@
 import {ImageBlock} from '../ImageBlock'
 import {renderBlock} from '../../__tests__/render-helper'
 
-jest.mock('../../../PageEditorContext', () => ({
+jest.mock('../../../BlockContentEditorContext', () => ({
   __esModule: true,
-  usePageEditorContext: jest.fn(() => ({})),
+  useBlockContentEditorContext: jest.fn(() => ({})),
 }))
 
 describe('ImageBlock', () => {
