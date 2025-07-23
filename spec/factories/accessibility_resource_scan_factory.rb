@@ -20,7 +20,7 @@
 module Factories
   def accessibility_resource_scan_model(opts = {})
     opts[:course] ||= course_model
-    if !opts[:wiki_page] && !opts[:assignment] && !opts[:attachment]
+    if !opts[:context] && !opts[:wiki_page] && !opts[:assignment] && !opts[:attachment]
       opts[:wiki_page] = wiki_page_model(course: opts[:course])
     end
 

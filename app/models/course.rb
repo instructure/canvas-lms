@@ -291,6 +291,8 @@ class Course < ActiveRecord::Base
   has_many :favorites, as: :context, inverse_of: :context, dependent: :destroy
   has_many :group_and_membership_importers, dependent: :destroy, inverse_of: :course
 
+  has_many :accessibility_resource_scans, dependent: :destroy
+
   prepend Profile::Association
 
   before_create :set_restrict_quantitative_data_when_needed
@@ -368,6 +370,9 @@ class Course < ActiveRecord::Base
   # A hard limit on the number of graders (excluding the moderator) a moderated
   # assignment can have.
   MODERATED_GRADING_GRADER_LIMIT = 10
+
+  # Maximum number of resources that can be scanned for accessibility issues
+  MAX_ACCESSIBILITY_SCAN_RESOURCES = 1000
 
   # using a lambda for setting name to avoid caching the translated string when the model is loaded
   # (in case selected language changes)
@@ -4578,6 +4583,16 @@ class Course < ActiveRecord::Base
     end
 
     false
+  end
+
+  # Accessibility scan limit check
+  def exceeds_accessibility_scan_limit?
+    # TODO: add caching with proper invalidation
+    wiki_page_count = wiki_pages.not_deleted.count
+    assignment_count = assignments.active.count
+
+    total = wiki_page_count + assignment_count
+    total > MAX_ACCESSIBILITY_SCAN_RESOURCES
   end
 
   private

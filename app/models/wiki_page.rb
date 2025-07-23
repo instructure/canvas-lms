@@ -36,6 +36,7 @@ class WikiPage < ActiveRecord::Base
   include LockedFor
   include HtmlTextHelper
   include DatesOverridable
+  include Accessibility::Scannable
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]

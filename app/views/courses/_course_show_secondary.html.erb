@@ -85,7 +85,7 @@
            class="btn button-sidebar-wide accessibility_link <%= 'disabled' unless @accessibility_scan_enabled %>"
            aria-disabled="<%= !@accessibility_scan_enabled %>"
            <% unless @accessibility_scan_enabled %>
-           data-tooltip="bottom" title="<%= t(:accessibility_limit_exceeded, "The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).") %>"
+           data-tooltip="bottom" title="<%= t(:accessibility_limit_exceeded, "The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).") %>"
            onclick="return false;"
            <% end %>>
           <i class="icon-a11y"></i> <%= t('links.course_check_accessibility', %{Check Accessibility}) %>

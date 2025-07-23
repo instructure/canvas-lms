@@ -34,7 +34,7 @@ export const severityColors: Record<Severity, string> = {
 }
 
 export const LIMIT_EXCEEDED_MESSAGE = I18n.t(
-  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages, assignments, and attachments combined).',
+  'The Course Accessibility Checker is not yet available for courses with more than 1,000 resources (pages and assignments combined).',
 )
 
 export const IssuesTableColumns = {

@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-RSpec.shared_examples "has a single accessibility context" do
+RSpec.shared_examples "it has a single accessibility context" do
   let(:error_message) { "Exactly one context must be present" }
 
   context "validations" do
