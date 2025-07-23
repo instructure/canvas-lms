@@ -30,6 +30,10 @@ module Modules2IndexPage
     "button[aria-label='Collapse All Modules']"
   end
 
+  def completion_requirement_selector
+    "[data-testid='completion-requirement']"
+  end
+
   def copy_to_button_selector
     "button:contains('Copy')"
   end
@@ -167,6 +171,10 @@ module Modules2IndexPage
     "#{module_item_by_id_selector(module_item_id)} #{selector}"
   end
 
+  def module_prerequisite_selector
+    "[data-testid='module-header-prerequisites']"
+  end
+
   def module_progression_status_bar_selector(module_id)
     "#{module_header_selector(module_id)} [data-testid='module-progression-status-bar']"
   end
@@ -212,6 +220,10 @@ module Modules2IndexPage
   end
 
   #------------------------------ Elements ------------------------------
+
+  def completion_requirement
+    f(completion_requirement_selector)
+  end
 
   def context_module(module_id)
     f(context_module_selector(module_id))
@@ -363,6 +375,10 @@ module Modules2IndexPage
 
   def blueprint_lock_icon(module_item_id, locked: false)
     f(blueprint_lock_icon_selector(module_item_id, locked:))
+  end
+
+  def module_prerequisite
+    f(module_prerequisite_selector)
   end
 
   def module_progression_info(module_id)
