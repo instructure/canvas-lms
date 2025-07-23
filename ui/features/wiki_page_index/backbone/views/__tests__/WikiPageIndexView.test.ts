@@ -29,7 +29,16 @@ jest.mock('../../../react/ConfirmDeleteModal', () => ({
   showConfirmDelete: jest.fn(),
 }))
 
-const indexMenuLtiTool = {
+interface IndexMenuLtiTool {
+  id: string
+  title: string
+  base_url: string
+  tool_id: string
+  icon_url: string
+  canvas_icon_class: null | string
+}
+
+const indexMenuLtiTool: IndexMenuLtiTool = {
   id: '18',
   title: 'Named LTI Tool',
   base_url: 'http://localhost/courses/1/external_tools/18?launch_type=wiki_index_menu',
@@ -39,21 +48,21 @@ const indexMenuLtiTool = {
 }
 
 describe('WikiPageIndexView', () => {
-  let prevHtml
+  let prevHtml: string
 
   describe('confirmDeletePages not checked', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       prevHtml = document.body.innerHTML
       fakeENV.setup({
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42'})
+      model = new (WikiPage as any)({page_id: '42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
       })
     })
@@ -71,18 +80,18 @@ describe('WikiPageIndexView', () => {
   })
 
   describe('confirmDeletePages checked', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       prevHtml = document.body.innerHTML
       fakeENV.setup({
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42', title: 'page 42'})
+      model = new (WikiPage as any)({page_id: '42', title: 'page 42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
         selectedPages: {42: model},
       })
@@ -105,9 +114,9 @@ describe('WikiPageIndexView', () => {
   })
 
   describe('direct_share', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       fakeENV.setup({
@@ -115,9 +124,9 @@ describe('WikiPageIndexView', () => {
         COURSE_ID: 'a course',
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42'})
+      model = new (WikiPage as any)({page_id: '42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
         WIKI_RIGHTS: {
           create_page: true,
@@ -133,7 +142,7 @@ describe('WikiPageIndexView', () => {
 
     it('opens and closes the direct share course tray', () => {
       const trayComponent = jest.spyOn(view, 'DirectShareCourseTray').mockReturnValue(null)
-      collection.trigger('fetch')
+      ;(collection as any).trigger('fetch')
       view.$el.find('.copy-wiki-page-to').click()
       expect(trayComponent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -143,7 +152,7 @@ describe('WikiPageIndexView', () => {
         }),
         {},
       )
-      trayComponent.mock.calls[0][0].onDismiss()
+      ;(trayComponent.mock.calls[0][0] as any).onDismiss()
       expect(trayComponent).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
@@ -154,7 +163,7 @@ describe('WikiPageIndexView', () => {
 
     it('opens and closes the direct share user modal', () => {
       const userModal = jest.spyOn(view, 'DirectShareUserModal').mockReturnValue(null)
-      collection.trigger('fetch')
+      ;(collection as any).trigger('fetch')
       view.$el.find('.send-wiki-page-to').click()
       expect(userModal).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -167,7 +176,7 @@ describe('WikiPageIndexView', () => {
         }),
         {},
       )
-      userModal.mock.calls[0][0].onDismiss()
+      ;(userModal.mock.calls[0][0] as any).onDismiss()
       expect(userModal).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
@@ -178,18 +187,18 @@ describe('WikiPageIndexView', () => {
   })
 
   describe('open_external_tool', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       fakeENV.setup({
         COURSE_ID: 'a course',
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42'})
+      model = new (WikiPage as any)({page_id: '42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
         WIKI_RIGHTS: {
           create_page: true,
@@ -201,13 +210,13 @@ describe('WikiPageIndexView', () => {
 
     afterEach(() => {
       fakeENV.teardown()
-      delete window.ltiTrayState
+      delete (window as any).ltiTrayState
       jest.clearAllMocks()
     })
 
     it('opens and closes the lti tray and returns focus', () => {
       const trayComponent = jest.spyOn(view, 'ContentTypeExternalToolTray').mockReturnValue(null)
-      collection.trigger('fetch')
+      ;(collection as any).trigger('fetch')
       const toolbarKabobMenu = view.$el.find('.al-trigger')[0]
       view.setExternalToolTray(indexMenuLtiTool, toolbarKabobMenu)
       expect(trayComponent).toHaveBeenCalledWith(
@@ -222,7 +231,7 @@ describe('WikiPageIndexView', () => {
         }),
         {},
       )
-      trayComponent.mock.calls[0][0].onDismiss()
+      ;(trayComponent.mock.calls[0][0] as any).onDismiss()
       expect(trayComponent).toHaveBeenLastCalledWith(
         expect.objectContaining({
           open: false,
@@ -233,7 +242,7 @@ describe('WikiPageIndexView', () => {
 
     it('reloads page when closing tray if needed', () => {
       const trayComponent = jest.spyOn(view, 'ContentTypeExternalToolTray').mockReturnValue(null)
-      collection.trigger('fetch')
+      ;(collection as any).trigger('fetch')
       const toolbarKabobMenu = view.$el.find('.al-trigger')[0]
       view.setExternalToolTray(indexMenuLtiTool, toolbarKabobMenu)
       expect(trayComponent).toHaveBeenCalledWith(
@@ -252,17 +261,17 @@ describe('WikiPageIndexView', () => {
   })
 
   describe('sorting', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       fakeENV.setup({
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42'})
+      model = new (WikiPage as any)({page_id: '42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
       })
     })
@@ -284,17 +293,17 @@ describe('WikiPageIndexView', () => {
   })
 
   describe('new page button', () => {
-    let view
-    let collection
-    let model
+    let view: any // WikiPageIndexView is a Backbone view
+    let collection: WikiPageCollection
+    let model: any // WikiPage is a Backbone model
 
     beforeEach(() => {
       fakeENV.setup({
         context_asset_string: 'course_1',
       })
-      model = new WikiPage({page_id: '42'})
+      model = new (WikiPage as any)({page_id: '42'})
       collection = new WikiPageCollection([model])
-      view = new WikiPageIndexView({
+      view = new (WikiPageIndexView as any)({
         collection,
         WIKI_RIGHTS: {
           create_page: true,

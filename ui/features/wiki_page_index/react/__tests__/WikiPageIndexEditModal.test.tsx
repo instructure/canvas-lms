@@ -17,24 +17,27 @@
  */
 
 import {fireEvent, render} from '@testing-library/react'
-import {createRoot} from 'react-dom/client'
+import {createRoot, Root} from 'react-dom/client'
 import WikiPage from '../../../../shared/wiki/backbone/models/WikiPage'
 import WikiPageIndexItemView from '../../backbone/views/WikiPageIndexItemView'
-import renderWikiPageIndexEditModal from '../WikiPageIndexEditModal'
+import renderWikiPageIndexEditModal, {WikiPageIndexEditModalProps} from '../WikiPageIndexEditModal'
 import {TITLE_MAX_LENGTH} from '@canvas/wiki/utils/constants'
 
-const wikiPageModel = new WikiPage({page_id: 1, title: 'hi'})
+const wikiPageModel = new (WikiPage as any)({page_id: 1, title: 'hi'})
 wikiPageModel.initialize({url: 'page-1'}, {contextAssetString: 'course_1'})
 
-const viewElement = new WikiPageIndexItemView({
+const viewElement = new (WikiPageIndexItemView as any)({
   model: wikiPageModel,
   editModalRoot: createRoot(document.createElement('div')),
 })
 
-const getProps = overrides => ({
-  model: wikiPageModel,
+const getProps = (
+  overrides?: Partial<WikiPageIndexEditModalProps>,
+): WikiPageIndexEditModalProps => ({
+  model: wikiPageModel as any, // WikiPage is a Backbone model
   modalOpen: true,
   closeModal: jest.fn(),
+  ...overrides,
 })
 
 describe('renderWikiPageTitle', () => {
@@ -44,7 +47,10 @@ describe('renderWikiPageTitle', () => {
 
   it('sets the wiki page title to the input', () => {
     const props = getProps()
-    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const component = renderWikiPageIndexEditModal(
+      (viewElement as any).editModalRoot as Root,
+      props,
+    )
     const {getByTestId} = render(component)
 
     expect(getByTestId('page-title-input')).toHaveValue('hi')
@@ -53,8 +59,11 @@ describe('renderWikiPageTitle', () => {
   it('saves a new title', () => {
     const props = getProps()
     jest.spyOn(props.model, 'set').mockImplementation(() => {})
-    const spy = jest.spyOn(props.model, 'save').mockImplementation(() => {})
-    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const spy = jest.spyOn(props.model, 'save').mockImplementation(() => Promise.resolve())
+    const component = renderWikiPageIndexEditModal(
+      (viewElement as any).editModalRoot as Root,
+      props,
+    )
     const {getByTestId} = render(component)
 
     fireEvent.change(getByTestId('page-title-input'), {target: {value: 'hello'}})
@@ -66,8 +75,11 @@ describe('renderWikiPageTitle', () => {
   it('saves on enter', () => {
     const props = getProps()
     jest.spyOn(props.model, 'set').mockImplementation(() => {})
-    const spy = jest.spyOn(props.model, 'save').mockImplementation(() => {})
-    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const spy = jest.spyOn(props.model, 'save').mockImplementation(() => Promise.resolve())
+    const component = renderWikiPageIndexEditModal(
+      (viewElement as any).editModalRoot as Root,
+      props,
+    )
     const {getByTestId} = render(component)
 
     const input = getByTestId('page-title-input')
@@ -79,7 +91,10 @@ describe('renderWikiPageTitle', () => {
 
   it('errors if the title is blank', () => {
     const props = getProps()
-    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const component = renderWikiPageIndexEditModal(
+      (viewElement as any).editModalRoot as Root,
+      props,
+    )
     const {getByTestId, getByText} = render(component)
 
     const input = getByTestId('page-title-input')
@@ -92,7 +107,10 @@ describe('renderWikiPageTitle', () => {
 
   it('errors if the title is too long', () => {
     const props = getProps()
-    const component = renderWikiPageIndexEditModal(viewElement.editModalRoot, props)
+    const component = renderWikiPageIndexEditModal(
+      (viewElement as any).editModalRoot as Root,
+      props,
+    )
     const {getByTestId, getByText} = render(component)
 
     const input = getByTestId('page-title-input')
