@@ -81,7 +81,7 @@ const ModuleHeaderActionPanel: React.FC<ModuleHeaderActionPanelProps> = ({
         {completionRequirements?.length && (
           <Flex.Item>
             <Pill>
-              <Text size="medium" weight="bold">
+              <Text size="medium" weight="bold" data-testid="completion-requirement">
                 {requirementCount ? I18n.t('Complete One Item') : I18n.t('Complete All Items')}
               </Text>
             </Pill>

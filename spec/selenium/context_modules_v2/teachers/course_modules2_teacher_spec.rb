@@ -393,6 +393,42 @@ describe "context modules", :ignore_js_errors do
     end
   end
 
+  context "module header" do
+    it "includes Complete All Items pill when Complete All requirements are present" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
+      @module1.save!
+
+      go_to_modules
+      expect(completion_requirement.text).to eq("Complete All Items")
+    end
+
+    it "includes Complete One Item pill when Complete One requirement is present" do
+      @module1.completion_requirements = { @module_item1.id => { type: "must_view" }, @module_item2.id => { type: "must_view" } }
+      @module1.requirement_count = 1
+      @module1.save!
+
+      go_to_modules
+      expect(completion_requirement.text).to eq("Complete One Item")
+    end
+
+    it "includes Module Pre-requisite when one is present" do
+      @module2.prerequisites = "module_#{@module1.id}"
+      @module2.save!
+
+      go_to_modules
+      expect(module_prerequisite.text).to eq("Prerequisite: #{@module1.name}")
+    end
+
+    it "shows multiple Module Pre-requisites when multiple are present" do
+      @module3 = @course.context_modules.create!(name: "module3")
+      @module3.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
+      @module3.save!
+
+      go_to_modules
+      expect(module_prerequisite.text).to eq("Prerequisites: #{@module1.name}, #{@module2.name}")
+    end
+  end
+
   context "module locking" do
     include_examples "module unlock dates"
   end
