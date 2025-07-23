@@ -166,8 +166,16 @@ module OtherHelperMethods
     driver.execute_script "localStorage.clear();"
   end
 
+  def set_local_storage(key, value)
+    driver.execute_script("localStorage.setItem(arguments[0], arguments[1]);", key, value)
+  end
+
   def clear_session_storage
     driver.execute_script "sessionStorage.clear();"
+  end
+
+  def set_session_storage(key, value)
+    driver.execute_script("sessionStorage.setItem('#{key}', '#{value}');")
   end
 
   def scroll_height
