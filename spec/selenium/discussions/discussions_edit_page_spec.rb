@@ -422,7 +422,7 @@ describe "discussions" do
 
           Discussion.click_graded_checkbox
           Discussion.save_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load
 
           get "/courses/#{course.id}/discussion_topics/#{discussion_topic.id}/edit"
 
@@ -955,7 +955,7 @@ describe "discussions" do
 
           Discussion.save_button.click
           Discussion.section_warning_continue_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load
 
           # Expect the module override to be overridden and not appear
           get "/courses/#{course.id}/discussion_topics/#{graded_discussion.id}/edit"
@@ -1036,7 +1036,7 @@ describe "discussions" do
           # Save the discussion without changing the inherited module override
           Discussion.save_button.click
           Discussion.section_warning_continue_button.click
-          wait_for_ajaximations
+          wait_for_new_page_load
 
           assignment = graded_discussion.assignment
           assignment.reload
@@ -1269,7 +1269,7 @@ describe "discussions" do
 
             fj("button:contains('Save')").click
             Discussion.section_warning_continue_button.click
-            wait_for_ajaximations
+            wait_for_new_page_load
 
             graded_discussion = DiscussionTopic.last
             sub_assignments = graded_discussion.assignment.sub_assignments
@@ -1316,7 +1316,7 @@ describe "discussions" do
 
             fj("button:contains('Save')").click
             Discussion.section_warning_continue_button.click
-            wait_for_ajaximations
+            wait_for_new_page_load
 
             graded_discussion.reload
             sub_assignments = graded_discussion.assignment.sub_assignments
@@ -1664,6 +1664,7 @@ describe "discussions" do
           wait_for_ajaximations
 
           Discussion.section_warning_continue_button.click
+          wait_for_new_page_load
           dt = DiscussionTopic.last
           expect(dt.reply_to_entry_required_count).to eq 3
 
