@@ -149,12 +149,17 @@ describe ContentZipper do
       attachment.workflow_state = "to_be_zipped"
       attachment.context = @assignment
       attachment.save!
+      @teacher.time_zone = ActiveSupport::TimeZone["Eastern Time (US & Canada)"]
+      @teacher.save!(validate: false)
+      @teacher.reload
       ContentZipper.process_attachment(attachment, @teacher)
       attachment.reload
       expect(attachment.workflow_state).to eq "zipped"
 
       content = nil
       Zip::File.foreach(attachment.full_filename) do |f|
+        now_utc = Zip::DOSTime.from_time(Time.use_zone("Eastern Time (US & Canada)") { Time.now.utc })
+        expect(f.time).to be_within(1.second).of(now_utc)
         content = f.get_input_stream.read if f.file?
       end
       expect(content).to include("hai this is my answer")
@@ -472,7 +477,9 @@ describe ContentZipper do
 
       it "skips files that couldn't be opened, without failing the download" do
         @course.attachments.create!(folder: @root, uploaded_data: StringIO.new("good"), filename: "good")
+        @attachment.reload
         ContentZipper.process_attachment(@attachment, @user)
+        @course.attachments.reload
         expect(@attachment.workflow_state).to eq "zipped"
         expect(Zip::File.new(@attachment.full_filename).entries.map(&:name)).to eq ["good"]
       end
@@ -542,6 +549,7 @@ describe ContentZipper do
       end
 
       let(:zipped_file) do
+        eportfolio.reload
         eportfolio.attachments.create do |attachment|
           attachment.display_name = "an_attachment"
           attachment.user = @user
@@ -567,6 +575,7 @@ describe ContentZipper do
       it "does process attachments that user can download" do
         @user = @student
         ContentZipper.new.zip_eportfolio(zipped_file, eportfolio)
+        zipped_file.reload
         expect(zipped_filenames).to include a_string_matching(/hidden.png/)
       end
     end
