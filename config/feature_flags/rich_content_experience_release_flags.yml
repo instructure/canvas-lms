@@ -146,6 +146,11 @@ files_a11y_rewrite:
   display_name: Files a11y Rewrite
   description: |-
     Enables the new Files a11y Rewrite page.
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 
 files_a11y_rewrite_toggle:
   applies_to: SiteAdmin
@@ -155,6 +160,8 @@ files_a11y_rewrite_toggle:
     Allows users to switch to the old files ui when the Files A11y Rewrite flag is enabled.
   environments:
     development:
+      state: allowed_on
+    ci:
       state: allowed_on
 
 hidden_attachments_replacement_chain:
