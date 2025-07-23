@@ -177,6 +177,8 @@
   path: '/api/v1/accounts/:account_id/grading_standards'
 - verb: POST
   path: '/api/v1/accounts/:account_id/grading_standards'
+- verb: DELETE
+  path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/accounts/:account_id/grading_standards/:grading_standard_id'
 - verb: GET
@@ -1063,6 +1065,8 @@
   path: '/api/v1/courses/:course_id/grading_standards'
 - verb: POST
   path: '/api/v1/courses/:course_id/grading_standards'
+- verb: DELETE
+  path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
   path: '/api/v1/courses/:course_id/grading_standards/:grading_standard_id'
 - verb: GET
