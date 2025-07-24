@@ -26,6 +26,13 @@ GIT
     soap4r-ng (2.0.4)
 
 GIT
+  remote: https://github.com/instructure/stackprof.git
+  revision: b275d4c60011391dba41016b4a05bf09eebe3703
+  branch: switch-d3-data-to-iterative
+  specs:
+    stackprof (0.2.27)
+
+GIT
   remote: https://github.com/wrapbook/crystalball.git
   revision: 59837f892594816705b7bb6611191a7bda0c3fb5
   specs:
@@ -1169,7 +1176,6 @@ GEM
     sqlite3 (2.6.0-arm64-darwin)
     sqlite3 (2.6.0-x86_64-darwin)
     sqlite3 (2.6.0-x86_64-linux-gnu)
-    stackprof (0.2.27)
     statsd-ruby (1.5.0)
     stormbreaker (1.0.0)
       axe-core-api (~> 4.1)
@@ -1458,7 +1464,7 @@ DEPENDENCIES
   spring-commands-rspec (= 1.0.4)
   spring-commands-rubocop (~> 0.4)
   sqlite3 (~> 2.6)
-  stackprof (~> 0.2)
+  stackprof!
   stormbreaker (~> 1.0)
   stringify_ids!
   switchman (~> 4.0)
