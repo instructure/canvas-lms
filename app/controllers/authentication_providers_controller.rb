@@ -958,7 +958,7 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   def destroy_all
-    @account.authentication_providers.active.each(&:destroy)
+    @account.authentication_providers.active.filter { |ap| ap.visible_to?(@current_user) }.each(&:destroy)
     redirect_to :account_authentication_providers
   end
 
