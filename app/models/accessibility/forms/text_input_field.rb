@@ -29,15 +29,19 @@ module Accessibility
       def initialize(label:,
                      undo_text:,
                      value:,
+                     generate_button_label:,
+                     can_generate_fix: false,
                      placeholder: nil,
                      action: nil)
         super(
           label:,
           undo_text:,
+          can_generate_fix:,
         )
         @value = value
         @placeholder = placeholder
         @action = action
+        @generate_button_label = generate_button_label
       end
 
       def field_type
@@ -48,7 +52,8 @@ module Accessibility
         super.merge({
           value: @value,
           placeholder: @placeholder,
-          action: @action
+          action: @action,
+          generate_button_label: @generate_button_label
         }.compact)
       end
     end
