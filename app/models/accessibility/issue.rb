@@ -45,6 +45,19 @@ module Accessibility
       }
     end
 
+    def search(query)
+      data = generate
+      return data if query.blank?
+
+      {
+        pages: filter_resources(data[:pages], query),
+        assignments: filter_resources(data[:assignments], query),
+        attachments: filter_resources(data[:attachments], query),
+        last_checked: data[:last_checked],
+        accessibility_scan_disabled: data[:accessibility_scan_disabled]
+      }
+    end
+
     def update_content(rule, content_type, content_id, path, value)
       html_fixer = HtmlFixer.new(rule, content_type, content_id, path, value, self)
       return error_response(html_fixer.errors.full_messages.join(", "), :bad_request) unless html_fixer.valid?
@@ -67,6 +80,12 @@ module Accessibility
     end
 
     private
+
+    def filter_resources(resources, query)
+      resources.values&.select do |resource|
+        resource.values&.any? { |value| value.to_s.downcase.include?(query.downcase) }
+      end
+    end
 
     def error_response(message, status)
       { json: { error: message }, status: }
