@@ -65,10 +65,11 @@ module Accessibility
             generate_alt_text(image_url, config_name:, try_counter: try_counter - 1) if try_counter > 0
           else
             Rails.logger.error("Failed to generate valid alt text after multiple attempts. Tried #{DEFAULT_REPEAT_COUNT} times.")
-            nil
+            raise "Failed to generate valid alt text after multiple attempts."
           end
         rescue => e
           Rails.logger.error("Error generating alt text: #{e.message}")
+          Rails.logger.error e.backtrace.join("\n")
           nil
         end
       end
