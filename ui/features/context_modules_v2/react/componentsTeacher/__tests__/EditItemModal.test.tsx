@@ -22,21 +22,9 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useModuleContext'
 import {setupServer} from 'msw/node'
 import {http, HttpResponse} from 'msw'
-import EditItemModal from '../EditItemModal'
+import EditItemModal, {type EditItemModalProps} from '../EditItemModal'
 
-type ComponentProps = {
-  isOpen: boolean
-  onRequestClose: () => void
-  itemName: string
-  itemType: string
-  itemIndent: number
-  courseId: string
-  moduleId: string
-  itemId: string
-  itemURL?: string
-}
-
-const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentProps => ({
+const buildDefaultProps = (overrides: Partial<EditItemModalProps> = {}): EditItemModalProps => ({
   isOpen: true,
   onRequestClose: jest.fn(),
   itemName: 'Test Item',
@@ -48,7 +36,7 @@ const buildDefaultProps = (overrides: Partial<ComponentProps> = {}): ComponentPr
   ...overrides,
 })
 
-const setUp = (props: ComponentProps, courseId = 'test-course-id') => {
+const setUp = (props: EditItemModalProps, courseId = 'test-course-id') => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -128,6 +116,63 @@ describe('EditItemModal', () => {
     setUp(props)
     fireEvent.click(screen.getByText('Cancel'))
     expect(props.onRequestClose).toHaveBeenCalled()
+  })
+
+  describe('Master Course Restriction', () => {
+    it('should disable title input when master course restriction of "all" is true', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: true,
+          content: false,
+          availabilityDates: null,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).toBeDisabled()
+    })
+
+    it('should disable title input when master course restriction of "content" is true', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: null,
+          content: true,
+          availabilityDates: null,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).toBeDisabled()
+    })
+
+    it('should not disable title input when master course restriction of "content" is falsey', () => {
+      const props = buildDefaultProps({
+        masterCourseRestrictions: {
+          all: null,
+          content: null,
+          availabilityDates: true,
+          dueDates: null,
+          points: null,
+          settings: null,
+        },
+      })
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).not.toBeDisabled()
+    })
+
+    it('should not disable title input when master course restrictions are missing', () => {
+      const props = buildDefaultProps()
+      setUp(props)
+      const titleInput = screen.getByTestId('edit-modal-title')
+      expect(titleInput).not.toBeDisabled()
+    })
   })
 
   describe('External URL types', () => {

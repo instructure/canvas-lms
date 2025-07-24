@@ -28,10 +28,11 @@ import IndentSelector from './AddItemModalComponents/IndentSelector'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {submiEditItem, prepareItemData} from '../handlers/editItemHandlers'
 import {queryClient} from '@canvas/query'
+import {ModuleItemMasterCourseRestrictionType} from '../utils/types'
 
 const I18n = createI18nScope('context_modules_v2')
 
-interface EditItemModalProps {
+export interface EditItemModalProps {
   isOpen: boolean
   onRequestClose: () => void
   itemName: string
@@ -41,6 +42,7 @@ interface EditItemModalProps {
   moduleId: string
   itemId: string
   itemType?: string
+  masterCourseRestrictions?: ModuleItemMasterCourseRestrictionType | null
 }
 
 const EditItemModal = (props: EditItemModalProps) => {
@@ -54,6 +56,7 @@ const EditItemModal = (props: EditItemModalProps) => {
     courseId,
     moduleId,
     itemType,
+    masterCourseRestrictions,
   } = props
 
   const [title, setTitle] = useState(itemName)
@@ -134,6 +137,11 @@ const EditItemModal = (props: EditItemModalProps) => {
                 display="inline-block"
                 width="12.5rem"
                 data-testid="edit-modal-title"
+                interaction={
+                  masterCourseRestrictions?.all || masterCourseRestrictions?.content
+                    ? 'disabled'
+                    : 'enabled'
+                }
               />
             </Grid.Col>
           </Grid.Row>

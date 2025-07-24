@@ -319,6 +319,7 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
           itemType={content?.type?.toLowerCase()}
           courseId={courseId}
           moduleId={moduleId}
+          masterCourseRestrictions={masterCourseRestrictions}
         />
       )}
     </>
