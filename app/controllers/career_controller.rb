@@ -28,9 +28,10 @@ class CareerController < ApplicationController
     return redirect_to(root_path) if app == CanvasCareer::Constants::App::ACADEMIC
 
     env = {
-      FEATURES: features_env
+      FEATURES: features_env,
     }
     js_env(CANVAS_CAREER: env)
+    js_env(MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size)
 
     config = CanvasCareer::Config.new(@domain_root_account)
     if app == CanvasCareer::Constants::App::CAREER_LEARNING_PROVIDER
