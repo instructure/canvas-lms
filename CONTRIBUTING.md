@@ -1,6 +1,8 @@
 Contributing
 -----------
 
+TEST PR
+
 There are two wonderful ways you can contribute to Canvas: filing issues and
 submitting pull requests.
 
