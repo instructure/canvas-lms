@@ -171,6 +171,38 @@ $(document).ready(function (_event) {
     output +=
       '<li>' +
       htmlEscape(
+        I18n.t(
+          'import_counts.differentiation_tag_sets',
+          'Differentiation Tag Sets: %{group_categories_count}',
+          {
+            group_categories_count: batch.data.counts.differentiation_tag_sets,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t('import_counts.differentiation_tags', 'Differentiation Tags: %{group_count}', {
+          group_count: batch.data.counts.differentiation_tags,
+        }),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
+        I18n.t(
+          'import_counts.differentiation_tag_enrollments',
+          'Differentiation Tag Enrollments: %{group_enrollments_count}',
+          {
+            group_enrollments_count: batch.data.counts.differentiation_tag_memberships,
+          },
+        ),
+      ) +
+      '</li>'
+    output +=
+      '<li>' +
+      htmlEscape(
         I18n.t('import_counts.user_observers', 'User Observers: %{user_observers_count}', {
           user_observers_count: batch.data.counts.user_observers,
         }),
