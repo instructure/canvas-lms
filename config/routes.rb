@@ -2543,6 +2543,8 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/grading_standards/:grading_standard_id", action: :context_show
       post "accounts/:account_id/grading_standards", action: :create
       post "courses/:course_id/grading_standards", action: :create
+      put "courses/:course_id/grading_standards/:grading_standard_id", action: :update
+      put "accounts/:account_id/grading_standards/:grading_standard_id", action: :update
       delete "courses/:course_id/grading_standards/:grading_standard_id", action: :destroy
       delete "accounts/:account_id/grading_standards/:grading_standard_id", action: :destroy
     end
