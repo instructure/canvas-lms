@@ -24,7 +24,7 @@ describe Accessibility::Rules::ImgAltFilenameRule do
   include RuleTestHelper
 
   context "when testing image alt text using filenames" do
-    it "identifies images using filenames as alt text" do
+    it "identifies images using filenames as alt text if alt text contains filename from the src" do
       input_html = '<div><img src="image.jpg" alt="image.jpg"></div>'
 
       issues = find_issues(:img_alt_filename, input_html, "page-123")
@@ -35,18 +35,42 @@ describe Accessibility::Rules::ImgAltFilenameRule do
       end
     end
 
-    it "maintains resource-specific isolation between content types" do
-      input_html = '<div><img src="image.jpg" alt="image.jpg"></div>'
+    it "identifies images using filenames as alt text if alt text contains an arbitrary filename" do
+      input_html = '<div><img src="image.jpg" alt="picture.png"></div>'
 
-      page_issues = find_issues(:img_alt_filename, input_html, "page-123")
-      assignment_issues = find_issues(:img_alt_filename, input_html, "assignment-456")
-      file_issues = find_issues(:img_alt_filename, input_html, "file-789")
+      issues = find_issues(:img_alt_filename, input_html, "page-123")
 
-      if page_issues.any? && assignment_issues.any? && file_issues.any?
-        expect(page_issues.first[:data][:id]).to include("page-123")
-        expect(assignment_issues.first[:data][:id]).to include("assignment-456")
-        expect(file_issues.first[:data][:id]).to include("file-789")
+      expect(issues).not_to be_empty
+      if issues.any?
+        expect(issues.first[:element_type]).to eq("img")
       end
+    end
+
+    it "identifies images using filenames as alt text if alt text contains an arbitrary filename with path" do
+      input_html = '<div><img src="image.jpg" alt="/path/picture.png"></div>'
+
+      issues = find_issues(:img_alt_filename, input_html, "page-123")
+
+      expect(issues).not_to be_empty
+      if issues.any?
+        expect(issues.first[:element_type]).to eq("img")
+      end
+    end
+
+    it "do not signal an issue if the alt text does not seem to contain a filename extension separated by a dot" do
+      input_html = '<div><img src="image.jpg" alt="/path/picture"></div>'
+
+      issues = find_issues(:img_alt_filename, input_html, "page-123")
+
+      expect(issues).to be_empty
+    end
+
+    it "do not signal an issue if the alt text has spaces in it" do
+      input_html = '<div><img src="image.jpg" alt="picture of the index.html"></div>'
+
+      issues = find_issues(:img_alt_filename, input_html, "page-123")
+
+      expect(issues).to be_empty
     end
   end
 
