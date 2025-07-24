@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render} from '@testing-library/react'
 import {clickOrFail} from '../../__tests__/interactionHelpers'
 import {ToolDetailsInner} from '../ToolDetails'
@@ -26,31 +25,23 @@ import {
 } from '../../manage/__tests__/helpers'
 import {BrowserRouter} from 'react-router-dom'
 import fetchMock from 'fetch-mock'
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 describe('ToolDetailsInner', () => {
-  const renderToolDetailsInner = () => {
-    const refresh = jest.fn()
-    const stale = false
-    const registration = mockRegistrationWithAllInformation({n: 'test', i: 1})
-
-    return {
-      refresh,
-      stale,
-      wrapper: render(
-        <BrowserRouter>
-          <ToolDetailsInner
-            registration={registration}
-            accountId={registration.account_id}
-            stale={stale}
-            refreshRegistration={refresh}
-          />
-        </BrowserRouter>,
-      ),
-    }
+  const renderToolDetailsInner = (
+    registration = mockRegistrationWithAllInformation({n: 'test', i: 1}),
+  ) => {
+    return render(
+      <BrowserRouter>
+        <QueryClientProvider client={new QueryClient()}>
+          <ToolDetailsInner registration={registration} accountId={registration.account_id} />
+        </QueryClientProvider>
+      </BrowserRouter>,
+    )
   }
 
   it('renders Delete and Copy Client ID buttons', async () => {
-    const {wrapper} = renderToolDetailsInner()
+    const wrapper = renderToolDetailsInner()
 
     expect(wrapper.queryByText('Copy Client ID')).toBeInTheDocument()
     expect(wrapper.queryByText('Delete App')).toBeInTheDocument()
@@ -62,7 +53,7 @@ describe('ToolDetailsInner', () => {
       data: {},
     })
 
-    const {wrapper} = renderToolDetailsInner()
+    const wrapper = renderToolDetailsInner()
     const deleteBtn = await wrapper.getByText('Delete App').closest('button')
     await clickOrFail(deleteBtn)
     const confirmationModalAcceptBtn = await wrapper.getByText('Delete').closest('button')
@@ -78,27 +69,16 @@ describe('ToolDetailsInner', () => {
   })
 
   it('shows the delete button on a site admin registration', async () => {
-    const {wrapper} = renderToolDetailsInner()
-    const deleteButton = await wrapper.getByTestId('delete-app')
+    const wrapper = renderToolDetailsInner()
+    const deleteButton = wrapper.getByTestId('delete-app')
     expect(deleteButton).not.toHaveAttribute('disabled')
   })
 
   it('disables the delete button on a site admin registration', async () => {
-    const refresh = jest.fn()
-    const stale = false
     const registration = mockSiteAdminRegistration('site admin', 1)
 
-    const wrapper = render(
-      <BrowserRouter>
-        <ToolDetailsInner
-          registration={registration}
-          accountId={registration.account_id}
-          stale={stale}
-          refreshRegistration={refresh}
-        />
-      </BrowserRouter>,
-    )
-    const deleteButton = await wrapper.getByTestId('delete-app')
+    const wrapper = renderToolDetailsInner(registration)
+    const deleteButton = wrapper.getByTestId('delete-app')
     expect(deleteButton).toHaveAttribute('disabled')
   })
 })

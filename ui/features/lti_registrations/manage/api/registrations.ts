@@ -129,13 +129,37 @@ export type FetchRegistrationWithAllInfoForId = (options: {
   accountId: AccountId
 }) => Promise<ApiResult<LtiRegistrationWithAllInformation>>
 
-export const fetchRegistrationWithAllInfoForId: FetchRegistrationWithAllInfoForId = options =>
-  parseFetchResult(ZLtiRegistrationWithAllInformation)(
-    fetch(
-      `/api/v1/accounts/${options.accountId}/lti_registrations/${options.ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
-      defaultFetchOptions(),
-    ),
-  )
+const createRegistrationWithAllInfoQueryKey = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => [accountId, 'lti_registrations', ltiRegistrationId, 'allInfo']
+
+export const useRegistrationWithAllInfo = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  return useQuery({
+    queryKey: createRegistrationWithAllInfoQueryKey(ltiRegistrationId, accountId),
+    queryFn: () => {
+      return doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}?include[]=overlaid_configuration&include[]=overlay&include[]=overlay_versions`,
+        },
+        ZLtiRegistrationWithAllInformation,
+      )
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export const refreshRegistrationWithAllInfo = (
+  ltiRegistrationId: LtiRegistrationId,
+  accountId: AccountId,
+) => {
+  queryClient.invalidateQueries({
+    queryKey: createRegistrationWithAllInfoQueryKey(ltiRegistrationId, accountId),
+  })
+}
 
 export type FetchLtiRegistrationWithLegacyConfiguration = (
   accountId: AccountId,
@@ -157,20 +181,26 @@ export const fetchLtiRegistrationWithLegacyConfig: FetchLtiRegistrationWithLegac
     ),
   )
 
-/**
- * Reset an LtiRegistration to its default configuration, removing overlays
- * @returns an LtiRegistration
- */
-export const resetLtiRegistration: FetchLtiRegistration = (
-  accountId: AccountId,
-  ltiRegistrationId: LtiRegistrationId,
-) =>
-  parseFetchResult(ZLtiRegistrationWithConfiguration)(
-    fetch(`/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`, {
-      method: 'PUT',
-      ...defaultFetchOptions(),
-    }),
-  )
+export type ResetLtiRegistrationOptions = {
+  ltiRegistrationId: LtiRegistrationId
+  accountId: AccountId
+}
+
+export const useResetLtiRegistration = () => {
+  return useMutation({
+    mutationFn: ({ltiRegistrationId, accountId}: ResetLtiRegistrationOptions) =>
+      doFetchWithSchema(
+        {
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${ltiRegistrationId}/reset`,
+          method: 'PUT',
+        },
+        ZLtiRegistrationWithConfiguration,
+      ),
+    onSettled: (_, __, {ltiRegistrationId, accountId}) => {
+      refreshRegistrationWithAllInfo(ltiRegistrationId, accountId)
+    },
+  })
+}
 
 export type FetchThirdPartyToolConfiguration = (
   config:
@@ -215,6 +245,8 @@ export type DeleteRegistration = (
 
 /**
  * Deletes an LTI registration
+ * @deprecated Please use the `useDeleteRegistration` hook instead.
+ * @todo Remove this function once lti_registrations_next has been rolled out.
  * @param accountId
  * @param registrationId
  * @returns
@@ -297,6 +329,35 @@ type UpdateRegistrationParams = {
 }
 
 export type UpdateRegistration = (params: UpdateRegistrationParams) => Promise<ApiResult<unknown>>
+
+export const useUpdateRegistration = () => {
+  return useMutation({
+    mutationFn: ({
+      accountId,
+      registrationId,
+      internalConfig,
+      overlay,
+      adminNickname,
+      workflowState,
+    }: UpdateRegistrationParams) =>
+      doFetchWithSchema(
+        {
+          method: 'PUT',
+          path: `/api/v1/accounts/${accountId}/lti_registrations/${registrationId}`,
+          body: compact({
+            configuration: internalConfig,
+            overlay,
+            admin_nickname: adminNickname,
+            workflow_state: workflowState,
+          }),
+        },
+        z.unknown(),
+      ),
+    onSettled(_, __, {registrationId, accountId}) {
+      refreshRegistrationWithAllInfo(registrationId, accountId)
+    },
+  })
+}
 
 /**
  * Updates an LTI registration
