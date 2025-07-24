@@ -80,6 +80,16 @@ describe CareerController do
           )
         end
 
+        it "sets up the JS environment with MAX_GROUP_CONVERSATION_SIZE" do
+          @account.enable_feature!(:horizon_crm_integration)
+
+          Setting.set("max_group_conversation_size", 2)
+
+          get :show, params: { course_id: @course.id }
+
+          expect(assigns[:js_env][:MAX_GROUP_CONVERSATION_SIZE]).to eq(2)
+        end
+
         it "calls remote_env with learning provider URL" do
           expect(controller).to receive(:remote_env).with(
             canvas_career_learning_provider: "https://example.com/lp"
