@@ -116,6 +116,7 @@ export const handleAssignTo = (
     pointsPossible: content?.pointsPossible,
     moduleId,
     isCheckpointed,
+    isGraded: !!content?.graded,
   })
   if (setIsMenuOpen) {
     setIsMenuOpen(false)

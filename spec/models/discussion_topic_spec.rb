@@ -52,6 +52,7 @@ describe DiscussionTopic do
       aggregate_failures do
         expect(topic).to be_a DiscussionTopic
         expect(topic.assignment.submission_types).to eq "discussion_topic"
+        expect(topic.graded?).to be true
       end
     end
 
@@ -332,6 +333,7 @@ describe DiscussionTopic do
     expect(t.assignment).to be_nil
     a.reload
     expect(a).to be_deleted
+    expect(t.graded?).to be false
   end
 
   context "permissions" do
