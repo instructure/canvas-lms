@@ -20,6 +20,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlock} from '../Blocks/TextBlock'
 import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
+import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 
 const I18n = createI18nScope('page_editor')
 
@@ -29,6 +30,7 @@ export const blockFactory = {
   simpleText: () => <TextBlock title="" content="" />,
   imageText: () => <p>image_text</p>,
   image: () => <ImageBlock url="" altText="" />,
+  separatorLine: () => <SeparatorLineBlock thickness="small" />,
 } as const satisfies BlockFactory
 
 export type BlockTypes = keyof typeof blockFactory
@@ -52,5 +54,9 @@ export const blockData: BlockData[] = [
   {
     groupName: I18n.t('Image'),
     items: [{itemName: I18n.t('Image'), id: 'image'}],
+  },
+  {
+    groupName: I18n.t('Divider'),
+    items: [{itemName: I18n.t('Separator line'), id: 'separatorLine'}],
   },
 ]
