@@ -32,25 +32,17 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconCopyLine, IconTrashLine} from '@instructure/ui-icons'
 import * as React from 'react'
 import {Outlet, useMatch, useNavigate} from 'react-router-dom'
-import {matchApiResultState} from '../../../common/lib/apiResult/matchApiResultState'
-import {useApiResult} from '../../../common/lib/apiResult/useApiResult'
 import {useZodParams} from '../../../common/lib/useZodParams/useZodParams'
-import {fetchRegistrationWithAllInfoForId, deleteRegistration} from '../../api/registrations'
+import {useRegistrationWithAllInfo, useDeleteRegistration} from '../../api/registrations'
 import type {AccountId} from '../../model/AccountId'
-import {
-  isForcedOn,
-  LtiRegistration,
-  type LtiRegistrationWithAllInformation,
-} from '../../model/LtiRegistration'
+import type {LtiRegistrationWithAllInformation} from '../../model/LtiRegistration'
 import {type LtiRegistrationId, ZLtiRegistrationId} from '../../model/LtiRegistrationId'
 import {ltiToolDefaultIconUrl} from '../../model/ltiToolIcons'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-import {ApiResultErrorPage} from '../../../common/lib/apiResult/ApiResultErrorPage'
 import {InlineList} from '@instructure/ui-list'
 import {InstUISettingsProvider} from '@instructure/emotion'
 import theme from '@instructure/canvas-theme'
-import Header from 'features/assignment_grade_summary/react/components/Header'
 
 const I18n = createI18nScope('lti_registrations')
 
@@ -79,31 +71,25 @@ export const ToolDetailsRequest = ({
   accountId: AccountId
   ltiRegistrationId: LtiRegistrationId
 }) => {
-  const fetchReg = React.useCallback(
-    () => fetchRegistrationWithAllInfoForId({accountId, ltiRegistrationId}),
-    [accountId, ltiRegistrationId],
-  )
+  const result = useRegistrationWithAllInfo(ltiRegistrationId, accountId)
 
-  const {state, refresh} = useApiResult(fetchReg)
-
-  return matchApiResultState(state)({
-    data: (value, stale) => (
-      <ToolDetailsInner
-        registration={value}
-        stale={stale}
-        accountId={accountId}
-        refreshRegistration={refresh}
-      />
-    ),
-    error: error => (
-      <ApiResultErrorPage errorSubject={I18n.t('LTI Tool details fetch error')} error={error} />
-    ),
-    loading: () => (
+  if (result.isPending) {
+    return (
       <Flex direction="column" alignItems="center" padding="large 0">
         <Spinner renderTitle="Loading" />
       </Flex>
-    ),
-  })
+    )
+  } else if (result.isError) {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('LTI Tool details fetch error')}
+        errorMessage={result.error.message}
+      />
+    )
+  } else {
+    return <ToolDetailsInner registration={result.data.json} accountId={accountId} />
+  }
 }
 
 export type ToolDetailsRoute = 'access' | 'configuration' | 'usage' | 'history'
@@ -118,7 +104,6 @@ const useToolDetailsRoute = () => {
 
 export type ToolDetailsOutletContext = {
   registration: LtiRegistrationWithAllInformation
-  refreshRegistration: () => void
 }
 
 const OverflowThemeOverride = {defaultOverflowY: 'unset'}
@@ -183,16 +168,15 @@ const HeaderDetailFields = (registration: LtiRegistrationWithAllInformation) => 
 export const ToolDetailsInner = ({
   registration,
   accountId,
-  refreshRegistration,
 }: {
   registration: LtiRegistrationWithAllInformation
-  stale: boolean
   accountId: AccountId
-  refreshRegistration: () => void
 }) => {
   const navigate = useNavigate()
 
   const route = useToolDetailsRoute()
+
+  const deleteMutation = useDeleteRegistration()
 
   useAppendBreadcrumb(registration.name, `/accounts/${accountId}/apps/manage/${registration.id}`)
 
@@ -207,7 +191,7 @@ export const ToolDetailsInner = ({
     [navigate, registration.id],
   )
 
-  const outletContext: ToolDetailsOutletContext = {registration, refreshRegistration}
+  const outletContext: ToolDetailsOutletContext = {registration}
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
   const canDelete = !registration.inherited
 
@@ -259,11 +243,13 @@ export const ToolDetailsInner = ({
       })
 
       if (confirmed) {
-        const result = await deleteRegistration(registration.account_id, registration.id)
-        if (result._type === 'Success') {
-          refreshRegistration()
+        try {
+          await deleteMutation.mutateAsync({
+            registrationId: registration.id,
+            accountId: registration.account_id,
+          })
           navigate('/manage')
-        } else {
+        } catch {
           showFlashAlert({
             type: 'error',
             message: I18n.t('There was an error when attempting to delete the registration.'),
@@ -271,7 +257,7 @@ export const ToolDetailsInner = ({
         }
       }
     },
-    [registration],
+    [registration, navigate, deleteMutation],
   )
 
   React.useEffect(() => {
@@ -338,11 +324,11 @@ export const ToolDetailsInner = ({
                   "This account does not own this app and therefore can't delete it.",
                 )}
                 isShowingContent={tooltipShowing}
-                onShowContent={e => {
+                onShowContent={() => {
                   // The tooltip should only be shown if they *can't* click the delete button
                   setTooltipShowing(!canDelete)
                 }}
-                onHideContent={e => {
+                onHideContent={() => {
                   setTooltipShowing(false)
                 }}
               >

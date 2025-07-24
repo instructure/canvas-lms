@@ -35,11 +35,10 @@ import {DefaultLtiPrivacyLevel} from '../../../model/LtiPrivacyLevel'
 import {isLtiPlacementWithDefaultIcon, isLtiPlacementWithIcon} from '../../../model/LtiPlacement'
 import {ltiToolDefaultIconUrl} from '../../../model/ltiToolIcons'
 import {ToolConfigurationFooter} from './ToolConfigurationFooter'
-import {isForcedOn} from '../../../model/LtiRegistration'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import {
-  resetLtiRegistration,
+  useResetLtiRegistration,
   fetchLtiRegistrationWithLegacyConfig,
 } from '../../../api/registrations'
 import {isSuccessful} from '../../../../common/lib/apiResult/ApiResult'
@@ -92,7 +91,8 @@ const SubSection = ({
 }
 
 export const ToolConfigurationView = () => {
-  const {registration, refreshRegistration} = useOutletContext<ToolDetailsOutletContext>()
+  const {registration} = useOutletContext<ToolDetailsOutletContext>()
+  const mutation = useResetLtiRegistration()
 
   const customFields = Object.entries(registration.overlaid_configuration.custom_fields || {})
   const redirectUris = registration.overlaid_configuration.redirect_uris || []
@@ -105,10 +105,6 @@ export const ToolConfigurationView = () => {
   )
 
   const [tooltipShowing, setTooltipShowing] = React.useState(false)
-  const resetAppConfiguration = async () => {
-    const result = await resetLtiRegistration(registration.account_id, registration.id)
-    await refreshRegistration()
-  }
 
   const canRestoreDefault = !registration.inherited
 
@@ -126,10 +122,13 @@ export const ToolConfigurationView = () => {
       })
 
       if (confirmed) {
-        resetAppConfiguration()
+        await mutation.mutateAsync({
+          ltiRegistrationId: registration.id,
+          accountId: registration.account_id,
+        })
       }
     },
-    [],
+    [mutation, registration.account_id, registration.id],
   )
 
   const handleCopyJsonConfig = React.useCallback(
@@ -379,11 +378,11 @@ export const ToolConfigurationView = () => {
                     "This account does not own this app and therefore can't reset its configuration.",
                   )}
                   isShowingContent={tooltipShowing}
-                  onShowContent={e => {
+                  onShowContent={() => {
                     // The tooltip should only be shown if they *can't* click the restore default button
                     setTooltipShowing(!canRestoreDefault)
                   }}
-                  onHideContent={e => {
+                  onHideContent={() => {
                     setTooltipShowing(false)
                   }}
                 >

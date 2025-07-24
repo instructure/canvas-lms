@@ -129,7 +129,7 @@ const router = createBrowserRouter(
             },
             {
               path: 'configuration/edit',
-              element: <ToolConfigurationEdit updateLtiRegistration={updateRegistration} />,
+              element: <ToolConfigurationEdit />,
             },
             ...(isLtiRegistrationsUsageEnabled()
               ? [
