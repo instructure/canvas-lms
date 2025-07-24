@@ -73,6 +73,7 @@ export interface ItemAssignToProps {
   pointsPossible?: number
   moduleId?: string
   isCheckpointed?: boolean
+  isGraded?: boolean
 }
 
 export const renderItemAssignToManager = (
@@ -83,7 +84,7 @@ export const renderItemAssignToManager = (
   let container = document.getElementById(
     'module-item-assign-to-mount-point',
   ) as HTMLElementWithRoot
-  console.log(itemProps)
+
   if (!container) {
     container = document.createElement('div') as HTMLElementWithRoot
     container.id = 'module-item-assign-to-mount-point'
@@ -170,6 +171,7 @@ export const renderItemAssignToManager = (
       itemContentId={itemProps.moduleItemContentId}
       pointsPossible={itemProps.pointsPossible}
       isCheckpointed={itemProps.isCheckpointed}
+      removeDueDateInput={!itemProps.isGraded}
       locale={ENV.LOCALE || 'en'}
       timezone={ENV.TIMEZONE || 'UTC'}
     />,
