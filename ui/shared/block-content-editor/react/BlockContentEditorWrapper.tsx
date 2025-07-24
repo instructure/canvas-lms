@@ -24,6 +24,7 @@ import {ImageBlock} from './Blocks/ImageBlock'
 import {useBlockContentEditorIntegration} from './hooks/useBlockContentEditorIntegration'
 import {Prettify} from './utilities/Prettify'
 import {BlockContentEditorProps} from './BlockContentEditor'
+import {SeparatorLineBlock} from './Blocks/SeparatorLineBlock'
 
 export type BlockContentEditorWrapperProps = Prettify<
   Omit<BlockContentEditorProps, 'mode'> & {
@@ -33,12 +34,14 @@ export type BlockContentEditorWrapperProps = Prettify<
 
 export const BlockContentEditorWrapper = (props: BlockContentEditorWrapperProps) => {
   const onNodesChange = useBlockContentEditorIntegration(props.onInit)
+  const components = {
+    TextBlock,
+    ImageBlock,
+    SeparatorLineBlock,
+  }
+
   return (
-    <Editor
-      enabled={props.isEditMode}
-      resolver={{TextBlock, ImageBlock}}
-      onNodesChange={onNodesChange}
-    >
+    <Editor enabled={props.isEditMode} resolver={components} onNodesChange={onNodesChange}>
       <AddBlockModalRenderer />
       <AddBlock />
       <Frame data={props.data ?? undefined}>
