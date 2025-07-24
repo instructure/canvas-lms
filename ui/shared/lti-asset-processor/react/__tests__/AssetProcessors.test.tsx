@@ -160,14 +160,14 @@ describe('AssetProcessors', () => {
     })
   })
 
-  it('removes attached processors when the delete menu item is clicked', async () => {
+  it('removes attached processors when the remove menu item is clicked', async () => {
     const {queryByText, getByText} = renderAssetProcessors()
     onProcessorResponseCb!({tool: mockTools[1], data: mockDeepLinkResponse})
     expect(getByText('t2 · Lti 1.3 Tool Title')).toBeInTheDocument()
     getByText('Actions for document processing app: t2 · Lti 1.3 Tool Title').click()
-    getByText('Delete').click()
-    expect(getByText('Confirm Delete')).toBeInTheDocument()
-    getByText('Delete').click()
+    getByText('Remove').click()
+    expect(getByText('Confirm Removal')).toBeInTheDocument()
+    getByText('Remove').click()
     if (queryByText('t2 · Lti 1.3 Tool Title')) {
       await waitForElementToBeRemoved(() => queryByText('t2 · Lti 1.3 Tool Title'))
     }
@@ -178,9 +178,9 @@ describe('AssetProcessors', () => {
     const {queryByText, getByText} = renderAssetProcessors()
     expect(getByText('tool label · ap title')).toBeInTheDocument()
     getByText('Actions for document processing app: tool label · ap title').click()
-    getByText('Delete').click()
-    expect(getByText('Confirm Delete')).toBeInTheDocument()
-    getByText('Delete').click()
+    getByText('Remove').click()
+    expect(getByText('Confirm Removal')).toBeInTheDocument()
+    getByText('Remove').click()
     if (queryByText('tool label · ap title')) {
       await waitForElementToBeRemoved(() => queryByText('tool label · ap title'))
     }
@@ -191,7 +191,7 @@ describe('AssetProcessors', () => {
     expect(getByText('tool label · ap title')).toBeInTheDocument()
     getByText('Actions for document processing app: tool label · ap title').click()
     getByText('Modify').click()
-    expect(getByText('Modify settings for tool label · ap title')).toBeInTheDocument()
+    expect(getByText('Modify Settings for tool label · ap title')).toBeInTheDocument()
 
     const iframe = document.querySelector('iframe')
     expect(iframe).toBeInTheDocument()
@@ -206,7 +206,7 @@ describe('AssetProcessors', () => {
     onProcessorResponseCb!({tool: mockTools[1], data: mockDeepLinkResponse})
     expect(getByText('t2 · Lti 1.3 Tool Title')).toBeInTheDocument()
     getByText('Actions for document processing app: t2 · Lti 1.3 Tool Title').click()
-    expect(getByText('Delete')).toBeInTheDocument()
+    expect(getByText('Remove')).toBeInTheDocument()
     expect(queryByText('Modify')).not.toBeInTheDocument()
   })
 

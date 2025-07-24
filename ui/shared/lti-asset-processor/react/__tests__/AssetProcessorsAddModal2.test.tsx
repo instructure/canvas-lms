@@ -91,7 +91,7 @@ describe('AssetProcessorsAddModal', () => {
 
     await waitFor(
       () => {
-        expect(getByText('Add a document processing app')).toBeInTheDocument()
+        expect(getByText('Add A Document Processing App')).toBeInTheDocument()
 
         const cards = queryAllByTestId('asset-processor-card')
         expect(cards.length).toBeGreaterThan(0)

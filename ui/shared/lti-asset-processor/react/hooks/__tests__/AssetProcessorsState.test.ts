@@ -325,7 +325,7 @@ describe('useAssetProcessorsState', () => {
     })
   })
 
-  describe('deleteAttachedProcessor', () => {
+  describe('removeAttachedProcessor', () => {
     it('should delete processor at specified index after confirmation', async () => {
       const {result} = renderHook(() => useAssetProcessorsState())
 
@@ -347,7 +347,7 @@ describe('useAssetProcessorsState', () => {
 
       // Delete the middle processor
       await act(async () => {
-        await result.current.deleteAttachedProcessor(1)
+        await result.current.removeAttachedProcessor(1)
       })
 
       expect(result.current.attachedProcessors).toHaveLength(2)
