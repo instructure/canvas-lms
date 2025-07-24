@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {node} from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
-import {propType as termsPropType} from '../store/TermsStore'
 import SearchableSelect from './SearchableSelect'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import CoursesStore from '../store/CoursesStore'
@@ -51,19 +49,21 @@ const I18n = createI18nScope('account_course_user_search')
 
 const nonBreakingSpace = '\u00a0'
 
+function byName(a: Account, b: Account): number {
+  const locale = ENV.LOCALES[0] || navigator.language || 'en'
+  return a.name.localeCompare(b.name, locale)
+}
+
 const renderAccountOptions = (accounts: Account[] = [], depth = 0): {id: string; name: string}[] =>
   flatten(
-    accounts.map(account =>
-      [{id: account.id, name: Array(2 * depth + 1).join(nonBreakingSpace) + account.name}].concat(
-        renderAccountOptions(account.subAccounts || [], depth + 1),
+    accounts
+      .sort(byName)
+      .map(account =>
+        [{id: account.id, name: Array(2 * depth + 1).join(nonBreakingSpace) + account.name}].concat(
+          renderAccountOptions(account.subAccounts || [], depth + 1),
+        ),
       ),
-    ),
   )
-
-NewCourseModal.propTypes = {
-  terms: termsPropType,
-  children: node.isRequired,
-}
 
 const createValidationSchema = () =>
   z.object({
@@ -71,10 +71,12 @@ const createValidationSchema = () =>
     reference_code: z.string().min(1, I18n.t('Reference code is required.')),
   })
 
-export default function NewCourseModal({
-  terms,
-  children,
-}: {terms: TermList; children: React.ReactNode}) {
+interface NewCourseModalProps {
+  terms: TermList
+  children: React.ReactNode
+}
+
+export default function NewCourseModal({terms, children}: NewCourseModalProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
   const [account, setAccount] = useState('')
   const [enrollmentTerm, setEnrollmentTerm] = useState('')
