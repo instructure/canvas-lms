@@ -16,5 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './react/BlockContentEditor'
-export * from './react/BlockContentViewer'
+import './block-content-editor-layout.css'
+import {ReactNode} from 'react'
+
+export const BlockContentViewerLayout = (props: {
+  editor: ReactNode
+}) => {
+  return (
+    <div className="block-content-editor-container">
+      <div className="editor-area">{props.editor}</div>
+    </div>
+  )
+}

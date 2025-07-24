@@ -18,22 +18,18 @@
 
 import {SerializedNodes} from '@craftjs/core'
 import {BlockContentEditorContext} from './BlockContentEditorContext'
-import {BlockContentEditorLayout} from './layout/BlockContentEditorLayout'
-import {Toolbar} from './Toolbar'
-import {PageEditorHandler} from './hooks/useBlockContentEditorIntegration'
+import {BlockContentViewerLayout} from './layout/BlockContentViewerLayout'
 import {BlockContentEditorWrapper} from './BlockContentEditorWrapper'
 
-export type BlockContentEditorProps = {
+export type BlockContentViewerProps = {
   data: SerializedNodes | null
-  onInit: ((handler: PageEditorHandler) => void) | null
 }
 
-export const BlockContentEditor = (props: BlockContentEditorProps) => {
-  const editor = <BlockContentEditorWrapper isEditMode={true} {...props} />
-
+export const BlockContentViewer = (props: BlockContentViewerProps) => {
+  const editor = <BlockContentEditorWrapper data={props.data} onInit={null} isEditMode={false} />
   return (
     <BlockContentEditorContext data={props.data}>
-      <BlockContentEditorLayout toolbar={<Toolbar />} editor={editor} />
+      <BlockContentViewerLayout editor={editor} />
     </BlockContentEditorContext>
   )
 }
