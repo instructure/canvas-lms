@@ -2124,10 +2124,10 @@ describe Submission do
   describe "#queue_conditional_release_grade_change_handler" do
     let_once(:submission) { @assignment.submissions.find_by(user: @student) }
 
-    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" set to 'high'" do
+    context "with conditional_release_tuning plugin priority set to 'high'" do
       it "queues override handler job with high priority" do
         allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
-        Setting.set("conditional_release_handler_priority_#{@course.root_account.global_id}", "high")
+        PluginSetting.create(name: "conditional_release_tuning", settings: { priority: "high" })
         submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
 
         job = Delayed::Job.find_by(tag: "ConditionalRelease::OverrideHandler.handle_grade_change")
@@ -2135,10 +2135,10 @@ describe Submission do
       end
     end
 
-    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" set to 'normal'" do
+    context "with conditional_release_tuning plugin priority set to 'normal'" do
       it "queues override handler job with normal priority" do
         allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
-        Setting.set("conditional_release_handler_priority_#{@course.root_account.global_id}", "normal")
+        PluginSetting.create(name: "conditional_release_tuning", settings: { priority: "normal" })
         submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
 
         job = Delayed::Job.find_by(tag: "ConditionalRelease::OverrideHandler.handle_grade_change")
@@ -2146,7 +2146,7 @@ describe Submission do
       end
     end
 
-    context "with \"conditional_release_handler_priority_\#{root_account.global_id}\" unset" do
+    context "with conditional_release_tuning plugin priority unset" do
       it "queues override handler job with low priority" do
         allow(submission.assignment).to receive(:queue_conditional_release_grade_change_handler?).and_return(true)
         submission.update!(score: 11, workflow_state: :graded, posted_at: Time.zone.now)
