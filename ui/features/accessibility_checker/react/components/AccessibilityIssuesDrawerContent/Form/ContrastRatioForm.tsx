@@ -160,6 +160,7 @@ const ContrastRatioForm: React.FC<ContrastRatioFormProps> = ({
       <ContrastOptions options={options} isOptionsValid={isOptionsValid} badgeColor={badgeColor} />
       <View margin="medium 0">
         <ColorPicker
+          id="a11y-color-picker"
           data-testid="color-picker"
           placeholderText={I18n.t('Enter HEX')}
           label={inputLabel}

@@ -31,6 +31,7 @@ export type NewStateToFetch = {
   page?: number
   pageSize?: number
   tableSortState?: TableSortState | null
+  search?: string | null
 }
 
 export type AccessibilityCheckerState = {
@@ -43,6 +44,7 @@ export type AccessibilityCheckerState = {
   accessibilityScanDisabled: boolean
   tableSortState?: TableSortState | null
   tableData: ContentItem[] | null // TODO convert items to ContentItemForDisplay[]
+  search?: string | null
 }
 
 export type AccessibilityCheckerActions = {
@@ -55,6 +57,7 @@ export type AccessibilityCheckerActions = {
   setAccessibilityScanDisabled: (accessibilityScanDisabled: boolean) => void
   setTableSortState: (tableSortState: TableSortState | null) => void
   setTableData: (tableData: ContentItem[] | null) => void
+  setSearch: (search: string | null) => void
 }
 
 export const initialState: AccessibilityCheckerState = {
@@ -67,12 +70,14 @@ export const initialState: AccessibilityCheckerState = {
   accessibilityScanDisabled: false,
   tableSortState: null,
   tableData: null,
+  search: null,
 }
 
 export const defaultStateToFetch: NewStateToFetch = {
   page: 0,
   pageSize: 10,
   tableSortState: {} as TableSortState,
+  search: null,
 }
 
 export const useAccessibilityCheckerStore = create<
@@ -91,6 +96,7 @@ export const useAccessibilityCheckerStore = create<
       setAccessibilityScanDisabled: accessibilityScanDisabled => set({accessibilityScanDisabled}),
       setTableSortState: tableSortState => set({tableSortState}),
       setTableData: tableData => set({tableData}),
+      setSearch: search => set({search}),
     }),
     {
       name: 'AccessibilityCheckerStore',

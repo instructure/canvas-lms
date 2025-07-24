@@ -28,8 +28,21 @@ module Accessibility
     before_action :require_user
     before_action :validate_allowed
 
+    def index
+      @search_query = params[:search]
+    end
+
     def create
-      render json: Accessibility::Issue.new(context: @context).generate
+      if request.body.present? && !request.body.read.strip.empty?
+        request.body.rewind
+        payload = JSON.parse(request.body.read)
+        search_query = payload["search"]
+      else
+        search_query = nil
+      end
+
+      issue = Accessibility::Issue.new(context: @context)
+      render json: issue.search(search_query)
     end
 
     def update

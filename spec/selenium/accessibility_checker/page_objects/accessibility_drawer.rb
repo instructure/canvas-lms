@@ -62,7 +62,7 @@ module AccessibilityDrawer
   end
 
   def color_picker_form_input_selector
-    "#TextInput___0"
+    "#a11y-color-picker"
   end
 
   #------------------------------ Elements ------------------------------

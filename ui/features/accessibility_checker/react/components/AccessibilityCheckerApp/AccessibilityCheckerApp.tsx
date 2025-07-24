@@ -34,6 +34,8 @@ import {AccessibilityIssuesSummary} from '../AccessibilityIssuesSummary/Accessib
 import {AccessibilityIssuesTable} from '../AccessibilityIssuesTable/AccessibilityIssuesTable'
 import {useAccessibilityFetchUtils} from './useAccessibilityFetchUtils'
 
+import SearchIssue from './Search/SearchIssue'
+
 const I18n = createI18nScope('accessibility_checker')
 
 export const AccessibilityCheckerApp: React.FC = () => {
@@ -41,13 +43,16 @@ export const AccessibilityCheckerApp: React.FC = () => {
   const {setSelectedItem, setIsTrayOpen} = context
   const {parseFetchParams, doFetchAccessibilityIssues} = useAccessibilityFetchUtils()
 
-  const [accessibilityIssues, accessibilityScanDisabled, loading] = useAccessibilityCheckerStore(
-    useShallow(state => [
-      state.accessibilityIssues,
-      state.accessibilityScanDisabled,
-      state.loading,
-    ]),
-  )
+  const [accessibilityIssues, accessibilityScanDisabled, loading, search, setSearch] =
+    useAccessibilityCheckerStore(
+      useShallow(state => [
+        state.accessibilityIssues,
+        state.accessibilityScanDisabled,
+        state.loading,
+        state.search,
+        state.setSearch,
+      ]),
+    )
 
   useEffect(() => {
     doFetchAccessibilityIssues(parseFetchParams())
@@ -69,6 +74,17 @@ export const AccessibilityCheckerApp: React.FC = () => {
       setIsTrayOpen(true)
     },
     [accessibilityIssues, setSelectedItem, setIsTrayOpen],
+  )
+
+  const handleSearchChange = useCallback(
+    async (value: string) => {
+      const newSearch = value
+      setSearch(newSearch)
+      if (newSearch.length >= 0) {
+        await doFetchAccessibilityIssues({search: newSearch, page: 0})
+      }
+    },
+    [setSearch, doFetchAccessibilityIssues],
   )
 
   const handleReload = useCallback(() => {
@@ -123,6 +139,15 @@ export const AccessibilityCheckerApp: React.FC = () => {
           </Flex.Item>
         )}
       </Flex>
+
+      <Flex alignItems="start" direction="row" margin="small 0">
+        <Flex.Item width="100%">
+          <Flex direction="column" justifyItems="space-between">
+            <SearchIssue onSearchChange={handleSearchChange} />
+          </Flex>
+        </Flex.Item>
+      </Flex>
+
       <AccessibilityIssuesSummary />
       <AccessibilityIssuesTable onRowClick={handleRowClick} />
     </View>

@@ -32,8 +32,8 @@ import {AccessibilityData} from '../../types'
 import {convertKeysToCamelCase, processAccessibilityData} from '../../utils'
 
 export const useAccessibilityFetchUtils = () => {
-  const [page, pageSize, tableSortState] = useAccessibilityCheckerStore(
-    useShallow(state => [state.page, state.pageSize, state.tableSortState]),
+  const [page, pageSize, tableSortState, search] = useAccessibilityCheckerStore(
+    useShallow(state => [state.page, state.pageSize, state.tableSortState, state.search]),
   )
   const [
     setAccessibilityScanDisabled,
@@ -44,6 +44,7 @@ export const useAccessibilityFetchUtils = () => {
     setPageSize,
     setTableData,
     setTableSortState,
+    setSearch,
   ] = useAccessibilityCheckerStore(
     useShallow(state => [
       state.setAccessibilityScanDisabled,
@@ -54,6 +55,7 @@ export const useAccessibilityFetchUtils = () => {
       state.setPageSize,
       state.setTableData,
       state.setTableSortState,
+      state.setSearch,
     ]),
   )
 
@@ -64,6 +66,7 @@ export const useAccessibilityFetchUtils = () => {
       tableSortState: {
         ...defaultStateToFetch.tableSortState,
       },
+      search: defaultStateToFetch.search,
     }
     const queryParams = new URLSearchParams(window.location.search)
 
@@ -92,6 +95,10 @@ export const useAccessibilityFetchUtils = () => {
       }
 
       parsedFetchParams.tableSortState!.sortId = queryParams.get('sort-id')
+    }
+
+    if (queryParams.has('search')) {
+      parsedFetchParams.search = queryParams.get('search') || defaultStateToFetch.search
     }
 
     return parsedFetchParams
@@ -146,7 +153,7 @@ export const useAccessibilityFetchUtils = () => {
 
   const updateQueryParams = useCallback((latestFetchedState: NewStateToFetch) => {
     const queryParams = new URLSearchParams(window.location.search)
-    const {page, pageSize, tableSortState} = latestFetchedState
+    const {page, pageSize, tableSortState, search} = latestFetchedState
 
     if (page !== undefined) {
       queryParams.set('page', (page + 1).toString())
@@ -170,6 +177,12 @@ export const useAccessibilityFetchUtils = () => {
       queryParams.delete('sort-direction')
     }
 
+    if (search) {
+      queryParams.set('search', search)
+    } else {
+      queryParams.delete('search')
+    }
+
     window.history.replaceState(null, '', `${window.location.pathname}?${queryParams.toString()}`)
   }, [])
 
@@ -185,6 +198,7 @@ export const useAccessibilityFetchUtils = () => {
           page,
           pageSize,
           tableSortState: tableSortState || defaultStateToFetch.tableSortState,
+          search,
         }
 
         Object.assign(newStateToFetch, requestedStateChange)
@@ -195,6 +209,9 @@ export const useAccessibilityFetchUtils = () => {
         const data: DoFetchApiResults<any> = await doFetchApi({
           path: window.location.pathname + '/issues',
           method: 'POST',
+          body: JSON.stringify({
+            search: newStateToFetch.search,
+          }),
         })
 
         const accessibilityIssues = convertKeysToCamelCase(data.json) as AccessibilityData
@@ -205,6 +222,7 @@ export const useAccessibilityFetchUtils = () => {
         setPage(newStateToFetch.page!)
         setPageSize(newStateToFetch.pageSize!)
         setTableSortState(newStateToFetch.tableSortState!)
+        setSearch(newStateToFetch.search!)
 
         updateQueryParams(newStateToFetch)
       } catch (err: any) {
@@ -227,6 +245,7 @@ export const useAccessibilityFetchUtils = () => {
       setPageSize,
       setTableData,
       setTableSortState,
+      setSearch,
       updateQueryParams,
     ],
   )
