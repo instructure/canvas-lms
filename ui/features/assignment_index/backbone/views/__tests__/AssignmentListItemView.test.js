@@ -317,6 +317,20 @@ describe('AssignmentListItemViewSpec', () => {
     expect(view.$('.ig-row').hasClass('ig-published')).toBe(false)
   })
 
+  test('show ig-published class if assignment is published and canmanage is false', () => {
+    ENV.current_user_roles = ['teacher']
+    ENV.current_user_is_student = false
+    const view = createView(assignment1(), {canManage: false})
+    expect(view.$('.ig-row').hasClass('ig-published')).toBe(true)
+  })
+
+  test('does not show ig-published class if assignment is published and user has student role', () => {
+    ENV.current_user_roles = ['student']
+    ENV.current_user_is_student = true
+    const view = createView(assignment1(), {canManage: false})
+    expect(view.$('.ig-row').hasClass('ig-published')).toBe(false)
+  })
+
   test.skip('asks for confirmation before deleting an assignment', () => {
     const view = createView(assignment1())
     jest.spyOn(view.visibleAssignments(), 'returns').mockReturnValue([])
