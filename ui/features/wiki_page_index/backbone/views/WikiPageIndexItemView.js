@@ -101,8 +101,11 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     json.frontPageText = ENV.K5_SUBJECT_COURSE ? I18n.t('Subject Home') : I18n.t('Front Page')
-    json.block_editor = ENV.EDITOR_FEATURE === 'block_editor'
-    json.page_is_block = this.model.get('editor') === 'block_editor'
+    json.block_editor =
+      ENV.EDITOR_FEATURE === 'block_editor' || ENV.EDITOR_FEATURE === 'block_content_editor'
+    json.page_is_block =
+      this.model.get('editor') === 'block_editor' ||
+      this.model.get('editor') === 'block_content_editor'
     json.page_type_label = json.page_is_block ? I18n.t('block page') : I18n.t('classic page')
     json.is_horizon_course = ENV?.horizon_course
     return json
