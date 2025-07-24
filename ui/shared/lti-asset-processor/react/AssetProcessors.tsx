@@ -45,7 +45,7 @@ export type AssetProcessorsProps = {
 export function AssetProcessors(props: AssetProcessorsProps) {
   const openAddDialog = useAssetProcessorsAddModalState(s => s.actions.showToolList)
   const toolsAvailable = !!useAssetProcessorsToolsList(props.courseId).data?.length
-  const {attachedProcessors, addAttachedProcessors, deleteAttachedProcessor} =
+  const {attachedProcessors, addAttachedProcessors, removeAttachedProcessor} =
     useAssetProcessorsState(s => s)
 
   return (
@@ -54,34 +54,36 @@ export function AssetProcessors(props: AssetProcessorsProps) {
         <AssetProcessorsAddModal onProcessorResponse={addAttachedProcessors} {...props} />
       )}
       <Flex direction="column" gap="small">
-        {attachedProcessors.map((processor, index) => (
-          <AssetProcessorsAttachedProcessorCard
-            assetProcessorId={processor.id}
-            key={index}
-            icon={{
-              toolId: processor.toolId,
-              toolName: processor.toolName || '',
-              url: processor.iconOrToolIconUrl,
-            }}
-            title={buildAPDisplayTitle(processor)}
-            description={processor.text}
-            windowSettings={processor.window}
-            iframeSettings={processor.iframe}
-            onDelete={() => deleteAttachedProcessor(index, props.hideErrors)}
-          ></AssetProcessorsAttachedProcessorCard>
-        ))}
-        <span
-          data-testid="asset-processor-errors"
-          id="asset_processors_errors"
-          className="error-message"
-        />
-        {toolsAvailable && (
-          <span>
-            <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
-              {I18n.t('Add Document Processing App')}
-            </Button>
-          </span>
-        )}
+        <Flex direction={attachedProcessors.length ? 'column' : 'row'} gap="small">
+          {attachedProcessors.map((processor, index) => (
+            <AssetProcessorsAttachedProcessorCard
+              assetProcessorId={processor.id}
+              key={index}
+              icon={{
+                toolId: processor.toolId,
+                toolName: processor.toolName || '',
+                url: processor.iconOrToolIconUrl,
+              }}
+              title={buildAPDisplayTitle(processor)}
+              description={processor.text}
+              windowSettings={processor.window}
+              iframeSettings={processor.iframe}
+              onRemove={() => removeAttachedProcessor(index, props.hideErrors)}
+            ></AssetProcessorsAttachedProcessorCard>
+          ))}
+          <span
+            data-testid="asset-processor-errors"
+            id="asset_processors_errors"
+            className="error-message"
+          />
+          {toolsAvailable && (
+            <Flex.Item>
+              <Button color="secondary" onClick={openAddDialog} id="asset-processor-add-button">
+                {I18n.t('Add Document Processing App')}
+              </Button>
+            </Flex.Item>
+          )}
+        </Flex>
       </Flex>
     </>
   )

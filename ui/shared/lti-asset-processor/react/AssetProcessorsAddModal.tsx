@@ -62,7 +62,7 @@ export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
     <Modal
       open={true}
       onDismiss={close}
-      label={I18n.t('Add a document processing app')}
+      label={I18n.t('Add A Document Processing App')}
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
@@ -77,7 +77,7 @@ export function AssetProcessorsAddModal(props: AssetProcessorsAddModalProps) {
           placement="end"
           screenReaderLabel={I18n.t('Close')}
         />
-        <Heading>{I18n.t('Add a document processing app')}</Heading>
+        <Heading>{I18n.t('Add A Document Processing App')}</Heading>
       </Modal.Header>
       <Modal.Body padding="small">
         <AssetProcessorsAddModalBody {...props} />

@@ -44,7 +44,7 @@ export type AssetProcessorsState = {
   attachedProcessors: AttachedAssetProcessor[]
 
   addAttachedProcessors: ({tool, data}: {tool: LtiLaunchDefinition; data: DeepLinkResponse}) => void
-  deleteAttachedProcessor: (index: number, onDelete?: () => void) => Promise<void>
+  removeAttachedProcessor: (index: number, onRemove?: () => void) => Promise<void>
   setFromExistingAttachedProcessors: (processors: ExistingAttachedAssetProcessor[]) => void
 }
 
@@ -157,17 +157,17 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
     set({attachedProcessors: [...get().attachedProcessors, ...newProcessors]})
   },
 
-  deleteAttachedProcessor: async (index: number, onDelete?: () => void) => {
+  removeAttachedProcessor: async (index: number, onRemove?: () => void) => {
     const attachedProcessors = get().attachedProcessors
     const processor = attachedProcessors[index]
 
-    const title = I18n.t('Confirm Delete')
+    const title = I18n.t('Confirm Removal')
     const msg = I18n.t(
-      "Are you sure you'd like to delete *%{title}*? Deleting %{title} will will prevent future submissions from being processed by them as well as removing any existing reports by %{title} from your Speedgrader view.",
+      "Are you sure you'd like to remove *%{title}*? Removing %{title} will prevent future submissions from being processed by them as well as removing any existing reports by %{title} from your Speedgrader view.",
       {title: processor.title, wrapper: '<strong>$1</strong>'},
     )
     const messageDangerouslySetInnerHTML = {__html: msg}
-    const confirmButtonLabel = I18n.t('Delete')
+    const confirmButtonLabel = I18n.t('Remove')
     if (
       await confirmDanger({
         title,
@@ -177,7 +177,7 @@ export const useAssetProcessorsState = create<AssetProcessorsState>((set, get) =
       })
     ) {
       set({attachedProcessors: get().attachedProcessors.filter((_, i) => i !== index)})
-      onDelete?.()
+      onRemove?.()
     }
   },
 
