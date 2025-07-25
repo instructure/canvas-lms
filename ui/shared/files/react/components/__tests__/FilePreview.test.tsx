@@ -18,6 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
+import '@canvas/files/mockFilesENV'
 import {render, screen} from '@testing-library/react'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import Folder from '@canvas/files/backbone/models/Folder'

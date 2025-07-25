@@ -33,6 +33,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File'
 import FilesystemObject from '../../backbone/models/FilesystemObject'
 import '@canvas/rails-flash-notifications'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('file_preview')
 const FLAMEGRAPH_FOLDER_REGEX = /^users_.+\/flamegraphs$/
@@ -296,8 +297,7 @@ export default class FilePreview extends React.PureComponent {
       'ef-file-preview-button': true,
       'ef-file-preview-button--active': this.state.showInfoPanel,
     })
-    const isStudent = (ENV?.current_user_roles || []).includes('student')
-    const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
 
     return (
       <Overlay

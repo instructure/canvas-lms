@@ -27,6 +27,7 @@ import ExternalToolsButton from './ExternalToolsButton'
 import UploadButton from './UploadButton'
 import {Flex} from '@instructure/ui-flex'
 import {reloadWindow} from '@canvas/util/globalUtils'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('files_v2')
 interface TopLevelButtonsProps {
@@ -104,8 +105,7 @@ const TopLevelButtons = ({
     )
   }
 
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   if (size === 'small') {
     return (

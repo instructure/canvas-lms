@@ -38,6 +38,7 @@ import $ from 'jquery'
 import {createRoot, Root} from 'react-dom/client'
 import DragFeedback from '@canvas/files/react/components/DragFeedback'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 // Need to render in this manner to satisfy TypeScript and make sure headers are rendered in stacked view
 interface TableBodyProps {
@@ -251,8 +252,7 @@ const TableBody: React.FC<TableBodyProps> = ({
     )
   }
 
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   return (
     <>

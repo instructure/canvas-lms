@@ -31,6 +31,7 @@ import {DeleteModal} from './DeleteModal'
 import {downloadFile, downloadZip} from '../../../utils/downloadUtils'
 import {getName, isFile, isLockedBlueprintItem} from '../../../utils/fileFolderUtils'
 import {externalToolEnabled} from '../../../utils/fileUtils'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 import {
   IconMoreLine,
@@ -171,8 +172,7 @@ const ActionMenuButton = ({
   const send_copy_permissions = contextType === 'course' && userCanEditFilesForContext
   const rename_move_permissions = userCanEditFilesForContext && !blueprint_locked
   const delete_permissions = userCanDeleteFilesForContext && !blueprint_locked
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   const filteredItems = useMemo(
     () =>
@@ -354,9 +354,11 @@ const ActionMenuButton = ({
 
   return (
     <div ref={el => handleActionButtonRef(el, rowIndex)}>
-      <Menu placement="bottom" trigger={triggerButton()}>
-        {filteredItems.map((item, i) => renderMenuItem(i, item))}
-      </Menu>
+      {filteredItems.length > 0 && (
+        <Menu placement="bottom" trigger={triggerButton()}>
+          {filteredItems.map((item, i) => renderMenuItem(i, item))}
+        </Menu>
+      )}
       {buildTrays()}
       {buildModals()}
     </div>

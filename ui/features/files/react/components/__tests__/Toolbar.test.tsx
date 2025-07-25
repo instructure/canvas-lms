@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import Toolbar from '../Toolbar'
 import Folder from '@canvas/files/backbone/models/Folder'
 import File from '@canvas/files/backbone/models/File'

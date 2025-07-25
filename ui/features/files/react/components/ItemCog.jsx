@@ -157,8 +157,8 @@ class ItemCog extends React.Component {
       })
 
     const menuItems = []
-    const isStudent = (ENV?.current_user_roles || []).includes('student')
-    const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
+
     if (!isAccessRestricted) {
       // Download Link
       if (this.props.model instanceof Folder) {

@@ -32,6 +32,7 @@ import ColumnHeaders from './ColumnHeaders'
 import LoadingIndicator from './LoadingIndicator'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('react_files')
 
@@ -140,8 +141,7 @@ ShowFolder.render = function () {
     this.props.currentFolder.folders.loadedAll && this.props.currentFolder.files.loadedAll
   )
 
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   // We have to put the "select all" checkbox out here because VO won't read the table properly
   // if it's in the table header, and won't read it at all if it's outside the table but inside

@@ -33,6 +33,7 @@ import {FilePreview} from './FilePreview'
 import {FilePreviewNavigationButtons} from './FilePreviewNavigationButtons'
 import {FileNotFound} from './FileNotFound'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('files_v2')
 
@@ -61,8 +62,7 @@ export const FilePreviewModal = ({
   )
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const name = currentItem?.display_name || I18n.t('File')
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   // Reset state when the modal is opened or item changes
   useEffect(() => {

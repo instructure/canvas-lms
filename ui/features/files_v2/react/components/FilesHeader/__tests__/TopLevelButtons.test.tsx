@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import TopLevelButtons from '../TopLevelButtons'
 import {
   FileManagementProvider,

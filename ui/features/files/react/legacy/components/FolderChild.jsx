@@ -25,6 +25,7 @@ import Folder from '@canvas/files/backbone/models/Folder'
 import FocusStore from '../modules/FocusStore'
 import classnames from 'classnames'
 import '@canvas/rails-flash-notifications'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('react_files')
 
@@ -120,8 +121,7 @@ export default {
       activeDragTarget: this.state.isActiveDragTarget,
     })
 
-    const isStudent = (ENV?.current_user_roles || []).includes('student')
-    const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
 
     const attrs = {
       onClick: this.props.toggleSelected,

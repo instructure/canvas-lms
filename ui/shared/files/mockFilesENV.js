@@ -16,9 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-undef */
+
 if (!window.ENV) {
   window.ENV = {}
 }
+
+if (!window.ENV.FEATURES) {
+  window.ENV.FEATURES = {}
+}
+
+if (!window.ENV.current_user_roles) {
+  window.ENV.current_user_roles = []
+}
+
+jest.mock('@canvas/files/react/modules/filesEnv', () => ({
+  ...jest.requireActual('@canvas/files/react/modules/filesEnv'),
+  get userFileAccessRestricted() {
+    return (
+      window.ENV?.FEATURES?.restrict_student_access &&
+      (window.ENV?.current_user_roles || []).includes('student')
+    )
+  },
+}))
+
 export default (window.ENV.FILES_CONTEXTS = [
   {
     asset_string: 'course_1',
