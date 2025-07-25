@@ -135,7 +135,7 @@ module LinkedAttachmentHandler
     saving_user
   end
 
-  def access_for_attachment_association?(user, session, _location_param)
+  def access_for_attachment_association?(user, session, _association, _location_param)
     grants_right?(user, session, :read) if user && respond_to?(:grants_right?)
   end
 
