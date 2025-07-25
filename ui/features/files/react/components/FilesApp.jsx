@@ -83,8 +83,7 @@ FilesApp.render = function () {
     ? filesEnv.contextFor({contextType, contextId}).file_index_menu_tools
     : []
 
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   return (
     <div>

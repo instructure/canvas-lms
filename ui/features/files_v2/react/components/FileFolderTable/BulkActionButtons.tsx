@@ -40,6 +40,7 @@ import MoveModal from './MoveModal'
 import UsageRightsModal from './UsageRightsModal'
 import PermissionsModal from './PermissionsModal'
 import {DisabledActionsInfoButton} from './DisabledActionsInfoButton'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('files_v2')
 
@@ -97,8 +98,7 @@ const BulkActionButtons = ({
   const handleDownload = useCallback(() => downloadZip(selectedRows), [selectedRows])
 
   const selectedItems = rows.filter(row => selectedRows.has(getUniqueId(row)))
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   const buildModals = useCallback(
     () => (

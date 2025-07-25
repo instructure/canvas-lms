@@ -38,6 +38,7 @@ import {Sort} from '../../hooks/useGetPaginatedFiles'
 import {createPortal} from 'react-dom'
 import {getColumnHeaders, setColumnWidths, type ColumnID} from './FileFolderTableUtils'
 import {DragAndDropWrapper} from './DragAndDropWrapper'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('files_v2')
 
@@ -158,8 +159,7 @@ const FileFolderTable = ({
 
   const showDrop = userCanEditFilesForContext && !isLoading && !searchString && !isStacked
   const isEmpty = rows.length === 0 && !isLoading
-  const isStudent = (ENV?.current_user_roles || []).includes('student')
-  const isAccessRestricted = ENV?.FEATURES?.restrict_student_access && isStudent
+  const isAccessRestricted = filesEnv.userFileAccessRestricted
 
   return (
     <>

@@ -394,3 +394,4 @@ restrict_student_access:
   display_name: Restricted Inbox, Files and Calendar Functionality
   description: Enable restricted functionalities for students so that inbox communications, file movements and calendar events can be restricted.
   applies_to: RootAccount
+  shadow: true

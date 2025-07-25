@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, screen, waitFor} from '@testing-library/react'
+import '@canvas/files/mockFilesENV'
 import {BrowserRouter as Router} from 'react-router-dom'
 import ActionMenuButton, {ActionMenuButtonProps} from '../ActionMenuButton'
 import {FAKE_FILES, FAKE_FOLDERS} from '../../../../fixtures/fakeData'

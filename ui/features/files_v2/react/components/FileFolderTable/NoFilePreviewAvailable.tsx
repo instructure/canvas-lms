@@ -26,10 +26,10 @@ import {Button} from '@instructure/ui-buttons'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import type {File} from '../../../interfaces/File'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('files_v2')
-const isStudent = (ENV?.current_user_roles || []).includes('student')
-const userCanDownloadFilesForContext = !(ENV?.FEATURES?.restrict_student_access && isStudent)
+const isAccessRestricted = filesEnv.userFileAccessRestricted
 
 const NoFilePreviewAvailable = ({item}: {item: File}) => (
   <Flex height="100%" alignItems="center" justifyItems="center" id="file-preview">
@@ -70,7 +70,7 @@ const NoFilePreviewAvailable = ({item}: {item: File}) => (
               )}
             </Flex>
           </Flex.Item>
-          {userCanDownloadFilesForContext && (
+          {!isAccessRestricted && (
             <Flex.Item padding="x-small">
               <Button renderIcon={<IconDownloadSolid />} href={item.url} id="download-button">
                 {I18n.t('Download')}

@@ -39,6 +39,7 @@ import {ltiState} from '@canvas/lti/jquery/messages'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {reloadWindow} from '@canvas/util/globalUtils'
+import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 const I18n = createI18nScope('react_files')
 
@@ -69,11 +70,6 @@ export default class Toolbar extends React.Component {
 
   addFolder() {
     return this.props.currentFolder.folders.add({})
-  }
-
-  isAccessRestricted() {
-    const isStudent = (ENV?.current_user_roles || []).includes('student')
-    return ENV?.FEATURES?.restrict_student_access && isStudent
   }
 
   handleSwitchToNewFiles = async () => {
@@ -281,7 +277,7 @@ export default class Toolbar extends React.Component {
                 &nbsp;
                 <span className={phoneHiddenSet}>{I18n.t('Folder')}</span>
               </button>
-              {!this.isAccessRestricted() && (
+              {!filesEnv.userFileAccessRestricted && (
                 <UploadButton
                   currentFolder={this.props.currentFolder}
                   showingButtons={!!this.showingButtons}
@@ -442,7 +438,7 @@ export default class Toolbar extends React.Component {
       userCanDeleteFilesForContext,
     } = this.props
 
-    const isAccessRestricted = this.isAccessRestricted()
+    const isAccessRestricted = filesEnv.userFileAccessRestricted
 
     const canManage = permission => {
       return permission && !submissionsFolderSelected && !restrictedByMasterCourse
