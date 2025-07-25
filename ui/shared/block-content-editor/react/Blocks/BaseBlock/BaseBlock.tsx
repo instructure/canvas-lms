@@ -16,41 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PropsWithChildren, useRef, useState} from 'react'
-import {BaseBlockLayout} from './BaseBlockLayout'
+import {ComponentProps, PropsWithChildren, useState} from 'react'
 import {BlockContext} from './BaseBlockContext'
-import {useSetEditMode} from './useSetEditMode'
-import {RemoveButton} from './RemoveButton'
-import {AddButton} from '../../AddBlock/AddButton'
-import {useDeleteNode} from '../../hooks/useDeleteNode'
-import {useDuplicateNode} from '../../hooks/useDuplicateNode'
-import {useNode} from '@craftjs/core'
-import {useBlockContentEditorContext} from '../../BlockContentEditorContext'
-import {ApplyButton} from './ApplyButton'
-import {CopyButton} from './CopyButton'
+import {useGetRenderMode} from './useGetRenderMode'
+import {BaseBlockViewLayout} from './layout/BaseBlockViewLayout'
+import {BaseBlockEditWrapper} from './components/BaseBlockEditWrapper'
 
-const InsertButton = () => {
-  const {addBlockModal} = useBlockContentEditorContext()
-  const {id} = useNode()
-  return <AddButton onClicked={() => addBlockModal.open(id)} />
-}
-
-const DeleteButton = () => {
-  const deleteNode = useDeleteNode()
-
-  return <RemoveButton onClicked={deleteNode} />
-}
-
-const SaveButton = (props: {
-  onClick: () => void
-}) => {
-  return <ApplyButton onClick={props.onClick} />
-}
-
-const DuplicateButton = () => {
-  const duplicateNode = useDuplicateNode()
-
-  return <CopyButton onClicked={duplicateNode} />
+const BaseBlockContent = (
+  props: ComponentProps<typeof BaseBlock> & {
+    setIsEditMode: (isEditMode: boolean) => void
+  },
+) => {
+  const renderMode = useGetRenderMode()
+  return renderMode === 'view' ? (
+    <BaseBlockViewLayout>{props.children}</BaseBlockViewLayout>
+  ) : (
+    <BaseBlockEditWrapper {...props} isEditMode={renderMode === 'edit'} />
+  )
 }
 
 export const BaseBlock = (
@@ -59,27 +41,9 @@ export const BaseBlock = (
   }>,
 ) => {
   const [isEditMode, setIsEditMode] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  useSetEditMode(ref, setIsEditMode)
-
   return (
     <BlockContext.Provider value={{isEditMode}}>
-      <BaseBlockLayout
-        ref={ref}
-        title={props.title}
-        addButton={<InsertButton />}
-        actionButtons={
-          isEditMode
-            ? [<SaveButton key="action-save-btn" onClick={() => setIsEditMode(false)} />]
-            : []
-        }
-        menu={[
-          <DuplicateButton key="menu-duplicate-btn" />,
-          <DeleteButton key="menu-delete-btn" />,
-        ]}
-      >
-        {props.children}
-      </BaseBlockLayout>
+      <BaseBlockContent {...props} setIsEditMode={setIsEditMode} />
     </BlockContext.Provider>
   )
 }
