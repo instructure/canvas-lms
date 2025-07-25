@@ -47,7 +47,7 @@ const I18n = createI18nScope('discussion_topic')
 
 const instUINavEnabled = () => window.ENV?.FEATURES?.instui_nav
 const DiscussionTopicToolbarContainer = props => {
-  const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
+  const {searchTerm, filter, setSearchTerm, setFilter} = useContext(SearchContext)
   const {showTranslationControl} = useContext(DiscussionManagerUtilityContext)
   const [currentSearchValue, setCurrentSearchValue] = useState(searchTerm || '')
 
@@ -72,19 +72,13 @@ const DiscussionTopicToolbarContainer = props => {
   }
 
   const onSortClick = () => {
-    let newOrder = null
-    if (sort === null) {
-      newOrder = props.discussionTopic.participant.sortOrder === 'asc' ? 'desc' : 'asc'
-    } else {
-      newOrder = sort === 'asc' ? 'desc' : 'asc'
-    }
+    const newOrder = props.discussionTopic.participant.sortOrder === 'asc' ? 'desc' : 'asc'
     updateDiscussionTopicParticipant({
       variables: {
         discussionTopicId: props.discussionTopic._id,
         sortOrder: newOrder,
       },
-    }).then(() => {
-      setSort(newOrder)
+      refetchQueries: ['GetDiscussionQuery'],
     })
   }
   const onExpandCollapseClick = bool => {

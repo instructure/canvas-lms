@@ -932,4 +932,42 @@ describe "Discussion Topic Show" do
       expect(Discussion.summary_error).to include_text("Sorry, the service is currently busy. Please try again later.")
     end
   end
+
+  context "sort order functionality" do
+    before :once do
+      @entry1 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "First",
+        created_at: 1.hour.ago
+      )
+      @entry2 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "Second",
+        created_at: 30.minutes.ago
+      )
+      @entry3 = @topic.discussion_entries.create!(
+        user: @teacher,
+        message: "Third",
+        created_at: 10.minutes.ago
+      )
+    end
+
+    it "has default sort order as desc and toggles to asc when clicked" do
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      wait_for_ajaximations
+
+      entries_before = Discussion.discussion_entries
+      first_entry_text = entries_before.first.text
+      expect(first_entry_text).to include("Third")
+
+      Discussion.click_sort_dropdown
+      wait_for_ajaximations
+      Discussion.select_sort_option("asc")
+      wait_for_ajaximations
+
+      entries_after = Discussion.discussion_entries
+      first_entry_text_after = entries_after.first.text
+      expect(first_entry_text_after).to include("First")
+    end
+  end
 end
