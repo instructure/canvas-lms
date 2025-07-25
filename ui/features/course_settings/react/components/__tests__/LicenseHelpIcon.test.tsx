@@ -18,12 +18,11 @@
 
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import LicenseHelpModal from '../LicenseHelpModal'
+import LicenseHelpIcon from '../LicenseHelpIcon'
 
 const renderWithSelect = (selected: string) => {
   return (
     <>
-      <button className="license_help_link" data-testid="license_help_link" />
       <select id="course_license" data-testid="course_license">
         <option value="private" selected={selected === 'private'}></option>
         <option value="cc_by" selected={selected === 'cc_by'}></option>
@@ -32,15 +31,15 @@ const renderWithSelect = (selected: string) => {
         <option value="cc_by_nc_sa" selected={selected === 'cc_by_nc_sa'}></option>
         <option value="cc_by_nc_nd" selected={selected === 'cc_by_nc_nd'}></option>
       </select>
-      <LicenseHelpModal />
+      <LicenseHelpIcon />
     </>
   )
 }
 
-describe('LicenseHelpModal', () => {
-  it('does not throw errors if the license icon/select is missing', () => {
+describe('LicenseHelpIcon', () => {
+  it('does not throw errors if the license select is missing', () => {
     expect(() => {
-      render(<LicenseHelpModal />)
+      render(<LicenseHelpIcon />)
     }).not.toThrow()
   })
 

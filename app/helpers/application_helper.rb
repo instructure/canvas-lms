@@ -385,19 +385,6 @@ module ApplicationHelper
     available_section_tabs.find { |tc| tc[:id] == tool.asset_string }.present?
   end
 
-  def license_help_link
-    @include_license_dialog = true
-    js_bundle("license_help")
-    icon = safe_join ["<i class='icon-question' aria-hidden='true'></i>".html_safe]
-    link_to(
-      icon,
-      "#",
-      role: "button",
-      class: "license_help_link no-hover",
-      title: I18n.t("Help with content licensing")
-    )
-  end
-
   def equella_enabled?
     @equella_settings ||= @context.equella_settings if @context.respond_to?(:equella_settings)
     @equella_settings ||= @domain_root_account.try(:equella_settings)

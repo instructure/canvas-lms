@@ -453,8 +453,7 @@
               <%= options_for_select(non_cc, @context.license) %>
               <%= grouped_options_for_select([[t("Creative Commons Licenses"), cc]], @context.license) %>
             </select>
-            <%= license_help_link %>
-            <div id="license_mount"></div>
+            <span id="license_mount"></span>
           <% else %>
             <%= @context.readable_license %>
           <% end %>
