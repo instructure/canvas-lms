@@ -136,7 +136,6 @@ const featureBundles: {
   learning_mastery_v2: () => import('./features/learning_mastery_v2/index'),
   learning_mastery: () => import('./features/learning_mastery/index'),
   learning_outcomes: () => import('./features/learning_outcomes/index'),
-  license_help: () => import('./features/license_help/index'),
   locale: () => import('./features/locale/index'),
   login: () => import('./features/login/index'),
   lti_collaborations: () => import('./features/lti_collaborations/index'),
