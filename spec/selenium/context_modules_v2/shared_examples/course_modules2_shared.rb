@@ -65,7 +65,7 @@ shared_examples_for "module collapse and expand" do |context|
   it "start with all modules collapsed" do
     get @mod_url
 
-    expect(module_header_expand_toggles.length).to eq(2)
+    expect(module_header_expand_toggles.length).to eq(3)
     expect(module_header_expand_toggles.first.text).to include("Expand module")
     expect(module_header_expand_toggles.last.text).to include("Expand module")
   end

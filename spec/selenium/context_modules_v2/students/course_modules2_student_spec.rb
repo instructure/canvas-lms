@@ -115,7 +115,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -135,7 +135,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click
@@ -159,7 +159,7 @@ describe "context modules", :ignore_js_errors do
       expect(student_modules_container).to be_displayed
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
       expect(module_item_titles[0]).to be_displayed
       expect(module_item_titles[1]).to be_displayed
       expect(module_item_titles[2]).to be_displayed
@@ -178,7 +178,7 @@ describe "context modules", :ignore_js_errors do
       expand_all_modules_button.click
 
       # all modules should be expanded
-      expect(module_item_titles.count).to eq(4)
+      expect(module_item_titles.count).to eq(8)
 
       # collapse all modules
       collapse_all_modules_button.click

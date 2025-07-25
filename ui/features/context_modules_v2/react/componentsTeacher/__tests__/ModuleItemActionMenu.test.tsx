@@ -22,7 +22,7 @@ import {ContextModuleProvider, contextModuleDefaultProps} from '../../hooks/useM
 import ModuleItemActionMenu from '../ModuleItemActionMenu'
 
 const setUp = (itemType: string = 'Assignment') => {
-  return render(
+  const container = render(
     <ContextModuleProvider {...contextModuleDefaultProps}>
       <ModuleItemActionMenu
         itemType={itemType}
@@ -50,70 +50,86 @@ const setUp = (itemType: string = 'Assignment') => {
       />
     </ContextModuleProvider>,
   )
+
+  const menuButton = container.getByTestId('module-item-action-menu-button')
+  return {container, menuButton}
+}
+
+const assertMenuItems = ({
+  itemType,
+  visibleItems = [],
+  hiddenItems = [],
+}: {
+  itemType: string
+  visibleItems: string[]
+  hiddenItems: string[]
+}) => {
+  const {container, menuButton} = setUp(itemType)
+  fireEvent.click(menuButton)
+
+  for (const text of visibleItems) {
+    expect(container.getByText(text)).toBeInTheDocument()
+  }
+
+  for (const text of hiddenItems) {
+    expect(container.queryByText(text)).not.toBeInTheDocument()
+  }
 }
 
 describe('ModuleItemActionMenu', () => {
-  it('renders', () => {
-    const container = setUp()
+  it('renders action menu correctly', () => {
+    const {container} = setUp()
     expect(container.container).toBeInTheDocument()
   })
 
-  it('renders menu with correct props', () => {
-    const container = setUp()
-    // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
-    expect(menuButton).toBeInTheDocument()
-    fireEvent.click(menuButton)
-
-    expect(container.getByText('Edit')).toBeInTheDocument()
-    expect(container.getByText('SpeedGrader')).toBeInTheDocument()
-    expect(container.getByText('Assign To...')).toBeInTheDocument()
-    expect(container.getByText('Duplicate')).toBeInTheDocument()
-    expect(container.getByText('Move to...')).toBeInTheDocument()
-    expect(container.getByText('Decrease indent')).toBeInTheDocument()
-    expect(container.getByText('Increase indent')).toBeInTheDocument()
-    expect(container.getByText('Send To...')).toBeInTheDocument()
-    expect(container.getByText('Copy To...')).toBeInTheDocument()
-    expect(container.getByText('Remove')).toBeInTheDocument()
+  it('renders menu with correct props for default itemType', () => {
+    assertMenuItems({
+      itemType: 'Assignment',
+      visibleItems: [
+        'Edit',
+        'SpeedGrader',
+        'Assign To...',
+        'Duplicate',
+        'Move to...',
+        'Decrease indent',
+        'Increase indent',
+        'Send To...',
+        'Copy To...',
+        'Remove',
+      ],
+      hiddenItems: [],
+    })
   })
 
-  it('renders menu for basic content types', () => {
-    const container = setUp('SubHeader')
-
-    // Check that the Menu button is rendered
-    const menuButton = container.getByRole('button', {name: 'Module Item Options'})
-    expect(menuButton).toBeInTheDocument()
-    fireEvent.click(menuButton)
-
-    expect(container.getByText('Edit')).toBeInTheDocument()
-    expect(container.queryByText('SpeedGrader')).not.toBeInTheDocument()
-    expect(container.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(container.queryByText('Duplicate')).not.toBeInTheDocument()
-    expect(container.getByText('Move to...')).toBeInTheDocument()
-    expect(container.getByText('Decrease indent')).toBeInTheDocument()
-    expect(container.getByText('Increase indent')).toBeInTheDocument()
-    expect(container.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(container.queryByText('Copy To...')).not.toBeInTheDocument()
-    expect(container.getByText('Remove')).toBeInTheDocument()
+  it('renders menu for basic content types like SubHeader', () => {
+    assertMenuItems({
+      itemType: 'SubHeader',
+      visibleItems: ['Edit', 'Move to...', 'Decrease indent', 'Increase indent', 'Remove'],
+      hiddenItems: [
+        'SpeedGrader',
+        'Assign To...',
+        'Duplicate',
+        'Send To...',
+        'Copy To...',
+        'Add Mastery Paths',
+        'Edit Mastery Paths',
+      ],
+    })
   })
 
-  it('hides specific menu items for File itemType', () => {
-    const container = setUp('File')
-    const menuButton = container.getByTestId('module-item-action-menu-button')
-    fireEvent.click(menuButton)
-
-    expect(container.getByText('Edit')).toBeInTheDocument()
-    expect(container.getByText('Move to...')).toBeInTheDocument()
-    expect(container.getByText('Decrease indent')).toBeInTheDocument()
-    expect(container.getByText('Increase indent')).toBeInTheDocument()
-    expect(container.getByText('Remove')).toBeInTheDocument()
-
-    expect(container.queryByText('SpeedGrader')).not.toBeInTheDocument()
-    expect(container.queryByText('Assign To...')).not.toBeInTheDocument()
-    expect(container.queryByText('Duplicate')).not.toBeInTheDocument()
-    expect(container.queryByText('Send To...')).not.toBeInTheDocument()
-    expect(container.queryByText('Copy To...')).not.toBeInTheDocument()
-    expect(container.queryByText('Add Mastery Paths')).not.toBeInTheDocument()
-    expect(container.queryByText('Edit Mastery Paths')).not.toBeInTheDocument()
+  it.each([['File'], ['ExternalTool']])('hides specific menu items for %s itemType', itemType => {
+    assertMenuItems({
+      itemType,
+      visibleItems: ['Edit', 'Move to...', 'Decrease indent', 'Increase indent', 'Remove'],
+      hiddenItems: [
+        'SpeedGrader',
+        'Assign To...',
+        'Duplicate',
+        'Send To...',
+        'Copy To...',
+        'Add Mastery Paths',
+        'Edit Mastery Paths',
+      ],
+    })
   })
 })

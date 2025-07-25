@@ -34,6 +34,10 @@ module Modules2IndexPage
     "button:contains('Copy')"
   end
 
+  def close_copy_tray_button_selector
+    "[data-testid='confirm-action-secondary-button']"
+  end
+
   def copy_to_tray_course_select_selector
     "#direct-share-course-select"
   end
@@ -233,6 +237,10 @@ module Modules2IndexPage
     fj(copy_to_button_selector)
   end
 
+  def close_copy_to_tray_button
+    fj(close_copy_tray_button_selector)
+  end
+
   def copy_to_tray_course_select
     f(copy_to_tray_course_select_selector)
   end
@@ -415,18 +423,29 @@ module Modules2IndexPage
     student_view ? set_rewrite_student_flag : set_rewrite_flag
     @quiz = @course.quizzes.create!(title: "some quiz")
     @quiz.publish!
+    @quiz2 = @course.quizzes.create!(title: "some quiz 2")
+    @quiz2.publish!
     @assignment = @course.assignments.create!(title: "assignment 1", submission_types: "online_text_entry")
     @assignment2 = @course.assignments.create!(title: "assignment 2",
                                                submission_types: "online_text_entry",
                                                points_possible: 10)
     @assignment3 = @course.assignments.create!(title: "assignment 3", submission_types: "online_text_entry")
+    @assignment4 = @course.assignments.create!(title: "assignment 4", submission_types: "online_text_entry")
+    @discussion = @course.discussion_topics.create!(title: "Discussion title", message: "Testing")
+    @wiki_page = @course.wiki_pages.create!(title: "Wiki", body: "Testing")
 
     @module1 = @course.context_modules.create!(name: "module1")
     @module2 = @course.context_modules.create!(name: "module2")
+    @module3 = @course.context_modules.create!(name: "module3")
     @module_item1 = @module1.add_item({ id: @assignment.id, type: "assignment" })
     @module_item2 = @module1.add_item({ id: @assignment2.id, type: "assignment" })
     @module_item3 = @module2.add_item({ id: @assignment3.id, type: "assignment" })
     @module_item4 = @module2.add_item({ id: @quiz.id, type: "quiz" })
+
+    @module_item5 = @module3.add_item({ id: @quiz2.id, type: "quiz" })
+    @module_item6 = @module3.add_item({ id: @assignment4.id, type: "assignment" })
+    @module_item7 = @module3.add_item({ id: @discussion.id, type: "discussion_topic" })
+    @module_item8 = @module3.add_item({ id: @wiki_page.id, type: "page" })
 
     @course.reload
   end
