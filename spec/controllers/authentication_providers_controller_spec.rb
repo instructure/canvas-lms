@@ -373,4 +373,34 @@ describe AuthenticationProvidersController do
       expect(aac.reload).to be_active
     end
   end
+
+  describe "destroy_all" do
+    subject { delete :destroy_all, params: { account_id: account.id } }
+
+    context "with multiple authentication providers" do
+      before do
+        3.times do
+          account.authentication_providers.create!(auth_type: "google")
+        end
+      end
+
+      it "soft deletes all authentication providers in the account" do
+        expect { subject }.to change {
+          account.authentication_providers.active.count
+        }.from(4).to(1)
+
+        # Canvas re-create the Canvas auth provider unless non-Canvas
+        # providers are configured
+        expect(account.authentication_providers.active.first.auth_type).to eq "canvas"
+      end
+
+      context "when the current user root account management permissions" do
+        let(:non_admin) { user_model }
+
+        before { user_session(non_admin) }
+
+        it { is_expected.to be_unauthorized }
+      end
+    end
+  end
 end
