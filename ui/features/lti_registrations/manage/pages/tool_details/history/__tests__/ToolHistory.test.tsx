@@ -27,6 +27,7 @@ import {
 } from '../../../manage/__tests__/helpers'
 import {renderWithRouter} from '../../__tests__/helpers'
 import {ToolHistory} from '../ToolHistory'
+import {ZAccountId} from '@canvas/lti-apps/models/AccountId'
 
 const server = setupServer()
 
@@ -34,6 +35,8 @@ describe('ToolHistory', () => {
   beforeAll(() => server.listen())
   afterEach(() => server.resetHandlers())
   afterAll(() => server.close())
+
+  const accountId = ZAccountId.parse('4')
 
   it('renders without crashing', async () => {
     const registration = mockRegistrationWithAllInformation({
@@ -46,7 +49,7 @@ describe('ToolHistory', () => {
 
     server.use(
       http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
+        `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
         () => {
           return HttpResponse.json([
             mockLtiOverlayVersion({user: mockUser({overrides: {name: 'Foo Bar Baz'}})}),
@@ -55,7 +58,7 @@ describe('ToolHistory', () => {
       ),
     )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+    render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
     expect(await screen.findByText('Foo Bar Baz')).toBeInTheDocument()
   })
@@ -74,14 +77,14 @@ describe('ToolHistory', () => {
 
     server.use(
       http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
+        `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
         () => {
           return HttpResponse.json(versions)
         },
       ),
     )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+    render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
     await waitFor(() => {
       const renderedNames = screen.getAllByText(new RegExp(allNames.join('|')))
@@ -106,14 +109,14 @@ describe('ToolHistory', () => {
 
     server.use(
       http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
+        `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
         () => {
           return HttpResponse.json(versions)
         },
       ),
     )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+    render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
     // Wait for the table to load
     await waitFor(() => {
@@ -147,14 +150,14 @@ describe('ToolHistory', () => {
 
     server.use(
       http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
+        `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
         () => {
           return HttpResponse.json([mockLtiOverlayVersion({overrides: {caused_by_reset: true}})])
         },
       ),
     )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+    render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
     expect(await screen.findByText('Restored to default')).toBeInTheDocument()
   })
@@ -168,14 +171,14 @@ describe('ToolHistory', () => {
 
     server.use(
       http.get(
-        `/api/v1/accounts/${registration.account_id}/lti_registrations/${registration.id}/overlay_history`,
+        `/api/v1/accounts/${accountId}/lti_registrations/${registration.id}/overlay_history`,
         () => {
           return HttpResponse.json([mockLtiOverlayVersion({user: 'Instructure'})])
         },
       ),
     )
 
-    render(renderWithRouter({child: <ToolHistory />, registration}))
+    render(renderWithRouter({child: <ToolHistory accountId={accountId} />, registration}))
 
     expect(await screen.findByText('Instructure')).toBeInTheDocument()
   })

@@ -140,7 +140,7 @@ const router = createBrowserRouter(
               : []),
             {
               path: 'history',
-              element: <ToolHistory />,
+              element: <ToolHistory accountId={accountId} />,
             },
           ],
         },
