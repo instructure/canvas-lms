@@ -655,7 +655,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_users
-    outcome_results_linked_users_json(@users)
+    outcome_results_linked_users_json(@users, @context)
   end
 
   def include_alignments

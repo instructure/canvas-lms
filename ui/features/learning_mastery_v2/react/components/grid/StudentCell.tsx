@@ -22,21 +22,43 @@ import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Student} from '../../types/rollup'
+import {SecondaryInfoDisplay} from '../../utils/constants'
+import {Text} from '@instructure/ui-text'
 
 export interface StudentCellProps {
   courseId: string
   student: Student
+  secondaryInfoDisplay?: SecondaryInfoDisplay
 }
 
-export const StudentCell: React.FC<StudentCellProps> = ({courseId, student}) => {
-  const student_grades_url = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
+const getSecondaryInfo = (student: Student, secondaryInfoDisplay?: SecondaryInfoDisplay) => {
+  if (!secondaryInfoDisplay) return null
 
+  switch (secondaryInfoDisplay) {
+    case SecondaryInfoDisplay.SIS_ID:
+      return student.sis_id || ''
+    case SecondaryInfoDisplay.INTEGRATION_ID:
+      return student.integration_id || ''
+    case SecondaryInfoDisplay.LOGIN_ID:
+      return student.login_id || ''
+    default:
+      return null
+  }
+}
+
+export const StudentCell: React.FC<StudentCellProps> = ({
+  courseId,
+  student,
+  secondaryInfoDisplay,
+}) => {
+  const studentGradesUrl = `/courses/${courseId}/grades/${student.id}#tab-outcomes`
   const shouldShowStudentStatus = student.status === 'inactive' || student.status === 'concluded'
   const displayNameWidth = shouldShowStudentStatus ? '50%' : '75%'
+  const secondaryInfo = getSecondaryInfo(student, secondaryInfoDisplay)
 
   return (
     <Flex height="100%" alignItems="center" justifyItems="start" data-testid="student-cell">
-      <Flex.Item as="div" padding="0 0 0 small" size="25%">
+      <Flex.Item as="div" size="25%" textAlign="center">
         <Avatar
           alt={student.display_name}
           as="div"
@@ -46,10 +68,17 @@ export const StudentCell: React.FC<StudentCellProps> = ({courseId, student}) => 
           data-testid="student-avatar"
         />
       </Flex.Item>
-      <Flex.Item as="div" padding="0 xx-small 0 small" size={displayNameWidth}>
-        <Link isWithinText={false} href={student_grades_url} data-testid="student-cell-link">
-          <TruncateText>{student.display_name}</TruncateText>
-        </Link>
+      <Flex.Item as="div" size={displayNameWidth}>
+        <Flex direction="column">
+          <Link isWithinText={false} href={studentGradesUrl} data-testid="student-cell-link">
+            <TruncateText>{student.display_name}</TruncateText>
+          </Link>
+          {secondaryInfo !== null && (
+            <Text size="legend" color="secondary" data-testid="student-secondary-info">
+              {secondaryInfo}
+            </Text>
+          )}
+        </Flex>
       </Flex.Item>
       {shouldShowStudentStatus && (
         <Flex.Item size="25%" data-testid="student-status">

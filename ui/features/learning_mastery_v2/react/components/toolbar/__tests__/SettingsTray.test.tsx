@@ -17,10 +17,13 @@
  */
 import {render} from '@testing-library/react'
 import {SettingsTray, SettingsTrayProps} from '../SettingsTray'
+import {DEFAULT_GRADEBOOK_SETTINGS, SecondaryInfoDisplay} from '../../../utils/constants'
 
 const makeProps = (props = {}): SettingsTrayProps => ({
   open: true,
   onDismiss: jest.fn(),
+  gradebookSettings: DEFAULT_GRADEBOOK_SETTINGS,
+  setGradebookSettings: jest.fn(),
   ...props,
 })
 
@@ -46,5 +49,37 @@ describe('SettingsTray', () => {
     const {getByTestId} = render(<SettingsTray {...props} />)
     getByTestId('lmgb-close-settings-button').querySelector('button')!.click()
     expect(props.onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onDismiss when Cancel button is clicked', () => {
+    const props = makeProps({open: true})
+    const {getByText} = render(<SettingsTray {...props} />)
+    getByText('Cancel').click()
+    expect(props.onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onDismiss when Apply button is clicked', () => {
+    const props = makeProps({open: true})
+    const {getByText} = render(<SettingsTray {...props} />)
+    getByText('Apply').click()
+    expect(props.onDismiss).toHaveBeenCalledTimes(1)
+  })
+
+  describe('SecondaryInfoSelector', () => {
+    it('renders SecondaryInfoSelector', () => {
+      const {getByText} = render(<SettingsTray {...makeProps({open: true})} />)
+      expect(getByText('Secondary info')).toBeInTheDocument()
+    })
+
+    it('updates secondaryInfoDisplay on change', () => {
+      const props = makeProps({open: true})
+      const {getByText, getByLabelText} = render(<SettingsTray {...props} />)
+      getByLabelText('SIS ID').click()
+      getByText('Apply').click()
+      expect(props.setGradebookSettings).toHaveBeenCalledWith({
+        ...props.gradebookSettings,
+        secondaryInfoDisplay: SecondaryInfoDisplay.SIS_ID,
+      })
+    })
   })
 })
