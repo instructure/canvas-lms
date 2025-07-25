@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
 import {render, waitFor} from '@testing-library/react'
 import LearningMastery from '../index'
 import useRollups from '../hooks/useRollups'
@@ -24,6 +23,7 @@ import fakeENV from '@canvas/test-utils/fakeENV'
 import {Rating, Student, Outcome, StudentRollupData} from '../types/rollup'
 import {SortOrder, SortBy} from '../utils/constants'
 import {getSearchParams, setSearchParams} from '../utils/ManageURLSearchParams'
+import {MOCK_OUTCOMES, MOCK_RATINGS, MOCK_STUDENTS} from '../__fixtures__/rollups'
 
 jest.mock('../hooks/useRollups')
 
@@ -33,48 +33,9 @@ jest.mock('../utils/ManageURLSearchParams', () => ({
 }))
 
 describe('LearningMastery', () => {
-  const ratings: Rating[] = [
-    {
-      color: 'blue',
-      description: 'great!',
-      mastery: false,
-      points: 5,
-    },
-    {
-      color: 'green',
-      description: 'mastery!',
-      mastery: true,
-      points: 3,
-    },
-    {
-      color: 'red',
-      description: 'not great',
-      mastery: false,
-      points: 0,
-    },
-  ]
-
-  const users: Student[] = [
-    {
-      id: '1',
-      name: 'Student 1',
-      display_name: 'Student 1',
-      avatar_url: 'url',
-    },
-  ]
-
-  const outcomes: Outcome[] = [
-    {
-      id: '1',
-      title: 'outcome 1',
-      description: 'Outcome description',
-      display_name: 'Friendly outcome name',
-      calculation_method: 'decaying_average',
-      calculation_int: 65,
-      mastery_points: 5,
-      ratings,
-    },
-  ]
+  const ratings: Rating[] = MOCK_RATINGS
+  const students: Student[] = MOCK_STUDENTS
+  const outcomes: Outcome[] = MOCK_OUTCOMES
 
   const rollups: StudentRollupData[] = [
     {
@@ -119,7 +80,7 @@ describe('LearningMastery', () => {
     mockUseRollups.mockReturnValue({
       isLoading: false,
       error: null,
-      students: users,
+      students,
       gradebookFilters: [],
       setGradebookFilters: () => {},
       outcomes,
@@ -162,7 +123,7 @@ describe('LearningMastery', () => {
     mockUseRollups.mockReturnValueOnce({
       isLoading: false,
       error: null,
-      students: users,
+      students,
       gradebookFilters: [],
       setGradebookFilters: () => {},
       outcomes,
@@ -242,10 +203,10 @@ describe('LearningMastery', () => {
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
 
     await waitFor(() => {
-      expect(getByText('Student 1')).toBeInTheDocument()
+      expect(getByText(students[0].name)).toBeInTheDocument()
     })
 
-    expect(getByText('outcome 1')).toBeInTheDocument()
+    expect(getByText(outcomes[0].title)).toBeInTheDocument()
     expect(getByText('rating description!')).toBeInTheDocument()
   })
 

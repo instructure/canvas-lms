@@ -28,6 +28,7 @@ import GradebookMenu from '@canvas/gradebook-menu/react/GradebookMenu'
 import {View} from '@instructure/ui-view'
 import {ExportCSVButton} from './ExportCSVButton'
 import {SettingsTray} from './SettingsTray'
+import {GradebookSettings} from '../../utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -42,6 +43,8 @@ export interface ToolbarProps {
   contextURL?: string
   gradebookFilters?: string[]
   showDataDependentControls?: boolean
+  gradebookSettings: GradebookSettings
+  setGradebookSettings: (settings: GradebookSettings) => void
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -49,6 +52,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   contextURL,
   gradebookFilters,
   showDataDependentControls,
+  gradebookSettings,
+  setGradebookSettings,
 }) => {
   const [isSettingsTrayOpen, setSettingsTrayOpen] = useState<boolean>(false)
 
@@ -96,7 +101,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             >
               <IconSettingsLine size="x-small" />
             </IconButton>
-            <SettingsTray open={isSettingsTrayOpen} onDismiss={() => setSettingsTrayOpen(false)} />
+            <SettingsTray
+              open={isSettingsTrayOpen}
+              onDismiss={() => setSettingsTrayOpen(false)}
+              gradebookSettings={gradebookSettings}
+              setGradebookSettings={setGradebookSettings}
+            />
           </Flex>
         )}
       </Flex>

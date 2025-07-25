@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as createI18nScope} from '@canvas/i18n'
@@ -31,6 +31,7 @@ import {Toolbar} from './components/toolbar/Toolbar'
 import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
+import {DEFAULT_GRADEBOOK_SETTINGS, GradebookSettings} from './utils/constants'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -70,6 +71,10 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
 
   setSearchParams(currentPage, studentsPerPage, sorting)
 
+  const [gradebookSettings, setGradebookSettings] = useState<GradebookSettings>(
+    DEFAULT_GRADEBOOK_SETTINGS,
+  )
+
   const onGradebookFilterChange = (filterItem: string) => {
     const filters = new Set(gradebookFilters)
 
@@ -104,6 +109,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         pagination={pagination}
         setCurrentPage={setCurrentPage}
         sorting={sorting}
+        gradebookSettings={gradebookSettings}
         data-testid="gradebook-body"
       />
     )
@@ -116,6 +122,8 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
         contextURL={contextURL}
         gradebookFilters={gradebookFilters}
         showDataDependentControls={error === null}
+        gradebookSettings={gradebookSettings}
+        setGradebookSettings={setGradebookSettings}
       />
       <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
       {renderBody()}
