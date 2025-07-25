@@ -112,6 +112,7 @@ describe('LearningMastery', () => {
     const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
     mockUseRollups.mockReturnValue({
       isLoading: false,
+      error: null,
       students: users,
       gradebookFilters: [],
       setGradebookFilters: () => {},
@@ -139,7 +140,7 @@ describe('LearningMastery', () => {
 
   it('renders a loading spinner when useRollups.isLoading is true', async () => {
     const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
-    mockUseRollups.mockReturnValue({isLoading: true} as ReturnType<typeof useRollups>)
+    mockUseRollups.mockReturnValue({isLoading: true, error: null} as ReturnType<typeof useRollups>)
     const {getByText} = render(<LearningMastery {...defaultProps()} />)
     expect(getByText('Loading')).toBeInTheDocument()
   })
@@ -147,6 +148,35 @@ describe('LearningMastery', () => {
   it('renders the gradebook menu on the page', async () => {
     const {getByTestId} = render(<LearningMastery {...defaultProps()} />)
     expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+  })
+
+  it('renders the export button on the page', async () => {
+    const {getByText} = render(<LearningMastery {...defaultProps()} />)
+    expect(getByText('Export')).toBeInTheDocument()
+  })
+
+  it('does not render the export button on load error', async () => {
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue({isLoading: false, error: ''} as ReturnType<typeof useRollups>)
+    const {queryByText} = render(<LearningMastery {...defaultProps()} />)
+    expect(queryByText('Export')).not.toBeInTheDocument()
+  })
+
+  it('does not render the gradebook body on the page if loading failed', async () => {
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue({isLoading: false, error: ''} as ReturnType<typeof useRollups>)
+    const {queryByTestId} = render(<LearningMastery {...defaultProps()} />)
+    expect(queryByTestId('gradebook-body')).not.toBeInTheDocument()
+  })
+
+  it('renders generic error page if loading failed, while still rendering the gradebook menu', async () => {
+    const mockUseRollups = useRollups as jest.MockedFunction<typeof useRollups>
+    mockUseRollups.mockReturnValue({isLoading: false, error: 'Banana Error'} as ReturnType<
+      typeof useRollups
+    >)
+    const {getByTestId, getByText} = render(<LearningMastery {...defaultProps()} />)
+    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+    expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   it('renders each student, outcome, rollup from the response', async () => {

@@ -28,6 +28,8 @@ import LMGBContext, {
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
+import GenericErrorPage from '@canvas/generic-error-page/react'
+import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = createI18nScope('LearningMasteryGradebook')
 
@@ -47,6 +49,7 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
 
   const {
     isLoading,
+    error,
     students,
     outcomes,
     rollups,
@@ -73,25 +76,43 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     setGradebookFilters(Array.from(filters))
   }
 
+  const renderBody = () => {
+    if (error !== null)
+      return (
+        <GenericErrorPage
+          errorMessage={error}
+          imageUrl={errorShipUrl}
+          errorSubject={I18n.t('Error loading rollups')}
+          errorCategory={I18n.t('Learning Mastery Gradebook Error Page')}
+        />
+      )
+    if (isLoading) return renderLoader()
+    return (
+      <Gradebook
+        courseId={courseId}
+        outcomes={outcomes}
+        students={students}
+        rollups={rollups}
+        gradebookFilters={gradebookFilters}
+        gradebookFilterHandler={onGradebookFilterChange}
+        pagination={pagination}
+        setCurrentPage={setCurrentPage}
+        sorting={sorting}
+        data-testid="gradebook-body"
+      />
+    )
+  }
+
   return (
     <LMGBContext.Provider value={contextValues}>
-      <Toolbar courseId={courseId} contextURL={contextURL} gradebookFilters={gradebookFilters} />
+      <Toolbar
+        courseId={courseId}
+        contextURL={contextURL}
+        gradebookFilters={gradebookFilters}
+        showDataDependentControls={error === null}
+      />
       <FilterWrapper pagination={pagination} onPerPageChange={setStudentsPerPage} />
-      {isLoading ? (
-        renderLoader()
-      ) : (
-        <Gradebook
-          courseId={courseId}
-          outcomes={outcomes}
-          students={students}
-          rollups={rollups}
-          gradebookFilters={gradebookFilters}
-          gradebookFilterHandler={onGradebookFilterChange}
-          pagination={pagination}
-          setCurrentPage={setCurrentPage}
-          sorting={sorting}
-        />
-      )}
+      {renderBody()}
     </LMGBContext.Provider>
   )
 }

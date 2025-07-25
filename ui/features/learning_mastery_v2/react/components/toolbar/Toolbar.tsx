@@ -41,9 +41,15 @@ export interface ToolbarProps {
   courseId: string
   contextURL?: string
   gradebookFilters?: string[]
+  showDataDependentControls?: boolean
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({courseId, contextURL, gradebookFilters}) => {
+export const Toolbar: React.FC<ToolbarProps> = ({
+  courseId,
+  contextURL,
+  gradebookFilters,
+  showDataDependentControls,
+}) => {
   const [isSettingsTrayOpen, setSettingsTrayOpen] = useState<boolean>(false)
 
   return (
@@ -77,20 +83,22 @@ export const Toolbar: React.FC<ToolbarProps> = ({courseId, contextURL, gradebook
             />
           </View>
         </Flex>
-        <Flex gap="small" alignItems="stretch" direction="row">
-          <ExportCSVButton courseId={courseId} gradebookFilters={gradebookFilters} />
-          <View as="div" borderWidth="none small none none" width="0px" />
-          <IconButton
-            withBorder={false}
-            withBackground={false}
-            screenReaderLabel={I18n.t('Settings')}
-            data-testid="lmgb-settings-button"
-            onClick={() => setSettingsTrayOpen(true)}
-          >
-            <IconSettingsLine size="x-small" />
-          </IconButton>
-          <SettingsTray open={isSettingsTrayOpen} onDismiss={() => setSettingsTrayOpen(false)} />
-        </Flex>
+        {showDataDependentControls && (
+          <Flex gap="small" alignItems="stretch" direction="row">
+            <ExportCSVButton courseId={courseId} gradebookFilters={gradebookFilters} />
+            <View as="div" borderWidth="none small none none" width="0px" />
+            <IconButton
+              withBorder={false}
+              withBackground={false}
+              screenReaderLabel={I18n.t('Settings')}
+              data-testid="lmgb-settings-button"
+              onClick={() => setSettingsTrayOpen(true)}
+            >
+              <IconSettingsLine size="x-small" />
+            </IconButton>
+            <SettingsTray open={isSettingsTrayOpen} onDismiss={() => setSettingsTrayOpen(false)} />
+          </Flex>
+        )}
       </Flex>
     </InstUISettingsProvider>
   )
