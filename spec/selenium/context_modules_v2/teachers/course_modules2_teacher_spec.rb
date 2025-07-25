@@ -383,4 +383,9 @@ describe "context modules", :ignore_js_errors do
   context "module locking" do
     include_examples "module unlock dates"
   end
+
+  context "module expanding and collapsing" do
+    it_behaves_like "module collapse and expand", :context_modules
+    it_behaves_like "module collapse and expand", :course_homepage
+  end
 end

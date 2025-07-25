@@ -46,3 +46,121 @@ shared_examples_for "module unlock dates" do
     expect(element_exists?(module_header_will_unlock_selector(@module1.id))).to be_falsey
   end
 end
+
+shared_examples_for "module collapse and expand" do |context|
+  before do
+    case context
+    when :context_modules
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}/modules"
+    when :canvas_for_elementary
+      @mod_course = @subject_course
+      @mod_url = "/courses/#{@mod_course.id}#modules"
+    when :course_homepage
+      @mod_course = @course
+      @mod_url = "/courses/#{@mod_course.id}"
+    end
+  end
+
+  it "start with all modules collapsed" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.length).to eq(2)
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+  end
+
+  it "collapses and expands the module" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+
+    module_header_expand_toggles.first.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+
+    module_header_expand_toggles.first.click
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+  end
+
+  it "expand and collapse module status retained after refresh" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+
+    module_header_expand_toggles.first.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+
+    refresh_page
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+  end
+
+  it "expands all modules when clicking the expand all button" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+
+    expand_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Collapse module")
+  end
+
+  it "collapses all modules when clicking the collapse all button" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+
+    expand_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Collapse module")
+
+    collapse_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+  end
+
+  it "expand all is retained after refresh" do
+    get @mod_url
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+
+    expand_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Collapse module")
+
+    refresh_page
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Collapse module")
+  end
+
+  it "collapse all is retained after refresh" do
+    get @mod_url
+
+    expand_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Collapse module")
+    expect(module_header_expand_toggles.last.text).to include("Collapse module")
+
+    collapse_all_modules_button.click
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+
+    refresh_page
+
+    expect(module_header_expand_toggles.first.text).to include("Expand module")
+    expect(module_header_expand_toggles.last.text).to include("Expand module")
+  end
+end
