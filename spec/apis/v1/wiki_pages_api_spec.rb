@@ -121,6 +121,42 @@ describe WikiPagesApiController, type: :request do
           end
         end
 
+        context "when sending block content editor attributes" do
+          context "when block content editor feature flag is on" do
+            before do
+              Account.default.enable_feature!(:block_content_editor)
+            end
+
+            it "creates block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).to be_present
+            end
+          end
+
+          context "when block content editor feature flag is off" do
+            before do
+              Account.default.disable_feature!(:block_content_editor)
+            end
+
+            it "does not create block_editor association" do
+              block_editor_attributes = {
+                blocks: {
+                  "ROOT" => { "type" => "div" }
+                }
+              }
+              create_wiki_page(@teacher, { title: "New Page", block_editor_attributes: })
+              expect(WikiPage.last.title).to eq "New Page"
+              expect(WikiPage.last.block_editor).not_to be_present
+            end
+          end
+        end
+
         context "when the user does not have manage_wiki_update permission" do
           before :once do
             teacher_role = Role.get_built_in_role("TeacherEnrollment", root_account_id: Account.default.id)
