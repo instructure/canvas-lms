@@ -297,15 +297,18 @@ const ModuleItemActionPanel: React.FC<ModuleItemActionPanelProps> = ({
               setIsDirectShareOpen(false)
             }}
           />
-          <DirectShareCourseTray
-            open={isDirectShareCourseOpen}
-            sourceCourseId={courseId}
-            courseId={courseId}
-            contentSelection={mapContentSelection(itemId, content?.type?.toLowerCase() || '') || {}}
-            onDismiss={() => {
-              setIsDirectShareCourseOpen(false)
-            }}
-          />
+          {content?._id && (
+            <DirectShareCourseTray
+              open={isDirectShareCourseOpen}
+              sourceCourseId={courseId}
+              contentSelection={
+                mapContentSelection(content?._id, content?.type?.toLowerCase() || '') || {}
+              }
+              onDismiss={() => {
+                setIsDirectShareCourseOpen(false)
+              }}
+            />
+          )}
         </>
       )}
       {content && (

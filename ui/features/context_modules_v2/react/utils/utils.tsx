@@ -117,7 +117,7 @@ export const mapContentSelection = (id: string, contentType: string) => {
 
   if (type === 'assignment') return {assignments: [id]}
   if (type === 'quiz') return {quizzes: [id]}
-  if (type === 'discussion') return {discussions: [id]}
+  if (type === 'discussion') return {discussion_topics: [id]}
   if (type === 'attachment' || type === 'file') return {files: [id]}
   if (type === 'external' || type === 'url') return {urls: [id]}
   if (type === 'page') return {pages: [id]}

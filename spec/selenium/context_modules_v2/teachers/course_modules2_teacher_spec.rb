@@ -178,27 +178,40 @@ describe "context modules", :ignore_js_errors do
         @other_course = course_factory(course_name: "Other Course Eh")
         course_with_teacher(course: @other_course, user: @teacher, name: "Sharee", active_all: true)
         @course = course
-        # First item of the module item list is the one used for testing
-        @item = @module1.content_tags[0]
+        @quiz_item = @module3.content_tags[0]
+        @assignment_item = @module3.content_tags[1]
+        @discussion_item = @module3.content_tags[2]
+        @page_item = @module3.content_tags[3]
       end
 
-      it "module item is correctly copied" do
-        go_to_modules
-        module_header_expand_toggles.first.click
-        wait_for_ajaximations
-        manage_module_item_button(@item.id).click
+      def copy_and_expect(item, expected_key)
+        manage_module_item_button(item.id).click
         module_item_action_menu_link("Copy To...").click
 
         set_value(copy_to_tray_course_select, "course")
         option_list_id = copy_to_tray_course_select.attribute("aria-controls")
-
         expect(option_list(option_list_id).count).to eq 1
 
         option_list_course_option(option_list_id, @other_course.name).click
         copy_button.click
-
         wait_for_ajaximations
-        expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq(["assignments"])
+
+        expect(@other_course.content_migrations.last.migration_settings["copy_options"].keys).to eq([expected_key])
+
+        close_copy_to_tray_button.click
+        wait_for_ajaximations
+      end
+
+      it "module item is correctly copied" do
+        go_to_modules
+        # Use the third module
+        module_header_expand_toggles[2].click
+        wait_for_ajaximations
+
+        copy_and_expect(@quiz_item, "quizzes")
+        copy_and_expect(@assignment_item, "assignments")
+        copy_and_expect(@discussion_item, "discussion_topics")
+        copy_and_expect(@page_item, "wiki_pages")
       end
     end
   end
@@ -270,9 +283,9 @@ describe "context modules", :ignore_js_errors do
       wait_for_ajaximations
 
       visible_modules = ff("div[class*='context_module'] h2")
-      expect(visible_modules.length).to eq(2)
+      expect(visible_modules.length).to eq(3)
       expect(visible_modules.first.text).to include("module1")
-      expect(visible_modules.last.text).to include("module2")
+      expect(visible_modules.last.text).to include("module3")
     end
 
     it "displays selected module in students view when acting as student" do
