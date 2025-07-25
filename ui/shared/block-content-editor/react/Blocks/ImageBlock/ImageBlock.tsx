@@ -18,7 +18,7 @@
 
 import './image-block.css'
 import {useScope as createI18nScope} from '@canvas/i18n'
-import {BaseBlock, useIsEditMode} from '../BaseBlock'
+import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {ImageActionsWrapper} from './ImageActionsWrapper'
 import {useState} from 'react'
 import {useSave} from '../BaseBlock/useSave'
@@ -29,7 +29,8 @@ import {ImageBlockDefaultPreviewImage} from './ImageBlockDefaultPreviewImage'
 const I18n = createI18nScope('page_editor')
 
 const ImageBlockContent = (props: ImageBlockProps) => {
-  const isEditMode = useIsEditMode()
+  const renderMode = useGetRenderMode()
+  const isEditMode = renderMode === 'edit'
   const [isOpen, setIsOpen] = useState(false)
   const save = useSave<typeof ImageBlock>()
   const closeModal = () => setIsOpen(false)

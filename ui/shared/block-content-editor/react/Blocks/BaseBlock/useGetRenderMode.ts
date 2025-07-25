@@ -16,5 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './BaseBlock'
-export * from './useGetRenderMode'
+import {useEditor} from '@craftjs/core'
+import {useBlockContext} from './BaseBlockContext'
+
+export const useGetRenderMode = () => {
+  const {
+    query: {getOptions},
+  } = useEditor()
+  const isViewMode = !getOptions().enabled
+  const {isEditMode} = useBlockContext()
+  if (isViewMode) {
+    return 'view'
+  }
+  return isEditMode ? 'edit' : 'editPreview'
+}

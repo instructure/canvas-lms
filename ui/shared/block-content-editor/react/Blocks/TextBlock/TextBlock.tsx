@@ -20,7 +20,7 @@ import {useEffect, useState} from 'react'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {TextBlockEdit} from './TextBlockEdit'
 import {TextBlockEditPreview} from './TextBlockEditPreview'
-import {BaseBlock, useIsEditMode} from '../BaseBlock'
+import {BaseBlock, useGetRenderMode} from '../BaseBlock'
 import {useSave} from '../BaseBlock/useSave'
 
 export type TextBlockProps = {
@@ -29,22 +29,22 @@ export type TextBlockProps = {
 }
 
 export const TextBlockContent = (props: TextBlockProps) => {
-  const isEditMode = useIsEditMode()
+  const renderMode = useGetRenderMode()
   const save = useSave<typeof TextBlock>()
 
   const [title, setTitle] = useState(props.title)
   const [content, setContent] = useState(props.content)
 
   useEffect(() => {
-    if (!isEditMode) {
+    if (renderMode === 'editPreview') {
       save({
         title,
         content,
       })
     }
-  }, [isEditMode, title, content, save])
+  }, [renderMode, title, content, save])
 
-  return isEditMode ? (
+  return renderMode === 'edit' ? (
     <TextBlockEdit
       title={title}
       content={content}

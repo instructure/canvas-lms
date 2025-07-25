@@ -16,9 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useBlockContext} from './BaseBlockContext'
+import './base-block-layout.css'
+import {Flex} from '@instructure/ui-flex'
+import {PropsWithChildren} from 'react'
 
-export const useIsEditMode = () => {
-  const {isEditMode} = useBlockContext()
-  return isEditMode
+export const BaseBlockViewLayout = (props: PropsWithChildren) => {
+  return (
+    <Flex direction="column" padding="paddingCardLarge" gap="mediumSmall">
+      {props.children}
+    </Flex>
+  )
 }
