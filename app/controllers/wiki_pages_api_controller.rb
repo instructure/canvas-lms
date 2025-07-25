@@ -376,7 +376,7 @@ class WikiPagesApiController < ApplicationController
     @page = @wiki.build_wiki_page(@current_user, initial_params)
     if authorized_action(@page, @current_user, :create)
       allowed_fields = Set[:title, :body]
-      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
+      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor) || @context.account.feature_enabled?(:block_content_editor)
       allowed_fields << :estimated_duration_attributes if @context.is_a?(Course) && @context.horizon_course?
       update_params = get_update_params(allowed_fields)
       assign_todo_date
@@ -458,7 +458,7 @@ class WikiPagesApiController < ApplicationController
     if @page.new_record?
       perform_update = true if authorized_action(@page, @current_user, [:create])
       allowed_fields = Set[:title, :body]
-      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
+      allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor) || @context.account.feature_enabled?(:block_content_editor)
     elsif authorized_action(@page, @current_user, [:update, :update_content])
       perform_update = true
       allowed_fields = Set[]
@@ -673,7 +673,7 @@ class WikiPagesApiController < ApplicationController
   def get_update_params(allowed_fields = Set[])
     # normalize parameters
     wiki_page_params = %w[title body notify_of_update published front_page editing_roles publish_at]
-    wiki_page_params += [block_editor_attributes: [:time, :version, { blocks: strong_anything }]] if @context.account.feature_enabled?(:block_editor)
+    wiki_page_params += [block_editor_attributes: [:time, :version, { blocks: strong_anything }]] if @context.account.feature_enabled?(:block_editor) || @context.account.feature_enabled?(:block_content_editor)
     wiki_page_params += [estimated_duration_attributes: %i[id minutes _destroy]] if @context.is_a?(Course) && @context.horizon_course?
     page_params = params[:wiki_page] ? params[:wiki_page].permit(*wiki_page_params) : {}
 
@@ -721,7 +721,7 @@ class WikiPagesApiController < ApplicationController
 
       unless @page.grants_right?(@current_user, session, :update)
         allowed_fields << :body
-        allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor)
+        allowed_fields << :block_editor_attributes if @context.account.feature_enabled?(:block_editor) || @context.account.feature_enabled?(:block_content_editor)
         allowed_fields << :estimated_duration_attributes if @context.is_a?(Course) && @context.horizon_course?
         rejected_fields << :title if page_params.include?(:title) && page_params[:title] != @page.title
 
