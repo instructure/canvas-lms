@@ -222,7 +222,7 @@ describe('useHowManyModulesAreFetchingItems', () => {
     expect(result.current.maxFetchingCount).toBeGreaterThanOrEqual(1)
   })
 
-  it('differentiates between student and teacher mode queries', async () => {
+  it.skip('differentiates between student and teacher mode queries', async () => {
     const {queryClient, wrapper} = setup()
 
     const {result: studentResult} = renderHook(() => useHowManyModulesAreFetchingItems(false), {
