@@ -21,6 +21,7 @@ import {Toolbar, ToolbarProps} from '../Toolbar'
 const makeProps = (props = {}): ToolbarProps => ({
   courseId: '123',
   gradebookFilters: ['filter1', 'filter2'],
+  showDataDependentControls: true,
   ...props,
 })
 

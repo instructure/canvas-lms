@@ -18,7 +18,6 @@
 
 import {useState, useEffect} from 'react'
 import {groupBy} from 'lodash'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {loadRollups} from '../apiClient'
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {
@@ -33,6 +32,7 @@ import {
 } from '../types/rollup'
 import {DEFAULT_STUDENTS_PER_PAGE, SortOrder, SortBy} from '../utils/constants'
 import {Sorting} from '../types/shapes'
+import axios from '@canvas/axios'
 
 const I18n = createI18nScope('OutcomeManagement')
 
@@ -43,6 +43,7 @@ interface UseRollupsProps {
 
 interface UseRollupsReturn extends RollupData {
   isLoading: boolean
+  error: null | string
   gradebookFilters: string[]
   setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
   setCurrentPage: (page: number) => void
@@ -106,6 +107,7 @@ export default function useRollups({
   accountMasteryScalesEnabled,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [error, setError] = useState<null | string>(null)
   const [gradebookFilters, setGradebookFilters] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [data, setData] = useState<RollupData>({
@@ -146,12 +148,14 @@ export default function useRollups({
             totalCount: data.meta.pagination.count,
           },
         })
+      } catch (e) {
+        if (e instanceof axios.AxiosError) {
+          setError((e as any)?.message || 'Error loading rollups')
+        } else {
+          setError('Error loading rollups')
+        }
+      } finally {
         setIsLoading(false)
-      } catch (_e) {
-        showFlashAlert({
-          message: I18n.t('Error loading rollups'),
-          type: 'error',
-        })
       }
     })()
   }, [
@@ -166,6 +170,7 @@ export default function useRollups({
 
   return {
     isLoading,
+    error,
     students: data.students,
     outcomes: data.outcomes,
     rollups: data.rollups,
