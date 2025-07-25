@@ -2648,6 +2648,7 @@ class AbstractAssignment < ActiveRecord::Base
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
         homework.proxy_submitter = current_user if should_add_proxy
+        homework.real_submitter = original_student if group.present?
 
         if webhook_info
           homework.turnitin_data[:webhook_info] = webhook_info

@@ -152,6 +152,7 @@ class Submission < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   belongs_to :quiz_submission, class_name: "Quizzes::QuizSubmission"
+  belongs_to :real_submitter, class_name: "User", optional: true
   has_many :all_submission_comments, -> { order(:created_at) }, class_name: "SubmissionComment", dependent: :destroy
   has_many :all_submission_comments_for_groups, -> { for_groups.order(:created_at) }, class_name: "SubmissionComment"
   has_many :group_memberships, through: :assignment

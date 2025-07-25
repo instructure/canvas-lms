@@ -165,6 +165,7 @@ class User < ActiveRecord::Base
   has_many :teacher_enrollments, -> { where(enrollments: { type: "TeacherEnrollment" }) }, class_name: "TeacherEnrollment"
   has_many :all_submissions, -> { preload(:assignment, :submission_comments).order(updated_at: :desc) }, class_name: "Submission", dependent: :destroy
   has_many :submissions, -> { active.preload(:assignment, :submission_comments, :grading_period).order(updated_at: :desc) }
+  has_many :group_submissions, inverse_of: :real_submitter, class_name: "Submission", foreign_key: :real_submitter_id, dependent: :nullify
   has_many :pseudonyms, -> { ordered }, dependent: :destroy
   has_many :active_pseudonyms, -> { where("pseudonyms.workflow_state<>'deleted'") }, class_name: "Pseudonym"
   has_many :pseudonym_accounts, source: :account, through: :pseudonyms

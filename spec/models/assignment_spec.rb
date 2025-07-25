@@ -4442,6 +4442,30 @@ describe Assignment do
       end
     end
 
+    context "group submissions real_submitter_id" do
+      it "sets real_submitter_id to the original submitter for all group member submissions" do
+        student1 = @user
+        student2 = student_in_course(active_all: true).user
+        group_category = @course.group_categories.create!(name: "Group Set")
+        group = @course.groups.create!(name: "Group 1", group_category:)
+        group.add_user(student1)
+        group.add_user(student2)
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category:,
+            submission_types: "online_text_entry"
+          )
+        )
+
+        primary_submission = assignment.submit_homework(student1, submission_type: "online_text_entry", body: "hello")
+        groupmate_submission = assignment.submissions.find_by!(user: student2)
+
+        expect(primary_submission.reload.real_submitter_id).to eq(student1.id)
+        expect(groupmate_submission.reload.real_submitter_id).to eq(student1.id)
+      end
+    end
+
     it "sets the 'eula_agreement_timestamp'" do
       setup_assignment_without_submission
       timestamp = Time.now.to_i.to_s

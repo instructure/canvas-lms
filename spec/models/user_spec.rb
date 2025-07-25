@@ -827,6 +827,22 @@ describe User do
     @assignment = @course.assignments.create title: "Test Assignment", points_possible: 10
   end
 
+  describe "group_submissions association" do
+    it "nullifies real_submitter_id on submissions when the user is permanently destroyed" do
+      create_course_with_student_and_assignment
+      real_submitter = user_model
+
+      submission = @assignment.submissions.find_by!(user: @student)
+      submission.update!(real_submitter:)
+      expect(submission.reload.real_submitter_id).to eq(real_submitter.id)
+
+      real_submitter.destroy_permanently!
+
+      expect(submission.reload.real_submitter_id).to be_nil
+      expect(Submission.exists?(submission.id)).to be true
+    end
+  end
+
   describe "#recent_feedback" do
     let_once(:post_policies_course) { Course.create!(workflow_state: :available) }
     let_once(:auto_posted_assignment) { post_policies_course.assignments.create!(points_possible: 10) }
