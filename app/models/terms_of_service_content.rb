@@ -47,7 +47,7 @@ class TermsOfServiceContent < ActiveRecord::Base
     end
   end
 
-  def access_for_attachment_association?(_user, _session, _location_param)
+  def access_for_attachment_association?(_user, _session, _association, _location_param)
     true
   end
 
