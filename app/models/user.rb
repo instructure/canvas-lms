@@ -1535,7 +1535,8 @@ class User < ActiveRecord::Base
   end
 
   def allows_user_to_remove_from_account?(account, other_user)
-    check_pseudonym = pseudonym
+    check_pseudonym = pseudonyms_visible_to(other_user).min_by { |p| [p.position, p.id] }
+
     check_pseudonym ||= Pseudonym.new(account:, user: self) if associated_accounts.exists?
     check_pseudonym&.grants_right?(other_user, :delete) &&
       (check_pseudonym&.grants_right?(other_user, :manage_sis) ||
