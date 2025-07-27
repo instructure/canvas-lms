@@ -28,6 +28,7 @@ import LMGBContext, {
 } from '@canvas/outcomes/react/contexts/LMGBContext'
 import {FilterWrapper} from './components/filters/FilterWrapper'
 import {Toolbar} from './components/toolbar/Toolbar'
+import {getSearchParams, setSearchParams} from './utils/ManageURLSearchParams'
 import GenericErrorPage from '@canvas/generic-error-page/react'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
@@ -56,13 +57,18 @@ const LearningMastery: React.FC<LearningMasteryProps> = ({courseId}) => {
     gradebookFilters,
     setGradebookFilters,
     pagination,
+    currentPage,
     setCurrentPage,
+    studentsPerPage,
     setStudentsPerPage,
     sorting,
   } = useRollups({
     courseId,
     accountMasteryScalesEnabled: accountLevelMasteryScalesFF ?? false,
+    ...getSearchParams(),
   })
+
+  setSearchParams(currentPage, studentsPerPage, sorting)
 
   const onGradebookFilterChange = (filterItem: string) => {
     const filters = new Set(gradebookFilters)
