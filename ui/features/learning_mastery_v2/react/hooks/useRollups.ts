@@ -39,6 +39,10 @@ const I18n = createI18nScope('OutcomeManagement')
 interface UseRollupsProps {
   courseId: string | number
   accountMasteryScalesEnabled: boolean
+  currentPage?: number
+  studentsPerPage?: number
+  sortOrder?: SortOrder
+  sortBy?: SortBy
 }
 
 interface UseRollupsReturn extends RollupData {
@@ -46,7 +50,9 @@ interface UseRollupsReturn extends RollupData {
   error: null | string
   gradebookFilters: string[]
   setGradebookFilters: React.Dispatch<React.SetStateAction<string[]>>
+  currentPage: number
   setCurrentPage: (page: number) => void
+  studentsPerPage: number
   setStudentsPerPage: (studentsPerPage: number) => void
   sorting: Sorting
 }
@@ -105,19 +111,23 @@ const rollupsByUser = (rollups: StudentRollup[], outcomes: Outcome[]): StudentRo
 export default function useRollups({
   courseId,
   accountMasteryScalesEnabled,
+  currentPage: currentPageProp = 1,
+  studentsPerPage: studentsPerPageProp = DEFAULT_STUDENTS_PER_PAGE,
+  sortOrder: sortOrderProp = SortOrder.ASC,
+  sortBy: sortByProp = SortBy.SortableName,
 }: UseRollupsProps): UseRollupsReturn {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<null | string>(null)
   const [gradebookFilters, setGradebookFilters] = useState<string[]>([])
-  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [currentPage, setCurrentPage] = useState<number>(currentPageProp)
   const [data, setData] = useState<RollupData>({
     rollups: [],
     outcomes: [],
     students: [],
   })
-  const [studentsPerPage, setStudentsPerPage] = useState<number>(DEFAULT_STUDENTS_PER_PAGE)
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC)
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.SortableName)
+  const [studentsPerPage, setStudentsPerPage] = useState<number>(studentsPerPageProp)
+  const [sortOrder, setSortOrder] = useState<SortOrder>(sortOrderProp)
+  const [sortBy, setSortBy] = useState<SortBy>(sortByProp)
 
   const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
 
@@ -177,7 +187,9 @@ export default function useRollups({
     gradebookFilters,
     setGradebookFilters,
     pagination: data.pagination ? {...data.pagination, perPage: studentsPerPage} : undefined,
+    currentPage,
     setCurrentPage,
+    studentsPerPage,
     setStudentsPerPage,
     sorting: {
       sortOrder,
