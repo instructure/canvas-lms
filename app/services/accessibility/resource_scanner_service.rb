@@ -20,6 +20,9 @@
 class Accessibility::ResourceScannerService < ApplicationService
   include Accessibility::Issue::ContentChecker
 
+  MAX_HTML_SIZE = 125.kilobytes
+  MAX_PDF_SIZE = 5.megabytes
+
   def initialize(resource:)
     super()
     @resource = resource
@@ -47,6 +50,8 @@ class Accessibility::ResourceScannerService < ApplicationService
     scan.in_progress!
     @resource = scan.context
 
+    return handle_size_limit_failure(scan) if over_size_limit?
+
     issues = scan_resource_for_issues
 
     scan.accessibility_issues.delete_all
@@ -66,6 +71,39 @@ class Accessibility::ResourceScannerService < ApplicationService
     AccessibilityResourceScan.for_context(@resource)
                              .where(workflow_state: %w[queued in_progress])
                              .exists?
+  end
+
+  def over_size_limit?
+    case @resource
+    when WikiPage
+      @resource.body.size > MAX_HTML_SIZE
+    when Assignment
+      @resource.description.size > MAX_HTML_SIZE
+    when Attachment
+      @resource.size > MAX_PDF_SIZE
+    else
+      false
+    end
+  end
+
+  def handle_size_limit_failure(scan)
+    error_message = case @resource
+                    when Attachment
+                      I18n.t(
+                        "This file is too large to check. PDF attachments must not be greater than %{size} MB.",
+                        { size: MAX_PDF_SIZE / 1.megabyte }
+                      )
+                    else
+                      I18n.t(
+                        "This content is too large to check. HTML body must not be greater than %{size} KB.",
+                        { size: MAX_HTML_SIZE / 1.kilobyte }
+                      )
+                    end
+    scan.update(
+      workflow_state: "failed",
+      error_message:
+    )
+    Rails.logger.warn("[A11Y Scan] Skipped resource #{@resource&.id} due to size limit.")
   end
 
   def resource_workflow_state
