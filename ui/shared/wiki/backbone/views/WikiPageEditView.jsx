@@ -327,11 +327,12 @@ export default class WikiPageEditView extends ValidatedFormView {
         </Suspense>,
       )
     } else if (this.model.get('editor') === 'block_content_editor') {
+      const data = this.model.get('block_editor_attributes')?.['blocks'] ?? null
       import('@canvas/block-content-editor').then(({BlockContentEditor}) => {
         const root = createRoot(document.getElementById('block_editor'))
         root.render(
           <BlockContentEditor
-            data={null}
+            data={data}
             onInit={handler => {
               this.blockEditorHandler = handler
             }}
