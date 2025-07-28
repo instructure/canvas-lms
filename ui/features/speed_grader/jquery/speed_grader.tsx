@@ -1752,7 +1752,16 @@ EG = {
   },
 
   addCommentTextAreaFocus() {
-    $add_a_comment_textarea.focus()
+    if (isRceLiteEnabled()) {
+      const rceEditor = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT} .tox-edit-area iframe`)
+      const iframe = rceEditor[0] as HTMLIFrameElement
+      const iframeDoc = iframe.contentDocument
+      if (iframeDoc && iframeDoc.body) {
+        iframeDoc.body.focus()
+      }
+    } else {
+      $add_a_comment_textarea.focus()
+    }
   },
 
   gradeFocus() {
