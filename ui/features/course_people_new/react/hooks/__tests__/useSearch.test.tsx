@@ -26,7 +26,7 @@ describe('useSearch', () => {
   const event = {
     target: {
       value: '123',
-    }
+    },
   } as ChangeEvent<HTMLInputElement>
 
   it('should create custom hook with initial state an empty string', () => {

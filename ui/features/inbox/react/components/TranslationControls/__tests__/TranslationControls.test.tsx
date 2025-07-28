@@ -16,32 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import TranslationControls from '../TranslationControls';
-import { TranslationContext, TranslationContextValue } from '../../../hooks/useTranslationContext';
+import React from 'react'
+import {render, screen, fireEvent} from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+import TranslationControls from '../TranslationControls'
+import {TranslationContext, TranslationContextValue} from '../../../hooks/useTranslationContext'
 
 describe('TranslationControls', () => {
   const defaultProps = {
     inboxSettingsFeature: false,
-    signature: ''
+    signature: '',
   }
 
   it('renders without crashing', () => {
     render(
-      <TranslationContext.Provider value={{ body: "" } as TranslationContextValue}>
+      <TranslationContext.Provider value={{body: ''} as TranslationContextValue}>
         <TranslationControls signature="" inboxSettingsFeature={false} />
-      </TranslationContext.Provider>
-    );
-    expect(screen.getByText(/Include translated version of this message/i)).toBeInTheDocument();
-  });
+      </TranslationContext.Provider>,
+    )
+    expect(screen.getByText(/Include translated version of this message/i)).toBeInTheDocument()
+  })
 
   it('toggles the checkbox', () => {
     render(
-      <TranslationContext.Provider value={{ body: ""} as TranslationContextValue}>
+      <TranslationContext.Provider value={{body: ''} as TranslationContextValue}>
         <TranslationControls {...defaultProps} />
-      </TranslationContext.Provider>
+      </TranslationContext.Provider>,
     )
     const checkbox = screen.getByLabelText('Include translated version of this message')
     expect(checkbox).not.toBeChecked()
@@ -51,12 +51,12 @@ describe('TranslationControls', () => {
 
   it('displays TranslationOptions when checkbox is checked', () => {
     render(
-      <TranslationContext.Provider value={{ body: ""} as TranslationContextValue}>
+      <TranslationContext.Provider value={{body: ''} as TranslationContextValue}>
         <TranslationControls {...defaultProps} />
-      </TranslationContext.Provider>
+      </TranslationContext.Provider>,
     )
     const checkbox = screen.getByLabelText('Include translated version of this message')
     fireEvent.click(checkbox)
     expect(screen.getByText(/Translate To/i)).toBeInTheDocument()
   })
-});
+})

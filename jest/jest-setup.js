@@ -239,8 +239,13 @@ global.BroadcastChannel = jest.fn().mockImplementation(() => ({
 
 global.DataTransferItem = global.DataTransferItem || class DataTransferItem {}
 
+// Mock performance API - needed for wasPageReloaded.ts
 global.performance = global.performance || {}
-global.performance.getEntriesByType = global.performance.getEntriesByType || (() => [])
+global.performance.getEntriesByType = jest.fn(() => [
+  {
+    type: 'navigate',
+  },
+])
 
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}

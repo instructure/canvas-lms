@@ -39,7 +39,9 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this course with this title. Hitting save will create a duplicate.'),
+        getByText(
+          'There is already a page in this course with this title. Hitting save will create a duplicate.',
+        ),
       ).toBeInTheDocument()
     })
 
@@ -48,7 +50,9 @@ describe('titleConflicts', () => {
       const {getByTestId, getByText} = render(<>{conflictMessage().text}</>)
       expect(getByTestId('warning-icon')).toBeInTheDocument()
       expect(
-        getByText('There is already a page in this group with this title. Hitting save will create a duplicate.'),
+        getByText(
+          'There is already a page in this group with this title. Hitting save will create a duplicate.',
+        ),
       ).toBeInTheDocument()
     })
   })
@@ -112,9 +116,9 @@ describe('titleConflicts', () => {
         expect.arrayContaining([
           expect.objectContaining({
             text: expect.anything(),
-            type: 'hint'
-          })
-        ])
+            type: 'hint',
+          }),
+        ]),
       )
     })
 

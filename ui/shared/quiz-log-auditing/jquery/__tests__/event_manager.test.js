@@ -56,6 +56,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
 
   beforeEach(() => {
     fakeENV.setup()
+    jest.useRealTimers()
     capturedRequests = []
 
     const handlers = [
@@ -117,6 +118,7 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
     }
     server.resetHandlers()
     server.close()
+    jest.useFakeTimers()
     fakeENV.teardown()
   })
 
@@ -157,24 +159,28 @@ describe('Quizzes::LogAuditing::EventManager - Event delivery', () => {
 
     evtManager.start()
 
+    // First event: change event
     testEventFactory.trigger('change')
     await evtManager.deliver()
     expect(capturedRequests).toHaveLength(1)
-    let payload1 = capturedRequests[0].requestBody
+    const payload1 = capturedRequests[0].requestBody
     expect(payload1.quiz_submission_events[0].event_type).toBe('test_event')
 
+    // Second event: focus event (should be ignored as no blur preceded it)
     testEventFactory.trigger('focus')
+    // Focus event without preceding blur should not create any event to deliver
     await evtManager.deliver()
+    // Should still have only 1 request as focus event was ignored
     expect(capturedRequests).toHaveLength(1)
-    payload1 = capturedRequests[0].requestBody
-    expect(payload1.quiz_submission_events[0].event_type).toBe('test_event')
 
+    // Third event: blur event
     testEventFactory.trigger('blur')
     await evtManager.deliver()
     expect(capturedRequests).toHaveLength(2)
     const payload2 = capturedRequests[1].requestBody
     expect(payload2.quiz_submission_events[0].event_type).toBe(K.EVT_PAGE_BLURRED)
 
+    // Fourth event: focus event (should be delivered as blur preceded it)
     testEventFactory.trigger('focus')
     await evtManager.deliver()
     expect(capturedRequests).toHaveLength(3)

@@ -33,7 +33,7 @@ describe('NoPeopleFound', () => {
 
   describe('all users', () => {
     beforeEach(() => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
       renderComponent()
     })
 
@@ -54,7 +54,7 @@ describe('NoPeopleFound', () => {
 
   describe('users with permissions', () => {
     beforeEach(() => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue(useCoursePeopleContextMocks)
       renderComponent()
     })
 
@@ -69,7 +69,7 @@ describe('NoPeopleFound', () => {
 
   describe('users with partial permissions', () => {
     it('does not render Login ID option when canViewLoginIdColumn is false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...useCoursePeopleContextMocks,
         canViewLoginIdColumn: false,
       })
@@ -78,7 +78,7 @@ describe('NoPeopleFound', () => {
     })
 
     it('does not render SIS ID option when canViewSisIdColumn is false', () => {
-      (useCoursePeopleContext as jest.Mock).mockReturnValue({
+      ;(useCoursePeopleContext as jest.Mock).mockReturnValue({
         ...useCoursePeopleContextMocks,
         canViewSisIdColumn: false,
       })

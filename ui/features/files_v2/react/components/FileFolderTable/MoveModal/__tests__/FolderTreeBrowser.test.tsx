@@ -37,7 +37,7 @@ const renderComponent = (props: any = {}) =>
 
 describe('FolderTreeBrowser', () => {
   beforeEach(() => {
-    (useFoldersQuery as jest.Mock).mockReturnValue({
+    ;(useFoldersQuery as jest.Mock).mockReturnValue({
       folders: {[FAKE_FOLDERS[1].id]: FAKE_FOLDERS[1]},
       foldersLoading: false,
       foldersSuccessful: true,

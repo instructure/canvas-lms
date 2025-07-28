@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import 'jquery-migrate'
+import fakeENV from '@canvas/test-utils/fakeENV'
 
 const $questionContent = {
   bind: jest.fn().mockReturnValue({change: jest.fn()}),
@@ -27,6 +28,7 @@ describe('isChangeMultiFuncBound', () => {
   let isChangeMultiFuncBound
 
   beforeEach(async () => {
+    fakeENV.setup()
     $._data = jest.fn()
     const module = await import('../quizzes')
     isChangeMultiFuncBound = module.isChangeMultiFuncBound
@@ -34,6 +36,7 @@ describe('isChangeMultiFuncBound', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    fakeENV.teardown()
   })
 
   it('gets events from data on first element', () => {
@@ -65,6 +68,7 @@ describe('rebindMultiChange', () => {
   let quiz
 
   beforeEach(async () => {
+    fakeENV.setup()
     $._data = jest.fn()
     const module = await import('../quizzes')
     quiz = module.quiz
@@ -73,6 +77,7 @@ describe('rebindMultiChange', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    fakeENV.teardown()
   })
 
   it('rebinds event on questionContent for multiple dropdowns', () => {

@@ -24,14 +24,14 @@ import {OBSERVER_ENROLLMENT} from '../../../../util/constants'
 import {mockEnrollment} from '../../../../graphql/Mocks'
 
 jest.mock('../../../../util/utils', () => ({
-  timeEventToString: jest.fn(() => 'Feb 18, 2025 at 12:00pm')
+  timeEventToString: jest.fn(() => 'Feb 18, 2025 at 12:00pm'),
 }))
 
 describe('UserLastActivity', () => {
   const mockedLastActivity = 'Feb 18, 2025 at 12:00pm'
   const defaultEnrollments = [
     mockEnrollment({enrollmentId: '1'}),
-    mockEnrollment({enrollmentId: '2', lastActivityAt: '2025-02-17T10:17:35-06:00'})
+    mockEnrollment({enrollmentId: '2', lastActivityAt: '2025-02-17T10:17:35-06:00'}),
   ]
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe('UserLastActivity', () => {
   it('filters out observer enrollments', () => {
     const enrollmentsWithObserver = [
       mockEnrollment({enrollmentId: '1'}),
-      mockEnrollment({enrollmentId: '2', enrollmentType: OBSERVER_ENROLLMENT})
+      mockEnrollment({enrollmentId: '2', enrollmentType: OBSERVER_ENROLLMENT}),
     ]
     const {getAllByText} = render(<UserLastActivity enrollments={enrollmentsWithObserver} />)
     const activities = getAllByText(mockedLastActivity)
@@ -57,7 +57,10 @@ describe('UserLastActivity', () => {
   })
 
   it('skips enrollments without last activity', () => {
-    const enrollmentsNoLastActivity = [defaultEnrollments[0], {...defaultEnrollments[1], lastActivityAt: null}]
+    const enrollmentsNoLastActivity = [
+      defaultEnrollments[0],
+      {...defaultEnrollments[1], lastActivityAt: null},
+    ]
     const {getAllByText} = render(<UserLastActivity enrollments={enrollmentsNoLastActivity} />)
     const activities = getAllByText(mockedLastActivity)
     expect(activities).toHaveLength(1)

@@ -87,7 +87,9 @@ describe('Footer', () => {
   })
 
   it('shows cannot cancel and publish tooltip while loading', () => {
-    const {getByText} = renderConnected(<Footer {...defaultProps} showLoadingOverlay={true} anyActiveRequests={true}/>)
+    const {getByText} = renderConnected(
+      <Footer {...defaultProps} showLoadingOverlay={true} anyActiveRequests={true} />,
+    )
     expect(getByText('You cannot cancel while loading the pace')).toBeInTheDocument()
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })

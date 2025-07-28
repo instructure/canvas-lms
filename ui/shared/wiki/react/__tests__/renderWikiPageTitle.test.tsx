@@ -88,20 +88,20 @@ describe('renderWikiPageTitle', () => {
       off: jest.fn(),
       getFormData: jest.fn(),
     }
-    const props = getProps({ viewElement: mockViewElement })
+    const props = getProps({viewElement: mockViewElement})
     const component = renderWikiPageTitle(props)
     const {getByText} = render(component)
-  
+
     const submitterFn = mockViewElement.on.mock.calls[0][1]
     const mockEvent = {
       stopPropagation: jest.fn(),
       result: Promise.reject({
         responseJSON: {
           errors: {
-            title: [{message: 'Title error message'}]
-          }
-        }
-      })
+            title: [{message: 'Title error message'}],
+          },
+        },
+      }),
     }
 
     submitterFn(mockEvent)
