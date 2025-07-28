@@ -138,6 +138,7 @@ export function ResubmitButton(props: ResubmitLtiAssetReportsProps) {
   return (
     <Flex.Item>
       <Button
+        id="asset-processor-resubmit-notices"
         size="small"
         disabled={!(resubmitMutation.isIdle || resubmitMutation.isError)}
         onClick={() => {
