@@ -25,7 +25,6 @@ import {ProductConfigureButton} from './discover/ProductConfigureButton'
 import {isLtiRegistrationsDiscoverEnabled} from './discover/utils'
 import {LtiAppsLayout} from './layout/LtiAppsLayout'
 import {ManageRoutes} from './manage'
-import {updateDeveloperKeyWorkflowState} from './manage/api/developerKey'
 import {fetchRegistrationToken, getLtiRegistrationByUUID} from './manage/api/ltiImsRegistration'
 import {
   bindGlobalLtiRegistration,
@@ -162,7 +161,6 @@ const dynamicRegistrationWizardService: DynamicRegistrationWizardService = {
   fetchRegistrationToken,
   getRegistrationByUUID: getLtiRegistrationByUUID,
   fetchLtiRegistration: fetchLtiRegistration,
-  updateDeveloperKeyWorkflowState,
   updateRegistration: updateRegistration,
   deleteRegistration: deleteRegistration,
 }
