@@ -1613,7 +1613,7 @@ class FilesController < ApplicationController
       file_urls[context] << parsed_file_url
     end
 
-    file_urls_with_uuids = file_urls_by_context.each_with_object({}) do |(context, file_list), file_metadata|
+    file_urls_with_metadata = file_urls_by_context.each_with_object({}) do |(context, file_list), file_metadata|
       next unless context.grants_any_right?(@current_user, session, :manage_files_create, :manage_files_edit, :moderate_user_content, :become_user) &&
                   context.grants_any_right?(user, session, :manage_files_create, :manage_files_edit)
 
@@ -1621,11 +1621,19 @@ class FilesController < ApplicationController
         att = file[:attachment]
         list = (att.media_entry_id.present? || att.canvadocable?) ? :canvas_instfs_ids : :instfs_ids
         file_metadata[list] ||= {}
-        file_metadata[list][file[:url]] = att.instfs_uuid
+        # Check can be removed once NQ is using the display_name field
+        file_metadata[list][file[:url]] = if params[:include_display_name]
+                                            {
+                                              instfs_uuid: att.instfs_uuid,
+                                              display_name: att.display_name,
+                                            }
+                                          else
+                                            att.instfs_uuid
+                                          end
       end
     end
 
-    return render json: file_urls_with_uuids.to_json, status: :ok if file_urls_with_uuids.present?
+    return render json: file_urls_with_metadata.to_json, status: :ok if file_urls_with_metadata.present?
 
     render json: { errors: [{ "message" => "No valid file URLs given" }] }, status: :unprocessable_entity
   end
