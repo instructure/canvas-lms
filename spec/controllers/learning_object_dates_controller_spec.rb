@@ -207,6 +207,38 @@ describe LearningObjectDatesController do
                                })
     end
 
+    it "does not set only_visible_to_overrides to true when assigning ungraded group discussion to groups" do
+      discussion = @course.discussion_topics.create!(title: "ungraded group discussion",
+                                                     unlock_at: "2022-01-05T12:00:00Z",
+                                                     lock_at: "2022-03-05T12:00:00Z")
+      category = @course.group_categories.create(name: "ungraded topic groups")
+      discussion.update!(group_category_id: category.id)
+      group1 = category.groups.create!(name: "Group 1", context: @course)
+      group2 = category.groups.create!(name: "Group 2", context: @course)
+
+      expect(discussion.only_visible_to_overrides).to be false
+
+      put :update, params: {
+        course_id: @course.id,
+        discussion_topic_id: discussion.id,
+        only_visible_to_overrides: true,
+        assignment_overrides: [
+          { group_id: group1.id, unlock_at: "2022-01-01T00:00:00Z" },
+          { group_id: group2.id, unlock_at: "2022-01-02T00:00:00Z" }
+        ]
+      }
+
+      discussion.reload
+      expect(discussion.only_visible_to_overrides).to be false
+      expect(discussion.assignment_overrides.active.count).to eq 2
+
+      group_override_1 = discussion.assignment_overrides.active.find_by(set: group1)
+      group_override_2 = discussion.assignment_overrides.active.find_by(set: group2)
+
+      expect(group_override_1).to be_present
+      expect(group_override_2).to be_present
+    end
+
     it "returns date details for an ungraded discussion with a section visibility" do
       discussion = @course.discussion_topics.create!(title: "ungraded topic",
                                                      unlock_at: "2022-01-05T12:00:00Z",
