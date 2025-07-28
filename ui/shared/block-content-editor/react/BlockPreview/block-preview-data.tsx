@@ -17,7 +17,7 @@
  */
 
 import {TextBlockPreview} from './TextBlockPreview'
-import {PageHighlightBlockPreview} from './PageHighlightBlockPreview'
+import {HighlightBlockPreview} from './HighlightBlockPreview'
 import {ImageTextBlockPreview} from './ImageTextBlockPreview'
 import {ImageBlockPreview} from './ImageBlockPreview'
 import {VideoBlockPreview} from './VideoBlockPreview'
@@ -27,10 +27,11 @@ import {TextBlock} from '../Blocks/TextBlock'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '@canvas/block-editor/react/components/user/blocks/ButtonBlock'
+import {HighlightBlock} from '../Blocks/HighlightBlock'
 
 export const previewFactory = {
   [TextBlock.name]: () => <TextBlockPreview />,
-  pageHighlight: () => <PageHighlightBlockPreview />,
+  [HighlightBlock.name]: () => <HighlightBlockPreview />,
   [ImageBlock.name]: () => <ImageBlockPreview />,
   video: () => <VideoBlockPreview />,
   [ButtonBlock.name]: () => <ButtonBlockPreview />,

@@ -22,6 +22,7 @@ import {ReactElement} from 'react'
 import {ImageBlock} from '../Blocks/ImageBlock'
 import {SeparatorLineBlock} from '../Blocks/SeparatorLineBlock'
 import {ButtonBlock} from '../Blocks/ButtonBlock'
+import {HighlightBlock} from '../Blocks/HighlightBlock'
 
 const I18n = createI18nScope('block_content_editor')
 
@@ -32,7 +33,7 @@ export const blockFactory = {
   [ImageBlock.name]: () => <ImageBlock url="" altText="" />,
   [SeparatorLineBlock.name]: () => <SeparatorLineBlock thickness="small" />,
   [ButtonBlock.name]: () => <ButtonBlock settings={{}} />,
-  pageHighlight: () => <p>page_highlight</p>,
+  [HighlightBlock.name]: () => <HighlightBlock content="" />,
   imageText: () => <p>image_text</p>,
   video: () => <p>video</p>,
 } as const satisfies BlockFactory
@@ -52,7 +53,7 @@ export const blockData: BlockData[] = [
     groupName: I18n.t('Text'),
     items: [
       {itemName: TextBlock.craft.displayName, id: TextBlock.name},
-      {itemName: I18n.t('Page highlight'), id: 'pageHighlight'},
+      {itemName: HighlightBlock.craft.displayName, id: HighlightBlock.name},
       {itemName: I18n.t('Image + text'), id: 'imageText'},
     ],
   },
@@ -65,7 +66,7 @@ export const blockData: BlockData[] = [
   },
   {
     groupName: I18n.t('Highlight'),
-    items: [{itemName: I18n.t('Page highlight'), id: 'pageHighlight'}],
+    items: [{itemName: HighlightBlock.craft.displayName, id: HighlightBlock.name}],
   },
   {
     groupName: I18n.t('Multimedia'),
