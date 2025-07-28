@@ -39,6 +39,7 @@ import type {AccessibilityCheckerContextType} from '../../../contexts/Accessibil
 import {useScope as createI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {stripQueryString} from '../../../utils/query'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = createI18nScope('accessibility_checker')
 
@@ -50,6 +51,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
       const isFirstRender = useRef(true)
       const [isChecked, setChecked] = useState(false)
       const [generateLoading, setGenerateLoading] = useState(false)
+      const [generationError, setGenerationError] = useState<string | null>(null)
       const {selectedItem} = useContext(
         AccessibilityCheckerContext,
       ) as Partial<AccessibilityCheckerContextType>
@@ -101,6 +103,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
 
       const handleGenerateClick = () => {
         setGenerateLoading(true)
+        setGenerationError(null)
         doFetchApi<GenerateResponse>({
           path: `${stripQueryString(window.location.href)}/generate`,
           method: 'POST',
@@ -120,7 +123,22 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
             onChangeValue(resultJson?.value)
           })
           .catch(error => {
-            console.error('Error during generation:', error)
+            console.error('Error generating text input:', error)
+            const statusCode = error?.response?.status || 0
+
+            if (statusCode == 429) {
+              setGenerationError(
+                I18n.t(
+                  'You have exceeded your daily limit for alt text generation. (You can generate alt text for 300 images per day.) Please try again after a day, or enter alt text manually.',
+                ),
+              )
+            } else {
+              setGenerationError(
+                I18n.t(
+                  'There was an error generating alt text. Please try again, or enter it manually.',
+                ),
+              )
+            }
           })
           .finally(() => setGenerateLoading(false))
       }
@@ -141,29 +159,6 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               {issue.form.checkboxSubtext}
             </Text>
           </View>
-          <Flex as="div" justifyItems="end">
-            {generateLoading ? (
-              <Flex.Item>
-                <Spinner
-                  size="x-small"
-                  renderTitle={I18n.t('Generating...')}
-                  margin="0 small 0 0"
-                />
-              </Flex.Item>
-            ) : (
-              <></>
-            )}
-            <Flex.Item>
-              <Button
-                color="ai-primary"
-                renderIcon={() => <IconAiSolid />}
-                onClick={handleGenerateClick}
-                disabled={generateLoading}
-              >
-                {issue.form.generateButtonLabel}
-              </Button>
-            </Flex.Item>
-          </Flex>
           <View as="div" margin="small 0">
             <TextArea
               data-testid="checkbox-text-input-form"
@@ -175,7 +170,7 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               messages={error && !isChecked ? [{text: error, type: 'newError'}] : []}
             />
           </View>
-          <Flex as="div" justifyItems="space-between" margin="small 0">
+          <Flex as="div" justifyItems="space-between" margin="small small">
             <Flex.Item>
               <Text size="small" color="secondary">
                 {issue.form.inputDescription}
@@ -187,6 +182,40 @@ const CheckboxTextInput: React.FC<FormComponentProps & React.RefAttributes<FormC
               </Text>
             </Flex.Item>
           </Flex>
+          <Flex as="div" margin="small 0">
+            <Flex.Item>
+              <Button
+                color="ai-primary"
+                renderIcon={() => <IconAiSolid />}
+                onClick={handleGenerateClick}
+                disabled={generateLoading}
+              >
+                {issue.form.generateButtonLabel}
+              </Button>
+            </Flex.Item>
+            {generateLoading ? (
+              <Flex.Item>
+                <Spinner
+                  size="x-small"
+                  renderTitle={I18n.t('Generating...')}
+                  margin="0 small 0 0"
+                />
+              </Flex.Item>
+            ) : (
+              <></>
+            )}
+          </Flex>
+          {generationError !== null ? (
+            <Flex>
+              <Flex.Item>
+                <Alert variant="error" renderCloseButtonLabel="Close" timeout={5000}>
+                  {generationError}
+                </Alert>
+              </Flex.Item>
+            </Flex>
+          ) : (
+            <></>
+          )}
         </>
       )
     },

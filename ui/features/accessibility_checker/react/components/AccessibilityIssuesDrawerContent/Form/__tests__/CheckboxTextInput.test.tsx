@@ -228,11 +228,6 @@ describe('CheckboxTextInput', () => {
       },
     }
 
-    // Mock console.error to prevent test output pollution
-    const consoleSpy = jest.fn()
-    const originalConsoleError = console.error
-    console.error = consoleSpy
-
     // Mock API failure
     ;(doFetchApi as jest.Mock).mockImplementation(options => {
       // Test that the path contains "/generate"
@@ -251,16 +246,16 @@ describe('CheckboxTextInput', () => {
     const generateButton = screen.getByText('Generate Alt Text')
     fireEvent.click(generateButton)
 
-    // Wait for the async operation to complete
+    // Verify loading indicator appears
+    expect(screen.getByText('Generating...')).toBeInTheDocument()
+
+    // Wait for the loading state to be cleared after the error
     await waitFor(() => {
-      expect(consoleSpy).toHaveBeenCalledWith('Error during generation:', expect.any(Error))
+      expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
     })
 
-    // Check that loading state is cleared
-    expect(screen.queryByText('Generating...')).not.toBeInTheDocument()
-
-    // Restore the original console.error
-    console.error = originalConsoleError
+    // Verify that onChangeValue was not called (since the API failed)
+    expect(defaultProps.onChangeValue).not.toHaveBeenCalled()
   })
 
   it('does not call onReload on initial mount', () => {
