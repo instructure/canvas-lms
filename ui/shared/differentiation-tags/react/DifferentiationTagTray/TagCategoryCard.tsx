@@ -99,6 +99,7 @@ function TagCategoryCard({
         margin="small 0"
         display="block"
         borderWidth="small"
+        borderRadius="medium"
         role="group"
         aria-label={name}
       >
