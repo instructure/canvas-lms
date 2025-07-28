@@ -123,6 +123,7 @@ export const LtiPlacements = {
   WikiIndexMenu: 'wiki_index_menu',
   DefaultPlacements: 'default_placements',
   ActivityAssetProcessor: 'ActivityAssetProcessor',
+  ActivityAssetProcessorContribution: 'ActivityAssetProcessorContribution',
 } as const
 
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
@@ -133,6 +134,7 @@ export const i18nLtiPlacement = (placement: LtiPlacement): string =>
     assignment_selection: I18n.t('Assignment Selection'),
     assignment_view: I18n.t('Assignment View'),
     ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
+    ActivityAssetProcessorContribution: I18n.t('Discussions Document Processor'),
     similarity_detection: I18n.t('Similarity Detection'),
     assignment_menu: I18n.t('Assignment Menu'),
     assignment_index_menu: I18n.t('Assignments Index Menu'),

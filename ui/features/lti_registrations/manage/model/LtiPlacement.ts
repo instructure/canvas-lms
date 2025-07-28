@@ -132,6 +132,7 @@ export const LtiPlacements = {
   WikiPageMenu: 'wiki_page_menu',
   WikiIndexMenu: 'wiki_index_menu',
   ActivityAssetProcessor: 'ActivityAssetProcessor',
+  ActivityAssetProcessorContribution: 'ActivityAssetProcessorContribution',
 } as const
 
 export const AllLtiPlacements = [
@@ -175,6 +176,7 @@ export const AllLtiPlacements = [
   LtiPlacements.WikiPageMenu,
   LtiPlacements.WikiIndexMenu,
   LtiPlacements.ActivityAssetProcessor,
+  LtiPlacements.ActivityAssetProcessorContribution,
 ] as const
 
 export const InternalOnlyLtiPlacements = [

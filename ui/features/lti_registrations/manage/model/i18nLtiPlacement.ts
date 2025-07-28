@@ -63,6 +63,7 @@ export const LtiPlacementTranslations: Record<LtiPlacement, string> = {
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
   ActivityAssetProcessor: I18n.t('Assignment Document Processor'),
+  ActivityAssetProcessorContribution: I18n.t('Discussions Document Processor'),
 }
 export const i18nLtiPlacement = (placement: LtiPlacement): string =>
   LtiPlacementTranslations[placement]

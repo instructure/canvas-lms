@@ -29,6 +29,7 @@ describe('PlacementsConfirmationWrapper', () => {
     const internalConfig = mockInternalConfiguration({placements: []})
     const overlayStore = createLti1p3RegistrationOverlayStore(internalConfig, '')
     window.ENV.FEATURES.lti_asset_processor = true
+    window.ENV.FEATURES.lti_asset_processor_discussions = true
 
     render(
       <PlacementsConfirmationWrapper internalConfig={internalConfig} overlayStore={overlayStore} />,
