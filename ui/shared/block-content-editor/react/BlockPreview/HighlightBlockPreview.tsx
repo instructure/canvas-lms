@@ -22,7 +22,7 @@ import {useScope as createI18nScope} from '@canvas/i18n'
 
 const I18n = createI18nScope('page_editor')
 
-export const PageHighlightBlockPreview = () => (
+export const HighlightBlockPreview = () => (
   <BlockPreviewLayout
     image={<SVGWrapper url="/images/block-content-editor/page-highlight-no-icon.svg" />}
     title={I18n.t('Page highlight')}

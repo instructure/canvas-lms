@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from './block-preview-data'
-export * from './ButtonBlockPreview'
-export * from './ImageBlockPreview'
-export * from './ImageTextBlockPreview'
-export * from './HighlightBlockPreview'
-export * from './SeparatorLineBlockPreview'
-export * from './TextBlockPreview'
-export * from './VideoBlockPreview'
+import React from 'react'
+
+const HighlightBlockSettings = () => {
+  return <p>Highlight Block Settings</p>
+}
+
+export {HighlightBlockSettings}
