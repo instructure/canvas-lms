@@ -17,14 +17,14 @@
  */
 
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 import ProductCard from '../ProductCard'
-import type { OrganizationProduct } from '../../../models/Product' 
-import { product } from '../../common/__tests__/data'
+import type {OrganizationProduct} from '../../../models/Product'
+import {product} from '../../common/__tests__/data'
 
 // Mock the productRoute function
 jest.mock('../../../utils/routes', () => ({
-  productRoute: jest.fn((id) => `/product/${id}`),
+  productRoute: jest.fn(id => `/product/${id}`),
 }))
 
 const mockOrganizationProduct: OrganizationProduct = {
@@ -41,7 +41,7 @@ const mockOrganizationProduct: OrganizationProduct = {
       name: 'Not Approved',
       color: '#808080',
       description: 'This product is not approved',
-    }
+    },
   },
 }
 

@@ -1,4 +1,3 @@
- 
 /*
  * Copyright (C) 2025 - present Instructure, Inc.
  *
@@ -18,17 +17,17 @@
  */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import {render} from '@testing-library/react'
 import FormattedErrorMessage from '../FormattedErrorMessage'
 
 describe('FormattedErrorMessage', () => {
   it('renders the error message', () => {
-    const {getByText} = render(<FormattedErrorMessage message='Test error' margin='small' />)
+    const {getByText} = render(<FormattedErrorMessage message="Test error" margin="small" />)
     expect(getByText('Test error')).toBeInTheDocument()
   })
 
   it('renders the warning icon', () => {
-    const {getByTestId} = render(<FormattedErrorMessage message='Test error' margin='small' />)
+    const {getByTestId} = render(<FormattedErrorMessage message="Test error" margin="small" />)
     expect(getByTestId('warning-icon')).toBeInTheDocument()
   })
 })

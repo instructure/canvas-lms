@@ -46,6 +46,6 @@ describe('CreateOrEditSetModal::SelfSignup::', () => {
 
     await waitFor(() => {
       expect(onDatechangeMock).toHaveBeenCalled()
-    });
+    })
   })
 })

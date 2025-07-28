@@ -22,71 +22,80 @@ import CoursePeople from '../CoursePeople'
 import useCoursePeopleQuery from '../hooks/useCoursePeopleQuery'
 import useSearch from '../hooks/useSearch'
 import {mockUser, mockEnrollment} from '../../graphql/Mocks'
-import {
-  INACTIVE_ENROLLMENT,
-  PENDING_ENROLLMENT
-} from '../../util/constants'
+import {INACTIVE_ENROLLMENT, PENDING_ENROLLMENT} from '../../util/constants'
 import {User} from '../../types'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.mock('../hooks/useCoursePeopleQuery')
 jest.mock('../hooks/useSearch')
-jest.mock('../components/PageHeader/CoursePeopleHeader', () => () => <div data-testid="page-header" />)
+jest.mock('../components/PageHeader/CoursePeopleHeader', () => () => (
+  <div data-testid="page-header" />
+))
 jest.mock('../components/RosterTable/RosterTable', () => ({users}: {users: User[]}) => (
   <div data-testid="roster-table">RosterTable: {users.map(user => user._id).join(',')}</div>
 ))
-jest.mock('../components/SearchPeople/PeopleSearchBar', () => ({searchTerm}: {searchTerm: string}) => (
-  <div data-testid="search-bar">SearchBar: {searchTerm}</div>
+jest.mock(
+  '../components/SearchPeople/PeopleSearchBar',
+  () =>
+    ({searchTerm}: {searchTerm: string}) => (
+      <div data-testid="search-bar">SearchBar: {searchTerm}</div>
+    ),
+)
+jest.mock(
+  '../components/FilterPeople/PeopleFilter',
+  () =>
+    ({onOptionSelect}: {onOptionSelect: (id: string) => void}) => (
+      <div
+        data-testid="people-filter"
+        role="button"
+        tabIndex={0}
+        onClick={() => onOptionSelect('test-id')}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            onOptionSelect('test-id')
+          }
+        }}
+      >
+        PeopleFilter
+      </div>
+    ),
+)
+jest.mock('../components/SearchPeople/NoPeopleFound', () => () => (
+  <div data-testid="no-people-found" />
 ))
-jest.mock('../components/FilterPeople/PeopleFilter', () => ({onOptionSelect}: {onOptionSelect: (id: string) => void}) => (
-  <div
-    data-testid="people-filter"
-    role="button"
-    tabIndex={0}
-    onClick={() => onOptionSelect('test-id')}
-    onKeyDown={(e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        onOptionSelect('test-id')
-      }
-    }}
-  >
-    PeopleFilter
-  </div>
-))
-jest.mock('../components/SearchPeople/NoPeopleFound', () => () => <div data-testid="no-people-found" />)
 
 const mockUsers = [
   mockUser({
     userId: '1',
-    userName: 'Student One'
+    userName: 'Student One',
   }),
   mockUser({
     userId: '2',
     userName: 'Student Two',
-    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: INACTIVE_ENROLLMENT}),
   }),
   mockUser({
     userId: '3',
     userName: 'Student Three',
-    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT})
+    firstEnrollment: mockEnrollment({enrollmentState: PENDING_ENROLLMENT}),
   }),
 ]
 
 describe('CoursePeople', () => {
   beforeEach(() => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: mockUsers,
       isLoading: false,
-      error: null
-    });
-    (useSearch as jest.Mock).mockImplementation(() => ({
+      error: null,
+    })
+    ;(useSearch as jest.Mock).mockImplementation(() => ({
       search: 'test user',
       debouncedSearch: 'test user',
       onChangeHandler: jest.fn(),
       onClearHandler: jest.fn(),
-    }));
-    (showFlashAlert as jest.Mock).mockClear()
+    }))
+    ;(showFlashAlert as jest.Mock).mockClear()
   })
 
   afterEach(() => {
@@ -102,10 +111,10 @@ describe('CoursePeople', () => {
   })
 
   it('renders NoPeopleFound component if no people', () => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: [],
       isLoading: false,
-      error: null
+      error: null,
     })
     const {getByTestId} = render(<CoursePeople />)
     expect(getByTestId('no-people-found')).toBeInTheDocument()
@@ -129,8 +138,8 @@ describe('CoursePeople', () => {
     filter.click()
     expect(useCoursePeopleQuery).toHaveBeenCalledWith(
       expect.objectContaining({
-        optionId: 'test-id'
-      })
+        optionId: 'test-id',
+      }),
     )
   })
 
@@ -138,31 +147,33 @@ describe('CoursePeople', () => {
     render(<CoursePeople />)
     expect(useCoursePeopleQuery).toHaveBeenCalledWith(
       expect.objectContaining({
-        searchTerm: 'test user'
-      })
+        searchTerm: 'test user',
+      }),
     )
   })
 
   it('displays loading state', () => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: null,
       isLoading: true,
-      error: null
+      error: null,
     })
     const {getByText} = render(<CoursePeople />)
     expect(getByText('Loading')).toBeInTheDocument()
   })
 
   it('displays flash error message if query fails', () => {
-    (useCoursePeopleQuery as jest.Mock).mockReturnValue({
+    ;(useCoursePeopleQuery as jest.Mock).mockReturnValue({
       data: null,
       isLoading: false,
-      error: new Error()
+      error: new Error(),
     })
     render(<CoursePeople />)
-    expect(showFlashAlert).toHaveBeenCalledWith(expect.objectContaining({
-      message: 'An error occurred while loading people.',
-      type: 'error'
-    }))
+    expect(showFlashAlert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'An error occurred while loading people.',
+        type: 'error',
+      }),
+    )
   })
 })

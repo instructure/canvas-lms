@@ -338,7 +338,7 @@ describe('OutcomeView', () => {
       view.$('#title').val('this is a brand new title')
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(() => {
           expect($('.confirm-outcome-edit-modal-container').length).toBeGreaterThan(0)
@@ -365,7 +365,7 @@ describe('OutcomeView', () => {
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')
@@ -391,7 +391,7 @@ describe('OutcomeView', () => {
       view.on('submit', submitSpy)
       view.$('form').trigger('submit')
       await waitFrames(10)
-      
+
       return new Promise(resolve => {
         setTimeout(async () => {
           $('#confirm-outcome-edit-modal').trigger('click')

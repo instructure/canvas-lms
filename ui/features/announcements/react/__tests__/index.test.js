@@ -40,7 +40,7 @@ describe('Announcements app', () => {
   it('renders the Announcements component', async () => {
     app = createAnnIndex(container, {})
     app.render()
-    
+
     await waitFor(() => {
       expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
     })
@@ -49,11 +49,11 @@ describe('Announcements app', () => {
   it('unmounts the Announcements component', async () => {
     app = createAnnIndex(container, {})
     app.render()
-    
+
     await waitFor(() => {
       expect(container.querySelector('.announcements-v2__wrapper')).toBeInTheDocument()
     })
-    
+
     app.unmount()
     expect(container.querySelector('.announcements-v2__wrapper')).not.toBeInTheDocument()
   })

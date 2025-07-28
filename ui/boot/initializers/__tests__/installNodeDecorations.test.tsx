@@ -50,7 +50,7 @@ describe('up() installer', () => {
   it('is idempotent and defines the innerText property at most once', () => {
     // Our initializers are automagically run by Jest, so assert the state we expect.
     expect(typeof Object.getOwnPropertyDescriptor(Node.prototype, 'innerText')!.get).toBe(
-      'function'
+      'function',
     )
 
     expect(() => up()).not.toThrow()

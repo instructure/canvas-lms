@@ -35,7 +35,7 @@ import {
   PACE_MODULE_1,
   PACE_MODULE_2,
   SECTION_PACE,
-  STUDENT_PACE
+  STUDENT_PACE,
 } from '../../__tests__/fixtures'
 
 const newbod1: BlackoutDate = {
@@ -330,11 +330,10 @@ describe('course_paces reducer', () => {
   })
 
   describe('getModuleItems', () => {
-
     const modules: Module[] = [
       {
         ...PACE_MODULE_1,
-        items : [
+        items: [
           {
             ...PACE_ITEM_1,
             id: '3',
@@ -349,12 +348,12 @@ describe('course_paces reducer', () => {
             ...PACE_ITEM_3,
             id: '2',
             position: 2,
-          }
-        ]
+          },
+        ],
       },
       {
         ...PACE_MODULE_2,
-        items : [
+        items: [
           {
             ...PACE_ITEM_4,
             id: '5',
@@ -364,12 +363,12 @@ describe('course_paces reducer', () => {
             ...PACE_ITEM_1,
             id: '4',
             position: 1,
-          }
-        ]
+          },
+        ],
       },
     ]
 
-    it('return module items ordered by position',() => {
+    it('return module items ordered by position', () => {
       const result = getModuleItems(modules)
       expect(result.map(item => item.id)).toEqual(['1', '2', '3', '4', '5'])
     })

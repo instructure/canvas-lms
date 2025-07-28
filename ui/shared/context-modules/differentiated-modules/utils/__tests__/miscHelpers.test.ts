@@ -141,7 +141,6 @@ describe('convertModuleSettingsForApi', () => {
     })
   })
 
-
   it('excludes unlockAt if lockUntilChecked is false', () => {
     const formattedSettings = convertModuleSettingsForApi({
       ...moduleSettings,

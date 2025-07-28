@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import { render, screen } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import {render, screen} from '@testing-library/react'
+import {Provider} from 'react-redux'
+import {createStore} from 'redux'
 import BulkEditStudentPaces from '../bulk_edit_students'
 
 // Define a simple reducer that mimics the expected state shape
-const reducer = (state = { ui: { bulkEditModalOpen: false, selectedBulkStudents: [] } }) => state
+const reducer = (state = {ui: {bulkEditModalOpen: false, selectedBulkStudents: []}}) => state
 const store = createStore(reducer)
 
 const openModal = jest.fn()
@@ -45,7 +45,7 @@ describe('BulkEditStudentPaces', () => {
     render(
       <Provider store={store}>
         <BulkEditStudentPaces {...defaultProps} />
-      </Provider>
+      </Provider>,
     )
 
     const bulkEditButton = screen.getByTestId('bulk-edit-student-paces-button')

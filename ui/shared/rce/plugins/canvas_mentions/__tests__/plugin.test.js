@@ -18,18 +18,13 @@
 
 import tinymce from '@instructure/canvas-rce/es/rce/tinyRCE'
 import * as plugin from '../plugin'
-import {
-  onKeyDown,
-  onKeyUp,
-  onSetContent,
-  onMouseDown
-} from '../events'
+import {onKeyDown, onKeyUp, onSetContent, onMouseDown} from '../events'
 
 jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   create: jest.fn(),
   PluginManager: {
     add: jest.fn(),
-  }
+  },
 }))
 
 afterEach(() => {
@@ -46,10 +41,9 @@ describe('plugin', () => {
   })
 })
 
-
 describe('CanvasMentionsPlugin', () => {
   const onMethod = jest.fn()
-  const editor = { on : onMethod }
+  const editor = {on: onMethod}
 
   it('register onInputChange for "input" event', () => {
     plugin.CanvasMentionsPlugin(editor)

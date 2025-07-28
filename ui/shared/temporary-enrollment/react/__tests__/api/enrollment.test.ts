@@ -74,14 +74,12 @@ describe('enrollment api', () => {
     })
 
     beforeAll(() => {
-       
       originalConsoleError = console.error
-       
+
       console.error = mockConsoleError
     })
 
     afterAll(() => {
-       
       console.error = originalConsoleError
     })
 

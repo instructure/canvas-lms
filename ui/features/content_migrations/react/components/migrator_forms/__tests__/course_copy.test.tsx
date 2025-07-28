@@ -150,7 +150,7 @@ describe('CourseCopyImporter', () => {
   })
 
   it('Does not renders BP settings import option when the destination course is marked ineligible', async () => {
-    fakeENV.setup({...defaultEnv, SHOW_BP_SETTINGS_IMPORT_OPTION: false,})
+    fakeENV.setup({...defaultEnv, SHOW_BP_SETTINGS_IMPORT_OPTION: false})
     const {getByRole, findByText, queryByText} = renderComponent()
     await userEvent.type(getByRole('combobox', {name: searchForACourse}), 'math')
     await waitFor(async () => {
@@ -264,11 +264,13 @@ describe('CourseCopyImporter', () => {
         await waitFor(() => expect(getByRole('combobox', {name: selectACourse})).toBeEnabled())
         await userEvent.click(getByRole('combobox', {name: selectACourse}))
 
-        const defaultTermGroup = getByRole('group', { name: /Default term/ })
+        const defaultTermGroup = getByRole('group', {name: /Default term/})
         expect(defaultTermGroup).toBeInTheDocument()
-        expect(within(defaultTermGroup).getByRole('option', {name: /Mathmatics/})).toBeInTheDocument()
+        expect(
+          within(defaultTermGroup).getByRole('option', {name: /Mathmatics/}),
+        ).toBeInTheDocument()
 
-        const otherTermGroup = getByRole('group', { name: /Other term/ })
+        const otherTermGroup = getByRole('group', {name: /Other term/})
         expect(otherTermGroup).toBeInTheDocument()
         expect(within(otherTermGroup).getByRole('option', {name: /Biology/})).toBeInTheDocument()
       })
@@ -287,15 +289,19 @@ describe('CourseCopyImporter', () => {
 
         it('should set the same value for dropdown on search change', async () => {
           const component = await populateSearchField()
-          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
-            .toBe('Mathmatics')
+          expect(
+            (component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement)
+              .value,
+          ).toBe('Mathmatics')
         })
 
         it('should clear the dropdown on search field change', async () => {
           const component = await populateSearchField()
           await userEvent.type(component.getByRole('combobox', {name: searchForACourse}), 'invalid')
-          expect((component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement).value)
-            .toBe('')
+          expect(
+            (component.getByTestId('course-copy-select-preloaded-courses') as HTMLInputElement)
+              .value,
+          ).toBe('')
         })
 
         it('should throw invalid message on empty selected course', async () => {
@@ -304,7 +310,9 @@ describe('CourseCopyImporter', () => {
           await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
 
           await waitFor(() => {
-            expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+            expect(
+              component.queryAllByText(/You must select a course to copy content from/),
+            ).toHaveLength(2)
           })
           expect(onSubmit).not.toHaveBeenCalled()
         })
@@ -335,22 +343,25 @@ describe('CourseCopyImporter', () => {
 
         it('should set the same value for search field on dropdown change', async () => {
           const component = await openPreloadedCoursesDropdown()
-          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
-          expect((component.getByTestId('course-copy-select-course') as HTMLInputElement).value)
-            .toBe('Mathmatics')
+          await userEvent.click(component.getByRole('option', {name: /Mathmatics/}))
+          expect(
+            (component.getByTestId('course-copy-select-course') as HTMLInputElement).value,
+          ).toBe('Mathmatics')
         })
 
         it('should throw invalid message on empty selected course', async () => {
           const component = await openPreloadedCoursesDropdown()
           await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
 
-          expect(component.queryAllByText(/You must select a course to copy content from/)).toHaveLength(2)
+          expect(
+            component.queryAllByText(/You must select a course to copy content from/),
+          ).toHaveLength(2)
           expect(onSubmit).not.toHaveBeenCalled()
         })
 
         it('should send the selected course in submit', async () => {
           const component = await openPreloadedCoursesDropdown()
-          await userEvent.click(component.getByRole('option', { name: /Mathmatics/ }))
+          await userEvent.click(component.getByRole('option', {name: /Mathmatics/}))
           await userEvent.click(component.getByRole('button', {name: addToImportQueue}))
 
           expect(onSubmit).toHaveBeenCalledWith(
@@ -403,13 +414,12 @@ describe('CourseCopyImporter', () => {
     it('includes current_course_id in composeManageableCourseURL when ENV.COURSE_ID is set', async () => {
       fakeENV.setup({
         ...defaultEnv,
-        COURSE_ID: '123'
+        COURSE_ID: '123',
       })
 
       renderComponent()
 
       await userEvent.type(screen.getByTestId('course-copy-select-course'), 'coursetest')
-
 
       await waitFor(() => {
         expect(doFetchApi).toHaveBeenCalledWith({

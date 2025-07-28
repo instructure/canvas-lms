@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { renderConnected } from '../../../__tests__/utils'
+import {renderConnected} from '../../../__tests__/utils'
 import '@testing-library/jest-dom'
 import CourseStats from '../CourseStats'
 
@@ -25,9 +25,9 @@ import {
   BLACKOUT_DATES,
   COURSE_PACE_CONTEXT,
   DEFAULT_STORE_STATE,
-  PRIMARY_PACE
+  PRIMARY_PACE,
 } from '../../../__tests__/fixtures'
-import { StoreState } from '../../../types'
+import {StoreState} from '../../../types'
 
 describe('Pace Modal CourseStats', () => {
   it('Course Pace in Draft status', () => {
@@ -36,34 +36,37 @@ describe('Pace Modal CourseStats', () => {
       original: {
         coursePace: {
           ...PRIMARY_PACE,
-          workflow_state: 'unpublished'
+          workflow_state: 'unpublished',
         },
-        blackoutDates: BLACKOUT_DATES
-      }
+        blackoutDates: BLACKOUT_DATES,
+      },
     }
 
-    const { getByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />, defaultStoreState)
+    const {getByTestId} = renderConnected(
+      <CourseStats paceContext={COURSE_PACE_CONTEXT} />,
+      defaultStoreState,
+    )
     const draftStatusElement = getByTestId('status-draft')
 
     expect(draftStatusElement).toBeInTheDocument()
   })
 
   it('Course Pace not in Draft status', () => {
-    const { queryByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
+    const {queryByTestId} = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
     const draftStatusElement = queryByTestId('status-draft')
 
     expect(draftStatusElement).not.toBeInTheDocument()
   })
 
   it('Assignment count is shown correctly', () => {
-    const { getByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
+    const {getByTestId} = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
     const assignmentsCountElement = getByTestId('assignments-count')
 
     expect(assignmentsCountElement.textContent).toBe('Assignment Count:3')
   })
 
   it('Students Enrolled count is shown correctly', () => {
-    const { getByTestId } = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
+    const {getByTestId} = renderConnected(<CourseStats paceContext={COURSE_PACE_CONTEXT} />)
     const assignmentsCountElement = getByTestId('student-enrollment-count')
 
     expect(assignmentsCountElement.textContent).toBe('Students Enrolled:31')

@@ -51,7 +51,7 @@ const defaultProps: ResponsiveComponentProps = {
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
   setOuterResponsiveSize: jest.fn(),
-  isBulkEnrollment: false
+  isBulkEnrollment: false,
 }
 
 afterEach(() => {
@@ -88,7 +88,9 @@ describe('PaceModal', () => {
     })
 
     it('Time selection section is shown', () => {
-      const {getByTestId} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
+      const {getByTestId} = renderConnected(
+        <PaceModal {...defaultProps} coursePace={STUDENT_PACE} />,
+      )
       expect(getByTestId('time-selection-section')).toBeInTheDocument()
     })
   })
@@ -100,7 +102,9 @@ describe('PaceModal', () => {
     })
 
     it('set weighted assignment duration tray is shown', () => {
-      const {getByTestId, getByRole} = renderConnected(<PaceModal {...defaultProps} coursePace={STUDENT_PACE} />)
+      const {getByTestId, getByRole} = renderConnected(
+        <PaceModal {...defaultProps} coursePace={STUDENT_PACE} />,
+      )
 
       const settingsButton = getByRole('button', {name: 'Settings'})
       act(() => settingsButton.click())

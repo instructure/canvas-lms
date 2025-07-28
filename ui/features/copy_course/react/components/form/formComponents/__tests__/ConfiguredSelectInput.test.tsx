@@ -84,13 +84,13 @@ describe('ConfiguredSelectInput', () => {
   })
 
   it('renders Select with filtered options when typing', async () => {
-    const { getByLabelText, queryByText } = renderConfiguredSelectInput({
+    const {getByLabelText, queryByText} = renderConfiguredSelectInput({
       searchable: true,
-      defaultInputValue: ''
+      defaultInputValue: '',
     })
 
     fireEvent.click(getByLabelText(label))
-    fireEvent.change(getByLabelText(label), { target: { value: 'Option 2' } })
+    fireEvent.change(getByLabelText(label), {target: {value: 'Option 2'}})
 
     await waitFor(() => {
       expect(queryByText('Option 2')).toBeInTheDocument()
@@ -101,10 +101,10 @@ describe('ConfiguredSelectInput', () => {
 
   it('selects an option when clicked and calls onSelect', () => {
     const onSelect = jest.fn()
-    const { getByLabelText, getByText, getByDisplayValue } = renderConfiguredSelectInput({
+    const {getByLabelText, getByText, getByDisplayValue} = renderConfiguredSelectInput({
       searchable: true,
       defaultInputValue: '',
-      onSelect
+      onSelect,
     })
 
     fireEvent.click(getByLabelText(label))
@@ -116,10 +116,10 @@ describe('ConfiguredSelectInput', () => {
 
   it('automatically selects first option if no defaultInputValue is provided', () => {
     const onSelect = jest.fn()
-    const { getByDisplayValue } = renderConfiguredSelectInput({
+    const {getByDisplayValue} = renderConfiguredSelectInput({
       searchable: true,
       defaultInputValue: undefined,
-      onSelect
+      onSelect,
     })
 
     expect(getByDisplayValue('Option 1')).toBeInTheDocument()
@@ -127,12 +127,12 @@ describe('ConfiguredSelectInput', () => {
   })
 
   it('shows "No results" if filtering returns nothing', async () => {
-    const { getByLabelText, findByText } = renderConfiguredSelectInput({
+    const {getByLabelText, findByText} = renderConfiguredSelectInput({
       searchable: true,
-      defaultInputValue: ''
+      defaultInputValue: '',
     })
 
-    fireEvent.change(getByLabelText(label), { target: { value: 'Not an option' } })
+    fireEvent.change(getByLabelText(label), {target: {value: 'Not an option'}})
     expect(await findByText('No results')).toBeInTheDocument()
   })
 
@@ -145,16 +145,16 @@ describe('ConfiguredSelectInput', () => {
     }
 
     const groupedOptions = [
-      { id: '1', name: 'Active Term', startAt: makeDate(-1), endAt: makeDate(1) },
-      { id: '2', name: 'Future Term', startAt: makeDate(5), endAt: makeDate(10) },
-      { id: '3', name: 'Past Term', startAt: makeDate(-10), endAt: makeDate(-5) },
-      { id: '4', name: 'Unscheduled Term' }
+      {id: '1', name: 'Active Term', startAt: makeDate(-1), endAt: makeDate(1)},
+      {id: '2', name: 'Future Term', startAt: makeDate(5), endAt: makeDate(10)},
+      {id: '3', name: 'Past Term', startAt: makeDate(-10), endAt: makeDate(-5)},
+      {id: '4', name: 'Unscheduled Term'},
     ]
 
-    const { getByLabelText, getByText } = renderConfiguredSelectInput({
+    const {getByLabelText, getByText} = renderConfiguredSelectInput({
       options: groupedOptions,
       defaultInputValue: '',
-      searchable: true
+      searchable: true,
     })
 
     fireEvent.click(getByLabelText(label))
@@ -171,5 +171,4 @@ describe('ConfiguredSelectInput', () => {
     expect(getByText('Past Term')).toBeInTheDocument()
     expect(getByText('Unscheduled Term')).toBeInTheDocument()
   })
-
 })

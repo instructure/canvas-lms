@@ -31,7 +31,7 @@ const allRoles = [
 ]
 
 const useCoursePeopleContextMocks = {
-  allRoles
+  allRoles,
 }
 
 describe('PeopleFilter', () => {
@@ -46,14 +46,14 @@ describe('PeopleFilter', () => {
   const renderComponent = () => render(<PeopleFilter {...defaultProps} />)
 
   const labelWithCount = (role: EnvRole) =>
-    role.id === defaultRole.id
-      ? role.label
-      : `${role.label} (${role.count})`
+    role.id === defaultRole.id ? role.label : `${role.label} (${role.count})`
 
   const otherLabel = labelWithCount(otherRole)
 
   beforeEach(() => {
-    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(useCoursePeopleContextMocks)
+    require('../../../hooks/useCoursePeopleContext').default.mockReturnValue(
+      useCoursePeopleContextMocks,
+    )
     renderComponent()
   })
 
@@ -72,9 +72,7 @@ describe('PeopleFilter', () => {
   it('shows options when clicked', async () => {
     await user.click(screen.getByLabelText('Filter by role'))
     await waitFor(() => {
-      const options = filterOptions.map(role =>
-        screen.getByText(labelWithCount(role))
-      )
+      const options = filterOptions.map(role => screen.getByText(labelWithCount(role)))
       expect(options).toHaveLength(filterOptions.length)
     })
   })

@@ -206,7 +206,10 @@ describe('ZipFileImporter', () => {
           expect(screen.getByText('Upload to')).toBeInTheDocument()
         })
         await userEvent.click(screen.getByText('course files'))
-        await userEvent.type(screen.getByPlaceholderText('Search for a folder or file name...'), searchTerm)
+        await userEvent.type(
+          screen.getByPlaceholderText('Search for a folder or file name...'),
+          searchTerm,
+        )
         await userEvent.click(screen.getByRole('button', {name: 'Search', hidden: true}))
       }
       let container: HTMLElement
@@ -214,7 +217,7 @@ describe('ZipFileImporter', () => {
         politeness: 'polite',
         message: `Folder Tree Results Updated Below for ${keyword}`,
         srOnly: true,
-        type: "info",
+        type: 'info',
       })
       beforeEach(async () => {
         const wrapper = renderComponent()

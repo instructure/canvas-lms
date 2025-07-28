@@ -28,6 +28,8 @@ import type {Tool} from '@canvas/global/env/EnvCommon'
 
 describe('TopNavigationTools', () => {
   it('renders pinned tools as icon buttons and unpinned tools in menu', async () => {
+    jest.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -66,6 +68,8 @@ describe('TopNavigationTools', () => {
     // Menu should contain one MenuItem for unpinned tool
     const menuItem = getByRole('menuitem', {name: /Tool 2/})
     expect(menuItem).toBeInTheDocument()
+
+    jest.useFakeTimers()
   })
 
   it('renders empty container when no tools provided', () => {
@@ -81,6 +85,8 @@ describe('TopNavigationTools', () => {
   })
 
   it('renders all tools in menu when no tools are pinned', async () => {
+    jest.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -117,11 +123,15 @@ describe('TopNavigationTools', () => {
     // Menu should contain MenuItems for both tools
     expect(getByRole('menuitem', {name: /Tool 1/})).toBeInTheDocument()
     expect(getByRole('menuitem', {name: /Tool 2/})).toBeInTheDocument()
+
+    jest.useFakeTimers()
   })
 })
 
 describe('MobileTopNavigationTools', () => {
   it('renders all tools in a single menu with pinned tools at top', async () => {
+    jest.useRealTimers()
+
     const tools = [
       {
         id: '1',
@@ -159,11 +169,15 @@ describe('MobileTopNavigationTools', () => {
 
     // Should have a separator between pinned and unpinned tools
     expect(getByRole('presentation')).toBeInTheDocument()
+
+    jest.useFakeTimers()
   })
 })
 
 describe('handleToolClick', () => {
   it('finds tool', async () => {
+    jest.useRealTimers()
+
     const tool = {
       id: '1',
       title: 'Tool 1',
@@ -180,6 +194,8 @@ describe('handleToolClick', () => {
     const toolButton = getByRole('button', {name: /Tool 1/})
     await user.click(toolButton)
     expect(handleToolLaunch).toHaveBeenCalledWith(tool)
+
+    jest.useFakeTimers()
   })
 })
 
